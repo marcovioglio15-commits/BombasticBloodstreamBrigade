@@ -108,6 +108,17 @@ public sealed class HUDGrowthSequenceSection
     }
 
     /// <summary>
+    /// Hides the growth sequence when the player is already at the configured level cap.
+    /// </summary>
+    public void HandleLevelCapReached()
+    {
+        if (!isEnabled)
+            return;
+
+        HideAllSlots();
+    }
+
+    /// <summary>
     /// Updates the growth sequence slots from ECS config and player progression state.
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read player and visual config data.</param>

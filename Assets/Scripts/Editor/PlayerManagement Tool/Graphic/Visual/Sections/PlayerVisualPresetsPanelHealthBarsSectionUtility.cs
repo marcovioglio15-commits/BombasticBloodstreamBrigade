@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds scalable and conditionally visible Player Visual Preset controls for the health and shield syringe HUD.
+/// Builds scalable and conditionally visible Player Visual Preset controls for health, shield, and experience syringe HUD views.
 /// </summary>
 internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 {
@@ -12,16 +12,16 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the complete Health Bars visual-preset subsection.
+    /// Builds the complete Health Bars & Experience visual-preset subsection.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized authoring data.</param>
     /// <returns>Configured Health Bars subsection.</returns>
     public static VisualElement Build(PlayerVisualPresetsPanel panel)
     {
-        Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Health Bars",
-                                                                        "NashCore.PlayerManagement.Visual.HealthBars",
+        Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Health Bars & Experience",
+                                                                        "NashCore.PlayerManagement.Visual.HealthBarsExperience",
                                                                         true);
-        root.tooltip = "Configures the ECS-authoritative procedural health and shield syringe HUD.";
+        root.tooltip = "Configures the ECS-authoritative procedural health, shield, and independent experience syringe HUD.";
 
         if (panel == null || panel.PresetSerializedObject == null)
             return root;
@@ -40,11 +40,9 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         SerializedProperty enabled = settings.FindPropertyRelative("enabled");
         VisualElement details = new VisualElement();
         VisualElement warnings = new VisualElement();
-        AddField(root, enabled, scalingRules, "Enabled", "Enables both ECS-authoritative syringe HUD views.");
-        BuildGeneral(details, settings, scalingRules);
-        BuildGeometryAndGraduation(details, settings, scalingRules);
-        BuildChannel(details, settings.FindPropertyRelative("health"), scalingRules, "Health Syringe", "Health");
-        BuildChannel(details, settings.FindPropertyRelative("shield"), scalingRules, "Shield Syringe", "Shield");
+        AddField(root, enabled, scalingRules, "Enabled", "Enables the ECS-authoritative health, shield, and experience syringe HUD views.");
+        BuildHealthBarsSection(details, settings, scalingRules);
+        BuildExperienceSection(details, settings, scalingRules);
         root.Add(details);
         root.Add(warnings);
 
@@ -59,14 +57,17 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         TrackRefresh(root, settings.FindPropertyRelative("maximumLabelCount"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("labelMinimumSpacing"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("graduationEndPadding"), Refresh);
+        TrackRefresh(root, settings.FindPropertyRelative("terminationEnabled"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("terminationOffset"), Refresh);
         TrackRefresh(root, settings.FindPropertyRelative("fontAsset"), Refresh);
+        TrackRefresh(root, settings.FindPropertyRelative("experiencePalettePreset"), Refresh);
         SerializedProperty paintDrips = settings.FindPropertyRelative("paintDrips");
         TrackRefresh(root, paintDrips.FindPropertyRelative("enabled"), Refresh);
         TrackRefresh(root, paintDrips.FindPropertyRelative("density"), Refresh);
         TrackRefresh(root, paintDrips.FindPropertyRelative("length"), Refresh);
         TrackRefresh(root, paintDrips.FindPropertyRelative("width"), Refresh);
         TrackRefresh(root, paintDrips.FindPropertyRelative("irregularity"), Refresh);
+        TrackShapeRefresh(root, settings.FindPropertyRelative("experienceShape"), Refresh);
         return root;
 
         void Refresh()
@@ -79,6 +80,107 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 
     #region Section Construction
     /// <summary>
+    /// Builds the health and shield syringe controls under their own root foldout.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the health-bars foldout.</param>
+    /// <param name="settings">Serialized Health Bars settings root.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    private static void BuildHealthBarsSection(VisualElement parent,
+                                               SerializedProperty settings,
+                                               SerializedProperty scalingRules)
+    {
+        Foldout foldout = CreateFoldout("Health Bars", "HealthBars");
+        BuildGeneral(foldout, settings, scalingRules);
+        BuildGeometryAndGraduation(foldout, settings, scalingRules);
+        BuildChannel(foldout, settings.FindPropertyRelative("health"), scalingRules, "Health Syringe", "Health");
+        BuildChannel(foldout, settings.FindPropertyRelative("shield"), scalingRules, "Shield Syringe", "Shield");
+        parent.Add(foldout);
+    }
+
+    /// <summary>
+    /// Builds the independent experience syringe controls under a sibling foldout.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the experience foldout.</param>
+    /// <param name="settings">Serialized Health Bars settings root.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    private static void BuildExperienceSection(VisualElement parent,
+                                               SerializedProperty settings,
+                                               SerializedProperty scalingRules)
+    {
+        Foldout foldout = CreateFoldout("Experience Syringe", "Experience");
+        SerializedProperty channel = settings.FindPropertyRelative("experience");
+        SerializedProperty shape = settings.FindPropertyRelative("experienceShape");
+
+        if (channel == null || shape == null)
+        {
+            foldout.Add(new HelpBox("Experience syringe settings are missing.", HelpBoxMessageType.Warning));
+            parent.Add(foldout);
+            return;
+        }
+
+        SerializedProperty enabled = channel.FindPropertyRelative("enabled");
+        SerializedProperty sloshBubblesOnly = channel.FindPropertyRelative("sloshAffectsBubblesOnly");
+        VisualElement details = new VisualElement();
+        BuildExperienceGeneric(foldout, settings, channel, scalingRules);
+        BuildSilhouette(details, shape, scalingRules, "Experience.Silhouette");
+        BuildGraduation(details, shape, scalingRules, "Experience.Graduation");
+        BuildPaintDrips(details,
+                        shape.FindPropertyRelative("paintDrips"),
+                        scalingRules,
+                        "Experience.PaintDrips");
+        BuildPalette(details, channel.FindPropertyRelative("palette"), scalingRules, "Experience");
+        BuildOutlineStyle(details, channel.FindPropertyRelative("outlineStyle"), scalingRules, "Experience");
+        BuildFluid(details, channel.FindPropertyRelative("fluid"), scalingRules, "Experience", sloshBubblesOnly);
+        BuildMotion(details, channel.FindPropertyRelative("motion"), scalingRules, "Experience", sloshBubblesOnly);
+        foldout.Add(details);
+        parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
+    /// Builds the experience channel generic controls without nesting them inside the health-bars dropdown.
+    /// </summary>
+    /// <param name="parent">Experience foldout receiving the generic subsection.</param>
+    /// <param name="settings">Serialized Health Bars settings root.</param>
+    /// <param name="channel">Serialized Experience channel settings.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    private static void BuildExperienceGeneric(VisualElement parent,
+                                               SerializedProperty settings,
+                                               SerializedProperty channel,
+                                               SerializedProperty scalingRules)
+    {
+        Foldout foldout = CreateFoldout("Generic", "Experience.Generic");
+        SerializedProperty enabled = channel.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Enables the player experience syringe channel.");
+        AddField(details,
+                 settings.FindPropertyRelative("experiencePalettePreset"),
+                 scalingRules,
+                 "Experience Palette Preset",
+                 "Scalable built-in palette token for explicit preset formulas; the Direct Palette section below is otherwise the baked runtime palette.");
+        AddField(details, channel.FindPropertyRelative("hideWhenMaximumUnavailable"), scalingRules, "Hide When Maximum Unavailable", "Hides the experience syringe when its authoritative maximum is zero or negative.");
+        AddField(details, channel.FindPropertyRelative("smoothingSeconds"), scalingRules, "Smoothing Seconds", "Seconds used to move the displayed experience liquid boundary and plunger toward the authoritative value. Set zero for immediate movement.");
+        AddField(details, channel.FindPropertyRelative("sloshAffectsBubblesOnly"), scalingRules, "Slosh Affects Bubbles Only", "Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current experience value.");
+        foldout.Add(details);
+        parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
     /// Builds shared health-bar visibility and layout controls.
     /// </summary>
     /// <param name="parent">Parent container receiving the foldout.</param>
@@ -89,13 +191,13 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
                                      SerializedProperty scalingRules)
     {
         Foldout foldout = CreateFoldout("General", "General");
-        AddField(foldout, settings.FindPropertyRelative("hideWhenPlayerMissing"), scalingRules, "Hide When Player Missing", "Hides both syringe views while no valid player entity is available.");
-        AddField(foldout, settings.FindPropertyRelative("verticalSpacing"), scalingRules, "Vertical Spacing", "Vertical pixel spacing between health and shield syringe roots.");
+        AddField(foldout, settings.FindPropertyRelative("hideWhenPlayerMissing"), scalingRules, "Hide When Player Missing", "Hides every syringe view while no valid player entity is available.");
+        AddField(foldout, settings.FindPropertyRelative("verticalSpacing"), scalingRules, "Vertical Spacing", "Vertical pixel spacing between health, shield, and experience syringe roots.");
         parent.Add(foldout);
     }
 
     /// <summary>
-    /// Builds shared fixed-unit graduation, label, and procedural geometry controls.
+    /// Builds health and shield fixed-unit graduation, label, and procedural geometry controls.
     /// </summary>
     /// <param name="parent">Parent container receiving the foldout.</param>
     /// <param name="settings">Serialized Health Bars settings root.</param>
@@ -104,10 +206,10 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
                                                    SerializedProperty settings,
                                                    SerializedProperty scalingRules)
     {
-        Foldout foldout = CreateFoldout("Geometry and Fixed-Unit Graduation", "GeometryGraduation");
-        BuildSilhouette(foldout, settings, scalingRules);
-        BuildGraduation(foldout, settings, scalingRules);
-        BuildPaintDrips(foldout, settings.FindPropertyRelative("paintDrips"), scalingRules);
+        Foldout foldout = CreateFoldout("Health and Shield Geometry and Graduation", "GeometryGraduation");
+        BuildSilhouette(foldout, settings, scalingRules, "GeometryGraduation.Silhouette");
+        BuildGraduation(foldout, settings, scalingRules, "GeometryGraduation.Graduation");
+        BuildPaintDrips(foldout, settings.FindPropertyRelative("paintDrips"), scalingRules, "GeometryGraduation.PaintDrips");
         parent.Add(foldout);
     }
 
@@ -119,12 +221,15 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     private static void BuildSilhouette(VisualElement parent,
                                         SerializedProperty settings,
-                                        SerializedProperty scalingRules)
+                                        SerializedProperty scalingRules,
+                                        string stateSuffix)
     {
-        Foldout foldout = CreateFoldout("Silhouette", "GeometryGraduation.Silhouette");
+        Foldout foldout = CreateFoldout("Silhouette", stateSuffix);
         SerializedProperty bodyStyle = settings.FindPropertyRelative("bodyStyle");
         SerializedProperty plungerWidth = settings.FindPropertyRelative("plungerWidth");
+        SerializedProperty terminationEnabled = settings.FindPropertyRelative("terminationEnabled");
         VisualElement simplifiedDetails = new VisualElement();
+        VisualElement terminationDetails = new VisualElement();
         VisualElement plungerDetails = new VisualElement();
         AddField(foldout, bodyStyle, scalingRules, "Body Style", "Selects a simple painted container close to the reference sketch or the detailed syringe silhouette.");
         AddField(foldout, settings.FindPropertyRelative("barHeight"), scalingRules, "Bar Height", "Complete procedural syringe height in pixels.");
@@ -134,23 +239,29 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         AddField(plungerDetails, settings.FindPropertyRelative("clampPlungerStartInsideBody"), scalingRules, "Clamp Plunger At Start", "Keeps the plunger head inside the syringe body when the represented value is at the first graduated position.");
         AddField(plungerDetails, settings.FindPropertyRelative("clampPlungerEndInsideBody"), scalingRules, "Clamp Plunger At End", "Keeps the plunger head inside the syringe body when the represented value is at the final graduated position.");
         AddField(plungerDetails, settings.FindPropertyRelative("stopLiquidAtPlunger"), scalingRules, "Stop Liquid At Plunger", "Stops the liquid boundary at the plunger's leading edge so the fluid never renders underneath the plunger head.");
+        AddField(foldout, terminationEnabled, scalingRules, "Enable Termination", "Draws the right-side syringe termination and reserves its dedicated layout spacing.");
         AddField(foldout, settings.FindPropertyRelative("endCapWidth"), scalingRules, "End Cap Width", "Horizontal width of each non-scaling end cap; the simplified right termination starts at the final graduated value.");
         AddField(simplifiedDetails, settings.FindPropertyRelative("terminationOffset"), scalingRules, "Termination Offset", "Horizontal pixel gap between the final graduated value and the simplified right termination.");
-        AddField(foldout, settings.FindPropertyRelative("terminationStyle"), scalingRules, "Termination Style", "Procedural silhouette used by the simplified terminal section and detailed syringe end caps.");
+        AddField(terminationDetails, settings.FindPropertyRelative("terminationStyle"), scalingRules, "Termination Style", "Procedural silhouette used by the simplified terminal section and detailed syringe end caps.");
+        terminationDetails.Add(simplifiedDetails);
         foldout.Add(plungerDetails);
-        foldout.Add(simplifiedDetails);
+        foldout.Add(terminationDetails);
         parent.Add(foldout);
 
         Refresh();
         TrackRefresh(foldout, bodyStyle, Refresh);
         TrackRefresh(foldout, plungerWidth, Refresh);
+        TrackRefresh(foldout, terminationEnabled, Refresh);
 
         void Refresh()
         {
+            bool terminationOn = terminationEnabled == null || terminationEnabled.boolValue;
             plungerDetails.style.display = plungerWidth != null && plungerWidth.floatValue > 0f
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
-            simplifiedDetails.style.display = bodyStyle != null &&
+            terminationDetails.style.display = terminationOn ? DisplayStyle.Flex : DisplayStyle.None;
+            simplifiedDetails.style.display = terminationOn &&
+                                              bodyStyle != null &&
                                               bodyStyle.enumValueIndex == (int)PlayerSyringeBodyStyle.SimplePaintedContainer
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
@@ -165,9 +276,10 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     private static void BuildGraduation(VisualElement parent,
                                         SerializedProperty settings,
-                                        SerializedProperty scalingRules)
+                                        SerializedProperty scalingRules,
+                                        string stateSuffix)
     {
-        Foldout foldout = CreateFoldout("Graduation and Numeric Labels", "GeometryGraduation.Graduation");
+        Foldout foldout = CreateFoldout("Graduation and Numeric Labels", stateSuffix);
         SerializedProperty graduationMode = settings.FindPropertyRelative("graduationMode");
         VisualElement fixedDetails = new VisualElement();
         VisualElement uniformDetails = new VisualElement();
@@ -219,9 +331,10 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     private static void BuildPaintDrips(VisualElement parent,
                                         SerializedProperty paintDrips,
-                                        SerializedProperty scalingRules)
+                                        SerializedProperty scalingRules,
+                                        string stateSuffix)
     {
-        Foldout foldout = CreateFoldout("Paint Drips", "GeometryGraduation.PaintDrips");
+        Foldout foldout = CreateFoldout("Paint Drips", stateSuffix);
 
         if (paintDrips == null)
         {
@@ -249,7 +362,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     }
 
     /// <summary>
-    /// Builds one health or shield channel with intelligent palette, fluid, and motion sub-foldouts.
+    /// Builds one syringe channel with intelligent palette, fluid, and motion sub-foldouts.
     /// </summary>
     /// <param name="parent">Parent container receiving the channel foldout.</param>
     /// <param name="channel">Serialized channel settings.</param>
@@ -279,8 +392,49 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         AddField(details, channel.FindPropertyRelative("smoothingSeconds"), scalingRules, "Smoothing Seconds", "Seconds used to move the displayed liquid boundary and plunger toward the authoritative current value. Set zero for immediate movement.");
         AddField(details, sloshBubblesOnly, scalingRules, "Slosh Affects Bubbles Only", "Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current value and the liquid wave and surface-slosh settings are hidden.");
         BuildPalette(details, channel.FindPropertyRelative("palette"), scalingRules, stateSuffix);
+        BuildOutlineStyle(details, channel.FindPropertyRelative("outlineStyle"), scalingRules, stateSuffix);
         BuildFluid(details, channel.FindPropertyRelative("fluid"), scalingRules, stateSuffix, sloshBubblesOnly);
         BuildMotion(details, channel.FindPropertyRelative("motion"), scalingRules, stateSuffix, sloshBubblesOnly);
+        foldout.Add(details);
+        parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
+    /// Builds conditionally visible painted-outline controls for one syringe channel.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the outline-style foldout.</param>
+    /// <param name="outlineStyle">Serialized outline-style settings.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    /// <param name="stateSuffix">Stable foldout-state suffix.</param>
+    private static void BuildOutlineStyle(VisualElement parent,
+                                          SerializedProperty outlineStyle,
+                                          SerializedProperty scalingRules,
+                                          string stateSuffix)
+    {
+        Foldout foldout = CreateFoldout("Painted Outline", stateSuffix + ".PaintedOutline");
+
+        if (outlineStyle == null)
+        {
+            parent.Add(foldout);
+            return;
+        }
+
+        SerializedProperty enabled = outlineStyle.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Enables non-uniform painted outline variation and optional internal streaks for this syringe.");
+        AddField(details, outlineStyle.FindPropertyRelative("edgeWobbleStrength"), scalingRules, "Edge Wobble Strength", "Normalized strength of deterministic edge wobble applied to outline and frame masks.");
+        AddField(details, outlineStyle.FindPropertyRelative("edgeWobbleFrequency"), scalingRules, "Edge Wobble Frequency", "Number of deterministic edge-wobble cells sampled along the syringe length.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakStrength"), scalingRules, "Inner Streak Strength", "Normalized opacity of thin internal painted streaks blended inside the chamber and liquid.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakDensity"), scalingRules, "Inner Streak Density", "Approximate normalized density of internal painted streak columns.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakLength"), scalingRules, "Inner Streak Length", "Maximum normalized vertical length of internal paint streaks descending from the chamber top.");
         foldout.Add(details);
         parent.Add(foldout);
 
@@ -502,7 +656,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
     private static Foldout CreateFoldout(string title, string stateSuffix)
     {
         return ManagementToolFoldoutStateUtility.CreateFoldout(title,
-                                                                "NashCore.PlayerManagement.Visual.HealthBars." + stateSuffix,
+                                                                "NashCore.PlayerManagement.Visual.HealthBarsExperience." + stateSuffix,
                                                                 true);
     }
     #endregion
@@ -540,8 +694,10 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         SerializedProperty maximumLabelCount = settings.FindPropertyRelative("maximumLabelCount");
         SerializedProperty labelMinimumSpacing = settings.FindPropertyRelative("labelMinimumSpacing");
         SerializedProperty graduationEndPadding = settings.FindPropertyRelative("graduationEndPadding");
+        SerializedProperty terminationEnabled = settings.FindPropertyRelative("terminationEnabled");
         SerializedProperty terminationOffset = settings.FindPropertyRelative("terminationOffset");
         SerializedProperty fontAsset = settings.FindPropertyRelative("fontAsset");
+        SerializedProperty experiencePalettePreset = settings.FindPropertyRelative("experiencePalettePreset");
         SerializedProperty paintDrips = settings.FindPropertyRelative("paintDrips");
 
         if (units != null && (!IsFinite(units.floatValue) || units.floatValue < 0.1f || units.floatValue > 100f))
@@ -598,6 +754,10 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
                                      HelpBoxMessageType.Warning));
         }
 
+        if (terminationEnabled == null)
+            warnings.Add(new HelpBox("Enable Termination toggle is missing from Health and Shield syringe settings.",
+                                     HelpBoxMessageType.Warning));
+
         if (terminationOffset != null &&
             (!IsFinite(terminationOffset.floatValue) ||
              terminationOffset.floatValue < 0f ||
@@ -613,6 +773,162 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
                                      HelpBoxMessageType.Warning));
         }
 
+        if (experiencePalettePreset != null &&
+            (experiencePalettePreset.enumValueIndex < (int)PlayerSyringePalettePreset.Health ||
+             experiencePalettePreset.enumValueIndex > (int)PlayerSyringePalettePreset.Experience))
+        {
+            warnings.Add(new HelpBox("Experience Palette Preset should resolve to a supported built-in syringe palette.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        AppendShapeWarnings(warnings, settings.FindPropertyRelative("experienceShape"), "Experience");
+
+        AppendPaintDripWarnings(warnings, paintDrips, "Health and Shield");
+    }
+
+    /// <summary>
+    /// Registers refresh tracking for one nested syringe-shape property block.
+    /// </summary>
+    /// <param name="root">Element owning the property trackers.</param>
+    /// <param name="shape">Serialized shape property block.</param>
+    /// <param name="refresh">Refresh callback.</param>
+    private static void TrackShapeRefresh(VisualElement root,
+                                          SerializedProperty shape,
+                                          System.Action refresh)
+    {
+        if (shape == null)
+            return;
+
+        TrackRefresh(root, shape.FindPropertyRelative("unitsPerMajorDivision"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("pixelsPerMajorDivision"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("graduationMode"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("uniformLabelCount"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("minimumLength"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("maximumLength"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("maximumLabelCount"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("labelMinimumSpacing"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("graduationEndPadding"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("terminationEnabled"), refresh);
+        TrackRefresh(root, shape.FindPropertyRelative("terminationOffset"), refresh);
+
+        SerializedProperty paintDrips = shape.FindPropertyRelative("paintDrips");
+
+        if (paintDrips == null)
+            return;
+
+        TrackRefresh(root, paintDrips.FindPropertyRelative("enabled"), refresh);
+        TrackRefresh(root, paintDrips.FindPropertyRelative("density"), refresh);
+        TrackRefresh(root, paintDrips.FindPropertyRelative("length"), refresh);
+        TrackRefresh(root, paintDrips.FindPropertyRelative("width"), refresh);
+        TrackRefresh(root, paintDrips.FindPropertyRelative("irregularity"), refresh);
+    }
+
+    /// <summary>
+    /// Appends warning boxes for one syringe-shape property block without mutating serialized values.
+    /// </summary>
+    /// <param name="warnings">Container receiving warning boxes.</param>
+    /// <param name="shape">Serialized shape property block.</param>
+    /// <param name="shapeLabel">User-facing shape label included in warning messages.</param>
+    private static void AppendShapeWarnings(VisualElement warnings,
+                                            SerializedProperty shape,
+                                            string shapeLabel)
+    {
+        if (shape == null)
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape settings are missing.", HelpBoxMessageType.Warning));
+            return;
+        }
+
+        SerializedProperty units = shape.FindPropertyRelative("unitsPerMajorDivision");
+        SerializedProperty pixels = shape.FindPropertyRelative("pixelsPerMajorDivision");
+        SerializedProperty uniformLabelCount = shape.FindPropertyRelative("uniformLabelCount");
+        SerializedProperty minimumLength = shape.FindPropertyRelative("minimumLength");
+        SerializedProperty maximumLength = shape.FindPropertyRelative("maximumLength");
+        SerializedProperty maximumLabelCount = shape.FindPropertyRelative("maximumLabelCount");
+        SerializedProperty labelMinimumSpacing = shape.FindPropertyRelative("labelMinimumSpacing");
+        SerializedProperty graduationEndPadding = shape.FindPropertyRelative("graduationEndPadding");
+        SerializedProperty terminationEnabled = shape.FindPropertyRelative("terminationEnabled");
+        SerializedProperty terminationOffset = shape.FindPropertyRelative("terminationOffset");
+        SerializedProperty paintDrips = shape.FindPropertyRelative("paintDrips");
+
+        if (units != null && (!IsFinite(units.floatValue) || units.floatValue < 0.1f || units.floatValue > 100f))
+            warnings.Add(new HelpBox(shapeLabel + " Shape Units Per Major Division should be finite and within 0.1-100.", HelpBoxMessageType.Warning));
+
+        if (pixels != null && (!IsFinite(pixels.floatValue) || pixels.floatValue < 8f || pixels.floatValue > 256f))
+            warnings.Add(new HelpBox(shapeLabel + " Shape Pixels Per Major Division should be finite and within 8-256.", HelpBoxMessageType.Warning));
+
+        if (uniformLabelCount != null &&
+            (uniformLabelCount.intValue < 0 ||
+             uniformLabelCount.intValue > PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Uniform Label Count exceeds the preauthored label-pool range.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        if (minimumLength != null &&
+            maximumLength != null &&
+            (!IsFinite(minimumLength.floatValue) ||
+             !IsFinite(maximumLength.floatValue) ||
+             minimumLength.floatValue < 64f ||
+             maximumLength.floatValue > 2048f ||
+             maximumLength.floatValue < minimumLength.floatValue))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Minimum and Maximum Length should be finite, ordered, and within 64-2048.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        if (maximumLabelCount != null &&
+            (maximumLabelCount.intValue < 2 ||
+             maximumLabelCount.intValue > PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Maximum Label Count exceeds the preauthored label-pool range.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        if (labelMinimumSpacing != null &&
+            (!IsFinite(labelMinimumSpacing.floatValue) ||
+             labelMinimumSpacing.floatValue < 8f ||
+             labelMinimumSpacing.floatValue > 256f))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Label Minimum Spacing should be finite and within 8-256.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        if (graduationEndPadding != null &&
+            (!IsFinite(graduationEndPadding.floatValue) ||
+             graduationEndPadding.floatValue < 0f ||
+             graduationEndPadding.floatValue > 256f))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Graduation End Padding should be finite and within 0-256.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        if (terminationEnabled == null)
+            warnings.Add(new HelpBox(shapeLabel + " Shape Enable Termination toggle is missing.",
+                                     HelpBoxMessageType.Warning));
+
+        if (terminationOffset != null &&
+            (!IsFinite(terminationOffset.floatValue) ||
+             terminationOffset.floatValue < 0f ||
+             terminationOffset.floatValue > 256f))
+        {
+            warnings.Add(new HelpBox(shapeLabel + " Shape Termination Offset should be finite and within 0-256.",
+                                     HelpBoxMessageType.Warning));
+        }
+
+        AppendPaintDripWarnings(warnings, paintDrips, shapeLabel + " Shape");
+    }
+
+    /// <summary>
+    /// Appends warning boxes for one nested paint-drip property block.
+    /// </summary>
+    /// <param name="warnings">Container receiving warning boxes.</param>
+    /// <param name="paintDrips">Serialized paint-drip settings.</param>
+    /// <param name="ownerLabel">User-facing owner label included in warning messages.</param>
+    private static void AppendPaintDripWarnings(VisualElement warnings,
+                                                SerializedProperty paintDrips,
+                                                string ownerLabel)
+    {
         SerializedProperty paintDripsEnabled = paintDrips != null
             ? paintDrips.FindPropertyRelative("enabled")
             : null;
@@ -628,28 +944,28 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
         if (dripDensity != null &&
             (!IsFinite(dripDensity.floatValue) || dripDensity.floatValue < 0f || dripDensity.floatValue > 1f))
         {
-            warnings.Add(new HelpBox("Paint Drip Density should be finite and within 0-1.",
+            warnings.Add(new HelpBox(ownerLabel + " Paint Drip Density should be finite and within 0-1.",
                                      HelpBoxMessageType.Warning));
         }
 
         if (dripLength != null &&
             (!IsFinite(dripLength.floatValue) || dripLength.floatValue < 0f || dripLength.floatValue > 0.5f))
         {
-            warnings.Add(new HelpBox("Paint Drip Length should be finite and within 0-0.5.",
+            warnings.Add(new HelpBox(ownerLabel + " Paint Drip Length should be finite and within 0-0.5.",
                                      HelpBoxMessageType.Warning));
         }
 
         if (dripWidth != null &&
             (!IsFinite(dripWidth.floatValue) || dripWidth.floatValue <= 0f || dripWidth.floatValue > 0.25f))
         {
-            warnings.Add(new HelpBox("Paint Drip Width should be finite, greater than zero, and no higher than 0.25.",
+            warnings.Add(new HelpBox(ownerLabel + " Paint Drip Width should be finite, greater than zero, and no higher than 0.25.",
                                      HelpBoxMessageType.Warning));
         }
 
         if (dripIrregularity != null &&
             (!IsFinite(dripIrregularity.floatValue) || dripIrregularity.floatValue < 0f || dripIrregularity.floatValue > 1f))
         {
-            warnings.Add(new HelpBox("Paint Drip Irregularity should be finite and within 0-1.",
+            warnings.Add(new HelpBox(ownerLabel + " Paint Drip Irregularity should be finite and within 0-1.",
                                      HelpBoxMessageType.Warning));
         }
     }

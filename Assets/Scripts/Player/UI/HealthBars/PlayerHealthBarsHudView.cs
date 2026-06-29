@@ -9,7 +9,7 @@ using UnityEditor;
 #endif
 
 /// <summary>
-/// Bridges ECS-authoritative player values and scalable visual configuration into two preauthored syringe views.
+/// Bridges ECS-authoritative player values and scalable visual configuration into preauthored syringe views.
 /// </summary>
 [ExecuteAlways]
 [DisallowMultipleComponent]
@@ -24,15 +24,18 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     [Tooltip("Preauthored syringe view representing PlayerShield.")]
     [SerializeField] private PlayerSyringeBarView shieldBar;
 
+    [Tooltip("Preauthored syringe view representing player progression toward the next level.")]
+    [SerializeField] private PlayerSyringeBarView experienceBar;
+
     #if UNITY_EDITOR
     [Header("Editor Preview")]
-    [Tooltip("Optional Player Master Preset used to resolve the same Visual Preset, health, and shield defaults shown at runtime. When assigned, it overrides the standalone preview values below.")]
+    [Tooltip("Optional Player Master Preset used to resolve the same Visual Preset plus health, shield, and experience defaults shown at runtime. When assigned, it overrides the standalone preview values below.")]
     [SerializeField] private PlayerMasterPreset editorPreviewMasterPreset;
 
     [Tooltip("Optional Player Controller Preset used to resolve the same health and shield defaults shown at runtime. This is used when the master preset is not assigned or has no controller preset.")]
     [SerializeField] private PlayerControllerPreset editorPreviewControllerPreset;
 
-    [Tooltip("Player Visual Preset used to render the health and shield syringes outside Play Mode through the same configuration builder used at runtime.")]
+    [Tooltip("Player Visual Preset used to render the health, shield, and experience syringes outside Play Mode through the same configuration builder used at runtime.")]
     [SerializeField] private PlayerVisualPreset editorPreviewPreset;
 
     [Tooltip("Current health shown only by the Edit Mode preview.")]
@@ -50,6 +53,14 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     [Tooltip("Maximum shield shown only by the Edit Mode preview. A zero value hides the shield when the selected preset enables that policy.")]
     [Min(0f)]
     [SerializeField] private float editorPreviewShieldMaximum;
+
+    [Tooltip("Current experience shown only by the Edit Mode preview.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewExperienceValue = 45f;
+
+    [Tooltip("Experience required by the next level shown only by the Edit Mode preview.")]
+    [Min(0f)]
+    [SerializeField] private float editorPreviewExperienceMaximum = 100f;
     #endif
     #endregion
 
@@ -65,6 +76,13 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     private bool editorPreviewQueued;
     private static readonly Dictionary<string, PlayerFormulaValue> editorPreviewFormulaContext = new Dictionary<string, PlayerFormulaValue>(System.StringComparer.OrdinalIgnoreCase);
     #endif
+    #endregion
+
+    #region Properties
+    /// <summary>
+    /// Gets whether the authored HUD view contains a dedicated experience syringe.
+    /// </summary>
+    public bool HasExperienceBar => experienceBar != null;
     #endregion
 
     #region Methods
@@ -114,7 +132,7 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     #endif
 
     /// <summary>
-    /// Initializes both preauthored syringe views without creating UI GameObjects.
+    /// Initializes all preauthored syringe views without creating UI GameObjects.
     /// </summary>
     public void Initialize()
     {
@@ -124,11 +142,14 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
         if (shieldBar != null)
             shieldBar.Initialize();
 
+        if (experienceBar != null)
+            experienceBar.Initialize();
+
         EnsureLayoutReferences();
     }
 
     /// <summary>
-    /// Releases persistent material instances owned by both syringe views.
+    /// Releases persistent material instances owned by the syringe views.
     /// </summary>
     public void Dispose()
     {
@@ -137,6 +158,9 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
         if (shieldBar != null)
             shieldBar.Dispose();
+
+        if (experienceBar != null)
+            experienceBar.Dispose();
     }
 
     /// <summary>
@@ -160,7 +184,7 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
     #region Runtime Updates
     /// <summary>
-    /// Updates both syringe views from the resolved player entity.
+    /// Updates player syringe views from the resolved player entity.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the resolved player.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
@@ -207,10 +231,12 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
                 shieldBar.HandleMissing(cachedConfig.HideWhenPlayerMissing != 0);
             }
         }
+
+        UpdateExperienceBar(entityManager, playerEntity, velocityX, snapImmediately);
     }
 
     /// <summary>
-    /// Applies the configured missing-player behavior to both preauthored syringe views.
+    /// Applies the configured missing-player behavior to every preauthored syringe view.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -221,6 +247,48 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
         if (shieldBar != null)
             shieldBar.HandleMissing(hide);
+
+        if (experienceBar != null)
+            experienceBar.HandleMissing(hide);
+    }
+
+    /// <summary>
+    /// Updates the progression syringe from ECS level and experience data, hiding it at level cap.
+    /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager owning the resolved player.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="velocityX">Current player world-X velocity used by optional inertial reactions.</param>
+    /// <param name="snapImmediately">True when fill smoothing should be bypassed.</param>
+    private void UpdateExperienceBar(EntityManager runtimeEntityManager,
+                                     Entity playerEntity,
+                                     float velocityX,
+                                     bool snapImmediately)
+    {
+        if (experienceBar == null)
+            return;
+
+        if (!runtimeEntityManager.HasComponent<PlayerLevel>(playerEntity) ||
+            !runtimeEntityManager.HasComponent<PlayerExperience>(playerEntity))
+        {
+            experienceBar.HandleMissing(cachedConfig.HideWhenPlayerMissing != 0);
+            return;
+        }
+
+        PlayerLevel playerLevel = runtimeEntityManager.GetComponentData<PlayerLevel>(playerEntity);
+
+        if (HasReachedLevelCap(runtimeEntityManager, playerEntity, playerLevel.Current))
+        {
+            experienceBar.HandleMissing(true);
+            return;
+        }
+
+        PlayerExperience playerExperience = runtimeEntityManager.GetComponentData<PlayerExperience>(playerEntity);
+        float maximumExperience = Mathf.Max(0f, playerLevel.RequiredExperienceForNextLevel);
+
+        if (maximumExperience > 0f)
+            experienceBar.UpdateValue(playerExperience.Current, maximumExperience, velocityX, snapImmediately);
+        else
+            experienceBar.HandleMissing(true);
     }
     #endregion
 
@@ -259,7 +327,7 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     }
 
     /// <summary>
-    /// Clears accumulated reactive motion on both preauthored syringe views.
+    /// Clears accumulated reactive motion on all preauthored syringe views.
     /// </summary>
     private void ResetReactiveMotion()
     {
@@ -268,6 +336,9 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
         if (shieldBar != null)
             shieldBar.ResetReactiveMotion();
+
+        if (experienceBar != null)
+            experienceBar.ResetReactiveMotion();
     }
 
     /// <summary>
@@ -303,7 +374,26 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
         if (shieldBar != null)
             shieldBar.ApplyConfiguration(in cachedConfig, in cachedConfig.Shield, font);
 
+        if (experienceBar != null)
+            experienceBar.ApplyConfiguration(in cachedConfig, in cachedConfig.Experience, in cachedConfig.ExperienceShape, font);
+
         ApplyLayoutConfiguration(cachedConfig.VerticalSpacing, false);
+    }
+
+    /// <summary>
+    /// Checks whether the current player has reached the configured progression level cap.
+    /// </summary>
+    /// <param name="runtimeEntityManager">Entity manager used to read progression config data.</param>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="levelValue">Current player level value.</param>
+    /// <returns>True when progression config exists and the level cap is reached.</returns>
+    private static bool HasReachedLevelCap(EntityManager runtimeEntityManager, Entity playerEntity, int levelValue)
+    {
+        if (!runtimeEntityManager.HasComponent<PlayerProgressionConfig>(playerEntity))
+            return false;
+
+        PlayerProgressionConfig progressionConfig = runtimeEntityManager.GetComponentData<PlayerProgressionConfig>(playerEntity);
+        return PlayerProgressionPhaseUtility.HasReachedLevelCap(progressionConfig, levelValue);
     }
 
     /// <summary>
@@ -344,7 +434,9 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
         ResolveEditorPreviewValues(out float healthValue,
                                    out float healthMaximum,
                                    out float shieldValue,
-                                   out float shieldMaximum);
+                                   out float shieldMaximum,
+                                   out float experienceValue,
+                                   out float experienceMaximum);
 
         PlayerHealthBarVisualConfig previewConfig = PlayerHealthBarVisualBakeUtility.BuildConfig(previewPreset);
         TMP_FontAsset font = previewConfig.FontAsset.Value;
@@ -365,6 +457,16 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
                 shieldBar.HandleMissing(true);
         }
 
+        if (experienceBar != null)
+        {
+            experienceBar.ApplyConfiguration(in previewConfig, in previewConfig.Experience, in previewConfig.ExperienceShape, font);
+
+            if (experienceMaximum > 0f)
+                experienceBar.UpdateValue(experienceValue, experienceMaximum, 0f, true);
+            else
+                experienceBar.HandleMissing(true);
+        }
+
         ApplyLayoutConfiguration(previewConfig.VerticalSpacing, true);
         EditorApplication.QueuePlayerLoopUpdate();
         SceneView.RepaintAll();
@@ -383,16 +485,20 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves health and shield values used only by Edit Mode preview.
+    /// Resolves health, shield, and experience values used only by Edit Mode preview.
     /// </summary>
     /// <param name="healthValue">Current health value shown by the preview.</param>
     /// <param name="healthMaximum">Maximum health value used to rebuild syringe length and labels.</param>
     /// <param name="shieldValue">Current shield value shown by the preview.</param>
     /// <param name="shieldMaximum">Maximum shield value used to rebuild syringe length and labels.</param>
+    /// <param name="experienceValue">Current experience value shown by the preview.</param>
+    /// <param name="experienceMaximum">Next-level experience value used to rebuild syringe length and labels.</param>
     private void ResolveEditorPreviewValues(out float healthValue,
                                             out float healthMaximum,
                                             out float shieldValue,
-                                            out float shieldMaximum)
+                                            out float shieldMaximum,
+                                            out float experienceValue,
+                                            out float experienceMaximum)
     {
         PlayerControllerPreset controllerPreset = ResolveEditorPreviewControllerPreset();
 
@@ -408,6 +514,8 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
                                                                       controllerPreset.HealthStatistics.MaxShield));
             healthValue = healthMaximum;
             shieldValue = shieldMaximum;
+            experienceMaximum = Mathf.Max(0.0001f, editorPreviewExperienceMaximum);
+            experienceValue = Mathf.Clamp(editorPreviewExperienceValue, 0f, experienceMaximum);
             return;
         }
 
@@ -415,6 +523,8 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
         shieldMaximum = Mathf.Max(0f, editorPreviewShieldMaximum);
         healthValue = Mathf.Max(0f, editorPreviewHealthValue);
         shieldValue = Mathf.Max(0f, editorPreviewShieldValue);
+        experienceMaximum = Mathf.Max(0.0001f, editorPreviewExperienceMaximum);
+        experienceValue = Mathf.Clamp(editorPreviewExperienceValue, 0f, experienceMaximum);
     }
 
     /// <summary>

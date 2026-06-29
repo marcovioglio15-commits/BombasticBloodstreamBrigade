@@ -79,7 +79,9 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudEnergySyringeSecti
         Foldout foldout = CreateFoldout("Silhouette", "EnergySyringe.GeometryGraduation.Silhouette");
         SerializedProperty bodyStyle = settings.FindPropertyRelative("bodyStyle");
         SerializedProperty plungerWidth = settings.FindPropertyRelative("plungerWidth");
+        SerializedProperty terminationEnabled = settings.FindPropertyRelative("terminationEnabled");
         VisualElement simplifiedDetails = new VisualElement();
+        VisualElement terminationDetails = new VisualElement();
         VisualElement plungerDetails = new VisualElement();
         AddField(foldout, bodyStyle, scalingRules, "Body Style", "Selects a simple painted container close to the reference sketch or the detailed syringe silhouette.");
         AddField(foldout, settings.FindPropertyRelative("barHeight"), scalingRules, "Bar Height", "Complete procedural syringe height in pixels.");
@@ -89,23 +91,29 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudEnergySyringeSecti
         AddField(plungerDetails, settings.FindPropertyRelative("clampPlungerStartInsideBody"), scalingRules, "Clamp Plunger At Start", "Keeps the plunger head inside the syringe body when the represented energy is at the first graduated position.");
         AddField(plungerDetails, settings.FindPropertyRelative("clampPlungerEndInsideBody"), scalingRules, "Clamp Plunger At End", "Keeps the plunger head inside the syringe body when the represented energy is at the final graduated position.");
         AddField(plungerDetails, settings.FindPropertyRelative("stopLiquidAtPlunger"), scalingRules, "Stop Liquid At Plunger", "Stops the liquid boundary at the plunger's leading edge so the energy liquid never renders underneath the plunger head.");
+        AddField(foldout, terminationEnabled, scalingRules, "Enable Termination", "Draws the right-side energy syringe termination and reserves its dedicated layout spacing.");
         AddField(foldout, settings.FindPropertyRelative("endCapWidth"), scalingRules, "End Cap Width", "Horizontal width of each non-scaling end cap; the simplified right termination starts at the final graduated value.");
         AddField(simplifiedDetails, settings.FindPropertyRelative("terminationOffset"), scalingRules, "Termination Offset", "Horizontal pixel gap between the final graduated value and the simplified right termination.");
-        AddField(foldout, settings.FindPropertyRelative("terminationStyle"), scalingRules, "Termination Style", "Procedural silhouette used by the simplified terminal section and detailed syringe end caps.");
+        AddField(terminationDetails, settings.FindPropertyRelative("terminationStyle"), scalingRules, "Termination Style", "Procedural silhouette used by the simplified terminal section and detailed syringe end caps.");
+        terminationDetails.Add(simplifiedDetails);
         foldout.Add(plungerDetails);
-        foldout.Add(simplifiedDetails);
+        foldout.Add(terminationDetails);
         parent.Add(foldout);
 
         Refresh();
         TrackRefresh(foldout, bodyStyle, Refresh);
         TrackRefresh(foldout, plungerWidth, Refresh);
+        TrackRefresh(foldout, terminationEnabled, Refresh);
 
         void Refresh()
         {
+            bool terminationOn = terminationEnabled == null || terminationEnabled.boolValue;
             plungerDetails.style.display = plungerWidth != null && plungerWidth.floatValue > 0f
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
-            simplifiedDetails.style.display = bodyStyle != null &&
+            terminationDetails.style.display = terminationOn ? DisplayStyle.Flex : DisplayStyle.None;
+            simplifiedDetails.style.display = terminationOn &&
+                                              bodyStyle != null &&
                                               bodyStyle.enumValueIndex == (int)PlayerSyringeBodyStyle.SimplePaintedContainer
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
@@ -230,8 +238,47 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudEnergySyringeSecti
         AddField(details, channel.FindPropertyRelative("smoothingSeconds"), scalingRules, "Smoothing Seconds", "Seconds used to move the displayed liquid boundary and plunger toward the authoritative current energy. Set zero for immediate movement.");
         AddField(details, sloshBubblesOnly, scalingRules, "Slosh Affects Bubbles Only", "Routes reactive slosh to the procedural bubbles only: the liquid fills flat up to the current energy and the liquid wave and surface-slosh settings are hidden.");
         BuildPalette(details, channel.FindPropertyRelative("palette"), scalingRules);
+        BuildOutlineStyle(details, channel.FindPropertyRelative("outlineStyle"), scalingRules);
         BuildFluid(details, channel.FindPropertyRelative("fluid"), scalingRules, sloshBubblesOnly);
         BuildMotion(details, channel.FindPropertyRelative("motion"), scalingRules, sloshBubblesOnly);
+        foldout.Add(details);
+        parent.Add(foldout);
+
+        Refresh();
+        TrackRefresh(foldout, enabled, Refresh);
+
+        void Refresh()
+        {
+            details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
+    /// Builds painted-outline controls and hides tuning while the stylized outline is disabled.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the outline-style foldout.</param>
+    /// <param name="outlineStyle">Serialized outline-style settings.</param>
+    /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    private static void BuildOutlineStyle(VisualElement parent,
+                                          SerializedProperty outlineStyle,
+                                          SerializedProperty scalingRules)
+    {
+        Foldout foldout = CreateFoldout("Painted Outline", "EnergySyringe.EnergyChannel.PaintedOutline");
+
+        if (outlineStyle == null)
+        {
+            parent.Add(foldout);
+            return;
+        }
+
+        SerializedProperty enabled = outlineStyle.FindPropertyRelative("enabled");
+        VisualElement details = new VisualElement();
+        AddField(foldout, enabled, scalingRules, "Enabled", "Enables non-uniform painted outline variation and optional internal streaks for this energy syringe.");
+        AddField(details, outlineStyle.FindPropertyRelative("edgeWobbleStrength"), scalingRules, "Edge Wobble Strength", "Normalized strength of deterministic edge wobble applied to outline and frame masks.");
+        AddField(details, outlineStyle.FindPropertyRelative("edgeWobbleFrequency"), scalingRules, "Edge Wobble Frequency", "Number of deterministic edge-wobble cells sampled along the syringe length.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakStrength"), scalingRules, "Inner Streak Strength", "Normalized opacity of thin internal painted streaks blended inside the chamber and liquid.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakDensity"), scalingRules, "Inner Streak Density", "Approximate normalized density of internal painted streak columns.");
+        AddField(details, outlineStyle.FindPropertyRelative("innerStreakLength"), scalingRules, "Inner Streak Length", "Maximum normalized vertical length of internal paint streaks descending from the chamber top.");
         foldout.Add(details);
         parent.Add(foldout);
 

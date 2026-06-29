@@ -36,6 +36,8 @@ public static class PlayerHealthBarVisualBakeUtility
         {
             Health = BuildChannel(resolvedSettings.Health),
             Shield = BuildChannel(resolvedSettings.Shield),
+            Experience = BuildChannel(resolvedSettings.Experience),
+            ExperienceShape = BuildShapeConfig(resolvedSettings.ExperienceShape),
             FontAsset = resolvedSettings.FontAsset,
             LabelOffset = new float2(resolvedSettings.LabelOffset.x, resolvedSettings.LabelOffset.y),
             VerticalSpacing = ResolveFinite(resolvedSettings.VerticalSpacing, 12f),
@@ -58,14 +60,7 @@ public static class PlayerHealthBarVisualBakeUtility
             LabelEveryMajorDivision = math.max(1, resolvedSettings.LabelEveryMajorDivision),
             MaximumLabelCount = math.clamp(resolvedSettings.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
             UniformLabelCount = math.clamp(resolvedSettings.UniformLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
-            PaintDrips = new PlayerSyringePaintDripConfig
-            {
-                Density = math.saturate(ResolveFinite(paintDrips.Density, 0.38f)),
-                Length = math.clamp(ResolveFinite(paintDrips.Length, 0.1f), 0f, 0.5f),
-                Width = math.clamp(ResolveFinite(paintDrips.Width, 0.018f), 0.0001f, 0.25f),
-                Irregularity = math.saturate(ResolveFinite(paintDrips.Irregularity, 0.65f)),
-                Enabled = paintDrips.Enabled ? (byte)1 : (byte)0
-            },
+            PaintDrips = BuildPaintDrips(paintDrips),
             BodyStyle = ResolveBodyStyle(resolvedSettings.BodyStyle),
             LabelPlacement = ResolveLabelPlacement(resolvedSettings.LabelPlacement),
             GraduationMode = ResolveGraduationMode(resolvedSettings.GraduationMode),
@@ -74,7 +69,8 @@ public static class PlayerHealthBarVisualBakeUtility
             HideWhenPlayerMissing = resolvedSettings.HideWhenPlayerMissing ? (byte)1 : (byte)0,
             ClampPlungerStartInsideBody = resolvedSettings.ClampPlungerStartInsideBody ? (byte)1 : (byte)0,
             ClampPlungerEndInsideBody = resolvedSettings.ClampPlungerEndInsideBody ? (byte)1 : (byte)0,
-            StopLiquidAtPlunger = resolvedSettings.StopLiquidAtPlunger ? (byte)1 : (byte)0
+            StopLiquidAtPlunger = resolvedSettings.StopLiquidAtPlunger ? (byte)1 : (byte)0,
+            TerminationEnabled = resolvedSettings.TerminationEnabled ? (byte)1 : (byte)0
         };
     }
 
@@ -88,6 +84,60 @@ public static class PlayerHealthBarVisualBakeUtility
         return new PlayerBaseHealthBarVisualConfig
         {
             Config = BuildConfig(visualPreset)
+        };
+    }
+
+    /// <summary>
+    /// Builds one runtime direct palette from a built-in authoring preset.
+    /// </summary>
+    /// <param name="preset">Built-in palette profile selected by the visual preset or scaling formula.</param>
+    /// <returns>Runtime direct palette matching the selected profile.</returns>
+    public static PlayerSyringePaletteConfig BuildPalette(PlayerSyringePalettePreset preset)
+    {
+        return BuildPalette(new PlayerSyringePaletteSettings(preset));
+    }
+
+    /// <summary>
+    /// Builds one runtime syringe-shape configuration from authored silhouette, graduation, and label settings.
+    /// </summary>
+    /// <param name="settings">Authored syringe-shape settings.</param>
+    /// <returns>Safe runtime syringe-shape configuration.</returns>
+    public static PlayerSyringeShapeConfig BuildShapeConfig(PlayerSyringeShapeSettings settings)
+    {
+        PlayerSyringeShapeSettings resolvedSettings = settings ?? PlayerSyringeShapeSettings.CreateExperienceDefaults();
+        PlayerSyringePaintDripSettings paintDrips = resolvedSettings.PaintDrips ?? new PlayerSyringePaintDripSettings();
+
+        return new PlayerSyringeShapeConfig
+        {
+            LabelOffset = new float2(resolvedSettings.LabelOffset.x, resolvedSettings.LabelOffset.y),
+            UnitsPerMajorDivision = math.max(0.0001f, ResolveFinite(resolvedSettings.UnitsPerMajorDivision, 1f)),
+            PixelsPerMajorDivision = math.max(0.0001f, ResolveFinite(resolvedSettings.PixelsPerMajorDivision, 52f)),
+            MinimumLength = math.max(1f, ResolveFinite(resolvedSettings.MinimumLength, 340f)),
+            MaximumLength = math.max(1f, ResolveFinite(resolvedSettings.MaximumLength, 760f)),
+            LabelMinimumSpacing = math.max(1f, ResolveFinite(resolvedSettings.LabelMinimumSpacing, 46f)),
+            GraduationEndPadding = math.max(0f, ResolveFinite(resolvedSettings.GraduationEndPadding, 0f)),
+            LabelFontSize = math.max(1f, ResolveFinite(resolvedSettings.LabelFontSize, 15f)),
+            LabelOutlineWidth = math.clamp(ResolveFinite(resolvedSettings.LabelOutlineWidth, 0.12f), 0f, 1f),
+            GraduationVerticalOffset = math.clamp(ResolveFinite(resolvedSettings.GraduationVerticalOffset, 0f), -0.5f, 0.5f),
+            BarHeight = math.max(1f, ResolveFinite(resolvedSettings.BarHeight, 88f)),
+            OutlineThickness = math.max(0f, ResolveFinite(resolvedSettings.OutlineThickness, 0.035f)),
+            ChamberInset = math.clamp(ResolveFinite(resolvedSettings.ChamberInset, 0.16f), 0f, 0.49f),
+            PlungerWidth = math.max(0f, ResolveFinite(resolvedSettings.PlungerWidth, 0.032f)),
+            EndCapWidth = math.max(0f, ResolveFinite(resolvedSettings.EndCapWidth, 36f)),
+            TerminationOffset = math.max(0f, ResolveFinite(resolvedSettings.TerminationOffset, 8f)),
+            MinorDivisionsPerMajor = math.max(1, resolvedSettings.MinorDivisionsPerMajor),
+            LabelEveryMajorDivision = math.max(1, resolvedSettings.LabelEveryMajorDivision),
+            MaximumLabelCount = math.clamp(resolvedSettings.MaximumLabelCount, 2, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+            UniformLabelCount = math.clamp(resolvedSettings.UniformLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+            PaintDrips = BuildPaintDrips(paintDrips),
+            BodyStyle = ResolveBodyStyle(resolvedSettings.BodyStyle),
+            LabelPlacement = ResolveLabelPlacement(resolvedSettings.LabelPlacement),
+            GraduationMode = ResolveGraduationMode(resolvedSettings.GraduationMode),
+            TerminationStyle = ResolveTerminationStyle(resolvedSettings.TerminationStyle),
+            ClampPlungerStartInsideBody = resolvedSettings.ClampPlungerStartInsideBody ? (byte)1 : (byte)0,
+            ClampPlungerEndInsideBody = resolvedSettings.ClampPlungerEndInsideBody ? (byte)1 : (byte)0,
+            StopLiquidAtPlunger = resolvedSettings.StopLiquidAtPlunger ? (byte)1 : (byte)0,
+            TerminationEnabled = resolvedSettings.TerminationEnabled ? (byte)1 : (byte)0
         };
     }
     #endregion
@@ -104,26 +154,11 @@ public static class PlayerHealthBarVisualBakeUtility
         PlayerSyringePaletteSettings palette = resolvedSettings.Palette ?? new PlayerSyringePaletteSettings();
         PlayerSyringeFluidSettings fluid = resolvedSettings.Fluid ?? new PlayerSyringeFluidSettings();
         PlayerSyringeMotionSettings motion = resolvedSettings.Motion ?? new PlayerSyringeMotionSettings();
+        PlayerSyringeOutlineStyleSettings outlineStyle = resolvedSettings.OutlineStyle ?? new PlayerSyringeOutlineStyleSettings();
 
         return new PlayerSyringeChannelConfig
         {
-            Palette = new PlayerSyringePaletteConfig
-            {
-                Outline = ToFloat4(palette.Outline),
-                Body = ToFloat4(palette.Body),
-                BodyShadow = ToFloat4(palette.BodyShadow),
-                Chamber = ToFloat4(palette.Chamber),
-                Liquid = ToFloat4(palette.Liquid),
-                LiquidHighlight = ToFloat4(palette.LiquidHighlight),
-                Bubbles = ToFloat4(palette.Bubbles),
-                Graduation = ToFloat4(palette.Graduation),
-                Label = ToFloat4(palette.Label),
-                LabelOutline = ToFloat4(palette.LabelOutline),
-                Plunger = ToFloat4(palette.Plunger),
-                PlungerWindow = ToFloat4(palette.PlungerWindow),
-                TerminationOutline = ToFloat4(palette.TerminationOutline),
-                TerminationInterior = ToFloat4(palette.TerminationInterior)
-            },
+            Palette = BuildPalette(palette),
             Fluid = new PlayerSyringeFluidConfig
             {
                 FlowSpeed = ResolveFinite(fluid.FlowSpeed, 0.45f),
@@ -156,15 +191,69 @@ public static class PlayerHealthBarVisualBakeUtility
                 TiltEnabled = motion.TiltEnabled ? (byte)1 : (byte)0,
                 ValueImpulseEnabled = motion.ValueImpulseEnabled ? (byte)1 : (byte)0
             },
+            OutlineStyle = new PlayerSyringeOutlineStyleConfig
+            {
+                EdgeWobbleStrength = math.saturate(ResolveFinite(outlineStyle.EdgeWobbleStrength, 0.35f)),
+                EdgeWobbleFrequency = math.clamp(ResolveFinite(outlineStyle.EdgeWobbleFrequency, 16f), 1f, 64f),
+                InnerStreakStrength = math.saturate(ResolveFinite(outlineStyle.InnerStreakStrength, 0.25f)),
+                InnerStreakDensity = math.saturate(ResolveFinite(outlineStyle.InnerStreakDensity, 0.3f)),
+                InnerStreakLength = math.clamp(ResolveFinite(outlineStyle.InnerStreakLength, 0.16f), 0f, 0.5f),
+                Enabled = outlineStyle.Enabled ? (byte)1 : (byte)0
+            },
             SmoothingSeconds = math.max(0f, ResolveFinite(resolvedSettings.SmoothingSeconds, 0.08f)),
             Enabled = resolvedSettings.Enabled ? (byte)1 : (byte)0,
             HideWhenMaximumUnavailable = resolvedSettings.HideWhenMaximumUnavailable ? (byte)1 : (byte)0,
             SloshAffectsBubblesOnly = resolvedSettings.SloshAffectsBubblesOnly ? (byte)1 : (byte)0
         };
     }
+
+    /// <summary>
+    /// Builds one runtime direct palette from authored direct color settings.
+    /// </summary>
+    /// <param name="palette">Authored direct color settings.</param>
+    /// <returns>Runtime direct palette matching the authored colors.</returns>
+    private static PlayerSyringePaletteConfig BuildPalette(PlayerSyringePaletteSettings palette)
+    {
+        return new PlayerSyringePaletteConfig
+        {
+            Outline = ToFloat4(palette.Outline),
+            Body = ToFloat4(palette.Body),
+            BodyShadow = ToFloat4(palette.BodyShadow),
+            Chamber = ToFloat4(palette.Chamber),
+            Liquid = ToFloat4(palette.Liquid),
+            LiquidHighlight = ToFloat4(palette.LiquidHighlight),
+            Bubbles = ToFloat4(palette.Bubbles),
+            Graduation = ToFloat4(palette.Graduation),
+            Label = ToFloat4(palette.Label),
+            LabelOutline = ToFloat4(palette.LabelOutline),
+            Plunger = ToFloat4(palette.Plunger),
+            PlungerWindow = ToFloat4(palette.PlungerWindow),
+            TerminationOutline = ToFloat4(palette.TerminationOutline),
+            TerminationInterior = ToFloat4(palette.TerminationInterior)
+        };
+    }
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Builds safe runtime paint-drip settings for a procedural syringe shape.
+    /// </summary>
+    /// <param name="paintDrips">Authored paint-drip settings.</param>
+    /// <returns>Safe runtime paint-drip settings.</returns>
+    private static PlayerSyringePaintDripConfig BuildPaintDrips(PlayerSyringePaintDripSettings paintDrips)
+    {
+        PlayerSyringePaintDripSettings resolvedPaintDrips = paintDrips ?? new PlayerSyringePaintDripSettings();
+
+        return new PlayerSyringePaintDripConfig
+        {
+            Density = math.saturate(ResolveFinite(resolvedPaintDrips.Density, 0.38f)),
+            Length = math.clamp(ResolveFinite(resolvedPaintDrips.Length, 0.1f), 0f, 0.5f),
+            Width = math.clamp(ResolveFinite(resolvedPaintDrips.Width, 0.018f), 0.0001f, 0.25f),
+            Irregularity = math.saturate(ResolveFinite(resolvedPaintDrips.Irregularity, 0.65f)),
+            Enabled = resolvedPaintDrips.Enabled ? (byte)1 : (byte)0
+        };
+    }
+
     /// <summary>
     /// Resolves one authored body style to a supported runtime value.
     /// </summary>

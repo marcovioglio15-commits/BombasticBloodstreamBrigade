@@ -73,6 +73,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             float primaryMaintenanceTickTimer = powerUpsState.ValueRO.PrimaryMaintenanceTickTimer;
             float secondaryMaintenanceTickTimer = powerUpsState.ValueRO.SecondaryMaintenanceTickTimer;
             float toggleBulletTimeSlowPercent = 0f;
+            float toggleBulletTimePlayerProjectileSlowPercent = 0f;
             float toggleBulletTimeTransitionTimeSeconds = 0f;
 
             ProcessTogglePassiveSlot(in powerUpsConfig.PrimarySlot,
@@ -92,6 +93,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref updatedShield,
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
+                                     ref toggleBulletTimePlayerProjectileSlowPercent,
                                      ref toggleBulletTimeTransitionTimeSeconds,
                                      ref ghostTrailState.ValueRW);
             ProcessTogglePassiveSlot(in powerUpsConfig.SecondarySlot,
@@ -111,6 +113,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref updatedShield,
                                      ref shieldChanged,
                                      ref toggleBulletTimeSlowPercent,
+                                     ref toggleBulletTimePlayerProjectileSlowPercent,
                                      ref toggleBulletTimeTransitionTimeSeconds,
                                      ref ghostTrailState.ValueRW);
             if (healthChanged)
@@ -133,7 +136,13 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                 toggleBulletTimeTransitionTimeSeconds = math.max(toggleBulletTimeTransitionTimeSeconds,
                                                                  currentBulletTimeState.ToggleTransitionTimeSeconds);
 
+            if (toggleBulletTimePlayerProjectileSlowPercent <= 0f &&
+                currentBulletTimeState.TogglePlayerProjectileSlowPercent > 0f)
+                toggleBulletTimeTransitionTimeSeconds = math.max(toggleBulletTimeTransitionTimeSeconds,
+                                                                 currentBulletTimeState.ToggleTransitionTimeSeconds);
+
             currentBulletTimeState.ToggleSlowPercent = toggleBulletTimeSlowPercent;
+            currentBulletTimeState.TogglePlayerProjectileSlowPercent = toggleBulletTimePlayerProjectileSlowPercent;
             currentBulletTimeState.ToggleTransitionTimeSeconds = math.max(0f, toggleBulletTimeTransitionTimeSeconds);
             bulletTimeState.ValueRW = currentBulletTimeState;
         }
@@ -145,6 +154,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     /// Applies one slot toggle runtime step including startup timing, maintenance, and passive aggregation.
     /// </summary>
     /// <param name="slotConfig">Slot configuration inspected for toggle maintenance settings.</param>
+    /// <param name="slotIndex">Stable primary or secondary slot index used by slot-bound toggle effects.</param>
     /// <param name="deltaTime">Current frame delta time.</param>
     /// <param name="playerEntity">Player entity used for health and shield resource access.</param>
     /// <param name="slotEnergy">Mutable slot energy state.</param>
@@ -159,6 +169,10 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     /// <param name="shieldLookup">Shield lookup used for shield maintenance costs.</param>
     /// <param name="updatedShield">Cached mutable shield value reused within the current caller.</param>
     /// <param name="shieldChanged">True when updatedShield already contains a fetched runtime value.</param>
+    /// <param name="toggleBulletTimeSlowPercent">Mutable maximum enemy slow percentage contributed by active toggle slots.</param>
+    /// <param name="toggleBulletTimePlayerProjectileSlowPercent">Mutable maximum player projectile slow percentage contributed by active toggle slots.</param>
+    /// <param name="toggleBulletTimeTransitionTimeSeconds">Mutable transition duration matching the strongest active bullet-time toggle.</param>
+    /// <param name="ghostTrailState">Mutable shared Ghost Trail runtime state updated when this slot deactivates.</param>
     private static void ProcessTogglePassiveSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                  byte slotIndex,
                                                  float deltaTime,
@@ -176,6 +190,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                                  ref PlayerShield updatedShield,
                                                  ref bool shieldChanged,
                                                  ref float toggleBulletTimeSlowPercent,
+                                                 ref float toggleBulletTimePlayerProjectileSlowPercent,
                                                  ref float toggleBulletTimeTransitionTimeSeconds,
                                                  ref PlayerGhostTrailState ghostTrailState)
     {
@@ -228,9 +243,12 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
 
         PlayerPassiveToolConfig togglePassiveTool = slotConfig.TogglePassiveTool;
 
-        if (togglePassiveTool.HasBulletTime != 0 && togglePassiveTool.BulletTime.EnemySlowPercent > 0f)
+        if (togglePassiveTool.HasBulletTime != 0 &&
+            (togglePassiveTool.BulletTime.EnemySlowPercent > 0f ||
+             togglePassiveTool.BulletTime.PlayerProjectileSlowPercent > 0f))
         {
             float slowPercent = math.clamp(togglePassiveTool.BulletTime.EnemySlowPercent, 0f, 100f);
+            float playerProjectileSlowPercent = math.clamp(togglePassiveTool.BulletTime.PlayerProjectileSlowPercent, 0f, 100f);
             float transitionTimeSeconds = math.max(0f, togglePassiveTool.BulletTime.TransitionTimeSeconds);
 
             if (slowPercent > toggleBulletTimeSlowPercent)
@@ -239,6 +257,16 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                 toggleBulletTimeTransitionTimeSeconds = transitionTimeSeconds;
             }
             else if (math.abs(slowPercent - toggleBulletTimeSlowPercent) <= 0.0001f)
+            {
+                toggleBulletTimeTransitionTimeSeconds = math.max(toggleBulletTimeTransitionTimeSeconds, transitionTimeSeconds);
+            }
+
+            if (playerProjectileSlowPercent > toggleBulletTimePlayerProjectileSlowPercent)
+            {
+                toggleBulletTimePlayerProjectileSlowPercent = playerProjectileSlowPercent;
+                toggleBulletTimeTransitionTimeSeconds = transitionTimeSeconds;
+            }
+            else if (math.abs(playerProjectileSlowPercent - toggleBulletTimePlayerProjectileSlowPercent) <= 0.0001f)
             {
                 toggleBulletTimeTransitionTimeSeconds = math.max(toggleBulletTimeTransitionTimeSeconds, transitionTimeSeconds);
             }

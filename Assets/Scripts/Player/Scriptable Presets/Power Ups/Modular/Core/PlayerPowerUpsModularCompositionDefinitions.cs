@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 #region Modular Composition Definitions
 /// <summary>
@@ -75,9 +76,10 @@ public sealed class ModularPowerUpDefinition
     [SerializeField]
     private List<PowerUpModuleBinding> moduleBindings = new List<PowerUpModuleBinding>();
 
-    [Tooltip("When enabled, this power up cannot be replaced from runtime slots.")]
+    [Tooltip("When enabled, enemy Power-Up Stealer modules cannot remove this power-up from active slots, equipped passives, or catalog-only passive ownership.")]
+    [FormerlySerializedAs("unreplaceable")]
     [SerializeField]
-    private bool unreplaceable;
+    private bool stealProtected;
     #endregion
 
     #endregion
@@ -99,11 +101,11 @@ public sealed class ModularPowerUpDefinition
         }
     }
 
-    public bool Unreplaceable
+    public bool StealProtected
     {
         get
         {
-            return unreplaceable;
+            return stealProtected;
         }
     }
     #endregion
@@ -115,11 +117,11 @@ public sealed class ModularPowerUpDefinition
     /// Assigns common metadata while preserving or creating the ordered module-binding collection.
     /// </summary>
     /// <param name="commonDataValue">Common metadata assigned to the composed power up.</param>
-    /// <param name="unreplaceableValue">Whether runtime loadout replacement must reject this power up.</param>
-    public void Configure(PowerUpCommonData commonDataValue, bool unreplaceableValue)
+    /// <param name="stealProtectedValue">Whether enemy Power-Up Stealer modules must ignore this power up.</param>
+    public void Configure(PowerUpCommonData commonDataValue, bool stealProtectedValue)
     {
         commonData = commonDataValue;
-        unreplaceable = unreplaceableValue;
+        stealProtected = stealProtectedValue;
 
         if (moduleBindings == null)
             moduleBindings = new List<PowerUpModuleBinding>();

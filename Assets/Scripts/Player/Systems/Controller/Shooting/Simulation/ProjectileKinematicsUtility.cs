@@ -110,23 +110,24 @@ public static class ProjectileKinematicsUtility
 
     #region Displacement
     /// <summary>
-    /// Resolves the frame delta time for a projectile, applying enemy Bullet Time only to enemy-owned shots.
-    /// Player projectiles keep the unscaled controller delta so active power-ups never slow the player weapon stream.
+    /// Resolves the frame delta time for a projectile, applying independent Bullet Time channels to enemy and player-owned shots.
     /// </summary>
     /// <param name="owner">Projectile owner used to identify the shooter entity.</param>
     /// <param name="enemyDataLookup">Read-only lookup that marks live enemy shooter entities.</param>
     /// <param name="deltaTime">Unscaled frame delta time from the owning system.</param>
     /// <param name="enemyTimeScale">Current enemy global time scale resolved from Bullet Time.</param>
+    /// <param name="playerProjectileTimeScale">Current player projectile time scale resolved from Bullet Time.</param>
     /// <returns>Delta time to use for this projectile simulation step.</returns>
     public static float ResolveOwnerScaledDeltaTime(in ProjectileOwner owner,
                                                     in ComponentLookup<EnemyData> enemyDataLookup,
                                                     float deltaTime,
-                                                    float enemyTimeScale)
+                                                    float enemyTimeScale,
+                                                    float playerProjectileTimeScale)
     {
         float safeDeltaTime = math.max(0f, deltaTime);
 
         if (!IsEnemyOwnedProjectile(owner.ShooterEntity, in enemyDataLookup))
-            return safeDeltaTime;
+            return safeDeltaTime * math.clamp(playerProjectileTimeScale, 0f, 1f);
 
         return safeDeltaTime * math.clamp(enemyTimeScale, 0f, 1f);
     }

@@ -46,6 +46,7 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int LabelPlacementId = Shader.PropertyToID("_LabelPlacement");
     private static readonly int GraduationVisibleId = Shader.PropertyToID("_GraduationVisible");
     private static readonly int TerminationStyleId = Shader.PropertyToID("_TerminationStyle");
+    private static readonly int TerminationEnabledId = Shader.PropertyToID("_TerminationEnabled");
     private static readonly int RequirementMarkerEnabledId = Shader.PropertyToID("_RequirementMarkerEnabled");
     private static readonly int RequirementMarkerPositionId = Shader.PropertyToID("_RequirementMarkerPosition");
     private static readonly int RequirementMarkerColorId = Shader.PropertyToID("_RequirementMarkerColor");
@@ -57,6 +58,12 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     private static readonly int PaintDripLengthId = Shader.PropertyToID("_PaintDripLength");
     private static readonly int PaintDripWidthId = Shader.PropertyToID("_PaintDripWidth");
     private static readonly int PaintDripIrregularityId = Shader.PropertyToID("_PaintDripIrregularity");
+    private static readonly int StylizedOutlineEnabledId = Shader.PropertyToID("_StylizedOutlineEnabled");
+    private static readonly int StylizedEdgeWobbleStrengthId = Shader.PropertyToID("_StylizedEdgeWobbleStrength");
+    private static readonly int StylizedEdgeWobbleFrequencyId = Shader.PropertyToID("_StylizedEdgeWobbleFrequency");
+    private static readonly int StylizedInnerStreakStrengthId = Shader.PropertyToID("_StylizedInnerStreakStrength");
+    private static readonly int StylizedInnerStreakDensityId = Shader.PropertyToID("_StylizedInnerStreakDensity");
+    private static readonly int StylizedInnerStreakLengthId = Shader.PropertyToID("_StylizedInnerStreakLength");
     private static readonly int LengthPixelScaleId = Shader.PropertyToID("_LengthPixelScale");
     private static readonly int MajorDivisionCountId = Shader.PropertyToID("_MajorDivisionCount");
     private static readonly int MinorDivisionsPerMajorId = Shader.PropertyToID("_MinorDivisionsPerMajor");
@@ -96,12 +103,16 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
 
     [Tooltip("Shared procedural syringe material template cloned once for this view.")]
     [SerializeField] private Material materialTemplate;
+
+    [Tooltip("Counter-rotates labels only for authored positive-scale panels that are mirrored through Y rotation.")]
+    [SerializeField] private bool counterRotateLabelsForMirroredRotation;
     #endregion
 
     private RectTransform root;
     private Material runtimeMaterial;
     private PlayerHealthBarVisualConfig sharedConfig;
     private PlayerSyringeChannelConfig channelConfig;
+    private PlayerSyringeShapeConfig shapeConfig;
     private TMP_FontAsset activeFont;
     private float displayedNormalized;
     private float targetNormalized;
@@ -220,20 +231,37 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     /// Applies a rebuilt ECS visual configuration without recreating UI objects.
     /// </summary>
     /// <param name="shared">Shared health-bar visual configuration.</param>
-    /// <param name="channel">Health or shield channel configuration.</param>
+    /// <param name="channel">Health, shield, boss, or active-energy channel configuration.</param>
     /// <param name="font">Direct font asset baked from the active visual preset.</param>
     public void ApplyConfiguration(in PlayerHealthBarVisualConfig shared,
                                    in PlayerSyringeChannelConfig channel,
                                    TMP_FontAsset font)
     {
+        PlayerSyringeShapeConfig sharedShape = PlayerSyringeBarLayoutUtility.BuildShapeFromShared(in shared);
+        ApplyConfiguration(in shared, in channel, in sharedShape, font);
+    }
+
+    /// <summary>
+    /// Applies a rebuilt ECS visual configuration with an explicit syringe shape override.
+    /// </summary>
+    /// <param name="shared">Shared health-bar visual configuration.</param>
+    /// <param name="channel">Health, shield, experience, boss, or active-energy channel configuration.</param>
+    /// <param name="shape">Silhouette, graduation, label, and paint-drip configuration used by this view.</param>
+    /// <param name="font">Direct font asset baked from the active visual preset.</param>
+    public void ApplyConfiguration(in PlayerHealthBarVisualConfig shared,
+                                   in PlayerSyringeChannelConfig channel,
+                                   in PlayerSyringeShapeConfig shape,
+                                   TMP_FontAsset font)
+    {
         Initialize();
         sharedConfig = shared;
         channelConfig = channel;
+        shapeConfig = shape;
         activeFont = font;
         configured = true;
 
         if (root != null)
-            root.sizeDelta = new Vector2(root.sizeDelta.x, math.max(1f, sharedConfig.BarHeight));
+            root.sizeDelta = new Vector2(root.sizeDelta.x, math.max(1f, shapeConfig.BarHeight));
 
         ApplyStaticMaterialProperties();
         RebuildLayout(previousMaximum);
@@ -362,21 +390,28 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         SetColor(PlungerWindowColorId, channelConfig.Palette.PlungerWindow);
         SetColor(TerminationOutlineColorId, channelConfig.Palette.TerminationOutline);
         SetColor(TerminationInteriorColorId, channelConfig.Palette.TerminationInterior);
-        runtimeMaterial.SetFloat(OutlineThicknessId, math.max(0f, sharedConfig.OutlineThickness));
-        runtimeMaterial.SetFloat(GraduationVerticalOffsetId, math.clamp(sharedConfig.GraduationVerticalOffset, -0.5f, 0.5f));
-        runtimeMaterial.SetFloat(ChamberInsetId, math.clamp(sharedConfig.ChamberInset, 0f, 0.49f));
-        runtimeMaterial.SetFloat(ClampPlungerStartInsideBodyId, sharedConfig.ClampPlungerStartInsideBody);
-        runtimeMaterial.SetFloat(ClampPlungerEndInsideBodyId, sharedConfig.ClampPlungerEndInsideBody);
-        runtimeMaterial.SetFloat(StopLiquidAtPlungerId, sharedConfig.StopLiquidAtPlunger);
-        runtimeMaterial.SetFloat(BodyStyleId, (float)sharedConfig.BodyStyle);
-        runtimeMaterial.SetFloat(LabelPlacementId, (float)sharedConfig.LabelPlacement);
-        runtimeMaterial.SetFloat(TerminationStyleId, (float)sharedConfig.TerminationStyle);
+        runtimeMaterial.SetFloat(OutlineThicknessId, math.max(0f, shapeConfig.OutlineThickness));
+        runtimeMaterial.SetFloat(GraduationVerticalOffsetId, math.clamp(shapeConfig.GraduationVerticalOffset, -0.5f, 0.5f));
+        runtimeMaterial.SetFloat(ChamberInsetId, math.clamp(shapeConfig.ChamberInset, 0f, 0.49f));
+        runtimeMaterial.SetFloat(ClampPlungerStartInsideBodyId, shapeConfig.ClampPlungerStartInsideBody);
+        runtimeMaterial.SetFloat(ClampPlungerEndInsideBodyId, shapeConfig.ClampPlungerEndInsideBody);
+        runtimeMaterial.SetFloat(StopLiquidAtPlungerId, shapeConfig.StopLiquidAtPlunger);
+        runtimeMaterial.SetFloat(BodyStyleId, (float)shapeConfig.BodyStyle);
+        runtimeMaterial.SetFloat(LabelPlacementId, (float)shapeConfig.LabelPlacement);
+        runtimeMaterial.SetFloat(TerminationStyleId, (float)shapeConfig.TerminationStyle);
+        runtimeMaterial.SetFloat(TerminationEnabledId, shapeConfig.TerminationEnabled);
         runtimeMaterial.SetFloat(RequirementMarkerEnabledId, 0f);
-        runtimeMaterial.SetFloat(PaintDripsEnabledId, sharedConfig.PaintDrips.Enabled);
-        runtimeMaterial.SetFloat(PaintDripDensityId, math.saturate(sharedConfig.PaintDrips.Density));
-        runtimeMaterial.SetFloat(PaintDripLengthId, math.clamp(sharedConfig.PaintDrips.Length, 0f, 0.5f));
-        runtimeMaterial.SetFloat(PaintDripIrregularityId, math.saturate(sharedConfig.PaintDrips.Irregularity));
-        runtimeMaterial.SetFloat(MinorDivisionsPerMajorId, math.max(1, sharedConfig.MinorDivisionsPerMajor));
+        runtimeMaterial.SetFloat(PaintDripsEnabledId, shapeConfig.PaintDrips.Enabled);
+        runtimeMaterial.SetFloat(PaintDripDensityId, math.saturate(shapeConfig.PaintDrips.Density));
+        runtimeMaterial.SetFloat(PaintDripLengthId, math.clamp(shapeConfig.PaintDrips.Length, 0f, 0.5f));
+        runtimeMaterial.SetFloat(PaintDripIrregularityId, math.saturate(shapeConfig.PaintDrips.Irregularity));
+        runtimeMaterial.SetFloat(StylizedOutlineEnabledId, channelConfig.OutlineStyle.Enabled);
+        runtimeMaterial.SetFloat(StylizedEdgeWobbleStrengthId, math.saturate(channelConfig.OutlineStyle.EdgeWobbleStrength));
+        runtimeMaterial.SetFloat(StylizedEdgeWobbleFrequencyId, math.clamp(channelConfig.OutlineStyle.EdgeWobbleFrequency, 1f, 64f));
+        runtimeMaterial.SetFloat(StylizedInnerStreakStrengthId, math.saturate(channelConfig.OutlineStyle.InnerStreakStrength));
+        runtimeMaterial.SetFloat(StylizedInnerStreakDensityId, math.saturate(channelConfig.OutlineStyle.InnerStreakDensity));
+        runtimeMaterial.SetFloat(StylizedInnerStreakLengthId, math.clamp(channelConfig.OutlineStyle.InnerStreakLength, 0f, 0.5f));
+        runtimeMaterial.SetFloat(MinorDivisionsPerMajorId, math.max(1, shapeConfig.MinorDivisionsPerMajor));
         runtimeMaterial.SetFloat(FlowEnabledId, channelConfig.Fluid.FlowEnabled);
         runtimeMaterial.SetFloat(FlowSpeedId, channelConfig.Fluid.FlowSpeed);
         runtimeMaterial.SetFloat(WaveAmplitudeId, math.max(0f, channelConfig.Fluid.WaveAmplitude));
@@ -417,32 +452,34 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         if (root == null || runtimeMaterial == null || !math.isfinite(maximumValue))
             return;
 
-        PlayerSyringeGraduationMode graduationMode = ResolveGraduationMode(sharedConfig.GraduationMode);
-        int uniformLabelCount = math.clamp(sharedConfig.UniformLabelCount,
+        PlayerSyringeGraduationMode graduationMode = PlayerSyringeBarLayoutUtility.ResolveGraduationMode(shapeConfig.GraduationMode);
+        int uniformLabelCount = math.clamp(shapeConfig.UniformLabelCount,
                                            0,
                                            PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity);
-        float safeUnits = math.max(0.0001f, sharedConfig.UnitsPerMajorDivision);
-        float layoutIntervalCount = ResolveLayoutIntervalCount(maximumValue,
-                                                               safeUnits,
-                                                               graduationMode,
-                                                               uniformLabelCount);
-        float minimumLength = math.max(1f, sharedConfig.MinimumLength);
-        float maximumLength = math.max(minimumLength, sharedConfig.MaximumLength);
-        float graduationStartInset = math.max(0f, sharedConfig.EndCapWidth) +
-                                     math.max(0f, sharedConfig.GraduationEndPadding);
-        float graduationEndInset = math.max(0f, sharedConfig.EndCapWidth);
+        float safeUnits = math.max(0.0001f, shapeConfig.UnitsPerMajorDivision);
+        float layoutIntervalCount = PlayerSyringeBarLayoutUtility.ResolveLayoutIntervalCount(maximumValue,
+                                                                                            safeUnits,
+                                                                                            graduationMode,
+                                                                                            uniformLabelCount);
+        float minimumLength = math.max(1f, shapeConfig.MinimumLength);
+        float maximumLength = math.max(minimumLength, shapeConfig.MaximumLength);
+        bool terminationEnabled = shapeConfig.TerminationEnabled != 0;
+        float endCapWidth = math.max(0f, shapeConfig.EndCapWidth);
+        float graduationStartInset = endCapWidth +
+                                     math.max(0f, shapeConfig.GraduationEndPadding);
+        float graduationEndInset = terminationEnabled ? endCapWidth : 0f;
         float terminationOffset = 0f;
 
-        if (sharedConfig.BodyStyle == PlayerSyringeBodyStyle.SimplePaintedContainer)
+        if (shapeConfig.BodyStyle == PlayerSyringeBodyStyle.SimplePaintedContainer)
         {
-            graduationStartInset = math.max(0f, sharedConfig.EndCapWidth) * 0.5f +
-                                   math.max(0f, sharedConfig.GraduationEndPadding);
-            terminationOffset = math.max(0f, sharedConfig.TerminationOffset);
+            graduationStartInset = endCapWidth * 0.5f +
+                                   math.max(0f, shapeConfig.GraduationEndPadding);
+            terminationOffset = terminationEnabled ? math.max(0f, shapeConfig.TerminationOffset) : 0f;
             graduationEndInset += terminationOffset;
         }
 
         float targetLength = graduationStartInset +
-                             layoutIntervalCount * math.max(0.0001f, sharedConfig.PixelsPerMajorDivision);
+                             layoutIntervalCount * math.max(0.0001f, shapeConfig.PixelsPerMajorDivision);
         targetLength += graduationEndInset;
         float resolvedLength = math.clamp(targetLength, minimumLength, maximumLength);
         float resolvedGraduationStartInset = math.min(graduationStartInset, resolvedLength * 0.45f);
@@ -451,19 +488,27 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                                               resolvedLength -
                                               resolvedGraduationStartInset -
                                               resolvedGraduationEndInset);
-        root.sizeDelta = new Vector2(resolvedLength, math.max(1f, sharedConfig.BarHeight));
-        runtimeMaterial.SetFloat(EndCapNormalizedId, math.clamp(sharedConfig.EndCapWidth / resolvedLength, 0.001f, 0.45f));
+        root.sizeDelta = new Vector2(resolvedLength, math.max(1f, shapeConfig.BarHeight));
+        runtimeMaterial.SetFloat(EndCapNormalizedId, math.clamp(shapeConfig.EndCapWidth / resolvedLength, 0.001f, 0.45f));
         runtimeMaterial.SetFloat(GraduationInsetNormalizedId, math.clamp(resolvedGraduationStartInset / resolvedLength, 0.001f, 0.45f));
         runtimeMaterial.SetFloat(GraduationEndNormalizedId, math.clamp(1f - resolvedGraduationEndInset / resolvedLength, 0.55f, 0.999f));
         runtimeMaterial.SetFloat(TerminationOffsetNormalizedId, math.clamp(terminationOffset / resolvedLength, 0f, 0.45f));
         runtimeMaterial.SetFloat(GraduationVisibleId, graduationMode == PlayerSyringeGraduationMode.Hidden ? 0f : 1f);
         runtimeMaterial.SetFloat(MajorDivisionCountId, math.max(0.0001f, layoutIntervalCount));
-        runtimeMaterial.SetFloat(PlungerWidthId, ResolveReferenceScaledNormalized(sharedConfig.PlungerWidth, resolvedLength, MaximumRuntimePlungerWidth));
-        runtimeMaterial.SetFloat(PaintDripWidthId, ResolveReferenceScaledNormalized(sharedConfig.PaintDrips.Width, resolvedLength, 0.25f));
+        runtimeMaterial.SetFloat(PlungerWidthId,
+                                 PlayerSyringeBarLayoutUtility.ResolveReferenceScaledNormalized(shapeConfig.PlungerWidth,
+                                                                                                resolvedLength,
+                                                                                                MaximumRuntimePlungerWidth,
+                                                                                                ReferenceDecorationLength));
+        runtimeMaterial.SetFloat(PaintDripWidthId,
+                                 PlayerSyringeBarLayoutUtility.ResolveReferenceScaledNormalized(shapeConfig.PaintDrips.Width,
+                                                                                                resolvedLength,
+                                                                                                0.25f,
+                                                                                                ReferenceDecorationLength));
         runtimeMaterial.SetFloat(LengthPixelScaleId, math.clamp(resolvedLength / ReferenceDecorationLength, 0.25f, 4f));
         // Aspect (height/length) lets the shader keep the horizontal outline as thick as the vertical one, so both
         // syringes show an identical outline regardless of their different resolved lengths.
-        runtimeMaterial.SetFloat(OutlineAspectId, math.clamp(math.max(1f, sharedConfig.BarHeight) / resolvedLength, 0.02f, 4f));
+        runtimeMaterial.SetFloat(OutlineAspectId, math.clamp(math.max(1f, shapeConfig.BarHeight) / resolvedLength, 0.02f, 4f));
 
         if (labelsRoot != null)
         {
@@ -479,17 +524,17 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
                               safeUnits,
                               graduationMode,
                               uniformLabelCount,
-                              math.max(1, sharedConfig.LabelEveryMajorDivision),
-                              math.clamp(sharedConfig.MaximumLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
+                              math.max(1, shapeConfig.LabelEveryMajorDivision),
+                              math.clamp(shapeConfig.MaximumLabelCount, 0, PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity),
                               graduationPixelWidth,
-                              math.max(1f, sharedConfig.LabelMinimumSpacing),
-                              sharedConfig.LabelPlacement,
-                              math.max(1f, sharedConfig.LabelFontSize),
-                              sharedConfig.LabelOffset,
-                              math.clamp(sharedConfig.GraduationVerticalOffset, -0.5f, 0.5f),
+                              math.max(1f, shapeConfig.LabelMinimumSpacing),
+                              shapeConfig.LabelPlacement,
+                              math.max(1f, shapeConfig.LabelFontSize),
+                              shapeConfig.LabelOffset,
+                              math.clamp(shapeConfig.GraduationVerticalOffset, -0.5f, 0.5f),
                               channelConfig.Palette.Label,
                               channelConfig.Palette.LabelOutline,
-                              math.saturate(sharedConfig.LabelOutlineWidth),
+                              math.saturate(shapeConfig.LabelOutlineWidth),
                               activeFont,
                               ShouldCounterMirrorLabels());
         }
@@ -498,65 +543,9 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
     }
 
     /// <summary>
-    /// Converts a reference-length normalized visual size into the normalized size needed by the current syringe length.
-    /// </summary>
-    /// <param name="normalizedValue">Authored normalized value tuned against the reference syringe length.</param>
-    /// <param name="resolvedLength">Current resolved syringe length in pixels.</param>
-    /// <param name="maximumValue">Maximum normalized value accepted by the target shader property.</param>
-    /// <returns>Length-compensated normalized value preserving stable pixel size across short and long syringes.</returns>
-    private static float ResolveReferenceScaledNormalized(float normalizedValue, float resolvedLength, float maximumValue)
-    {
-        return math.clamp(math.max(0f, normalizedValue) *
-                          ReferenceDecorationLength /
-                          math.max(1f, resolvedLength),
-                          0f,
-                          maximumValue);
-    }
-
-    /// <summary>
-    /// Resolves the number of value-track intervals that should drive syringe length and tick spacing.
-    /// </summary>
-    /// <param name="maximumValue">Authoritative maximum represented by this syringe.</param>
-    /// <param name="safeUnitsPerMajorDivision">Positive value represented by a fixed major interval.</param>
-    /// <param name="graduationMode">Runtime graduation distribution mode.</param>
-    /// <param name="uniformLabelCount">Requested uniform label count.</param>
-    /// <returns>Non-negative interval count used by layout and shader tick distribution.</returns>
-    private static float ResolveLayoutIntervalCount(float maximumValue,
-                                                    float safeUnitsPerMajorDivision,
-                                                    PlayerSyringeGraduationMode graduationMode,
-                                                    int uniformLabelCount)
-    {
-        switch (graduationMode)
-        {
-            case PlayerSyringeGraduationMode.UniformLabels:
-                return math.max(1f, uniformLabelCount > 1 ? uniformLabelCount - 1 : 1);
-            default:
-                return math.max(0f, maximumValue / safeUnitsPerMajorDivision);
-        }
-    }
-
-    /// <summary>
-    /// Resolves unsupported runtime graduation enum values back to the authored fixed-unit behavior.
-    /// </summary>
-    /// <param name="graduationMode">Runtime value that may have been changed by formulas.</param>
-    /// <returns>Supported graduation mode.</returns>
-    private static PlayerSyringeGraduationMode ResolveGraduationMode(PlayerSyringeGraduationMode graduationMode)
-    {
-        switch (graduationMode)
-        {
-            case PlayerSyringeGraduationMode.FixedUnits:
-            case PlayerSyringeGraduationMode.UniformLabels:
-            case PlayerSyringeGraduationMode.Hidden:
-                return graduationMode;
-            default:
-                return PlayerSyringeGraduationMode.FixedUnits;
-        }
-    }
-
-    /// <summary>
     /// Detects mirrored parent layout so TextMeshPro labels can counter-scale and stay readable.
     /// </summary>
-    /// <returns>True when the owner hierarchy has a negative horizontal scale.</returns>
+    /// <returns>True when the owner hierarchy has legacy negative horizontal scale or an authored mirrored-rotation flag.</returns>
     private bool ShouldCounterMirrorLabels()
     {
         Transform ownerTransform = labelsRoot != null ? labelsRoot : transform;
@@ -564,7 +553,10 @@ public sealed class PlayerSyringeBarView : MonoBehaviour
         if (ownerTransform == null)
             return false;
 
-        return ownerTransform.lossyScale.x < 0f;
+        if (ownerTransform.lossyScale.x < 0f)
+            return true;
+
+        return counterRotateLabelsForMirroredRotation && Vector3.Dot(ownerTransform.right, Vector3.right) < 0f;
     }
     #endregion
 

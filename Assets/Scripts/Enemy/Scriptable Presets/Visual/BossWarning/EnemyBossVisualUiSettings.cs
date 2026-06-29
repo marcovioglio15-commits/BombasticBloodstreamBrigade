@@ -19,8 +19,21 @@ public sealed class EnemyBossVisualUiSettings
     [Tooltip("Shows the screen-edge indicator for an active boss that is outside the camera view.")]
     [SerializeField] private bool showOffscreenIndicator = true;
 
+    [Tooltip("Shows a mirrored boss portrait opposite to the player portrait when the dedicated boss HUD is enabled.")]
+    [SerializeField] private bool showPortrait = true;
+
     [Tooltip("Optional boss display name shown near the mirrored top-right boss bars. Empty falls back to the visual preset name.")]
     [SerializeField] private string bossDisplayName;
+
+    [Tooltip("Sprite rendered by the mirrored boss portrait. Empty hides only the portrait image while keeping the rest of the boss HUD active.")]
+    [SerializeField] private Sprite portraitSprite;
+
+    [Tooltip("Tint color applied to the mirrored boss portrait image.")]
+    [SerializeField] private Color portraitColor = Color.white;
+
+    [Tooltip("Square size in pixels used by the mirrored boss portrait image.")]
+    [Range(24f, 256f)]
+    [SerializeField] private float portraitSizePixels = 96f;
 
     [Tooltip("Procedural syringe settings used by the mirrored boss health and shield bars. The Health channel drives boss health and the Shield channel drives boss shield.")]
     [SerializeField] private PlayerHealthBarsVisualSettings syringeBars = new PlayerHealthBarsVisualSettings(PlayerSyringePalettePreset.BossHealth,
@@ -68,11 +81,43 @@ public sealed class EnemyBossVisualUiSettings
         }
     }
 
+    public bool ShowPortrait
+    {
+        get
+        {
+            return showPortrait;
+        }
+    }
+
     public string BossDisplayName
     {
         get
         {
             return bossDisplayName;
+        }
+    }
+
+    public Sprite PortraitSprite
+    {
+        get
+        {
+            return portraitSprite;
+        }
+    }
+
+    public Color PortraitColor
+    {
+        get
+        {
+            return portraitColor;
+        }
+    }
+
+    public float PortraitSizePixels
+    {
+        get
+        {
+            return portraitSizePixels;
         }
     }
 
@@ -126,14 +171,33 @@ public sealed class EnemyBossVisualUiSettings
     /// <param name="ownerAssetName">Visual preset asset name used by warning messages.</param>
     public void Validate(string ownerAssetName)
     {
-        if (!IsFinite(offscreenIndicatorColor))
-            LogWarning(ownerAssetName, "Offscreen Indicator Color channels should be finite.");
+        if (!enabled)
+            return;
 
-        if (offscreenIndicatorSizePixels <= 0f || !IsFinite(offscreenIndicatorSizePixels))
-            LogWarning(ownerAssetName, "Offscreen Indicator Size should be finite and greater than zero.");
+        if (showPortrait)
+        {
+            if (!IsFinite(portraitColor))
+                LogWarning(ownerAssetName, "Portrait Color channels should be finite.");
 
-        if (edgePaddingPixels < 0f || !IsFinite(edgePaddingPixels))
-            LogWarning(ownerAssetName, "Screen Margin should be finite and zero or positive.");
+            if (portraitSizePixels <= 0f || !IsFinite(portraitSizePixels))
+                LogWarning(ownerAssetName, "Portrait Size should be finite and greater than zero.");
+
+        }
+
+        if (showOffscreenIndicator)
+        {
+            if (!IsFinite(offscreenIndicatorColor))
+                LogWarning(ownerAssetName, "Offscreen Indicator Color channels should be finite.");
+
+            if (offscreenIndicatorSizePixels <= 0f || !IsFinite(offscreenIndicatorSizePixels))
+                LogWarning(ownerAssetName, "Offscreen Indicator Size should be finite and greater than zero.");
+
+            if (edgePaddingPixels < 0f || !IsFinite(edgePaddingPixels))
+                LogWarning(ownerAssetName, "Screen Margin should be finite and zero or positive.");
+        }
+
+        if (!showHealthBar)
+            return;
 
         if (syringeBars == null)
             LogWarning(ownerAssetName, "Syringe Bars settings are missing.");

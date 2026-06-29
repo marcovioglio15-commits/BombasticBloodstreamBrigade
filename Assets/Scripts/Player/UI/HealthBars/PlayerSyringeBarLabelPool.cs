@@ -428,7 +428,8 @@ public sealed class PlayerSyringeBarLabelPool : MonoBehaviour
         labelTransform.pivot = new Vector2(0.5f, insideChamber ? 0.5f : 0f);
         labelTransform.sizeDelta = new Vector2(labelTransform.sizeDelta.x, math.max(18f, fontSize + 2f));
         labelTransform.anchoredPosition = new Vector2(labelOffset.x, labelOffset.y);
-        labelTransform.localScale = new Vector3(counterMirrorGlyphs ? -1f : 1f, 1f, 1f);
+        labelTransform.localScale = Vector3.one;
+        labelTransform.localRotation = Quaternion.Euler(0f, counterMirrorGlyphs ? 180f : 0f, 0f);
         label.fontSize = math.max(1f, fontSize);
         label.alignment = insideChamber ? TextAlignmentOptions.Center : TextAlignmentOptions.Bottom;
         label.color = new Color(labelColor.x, labelColor.y, labelColor.z, labelColor.w);

@@ -209,11 +209,11 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         return true;
     }
 
-    public static string BuildPowerUpCardTitle(int powerUpIndex, string powerUpId, string displayName, int bindingCount, bool unreplaceable)
+    public static string BuildPowerUpCardTitle(int powerUpIndex, string powerUpId, string displayName, int bindingCount, bool stealProtected)
     {
         string resolvedDisplayName = string.IsNullOrWhiteSpace(displayName) ? "<Unnamed>" : displayName.Trim();
         string resolvedPowerUpId = string.IsNullOrWhiteSpace(powerUpId) ? "<No ID>" : powerUpId.Trim();
-        string lockTag = unreplaceable ? " | Unreplaceable" : string.Empty;
+        string lockTag = stealProtected ? " | Steal Protected" : string.Empty;
         return string.Format("#{0:D2}  {1}  ({2})  [{3} Modules{4}]",
                              powerUpIndex + 1,
                              resolvedDisplayName,
@@ -277,17 +277,17 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         return moduleBindingsProperty.arraySize;
     }
 
-    public static bool ResolvePowerUpDefinitionUnreplaceable(SerializedProperty powerUpProperty)
+    public static bool ResolvePowerUpDefinitionStealProtected(SerializedProperty powerUpProperty)
     {
         if (powerUpProperty == null)
             return false;
 
-        SerializedProperty unreplaceableProperty = powerUpProperty.FindPropertyRelative("unreplaceable");
+        SerializedProperty stealProtectedProperty = powerUpProperty.FindPropertyRelative("stealProtected");
 
-        if (unreplaceableProperty == null)
+        if (stealProtectedProperty == null)
             return false;
 
-        return unreplaceableProperty.boolValue;
+        return stealProtectedProperty.boolValue;
     }
     #endregion
 
@@ -308,8 +308,8 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         string powerUpId = ResolvePowerUpDefinitionId(powerUpProperty);
         string displayName = ResolvePowerUpDefinitionDisplayName(powerUpProperty);
         int bindingCount = ResolvePowerUpDefinitionBindingCount(powerUpProperty);
-        bool unreplaceable = ResolvePowerUpDefinitionUnreplaceable(powerUpProperty);
-        foldout.text = BuildPowerUpCardTitle(powerUpIndex, powerUpId, displayName, bindingCount, unreplaceable);
+        bool stealProtected = ResolvePowerUpDefinitionStealProtected(powerUpProperty);
+        foldout.text = BuildPowerUpCardTitle(powerUpIndex, powerUpId, displayName, bindingCount, stealProtected);
 
         if (coverageWarningBox == null)
             return;

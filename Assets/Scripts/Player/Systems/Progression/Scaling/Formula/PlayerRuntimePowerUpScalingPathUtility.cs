@@ -114,6 +114,30 @@ public static class PlayerRuntimePowerUpScalingPathUtility
     }
 
     /// <summary>
+    /// Applies one resolved boolean Add Scaling value to catalog metadata that is not part of active/passive payload structs.
+    /// </summary>
+    /// <param name="payloadPath">Power-up payload path extracted from the scaling rule stat key.</param>
+    /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
+    /// <param name="catalogEntry">Mutable unlock catalog entry receiving metadata updates.</param>
+    /// <returns>True when the path matched a catalog metadata field.</returns>
+    public static bool TryApplyCatalogBooleanValue(string payloadPath,
+                                                   bool resolvedValue,
+                                                   ref PlayerPowerUpUnlockCatalogElement catalogEntry)
+    {
+        if (string.IsNullOrWhiteSpace(payloadPath))
+            return false;
+
+        switch (payloadPath)
+        {
+            case "stealProtected":
+                catalogEntry.StealProtected = resolvedValue ? (byte)1 : (byte)0;
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
     /// Applies token Add Scaling values to active-slot fields that store defined string IDs. Returns
     /// true when the path matched so callers can short-circuit downstream token application stages.
     /// </summary>
@@ -282,6 +306,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "bulletTime.enemySlowPercent":
                 activeSlotConfig.BulletTime.EnemySlowPercent = math.clamp(resolvedValue, 0f, 100f);
+                return;
+            case "bulletTime.playerProjectileSlowPercent":
+                activeSlotConfig.BulletTime.PlayerProjectileSlowPercent = math.clamp(resolvedValue, 0f, 100f);
                 return;
             case "bulletTime.transitionTimeSeconds":
                 activeSlotConfig.BulletTime.TransitionTimeSeconds = math.max(0f, resolvedValue);
@@ -599,14 +626,33 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "bulletTime.duration":
                 passiveToolConfig.BulletTime.DurationSeconds = math.max(0.05f, resolvedValue);
+                RefreshPassiveBulletTimeFlag(ref passiveToolConfig);
                 return;
             case "bulletTime.enemySlowPercent":
                 passiveToolConfig.BulletTime.EnemySlowPercent = math.clamp(resolvedValue, 0f, 100f);
+                RefreshPassiveBulletTimeFlag(ref passiveToolConfig);
+                return;
+            case "bulletTime.playerProjectileSlowPercent":
+                passiveToolConfig.BulletTime.PlayerProjectileSlowPercent = math.clamp(resolvedValue, 0f, 100f);
+                RefreshPassiveBulletTimeFlag(ref passiveToolConfig);
                 return;
             case "bulletTime.transitionTimeSeconds":
                 passiveToolConfig.BulletTime.TransitionTimeSeconds = math.max(0f, resolvedValue);
+                RefreshPassiveBulletTimeFlag(ref passiveToolConfig);
                 return;
         }
+    }
+
+    /// <summary>
+    /// Recomputes the passive Bullet Time presence flag after Add Scaling mutates one of its payload values.
+    /// </summary>
+    /// <param name="passiveToolConfig">Mutable passive config rebuilt from base data and scaling formulas.</param>
+    private static void RefreshPassiveBulletTimeFlag(ref PlayerPassiveToolConfig passiveToolConfig)
+    {
+        passiveToolConfig.HasBulletTime = passiveToolConfig.BulletTime.EnemySlowPercent > 0f ||
+                                          passiveToolConfig.BulletTime.PlayerProjectileSlowPercent > 0f
+            ? (byte)1
+            : (byte)0;
     }
 
     /// <summary>
@@ -941,6 +987,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
 
         switch (payloadPath)
         {
+            case "stealProtected":
+                activeSlotConfig.StealProtected = resolvedValue ? (byte)1 : (byte)0;
+                return;
             case "resourceGate.isToggleable":
                 activeSlotConfig.Toggleable = resolvedValue ? (byte)1 : (byte)0;
                 return;

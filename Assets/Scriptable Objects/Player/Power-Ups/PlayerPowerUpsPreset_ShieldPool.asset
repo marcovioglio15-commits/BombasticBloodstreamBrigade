@@ -411,6 +411,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -843,6 +844,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -1275,6 +1277,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -1707,6 +1710,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -2139,6 +2143,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -2571,6 +2576,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -3003,6 +3009,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -3435,6 +3442,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -3867,6 +3875,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -4299,6 +4308,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -4731,6 +4741,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -5163,6 +5174,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -5595,6 +5607,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -6027,6 +6040,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -6459,6 +6473,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -6891,6 +6906,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -7323,6 +7339,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -7755,6 +7772,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -8187,6 +8205,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -8619,6 +8638,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -9051,6 +9071,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -9511,6 +9532,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -9943,6 +9965,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -10376,6 +10399,7 @@ MonoBehaviour:
       bulletTime:
         duration: 3
         enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
         transitionTimeSeconds: 0.2
       impactFrame:
         durationMode: 0
@@ -10821,6 +10845,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -11253,6 +11278,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -11685,6 +11711,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -12117,6 +12144,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -12550,6 +12578,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -12835,7 +12864,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActiveChargeShot
       displayName: Charge Shot
@@ -12995,6 +13024,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -13427,6 +13457,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -13859,6 +13890,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -14295,6 +14327,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -14731,6 +14764,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -15016,7 +15050,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActiveGigaLaser
       displayName: Giga Laser
@@ -15176,6 +15210,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -15608,6 +15643,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -16040,6 +16076,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -16472,6 +16509,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -16905,6 +16943,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -17190,7 +17229,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActiveGigaBomb
       displayName: Giga Bomb
@@ -17350,6 +17389,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -17782,6 +17822,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -18214,6 +18255,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -18499,7 +18541,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActiveBasicDash
       displayName: Basic Dash
@@ -18659,6 +18701,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -19091,6 +19134,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -19523,6 +19567,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -19808,7 +19853,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActivePortableHealthPack
       displayName: Portable Health Pack
@@ -19968,6 +20013,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -20400,6 +20446,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -20832,6 +20879,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -21117,7 +21165,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActiveBulletTime
       displayName: Bullet Time
@@ -21277,6 +21325,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -21709,6 +21758,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -22141,6 +22191,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 50
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.5
         impactFrame:
           durationMode: 0
@@ -22426,7 +22477,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Active_DamageBoost
       displayName: Damage Boost
@@ -22583,6 +22634,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -23015,6 +23067,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -23448,6 +23501,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -23733,7 +23787,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActivePowerUp_OrbitalProjection
       displayName: Orbital Projections
@@ -23873,6 +23927,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -24312,6 +24367,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -24622,7 +24678,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: ActivePowerUp_OrbitalProjectionToggleable
       displayName: OrbitalProjectionToggleable
@@ -24762,6 +24818,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -25201,6 +25258,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -25511,7 +25569,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    unreplaceable: 0
+    stealProtected: 0
   passivePowerUps:
   - commonData:
       powerUpId: PassiveElementalTrail
@@ -25672,6 +25730,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -26104,6 +26163,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -26389,7 +26449,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: PassiveEnemiesExplodeOnDeath
       displayName: Enemies Explode On Death
@@ -26549,6 +26609,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -26834,7 +26895,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: PassiveOrbitalProjectiles
       displayName: Orbital Projectiles
@@ -26994,6 +27055,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -27427,6 +27489,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -27712,7 +27775,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: PassiveBouncingProjectiles
       displayName: Bouncing Projectiles
@@ -27872,6 +27935,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -28157,7 +28221,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: PassiveSplittingProjectiles
       displayName: Splitting Projectiles
@@ -28317,6 +28381,7 @@ MonoBehaviour:
         bulletTime:
           duration: 3
           enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0.2
         impactFrame:
           durationMode: 0
@@ -28602,7 +28667,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_MegaProjectiles
       displayName: Mega Projectiles
@@ -28763,6 +28828,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -29046,7 +29112,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_MicroProjectiles
       displayName: Micro Projectiles
@@ -29207,6 +29273,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -29490,7 +29557,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_HealthIncrease
       displayName: Health Increase
@@ -29648,6 +29715,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -30079,6 +30147,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -30362,7 +30431,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_AdditionalBarrel
       displayName: Additional Barrel
@@ -30520,6 +30589,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -30951,6 +31021,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -31382,6 +31453,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -31665,7 +31737,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 4
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_DamageIncrease
       displayName: Damage Increase
@@ -31823,6 +31895,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -32254,6 +32327,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -32537,7 +32611,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_FireRate
       displayName: Fire Rate Increase
@@ -32695,6 +32769,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -33126,6 +33201,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -33409,7 +33485,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_Range
       displayName: Range Increase
@@ -33567,6 +33643,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -33998,6 +34075,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -34281,7 +34359,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_GatheringRadius
       displayName: Gathering Radius Increase
@@ -34439,6 +34517,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -34870,6 +34949,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -35153,7 +35233,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_MovementSpeed
       displayName: Movement Speed Increase
@@ -35311,6 +35391,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -35742,6 +35823,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -36025,7 +36107,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_Shield
       displayName: Shield Increase
@@ -36183,6 +36265,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -36614,6 +36697,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -36897,7 +36981,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_ElementalBullets_Fire
       displayName: Elemental Bullets Fire
@@ -37056,6 +37140,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -37339,7 +37424,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_ElementalBullets_Ice
       displayName: Elemental Bullets Ice
@@ -37498,6 +37583,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -37781,7 +37867,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_LaserBeam
       displayName: Laser Beam
@@ -37939,6 +38025,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -38370,6 +38457,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0.05
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -38653,7 +38741,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 2
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_OrbitalSpear
       displayName: Orbital Spear
@@ -38793,6 +38881,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -39103,7 +39192,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_RearShield
       displayName: Rear Shield
@@ -39243,6 +39332,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -39553,7 +39643,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_OrbitalWings
       displayName: Orbital Wings
@@ -39693,6 +39783,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -40030,7 +40121,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    unreplaceable: 0
+    stealProtected: 0
   - commonData:
       powerUpId: Passive_OrbitalShield
       displayName: Orbital Shield
@@ -40170,6 +40261,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -40609,6 +40701,7 @@ MonoBehaviour:
         bulletTime:
           duration: 0
           enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
           transitionTimeSeconds: 0
         impactFrame:
           durationMode: 0
@@ -40919,7 +41012,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 3
-    unreplaceable: 0
+    stealProtected: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
@@ -41788,7 +41881,7 @@ MonoBehaviour:
     chargeType: 0
     chargePerTrigger: 0
     minimumActivationEnergyPercent: 0
-    unreplaceable: 0
+    stealProtected: 0
     bombData:
       bombPrefab: {fileID: 0}
       spawnOffset: {x: 0, y: 0, z: 1.2}
@@ -41819,6 +41912,7 @@ MonoBehaviour:
     bulletTimeData:
       duration: 3
       enemySlowPercent: 40
+      playerProjectileSlowPercent: 0
       transitionTimeSeconds: 0.2
   - commonData:
       powerUpId: Bomb
@@ -41838,7 +41932,7 @@ MonoBehaviour:
     chargeType: 0
     chargePerTrigger: 0
     minimumActivationEnergyPercent: 0
-    unreplaceable: 0
+    stealProtected: 0
     bombData:
       bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
       spawnOffset: {x: 0, y: 0, z: 0}
@@ -41869,6 +41963,7 @@ MonoBehaviour:
     bulletTimeData:
       duration: 3
       enemySlowPercent: 40
+      playerProjectileSlowPercent: 0
       transitionTimeSeconds: 0.2
   - commonData:
       powerUpId: Bullet Time
@@ -41888,7 +41983,7 @@ MonoBehaviour:
     chargeType: 0
     chargePerTrigger: 0
     minimumActivationEnergyPercent: 0
-    unreplaceable: 0
+    stealProtected: 0
     bombData:
       bombPrefab: {fileID: 7369153295349678932, guid: dca4840ccd694c04299341737a490946, type: 3}
       spawnOffset: {x: 0, y: 0, z: 0}
@@ -41919,6 +42014,7 @@ MonoBehaviour:
     bulletTimeData:
       duration: 3
       enemySlowPercent: 40
+      playerProjectileSlowPercent: 0
       transitionTimeSeconds: 0.2
   primaryActiveToolId: Dash
   secondaryActiveToolId: Bullet Time

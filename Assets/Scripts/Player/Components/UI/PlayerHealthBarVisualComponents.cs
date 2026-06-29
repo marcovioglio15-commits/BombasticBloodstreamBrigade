@@ -53,6 +53,55 @@ public struct PlayerSyringePaintDripConfig
 }
 
 /// <summary>
+/// Stores optional stylized outline and internal paint-streak settings consumed by one syringe shader instance.
+/// </summary>
+public struct PlayerSyringeOutlineStyleConfig
+{
+    public float EdgeWobbleStrength;
+    public float EdgeWobbleFrequency;
+    public float InnerStreakStrength;
+    public float InnerStreakDensity;
+    public float InnerStreakLength;
+    public byte Enabled;
+}
+
+/// <summary>
+/// Stores scalable silhouette, graduation, label, and paint-drip settings consumed by one syringe view.
+/// </summary>
+public struct PlayerSyringeShapeConfig
+{
+    public float2 LabelOffset;
+    public float UnitsPerMajorDivision;
+    public float PixelsPerMajorDivision;
+    public float MinimumLength;
+    public float MaximumLength;
+    public float LabelMinimumSpacing;
+    public float GraduationEndPadding;
+    public float LabelFontSize;
+    public float LabelOutlineWidth;
+    public float GraduationVerticalOffset;
+    public float BarHeight;
+    public float OutlineThickness;
+    public float ChamberInset;
+    public float PlungerWidth;
+    public float EndCapWidth;
+    public float TerminationOffset;
+    public int MinorDivisionsPerMajor;
+    public int LabelEveryMajorDivision;
+    public int MaximumLabelCount;
+    public int UniformLabelCount;
+    public PlayerSyringePaintDripConfig PaintDrips;
+    public PlayerSyringeBodyStyle BodyStyle;
+    public PlayerSyringeLabelPlacement LabelPlacement;
+    public PlayerSyringeGraduationMode GraduationMode;
+    public PlayerSyringeTerminationStyle TerminationStyle;
+    public byte ClampPlungerStartInsideBody;
+    public byte ClampPlungerEndInsideBody;
+    public byte StopLiquidAtPlunger;
+    public byte TerminationEnabled;
+}
+
+/// <summary>
 /// Stores fluid animation settings consumed by one player syringe shader instance.
 /// </summary>
 public struct PlayerSyringeFluidConfig
@@ -100,6 +149,7 @@ public struct PlayerSyringeChannelConfig
     public PlayerSyringePaletteConfig Palette;
     public PlayerSyringeFluidConfig Fluid;
     public PlayerSyringeMotionConfig Motion;
+    public PlayerSyringeOutlineStyleConfig OutlineStyle;
     public float SmoothingSeconds;
     public byte Enabled;
     public byte HideWhenMaximumUnavailable;
@@ -107,12 +157,14 @@ public struct PlayerSyringeChannelConfig
 }
 
 /// <summary>
-/// Stores the complete scalable ECS-authoritative player health and shield syringe configuration.
+/// Stores the complete scalable ECS-authoritative player health, shield, and experience syringe configuration.
 /// </summary>
 public struct PlayerHealthBarVisualConfig : IComponentData
 {
     public PlayerSyringeChannelConfig Health;
     public PlayerSyringeChannelConfig Shield;
+    public PlayerSyringeChannelConfig Experience;
+    public PlayerSyringeShapeConfig ExperienceShape;
     public UnityObjectRef<TMP_FontAsset> FontAsset;
     public float2 LabelOffset;
     public float VerticalSpacing;
@@ -145,6 +197,7 @@ public struct PlayerHealthBarVisualConfig : IComponentData
     public byte ClampPlungerStartInsideBody;
     public byte ClampPlungerEndInsideBody;
     public byte StopLiquidAtPlunger;
+    public byte TerminationEnabled;
 }
 
 /// <summary>

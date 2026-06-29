@@ -9,14 +9,22 @@ public struct PlayerBulletTimeState : IComponentData
     #region Fields
     public float TimedRemainingDuration;
     public float TimedSlowPercent;
+    public float TimedPlayerProjectileRemainingDuration;
+    public float TimedPlayerProjectileSlowPercent;
     public float TimedTransitionTimeSeconds;
     public float ToggleSlowPercent;
+    public float TogglePlayerProjectileSlowPercent;
     public float ToggleTransitionTimeSeconds;
     public float CurrentSlowPercent;
     public float TransitionStartSlowPercent;
     public float TransitionTargetSlowPercent;
     public float TransitionDurationSeconds;
     public float TransitionElapsedSeconds;
+    public float CurrentPlayerProjectileSlowPercent;
+    public float PlayerProjectileTransitionStartSlowPercent;
+    public float PlayerProjectileTransitionTargetSlowPercent;
+    public float PlayerProjectileTransitionDurationSeconds;
+    public float PlayerProjectileTransitionElapsedSeconds;
     #endregion
 }
 

@@ -31,6 +31,9 @@ public sealed class PlayerSyringeChannelSettings
 
     [Tooltip("Optional movement and value-change reaction settings used by this syringe channel.")]
     [SerializeField] private PlayerSyringeMotionSettings motion = new PlayerSyringeMotionSettings();
+
+    [Tooltip("Optional stylized outline and internal painted-streak settings used by this syringe channel.")]
+    [SerializeField] private PlayerSyringeOutlineStyleSettings outlineStyle = new PlayerSyringeOutlineStyleSettings();
     #endregion
 
     #endregion
@@ -43,6 +46,7 @@ public sealed class PlayerSyringeChannelSettings
     public PlayerSyringePaletteSettings Palette => palette;
     public PlayerSyringeFluidSettings Fluid => fluid;
     public PlayerSyringeMotionSettings Motion => motion;
+    public PlayerSyringeOutlineStyleSettings OutlineStyle => outlineStyle;
     #endregion
 
     #region Methods
@@ -99,7 +103,7 @@ public sealed class PlayerSyringeChannelSettings
     /// <param name="channelLabel">User-facing channel label used by warning messages.</param>
     public void Validate(string ownerAssetName, string channelLabel)
     {
-        if (palette == null || fluid == null || motion == null)
+        if (palette == null || fluid == null || motion == null || outlineStyle == null)
         {
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Health Bars/{1}: one or more settings blocks are missing.",
                                            ownerAssetName,
@@ -199,6 +203,8 @@ public sealed class PlayerSyringeChannelSettings
         {
             LogWarning(ownerAssetName, channelLabel, "Value Impulse Strength should be within 0-4 and Value Impulse Decay within 0-50.");
         }
+
+        outlineStyle.Validate(ownerAssetName, channelLabel);
     }
     #endregion
 

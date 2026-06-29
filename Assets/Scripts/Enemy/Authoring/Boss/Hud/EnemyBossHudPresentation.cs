@@ -33,6 +33,12 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
     [Tooltip("Text label that displays the active boss name.")]
     [SerializeField] private TMP_Text bossNameText;
 
+    [Tooltip("Rect transform hosting the mirrored boss portrait image.")]
+    [SerializeField] private RectTransform portraitRoot;
+
+    [Tooltip("Image used to render the mirrored boss portrait sprite from the Enemy Visual Preset.")]
+    [SerializeField] private Image portraitImage;
+
     [Tooltip("Preauthored procedural syringe view representing boss health.")]
     [SerializeField] private PlayerSyringeBarView healthSyringeBar;
 
@@ -235,6 +241,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
                                                  bossUi,
                                                  healthSyringeBar,
                                                  shieldSyringeBar,
+                                                 portraitRoot,
+                                                 portraitImage,
                                                  offscreenIndicatorRoot,
                                                  bossNameText,
                                                  editorPreviewHealthValue,
@@ -351,9 +359,15 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         bool showHealthBar = hudConfig.ShowHealthBar != 0;
         bool showOffscreenIndicator = hudConfig.ShowOffscreenIndicator != 0;
+        bool showPortrait = hudConfig.ShowPortrait != 0;
 
         ApplyVisibility(true);
         ApplyHealthBarVisibility(showHealthBar);
+
+        if (showPortrait)
+            SyncBossPortraitConfig(bossSnapshot.PrimaryEntity, in hudConfig);
+        else
+            SetBossPortraitVisible(false);
 
         if (showHealthBar)
         {
@@ -383,6 +397,42 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         {
             EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
         }
+    }
+
+    /// <summary>
+    /// Applies boss portrait sprite, tint, size, and mirrored orientation from ECS and managed visual data.
+    /// </summary>
+    /// <param name="bossEntity">Primary boss entity supplying managed portrait sprite data.</param>
+    /// <param name="hudConfig">Unmanaged boss HUD configuration baked from the visual preset.</param>
+    private void SyncBossPortraitConfig(Entity bossEntity, in EnemyBossHudConfig hudConfig)
+    {
+        if (portraitRoot == null || portraitImage == null)
+            return;
+
+        if (!entityManager.HasComponent<EnemyBossHudManagedConfig>(bossEntity))
+        {
+            SetBossPortraitVisible(false);
+            return;
+        }
+
+        EnemyBossHudManagedConfig managedConfig = entityManager.GetComponentObject<EnemyBossHudManagedConfig>(bossEntity);
+
+        if (managedConfig == null || managedConfig.PortraitSprite == null)
+        {
+            SetBossPortraitVisible(false);
+            return;
+        }
+
+        ApplyPortraitMirrorTransform();
+        ApplyPortraitSize(hudConfig.PortraitSizePixels);
+        EnemyBossHudPresentationUtility.ApplyImageColor(portraitImage,
+                                                        EnemyBossHudPresentationUtility.ToColor(hudConfig.PortraitColor));
+
+        if (portraitImage.sprite != managedConfig.PortraitSprite)
+            portraitImage.sprite = managedConfig.PortraitSprite;
+
+        portraitImage.enabled = true;
+        SetBossPortraitVisible(true);
     }
 
     /// <summary>
@@ -479,6 +529,7 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
         if (shieldSyringeBar != null)
             shieldSyringeBar.HandleMissing(true);
 
+        SetBossPortraitVisible(false);
         EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
 
         if (hideWhenNoBoss)
@@ -502,6 +553,23 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         if (bossNameText == null)
             bossNameText = GetComponentInChildren<TMP_Text>(true);
+
+        if (portraitImage == null)
+            portraitImage = EnemyBossHudPresentationUtility.ResolveImage(transform, "BossPortraitImage");
+
+        if (portraitRoot == null && portraitImage != null)
+        {
+            portraitRoot = portraitImage.transform.parent as RectTransform;
+
+            if (portraitRoot == null)
+                portraitRoot = portraitImage.rectTransform;
+        }
+
+        if (portraitRoot == null)
+            portraitRoot = transform.Find("BossPortraitContainer") as RectTransform;
+
+        if (portraitImage == null && portraitRoot != null)
+            portraitImage = portraitRoot.GetComponentInChildren<Image>(true);
 
         if (healthSyringeBar == null)
             healthSyringeBar = EnemyBossHudPresentationUtility.ResolveComponent<PlayerSyringeBarView>(transform, "BossHealthSyringe");
@@ -529,6 +597,8 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         if (shieldSyringeBar != null)
             shieldSyringeBar.HandleMissing(true);
+
+        SetBossPortraitVisible(false);
     }
 
     /// <summary>
@@ -553,6 +623,46 @@ public sealed class EnemyBossHudPresentation : MonoBehaviour
 
         if (shieldSyringeBar != null)
             shieldSyringeBar.Dispose();
+    }
+
+    /// <summary>
+    /// Applies the authored mirrored boss portrait transform without using negative scale.
+    /// </summary>
+    private void ApplyPortraitMirrorTransform()
+    {
+        if (portraitRoot == null)
+            return;
+
+        portraitRoot.localScale = Vector3.one;
+        portraitRoot.localRotation = Quaternion.Euler(0f, 180f, 0f);
+    }
+
+    /// <summary>
+    /// Applies the configured square portrait size to the preauthored RectTransform.
+    /// </summary>
+    /// <param name="sizePixels">Target square size in UI pixels.</param>
+    private void ApplyPortraitSize(float sizePixels)
+    {
+        if (portraitRoot == null)
+            return;
+
+        float resolvedSize = Mathf.Max(1f, sizePixels);
+        portraitRoot.sizeDelta = new Vector2(resolvedSize, resolvedSize);
+    }
+
+    /// <summary>
+    /// Shows or hides the boss portrait root without touching the rest of the boss HUD.
+    /// </summary>
+    /// <param name="visible">Desired portrait visibility.</param>
+    private void SetBossPortraitVisible(bool visible)
+    {
+        if (portraitRoot == null)
+            return;
+
+        GameObject portraitObject = portraitRoot.gameObject;
+
+        if (portraitObject.activeSelf != visible)
+            portraitObject.SetActive(visible);
     }
 
     /// <summary>

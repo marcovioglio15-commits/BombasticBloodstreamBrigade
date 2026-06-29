@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using Unity.Mathematics;
@@ -115,12 +116,40 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
                                                                                        "BossHealthSyringe");
         PlayerSyringeBarView shieldSyringe = FindComponentByName<PlayerSyringeBarView>(prefab.transform,
                                                                                        "BossShieldSyringe");
+        RectTransform portraitRoot = FindComponentByName<RectTransform>(prefab.transform,
+                                                                        "BossPortraitContainer");
+        Image portraitImage = FindComponentByName<Image>(prefab.transform,
+                                                         "BossPortraitImage");
+        RectTransform contentRoot = FindComponentByName<RectTransform>(prefab.transform,
+                                                                       "BossHudContentRoot");
+        RectTransform panelRoot = FindComponentByName<RectTransform>(prefab.transform,
+                                                                     "Panel");
 
-        if (presentation == null || healthSyringe == null || shieldSyringe == null)
-            throw new InvalidOperationException("Boss HUD prefab syringe presentation is incomplete.");
+        if (presentation == null ||
+            healthSyringe == null ||
+            shieldSyringe == null ||
+            portraitRoot == null ||
+            portraitImage == null ||
+            contentRoot == null ||
+            panelRoot == null)
+        {
+            throw new InvalidOperationException("Boss HUD prefab syringe or portrait presentation is incomplete.");
+        }
 
         ValidateSerializedReference(presentation, "healthSyringeBar", healthSyringe);
         ValidateSerializedReference(presentation, "shieldSyringeBar", shieldSyringe);
+        ValidateSerializedReference(presentation, "visibilityRoot", contentRoot.gameObject);
+        ValidateSerializedReference(presentation, "panelRoot", panelRoot);
+        ValidateSerializedReference(presentation, "portraitRoot", portraitRoot);
+        ValidateSerializedReference(presentation, "portraitImage", portraitImage);
+        PlayerSyringeBarSmokeTestLayoutUtility.ValidateBossHudLayout(contentRoot, panelRoot, portraitRoot);
+        PlayerSyringeBarSmokeTestLayoutUtility.ValidateSyringeLabelCounterRotation(healthSyringe,
+                                                                                   true,
+                                                                                   "Boss Health Syringe");
+        PlayerSyringeBarSmokeTestLayoutUtility.ValidateSyringeLabelCounterRotation(shieldSyringe,
+                                                                                   true,
+                                                                                   "Boss Shield Syringe");
+        ValidateNoNegativeScale(prefab.transform);
         ValidateBossEditorPreview(prefab);
         ValidateNoMissingScripts(prefab.transform);
     }
@@ -207,6 +236,8 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             ValidateHudSlotReference(hudObject, "primaryPowerUpSlotView");
             ValidateHudSlotReference(hudObject, "secondaryPowerUpSlotView");
             ValidateSceneSlotReferences(hudObject);
+            ValidateBossHudSceneReferences(scene);
+            ValidateNoNegativeScale(hudManager.transform.root);
             ValidateNoMissingScripts(hudManager.transform.root);
         }
         finally
@@ -232,6 +263,34 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             throw new InvalidOperationException("HUDManager is missing redesigned slot view binding: " + propertyName);
 
         ValidatePreviewPreset(slotView);
+    }
+    #endregion
+
+    #region Boss Scene References
+    /// <summary>
+    /// Validates that the scene boss presenter keeps authored portrait references.
+    /// </summary>
+    /// <param name="scene">Loaded UI scene inspected for boss HUD bindings.</param>
+    private static void ValidateBossHudSceneReferences(Scene scene)
+    {
+        EnemyBossHudPresentation presentation = FindComponentInScene<EnemyBossHudPresentation>(scene);
+
+        if (presentation == null)
+            return;
+
+        RectTransform portraitRoot = FindComponentByName<RectTransform>(presentation.transform, "BossPortraitContainer");
+        Image portraitImage = FindComponentByName<Image>(presentation.transform, "BossPortraitImage");
+        RectTransform contentRoot = FindComponentByName<RectTransform>(presentation.transform, "BossHudContentRoot");
+        RectTransform panelRoot = FindComponentByName<RectTransform>(presentation.transform, "Panel");
+
+        if (portraitRoot == null || portraitImage == null || contentRoot == null || panelRoot == null)
+            throw new InvalidOperationException("Scene boss HUD is missing the authored portrait hierarchy.");
+
+        ValidateSerializedReference(presentation, "visibilityRoot", contentRoot.gameObject);
+        ValidateSerializedReference(presentation, "panelRoot", panelRoot);
+        ValidateSerializedReference(presentation, "portraitRoot", portraitRoot);
+        ValidateSerializedReference(presentation, "portraitImage", portraitImage);
+        PlayerSyringeBarSmokeTestLayoutUtility.ValidateBossHudLayout(contentRoot, panelRoot, portraitRoot);
     }
     #endregion
 
@@ -385,6 +444,17 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
         SerializedProperty clampPlungerStartInsideBody = energySyringe.FindPropertyRelative("clampPlungerStartInsideBody");
         SerializedProperty clampPlungerEndInsideBody = energySyringe.FindPropertyRelative("clampPlungerEndInsideBody");
         SerializedProperty stopLiquidAtPlunger = energySyringe.FindPropertyRelative("stopLiquidAtPlunger");
+        SerializedProperty terminationEnabled = energySyringe.FindPropertyRelative("terminationEnabled");
+        SerializedProperty energyChannel = energySyringe.FindPropertyRelative("health");
+        SerializedProperty outlineStyle = energyChannel != null
+            ? energyChannel.FindPropertyRelative("outlineStyle")
+            : null;
+        SerializedProperty outlineEnabled = outlineStyle != null
+            ? outlineStyle.FindPropertyRelative("enabled")
+            : null;
+        SerializedProperty edgeWobbleStrength = outlineStyle != null
+            ? outlineStyle.FindPropertyRelative("edgeWobbleStrength")
+            : null;
 
         ValidateEnergySyringeBooleanPath(clampPlungerStartInsideBody,
                                          "activePowerUpHud.energySyringe.clampPlungerStartInsideBody",
@@ -398,6 +468,18 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
                                          "activePowerUpHud.energySyringe.stopLiquidAtPlunger",
                                          previewConfig.EnergySyringe.StopLiquidAtPlunger,
                                          "Stop Liquid At Plunger");
+        ValidateEnergySyringeBooleanPath(terminationEnabled,
+                                         "activePowerUpHud.energySyringe.terminationEnabled",
+                                         previewConfig.EnergySyringe.TerminationEnabled,
+                                         "Enable Termination");
+        ValidateEnergySyringeBooleanPath(outlineEnabled,
+                                         "activePowerUpHud.energySyringe.health.outlineStyle.enabled",
+                                         previewConfig.EnergySyringe.Health.OutlineStyle.Enabled,
+                                         "Painted Outline Enabled");
+        ValidateEnergySyringeNumericPath(edgeWobbleStrength,
+                                         "activePowerUpHud.energySyringe.health.outlineStyle.edgeWobbleStrength",
+                                         previewConfig.EnergySyringe.Health.OutlineStyle.EdgeWobbleStrength,
+                                         "Edge Wobble Strength");
     }
 
     /// <summary>
@@ -424,6 +506,33 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " has an invalid scaling path: " + statKey);
 
         if ((property.boolValue && bakedValue == 0) || (!property.boolValue && bakedValue != 0))
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " did not bake into the runtime config.");
+    }
+
+    /// <summary>
+    /// Validates one active energy-syringe numeric path against Add Scaling and baked config output.
+    /// </summary>
+    /// <param name="property">Serialized numeric field inspected in the Player Visual Preset.</param>
+    /// <param name="expectedStatKey">Expected unified scaling stat key.</param>
+    /// <param name="bakedValue">Baked runtime numeric value.</param>
+    /// <param name="label">User-facing setting name used by diagnostics.</param>
+    private static void ValidateEnergySyringeNumericPath(SerializedProperty property,
+                                                         string expectedStatKey,
+                                                         float bakedValue,
+                                                         string label)
+    {
+        if (property == null)
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " is missing from the Player Visual Preset.");
+
+        if (!PlayerScalingFormulaEditorUtility.SupportsScalingTarget(property))
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " is not exposed as an Add Scaling target.");
+
+        string statKey = PlayerScalingStatKeyUtility.BuildStatKey(property);
+
+        if (statKey != expectedStatKey)
+            throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " has an invalid scaling path: " + statKey);
+
+        if (!Mathf.Approximately(property.floatValue, bakedValue))
             throw new InvalidOperationException("Active Power-Up HUD Energy Syringe " + label + " did not bake into the runtime config.");
     }
 
@@ -540,6 +649,25 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             {
                 if (components[componentIndex] == null)
                     throw new InvalidOperationException("Missing script under UI hierarchy: " + transforms[transformIndex].name);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Validates that mirrored UI objects use rotation rather than negative scale.
+    /// </summary>
+    /// <param name="root">Hierarchy root inspected recursively.</param>
+    private static void ValidateNoNegativeScale(Transform root)
+    {
+        Transform[] transforms = root.GetComponentsInChildren<Transform>(true);
+
+        for (int index = 0; index < transforms.Length; index++)
+        {
+            if (transforms[index].localScale.x < 0f ||
+                transforms[index].localScale.y < 0f ||
+                transforms[index].localScale.z < 0f)
+            {
+                throw new InvalidOperationException("Negative UI scale found under hierarchy: " + transforms[index].name);
             }
         }
     }

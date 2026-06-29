@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// Stores scalable authoring data shared by the player health and shield syringe HUD views.
+/// Stores scalable authoring data used by player health, shield, and experience syringe HUD views.
 /// </summary>
 [Serializable]
 public sealed class PlayerHealthBarsVisualSettings
@@ -15,13 +15,13 @@ public sealed class PlayerHealthBarsVisualSettings
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Enables the ECS-authoritative player health and shield syringe HUD.")]
+    [Tooltip("Enables the ECS-authoritative player health, shield, and experience syringe HUD.")]
     [SerializeField] private bool enabled = true;
 
-    [Tooltip("Hides both syringe views while no valid player entity is available.")]
+    [Tooltip("Hides every player syringe view while no valid player entity is available.")]
     [SerializeField] private bool hideWhenPlayerMissing = true;
 
-    [Tooltip("Vertical spacing in pixels between the health and shield syringe roots.")]
+    [Tooltip("Vertical spacing in pixels between the health, shield, and experience syringe roots.")]
     [Range(-200f, 200f)]
     [SerializeField] private float verticalSpacing = 12f;
 
@@ -86,7 +86,7 @@ public sealed class PlayerHealthBarsVisualSettings
     [Range(-0.5f, 0.5f)]
     [SerializeField] private float graduationVerticalOffset;
 
-    [Tooltip("Procedural body silhouette shared by the health and shield syringe channels.")]
+    [Tooltip("Procedural body silhouette shared by the health, shield, and experience syringe channels.")]
     [SerializeField] private PlayerSyringeBodyStyle bodyStyle = PlayerSyringeBodyStyle.SimplePaintedContainer;
 
     [Tooltip("Complete procedural syringe height in pixels.")]
@@ -114,6 +114,9 @@ public sealed class PlayerHealthBarsVisualSettings
     [Tooltip("Stops the liquid boundary at the plunger's leading edge so the fluid never renders underneath the plunger head.")]
     [SerializeField] private bool stopLiquidAtPlunger = true;
 
+    [Tooltip("Draws the right-side syringe termination and reserves its dedicated spacing in the procedural layout.")]
+    [SerializeField] private bool terminationEnabled = true;
+
     [Tooltip("Horizontal width of each non-scaling end cap; the simplified right termination starts at the final graduated value.")]
     [Range(0f, 256f)]
     [SerializeField] private float endCapWidth = 36f;
@@ -133,6 +136,17 @@ public sealed class PlayerHealthBarsVisualSettings
 
     [Tooltip("Shield syringe presentation and motion settings.")]
     [SerializeField] private PlayerSyringeChannelSettings shield = new PlayerSyringeChannelSettings(true, true);
+
+    [Tooltip("Built-in base palette applied to the player experience syringe before channel color Add Scaling formulas are evaluated.")]
+    [SerializeField] private PlayerSyringePalettePreset experiencePalettePreset = PlayerSyringePalettePreset.Experience;
+
+    [Tooltip("Independent silhouette, graduation, label, and paint-drip settings used only by the player experience syringe.")]
+    [SerializeField] private PlayerSyringeShapeSettings experienceShape = PlayerSyringeShapeSettings.CreateExperienceDefaults();
+
+    [Tooltip("Experience syringe presentation and motion settings.")]
+    [SerializeField] private PlayerSyringeChannelSettings experience = new PlayerSyringeChannelSettings(true,
+                                                                                                       true,
+                                                                                                       PlayerSyringePalettePreset.Experience);
     #endregion
 
     #endregion
@@ -166,19 +180,23 @@ public sealed class PlayerHealthBarsVisualSettings
     public bool ClampPlungerStartInsideBody => clampPlungerStartInsideBody;
     public bool ClampPlungerEndInsideBody => clampPlungerEndInsideBody;
     public bool StopLiquidAtPlunger => stopLiquidAtPlunger;
+    public bool TerminationEnabled => terminationEnabled;
     public float EndCapWidth => endCapWidth;
     public float TerminationOffset => terminationOffset;
     public PlayerSyringeTerminationStyle TerminationStyle => terminationStyle;
     public PlayerSyringePaintDripSettings PaintDrips => paintDrips;
     public PlayerSyringeChannelSettings Health => health;
     public PlayerSyringeChannelSettings Shield => shield;
+    public PlayerSyringePalettePreset ExperiencePalettePreset => experiencePalettePreset;
+    public PlayerSyringeShapeSettings ExperienceShape => experienceShape;
+    public PlayerSyringeChannelSettings Experience => experience;
     #endregion
 
     #region Methods
 
     #region Construction
     /// <summary>
-    /// Creates the default player health and shield syringe settings.
+    /// Creates the default player health, shield, and experience syringe settings.
     /// </summary>
     public PlayerHealthBarsVisualSettings()
     {
@@ -210,6 +228,11 @@ public sealed class PlayerHealthBarsVisualSettings
         shield = new PlayerSyringeChannelSettings(false,
                                                   true,
                                                   PlayerSyringePalettePreset.ActiveEnergy);
+        experiencePalettePreset = PlayerSyringePalettePreset.ActiveEnergy;
+        experienceShape = PlayerSyringeShapeSettings.CreateExperienceDefaults();
+        experience = new PlayerSyringeChannelSettings(false,
+                                                      true,
+                                                      PlayerSyringePalettePreset.ActiveEnergy);
     }
 
     /// <summary>
@@ -236,6 +259,11 @@ public sealed class PlayerHealthBarsVisualSettings
         shield = new PlayerSyringeChannelSettings(true,
                                                   true,
                                                   shieldPalettePreset);
+        experiencePalettePreset = PlayerSyringePalettePreset.Experience;
+        experienceShape = PlayerSyringeShapeSettings.CreateExperienceDefaults();
+        experience = new PlayerSyringeChannelSettings(true,
+                                                      true,
+                                                      PlayerSyringePalettePreset.Experience);
     }
     #endregion
 
@@ -328,15 +356,20 @@ public sealed class PlayerHealthBarsVisualSettings
         if (!IsSupportedTerminationStyle(terminationStyle))
             LogWarning(ownerAssetName, "Termination Style should resolve to Flat, Angular, Rounded, or Needle.");
 
-        if (paintDrips == null || health == null || shield == null)
+        if (!IsSupportedPalettePreset(experiencePalettePreset))
+            LogWarning(ownerAssetName, "Experience Palette Preset should resolve to a supported built-in syringe palette.");
+
+        if (paintDrips == null || health == null || shield == null || experienceShape == null || experience == null)
         {
-            LogWarning(ownerAssetName, "Paint Drips, Health, or Shield settings are missing.");
+            LogWarning(ownerAssetName, "Paint Drips, Health, Shield, Experience Shape, or Experience settings are missing.");
             return;
         }
 
         paintDrips.Validate(ownerAssetName);
+        experienceShape.Validate(ownerAssetName, "Experience");
         health.Validate(ownerAssetName, "Health");
         shield.Validate(ownerAssetName, "Shield");
+        experience.Validate(ownerAssetName, "Experience");
     }
     #endregion
 
@@ -416,6 +449,27 @@ public sealed class PlayerHealthBarsVisualSettings
         {
             case PlayerSyringeLabelPlacement.InsideChamber:
             case PlayerSyringeLabelPlacement.GraduationPlate:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Checks whether one authored palette preset maps to a supported built-in syringe palette.
+    /// </summary>
+    /// <param name="value">Palette preset to inspect.</param>
+    /// <returns>True when the palette preset can be baked into a runtime syringe palette.</returns>
+    private static bool IsSupportedPalettePreset(PlayerSyringePalettePreset value)
+    {
+        switch (value)
+        {
+            case PlayerSyringePalettePreset.Health:
+            case PlayerSyringePalettePreset.Shield:
+            case PlayerSyringePalettePreset.ActiveEnergy:
+            case PlayerSyringePalettePreset.BossHealth:
+            case PlayerSyringePalettePreset.BossShield:
+            case PlayerSyringePalettePreset.Experience:
                 return true;
             default:
                 return false;

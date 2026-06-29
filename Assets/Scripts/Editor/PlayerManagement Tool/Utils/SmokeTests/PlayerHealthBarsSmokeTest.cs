@@ -85,11 +85,22 @@ public static class PlayerHealthBarsSmokeTest
             SerializedObject presetObject = new SerializedObject(preset);
             SerializedProperty healthBars = presetObject.FindProperty("healthBars");
             SerializedProperty health = healthBars.FindPropertyRelative("health");
+            SerializedProperty experience = healthBars.FindPropertyRelative("experience");
             SerializedProperty motion = health.FindPropertyRelative("motion");
             SerializedProperty palette = health.FindPropertyRelative("palette");
+            SerializedProperty experiencePalette = experience.FindPropertyRelative("palette");
+            SerializedProperty outlineStyle = health.FindPropertyRelative("outlineStyle");
+            SerializedProperty experienceShape = healthBars.FindPropertyRelative("experienceShape");
             SerializedProperty colorChannel = palette.FindPropertyRelative("liquid").FindPropertyRelative("r");
+            SerializedProperty experienceLiquidColorChannel = experiencePalette.FindPropertyRelative("liquid").FindPropertyRelative("r");
             SerializedProperty healthEnabled = health.FindPropertyRelative("enabled");
+            SerializedProperty outlineStyleEnabled = outlineStyle.FindPropertyRelative("enabled");
+            SerializedProperty outlineEdgeWobbleStrength = outlineStyle.FindPropertyRelative("edgeWobbleStrength");
+            SerializedProperty experienceShapeBodyStyle = experienceShape.FindPropertyRelative("bodyStyle");
+            SerializedProperty experienceShapeUniformLabelCount = experienceShape.FindPropertyRelative("uniformLabelCount");
+            SerializedProperty experienceShapeTerminationEnabled = experienceShape.FindPropertyRelative("terminationEnabled");
             SerializedProperty terminationStyle = healthBars.FindPropertyRelative("terminationStyle");
+            SerializedProperty terminationEnabled = healthBars.FindPropertyRelative("terminationEnabled");
             SerializedProperty bodyStyle = healthBars.FindPropertyRelative("bodyStyle");
             SerializedProperty labelPlacement = healthBars.FindPropertyRelative("labelPlacement");
             SerializedProperty graduationMode = healthBars.FindPropertyRelative("graduationMode");
@@ -117,10 +128,20 @@ public static class PlayerHealthBarsSmokeTest
             TMP_FontAsset expectedFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(FontPath);
             fontAsset.objectReferenceValue = expectedFont;
 
+            if (experienceLiquidColorChannel != null)
+                experienceLiquidColorChannel.floatValue = 0.33f;
+
             if (colorChannel == null ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(colorChannel) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(experienceLiquidColorChannel) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(healthEnabled) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(outlineStyleEnabled) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(outlineEdgeWobbleStrength) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(experienceShapeBodyStyle) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(experienceShapeUniformLabelCount) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(experienceShapeTerminationEnabled) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(terminationStyle) ||
+                !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(terminationEnabled) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(bodyStyle) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(labelPlacement) ||
                 !PlayerScalingFormulaEditorUtility.SupportsScalingTarget(graduationMode) ||
@@ -149,7 +170,7 @@ public static class PlayerHealthBarsSmokeTest
             }
 
             SerializedProperty scalingRules = presetObject.FindProperty("scalingRules");
-            scalingRules.arraySize = 26;
+            scalingRules.arraySize = 33;
             ConfigureRule(scalingRules.GetArrayElementAtIndex(0), PlayerScalingStatKeyUtility.BuildStatKey(colorChannel), "[this] * 0.5");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(1), PlayerScalingStatKeyUtility.BuildStatKey(healthEnabled), "![this]");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(2), PlayerScalingStatKeyUtility.BuildStatKey(terminationStyle), "[this] + ([Needle] - [this])");
@@ -176,6 +197,13 @@ public static class PlayerHealthBarsSmokeTest
             ConfigureRule(scalingRules.GetArrayElementAtIndex(23), PlayerScalingStatKeyUtility.BuildStatKey(clampPlungerStartInsideBody), "![this]");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(24), PlayerScalingStatKeyUtility.BuildStatKey(clampPlungerEndInsideBody), "![this]");
             ConfigureRule(scalingRules.GetArrayElementAtIndex(25), PlayerScalingStatKeyUtility.BuildStatKey(stopLiquidAtPlunger), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(26), PlayerScalingStatKeyUtility.BuildStatKey(outlineStyleEnabled), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(27), PlayerScalingStatKeyUtility.BuildStatKey(outlineEdgeWobbleStrength), "[this] + 0.2");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(28), PlayerScalingStatKeyUtility.BuildStatKey(experienceShapeBodyStyle), "[this] + ([DetailedSyringe] - [this])");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(29), PlayerScalingStatKeyUtility.BuildStatKey(experienceShapeUniformLabelCount), "[this] + 1");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(30), PlayerScalingStatKeyUtility.BuildStatKey(terminationEnabled), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(31), PlayerScalingStatKeyUtility.BuildStatKey(experienceShapeTerminationEnabled), "![this]");
+            ConfigureRule(scalingRules.GetArrayElementAtIndex(32), PlayerScalingStatKeyUtility.BuildStatKey(experienceLiquidColorChannel), "[this] + 0.07");
             presetObject.ApplyModifiedPropertiesWithoutUndo();
 
             EntityManager entityManager = world.EntityManager;
@@ -191,6 +219,9 @@ public static class PlayerHealthBarsSmokeTest
             {
                 throw new InvalidOperationException("Default health and shield syringe palettes must remain visually distinct.");
             }
+
+            if (!Mathf.Approximately(baseConfig.Experience.Palette.Liquid.x, 0.33f))
+                throw new InvalidOperationException("Experience syringe direct palette was overwritten before runtime scaling.");
 
             entityManager.AddComponentData(playerEntity, new PlayerRuntimeScalingState
             {
@@ -219,7 +250,7 @@ public static class PlayerHealthBarsSmokeTest
             DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> metadata = entityManager.AddBuffer<PlayerRuntimeHealthBarVisualScalingElement>(configEntity);
             PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(preset, metadata);
 
-            if (metadata.Length != 26)
+            if (metadata.Length != 33)
                 throw new InvalidOperationException("Health Bars runtime scaling metadata did not include palette, bool, enum, numeric, and nested-block rules.");
 
             StringBuilder metadataDetails = new StringBuilder();
@@ -272,12 +303,19 @@ public static class PlayerHealthBarsSmokeTest
                 runtimeConfig.ClampPlungerStartInsideBody != 0 ||
                 runtimeConfig.ClampPlungerEndInsideBody == 0 ||
                 runtimeConfig.StopLiquidAtPlunger != 0 ||
+                runtimeConfig.Health.OutlineStyle.Enabled == 0 ||
+                !Mathf.Approximately(runtimeConfig.Health.OutlineStyle.EdgeWobbleStrength, baseConfig.Health.OutlineStyle.EdgeWobbleStrength + 0.2f) ||
+                runtimeConfig.ExperienceShape.BodyStyle != PlayerSyringeBodyStyle.DetailedSyringe ||
+                runtimeConfig.ExperienceShape.UniformLabelCount != baseConfig.ExperienceShape.UniformLabelCount + 1 ||
+                runtimeConfig.TerminationEnabled != 0 ||
+                runtimeConfig.ExperienceShape.TerminationEnabled != 0 ||
+                !Mathf.Approximately(runtimeConfig.Experience.Palette.Liquid.x, baseConfig.Experience.Palette.Liquid.x + 0.07f) ||
                 !Mathf.Approximately(runtimeConfig.GraduationVerticalOffset, baseConfig.GraduationVerticalOffset + 0.1f) ||
                 runtimeConfig.FontAsset.Value != expectedFont ||
                 scalingState.Initialized == 0 ||
                 scalingState.LastScalableStatsHash != 123u)
             {
-                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}, SloshBubbles={19}, GradOffset={20}, GraduationMode={21}, UniformLabels={22}, ClampStart={23}, ClampEnd={24}, StopLiquid={25}.",
+                throw new InvalidOperationException(string.Format("Health Bars runtime scaling rebuild mismatch. Color={0}/{1}, Enabled={2}, Termination={3}, Body={4}, Placement={5}, Spacing={6}, Padding={7}, OutlineWidth={8}, Drips={9}/{10}, Label={11}/{12}, Horizontal={13}/{14}, Font='{15}', State={16}/{17}, Metadata={18}, SloshBubbles={19}, GradOffset={20}, GraduationMode={21}, UniformLabels={22}, ClampStart={23}, ClampEnd={24}, StopLiquid={25}, OutlineStyle={26}/{27}, ExperienceShape={28}/{29}, TerminationEnabled={30}/{31}, ExperienceColor={32}/{33}.",
                                                                   runtimeConfig.Health.Palette.Liquid.x,
                                                                   baseConfig.Health.Palette.Liquid.x * 0.5f,
                                                                   runtimeConfig.Health.Enabled,
@@ -303,7 +341,15 @@ public static class PlayerHealthBarsSmokeTest
                                                                   runtimeConfig.UniformLabelCount,
                                                                   runtimeConfig.ClampPlungerStartInsideBody,
                                                                   runtimeConfig.ClampPlungerEndInsideBody,
-                                                                  runtimeConfig.StopLiquidAtPlunger));
+                                                                  runtimeConfig.StopLiquidAtPlunger,
+                                                                  runtimeConfig.Health.OutlineStyle.Enabled,
+                                                                  runtimeConfig.Health.OutlineStyle.EdgeWobbleStrength,
+                                                                  runtimeConfig.ExperienceShape.BodyStyle,
+                                                                  runtimeConfig.ExperienceShape.UniformLabelCount,
+                                                                  runtimeConfig.TerminationEnabled,
+                                                                  runtimeConfig.ExperienceShape.TerminationEnabled,
+                                                                  runtimeConfig.Experience.Palette.Liquid.x,
+                                                                  baseConfig.Experience.Palette.Liquid.x + 0.07f));
             }
         }
         finally
@@ -396,8 +442,12 @@ public static class PlayerHealthBarsSmokeTest
         if (prefab.transform.Find("PlayerHealthBar") != null || prefab.transform.Find("PlayerShieldBar") != null)
             throw new InvalidOperationException("Legacy health or shield prefab roots are still present.");
 
-        if (prefab.transform.Find("PlayerHealthSyringe") == null || prefab.transform.Find("PlayerShieldSyringe") == null)
-            throw new InvalidOperationException("Preauthored health or shield syringe root is missing.");
+        if (prefab.transform.Find("PlayerHealthSyringe") == null ||
+            prefab.transform.Find("PlayerShieldSyringe") == null ||
+            prefab.transform.Find("PlayerExperienceSyringe") == null)
+        {
+            throw new InvalidOperationException("Preauthored health, shield, or experience syringe root is missing.");
+        }
 
         PlayerHealthBarsHudView hudView = prefab.GetComponent<PlayerHealthBarsHudView>();
         VerticalLayoutGroup layoutGroup = prefab.GetComponent<VerticalLayoutGroup>();
@@ -406,8 +456,8 @@ public static class PlayerHealthBarsSmokeTest
         PlayerSyringeBarLabelPool[] labelPools = prefab.GetComponentsInChildren<PlayerSyringeBarLabelPool>(true);
         TMP_Text[] labels = prefab.GetComponentsInChildren<TMP_Text>(true);
 
-        if (hudView == null || syringeViews.Length != 2 || graphics.Length != 2 || labelPools.Length != 2)
-            throw new InvalidOperationException("Player bars prefab does not contain the expected one HUD view and two complete syringe views.");
+        if (hudView == null || syringeViews.Length != 3 || graphics.Length != 3 || labelPools.Length != 3)
+            throw new InvalidOperationException("Player bars prefab does not contain the expected one HUD view and three complete syringe views.");
 
         if (layoutGroup == null || layoutGroup.childForceExpandHeight)
             throw new InvalidOperationException("Player bars prefab must use one non-expanding VerticalLayoutGroup as the exclusive vertical-position authority.");
@@ -415,7 +465,7 @@ public static class PlayerHealthBarsSmokeTest
         if (prefab.transform.childCount < 3 ||
             prefab.transform.GetChild(0).name != "PlayerHealthSyringe" ||
             prefab.transform.GetChild(1).name != "PlayerShieldSyringe" ||
-            prefab.transform.GetChild(2).name != "PlayerExperienceBar")
+            prefab.transform.GetChild(2).name != "PlayerExperienceSyringe")
         {
             throw new InvalidOperationException("Player bars prefab children are not ordered Health, Shield, Experience for deterministic vertical layout.");
         }
@@ -435,10 +485,12 @@ public static class PlayerHealthBarsSmokeTest
                 throw new InvalidOperationException("Player syringe graphic is missing its Edit Mode preview material.");
         }
 
-        int requiredSyringeLabels = PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity * 2;
+        int requiredSyringeLabels = PlayerHealthBarsVisualSettings.AuthoredLabelPoolCapacity * 3;
 
         if (labels.Length < requiredSyringeLabels)
             throw new InvalidOperationException("Player bars prefab does not contain the required preauthored numeric label capacity.");
+
+        PlayerSyringeBarSmokeTestLayoutUtility.ValidatePlayerBarsLabelCounterRotation(prefab.transform);
     }
 
     /// <summary>

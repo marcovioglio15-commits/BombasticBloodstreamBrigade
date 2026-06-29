@@ -361,7 +361,8 @@ public static class PlayerPowerUpActivationSlotUtility
                 if (slotConfig.BulletTime.Duration <= 0f)
                     return false;
 
-                if (slotConfig.BulletTime.EnemySlowPercent <= 0f)
+                if (slotConfig.BulletTime.EnemySlowPercent <= 0f &&
+                    slotConfig.BulletTime.PlayerProjectileSlowPercent <= 0f)
                     return false;
 
                 return true;

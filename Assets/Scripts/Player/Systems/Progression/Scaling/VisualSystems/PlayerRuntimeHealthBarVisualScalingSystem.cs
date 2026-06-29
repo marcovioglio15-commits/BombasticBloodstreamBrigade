@@ -11,6 +11,15 @@ using Unity.Mathematics;
 [UpdateAfter(typeof(PlayerRuntimeScalingSyncSystem))]
 public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
 {
+    #region Types
+    private enum SyringeChannelTarget : byte
+    {
+        Health = 0,
+        Shield = 1,
+        Experience = 2
+    }
+    #endregion
+
     #region Fields
     private static readonly Dictionary<string, PlayerFormulaValue> VariableContext = new Dictionary<string, PlayerFormulaValue>(64, StringComparer.OrdinalIgnoreCase);
     private static readonly List<PlayerScalableStatElement> EffectiveScalableStats = new List<PlayerScalableStatElement>(64);
@@ -97,6 +106,7 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
     /// </summary>
     /// <param name="scalingBuffer">Runtime scaling metadata.</param>
     /// <param name="runtimeConfig">Mutable runtime player health-bar visual configuration.</param>
+    /// <param name="variableContext">Resolved formula variables for the current player entity.</param>
     public static void ApplyScaling(DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> scalingBuffer,
                                     ref PlayerHealthBarVisualConfig runtimeConfig,
                                     Dictionary<string, PlayerFormulaValue> variableContext)
@@ -173,18 +183,22 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "stopLiquidAtPlunger":
                 runtimeConfig.StopLiquidAtPlunger = byteValue;
                 return;
+            case "terminationEnabled":
+                runtimeConfig.TerminationEnabled = byteValue;
+                return;
             case "paintDrips.enabled":
                 runtimeConfig.PaintDrips.Enabled = byteValue;
                 return;
         }
 
-        if (TryResolveChannelPath(payloadPath, out bool isHealth, out string channelPath))
+        if (TryResolveChannelPath(payloadPath, out SyringeChannelTarget target, out string channelPath))
         {
-            if (isHealth)
-                ApplyChannelBooleanValue(channelPath, byteValue, ref runtimeConfig.Health);
-            else
-                ApplyChannelBooleanValue(channelPath, byteValue, ref runtimeConfig.Shield);
+            ApplyTargetChannelBooleanValue(channelPath, byteValue, target, ref runtimeConfig);
+            return;
         }
+
+        if (payloadPath.StartsWith("experienceShape.", StringComparison.Ordinal))
+            ApplyShapeBooleanValue(payloadPath.Substring("experienceShape.".Length), byteValue, ref runtimeConfig.ExperienceShape);
     }
 
     /// <summary>
@@ -297,20 +311,218 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "paintDrips.irregularity":
                 runtimeConfig.PaintDrips.Irregularity = resolvedValue;
                 return;
+            case "experiencePalettePreset":
+                runtimeConfig.Experience.Palette = PlayerHealthBarVisualBakeUtility.BuildPalette(ResolvePalettePreset(resolvedValue));
+                return;
         }
 
-        if (TryResolveChannelPath(payloadPath, out bool isHealth, out string channelPath))
+        if (TryResolveChannelPath(payloadPath, out SyringeChannelTarget target, out string channelPath))
         {
-            if (isHealth)
-                ApplyChannelNumericValue(channelPath, resolvedValue, ref runtimeConfig.Health);
-            else
-                ApplyChannelNumericValue(channelPath, resolvedValue, ref runtimeConfig.Shield);
+            ApplyTargetChannelNumericValue(channelPath, resolvedValue, target, ref runtimeConfig);
+            return;
         }
+
+        if (payloadPath.StartsWith("experienceShape.", StringComparison.Ordinal))
+            ApplyShapeNumericValue(payloadPath.Substring("experienceShape.".Length), resolvedValue, ref runtimeConfig.ExperienceShape);
     }
 
     #endregion
 
+    #region Shape Application
+    /// <summary>
+    /// Applies one boolean formula result to an explicit syringe shape profile.
+    /// </summary>
+    /// <param name="payloadPath">Target field path relative to the shape root.</param>
+    /// <param name="resolvedValue">Resolved byte-backed boolean value.</param>
+    /// <param name="shape">Mutable runtime shape configuration.</param>
+    private static void ApplyShapeBooleanValue(string payloadPath,
+                                               byte resolvedValue,
+                                               ref PlayerSyringeShapeConfig shape)
+    {
+        switch (payloadPath)
+        {
+            case "clampPlungerStartInsideBody":
+                shape.ClampPlungerStartInsideBody = resolvedValue;
+                break;
+            case "clampPlungerEndInsideBody":
+                shape.ClampPlungerEndInsideBody = resolvedValue;
+                break;
+            case "stopLiquidAtPlunger":
+                shape.StopLiquidAtPlunger = resolvedValue;
+                break;
+            case "terminationEnabled":
+                shape.TerminationEnabled = resolvedValue;
+                break;
+            case "paintDrips.enabled":
+                shape.PaintDrips.Enabled = resolvedValue;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Applies one numeric formula result to an explicit syringe shape profile.
+    /// </summary>
+    /// <param name="payloadPath">Target field path relative to the shape root.</param>
+    /// <param name="resolvedValue">Resolved numeric result.</param>
+    /// <param name="shape">Mutable runtime shape configuration.</param>
+    private static void ApplyShapeNumericValue(string payloadPath,
+                                               float resolvedValue,
+                                               ref PlayerSyringeShapeConfig shape)
+    {
+        switch (payloadPath)
+        {
+            case "unitsPerMajorDivision":
+                shape.UnitsPerMajorDivision = resolvedValue;
+                break;
+            case "pixelsPerMajorDivision":
+                shape.PixelsPerMajorDivision = resolvedValue;
+                break;
+            case "minimumLength":
+                shape.MinimumLength = resolvedValue;
+                break;
+            case "maximumLength":
+                shape.MaximumLength = resolvedValue;
+                break;
+            case "labelMinimumSpacing":
+                shape.LabelMinimumSpacing = resolvedValue;
+                break;
+            case "graduationEndPadding":
+                shape.GraduationEndPadding = resolvedValue;
+                break;
+            case "minorDivisionsPerMajor":
+                shape.MinorDivisionsPerMajor = (int)math.round(resolvedValue);
+                break;
+            case "labelEveryMajorDivision":
+                shape.LabelEveryMajorDivision = (int)math.round(resolvedValue);
+                break;
+            case "maximumLabelCount":
+                shape.MaximumLabelCount = (int)math.round(resolvedValue);
+                break;
+            case "uniformLabelCount":
+                shape.UniformLabelCount = (int)math.round(resolvedValue);
+                break;
+            case "labelFontSize":
+                shape.LabelFontSize = resolvedValue;
+                break;
+            case "labelOutlineWidth":
+                shape.LabelOutlineWidth = resolvedValue;
+                break;
+            case "graduationVerticalOffset":
+                shape.GraduationVerticalOffset = resolvedValue;
+                break;
+            case "labelOffset.x":
+                shape.LabelOffset.x = resolvedValue;
+                break;
+            case "labelOffset.y":
+                shape.LabelOffset.y = resolvedValue;
+                break;
+            case "barHeight":
+                shape.BarHeight = resolvedValue;
+                break;
+            case "outlineThickness":
+                shape.OutlineThickness = resolvedValue;
+                break;
+            case "chamberInset":
+                shape.ChamberInset = resolvedValue;
+                break;
+            case "plungerWidth":
+                shape.PlungerWidth = resolvedValue;
+                break;
+            case "endCapWidth":
+                shape.EndCapWidth = resolvedValue;
+                break;
+            case "terminationOffset":
+                shape.TerminationOffset = resolvedValue;
+                break;
+            case "bodyStyle":
+                shape.BodyStyle = (PlayerSyringeBodyStyle)math.clamp((int)math.round(resolvedValue),
+                                                                      (int)PlayerSyringeBodyStyle.SimplePaintedContainer,
+                                                                      (int)PlayerSyringeBodyStyle.DetailedSyringe);
+                break;
+            case "labelPlacement":
+                shape.LabelPlacement = (PlayerSyringeLabelPlacement)math.clamp((int)math.round(resolvedValue),
+                                                                               (int)PlayerSyringeLabelPlacement.InsideChamber,
+                                                                               (int)PlayerSyringeLabelPlacement.GraduationPlate);
+                break;
+            case "graduationMode":
+                shape.GraduationMode = (PlayerSyringeGraduationMode)math.clamp((int)math.round(resolvedValue),
+                                                                               (int)PlayerSyringeGraduationMode.FixedUnits,
+                                                                               (int)PlayerSyringeGraduationMode.Hidden);
+                break;
+            case "terminationStyle":
+                shape.TerminationStyle = (PlayerSyringeTerminationStyle)math.clamp((int)math.round(resolvedValue),
+                                                                                  (int)PlayerSyringeTerminationStyle.Flat,
+                                                                                  (int)PlayerSyringeTerminationStyle.Needle);
+                break;
+            case "paintDrips.density":
+                shape.PaintDrips.Density = resolvedValue;
+                break;
+            case "paintDrips.length":
+                shape.PaintDrips.Length = resolvedValue;
+                break;
+            case "paintDrips.width":
+                shape.PaintDrips.Width = resolvedValue;
+                break;
+            case "paintDrips.irregularity":
+                shape.PaintDrips.Irregularity = resolvedValue;
+                break;
+        }
+    }
+    #endregion
+
     #region Channel Application
+    /// <summary>
+    /// Routes one boolean formula result to the resolved syringe channel.
+    /// </summary>
+    /// <param name="payloadPath">Target field path relative to the channel root.</param>
+    /// <param name="resolvedValue">Resolved byte-backed boolean value.</param>
+    /// <param name="target">Resolved syringe channel target.</param>
+    /// <param name="runtimeConfig">Mutable runtime player health-bar visual configuration.</param>
+    private static void ApplyTargetChannelBooleanValue(string payloadPath,
+                                                       byte resolvedValue,
+                                                       SyringeChannelTarget target,
+                                                       ref PlayerHealthBarVisualConfig runtimeConfig)
+    {
+        switch (target)
+        {
+            case SyringeChannelTarget.Health:
+                ApplyChannelBooleanValue(payloadPath, resolvedValue, ref runtimeConfig.Health);
+                return;
+            case SyringeChannelTarget.Shield:
+                ApplyChannelBooleanValue(payloadPath, resolvedValue, ref runtimeConfig.Shield);
+                return;
+            case SyringeChannelTarget.Experience:
+                ApplyChannelBooleanValue(payloadPath, resolvedValue, ref runtimeConfig.Experience);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Routes one numeric formula result to the resolved syringe channel.
+    /// </summary>
+    /// <param name="payloadPath">Target field path relative to the channel root.</param>
+    /// <param name="resolvedValue">Resolved numeric result.</param>
+    /// <param name="target">Resolved syringe channel target.</param>
+    /// <param name="runtimeConfig">Mutable runtime player health-bar visual configuration.</param>
+    private static void ApplyTargetChannelNumericValue(string payloadPath,
+                                                       float resolvedValue,
+                                                       SyringeChannelTarget target,
+                                                       ref PlayerHealthBarVisualConfig runtimeConfig)
+    {
+        switch (target)
+        {
+            case SyringeChannelTarget.Health:
+                ApplyChannelNumericValue(payloadPath, resolvedValue, ref runtimeConfig.Health);
+                return;
+            case SyringeChannelTarget.Shield:
+                ApplyChannelNumericValue(payloadPath, resolvedValue, ref runtimeConfig.Shield);
+                return;
+            case SyringeChannelTarget.Experience:
+                ApplyChannelNumericValue(payloadPath, resolvedValue, ref runtimeConfig.Experience);
+                return;
+        }
+    }
+
     /// <summary>
     /// Applies one boolean formula result to a syringe channel.
     /// </summary>
@@ -349,6 +561,9 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
                 break;
             case "motion.valueImpulseEnabled":
                 channel.Motion.ValueImpulseEnabled = resolvedValue;
+                break;
+            case "outlineStyle.enabled":
+                channel.OutlineStyle.Enabled = resolvedValue;
                 break;
         }
     }
@@ -431,6 +646,21 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
             case "motion.valueImpulseDecay":
                 channel.Motion.ValueImpulseDecay = resolvedValue;
                 break;
+            case "outlineStyle.edgeWobbleStrength":
+                channel.OutlineStyle.EdgeWobbleStrength = resolvedValue;
+                break;
+            case "outlineStyle.edgeWobbleFrequency":
+                channel.OutlineStyle.EdgeWobbleFrequency = resolvedValue;
+                break;
+            case "outlineStyle.innerStreakStrength":
+                channel.OutlineStyle.InnerStreakStrength = resolvedValue;
+                break;
+            case "outlineStyle.innerStreakDensity":
+                channel.OutlineStyle.InnerStreakDensity = resolvedValue;
+                break;
+            case "outlineStyle.innerStreakLength":
+                channel.OutlineStyle.InnerStreakLength = resolvedValue;
+                break;
         }
     }
 
@@ -494,29 +724,49 @@ public partial struct PlayerRuntimeHealthBarVisualScalingSystem : ISystem
 
     #region Helpers
     /// <summary>
-    /// Resolves a health or shield channel path without runtime reflection.
+    /// Resolves a health, shield, or experience channel path without runtime reflection.
     /// </summary>
     /// <param name="payloadPath">Target path relative to healthBars.</param>
-    /// <param name="isHealth">True when the resolved path targets the health channel.</param>
+    /// <param name="target">Resolved channel target.</param>
     /// <param name="channelPath">Path relative to the resolved channel root.</param>
-    /// <returns>True when the path targets health or shield.</returns>
-    private static bool TryResolveChannelPath(string payloadPath, out bool isHealth, out string channelPath)
+    /// <returns>True when the path targets a supported syringe channel.</returns>
+    private static bool TryResolveChannelPath(string payloadPath, out SyringeChannelTarget target, out string channelPath)
     {
-        isHealth = false;
+        target = SyringeChannelTarget.Health;
         channelPath = string.Empty;
 
         if (payloadPath.StartsWith("health.", StringComparison.Ordinal))
         {
-            isHealth = true;
+            target = SyringeChannelTarget.Health;
             channelPath = payloadPath.Substring("health.".Length);
             return true;
         }
 
-        if (!payloadPath.StartsWith("shield.", StringComparison.Ordinal))
+        if (payloadPath.StartsWith("shield.", StringComparison.Ordinal))
+        {
+            target = SyringeChannelTarget.Shield;
+            channelPath = payloadPath.Substring("shield.".Length);
+            return true;
+        }
+
+        if (!payloadPath.StartsWith("experience.", StringComparison.Ordinal))
             return false;
 
-        channelPath = payloadPath.Substring("shield.".Length);
+        target = SyringeChannelTarget.Experience;
+        channelPath = payloadPath.Substring("experience.".Length);
         return true;
+    }
+
+    /// <summary>
+    /// Resolves one formula-driven numeric enum value into a supported palette preset.
+    /// </summary>
+    /// <param name="resolvedValue">Numeric formula result targeting Experience Palette Preset.</param>
+    /// <returns>Supported built-in syringe palette preset.</returns>
+    private static PlayerSyringePalettePreset ResolvePalettePreset(float resolvedValue)
+    {
+        return (PlayerSyringePalettePreset)math.clamp((int)math.round(resolvedValue),
+                                                      (int)PlayerSyringePalettePreset.Health,
+                                                      (int)PlayerSyringePalettePreset.Experience);
     }
 
     /// <summary>

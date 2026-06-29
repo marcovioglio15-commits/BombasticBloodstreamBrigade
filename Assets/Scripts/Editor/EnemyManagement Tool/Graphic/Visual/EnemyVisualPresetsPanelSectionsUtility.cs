@@ -428,6 +428,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         SerializedProperty enabledProperty = bossUiProperty.FindPropertyRelative("enabled");
         SerializedProperty showHealthBarProperty = bossUiProperty.FindPropertyRelative("showHealthBar");
         SerializedProperty showOffscreenIndicatorProperty = bossUiProperty.FindPropertyRelative("showOffscreenIndicator");
+        SerializedProperty showPortraitProperty = bossUiProperty.FindPropertyRelative("showPortrait");
 
         if (enabledProperty == null)
             return container;
@@ -442,12 +443,23 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
 
         AddReactiveToggleField(panel, container, showHealthBarProperty, "Show Health Bar", "Shows the mirrored boss health and shield bars when the dedicated boss HUD is enabled.", "Edit Enemy Boss UI Settings");
         AddReactiveToggleField(panel, container, showOffscreenIndicatorProperty, "Show Offscreen Indicator", "Shows the screen-edge indicator for an active boss that is outside the camera view.", "Edit Enemy Boss UI Settings");
+        AddReactiveToggleField(panel, container, showPortraitProperty, "Show Portrait", "Shows a mirrored boss portrait opposite to the player portrait when the dedicated boss HUD is enabled.", "Edit Enemy Boss UI Settings");
 
         bool showHealthBar = showHealthBarProperty == null || showHealthBarProperty.boolValue;
         bool showOffscreenIndicator = showOffscreenIndicatorProperty == null || showOffscreenIndicatorProperty.boolValue;
+        bool showPortrait = showPortraitProperty == null || showPortraitProperty.boolValue;
 
-        if (!showHealthBar && !showOffscreenIndicator)
-            container.Add(new HelpBox("Both Boss UI outputs are disabled. Enable at least one output to show boss runtime UI.", HelpBoxMessageType.Warning));
+        if (!showHealthBar && !showOffscreenIndicator && !showPortrait)
+            container.Add(new HelpBox("All Boss UI outputs are disabled. Enable at least one output to show boss runtime UI.", HelpBoxMessageType.Warning));
+
+        if (showPortrait)
+        {
+            AddSectionLabel(container, "Mirrored Boss Portrait");
+            AddPropertyField(panel, container, bossUiProperty, "portraitSprite", "Portrait Sprite", "Sprite rendered by the mirrored boss portrait. Empty hides only the portrait image while keeping the rest of the boss HUD active.");
+            AddPropertyField(panel, container, bossUiProperty, "portraitColor", "Portrait Color", "Tint color applied to the mirrored boss portrait image.");
+            AddSliderField(panel, container, bossUiProperty.FindPropertyRelative("portraitSizePixels"), "Portrait Size", 24f, 256f, "Square size in pixels used by the mirrored boss portrait image.");
+            AddNonPositiveValueWarning(bossUiProperty, container, "portraitSizePixels", "Boss portrait size should be greater than zero.");
+        }
 
         if (showHealthBar)
         {

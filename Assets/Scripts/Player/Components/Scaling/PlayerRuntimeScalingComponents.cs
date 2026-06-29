@@ -201,6 +201,7 @@ public struct PlayerPowerUpBaseConfigElement : IBufferElementData
 {
     public FixedString64Bytes PowerUpId;
     public PlayerPowerUpUnlockKind UnlockKind;
+    public byte StealProtected;
     public PlayerPowerUpSlotConfig ActiveSlotConfig;
     public PlayerPassiveToolConfig PassiveToolConfig;
 }

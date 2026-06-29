@@ -42,9 +42,13 @@ public partial struct ProjectileSimulationSystem : ISystem
     {
         state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         float enemyTimeScale = 1f;
+        float playerProjectileTimeScale = 1f;
 
         if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
+        {
             enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
+            playerProjectileTimeScale = math.clamp(enemyGlobalTimeScale.PlayerProjectileScale, 0f, 1f);
+        }
 
         // Create the projectile simulation job,
         // passing in delta time and component lookups.
@@ -53,6 +57,7 @@ public partial struct ProjectileSimulationSystem : ISystem
             DeltaTime = SystemAPI.Time.DeltaTime,
             GlobalTime = (float)SystemAPI.Time.ElapsedTime,
             EnemyTimeScale = enemyTimeScale,
+            PlayerProjectileTimeScale = playerProjectileTimeScale,
             MovementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true),
             EnemyDataLookup = SystemAPI.GetComponentLookup<EnemyData>(true),
             PassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true),
@@ -88,6 +93,7 @@ public partial struct ProjectileSimulationSystem : ISystem
         public float DeltaTime;
         public float GlobalTime;
         public float EnemyTimeScale;
+        public float PlayerProjectileTimeScale;
         [ReadOnly] public ComponentLookup<PlayerMovementState> MovementStateLookup;
         [ReadOnly] public ComponentLookup<EnemyData> EnemyDataLookup;
         [ReadOnly] public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsLookup;
@@ -107,7 +113,8 @@ public partial struct ProjectileSimulationSystem : ISystem
             float projectileDeltaTime = ProjectileKinematicsUtility.ResolveOwnerScaledDeltaTime(in owner,
                                                                                                 in EnemyDataLookup,
                                                                                                 DeltaTime,
-                                                                                                EnemyTimeScale);
+                                                                                                EnemyTimeScale,
+                                                                                                PlayerProjectileTimeScale);
 
             // If the projectile has the perfect circle behavior enabled
             // and the shooter has the perfect circle passive tool,

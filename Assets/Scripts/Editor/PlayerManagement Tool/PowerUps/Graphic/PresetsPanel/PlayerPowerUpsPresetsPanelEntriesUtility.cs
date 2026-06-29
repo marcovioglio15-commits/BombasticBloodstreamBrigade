@@ -275,13 +275,13 @@ public static class PlayerPowerUpsPresetsPanelEntriesUtility
         string powerUpId = PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpDefinitionId(powerUpProperty);
         string displayName = PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpDefinitionDisplayName(powerUpProperty);
         int bindingCount = PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpDefinitionBindingCount(powerUpProperty);
-        bool unreplaceable = PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpDefinitionUnreplaceable(powerUpProperty);
+        bool stealProtected = PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpDefinitionStealProtected(powerUpProperty);
         string foldoutStateKey = PlayerPowerUpsPresetsPanelEntriesSupportUtility.BuildPowerUpFoldoutStateKey(isActiveSection, powerUpProperty);
         Foldout foldout = PlayerManagementFoldoutStateUtility.CreateFoldout(PlayerPowerUpsPresetsPanelEntriesSupportUtility.BuildPowerUpCardTitle(powerUpIndex,
                                                                                                                                                     powerUpId,
                                                                                                                                                     displayName,
                                                                                                                                                     bindingCount,
-                                                                                                                                                    unreplaceable),
+                                                                                                                                                    stealProtected),
                                                                             foldoutStateKey,
                                                                             PlayerPowerUpsPresetsPanelEntriesSupportUtility.ResolvePowerUpFoldoutState(foldoutStateByKey,
                                                                                                                                                        foldoutStateKey));

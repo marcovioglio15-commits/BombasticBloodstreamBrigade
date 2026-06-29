@@ -10,7 +10,8 @@ public enum PlayerSyringePalettePreset : byte
     Shield = 1,
     ActiveEnergy = 2,
     BossHealth = 3,
-    BossShield = 4
+    BossShield = 4,
+    Experience = 5
 }
 
 /// <summary>
@@ -135,6 +136,9 @@ public sealed class PlayerSyringePaletteSettings
             case PlayerSyringePalettePreset.BossShield:
                 ApplyBossShieldPreset();
                 return;
+            case PlayerSyringePalettePreset.Experience:
+                ApplyExperiencePreset();
+                return;
         }
     }
 
@@ -201,6 +205,25 @@ public sealed class PlayerSyringePaletteSettings
         liquid = new Color(0.12f, 0.78f, 1f, 1f);
         liquidHighlight = new Color(0.48f, 0.94f, 1f, 1f);
         bubbles = new Color(0.72f, 1f, 1f, 0.72f);
+        terminationOutline = outline;
+        terminationInterior = body;
+    }
+
+    /// <summary>
+    /// Applies an amber experience palette used by the player progression syringe.
+    /// </summary>
+    private void ApplyExperiencePreset()
+    {
+        outline = new Color(0.055f, 0.04f, 0.02f, 1f);
+        body = new Color(0.32f, 0.22f, 0.09f, 1f);
+        bodyShadow = new Color(0.14f, 0.09f, 0.035f, 1f);
+        chamber = new Color(0.25f, 0.17f, 0.08f, 0.82f);
+        liquid = new Color(0.98f, 0.68f, 0.08f, 1f);
+        liquidHighlight = new Color(1f, 0.9f, 0.24f, 1f);
+        bubbles = new Color(1f, 0.94f, 0.58f, 0.72f);
+        graduation = new Color(0.12f, 0.08f, 0.03f, 1f);
+        label = new Color(0.035f, 0.025f, 0.015f, 1f);
+        labelOutline = new Color(1f, 0.86f, 0.24f, 0.9f);
         terminationOutline = outline;
         terminationInterior = body;
     }

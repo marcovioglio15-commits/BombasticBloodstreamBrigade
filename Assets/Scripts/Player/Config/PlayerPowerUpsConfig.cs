@@ -53,7 +53,7 @@ public struct PlayerPowerUpSlotConfig
     public byte ApplyCharacterTuningOnActiveTrigger;
     public byte AllowRechargeDuringToggleStartupLock;
     public float MinimumActivationEnergyPercent;
-    public byte Unreplaceable;
+    public byte StealProtected;
     public byte SuppressBaseShootingWhileActive;
     public byte InterruptOtherSlotOnEnter;
     public byte InterruptOtherSlotChargingOnly;
@@ -124,6 +124,7 @@ public struct BulletTimePowerUpConfig
 {
     public float Duration;
     public float EnemySlowPercent;
+    public float PlayerProjectileSlowPercent;
     public float TransitionTimeSeconds;
 }
 
@@ -347,6 +348,7 @@ public struct PassiveBulletTimeConfig
     public float CooldownSeconds;
     public float DurationSeconds;
     public float EnemySlowPercent;
+    public float PlayerProjectileSlowPercent;
     public float TransitionTimeSeconds;
 }
 

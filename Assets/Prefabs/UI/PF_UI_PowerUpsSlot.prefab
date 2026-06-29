@@ -1763,6 +1763,7 @@ MonoBehaviour:
   labelsRoot: {fileID: 6113811950747220916}
   labelPool: {fileID: 6760963869179351919}
   materialTemplate: {fileID: 2100000, guid: 8c3c9844b73c1b44a8ff92bb22f641f9, type: 2}
+  counterRotateLabelsForMirroredRotation: 0
 --- !u!114 &6604138743185475022
 MonoBehaviour:
   m_ObjectHideFlags: 0

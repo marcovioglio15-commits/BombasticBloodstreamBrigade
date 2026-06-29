@@ -2,6 +2,7 @@
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Rebuilds the boss HUD Edit Mode preview through the same syringe visual settings used by enemy baking.
@@ -28,6 +29,8 @@ internal static class EnemyBossHudEditorPreviewUtility
     /// <param name="bossUi">Boss UI settings resolved from the selected visual preset.</param>
     /// <param name="healthSyringeBar">Preauthored syringe view representing boss health.</param>
     /// <param name="shieldSyringeBar">Preauthored syringe view representing boss shield.</param>
+    /// <param name="portraitRoot">Rect transform hosting the mirrored boss portrait.</param>
+    /// <param name="portraitImage">Image used to render the preview portrait sprite.</param>
     /// <param name="offscreenIndicatorRoot">Offscreen indicator hidden during local bar preview.</param>
     /// <param name="bossNameText">Text label showing the preview boss name.</param>
     /// <param name="healthValue">Current health value shown by the preview.</param>
@@ -38,6 +41,8 @@ internal static class EnemyBossHudEditorPreviewUtility
                                EnemyBossVisualUiSettings bossUi,
                                PlayerSyringeBarView healthSyringeBar,
                                PlayerSyringeBarView shieldSyringeBar,
+                               RectTransform portraitRoot,
+                               Image portraitImage,
                                RectTransform offscreenIndicatorRoot,
                                TMP_Text bossNameText,
                                float healthValue,
@@ -46,6 +51,7 @@ internal static class EnemyBossHudEditorPreviewUtility
                                float shieldMaximum)
     {
         EnemyBossHudOffscreenIndicatorUtility.SetVisible(offscreenIndicatorRoot, false);
+        ApplyPortraitPreview(bossUi, portraitRoot, portraitImage);
 
         if (!ShouldShowBars(bossUi))
         {
@@ -66,6 +72,36 @@ internal static class EnemyBossHudEditorPreviewUtility
     #endregion
 
     #region Preview Application
+    /// <summary>
+    /// Applies the configured mirrored boss portrait preview using authored preset data.
+    /// </summary>
+    /// <param name="bossUi">Boss UI settings resolved from the selected visual preset.</param>
+    /// <param name="portraitRoot">Rect transform hosting the mirrored boss portrait.</param>
+    /// <param name="portraitImage">Image used to render the preview portrait sprite.</param>
+    private static void ApplyPortraitPreview(EnemyBossVisualUiSettings bossUi,
+                                             RectTransform portraitRoot,
+                                             Image portraitImage)
+    {
+        if (portraitRoot == null || portraitImage == null)
+            return;
+
+        bool visible = bossUi == null || bossUi.Enabled && bossUi.ShowPortrait && bossUi.PortraitSprite != null;
+
+        if (portraitRoot.gameObject.activeSelf != visible)
+            portraitRoot.gameObject.SetActive(visible);
+
+        if (!visible)
+            return;
+
+        portraitRoot.localScale = Vector3.one;
+        portraitRoot.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        float sizePixels = bossUi != null ? Mathf.Max(1f, bossUi.PortraitSizePixels) : 96f;
+        portraitRoot.sizeDelta = new Vector2(sizePixels, sizePixels);
+        portraitImage.sprite = bossUi != null ? bossUi.PortraitSprite : null;
+        portraitImage.color = bossUi != null ? bossUi.PortraitColor : Color.white;
+        portraitImage.enabled = portraitImage.sprite != null;
+    }
+
     /// <summary>
     /// Applies the configured boss health syringe preview values.
     /// </summary>

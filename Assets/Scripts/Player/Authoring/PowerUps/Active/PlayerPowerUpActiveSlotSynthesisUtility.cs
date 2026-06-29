@@ -331,6 +331,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               float dashInvulnerabilityExtraTime,
                                               float bulletTimeDuration,
                                               float bulletTimeEnemySlowPercent,
+                                              float bulletTimePlayerProjectileSlowPercent,
                                               float bulletTimeTransitionTimeSeconds,
                                               bool hasImpactFrame,
                                               in ImpactFramePowerUpConfig impactFrameConfig,
@@ -424,7 +425,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                                                           resolvedToolKind),
             AllowRechargeDuringToggleStartupLock = allowRechargeDuringToggleStartupLock ? (byte)1 : (byte)0,
             MinimumActivationEnergyPercent = math.clamp(minimumActivationEnergyPercent, 0f, 100f),
-            Unreplaceable = powerUp.Unreplaceable ? (byte)1 : (byte)0,
+            StealProtected = powerUp.StealProtected ? (byte)1 : (byte)0,
             SuppressBaseShootingWhileActive = suppressBaseShootingWhileActive ? (byte)1 : (byte)0,
             InterruptOtherSlotOnEnter = interruptOtherSlotOnEnter ? (byte)1 : (byte)0,
             InterruptOtherSlotChargingOnly = interruptOtherSlotChargingOnly ? (byte)1 : (byte)0,
@@ -463,6 +464,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             {
                 Duration = math.max(0.05f, bulletTimeDuration),
                 EnemySlowPercent = math.clamp(bulletTimeEnemySlowPercent, 0f, 100f),
+                PlayerProjectileSlowPercent = math.clamp(bulletTimePlayerProjectileSlowPercent, 0f, 100f),
                 TransitionTimeSeconds = math.max(0f, bulletTimeTransitionTimeSeconds)
             },
             ImpactFrame = impactFrameConfig,

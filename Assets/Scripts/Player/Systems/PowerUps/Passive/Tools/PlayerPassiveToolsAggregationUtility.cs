@@ -327,8 +327,10 @@ public static class PlayerPassiveToolsAggregationUtility
         if (passiveToolConfig.HasBulletTime != 0)
         {
             passiveToolsState.HasBulletTime = 1;
+            bool hasExistingBulletTimeSlow = passiveToolsState.BulletTime.EnemySlowPercent > 0f ||
+                                             passiveToolsState.BulletTime.PlayerProjectileSlowPercent > 0f;
 
-            if (passiveToolsState.BulletTime.EnemySlowPercent <= 0f)
+            if (!hasExistingBulletTimeSlow)
             {
                 passiveToolsState.BulletTime = passiveToolConfig.BulletTime;
             }
@@ -341,6 +343,8 @@ public static class PlayerPassiveToolsAggregationUtility
                                                                         passiveToolConfig.BulletTime.DurationSeconds);
                 passiveToolsState.BulletTime.EnemySlowPercent = math.max(passiveToolsState.BulletTime.EnemySlowPercent,
                                                                          passiveToolConfig.BulletTime.EnemySlowPercent);
+                passiveToolsState.BulletTime.PlayerProjectileSlowPercent = math.max(passiveToolsState.BulletTime.PlayerProjectileSlowPercent,
+                                                                                    passiveToolConfig.BulletTime.PlayerProjectileSlowPercent);
                 passiveToolsState.BulletTime.TransitionTimeSeconds = math.max(passiveToolsState.BulletTime.TransitionTimeSeconds,
                                                                               passiveToolConfig.BulletTime.TransitionTimeSeconds);
             }

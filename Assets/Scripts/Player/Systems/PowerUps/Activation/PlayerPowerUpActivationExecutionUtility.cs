@@ -380,6 +380,7 @@ public static class PlayerPowerUpActivationExecutionUtility
         PlayerBulletTimeRuntimeUtility.ActivateTimedEffect(ref bulletTimeState,
                                                            slotConfig.BulletTime.Duration,
                                                            slotConfig.BulletTime.EnemySlowPercent,
+                                                           slotConfig.BulletTime.PlayerProjectileSlowPercent,
                                                            slotConfig.BulletTime.TransitionTimeSeconds);
     }
 

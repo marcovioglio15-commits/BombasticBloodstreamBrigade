@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [Serializable]
 public sealed class BombToolData
@@ -345,6 +346,9 @@ public sealed class BulletTimeToolData
     [Tooltip("Enemy slowdown percentage while Bullet Time is active. 0 means no slowdown, 100 means full stop.")]
     [SerializeField] private float enemySlowPercent = 40f;
 
+    [Tooltip("Player projectile slowdown percentage while Bullet Time is active. 0 keeps player shots unscaled, 100 fully freezes player-owned projectile travel.")]
+    [SerializeField] private float playerProjectileSlowPercent;
+
     [Tooltip("Seconds used to blend the slow effect in and out whenever Bullet Time changes state.")]
     [SerializeField] private float transitionTimeSeconds = 0.2f;
     #endregion
@@ -365,6 +369,14 @@ public sealed class BulletTimeToolData
         get
         {
             return enemySlowPercent;
+        }
+    }
+
+    public float PlayerProjectileSlowPercent
+    {
+        get
+        {
+            return playerProjectileSlowPercent;
         }
     }
 
@@ -431,8 +443,9 @@ public sealed class ActiveToolDefinition
     [Tooltip("Minimum energy percentage required for activation. 0 disables this gate.")]
     [SerializeField] private float minimumActivationEnergyPercent;
 
-    [Tooltip("When enabled, this tool cannot be replaced from slots.")]
-    [SerializeField] private bool unreplaceable;
+    [Tooltip("When enabled, enemy Power-Up Stealer modules cannot remove this active power-up from the player.")]
+    [FormerlySerializedAs("unreplaceable")]
+    [SerializeField] private bool stealProtected;
 
     [Header("Tool Specific")]
     [Tooltip("Bomb-specific payload data.")]
@@ -536,11 +549,11 @@ public sealed class ActiveToolDefinition
         }
     }
 
-    public bool Unreplaceable
+    public bool StealProtected
     {
         get
         {
-            return unreplaceable;
+            return stealProtected;
         }
     }
 

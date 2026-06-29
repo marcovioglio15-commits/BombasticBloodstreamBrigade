@@ -31,7 +31,7 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
         SerializedProperty chargeTypeProperty = property.FindPropertyRelative("chargeType");
         SerializedProperty chargePerTriggerProperty = property.FindPropertyRelative("chargePerTrigger");
         SerializedProperty minimumActivationEnergyPercentProperty = property.FindPropertyRelative("minimumActivationEnergyPercent");
-        SerializedProperty unreplaceableProperty = property.FindPropertyRelative("unreplaceable");
+        SerializedProperty stealProtectedProperty = property.FindPropertyRelative("stealProtected");
         SerializedProperty bombDataProperty = property.FindPropertyRelative("bombData");
         SerializedProperty dashDataProperty = property.FindPropertyRelative("dashData");
         SerializedProperty bulletTimeDataProperty = property.FindPropertyRelative("bulletTimeData");
@@ -47,7 +47,7 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
             chargeTypeProperty == null ||
             chargePerTriggerProperty == null ||
             minimumActivationEnergyPercentProperty == null ||
-            unreplaceableProperty == null ||
+            stealProtectedProperty == null ||
             bombDataProperty == null ||
             dashDataProperty == null ||
             bulletTimeDataProperty == null)
@@ -77,7 +77,7 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
         AddField(root, chargeTypeProperty);
         AddField(root, chargePerTriggerProperty);
         AddField(root, minimumActivationEnergyPercentProperty);
-        AddField(root, unreplaceableProperty);
+        AddField(root, stealProtectedProperty, "Steal Protected");
 
         Label toolSpecificLabel = new Label("Tool Specific");
         toolSpecificLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -240,7 +240,9 @@ public sealed class ActiveToolDefinitionPropertyDrawer : PropertyDrawer
                 AddField(container, dashDataProperty, "Dash Settings");
                 return;
             case ActiveToolKind.BulletTime:
-                AddField(container, bulletTimeDataProperty, "Bullet Time Settings");
+                PowerUpModuleDefinitionPayloadDrawerUtility.BuildBulletTimePayloadUi(container,
+                                                                                     bulletTimeDataProperty,
+                                                                                     "Bullet Time Settings");
                 return;
         }
     }

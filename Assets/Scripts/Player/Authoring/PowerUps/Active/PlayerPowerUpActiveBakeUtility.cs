@@ -199,6 +199,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasBulletTime = false;
         float bulletTimeDuration = 0.05f;
         float bulletTimeEnemySlowPercent = 0f;
+        float bulletTimePlayerProjectileSlowPercent = 0f;
         float bulletTimeTransitionTimeSeconds = 0f;
         bool hasImpactFrame = false;
         ImpactFramePowerUpConfig impactFrameConfig = default;
@@ -433,6 +434,8 @@ public static class PlayerPowerUpActiveBakeUtility
                     hasBulletTime = true;
                     bulletTimeDuration = math.max(bulletTimeDuration, math.max(0.05f, bulletTimeModuleData.Duration));
                     bulletTimeEnemySlowPercent = math.max(bulletTimeEnemySlowPercent, math.clamp(bulletTimeModuleData.EnemySlowPercent, 0f, 100f));
+                    bulletTimePlayerProjectileSlowPercent = math.max(bulletTimePlayerProjectileSlowPercent,
+                                                                      math.clamp(bulletTimeModuleData.PlayerProjectileSlowPercent, 0f, 100f));
                     bulletTimeTransitionTimeSeconds = math.max(bulletTimeTransitionTimeSeconds,
                                                                math.max(0f, bulletTimeModuleData.TransitionTimeSeconds));
                     break;
@@ -621,6 +624,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        dashInvulnerabilityExtraTime,
                                                                        bulletTimeDuration,
                                                                        bulletTimeEnemySlowPercent,
+                                                                       bulletTimePlayerProjectileSlowPercent,
                                                                        bulletTimeTransitionTimeSeconds,
                                                                        hasImpactFrame,
                                                                        in impactFrameConfig,
@@ -752,7 +756,7 @@ public static class PlayerPowerUpActiveBakeUtility
             ApplyCharacterTuningOnActiveTrigger = 0,
             AllowRechargeDuringToggleStartupLock = 0,
             MinimumActivationEnergyPercent = math.clamp(activeTool.MinimumActivationEnergyPercent, 0f, 100f),
-            Unreplaceable = activeTool.Unreplaceable ? (byte)1 : (byte)0,
+            StealProtected = activeTool.StealProtected ? (byte)1 : (byte)0,
             SuppressBaseShootingWhileActive = 0,
             InterruptOtherSlotOnEnter = 0,
             InterruptOtherSlotChargingOnly = 1,
@@ -790,7 +794,9 @@ public static class PlayerPowerUpActiveBakeUtility
             BulletTime = new BulletTimePowerUpConfig
             {
                 Duration = bulletTimeData != null ? math.max(0.05f, bulletTimeData.Duration) : 0.05f,
-                EnemySlowPercent = bulletTimeData != null ? math.clamp(bulletTimeData.EnemySlowPercent, 0f, 100f) : 0f
+                EnemySlowPercent = bulletTimeData != null ? math.clamp(bulletTimeData.EnemySlowPercent, 0f, 100f) : 0f,
+                PlayerProjectileSlowPercent = bulletTimeData != null ? math.clamp(bulletTimeData.PlayerProjectileSlowPercent, 0f, 100f) : 0f,
+                TransitionTimeSeconds = bulletTimeData != null ? math.max(0f, bulletTimeData.TransitionTimeSeconds) : 0f
             },
             ChargeShot = default,
             PortableHealthPack = default,

@@ -3,11 +3,12 @@ using Unity.Mathematics;
 
 #region Components
 /// <summary>
-/// Global enemy simulation time scale used by gameplay effects such as Bullet Time.
+/// Global simulation time scale used by gameplay effects such as Bullet Time.
 /// </summary>
 public struct EnemyGlobalTimeScale : IComponentData
 {
     public float Scale;
+    public float PlayerProjectileScale;
 }
 
 /// <summary>

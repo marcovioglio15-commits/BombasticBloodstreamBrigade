@@ -66,7 +66,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesInitializationUtility
 
         SerializedProperty commonDataProperty = powerUpProperty.FindPropertyRelative("commonData");
         SerializedProperty moduleBindingsProperty = powerUpProperty.FindPropertyRelative("moduleBindings");
-        SerializedProperty unreplaceableProperty = powerUpProperty.FindPropertyRelative("unreplaceable");
+        SerializedProperty stealProtectedProperty = powerUpProperty.FindPropertyRelative("stealProtected");
 
         if (commonDataProperty != null)
         {
@@ -81,8 +81,8 @@ public static class PlayerPowerUpsPresetsPanelEntriesInitializationUtility
         if (moduleBindingsProperty != null)
             moduleBindingsProperty.arraySize = 0;
 
-        if (unreplaceableProperty != null)
-            unreplaceableProperty.boolValue = false;
+        if (stealProtectedProperty != null)
+            stealProtectedProperty.boolValue = false;
     }
 
     public static void SetPowerUpDefinitionId(SerializedProperty powerUpProperty, string powerUpId)

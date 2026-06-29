@@ -458,11 +458,11 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                                     List<string> dropPools,
                                                                     int dropTier,
                                                                     int purchaseCost,
-                                                                    bool unreplaceable,
+                                                                    bool stealProtected,
                                                                     params PowerUpModuleBinding[] bindings)
     {
         ModularPowerUpDefinition powerUpDefinition = new ModularPowerUpDefinition();
-        powerUpDefinition.Configure(CreateCommonData(powerUpId, displayName, descriptionValue, dropPools, dropTier, purchaseCost), unreplaceable);
+        powerUpDefinition.Configure(CreateCommonData(powerUpId, displayName, descriptionValue, dropPools, dropTier, purchaseCost), stealProtected);
         powerUpDefinition.ClearBindings();
 
         if (bindings != null)

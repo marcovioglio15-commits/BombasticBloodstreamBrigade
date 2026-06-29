@@ -19,6 +19,7 @@ internal static class PlayerRuntimeScalingBakeUtility
     private const string ActivePowerUpsRoot = "activePowerUps.Array.data[";
     private const string PassivePowerUpsRoot = "passivePowerUps.Array.data[";
     private const string ModuleDefinitionsRoot = "moduleDefinitions.Array.data[";
+    private const string StealProtectedPayloadPath = "stealProtected";
     private const int MaximumFixedString64Utf8Bytes = 61;
     #endregion
 
@@ -179,6 +180,7 @@ internal static class PlayerRuntimeScalingBakeUtility
 
             element.PowerUpId = new FixedString64Bytes(powerUp.CommonData.PowerUpId.Trim());
             element.UnlockKind = unlockKind;
+            element.StealProtected = powerUp.StealProtected ? (byte)1 : (byte)0;
             element.ActiveSlotConfig = default;
             element.PassiveToolConfig = default;
 
@@ -496,6 +498,15 @@ internal static class PlayerRuntimeScalingBakeUtility
         if (powerUp == null || powerUp.CommonData == null || string.IsNullOrWhiteSpace(powerUp.CommonData.PowerUpId))
             return false;
 
+        string stealProtectedSuffix = "." + StealProtectedPayloadPath;
+
+        if (propertyPath.EndsWith(stealProtectedSuffix, StringComparison.Ordinal))
+        {
+            powerUpId = powerUp.CommonData.PowerUpId.Trim();
+            payloadPath = StealProtectedPayloadPath;
+            return true;
+        }
+
         string overridePrefix = ".overridePayload.";
         int payloadIndex = propertyPath.IndexOf(overridePrefix, StringComparison.Ordinal);
 
@@ -600,6 +611,14 @@ internal static class PlayerRuntimeScalingBakeUtility
 
         if (string.IsNullOrWhiteSpace(powerUpId))
             return false;
+
+        string stealProtectedSuffix = "." + StealProtectedPayloadPath;
+
+        if (statKey.EndsWith(stealProtectedSuffix, StringComparison.Ordinal))
+        {
+            payloadPath = StealProtectedPayloadPath;
+            return true;
+        }
 
         string overridePrefix = ".overridePayload.";
         int payloadIndex = statKey.IndexOf(overridePrefix, StringComparison.Ordinal);

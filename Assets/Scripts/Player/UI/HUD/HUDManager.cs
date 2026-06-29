@@ -20,7 +20,7 @@ public sealed class HUDManager : MonoBehaviour
     [SerializeField] private string hudReferenceSearchRootName = "CanvasStyled";
 
     [Header("Health and Shield")]
-    [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, movement, and Player Visual Preset configuration.")]
+    [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, experience, movement, and Player Visual Preset configuration.")]
     [SerializeField] private PlayerHealthBarsHudView playerHealthBarsView;
 
     [Header("Portrait")]
@@ -208,9 +208,14 @@ public sealed class HUDManager : MonoBehaviour
         if (playerHealthBarsView != null)
             playerHealthBarsView.UpdateView(entityManager, playerEntity, snapCoreBars);
 
-        UpdateLevelAndExperience(playerEntity);
+        bool shouldUpdateGrowthSequence = UpdateLevelAndExperience(playerEntity);
         portraitSection.Update(entityManager, playerEntity);
-        growthSequenceSection.Update(entityManager, playerEntity);
+
+        if (shouldUpdateGrowthSequence)
+            growthSequenceSection.Update(entityManager, playerEntity);
+        else
+            growthSequenceSection.HandleLevelCapReached();
+
         powerUpOverlaySection.Update(entityManager, playerEntity);
         runTimerSection.Update(entityManager, playerEntity);
         comboCounterSection.Update(entityManager, playerEntity);
@@ -305,7 +310,8 @@ public sealed class HUDManager : MonoBehaviour
     /// Updates the player level text and experience progress bar from ECS progression data.
     /// </summary>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    private void UpdateLevelAndExperience(Entity playerEntity)
+    /// <returns>True when the growth sequence should continue updating for the current player.</returns>
+    private bool UpdateLevelAndExperience(Entity playerEntity)
     {
         bool hasPlayerLevel = entityManager.HasComponent<PlayerLevel>(playerEntity);
         bool hasPlayerExperience = entityManager.HasComponent<PlayerExperience>(playerEntity);
@@ -316,13 +322,29 @@ public sealed class HUDManager : MonoBehaviour
         if (!hasPlayerLevel || !hasPlayerExperience)
         {
             HandleMissingExperienceBar();
-            return;
+            return true;
         }
 
         PlayerLevel playerLevel = entityManager.GetComponentData<PlayerLevel>(playerEntity);
         PlayerExperience playerExperience = entityManager.GetComponentData<PlayerExperience>(playerEntity);
+
+        if (HasReachedLevelCap(playerEntity, playerLevel.Current))
+        {
+            HideLevelTextForExperienceCap();
+            HideLegacyExperienceBar();
+            return false;
+        }
+
         UpdateLevelText(in playerLevel);
+
+        if (playerHealthBarsView != null && playerHealthBarsView.HasExperienceBar)
+        {
+            HideLegacyExperienceBar();
+            return true;
+        }
+
         UpdateExperienceBar(in playerExperience, in playerLevel);
+        return true;
     }
 
     /// <summary>
@@ -525,6 +547,18 @@ public sealed class HUDManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Hides the level label that is visually attached to the experience syringe after progression reaches the cap.
+    /// </summary>
+    private void HideLevelTextForExperienceCap()
+    {
+        if (playerLevelText == null)
+            return;
+
+        playerLevelText.enabled = false;
+        displayedPlayerLevel = -1;
+    }
+
+    /// <summary>
     /// Applies the missing-player state to the experience progress bar.
     /// </summary>
     private void HandleMissingExperienceBar()
@@ -533,6 +567,32 @@ public sealed class HUDManager : MonoBehaviour
             return;
 
         experienceBarRuntime.HandleMissing(hideExperienceBarWhenPlayerMissing, displayedExperienceNormalized);
+    }
+
+    /// <summary>
+    /// Hides the legacy image-based experience bar while the syringe bar or level-cap state owns progression display.
+    /// </summary>
+    private void HideLegacyExperienceBar()
+    {
+        if (experienceBarRuntime == null)
+            return;
+
+        experienceBarRuntime.HandleMissing(true, displayedExperienceNormalized);
+    }
+
+    /// <summary>
+    /// Checks whether the current player has reached the configured progression level cap.
+    /// </summary>
+    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="levelValue">Current player level value.</param>
+    /// <returns>True when progression config exists and the level cap is reached.</returns>
+    private bool HasReachedLevelCap(Entity playerEntity, int levelValue)
+    {
+        if (!entityManager.HasComponent<PlayerProgressionConfig>(playerEntity))
+            return false;
+
+        PlayerProgressionConfig progressionConfig = entityManager.GetComponentData<PlayerProgressionConfig>(playerEntity);
+        return PlayerProgressionPhaseUtility.HasReachedLevelCap(progressionConfig, levelValue);
     }
 
     /// <summary>
@@ -550,7 +610,7 @@ public sealed class HUDManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Builds the legacy experience-bar runtime while health and shield use their dedicated syringe view.
+    /// Builds the legacy experience-bar runtime only when the dedicated experience syringe is not authored.
     /// </summary>
     private void EnsureExperienceBarVisualInitialized()
     {

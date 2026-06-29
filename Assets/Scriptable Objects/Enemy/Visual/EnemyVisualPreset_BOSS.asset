@@ -207,7 +207,11 @@ MonoBehaviour:
     enabled: 1
     showHealthBar: 1
     showOffscreenIndicator: 1
+    showPortrait: 0
     bossDisplayName: BLORBOG
+    portraitSprite: {fileID: 0}
+    portraitColor: {r: 1, g: 1, b: 1, a: 1}
+    portraitSizePixels: 96
     syringeBars:
       enabled: 1
       hideWhenPlayerMissing: 1
@@ -342,6 +346,55 @@ MonoBehaviour:
           valueImpulseEnabled: 1
           valueImpulseStrength: 1
           valueImpulseDecay: 1
+      experiencePalettePreset: 5
+      experience:
+        enabled: 1
+        hideWhenMaximumUnavailable: 1
+        smoothingSeconds: 0.08
+        sloshAffectsBubblesOnly: 0
+        palette:
+          outline: {r: 0.055, g: 0.04, b: 0.02, a: 1}
+          body: {r: 0.32, g: 0.22, b: 0.09, a: 1}
+          bodyShadow: {r: 0.14, g: 0.09, b: 0.035, a: 1}
+          chamber: {r: 0.25, g: 0.17, b: 0.08, a: 0.82}
+          liquid: {r: 0.98, g: 0.68, b: 0.08, a: 1}
+          liquidHighlight: {r: 1, g: 0.9, b: 0.24, a: 1}
+          bubbles: {r: 1, g: 0.94, b: 0.58, a: 0.72}
+          graduation: {r: 0.12, g: 0.08, b: 0.03, a: 1}
+          label: {r: 0.035, g: 0.025, b: 0.015, a: 1}
+          labelOutline: {r: 1, g: 0.86, b: 0.24, a: 0.9}
+          plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
+          plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
+          terminationOutline: {r: 0.055, g: 0.04, b: 0.02, a: 1}
+          terminationInterior: {r: 0.32, g: 0.22, b: 0.09, a: 1}
+        fluid:
+          flowEnabled: 1
+          flowSpeed: 0.45
+          waveAmplitude: 0.035
+          waveFrequency: 3
+          viscosity: 0.72
+          bubblesEnabled: 1
+          bubbleDensity: 0.35
+          bubbleMinimumSize: 0.025
+          bubbleMaximumSize: 0.07
+          bubbleRiseSpeed: 0.18
+          bubbleDrift: 0.12
+        motion:
+          movementReactionEnabled: 1
+          sloshStrength: 0.08
+          surfaceSloshStrength: 0.45
+          horizontalSloshEnabled: 1
+          horizontalSloshStrength: 0.16
+          sloshSpring: 18
+          sloshDamping: 8
+          maximumSlosh: 0.25
+          tiltEnabled: 1
+          maximumTiltDegrees: 2.5
+          tiltSpring: 16
+          tiltDamping: 8
+          valueImpulseEnabled: 1
+          valueImpulseStrength: 0.65
+          valueImpulseDecay: 7
     offscreenIndicatorSprite: {fileID: 21300000, guid: 53d6eb3725de4164185265b18768cfdf, type: 3}
     offscreenIndicatorColor: {r: 0.02114594, g: 1, b: 0, a: 0.95}
     offscreenIndicatorSizePixels: 100

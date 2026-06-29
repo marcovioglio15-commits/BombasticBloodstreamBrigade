@@ -23,13 +23,13 @@ internal static class PlayerSyringeBarPreviewLengthTestUtility
         float maximumLength = Mathf.Max(minimumLength, config.MaximumLength);
         float graduationStartInset = Mathf.Max(0f, config.EndCapWidth) +
                                      Mathf.Max(0f, config.GraduationEndPadding);
-        float graduationEndInset = Mathf.Max(0f, config.EndCapWidth);
+        float graduationEndInset = config.TerminationEnabled != 0 ? Mathf.Max(0f, config.EndCapWidth) : 0f;
 
         if (config.BodyStyle == PlayerSyringeBodyStyle.SimplePaintedContainer)
         {
             graduationStartInset = Mathf.Max(0f, config.EndCapWidth) * 0.5f +
                                    Mathf.Max(0f, config.GraduationEndPadding);
-            graduationEndInset += Mathf.Max(0f, config.TerminationOffset);
+            graduationEndInset += config.TerminationEnabled != 0 ? Mathf.Max(0f, config.TerminationOffset) : 0f;
         }
 
         float targetLength = graduationStartInset +

@@ -92,6 +92,7 @@ public struct PlayerPowerUpUnlockCatalogElement : IBufferElementData
     public FixedString64Bytes DisplayName;
     public FixedString128Bytes Description;
     public PlayerPowerUpUnlockKind UnlockKind;
+    public byte StealProtected;
     public byte IsUnlocked;
     public byte PendingInitialCharacterTuningApply;
     public int CurrentUnlockCount;

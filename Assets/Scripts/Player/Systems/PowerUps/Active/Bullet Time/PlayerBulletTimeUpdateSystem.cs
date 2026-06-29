@@ -22,7 +22,8 @@ public partial struct PlayerBulletTimeUpdateSystem : ISystem
             Entity singletonEntity = state.EntityManager.CreateEntity();
             state.EntityManager.AddComponentData(singletonEntity, new EnemyGlobalTimeScale
             {
-                Scale = 1f
+                Scale = 1f,
+                PlayerProjectileScale = 1f
             });
         }
     }
@@ -31,27 +32,36 @@ public partial struct PlayerBulletTimeUpdateSystem : ISystem
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
         float maxSlowPercent = 0f;
+        float maxPlayerProjectileSlowPercent = 0f;
 
         foreach (RefRW<PlayerBulletTimeState> bulletTimeState in SystemAPI.Query<RefRW<PlayerBulletTimeState>>())
         {
-            float slowPercent = PlayerBulletTimeRuntimeUtility.Tick(ref bulletTimeState.ValueRW, deltaTime);
+            float slowPercent = PlayerBulletTimeRuntimeUtility.Tick(ref bulletTimeState.ValueRW,
+                                                                    deltaTime,
+                                                                    out float playerProjectileSlowPercent);
 
             if (slowPercent > maxSlowPercent)
                 maxSlowPercent = slowPercent;
+
+            if (playerProjectileSlowPercent > maxPlayerProjectileSlowPercent)
+                maxPlayerProjectileSlowPercent = playerProjectileSlowPercent;
         }
 
         float enemyTimeScale = math.saturate(1f - (maxSlowPercent * 0.01f));
+        float playerProjectileTimeScale = math.saturate(1f - (maxPlayerProjectileSlowPercent * 0.01f));
 
         if (SystemAPI.TryGetSingletonRW<EnemyGlobalTimeScale>(out RefRW<EnemyGlobalTimeScale> enemyGlobalTimeScale))
         {
             enemyGlobalTimeScale.ValueRW.Scale = enemyTimeScale;
+            enemyGlobalTimeScale.ValueRW.PlayerProjectileScale = playerProjectileTimeScale;
             return;
         }
 
         Entity singletonEntity = state.EntityManager.CreateEntity();
         state.EntityManager.AddComponentData(singletonEntity, new EnemyGlobalTimeScale
         {
-            Scale = enemyTimeScale
+            Scale = enemyTimeScale,
+            PlayerProjectileScale = playerProjectileTimeScale
         });
     }
     #endregion

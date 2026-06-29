@@ -252,6 +252,7 @@ public static class PlayerPowerUpCatalogBakeUtility
             unlockCatalogEntry.DisplayName = new FixedString64Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.DisplayName) ? powerUpId : powerUp.CommonData.DisplayName.Trim());
             unlockCatalogEntry.Description = new FixedString128Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.Description) ? string.Empty : powerUp.CommonData.Description.Trim());
             unlockCatalogEntry.UnlockKind = unlockKind;
+            unlockCatalogEntry.StealProtected = powerUp.StealProtected ? (byte)1 : (byte)0;
             unlockCatalogEntry.IsUnlocked = 0;
             unlockCatalogEntry.PendingInitialCharacterTuningApply = 0;
             unlockCatalogEntry.CurrentUnlockCount = 0;

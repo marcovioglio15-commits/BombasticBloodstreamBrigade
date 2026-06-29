@@ -45,9 +45,13 @@ public partial struct ProjectileWallCollisionSystem : ISystem
 
         float deltaTime = SystemAPI.Time.DeltaTime;
         float enemyTimeScale = 1f;
+        float playerProjectileTimeScale = 1f;
 
         if (SystemAPI.TryGetSingleton<EnemyGlobalTimeScale>(out EnemyGlobalTimeScale enemyGlobalTimeScale))
+        {
             enemyTimeScale = math.clamp(enemyGlobalTimeScale.Scale, 0f, 1f);
+            playerProjectileTimeScale = math.clamp(enemyGlobalTimeScale.PlayerProjectileScale, 0f, 1f);
+        }
 
         CollisionFilter wallsCollisionFilter = WorldWallCollisionUtility.BuildWallsCollisionFilter(wallsLayerMask);
         BufferLookup<ProjectilePoolElement> poolLookup = SystemAPI.GetBufferLookup<ProjectilePoolElement>(false);
@@ -77,7 +81,8 @@ public partial struct ProjectileWallCollisionSystem : ISystem
             float projectileDeltaTime = ProjectileKinematicsUtility.ResolveOwnerScaledDeltaTime(in projectileOwner,
                                                                                                 in enemyDataLookup,
                                                                                                 deltaTime,
-                                                                                                enemyTimeScale);
+                                                                                                enemyTimeScale,
+                                                                                                playerProjectileTimeScale);
             float3 displacement = perfectCircleState.ValueRO.Enabled != 0
                 ? projectileData.Velocity * projectileDeltaTime
                 : ProjectileKinematicsUtility.ResolveLinearDisplacement(in projectileData,

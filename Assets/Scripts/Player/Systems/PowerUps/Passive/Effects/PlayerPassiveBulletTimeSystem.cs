@@ -50,9 +50,10 @@ public partial struct PlayerPassiveBulletTimeSystem : ISystem
                 continue;
 
             PassiveBulletTimeConfig bulletTimeConfig = passiveToolsState.BulletTime;
-            float slowPercent = math.clamp(bulletTimeConfig.EnemySlowPercent, 0f, 100f);
+            float enemySlowPercent = math.clamp(bulletTimeConfig.EnemySlowPercent, 0f, 100f);
+            float playerProjectileSlowPercent = math.clamp(bulletTimeConfig.PlayerProjectileSlowPercent, 0f, 100f);
 
-            if (slowPercent <= 0f)
+            if (enemySlowPercent <= 0f && playerProjectileSlowPercent <= 0f)
                 continue;
 
             float maxHealth = math.max(0f, playerHealth.ValueRO.Max);
@@ -92,6 +93,7 @@ public partial struct PlayerPassiveBulletTimeSystem : ISystem
                 PlayerBulletTimeRuntimeUtility.ActivateTimedEffect(ref bulletTimeState.ValueRW,
                                                                    bulletTimeConfig.DurationSeconds,
                                                                    bulletTimeConfig.EnemySlowPercent,
+                                                                   bulletTimeConfig.PlayerProjectileSlowPercent,
                                                                    bulletTimeConfig.TransitionTimeSeconds);
                 cooldownRemaining = math.max(0f, bulletTimeConfig.CooldownSeconds);
             }

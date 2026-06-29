@@ -3,7 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
-/// Tracks short acquisition windows during which enemy Power-Up Stealer modules must ignore newly obtained player power-ups.
+/// Tracks permanent and short acquisition windows during which enemy Power-Up Stealer modules must ignore player power-ups.
 /// </summary>
 internal static class PlayerPowerUpStealCooldownRuntimeUtility
 {
@@ -57,7 +57,7 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
 
     #region Protection
     /// <summary>
-    /// Checks whether one catalog entry is inside the configured anti-steal cooldown window.
+    /// Checks whether one catalog entry is permanently protected or inside the configured anti-steal cooldown window.
     /// </summary>
     /// <param name="catalogEntry">Catalog entry being inspected.</param>
     /// <param name="cooldownSeconds">Configured cooldown duration in seconds.</param>
@@ -67,6 +67,9 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
                                                    float cooldownSeconds,
                                                    float elapsedTime)
     {
+        if (catalogEntry.StealProtected != 0)
+            return true;
+
         float sanitizedCooldown = math.max(0f, cooldownSeconds);
 
         if (sanitizedCooldown <= 0f)
@@ -86,7 +89,7 @@ internal static class PlayerPowerUpStealCooldownRuntimeUtility
     /// <param name="unlockCatalog">Player unlock catalog scanned for the entry.</param>
     /// <param name="cooldownSeconds">Configured cooldown duration in seconds.</param>
     /// <param name="elapsedTime">Current gameplay elapsed time.</param>
-    /// <returns>True when the matching entry exists and is temporarily protected.</returns>
+    /// <returns>True when the matching entry exists and is protected.</returns>
     public static bool IsPowerUpProtectedFromSteal(FixedString64Bytes powerUpId,
                                                    PlayerPowerUpUnlockKind unlockKind,
                                                    DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,

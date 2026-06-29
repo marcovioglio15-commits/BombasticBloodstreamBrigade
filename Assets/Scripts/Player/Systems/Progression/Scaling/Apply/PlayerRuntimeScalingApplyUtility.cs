@@ -355,6 +355,7 @@ internal static class PlayerRuntimeScalingApplyUtility
                 }
 
                 ref PlayerPowerUpBaseConfigElement baseConfig = ref basePowerUpConfigs.ElementAt(baseConfigIndex);
+                catalogEntry.StealProtected = baseConfig.StealProtected;
                 catalogEntry.ActiveSlotConfig = baseConfig.ActiveSlotConfig;
                 catalogEntry.PassiveToolConfig = baseConfig.PassiveToolConfig;
                 ApplyPowerUpScaling(powerUpScaling,
@@ -362,6 +363,7 @@ internal static class PlayerRuntimeScalingApplyUtility
                                     catalogEntry.UnlockKind,
                                     ref catalogEntry.ActiveSlotConfig,
                                     ref catalogEntry.PassiveToolConfig);
+                ApplyPowerUpCatalogScaling(powerUpScaling, ref catalogEntry);
             }
 
             for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
@@ -385,6 +387,44 @@ internal static class PlayerRuntimeScalingApplyUtility
                                     ref unusedActiveSlot,
                                     ref equippedPassiveTool.Tool);
             }
+        }
+    }
+
+    /// <summary>
+    /// Applies catalog-level power-up scaling fields that are not embedded inside active or passive payload configs.
+    /// </summary>
+    /// <param name="powerUpScaling">Power-up scaling metadata baked from Add Scaling rules.</param>
+    /// <param name="catalogEntry">Mutable catalog entry rebuilt from immutable baselines.</param>
+    private static void ApplyPowerUpCatalogScaling(DynamicBuffer<PlayerRuntimePowerUpScalingElement> powerUpScaling,
+                                                   ref PlayerPowerUpUnlockCatalogElement catalogEntry)
+    {
+        if (!powerUpScaling.IsCreated || catalogEntry.PowerUpId.Length <= 0)
+            return;
+
+        for (int scalingIndex = 0; scalingIndex < powerUpScaling.Length; scalingIndex++)
+        {
+            PlayerRuntimePowerUpScalingElement scalingElement = powerUpScaling[scalingIndex];
+
+            if (scalingElement.UnlockKind != catalogEntry.UnlockKind)
+                continue;
+
+            if (scalingElement.PowerUpId != catalogEntry.PowerUpId)
+                continue;
+
+            if ((PlayerFormulaValueType)scalingElement.ValueType != PlayerFormulaValueType.Boolean)
+                continue;
+
+            if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
+                                                                                      scalingElement.BaseBooleanValue != 0,
+                                                                                      variableContext,
+                                                                                      out bool resolvedBoolean))
+            {
+                continue;
+            }
+
+            PlayerRuntimePowerUpScalingPathUtility.TryApplyCatalogBooleanValue(scalingElement.PayloadPath.ToString(),
+                                                                               resolvedBoolean,
+                                                                               ref catalogEntry);
         }
     }
 

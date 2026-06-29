@@ -221,6 +221,7 @@ public static class PlayerPowerUpPassiveBakeUtility
         bool hasBulletTime = false;
         float bulletTimeDurationSeconds = 0.05f;
         float bulletTimeEnemySlowPercent = 0f;
+        float bulletTimePlayerProjectileSlowPercent = 0f;
         float bulletTimeTransitionTimeSeconds = 0f;
         bool hasLaserBeam = false;
         LaserBeamPassiveConfig laserBeamConfig = default;
@@ -433,6 +434,8 @@ public static class PlayerPowerUpPassiveBakeUtility
                     bulletTimeDurationSeconds = math.max(bulletTimeDurationSeconds, math.max(0.05f, bulletTimeData.Duration));
                     bulletTimeEnemySlowPercent = math.max(bulletTimeEnemySlowPercent,
                                                           math.clamp(bulletTimeData.EnemySlowPercent, 0f, 100f));
+                    bulletTimePlayerProjectileSlowPercent = math.max(bulletTimePlayerProjectileSlowPercent,
+                                                                      math.clamp(bulletTimeData.PlayerProjectileSlowPercent, 0f, 100f));
                     bulletTimeTransitionTimeSeconds = math.max(bulletTimeTransitionTimeSeconds,
                                                                math.max(0f, bulletTimeData.TransitionTimeSeconds));
                     break;
@@ -559,7 +562,7 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasExplosion = hasExplosion ? (byte)1 : (byte)0,
             HasElementalTrail = hasTrailSpawn || hasAreaTick ? (byte)1 : (byte)0,
             HasHeal = hasHeal && healAmount > 0f ? (byte)1 : (byte)0,
-            HasBulletTime = hasBulletTime && bulletTimeEnemySlowPercent > 0f ? (byte)1 : (byte)0,
+            HasBulletTime = hasBulletTime && (bulletTimeEnemySlowPercent > 0f || bulletTimePlayerProjectileSlowPercent > 0f) ? (byte)1 : (byte)0,
             HasLaserBeam = hasLaserBeam ? (byte)1 : (byte)0,
             HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
             HasWeaponSwitch = hasWeaponSwitch ? (byte)1 : (byte)0,
@@ -631,6 +634,7 @@ public static class PlayerPowerUpPassiveBakeUtility
                 CooldownSeconds = hasSharedCooldown ? math.max(0f, sharedCooldownSeconds) : 0f,
                 DurationSeconds = math.max(0.05f, bulletTimeDurationSeconds),
                 EnemySlowPercent = math.clamp(bulletTimeEnemySlowPercent, 0f, 100f),
+                PlayerProjectileSlowPercent = math.clamp(bulletTimePlayerProjectileSlowPercent, 0f, 100f),
                 TransitionTimeSeconds = math.max(0f, bulletTimeTransitionTimeSeconds)
             },
             LaserBeam = laserBeamConfig,

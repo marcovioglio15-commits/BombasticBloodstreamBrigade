@@ -239,7 +239,7 @@ public sealed class PlayerVisualPreset : ScriptableObject
     private PlayerGroundShadowSettings groundShadow = new PlayerGroundShadowSettings();
 
     [Header("Health Bars")]
-    [Tooltip("ECS-authoritative procedural syringe settings used by the player health and shield HUD views.")]
+    [Tooltip("ECS-authoritative procedural syringe settings used by the player health, shield, and experience HUD views.")]
     [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
 
     [Header("Active Power-Up HUD")]

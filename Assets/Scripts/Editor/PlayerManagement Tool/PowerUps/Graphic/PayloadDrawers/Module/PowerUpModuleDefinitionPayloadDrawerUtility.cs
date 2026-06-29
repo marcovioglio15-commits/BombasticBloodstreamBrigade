@@ -58,6 +58,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.Dash:
                 PowerUpDashPayloadDrawerUtility.BuildDashPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.TimeDilationEnemies:
+                BuildTimeDilationPayloadUi(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.ImpactFrame:
                 PowerUpImpactFramePayloadDrawerUtility.BuildImpactFramePayloadUi(payloadContainer, payloadProperty);
                 return;
@@ -132,6 +135,61 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         return field;
     }
 
+    /// <summary>
+    /// Builds a scaling-aware Bullet Time payload UI and warning block.
+    /// </summary>
+    /// <param name="payloadContainer">Container that receives the Bullet Time controls.</param>
+    /// <param name="bulletTimeProperty">Serialized BulletTimeToolData property.</param>
+    /// <param name="title">Foldout title shown in the tool.</param>
+    public static void BuildBulletTimePayloadUi(VisualElement payloadContainer,
+                                                SerializedProperty bulletTimeProperty,
+                                                string title)
+    {
+        if (payloadContainer == null || bulletTimeProperty == null)
+            return;
+
+        SerializedProperty durationProperty = bulletTimeProperty.FindPropertyRelative("duration");
+        SerializedProperty enemySlowPercentProperty = bulletTimeProperty.FindPropertyRelative("enemySlowPercent");
+        SerializedProperty playerProjectileSlowPercentProperty = bulletTimeProperty.FindPropertyRelative("playerProjectileSlowPercent");
+        SerializedProperty transitionTimeSecondsProperty = bulletTimeProperty.FindPropertyRelative("transitionTimeSeconds");
+
+        if (durationProperty == null ||
+            enemySlowPercentProperty == null ||
+            playerProjectileSlowPercentProperty == null ||
+            transitionTimeSecondsProperty == null)
+        {
+            HelpBox errorBox = new HelpBox("Bullet Time payload fields are missing.", HelpBoxMessageType.Warning);
+            payloadContainer.Add(errorBox);
+            return;
+        }
+
+        Foldout bulletTimeFoldout = CreatePayloadFoldout(string.IsNullOrWhiteSpace(title) ? "Bullet Time" : title, true);
+        payloadContainer.Add(bulletTimeFoldout);
+        VisualElement durationField = AddField(bulletTimeFoldout, durationProperty, "Duration");
+        VisualElement enemySlowPercentField = AddField(bulletTimeFoldout, enemySlowPercentProperty, "Enemy Slow Percent");
+        VisualElement playerProjectileSlowPercentField = AddField(bulletTimeFoldout,
+                                                                  playerProjectileSlowPercentProperty,
+                                                                  "Player Projectile Slow Percent");
+        VisualElement transitionTimeSecondsField = AddField(bulletTimeFoldout, transitionTimeSecondsProperty, "Transition Time Seconds");
+        HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        payloadContainer.Add(warningBox);
+
+        Action refreshWarnings = () =>
+        {
+            RefreshBulletTimeWarnings(durationProperty,
+                                      enemySlowPercentProperty,
+                                      playerProjectileSlowPercentProperty,
+                                      transitionTimeSecondsProperty,
+                                      warningBox);
+        };
+
+        RegisterRefreshCallback(durationField, refreshWarnings);
+        RegisterRefreshCallback(enemySlowPercentField, refreshWarnings);
+        RegisterRefreshCallback(playerProjectileSlowPercentField, refreshWarnings);
+        RegisterRefreshCallback(transitionTimeSecondsField, refreshWarnings);
+        refreshWarnings();
+    }
+
     #endregion
 
     #region Generic Payload
@@ -177,6 +235,59 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     #endregion
 
     #region Specialized Payloads
+    /// <summary>
+    /// Builds the TimeDilationEnemies module payload UI from its nested Bullet Time data.
+    /// </summary>
+    /// <param name="payloadContainer">Container receiving the payload controls.</param>
+    /// <param name="payloadProperty">Serialized module payload root.</param>
+    private static void BuildTimeDilationPayloadUi(VisualElement payloadContainer, SerializedProperty payloadProperty)
+    {
+        if (payloadContainer == null || payloadProperty == null)
+            return;
+
+        SerializedProperty bulletTimeProperty = ResolveBulletTimePayloadProperty(payloadProperty);
+
+        if (bulletTimeProperty == null)
+        {
+            HelpBox errorBox = new HelpBox("Time Dilation payload fields are missing.", HelpBoxMessageType.Warning);
+            payloadContainer.Add(errorBox);
+            return;
+        }
+
+        BuildBulletTimePayloadUi(payloadContainer, bulletTimeProperty, "Time Dilation");
+    }
+
+    /// <summary>
+    /// Resolves Bullet Time payload data from either a module payload root or a direct BulletTimeToolData property.
+    /// </summary>
+    /// <param name="payloadProperty">Serialized payload property supplied by module defaults or binding overrides.</param>
+    /// <returns>Serialized BulletTimeToolData property when available.</returns>
+    private static SerializedProperty ResolveBulletTimePayloadProperty(SerializedProperty payloadProperty)
+    {
+        if (payloadProperty == null)
+            return null;
+
+        SerializedProperty nestedBulletTimeProperty = payloadProperty.FindPropertyRelative("bulletTime");
+
+        if (nestedBulletTimeProperty != null)
+            return nestedBulletTimeProperty;
+
+        return HasBulletTimeFields(payloadProperty) ? payloadProperty : null;
+    }
+
+    /// <summary>
+    /// Checks whether a serialized property directly exposes the Bullet Time fields used by Time Dilation.
+    /// </summary>
+    /// <param name="payloadProperty">Serialized property to inspect.</param>
+    /// <returns>True when the property can be drawn as BulletTimeToolData.</returns>
+    private static bool HasBulletTimeFields(SerializedProperty payloadProperty)
+    {
+        return payloadProperty.FindPropertyRelative("duration") != null &&
+               payloadProperty.FindPropertyRelative("enemySlowPercent") != null &&
+               payloadProperty.FindPropertyRelative("playerProjectileSlowPercent") != null &&
+               payloadProperty.FindPropertyRelative("transitionTimeSeconds") != null;
+    }
+
     /// <summary>
     /// Builds the AreaTickApplyElement payload UI with scaling-aware nested fields and context-sensitive effect sections.
     /// </summary>
@@ -1243,6 +1354,54 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     #endregion
 
     #region Warnings
+    /// <summary>
+    /// Refreshes warnings for Bullet Time payloads without mutating authored values.
+    /// </summary>
+    /// <param name="durationProperty">Serialized duration field.</param>
+    /// <param name="enemySlowPercentProperty">Serialized enemy slow percentage field.</param>
+    /// <param name="playerProjectileSlowPercentProperty">Serialized player projectile slow percentage field.</param>
+    /// <param name="transitionTimeSecondsProperty">Serialized transition duration field.</param>
+    /// <param name="warningBox">Warning box updated with current diagnostics.</param>
+    private static void RefreshBulletTimeWarnings(SerializedProperty durationProperty,
+                                                  SerializedProperty enemySlowPercentProperty,
+                                                  SerializedProperty playerProjectileSlowPercentProperty,
+                                                  SerializedProperty transitionTimeSecondsProperty,
+                                                  HelpBox warningBox)
+    {
+        if (warningBox == null)
+            return;
+
+        List<string> warningLines = new List<string>();
+
+        if (durationProperty != null && durationProperty.floatValue <= 0f)
+            warningLines.Add("Duration must be greater than 0 for Bullet Time to activate.");
+
+        float enemySlowPercent = enemySlowPercentProperty != null ? enemySlowPercentProperty.floatValue : 0f;
+        float playerProjectileSlowPercent = playerProjectileSlowPercentProperty != null ? playerProjectileSlowPercentProperty.floatValue : 0f;
+
+        if (enemySlowPercent <= 0f && playerProjectileSlowPercent <= 0f)
+            warningLines.Add("Set Enemy Slow Percent or Player Projectile Slow Percent above 0, otherwise Time Dilation has no runtime effect.");
+
+        if (enemySlowPercent < 0f || enemySlowPercent > 100f)
+            warningLines.Add("Enemy Slow Percent should stay between 0 and 100. Bake/runtime clamps out-of-range values.");
+
+        if (playerProjectileSlowPercent < 0f || playerProjectileSlowPercent > 100f)
+            warningLines.Add("Player Projectile Slow Percent should stay between 0 and 100. Bake/runtime clamps out-of-range values.");
+
+        if (transitionTimeSecondsProperty != null && transitionTimeSecondsProperty.floatValue < 0f)
+            warningLines.Add("Transition Time Seconds should not be negative. Bake/runtime clamps it to 0.");
+
+        if (warningLines.Count <= 0)
+        {
+            warningBox.style.display = DisplayStyle.None;
+            warningBox.text = string.Empty;
+            return;
+        }
+
+        warningBox.style.display = DisplayStyle.Flex;
+        warningBox.text = string.Join("\n", warningLines);
+    }
+
     /// <summary>
     /// Refreshes validation warnings for AreaTickApplyElement payload fields without mutating serialized values.
     /// </summary>

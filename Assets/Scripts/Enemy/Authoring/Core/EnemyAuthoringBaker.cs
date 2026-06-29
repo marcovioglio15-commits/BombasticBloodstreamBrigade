@@ -809,6 +809,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             displayName = visualPreset.PresetName;
 
         Color offscreenIndicatorColor = bossUi != null ? bossUi.OffscreenIndicatorColor : new Color(1f, 0.2f, 0.1f, 0.95f);
+        Color portraitColor = bossUi != null ? bossUi.PortraitColor : Color.white;
         PlayerHealthBarsVisualSettings bossSyringeSettings = bossUi != null && bossUi.SyringeBars != null
             ? bossUi.SyringeBars
             : new PlayerHealthBarsVisualSettings(PlayerSyringePalettePreset.BossHealth,
@@ -820,9 +821,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             Enabled = bossUi == null || bossUi.Enabled ? (byte)1 : (byte)0,
             ShowHealthBar = bossUi == null || bossUi.ShowHealthBar ? (byte)1 : (byte)0,
             ShowOffscreenIndicator = bossUi == null || bossUi.ShowOffscreenIndicator ? (byte)1 : (byte)0,
+            ShowPortrait = bossUi == null || bossUi.ShowPortrait ? (byte)1 : (byte)0,
             DisplayName = new Unity.Collections.FixedString64Bytes(displayName),
             BarsVisualConfig = bossBarsVisualConfig,
+            PortraitColor = DamageFlashRuntimeUtility.ToLinearFloat4(portraitColor),
             OffscreenIndicatorColor = DamageFlashRuntimeUtility.ToLinearFloat4(offscreenIndicatorColor),
+            PortraitSizePixels = bossUi != null ? math.max(1f, bossUi.PortraitSizePixels) : 96f,
             OffscreenIndicatorSizePixels = bossUi != null ? math.max(1f, bossUi.OffscreenIndicatorSizePixels) : 56f,
             EdgePaddingPixels = bossUi != null ? math.max(0f, bossUi.EdgePaddingPixels) : 30f
         };
@@ -876,7 +880,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     }
 
     /// <summary>
-    /// Adds managed boss HUD assets such as custom off-screen indicator sprites.
+    /// Adds managed boss HUD assets such as custom off-screen indicator and portrait sprites.
     /// </summary>
     /// <param name="authoring">Source authoring component.</param>
     /// <param name="entity">Enemy entity receiving managed data.</param>
@@ -890,16 +894,28 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         if (visualPreset == null || visualPreset.BossUi == null)
             return;
 
-        if (!visualPreset.BossUi.ShowOffscreenIndicator)
-            return;
-
-        if (visualPreset.BossUi.OffscreenIndicatorSprite == null)
+        if (!HasBossHudManagedConfig(visualPreset.BossUi))
             return;
 
         AddComponentObject(entity, new EnemyBossHudManagedConfig
         {
-            OffscreenIndicatorSprite = visualPreset.BossUi.OffscreenIndicatorSprite
+            OffscreenIndicatorSprite = visualPreset.BossUi.ShowOffscreenIndicator ? visualPreset.BossUi.OffscreenIndicatorSprite : null,
+            PortraitSprite = visualPreset.BossUi.ShowPortrait ? visualPreset.BossUi.PortraitSprite : null
         });
+    }
+
+    /// <summary>
+    /// Checks whether one boss UI settings block references managed assets required by runtime presentation.
+    /// </summary>
+    /// <param name="bossUi">Boss UI settings resolved from the visual preset.</param>
+    /// <returns>True when at least one enabled managed sprite exists.</returns>
+    private static bool HasBossHudManagedConfig(EnemyBossVisualUiSettings bossUi)
+    {
+        if (bossUi == null)
+            return false;
+
+        return bossUi.ShowOffscreenIndicator && bossUi.OffscreenIndicatorSprite != null ||
+               bossUi.ShowPortrait && bossUi.PortraitSprite != null;
     }
 
     /// <summary>

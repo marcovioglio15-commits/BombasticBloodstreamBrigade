@@ -23,11 +23,11 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         VisualElement root = new VisualElement();
         SerializedProperty commonDataProperty = property.FindPropertyRelative("commonData");
         SerializedProperty moduleBindingsProperty = property.FindPropertyRelative("moduleBindings");
-        SerializedProperty unreplaceableProperty = property.FindPropertyRelative("unreplaceable");
+        SerializedProperty stealProtectedProperty = property.FindPropertyRelative("stealProtected");
 
         if (commonDataProperty == null ||
             moduleBindingsProperty == null ||
-            unreplaceableProperty == null)
+            stealProtectedProperty == null)
         {
             Label errorLabel = new Label("ModularPowerUpDefinition serialized fields are missing.");
             errorLabel.style.unityFontStyleAndWeight = FontStyle.Italic;
@@ -36,7 +36,7 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         }
 
         AddField(root, commonDataProperty, "Common Data");
-        AddField(root, unreplaceableProperty, "Unreplaceable");
+        AddField(root, stealProtectedProperty, "Steal Protected");
         string contextKey = BuildContextKey(property);
         Foldout moduleBindingsFoldout = BuildModuleBindingsFoldout(contextKey);
         root.Add(moduleBindingsFoldout);

@@ -19,9 +19,12 @@ public struct EnemyBossHudConfig : IComponentData
     public byte Enabled;
     public byte ShowHealthBar;
     public byte ShowOffscreenIndicator;
+    public byte ShowPortrait;
     public FixedString64Bytes DisplayName;
     public PlayerHealthBarVisualConfig BarsVisualConfig;
+    public float4 PortraitColor;
     public float4 OffscreenIndicatorColor;
+    public float PortraitSizePixels;
     public float OffscreenIndicatorSizePixels;
     public float EdgePaddingPixels;
 }
@@ -33,6 +36,7 @@ public sealed class EnemyBossHudManagedConfig : IComponentData
 {
     #region Fields
     public Sprite OffscreenIndicatorSprite;
+    public Sprite PortraitSprite;
     #endregion
 }
 

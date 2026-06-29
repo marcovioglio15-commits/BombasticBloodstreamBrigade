@@ -36,6 +36,7 @@ Shader "Custom/UI/PlayerSyringeBar"
         _LabelPlacement("Label Placement", Float) = 0
         _GraduationVisible("Graduation Visible", Float) = 1
         _TerminationStyle("Termination Style", Float) = 1
+        _TerminationEnabled("Termination Enabled", Float) = 1
         _MajorDivisionCount("Major Graduation Interval Count", Float) = 5
         _MinorDivisionsPerMajor("Minor Divisions Per Major Interval", Float) = 1
 
@@ -54,6 +55,14 @@ Shader "Custom/UI/PlayerSyringeBar"
         _PaintDripWidth("Reference-Normalized Paint Drip Width", Range(0.0001, 0.25)) = 0.018
         _PaintDripIrregularity("Paint Drip Irregularity", Range(0, 1)) = 0.65
         _LengthPixelScale("Resolved Length / Reference Length", Float) = 1
+
+        [Header(Painted Outline)]
+        _StylizedOutlineEnabled("Stylized Painted Outline Enabled", Float) = 0
+        _StylizedEdgeWobbleStrength("Stylized Edge Wobble Strength", Range(0, 1)) = 0.35
+        _StylizedEdgeWobbleFrequency("Stylized Edge Wobble Frequency", Range(1, 64)) = 16
+        _StylizedInnerStreakStrength("Stylized Inner Streak Strength", Range(0, 1)) = 0.25
+        _StylizedInnerStreakDensity("Stylized Inner Streak Density", Range(0, 1)) = 0.3
+        _StylizedInnerStreakLength("Stylized Inner Streak Length", Range(0, 0.5)) = 0.16
 
         [Header(Runtime Value)]
         _FillNormalized("Normalized Authoritative Fill", Range(0, 1)) = 1
@@ -175,6 +184,7 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _LabelPlacement;
             float _GraduationVisible;
             float _TerminationStyle;
+            float _TerminationEnabled;
             float _MajorDivisionCount;
             float _MinorDivisionsPerMajor;
             float _RequirementMarkerEnabled;
@@ -189,6 +199,12 @@ Shader "Custom/UI/PlayerSyringeBar"
             float _PaintDripWidth;
             float _PaintDripIrregularity;
             float _LengthPixelScale;
+            float _StylizedOutlineEnabled;
+            float _StylizedEdgeWobbleStrength;
+            float _StylizedEdgeWobbleFrequency;
+            float _StylizedInnerStreakStrength;
+            float _StylizedInnerStreakDensity;
+            float _StylizedInnerStreakLength;
             float _FillNormalized;
             float _Slosh;
             float _ValueImpulse;
@@ -416,8 +432,9 @@ Shader "Custom/UI/PlayerSyringeBar"
 
             float BubbleMask(float2 chamberUv, float timeValue)
             {
-                float lengthScale = max(0.25, _LengthPixelScale);
-                float2 gridScale = float2(max(2.0, 18.0 * lengthScale), 5.0);
+                float gridY = 5.0;
+                float gridX = clamp(gridY / max(0.02, _OutlineAspect), 2.0, 64.0);
+                float2 gridScale = float2(gridX, gridY);
                 float2 movingUv = chamberUv * gridScale;
                 movingUv.y -= timeValue * _BubbleRiseSpeed * gridScale.y;
                 movingUv.x += sin((movingUv.y + timeValue) * 0.7) * _BubbleDrift;
@@ -437,15 +454,23 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float softness = 0.0025;
                 float endCap = clamp(_EndCapNormalized, 0.001, 0.45);
                 float outlineThickness = max(0.006, _OutlineThickness * 0.42);
+                float stylizedOutline = step(0.5, _StylizedOutlineEnabled);
+                float edgeWobbleFrequency = clamp(_StylizedEdgeWobbleFrequency, 1.0, 64.0);
+                float edgeWobble = (Hash21(floor(float2(uv.x * edgeWobbleFrequency,
+                                                         uv.y * 9.0 + 2.37))) - 0.5) * 2.0;
+                outlineThickness = max(0.004,
+                                       outlineThickness +
+                                       edgeWobble * saturate(_StylizedEdgeWobbleStrength) * stylizedOutline * 0.014);
                 // Horizontal outline is aspect-corrected (height/length) so its pixel thickness matches the vertical
                 // outline and stays identical across syringes of different resolved lengths.
                 float outlineThicknessX = outlineThickness * _OutlineAspect;
                 float detailedStyle = step(0.5, round(clamp(_BodyStyle, 0.0, 1.0)));
                 float simplifiedStyle = 1.0 - detailedStyle;
                 float graduationVisible = step(0.5, _GraduationVisible);
+                float terminationEnabled = step(0.5, _TerminationEnabled);
                 float externalLabels = step(0.5, round(clamp(_LabelPlacement, 0.0, 1.0))) * graduationVisible;
                 float bodyStart = lerp(endCap * 0.34, endCap * 0.82, detailedStyle);
-                float bodyEnd = lerp(1.0 - endCap * 0.34, 1.0 - endCap * 0.72, detailedStyle);
+                float bodyEnd = lerp(1.0 - endCap * 0.34, 1.0 - endCap * 0.72 * terminationEnabled, detailedStyle);
                 float bodyBottom = lerp(0.12, 0.045, detailedStyle);
                 float bodyTop = lerp(0.88, 0.955, detailedStyle);
                 float bodyBevel = lerp(0.008, 0.045, detailedStyle);
@@ -494,7 +519,7 @@ Shader "Custom/UI/PlayerSyringeBar"
                                             float2(bodyStart + 0.02, 0.585),
                                             softness);
                 leftStemTrimMask *= detailedStyle;
-                float tipMask = SyringeTipMask(uv, bodyEnd, endCap, softness) * detailedStyle;
+                float tipMask = SyringeTipMask(uv, bodyEnd, endCap, softness) * detailedStyle * terminationEnabled;
                 float paintDripMask = 0.0;
 
                 if (_PaintDripsEnabled > 0.5)
@@ -512,15 +537,22 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                                     bodyBottom + outlineThickness),
                                                              float2(simplifiedTerminationStart + softness * 2.0,
                                                                     bodyTop - outlineThickness),
-                                                             softness) * simplifiedStyle;
+                                                             softness) * simplifiedStyle * terminationEnabled;
+                float simplifiedBodyClosureLineMask = BoxMask(uv,
+                                                               float2(simplifiedTerminationStart - outlineThicknessX,
+                                                                      bodyBottom),
+                                                               float2(simplifiedTerminationStart + outlineThicknessX,
+                                                                      bodyTop),
+                                                               softness) * simplifiedStyle * (1.0 - terminationEnabled);
                 float bodyOutlineMask = saturate((bodyMask - bodyInteriorMask) +
                                                  (leftFlangeMask - leftFlangeInteriorMask) +
+                                                 simplifiedBodyClosureLineMask +
                                                  paintDripMask -
                                                  simplifiedRightBodyEdgeMask);
                 float detailedChamberStart = bodyStart + endCap * 0.18 + _ChamberInset * 0.035;
                 float chamberStart = lerp(graduationStart, detailedChamberStart, detailedStyle);
                 float chamberEnd = lerp(simplifiedTerminationStart,
-                                        bodyEnd - endCap * 0.26 - _ChamberInset * 0.035,
+                                        bodyEnd - endCap * 0.26 * terminationEnabled - _ChamberInset * 0.035,
                                         detailedStyle);
                 float chamberBottom = lerp(0.18, 0.37, externalLabels);
                 float chamberTop = lerp(0.82, 0.79, detailedStyle);
@@ -541,23 +573,30 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                                        chamberBottom),
                                                                 float2(simplifiedTerminationStart + softness * 2.0,
                                                                        chamberTop),
-                                                                softness) * simplifiedStyle;
+                                                                softness) * simplifiedStyle * terminationEnabled;
+                float simplifiedChamberClosureLineMask = BoxMask(uv,
+                                                                  float2(simplifiedTerminationStart - outlineThicknessX,
+                                                                         chamberBottom - 0.035),
+                                                                  float2(simplifiedTerminationStart + outlineThicknessX,
+                                                                         chamberTop + 0.035),
+                                                                  softness) * simplifiedStyle * (1.0 - terminationEnabled);
                 float chamberBorderMask = saturate(chamberFrameMask -
                                                    chamberMask -
-                                                   simplifiedRightChamberEdgeMask);
+                                                   simplifiedRightChamberEdgeMask +
+                                                   simplifiedChamberClosureLineMask);
                 float majorTickBottom = lerp(chamberBottom + 0.025, 0.205, externalLabels) + _GraduationVerticalOffset;
                 float majorTickTop = lerp(chamberBottom + 0.15, 0.345, externalLabels) + _GraduationVerticalOffset;
                 float simplifiedTerminationEnd = 1.0 - softness;
                 float simplifiedTerminationOuterMask = BoxMask(uv,
                                                                 float2(simplifiedTerminationStart, bodyBottom),
                                                                 float2(simplifiedTerminationEnd, bodyTop),
-                                                                softness) * simplifiedStyle;
+                                                                softness) * simplifiedStyle * terminationEnabled;
                 float simplifiedTerminationInteriorMask = BoxMask(uv,
                                                                    float2(simplifiedTerminationStart + outlineThicknessX,
                                                                           bodyBottom + outlineThickness),
                                                                    float2(simplifiedTerminationEnd - outlineThicknessX,
                                                                           bodyTop - outlineThickness),
-                                                                   softness) * simplifiedStyle;
+                                                                   softness) * simplifiedStyle * terminationEnabled;
                 float simplifiedTerminationOutlineMask = saturate(simplifiedTerminationOuterMask -
                                                                    simplifiedTerminationInteriorMask);
                 float graduationPanelMask = BoxMask(uv,
@@ -572,12 +611,12 @@ Shader "Custom/UI/PlayerSyringeBar"
                                                   float2(chamberEnd + 0.018, 0.25),
                                                   float2(bodyEnd + endCap * 0.06, 0.79),
                                                   0.018,
-                                                  softness) * detailedStyle;
+                                                  softness) * detailedStyle * terminationEnabled;
                 float collarInsetMask = BoxMask(uv,
                                                 float2(chamberEnd + 0.032, 0.29),
                                                 float2(bodyEnd - 0.004, 0.75),
                                                 softness);
-                float collarBandMask = saturate(collarMask - collarInsetMask) * detailedStyle;
+                float collarBandMask = saturate(collarMask - collarInsetMask) * detailedStyle * terminationEnabled;
                 float2 chamberUv = float2(saturate((uv.x - chamberStart) / max(0.0001, chamberEnd - chamberStart)),
                                           saturate((uv.y - chamberBottom) / max(0.0001, chamberTop - chamberBottom)));
                 float valueTrackX = saturate((uv.x - graduationStart) / max(0.0001, graduationEnd - graduationStart));
@@ -640,6 +679,33 @@ Shader "Custom/UI/PlayerSyringeBar"
                 float surfaceHighlight = smoothstep(surface - 0.06, surface, chamberUv.y) * liquidMask;
                 float2 bubbleUv = float2(valueTrackX - horizontalSlosh, chamberUv.y);
                 float bubbleMask = BubbleMask(bubbleUv, _Time.y) * liquidMask * _BubblesEnabled;
+                float innerStreakDensity = saturate(_StylizedInnerStreakDensity);
+                float innerStreakCells = clamp(lerp(6.0, 24.0, innerStreakDensity) * max(0.25, _LengthPixelScale),
+                                               2.0,
+                                               40.0);
+                float innerStreakIndex = floor(chamberUv.x * innerStreakCells);
+                float innerStreakRandom = Hash21(float2(innerStreakIndex, 17.29));
+                float innerStreakAlternate = Hash21(float2(innerStreakIndex, 42.61));
+                float innerStreakActive = step(1.0 - innerStreakDensity, innerStreakRandom);
+                float innerStreakCenter = (innerStreakIndex + lerp(0.25, 0.75, innerStreakAlternate)) / innerStreakCells;
+                float innerStreakWidth = lerp(0.004, 0.018, innerStreakAlternate) / max(0.25, _LengthPixelScale);
+                float innerStreakLength = max(0.001,
+                                              _StylizedInnerStreakLength *
+                                              lerp(0.35, 1.0, innerStreakRandom));
+                float innerStreakDistanceFromTop = 1.0 - chamberUv.y;
+                float innerStreakHorizontal = smoothstep(innerStreakWidth + softness,
+                                                         max(0.0, innerStreakWidth - softness),
+                                                         abs(chamberUv.x - innerStreakCenter));
+                float innerStreakVertical = smoothstep(-softness, softness, innerStreakDistanceFromTop) *
+                                            (1.0 - smoothstep(innerStreakLength,
+                                                              innerStreakLength + softness * 12.0,
+                                                              innerStreakDistanceFromTop));
+                float innerStreakMask = chamberInteriorMask *
+                                        innerStreakActive *
+                                        innerStreakHorizontal *
+                                        innerStreakVertical *
+                                        saturate(_StylizedInnerStreakStrength) *
+                                        stylizedOutline;
                 float plungerOuterBottom = lerp(bodyBottom + outlineThickness * 0.4,
                                                 chamberBottom - 0.045,
                                                 detailedStyle);
@@ -757,6 +823,8 @@ Shader "Custom/UI/PlayerSyringeBar"
                 finalAlpha = max(finalAlpha, simplifiedTerminationOutlineMask * _TerminationOutlineColor.a);
                 finalColor = lerp(finalColor, liquidColor, liquidMask * _LiquidColor.a);
                 finalAlpha = max(finalAlpha, liquidMask * _LiquidColor.a);
+                finalColor = lerp(finalColor, _OutlineColor.rgb, innerStreakMask * _OutlineColor.a);
+                finalAlpha = max(finalAlpha, innerStreakMask * _OutlineColor.a);
                 finalColor = lerp(finalColor, _BubbleColor.rgb, bubbleMask * _BubbleColor.a);
                 finalAlpha = max(finalAlpha, bubbleMask * _BubbleColor.a);
                 finalColor = lerp(finalColor, _OutlineColor.rgb, plungerOutlineFrameMask * _OutlineColor.a);

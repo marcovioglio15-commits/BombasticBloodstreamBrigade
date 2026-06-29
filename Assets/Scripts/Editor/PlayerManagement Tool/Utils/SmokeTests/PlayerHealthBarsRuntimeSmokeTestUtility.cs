@@ -29,7 +29,7 @@ internal static class PlayerHealthBarsRuntimeSmokeTestUtility
         PlayerHealthBarsHudView hudView = instance.GetComponent<PlayerHealthBarsHudView>();
         Transform shieldRoot = instance.transform.Find("PlayerShieldSyringe");
         RectTransform shieldRect = shieldRoot as RectTransform;
-        RectTransform experienceRect = instance.transform.Find("PlayerExperienceBar") as RectTransform;
+        RectTransform experienceRect = instance.transform.Find("PlayerExperienceSyringe") as RectTransform;
         RectTransform layoutRoot = instance.transform as RectTransform;
         World world = new World("PlayerHealthBarsShieldVisibilitySmokeTestWorld");
 
@@ -44,6 +44,15 @@ internal static class PlayerHealthBarsRuntimeSmokeTestUtility
                 Max = 100f
             });
             entityManager.AddComponentData(playerEntity, new PlayerShield());
+            entityManager.AddComponentData(playerEntity, new PlayerLevel
+            {
+                Current = 1,
+                RequiredExperienceForNextLevel = 100f
+            });
+            entityManager.AddComponentData(playerEntity, new PlayerExperience
+            {
+                Current = 25f
+            });
             entityManager.AddComponentData(playerEntity, new PlayerHealthBarVisualReference
             {
                 ConfigEntity = configEntity
