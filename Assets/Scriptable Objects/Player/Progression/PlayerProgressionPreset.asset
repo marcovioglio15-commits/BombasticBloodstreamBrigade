@@ -19,7 +19,7 @@ MonoBehaviour:
   scalableStats:
   - statName: Health
     statType: 1
-    defaultValue: 3
+    defaultValue: 5
     minimumValue: 1
     maximumValue: 10
     defaultBooleanValue: 0
