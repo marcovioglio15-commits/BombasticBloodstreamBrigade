@@ -9,8 +9,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Renders the Player HUD growth sequence from ECS visual config and the equipped level-up schedule.
 /// </summary>
-[Serializable]
-public sealed class HUDGrowthSequenceSection
+[DisallowMultipleComponent]
+public sealed class HUDGrowthSequenceSection : MonoBehaviour
 {
     #region Constants
     private const string DefaultContainerName = "GrowthSequence Container";
@@ -19,9 +19,6 @@ public sealed class HUDGrowthSequenceSection
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Enables the ECS-driven growth sequence HUD section.")]
-    [SerializeField] private bool isEnabled = true;
-
     [Tooltip("Optional root object for the growth sequence UI pool. When empty, GrowthSequence Container is found under the HUD manager.")]
     [SerializeField] private GameObject rootObject;
 
@@ -37,29 +34,13 @@ public sealed class HUDGrowthSequenceSection
     [Tooltip("Name of the growth sequence root used by auto discovery.")]
     [SerializeField] private string growthSequenceContainerName = DefaultContainerName;
 
-    [Tooltip("Creates a small runtime-only slot pool when GrowthSequence Container has no authored TMP or Image slots. Disable this once the HUD prefab carries explicit slots.")]
-    [SerializeField] private bool createFallbackSlotsWhenMissing = true;
-
-    [Tooltip("Number of fallback slots created under GrowthSequence Container when the authored slot pool is missing.")]
-    [SerializeField] private int fallbackSlotCount = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotCount;
-
-    [Tooltip("Width in UI units assigned to each fallback growth sequence slot.")]
-    [SerializeField] private float fallbackSlotWidth = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotWidth;
-
-    [Tooltip("Height in UI units assigned to each fallback growth sequence slot.")]
-    [SerializeField] private float fallbackSlotHeight = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotHeight;
-
-    [Tooltip("Horizontal spacing in UI units between generated fallback slots.")]
-    [SerializeField] private float fallbackSlotSpacing = HUDGrowthSequenceFallbackSlotUtility.DefaultSlotSpacing;
-
-    [Tooltip("TMP font size assigned to generated fallback text slots.")]
-    [SerializeField] private float fallbackFontSize = HUDGrowthSequenceFallbackSlotUtility.DefaultFontSize;
     #endregion
 
     private FixedString64Bytes displayedScheduleId;
     private int displayedNextStepIndex = -1;
     private int displayedVisibleCount = -1;
     private Entity lastConfigEntity;
+    private HUDGrowthSequenceRuntimeSlotPool runtimeSlotPool = HUDGrowthSequenceRuntimeSlotPool.Empty;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
     private bool loggedMissingPlayerReference;
     private bool loggedMissingConfigEntity;
@@ -97,13 +78,24 @@ public sealed class HUDGrowthSequenceSection
     }
 
     /// <summary>
+    /// Releases runtime-created growth sequence slot objects owned by this HUD section.
+    /// </summary>
+    public void Dispose()
+    {
+        if (!runtimeSlotPool.IsCreated)
+            return;
+
+        HUDGrowthSequenceRuntimeSlotUtility.DestroyPool(runtimeSlotPool);
+        runtimeSlotPool = HUDGrowthSequenceRuntimeSlotPool.Empty;
+        textSlots = null;
+        imageSlots = null;
+    }
+
+    /// <summary>
     /// Hides all growth sequence slots when the player or config entity is missing.
     /// </summary>
     public void HandleMissingPlayer()
     {
-        if (!isEnabled)
-            return;
-
         HideAllSlots();
     }
 
@@ -112,9 +104,6 @@ public sealed class HUDGrowthSequenceSection
     /// </summary>
     public void HandleLevelCapReached()
     {
-        if (!isEnabled)
-            return;
-
         HideAllSlots();
     }
 
@@ -123,11 +112,8 @@ public sealed class HUDGrowthSequenceSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read player and visual config data.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
-        if (!isEnabled)
-            return;
-
         if (!runtimeEntityManager.Exists(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualReference>(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerProgressionConfig>(playerEntity) ||
@@ -194,17 +180,19 @@ public sealed class HUDGrowthSequenceSection
             return;
         }
 
-        int slotCount = ResolveSlotCount();
         int maximumVisibleSteps = config.MaximumVisibleSteps > 0
             ? math.min(config.MaximumVisibleSteps, scheduleStepCount)
             : scheduleStepCount;
+        EnsureRuntimeSlots(maximumVisibleSteps);
+
+        int slotCount = ResolveSlotCount();
         int visibleCount = math.min(slotCount, maximumVisibleSteps);
 
         if (visibleCount <= 0)
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             LogDiagnosticOnce(ref loggedEmptySlotPool,
-                              "[HUDGrowthSequenceSection] Growth sequence has runtime data but no UI slots. Assign text/image slots or enable fallback slot creation on HUDManager.");
+                              "[HUDGrowthSequenceSection] Growth sequence has runtime data but no UI slot root. Assign Root Object on HUDGrowthSequenceSection or keep auto-discovery enabled for the GrowthSequence Container.");
 #endif
             HideAllSlots();
             return;
@@ -245,25 +233,16 @@ public sealed class HUDGrowthSequenceSection
                 rootObject = root.gameObject;
         }
 
-        Transform slotRoot = rootObject != null ? rootObject.transform : searchRoot;
+        if (rootObject == null)
+            return;
+
+        Transform slotRoot = rootObject.transform;
 
         if (textSlots == null || textSlots.Length <= 0)
             textSlots = slotRoot.GetComponentsInChildren<TMP_Text>(true);
 
         if (imageSlots == null || imageSlots.Length <= 0)
             imageSlots = slotRoot.GetComponentsInChildren<Image>(true);
-
-        if (ResolveSlotCount() <= 0 && createFallbackSlotsWhenMissing && rootObject != null)
-        {
-            HUDGrowthSequenceFallbackSlotPool fallbackSlotPool = HUDGrowthSequenceFallbackSlotUtility.Create(rootObject.transform,
-                                                                                                            fallbackSlotCount,
-                                                                                                            fallbackSlotWidth,
-                                                                                                            fallbackSlotHeight,
-                                                                                                            fallbackSlotSpacing,
-                                                                                                            fallbackFontSize);
-            textSlots = fallbackSlotPool.TextSlots;
-            imageSlots = fallbackSlotPool.ImageSlots;
-        }
     }
 
     /// <summary>
@@ -321,7 +300,7 @@ public sealed class HUDGrowthSequenceSection
     }
 
     /// <summary>
-    /// Renders one growth step into a preauthored slot.
+    /// Renders one growth step into an authored or runtime-created slot.
     /// </summary>
     /// <param name="slotIndex">Slot index to write.</param>
     /// <param name="step">Runtime growth step visual data.</param>
@@ -490,7 +469,7 @@ public sealed class HUDGrowthSequenceSection
 
     #region Visibility
     /// <summary>
-    /// Hides every preauthored growth sequence slot.
+    /// Hides every growth sequence slot.
     /// </summary>
     private void HideAllSlots()
     {
@@ -538,7 +517,7 @@ public sealed class HUDGrowthSequenceSection
     }
 
     /// <summary>
-    /// Resolves how many preauthored slots are available.
+    /// Resolves how many authored or runtime-created slots are available.
     /// </summary>
     /// <returns>Maximum slot count across text and image slot arrays.</returns>
     private int ResolveSlotCount()
@@ -546,6 +525,60 @@ public sealed class HUDGrowthSequenceSection
         int textSlotCount = textSlots != null ? textSlots.Length : 0;
         int imageSlotCount = imageSlots != null ? imageSlots.Length : 0;
         return math.max(textSlotCount, imageSlotCount);
+    }
+
+    /// <summary>
+    /// Creates runtime growth sequence slots only when no authored slot pool exists.
+    /// </summary>
+    /// <param name="requiredSlotCount">Slot count resolved from ECS config and the active schedule.</param>
+    private void EnsureRuntimeSlots(int requiredSlotCount)
+    {
+        if (requiredSlotCount <= 0 || rootObject == null)
+            return;
+
+        if (HasAuthoredSlotPool())
+            return;
+
+        runtimeSlotPool = HUDGrowthSequenceRuntimeSlotUtility.EnsureCapacity(rootObject.transform,
+                                                                            requiredSlotCount,
+                                                                            runtimeSlotPool);
+
+        if (!runtimeSlotPool.IsCreated)
+            return;
+
+        textSlots = runtimeSlotPool.TextSlots;
+        imageSlots = runtimeSlotPool.ImageSlots;
+    }
+
+    /// <summary>
+    /// Returns whether this section already has authored text or image slots.
+    /// </summary>
+    /// <returns>True when at least one authored slot reference is assigned.</returns>
+    private bool HasAuthoredSlotPool()
+    {
+        if (runtimeSlotPool.IsCreated)
+            return false;
+
+        return HasAssignedSlot(textSlots) || HasAssignedSlot(imageSlots);
+    }
+
+    /// <summary>
+    /// Checks one component array for an assigned slot reference.
+    /// </summary>
+    /// <param name="slots">Component array to inspect.</param>
+    /// <returns>True when at least one component reference is assigned.</returns>
+    private static bool HasAssignedSlot<TComponent>(TComponent[] slots) where TComponent : Component
+    {
+        if (slots == null)
+            return false;
+
+        for (int slotIndex = 0; slotIndex < slots.Length; slotIndex++)
+        {
+            if (slots[slotIndex] != null)
+                return true;
+        }
+
+        return false;
     }
     #endregion
 

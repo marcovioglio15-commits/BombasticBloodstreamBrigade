@@ -6,10 +6,9 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Handles world-space prompts and overlay interactions for dropped active power-up containers.
-/// none.
 /// </summary>
-[System.Serializable]
-public sealed class HUDPowerUpContainerInteractionSection
+[DisallowMultipleComponent]
+public sealed class HUDPowerUpContainerInteractionSection : MonoBehaviour
 {
     #region Fields
 
@@ -64,7 +63,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     #region Public Methods
     /// <summary>
     /// Registers button listeners and applies the initial hidden state.
-    /// none.
     /// </summary>
     public void Initialize()
     {
@@ -76,7 +74,6 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Unregisters button listeners and restores a safe default Time.timeScale.
-    /// none.
     /// </summary>
     public void Dispose()
     {
@@ -100,7 +97,6 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Clears presentation state when no valid player entity is available.
-    /// none.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -123,7 +119,7 @@ public sealed class HUDPowerUpContainerInteractionSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read and write runtime ECS state.</param>
     /// <param name="playerEntity">Current local player entity driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         entityManager = runtimeEntityManager;
         currentPlayerEntity = playerEntity;
@@ -219,7 +215,6 @@ public sealed class HUDPowerUpContainerInteractionSection
     #region Setup
     /// <summary>
     /// Registers the two overlay buttons used to pick the active slot replacement target.
-    /// none.
     /// </summary>
     private void RegisterButtons()
     {
@@ -250,7 +245,6 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Removes the listeners registered on the overlay action buttons.
-    /// none.
     /// </summary>
     private void UnregisterButtons()
     {
@@ -268,7 +262,6 @@ public sealed class HUDPowerUpContainerInteractionSection
 
     /// <summary>
     /// Auto-resolves button labels from the assigned button hierarchy when explicit references are missing.
-    /// none.
     /// </summary>
     private void CacheButtonTexts()
     {

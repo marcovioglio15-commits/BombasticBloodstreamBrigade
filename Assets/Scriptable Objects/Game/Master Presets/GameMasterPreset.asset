@@ -18,4 +18,5 @@ MonoBehaviour:
   version: 1.0.0
   audioManagerPreset: {fileID: 11400000, guid: 4762fb1f960c08e40b031f534d613690, type: 2}
   settingsManagerPreset: {fileID: 11400000, guid: 7863a90fb7b62c04b810ee60e0156cc3, type: 2}
+  hudManagerPreset: {fileID: 11400000, guid: e9ae73ef80d765c42ae45e03caeea19b, type: 2}
   sceneManagerPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}

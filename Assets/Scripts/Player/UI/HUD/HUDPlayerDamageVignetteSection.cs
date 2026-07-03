@@ -7,8 +7,8 @@ using UnityEngine.UI;
 /// Pulls sprite, tint and alpha each frame from the baked <see cref="PlayerDamageVignetteConfig"/> and the live <see cref="PlayerDamageVignetteState"/> on the player entity, so no UI is created at runtime.
 /// The shield Image only reacts to pure shield hits while the health Image reacts to hits that reach health, mirroring the per-channel rule applied by <see cref="PlayerDamageVignettePresentationSystem"/>.
 /// </summary>
-[System.Serializable]
-public sealed class HUDPlayerDamageVignetteSection
+[DisallowMultipleComponent]
+public sealed class HUDPlayerDamageVignetteSection : MonoBehaviour
 {
     #region Constants
     private const float AlphaWriteEpsilon = 0.001f;
@@ -45,6 +45,16 @@ public sealed class HUDPlayerDamageVignetteSection
     #region Methods
 
     #region Public Methods
+    /// <summary>
+    /// Applies the baked HUD Manager preset values before initialization or runtime update.
+    /// </summary>
+    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    public void ApplySettings(in GameHudRuntimeConfig config)
+    {
+        isEnabled = config.DamageVignetteEnabled != 0;
+        hideWhenPlayerMissing = config.DamageVignetteHideWhenPlayerMissing != 0;
+    }
+
     /// <summary>
     /// Applies the initial transparent state before any ECS data becomes available. Called from HUDManager.Awake.
     /// </summary>
@@ -90,7 +100,7 @@ public sealed class HUDPlayerDamageVignetteSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read the vignette components.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!isEnabled)
             return;

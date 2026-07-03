@@ -50,6 +50,11 @@ internal static class PlayerProgressionBlobBakeUtility
         string milestoneSkipHoldFillColorGScalingFormula = string.Empty;
         string milestoneSkipHoldFillColorBScalingFormula = string.Empty;
         string milestoneSkipHoldFillColorAScalingFormula = string.Empty;
+        bool milestoneSkipOnlyFromExitInput = preset != null && preset.MilestoneSkipOnlyFromExitInput;
+        bool baseMilestoneSkipOnlyFromExitInput = sourcePreset != null
+            ? sourcePreset.MilestoneSkipOnlyFromExitInput
+            : milestoneSkipOnlyFromExitInput;
+        string milestoneSkipOnlyFromExitInputScalingFormula = string.Empty;
 
         if (PlayerRuntimeScalingBakeMetadataUtility.TryResolveExperiencePickupRadiusScalingData(sourcePreset,
                                                                                                 out float resolvedBaseExperiencePickupRadius,
@@ -85,6 +90,14 @@ internal static class PlayerProgressionBlobBakeUtility
                                                         ref baseMilestoneSkipHoldFillColor.w,
                                                         ref milestoneSkipHoldFillColorAScalingFormula);
 
+        if (PlayerRuntimeScalingBakeMetadataUtility.TryResolveMilestoneSkipOnlyFromExitInputScalingData(sourcePreset,
+                                                                                                       out bool resolvedBaseMilestoneSkipOnlyFromExitInput,
+                                                                                                       out string resolvedMilestoneSkipOnlyFromExitInputScalingFormula))
+        {
+            baseMilestoneSkipOnlyFromExitInput = resolvedBaseMilestoneSkipOnlyFromExitInput;
+            milestoneSkipOnlyFromExitInputScalingFormula = resolvedMilestoneSkipOnlyFromExitInputScalingFormula;
+        }
+
         root.LevelCap = levelCap;
         root.ExperiencePickupRadius = experiencePickupRadius;
         root.BaseExperiencePickupRadius = baseExperiencePickupRadius;
@@ -93,6 +106,8 @@ internal static class PlayerProgressionBlobBakeUtility
         root.BaseMilestoneSkipHoldConfirmationSeconds = baseMilestoneSkipHoldConfirmationSeconds;
         root.MilestoneSkipHoldFillColor = milestoneSkipHoldFillColor;
         root.BaseMilestoneSkipHoldFillColor = baseMilestoneSkipHoldFillColor;
+        root.MilestoneSkipOnlyFromExitInput = milestoneSkipOnlyFromExitInput ? (byte)1 : (byte)0;
+        root.BaseMilestoneSkipOnlyFromExitInput = baseMilestoneSkipOnlyFromExitInput ? (byte)1 : (byte)0;
         root.EquippedScheduleIndex = -1;
         builder.AllocateString(ref root.ExperiencePickupRadiusScalingFormula,
                                string.IsNullOrWhiteSpace(experiencePickupRadiusScalingFormula) ? string.Empty : experiencePickupRadiusScalingFormula);
@@ -106,6 +121,8 @@ internal static class PlayerProgressionBlobBakeUtility
                                string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorBScalingFormula) ? string.Empty : milestoneSkipHoldFillColorBScalingFormula);
         builder.AllocateString(ref root.MilestoneSkipHoldFillColorAScalingFormula,
                                string.IsNullOrWhiteSpace(milestoneSkipHoldFillColorAScalingFormula) ? string.Empty : milestoneSkipHoldFillColorAScalingFormula);
+        builder.AllocateString(ref root.MilestoneSkipOnlyFromExitInputScalingFormula,
+                               string.IsNullOrWhiteSpace(milestoneSkipOnlyFromExitInputScalingFormula) ? string.Empty : milestoneSkipOnlyFromExitInputScalingFormula);
 
         BakeProgressionGamePhases(builder,
                                   ref root,

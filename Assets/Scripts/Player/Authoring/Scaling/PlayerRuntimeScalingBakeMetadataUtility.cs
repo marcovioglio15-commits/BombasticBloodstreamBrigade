@@ -262,6 +262,28 @@ internal static class PlayerRuntimeScalingBakeMetadataUtility
     }
 
     /// <summary>
+    /// Resolves raw milestone skip input-mode scaling metadata from the source progression preset.
+    /// </summary>
+    /// <param name="sourcePreset">Unscaled source progression preset.</param>
+    /// <param name="baseValue">Raw Boolean value stored on the source preset.</param>
+    /// <param name="formula">Enabled Add Scaling formula when present.</param>
+    /// <returns>True when metadata was resolved from the source preset; otherwise false.</returns>
+    public static bool TryResolveMilestoneSkipOnlyFromExitInputScalingData(PlayerProgressionPreset sourcePreset,
+                                                                          out bool baseValue,
+                                                                          out string formula)
+    {
+        baseValue = false;
+        formula = string.Empty;
+
+        if (sourcePreset == null)
+            return false;
+
+        baseValue = sourcePreset.MilestoneSkipOnlyFromExitInput;
+        formula = ResolveFormula(sourcePreset, "milestoneSkipOnlyFromExitInput");
+        return true;
+    }
+
+    /// <summary>
     /// Resolves raw dropped-container interaction lock scaling metadata from the source progression preset.
     /// </summary>
     /// <param name="sourcePreset">Unscaled source progression preset.</param>

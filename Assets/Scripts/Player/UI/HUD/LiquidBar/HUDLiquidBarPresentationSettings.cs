@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Stores inspector-facing presentation options used by HUDManager to render one liquid HUD bar.
+/// Stores presentation options used by HUD liquid bar runtimes.
 /// </summary>
 [Serializable]
 public sealed class HUDLiquidBarPresentationSettings
@@ -172,6 +172,32 @@ public sealed class HUDLiquidBarPresentationSettings
             deltaTriggerThreshold = 0.0125f,
             deltaMotionStrength = 0.9f,
             deltaMotionDecaySeconds = 0.3f
+        };
+    }
+
+    /// <summary>
+    /// Builds presentation settings for the legacy experience bar from baked HUD config and scene references.
+    /// </summary>
+    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    /// <param name="liquidMaterialTemplateValue">Optional authored material template reference.</param>
+    /// <param name="pistonRootValue">Optional authored plunger transform reference.</param>
+    /// <returns>Experience-bar presentation settings for runtime initialization.</returns>
+    public static HUDLiquidBarPresentationSettings CreateExperienceFromConfig(in GameHudRuntimeConfig config,
+                                                                              Material liquidMaterialTemplateValue,
+                                                                              RectTransform pistonRootValue)
+    {
+        return new HUDLiquidBarPresentationSettings
+        {
+            enableLiquidShader = config.EnableLegacyExperienceLiquidShader != 0,
+            liquidMaterialTemplate = liquidMaterialTemplateValue,
+            enablePiston = config.EnableLegacyExperiencePiston != 0,
+            pistonRoot = pistonRootValue,
+            pistonLocalOffsetX = config.LegacyExperiencePistonLocalOffsetX,
+            pistonLocalOffsetY = config.LegacyExperiencePistonLocalOffsetY,
+            enableValueDeltaMotion = config.EnableLegacyExperienceValueDeltaMotion != 0,
+            deltaTriggerThreshold = Mathf.Max(0f, config.LegacyExperienceDeltaTriggerThreshold),
+            deltaMotionStrength = Mathf.Max(0f, config.LegacyExperienceDeltaMotionStrength),
+            deltaMotionDecaySeconds = Mathf.Max(0f, config.LegacyExperienceDeltaMotionDecaySeconds)
         };
     }
     #endregion

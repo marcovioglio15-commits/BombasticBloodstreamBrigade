@@ -8,8 +8,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Drives the Player HUD portrait Image from ECS portrait animation config and live player state.
 /// </summary>
-[Serializable]
-public sealed class HUDPlayerPortraitSection
+[DisallowMultipleComponent]
+public sealed class HUDPlayerPortraitSection : MonoBehaviour
 {
     #region Constants
     private const float DamageDeltaEpsilon = 0.001f;
@@ -21,9 +21,6 @@ public sealed class HUDPlayerPortraitSection
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Enables the dynamic ECS-driven portrait HUD section.")]
-    [SerializeField] private bool isEnabled = true;
-
     [Tooltip("Optional root object for the portrait section. When empty, PlayerPortraitContainer is found under the HUD manager.")]
     [SerializeField] private GameObject rootObject;
 
@@ -94,13 +91,10 @@ public sealed class HUDPlayerPortraitSection
     }
 
     /// <summary>
-    /// Hides the portrait when the player is missing and the runtime config asks for that behavior.
+    /// Hides the portrait while no player visual config can drive it.
     /// </summary>
     public void HandleMissingPlayer()
     {
-        if (!isEnabled)
-            return;
-
         SetVisible(false);
         ResetRuntimeState();
     }
@@ -110,9 +104,9 @@ public sealed class HUDPlayerPortraitSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read player and portrait config data.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
-        if (!isEnabled || portraitImage == null)
+        if (portraitImage == null)
             return;
 
         if (!runtimeEntityManager.Exists(playerEntity) ||

@@ -1,10 +1,8 @@
 using Unity.Entities;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
-/// Manages player HUD widgets and updates health, shield, level, experience, and active-power-up bars from ECS runtime data.
+/// Orchestrates gameplay HUD section components and feeds them ECS-authoritative player data.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HUDManager : MonoBehaviour
@@ -12,183 +10,96 @@ public sealed class HUDManager : MonoBehaviour
     #region Fields
 
     #region Serialized Fields
-    [Header("Reference Discovery")]
-    [Tooltip("Optional scene root used by HUD sections to auto-discover portrait and growth sequence containers. When empty, the manager resolves CanvasStyled once during Awake.")]
-    [SerializeField] private Transform hudReferenceSearchRoot;
+    [Header("Section Components")]
+    [Tooltip("Scene component that owns the optional hierarchy root used by sections for one-time reference discovery.")]
+    [SerializeField] private HUDReferenceRootProvider referenceRootProvider;
 
-    [Tooltip("Fallback GameObject name used to resolve the HUD reference search root when no explicit root is assigned.")]
-    [SerializeField] private string hudReferenceSearchRootName = "CanvasStyled";
-
-    [Header("Health and Shield")]
     [Tooltip("Preauthored procedural syringe cluster driven by ECS health, shield, experience, movement, and Player Visual Preset configuration.")]
     [SerializeField] private PlayerHealthBarsHudView playerHealthBarsView;
 
-    [Header("Portrait")]
-    [Tooltip("Serialized HUD section that renders the dynamic ECS-driven player portrait.")]
-    [SerializeField] private HUDPlayerPortraitSection portraitSection = new HUDPlayerPortraitSection();
+    [Tooltip("Scene component that owns level label and legacy experience-bar references.")]
+    [SerializeField] private HUDLevelExperienceSection levelExperienceSection;
 
-    [Header("Growth Sequence")]
-    [Tooltip("Serialized HUD section that renders the active level-up growth sequence from ECS visual config.")]
-    [SerializeField] private HUDGrowthSequenceSection growthSequenceSection = new HUDGrowthSequenceSection();
+    [Tooltip("Scene component that renders the dynamic ECS-driven player portrait.")]
+    [SerializeField] private HUDPlayerPortraitSection portraitSection;
 
-    [Header("Level & Experience")]
-    [Tooltip("UI Text used to display the current player level.")]
-    [SerializeField] private TMP_Text playerLevelText;
+    [Tooltip("Scene component that renders the active level-up growth sequence from ECS visual config.")]
+    [SerializeField] private HUDGrowthSequenceSection growthSequenceSection;
 
-    [Tooltip("Hide player level text when no player entity with PlayerLevel is available.")]
-    [SerializeField] private bool hideLevelTextWhenPlayerMissing = true;
+    [Tooltip("Scene component that owns active power-up icon, energy and charge overlay references.")]
+    [SerializeField] private HUDPowerUpOverlaySectionComponent powerUpOverlaySection;
 
-    [Tooltip("UI Image used as fillable experience bar toward the next player level.")]
-    [SerializeField] private Image playerExperienceFillImage;
+    [Tooltip("Scene component that configures and renders the authoritative run timer.")]
+    [SerializeField] private HUDRunTimerSection runTimerSection;
 
-    [Tooltip("Seconds used to smooth visual experience fill transitions. Set 0 for immediate updates.")]
-    [SerializeField] private float experienceBarSmoothingSeconds = 0.08f;
+    [Tooltip("Scene component that renders the combo meter, current rank and next-rank progress.")]
+    [SerializeField] private HUDComboCounterSection comboCounterSection;
 
-    [Tooltip("Hide experience bar image when no player entity with progression runtime data is available.")]
-    [SerializeField] private bool hideExperienceBarWhenPlayerMissing = true;
+    [Tooltip("Scene component that renders milestone choices and sends ECS selection commands.")]
+    [SerializeField] private HUDMilestoneSelectionSection milestoneSelectionSection;
 
-    [Header("Experience Visual FX")]
-    [Tooltip("Optional fluid-shader presentation settings for the experience bar.")]
-    [SerializeField] private HUDLiquidBarPresentationSettings experienceBarPresentation = HUDLiquidBarPresentationSettings.CreateExperienceDefaults();
+    [Tooltip("Scene component that handles dropped active power-up prompts and overlay swaps.")]
+    [SerializeField] private HUDPowerUpContainerInteractionSection powerUpContainerInteractionSection;
 
-    [Header("Power Ups - Energy")]
-    [Tooltip("Primary redesigned active power-up slot view. Uses icon cooldown, energy syringe, requirement marker, and charge semiring when assigned.")]
-    [SerializeField] private PlayerActivePowerUpSlotHudView primaryPowerUpSlotView;
-
-    [Tooltip("Secondary redesigned active power-up slot view. Uses icon cooldown, energy syringe, requirement marker, and charge semiring when assigned.")]
-    [SerializeField] private PlayerActivePowerUpSlotHudView secondaryPowerUpSlotView;
-
-    [Tooltip("Primary slot energy fill image. Displayed only when the primary slot has an energy module.")]
-    [SerializeField] private Image primaryEnergyFillImage;
-
-    [Tooltip("Secondary slot energy fill image. Displayed only when the secondary slot has an energy module.")]
-    [SerializeField] private Image secondaryEnergyFillImage;
-
-    [Header("Power Ups - Icons")]
-    [Tooltip("Primary slot icon image. Shows the sprite assigned to the currently equipped primary active power up.")]
-    [SerializeField] private Image primaryPowerUpIconImage;
-
-    [Tooltip("Secondary slot icon image. Shows the sprite assigned to the currently equipped secondary active power up.")]
-    [SerializeField] private Image secondaryPowerUpIconImage;
-
-    [Tooltip("Optional root object for the primary active-slot HUD. When left empty, the icon parent is used automatically.")]
-    [SerializeField] private GameObject primaryPowerUpSlotRootObject;
-
-    [Tooltip("Optional root object for the secondary active-slot HUD. When left empty, the icon parent is used automatically.")]
-    [SerializeField] private GameObject secondaryPowerUpSlotRootObject;
-
-    [Tooltip("Seconds used to smooth energy fill transitions. Set 0 for immediate updates.")]
-    [SerializeField] private float energyBarSmoothingSeconds = 0.08f;
-
-    [Tooltip("Hide energy bars when no player entity is available.")]
-    [SerializeField] private bool hideEnergyBarsWhenPlayerMissing = true;
-
-    [Tooltip("Hide energy bars when the corresponding slot has no energy module.")]
-    [SerializeField] private bool hideEnergyBarsWhenModuleMissing = true;
-
-    [Header("Power Ups - Charge")]
-    [Tooltip("Primary slot charge fill image. Displayed only when the primary slot has a charge module.")]
-    [SerializeField] private Image primaryChargeFillImage;
-
-    [Tooltip("Secondary slot charge fill image. Displayed only when the secondary slot has a charge module.")]
-    [SerializeField] private Image secondaryChargeFillImage;
-
-    [Tooltip("Seconds used to smooth charge fill transitions. Set 0 for immediate updates.")]
-    [SerializeField] private float chargeBarSmoothingSeconds = 0.05f;
-
-    [Tooltip("Hide charge bars when no player entity is available.")]
-    [SerializeField] private bool hideChargeBarsWhenPlayerMissing = true;
-
-    [Tooltip("Hide charge bars when the corresponding slot has no charge module.")]
-    [SerializeField] private bool hideChargeBarsWhenModuleMissing = true;
-
-    [Header("Run Timer")]
-    [Tooltip("Serialized HUD section that configures and renders the authoritative run timer.")]
-    [SerializeField] private HUDRunTimerSection runTimerSection = new HUDRunTimerSection();
-
-    [Header("Combo Counter")]
-    [Tooltip("Serialized HUD section that renders the combo meter, current rank, and next-rank progress.")]
-    [SerializeField] private HUDComboCounterSection comboCounterSection = new HUDComboCounterSection();
-
-    [Header("Milestone Power-Up Selection")]
-    [Tooltip("Serialized HUD section that renders milestone choices and sends ECS selection commands.")]
-    [SerializeField] private HUDMilestoneSelectionSection milestoneSelectionSection = new HUDMilestoneSelectionSection();
-
-    [Header("Dropped Power-Up Containers")]
-    [Tooltip("Serialized HUD section that handles dropped active power-up prompts and overlay swaps.")]
-    [SerializeField] private HUDPowerUpContainerInteractionSection powerUpContainerInteractionSection = new HUDPowerUpContainerInteractionSection();
-
-    [Header("Damage Feedback Vignettes")]
-    [Tooltip("Serialized HUD section that fades the two full-screen damage vignette overlays driven by the active player visual preset.")]
-    [SerializeField] private HUDPlayerDamageVignetteSection damageVignetteSection = new HUDPlayerDamageVignetteSection();
+    [Tooltip("Scene component that fades the two full-screen damage vignette overlays driven by the active player visual preset.")]
+    [SerializeField] private HUDPlayerDamageVignetteSection damageVignetteSection;
     #endregion
 
     private World defaultWorld;
     private EntityManager entityManager;
     private EntityQuery playerQuery;
+    private EntityQuery hudConfigQuery;
     private bool playerQueryInitialized;
+    private bool hudConfigQueryInitialized;
+    private bool sectionSettingsApplied;
+    private bool sectionsInitialized;
     private Entity cachedPlayerEntity;
-    private int displayedPlayerLevel = -1;
-    private float displayedExperienceNormalized;
-    private Transform resolvedHudReferenceSearchRoot;
-    private HUDPowerUpOverlaySection powerUpOverlaySection;
-    private HUDLiquidBarRuntime experienceBarRuntime;
+    private GameHudRuntimeConfig activeHudConfig;
     #endregion
 
     #region Methods
 
     #region Unity Methods
+    /// <summary>
+    /// Resolves section components, applies HUD config, initializes section views and attempts ECS binding.
+    /// </summary>
     private void Awake()
     {
-        ClampSettings();
-        EnsureExperienceBarVisualInitialized();
-
-        if (playerHealthBarsView != null)
-            playerHealthBarsView.Initialize();
-
-        Transform hudSearchRoot = ResolveHudReferenceSearchRoot();
-        portraitSection.Initialize(hudSearchRoot);
-        growthSequenceSection.Initialize(hudSearchRoot);
-        powerUpOverlaySection = new HUDPowerUpOverlaySection(primaryPowerUpIconImage,
-                                                             secondaryPowerUpIconImage,
-                                                             primaryPowerUpSlotView,
-                                                             secondaryPowerUpSlotView,
-                                                             primaryPowerUpSlotRootObject,
-                                                             secondaryPowerUpSlotRootObject,
-                                                             primaryEnergyFillImage,
-                                                             secondaryEnergyFillImage,
-                                                             primaryChargeFillImage,
-                                                             secondaryChargeFillImage,
-                                                             energyBarSmoothingSeconds,
-                                                             hideEnergyBarsWhenPlayerMissing,
-                                                             hideEnergyBarsWhenModuleMissing,
-                                                             chargeBarSmoothingSeconds,
-                                                             hideChargeBarsWhenPlayerMissing,
-                                                             hideChargeBarsWhenModuleMissing);
-        runTimerSection.Initialize();
-        comboCounterSection.Initialize();
-        milestoneSelectionSection.Initialize();
-        powerUpContainerInteractionSection.Initialize();
-        damageVignetteSection.Initialize();
+        ResolveSectionComponents();
         TryInitializeEcsBindings();
+        GameHudRuntimeConfig initialConfig = ResolveHudConfig();
+        ApplyHudConfigToSections(in initialConfig);
+        InitializeSections();
         ApplyInitialVisualState();
     }
 
+    /// <summary>
+    /// Releases section resources that own runtime material instances or UI callbacks.
+    /// </summary>
     private void OnDestroy()
     {
         if (playerHealthBarsView != null)
             playerHealthBarsView.Dispose();
 
-        if (experienceBarRuntime != null)
-            experienceBarRuntime.Dispose();
+        if (levelExperienceSection != null)
+            levelExperienceSection.Dispose();
+
+        if (growthSequenceSection != null)
+            growthSequenceSection.Dispose();
 
         if (powerUpOverlaySection != null)
             powerUpOverlaySection.Dispose();
 
-        milestoneSelectionSection.Dispose();
-        powerUpContainerInteractionSection.Dispose();
+        if (milestoneSelectionSection != null)
+            milestoneSelectionSection.Dispose();
+
+        if (powerUpContainerInteractionSection != null)
+            powerUpContainerInteractionSection.Dispose();
     }
 
+    /// <summary>
+    /// Updates every HUD section from the current ECS player entity when available.
+    /// </summary>
     private void Update()
     {
         if (!TryInitializeEcsBindings())
@@ -196,6 +107,8 @@ public sealed class HUDManager : MonoBehaviour
             HandleMissingPlayer();
             return;
         }
+
+        RefreshHudConfigIfAvailable();
 
         if (!TryResolvePlayerEntity(out Entity playerEntity))
         {
@@ -208,24 +121,45 @@ public sealed class HUDManager : MonoBehaviour
         if (playerHealthBarsView != null)
             playerHealthBarsView.UpdateView(entityManager, playerEntity, snapCoreBars);
 
-        bool shouldUpdateGrowthSequence = UpdateLevelAndExperience(playerEntity);
-        portraitSection.Update(entityManager, playerEntity);
+        bool shouldUpdateGrowthSequence = levelExperienceSection == null ||
+                                           levelExperienceSection.UpdateLevelAndExperience(entityManager, playerEntity, playerHealthBarsView);
 
-        if (shouldUpdateGrowthSequence)
-            growthSequenceSection.Update(entityManager, playerEntity);
-        else
-            growthSequenceSection.HandleLevelCapReached();
+        if (portraitSection != null)
+            portraitSection.UpdateSection(entityManager, playerEntity);
 
-        powerUpOverlaySection.Update(entityManager, playerEntity);
-        runTimerSection.Update(entityManager, playerEntity);
-        comboCounterSection.Update(entityManager, playerEntity);
-        milestoneSelectionSection.Update(entityManager, playerEntity);
-        powerUpContainerInteractionSection.Update(entityManager, playerEntity);
-        damageVignetteSection.Update(entityManager, playerEntity);
+        if (growthSequenceSection != null)
+        {
+            if (shouldUpdateGrowthSequence)
+                growthSequenceSection.UpdateSection(entityManager, playerEntity);
+            else
+                growthSequenceSection.HandleLevelCapReached();
+        }
+
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.UpdateSection(entityManager, playerEntity);
+
+        if (runTimerSection != null)
+            runTimerSection.UpdateSection(entityManager, playerEntity);
+
+        if (comboCounterSection != null)
+            comboCounterSection.UpdateSection(entityManager, playerEntity);
+
+        if (milestoneSelectionSection != null)
+            milestoneSelectionSection.UpdateSection(entityManager, playerEntity);
+
+        if (powerUpContainerInteractionSection != null)
+            powerUpContainerInteractionSection.UpdateSection(entityManager, playerEntity);
+
+        if (damageVignetteSection != null)
+            damageVignetteSection.UpdateSection(entityManager, playerEntity);
     }
     #endregion
 
     #region ECS
+    /// <summary>
+    /// Initializes cached ECS world, player query and HUD config query references.
+    /// </summary>
+    /// <returns>True when the default ECS world is ready.</returns>
     private bool TryInitializeEcsBindings()
     {
         World currentWorld = World.DefaultGameObjectInjectionWorld;
@@ -234,6 +168,7 @@ public sealed class HUDManager : MonoBehaviour
         {
             defaultWorld = null;
             playerQueryInitialized = false;
+            hudConfigQueryInitialized = false;
             cachedPlayerEntity = Entity.Null;
             return false;
         }
@@ -242,28 +177,53 @@ public sealed class HUDManager : MonoBehaviour
         {
             defaultWorld = currentWorld;
             playerQueryInitialized = false;
+            hudConfigQueryInitialized = false;
             cachedPlayerEntity = Entity.Null;
         }
 
         entityManager = defaultWorld.EntityManager;
-
-        if (!playerQueryInitialized)
-        {
-            EntityQueryDesc queryDescription = new EntityQueryDesc
-            {
-                All = new ComponentType[]
-                {
-                    ComponentType.ReadOnly<PlayerControllerConfig>()
-                }
-            };
-
-            playerQuery = entityManager.CreateEntityQuery(queryDescription);
-            playerQueryInitialized = true;
-        }
-
+        EnsurePlayerQuery();
+        EnsureHudConfigQuery();
         return playerQueryInitialized;
     }
 
+    /// <summary>
+    /// Creates the player entity query once for the active ECS world.
+    /// </summary>
+    private void EnsurePlayerQuery()
+    {
+        if (playerQueryInitialized)
+            return;
+
+        EntityQueryDesc queryDescription = new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadOnly<PlayerControllerConfig>()
+            }
+        };
+
+        playerQuery = entityManager.CreateEntityQuery(queryDescription);
+        playerQueryInitialized = true;
+    }
+
+    /// <summary>
+    /// Creates the HUD config singleton query once for the active ECS world.
+    /// </summary>
+    private void EnsureHudConfigQuery()
+    {
+        if (hudConfigQueryInitialized)
+            return;
+
+        hudConfigQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameHudRuntimeConfig>());
+        hudConfigQueryInitialized = true;
+    }
+
+    /// <summary>
+    /// Resolves the active player entity from the cached player query.
+    /// </summary>
+    /// <param name="playerEntity">Resolved player entity when available.</param>
+    /// <returns>True when exactly one valid player entity is available.</returns>
     private bool TryResolvePlayerEntity(out Entity playerEntity)
     {
         if (cachedPlayerEntity != Entity.Null &&
@@ -305,296 +265,259 @@ public sealed class HUDManager : MonoBehaviour
     }
     #endregion
 
-    #region Bars
+    #region HUD Config
     /// <summary>
-    /// Updates the player level text and experience progress bar from ECS progression data.
+    /// Resolves the current HUD config singleton or project defaults when ECS config is unavailable.
     /// </summary>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    /// <returns>True when the growth sequence should continue updating for the current player.</returns>
-    private bool UpdateLevelAndExperience(Entity playerEntity)
+    /// <returns>HUD runtime config to apply to managed sections.</returns>
+    private GameHudRuntimeConfig ResolveHudConfig()
     {
-        bool hasPlayerLevel = entityManager.HasComponent<PlayerLevel>(playerEntity);
-        bool hasPlayerExperience = entityManager.HasComponent<PlayerExperience>(playerEntity);
-
-        if (!hasPlayerLevel)
-            HandleMissingLevelText();
-
-        if (!hasPlayerLevel || !hasPlayerExperience)
+        if (hudConfigQueryInitialized &&
+            !hudConfigQuery.IsEmptyIgnoreFilter &&
+            hudConfigQuery.CalculateEntityCount() == 1)
         {
-            HandleMissingExperienceBar();
-            return true;
+            return entityManager.GetComponentData<GameHudRuntimeConfig>(hudConfigQuery.GetSingletonEntity());
         }
 
-        PlayerLevel playerLevel = entityManager.GetComponentData<PlayerLevel>(playerEntity);
-        PlayerExperience playerExperience = entityManager.GetComponentData<PlayerExperience>(playerEntity);
-
-        if (HasReachedLevelCap(playerEntity, playerLevel.Current))
-        {
-            HideLevelTextForExperienceCap();
-            HideLegacyExperienceBar();
-            return false;
-        }
-
-        UpdateLevelText(in playerLevel);
-
-        if (playerHealthBarsView != null && playerHealthBarsView.HasExperienceBar)
-        {
-            HideLegacyExperienceBar();
-            return true;
-        }
-
-        UpdateExperienceBar(in playerExperience, in playerLevel);
-        return true;
+        return GameHudManagerPresetBakeUtility.BuildConfig(null);
     }
 
     /// <summary>
-    /// Updates the player level text label using the current runtime level.
+    /// Reapplies HUD preset values if the baked singleton becomes available after Awake.
     /// </summary>
-    /// <param name="playerLevel">Current player level state.</param>
-    private void UpdateLevelText(in PlayerLevel playerLevel)
+    private void RefreshHudConfigIfAvailable()
     {
-        if (playerLevelText == null)
+        if (!hudConfigQueryInitialized || hudConfigQuery.IsEmptyIgnoreFilter)
             return;
 
-        int currentPlayerLevel = Mathf.Max(0, playerLevel.Current);
-
-        if (!playerLevelText.enabled)
-            playerLevelText.enabled = true;
-
-        if (displayedPlayerLevel == currentPlayerLevel)
+        if (hudConfigQuery.CalculateEntityCount() != 1)
             return;
 
-        displayedPlayerLevel = currentPlayerLevel;
-        playerLevelText.text = string.Format("Lv {0}", currentPlayerLevel);
+        GameHudRuntimeConfig resolvedConfig = entityManager.GetComponentData<GameHudRuntimeConfig>(hudConfigQuery.GetSingletonEntity());
+
+        if (sectionSettingsApplied && AreConfigsEquivalent(in activeHudConfig, in resolvedConfig))
+            return;
+
+        ApplyHudConfigToSections(in resolvedConfig);
+        InitializeSections();
+        ApplyInitialVisualState();
     }
 
     /// <summary>
-    /// Updates the experience progress bar using the current experience value and next-level threshold.
+    /// Applies one HUD runtime config to all section components.
     /// </summary>
-    /// <param name="playerExperience">Current runtime experience state.</param>
-    /// <param name="playerLevel">Current player level state used to resolve the next threshold.</param>
-    private void UpdateExperienceBar(in PlayerExperience playerExperience, in PlayerLevel playerLevel)
+    /// <param name="config">Runtime HUD config resolved from ECS or defaults.</param>
+    private void ApplyHudConfigToSections(in GameHudRuntimeConfig config)
     {
-        if (experienceBarRuntime == null)
-            return;
+        activeHudConfig = config;
+        sectionSettingsApplied = true;
 
-        float targetNormalizedValue = 0f;
-        float requiredExperienceForNextLevel = Mathf.Max(0f, playerLevel.RequiredExperienceForNextLevel);
+        if (levelExperienceSection != null)
+            levelExperienceSection.ApplySettings(in config);
 
-        if (requiredExperienceForNextLevel > 0f)
-            targetNormalizedValue = Mathf.Clamp01(playerExperience.Current / requiredExperienceForNextLevel);
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.ApplySettings(in config);
 
-        UpdateManagedBar(experienceBarRuntime,
-                         ref displayedExperienceNormalized,
-                         targetNormalizedValue,
-                         false,
-                         experienceBarSmoothingSeconds);
+        if (runTimerSection != null)
+            runTimerSection.ApplySettings(in config);
+
+        if (comboCounterSection != null)
+            comboCounterSection.ApplySettings(in config);
+
+        if (milestoneSelectionSection != null)
+            milestoneSelectionSection.ApplySettings(in config);
+
+        if (damageVignetteSection != null)
+            damageVignetteSection.ApplySettings(in config);
     }
 
+    /// <summary>
+    /// Checks whether two HUD configs are equivalent enough to skip section reinitialization.
+    /// </summary>
+    /// <param name="left">Previously applied config.</param>
+    /// <param name="right">Newly resolved config.</param>
+    /// <returns>True when the serialized values match.</returns>
+    private static bool AreConfigsEquivalent(in GameHudRuntimeConfig left, in GameHudRuntimeConfig right)
+    {
+        return left.HideLevelTextWhenPlayerMissing == right.HideLevelTextWhenPlayerMissing &&
+               Mathf.Approximately(left.ExperienceBarSmoothingSeconds, right.ExperienceBarSmoothingSeconds) &&
+               left.RunTimerEnabled == right.RunTimerEnabled &&
+               left.RunTimerDirection == right.RunTimerDirection &&
+               Mathf.Approximately(left.RunTimerInitialSeconds, right.RunTimerInitialSeconds) &&
+               left.ComboCounterEnabled == right.ComboCounterEnabled &&
+               left.DamageVignetteEnabled == right.DamageVignetteEnabled;
+    }
     #endregion
 
-    #region Helpers
+    #region Sections
     /// <summary>
-    /// Resolves the hierarchy root used by nested HUD sections for one-time reference discovery.
+    /// Resolves unassigned section component references once from the loaded scene.
     /// </summary>
-    /// <returns>Configured root, resolved canvas root, or this manager transform as a final fallback.</returns>
+    private void ResolveSectionComponents()
+    {
+        if (referenceRootProvider == null)
+            referenceRootProvider = FindFirstObjectByType<HUDReferenceRootProvider>(FindObjectsInactive.Include);
+
+        if (playerHealthBarsView == null)
+            playerHealthBarsView = FindFirstObjectByType<PlayerHealthBarsHudView>(FindObjectsInactive.Include);
+
+        if (levelExperienceSection == null)
+            levelExperienceSection = FindFirstObjectByType<HUDLevelExperienceSection>(FindObjectsInactive.Include);
+
+        if (portraitSection == null)
+            portraitSection = FindFirstObjectByType<HUDPlayerPortraitSection>(FindObjectsInactive.Include);
+
+        if (growthSequenceSection == null)
+            growthSequenceSection = FindFirstObjectByType<HUDGrowthSequenceSection>(FindObjectsInactive.Include);
+
+        if (powerUpOverlaySection == null)
+            powerUpOverlaySection = FindFirstObjectByType<HUDPowerUpOverlaySectionComponent>(FindObjectsInactive.Include);
+
+        if (runTimerSection == null)
+            runTimerSection = FindFirstObjectByType<HUDRunTimerSection>(FindObjectsInactive.Include);
+
+        if (comboCounterSection == null)
+            comboCounterSection = FindFirstObjectByType<HUDComboCounterSection>(FindObjectsInactive.Include);
+
+        if (milestoneSelectionSection == null)
+            milestoneSelectionSection = FindFirstObjectByType<HUDMilestoneSelectionSection>(FindObjectsInactive.Include);
+
+        if (powerUpContainerInteractionSection == null)
+            powerUpContainerInteractionSection = FindFirstObjectByType<HUDPowerUpContainerInteractionSection>(FindObjectsInactive.Include);
+
+        if (damageVignetteSection == null)
+            damageVignetteSection = FindFirstObjectByType<HUDPlayerDamageVignetteSection>(FindObjectsInactive.Include);
+    }
+
+    /// <summary>
+    /// Initializes every section component after settings have been applied.
+    /// </summary>
+    private void InitializeSections()
+    {
+        Transform hudSearchRoot = ResolveHudReferenceSearchRoot();
+
+        if (playerHealthBarsView != null)
+            playerHealthBarsView.Initialize();
+
+        if (levelExperienceSection != null)
+            levelExperienceSection.Initialize();
+
+        if (portraitSection != null)
+            portraitSection.Initialize(hudSearchRoot);
+
+        if (growthSequenceSection != null)
+            growthSequenceSection.Initialize(hudSearchRoot);
+
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.Initialize();
+
+        if (runTimerSection != null)
+            runTimerSection.Initialize();
+
+        if (comboCounterSection != null)
+            comboCounterSection.Initialize();
+
+        if (milestoneSelectionSection != null)
+            milestoneSelectionSection.Initialize();
+
+        if (powerUpContainerInteractionSection != null)
+            powerUpContainerInteractionSection.Initialize();
+
+        if (damageVignetteSection != null)
+            damageVignetteSection.Initialize();
+
+        sectionsInitialized = true;
+    }
+
+    /// <summary>
+    /// Applies initial visuals for all section components after initialization.
+    /// </summary>
+    private void ApplyInitialVisualState()
+    {
+        if (!sectionsInitialized)
+            return;
+
+        if (levelExperienceSection != null)
+            levelExperienceSection.ApplyInitialVisualState();
+
+        if (portraitSection != null)
+            portraitSection.ApplyInitialVisualState();
+
+        if (growthSequenceSection != null)
+            growthSequenceSection.ApplyInitialVisualState();
+
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.ApplyInitialVisualState();
+
+        if (runTimerSection != null)
+            runTimerSection.ApplyInitialVisualState();
+
+        if (comboCounterSection != null)
+            comboCounterSection.ApplyInitialVisualState();
+
+        if (damageVignetteSection != null)
+            damageVignetteSection.ApplyInitialVisualState();
+
+        HandleMissingPlayer();
+    }
+
+    /// <summary>
+    /// Resolves the reference-discovery root used by sections that still support fallback lookup.
+    /// </summary>
+    /// <returns>Reference root transform for HUD sections.</returns>
     private Transform ResolveHudReferenceSearchRoot()
     {
-        if (resolvedHudReferenceSearchRoot != null)
-            return resolvedHudReferenceSearchRoot;
-
-        if (hudReferenceSearchRoot != null)
-        {
-            resolvedHudReferenceSearchRoot = hudReferenceSearchRoot;
-            return resolvedHudReferenceSearchRoot;
-        }
-
-        Transform namedRoot = ResolveNamedHudReferenceSearchRoot();
-
-        if (namedRoot != null)
-        {
-            resolvedHudReferenceSearchRoot = namedRoot;
-            return resolvedHudReferenceSearchRoot;
-        }
+        if (referenceRootProvider != null)
+            return referenceRootProvider.Resolve(transform);
 
         Canvas parentCanvas = GetComponentInParent<Canvas>(true);
 
         if (parentCanvas != null)
-        {
-            resolvedHudReferenceSearchRoot = parentCanvas.transform;
-            return resolvedHudReferenceSearchRoot;
-        }
+            return parentCanvas.transform;
 
-        Canvas sceneCanvas = ResolveSceneCanvasReferenceRoot();
-
-        if (sceneCanvas != null)
-        {
-            resolvedHudReferenceSearchRoot = sceneCanvas.transform;
-            return resolvedHudReferenceSearchRoot;
-        }
-
-        resolvedHudReferenceSearchRoot = transform;
-        return resolvedHudReferenceSearchRoot;
+        return transform;
     }
+    #endregion
 
+    #region Missing Player
     /// <summary>
-    /// Resolves the configured HUD root name from active scene objects.
+    /// Applies the missing-player state to all HUD section components.
     /// </summary>
-    /// <returns>Named root transform, or null when no matching object is active.</returns>
-    private Transform ResolveNamedHudReferenceSearchRoot()
-    {
-        if (string.IsNullOrWhiteSpace(hudReferenceSearchRootName))
-            return null;
-
-        GameObject namedRootObject = GameObject.Find(hudReferenceSearchRootName);
-
-        if (namedRootObject == null)
-            return null;
-
-        return namedRootObject.transform;
-    }
-
-    /// <summary>
-    /// Resolves a scene canvas fallback when the HUD manager is authored outside the canvas hierarchy.
-    /// </summary>
-    /// <returns>First active canvas in the scene, or null when none is available.</returns>
-    private static Canvas ResolveSceneCanvasReferenceRoot()
-    {
-        Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-        for (int canvasIndex = 0; canvasIndex < canvases.Length; canvasIndex++)
-        {
-            Canvas canvas = canvases[canvasIndex];
-
-            if (canvas != null && canvas.gameObject.activeInHierarchy)
-                return canvas;
-        }
-
-        return canvases.Length > 0 ? canvases[0] : null;
-    }
-
-    private void ClampSettings()
-    {
-        if (energyBarSmoothingSeconds < 0f)
-            energyBarSmoothingSeconds = 0f;
-
-        if (chargeBarSmoothingSeconds < 0f)
-            chargeBarSmoothingSeconds = 0f;
-
-        if (experienceBarSmoothingSeconds < 0f)
-            experienceBarSmoothingSeconds = 0f;
-    }
-
-    private void ApplyInitialVisualState()
-    {
-        EnsureExperienceBarVisualInitialized();
-
-        if (experienceBarRuntime != null)
-            experienceBarRuntime.ApplyInitialVisualState(displayedExperienceNormalized);
-
-        portraitSection.ApplyInitialVisualState();
-        growthSequenceSection.ApplyInitialVisualState();
-        powerUpOverlaySection.ApplyInitialVisualState();
-        runTimerSection.ApplyInitialVisualState();
-        comboCounterSection.ApplyInitialVisualState();
-        damageVignetteSection.ApplyInitialVisualState();
-
-        HandleMissingLevelText();
-        portraitSection.HandleMissingPlayer();
-        growthSequenceSection.HandleMissingPlayer();
-        runTimerSection.HandleMissingPlayer();
-        comboCounterSection.HandleMissingPlayer();
-        milestoneSelectionSection.HandleMissingPlayer();
-        powerUpContainerInteractionSection.HandleMissingPlayer();
-        damageVignetteSection.HandleMissingPlayer();
-    }
-
     private void HandleMissingPlayer()
     {
         if (playerHealthBarsView != null)
             playerHealthBarsView.HandleMissingPlayer();
 
-        HandleMissingLevelText();
-        HandleMissingExperienceBar();
-        portraitSection.HandleMissingPlayer();
-        growthSequenceSection.HandleMissingPlayer();
-        powerUpOverlaySection.HandleMissingPlayer();
-        runTimerSection.HandleMissingPlayer();
-        comboCounterSection.HandleMissingPlayer();
-        milestoneSelectionSection.HandleMissingPlayer();
-        powerUpContainerInteractionSection.HandleMissingPlayer();
-        damageVignetteSection.HandleMissingPlayer();
+        if (levelExperienceSection != null)
+            levelExperienceSection.HandleMissingPlayer();
+
+        if (portraitSection != null)
+            portraitSection.HandleMissingPlayer();
+
+        if (growthSequenceSection != null)
+            growthSequenceSection.HandleMissingPlayer();
+
+        if (powerUpOverlaySection != null)
+            powerUpOverlaySection.HandleMissingPlayer();
+
+        if (runTimerSection != null)
+            runTimerSection.HandleMissingPlayer();
+
+        if (comboCounterSection != null)
+            comboCounterSection.HandleMissingPlayer();
+
+        if (milestoneSelectionSection != null)
+            milestoneSelectionSection.HandleMissingPlayer();
+
+        if (powerUpContainerInteractionSection != null)
+            powerUpContainerInteractionSection.HandleMissingPlayer();
+
+        if (damageVignetteSection != null)
+            damageVignetteSection.HandleMissingPlayer();
     }
+    #endregion
 
-    /// <summary>
-    /// Applies the missing-player state to the player level label.
-    /// </summary>
-    private void HandleMissingLevelText()
-    {
-        if (playerLevelText == null)
-            return;
-
-        if (hideLevelTextWhenPlayerMissing)
-        {
-            playerLevelText.enabled = false;
-            displayedPlayerLevel = -1;
-            return;
-        }
-
-        playerLevelText.enabled = true;
-        playerLevelText.text = string.Empty;
-        displayedPlayerLevel = -1;
-    }
-
-    /// <summary>
-    /// Hides the level label that is visually attached to the experience syringe after progression reaches the cap.
-    /// </summary>
-    private void HideLevelTextForExperienceCap()
-    {
-        if (playerLevelText == null)
-            return;
-
-        playerLevelText.enabled = false;
-        displayedPlayerLevel = -1;
-    }
-
-    /// <summary>
-    /// Applies the missing-player state to the experience progress bar.
-    /// </summary>
-    private void HandleMissingExperienceBar()
-    {
-        if (experienceBarRuntime == null)
-            return;
-
-        experienceBarRuntime.HandleMissing(hideExperienceBarWhenPlayerMissing, displayedExperienceNormalized);
-    }
-
-    /// <summary>
-    /// Hides the legacy image-based experience bar while the syringe bar or level-cap state owns progression display.
-    /// </summary>
-    private void HideLegacyExperienceBar()
-    {
-        if (experienceBarRuntime == null)
-            return;
-
-        experienceBarRuntime.HandleMissing(true, displayedExperienceNormalized);
-    }
-
-    /// <summary>
-    /// Checks whether the current player has reached the configured progression level cap.
-    /// </summary>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    /// <param name="levelValue">Current player level value.</param>
-    /// <returns>True when progression config exists and the level cap is reached.</returns>
-    private bool HasReachedLevelCap(Entity playerEntity, int levelValue)
-    {
-        if (!entityManager.HasComponent<PlayerProgressionConfig>(playerEntity))
-            return false;
-
-        PlayerProgressionConfig progressionConfig = entityManager.GetComponentData<PlayerProgressionConfig>(playerEntity);
-        return PlayerProgressionPhaseUtility.HasReachedLevelCap(progressionConfig, levelValue);
-    }
-
+    #region Helpers
     /// <summary>
     /// Returns whether health and shield bars should snap to their exact runtime values.
     /// </summary>
@@ -607,60 +530,6 @@ public sealed class HUDManager : MonoBehaviour
 
         PlayerRunOutcomeState runOutcomeState = entityManager.GetComponentData<PlayerRunOutcomeState>(playerEntity);
         return runOutcomeState.IsFinalized != 0;
-    }
-
-    /// <summary>
-    /// Builds the legacy experience-bar runtime only when the dedicated experience syringe is not authored.
-    /// </summary>
-    private void EnsureExperienceBarVisualInitialized()
-    {
-        if (experienceBarPresentation == null)
-            experienceBarPresentation = HUDLiquidBarPresentationSettings.CreateExperienceDefaults();
-
-        if (experienceBarRuntime == null && playerExperienceFillImage != null)
-            experienceBarRuntime = HUDLiquidBarRuntime.CreateExperience(playerExperienceFillImage, experienceBarPresentation);
-    }
-
-    /// <summary>
-    /// Applies smoothing and visual updates shared by health, shield and experience bars.
-    /// </summary>
-    /// <param name="barRuntime">Reusable runtime visual that owns fill, plunger and shader state.</param>
-    /// <param name="displayedNormalizedValue">Cached displayed normalized value updated in place.</param>
-    /// <param name="targetNormalizedValue">Raw normalized target computed from ECS data.</param>
-    /// <param name="snapImmediately">When true smoothing is bypassed for this update.</param>
-    /// <param name="smoothingSeconds">Seconds used for the fill smoothing step.</param>
-    private void UpdateManagedBar(HUDLiquidBarRuntime barRuntime,
-                                  ref float displayedNormalizedValue,
-                                  float targetNormalizedValue,
-                                  bool snapImmediately,
-                                  float smoothingSeconds)
-    {
-        if (barRuntime == null)
-            return;
-
-        float clampedTargetNormalizedValue = Mathf.Clamp01(targetNormalizedValue);
-
-        if (snapImmediately)
-        {
-            displayedNormalizedValue = clampedTargetNormalizedValue;
-        }
-        else
-        {
-            displayedNormalizedValue = SmoothNormalized(displayedNormalizedValue,
-                                                        clampedTargetNormalizedValue,
-                                                        smoothingSeconds);
-        }
-
-        barRuntime.Apply(displayedNormalizedValue, clampedTargetNormalizedValue);
-    }
-
-    private static float SmoothNormalized(float displayedValue, float targetValue, float smoothingSeconds)
-    {
-        if (smoothingSeconds <= 0f)
-            return Mathf.Clamp01(targetValue);
-
-        float step = Time.deltaTime / smoothingSeconds;
-        return Mathf.MoveTowards(displayedValue, Mathf.Clamp01(targetValue), step);
     }
     #endregion
 

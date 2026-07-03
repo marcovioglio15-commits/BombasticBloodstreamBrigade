@@ -463,6 +463,7 @@ MonoBehaviour:
   milestoneTimeScaleResumeDurationSeconds: 1.5
   milestoneSkipHoldConfirmationSeconds: 0.5
   milestoneSkipHoldFillColor: {r: 0.95, g: 0.74, b: 0.15, a: 0.55}
+  milestoneSkipOnlyFromExitInput: 0
   powerUpContainerSettings:
     containerPrefab: {fileID: 7549901088543619621, guid: 518a26c8b52a63e42a92768c649a250c, type: 3}
     interactionRadius: 2.25

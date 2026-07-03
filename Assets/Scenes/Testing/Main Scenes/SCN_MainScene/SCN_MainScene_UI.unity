@@ -7009,6 +7009,7 @@ GameObject:
   - component: {fileID: 677397541}
   - component: {fileID: 677397540}
   - component: {fileID: 677397539}
+  - component: {fileID: 677397543}
   m_Layer: 5
   m_Name: CanvasStyled
   m_TagString: Untagged
@@ -7104,6 +7105,28 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &677397543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677397538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d584466e8de7b1546a5a9d4b609c9007, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDPowerUpOverlaySectionComponent
+  primaryPowerUpSlotView: {fileID: 1318305084}
+  secondaryPowerUpSlotView: {fileID: 3000374801372744436}
+  primaryEnergyFillImage: {fileID: 0}
+  secondaryEnergyFillImage: {fileID: 0}
+  primaryPowerUpIconImage: {fileID: 1318305082}
+  secondaryPowerUpIconImage: {fileID: 1352518997}
+  primaryPowerUpSlotRootObject: {fileID: 1318305083}
+  secondaryPowerUpSlotRootObject: {fileID: 3000374801372744435}
+  primaryChargeFillImage: {fileID: 0}
+  secondaryChargeFillImage: {fileID: 0}
 --- !u!1 &690436128
 GameObject:
   m_ObjectHideFlags: 0
@@ -7413,122 +7436,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19f6ac8c9ec34d06af8f3d47abf8cb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
-  hudReferenceSearchRoot: {fileID: 677397542}
-  hudReferenceSearchRootName: CanvasStyled
+  referenceRootProvider: {fileID: 1660581011}
   playerHealthBarsView: {fileID: 1174546168}
-  portraitSection:
-    isEnabled: 1
-    rootObject: {fileID: 5998807979436900098}
-    portraitImage: {fileID: 5998807979436900097}
-    autoDiscoverReferences: 1
-    portraitContainerName: PlayerPortraitContainer
-    portraitImageName: Portrait
-  growthSequenceSection:
-    isEnabled: 1
-    rootObject: {fileID: 5998807979436900099}
-    textSlots: []
-    imageSlots: []
-    autoDiscoverReferences: 1
-    growthSequenceContainerName: GrowthSequence Container
-    createFallbackSlotsWhenMissing: 1
-    fallbackSlotCount: 10
-    fallbackSlotWidth: 48
-    fallbackSlotHeight: 28
-    fallbackSlotSpacing: 8
-    fallbackFontSize: 20
-  playerLevelText: {fileID: 1174546166}
-  hideLevelTextWhenPlayerMissing: 1
-  playerExperienceFillImage: {fileID: 1174546167}
-  experienceBarSmoothingSeconds: 0.08
-  hideExperienceBarWhenPlayerMissing: 1
-  experienceBarPresentation:
-    enableLiquidShader: 1
-    liquidMaterialTemplate: {fileID: 2100000, guid: 02a9bec6018519942ba0bb10a4c9a5ff, type: 2}
-    enablePiston: 0
-    pistonRoot: {fileID: 0}
-    pistonLocalOffsetX: 0
-    pistonLocalOffsetY: 0
-    enableValueDeltaMotion: 1
-    deltaTriggerThreshold: 0.0125
-    deltaMotionStrength: 0.9
-    deltaMotionDecaySeconds: 0.3
-  primaryPowerUpSlotView: {fileID: 1318305084}
-  secondaryPowerUpSlotView: {fileID: 3000374801372744436}
-  primaryEnergyFillImage: {fileID: 1318305081}
-  secondaryEnergyFillImage: {fileID: 0}
-  primaryPowerUpIconImage: {fileID: 1318305082}
-  secondaryPowerUpIconImage: {fileID: 0}
-  primaryPowerUpSlotRootObject: {fileID: 1318305083}
-  secondaryPowerUpSlotRootObject: {fileID: 3000374801372744435}
-  energyBarSmoothingSeconds: 0.08
-  hideEnergyBarsWhenPlayerMissing: 1
-  hideEnergyBarsWhenModuleMissing: 1
-  primaryChargeFillImage: {fileID: 1318305080}
-  secondaryChargeFillImage: {fileID: 0}
-  chargeBarSmoothingSeconds: 0.05
-  hideChargeBarsWhenPlayerMissing: 1
-  hideChargeBarsWhenModuleMissing: 1
-  runTimerSection:
-    isEnabled: 1
-    timerText: {fileID: 2313405592280617168}
-    direction: 1
-    initialSeconds: 450
-    hideWhenPlayerMissing: 1
-  comboCounterSection:
-    isEnabled: 1
-    rootObject: {fileID: 1701642176}
-    rankBadgeImage: {fileID: 389611324}
-    rankText: {fileID: 1339633559}
-    comboValueText: {fileID: 1712532091}
-    progressFillImage: {fileID: 1318692706}
-    progressBackgroundImage: {fileID: 439898150}
-    defaultBadgeSprite: {fileID: -715656042, guid: 3f815dbec59a334408e6ababb0657717, type: 3}
-    defaultBadgeTint: {r: 0.96, g: 0.96, b: 0.98, a: 1}
-    defaultRankTextColor: {r: 1, g: 0.97766113, b: 0, a: 1}
-    defaultComboValueTextColor: {r: 0.98, g: 0.98, b: 1, a: 1}
-    defaultProgressFillColor: {r: 0.98, g: 0.46, b: 0.16, a: 1}
-    defaultProgressBackgroundColor: {r: 0.9, g: 0.92, b: 0.98, a: 0.2}
-    showRankBadgeImage: 1
-    showProgressBar: 1
-    hideWhenPlayerMissing: 1
-    hideWhenZeroCombo: 1
-    hideWhenNoActiveRank: 1
-    fadeInDuration: 0.18
-    fadeOutDuration: 0.18
-    idleRankLabel: D
-    rankVisuals: []
-  milestoneSelectionSection:
-    panelRoot: {fileID: 1835769325}
-    headerText: {fileID: 1835769324}
-    hideOptionTitleNumbers: 1
-    skipButton: {fileID: 1835769323}
-    skipHoldFillImage: {fileID: 1835769326}
-    skipHoldFillImageName: SkipHoldFill
-    configureSkipHoldFillImage: 1
-    autoDiscoverOptionViewsFromPanelRoot: 1
-    navigationInputDeadzone: 0.5
-    navigationRepeatCooldownSeconds: 0.15
-    wrapNavigation: 1
-    followPointerHoverSelection: 1
-    suspendEventSystemNavigationWhileSelectionActive: 1
-    autoSelectFirstOfferWhenUiMissing: 1
-    lockButtonsAfterSelectionClick: 1
-  powerUpContainerInteractionSection:
-    overlayPanelRoot: {fileID: 539589476735432990}
-    overlayTitleText: {fileID: 539589476735432989}
-    overlayDescriptionText: {fileID: 539589476735432988}
-    overlayIconImage: {fileID: 539589476735432987}
-    replacePrimaryButton: {fileID: 539589476735432985}
-    replacePrimaryButtonText: {fileID: 539589476735432986}
-    replaceSecondaryButton: {fileID: 539589476735432984}
-    replaceSecondaryButtonText: {fileID: 539589476735432983}
-  damageVignetteSection:
-    isEnabled: 1
-    shieldVignetteImage: {fileID: 880000010}
-    shieldVignetteRootObject: {fileID: 880000007}
-    healthVignetteImage: {fileID: 880000006}
-    healthVignetteRootObject: {fileID: 880000003}
-    hideWhenPlayerMissing: 1
+  levelExperienceSection: {fileID: 5998807979436900103}
+  portraitSection: {fileID: 1053845447}
+  growthSequenceSection: {fileID: 5998807979436900102}
+  powerUpOverlaySection: {fileID: 677397543}
+  runTimerSection: {fileID: 2313405592280617170}
+  comboCounterSection: {fileID: 1701642178}
+  milestoneSelectionSection: {fileID: 1835769327}
+  powerUpContainerInteractionSection: {fileID: 539589476735432991}
+  damageVignetteSection: {fileID: 4889486650585192685}
 --- !u!4 &750304365
 Transform:
   m_ObjectHideFlags: 0
@@ -10049,6 +9967,23 @@ Material:
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &1053845447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5998807979436900098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1273628e77c46d1b443e1c9707c356a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDPlayerPortraitSection
+  rootObject: {fileID: 5998807979436900098}
+  portraitImage: {fileID: 5998807979436900097}
+  autoDiscoverReferences: 1
+  portraitContainerName: PlayerPortraitContainer
+  portraitImageName: Portrait
 --- !u!1 &1059244650
 GameObject:
   m_ObjectHideFlags: 0
@@ -10767,23 +10702,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!114 &1174546167 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4312586117191139972, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
-  m_PrefabInstance: {fileID: 5998807979436900096}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!114 &1174546168 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7209400944879206899, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
   m_PrefabInstance: {fileID: 5998807979436900096}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 5998807979436900101}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3de4dbaf60c505a43886782428d581f0, type: 3}
@@ -12040,28 +11964,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e6c8c02f6c61ba043a718b4d32ae790f, type: 3}
---- !u!114 &1318305080 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9019244804687867119, guid: e6c8c02f6c61ba043a718b4d32ae790f, type: 3}
-  m_PrefabInstance: {fileID: 1318305079}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
---- !u!114 &1318305081 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6983523507071208040, guid: e6c8c02f6c61ba043a718b4d32ae790f, type: 3}
-  m_PrefabInstance: {fileID: 1318305079}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!114 &1318305082 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7791413094481165521, guid: e6c8c02f6c61ba043a718b4d32ae790f, type: 3}
@@ -15066,6 +14968,7 @@ GameObject:
   - component: {fileID: 1660581009}
   - component: {fileID: 1660581008}
   - component: {fileID: 1660581007}
+  - component: {fileID: 1660581011}
   m_Layer: 5
   m_Name: CanvasMain
   m_TagString: Untagged
@@ -15161,6 +15064,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1660581011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1660581006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d1d7a72d00142944b1d9878cac20124, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDReferenceRootProvider
+  referenceSearchRoot: {fileID: 1660581010}
+  referenceSearchRootName: CanvasMain
 --- !u!1 &1679090740
 GameObject:
   m_ObjectHideFlags: 0
@@ -15684,6 +15601,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1701642177}
+  - component: {fileID: 1701642178}
   m_Layer: 0
   m_Name: HUD_ComboCounterPanel
   m_TagString: Untagged
@@ -15715,6 +15633,40 @@ RectTransform:
   m_AnchoredPosition: {x: 250, y: -350}
   m_SizeDelta: {x: 140, y: 170}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &1701642178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1701642176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b939683fdd79b3545b96e365d78e45cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDComboCounterSection
+  isEnabled: 1
+  rootObject: {fileID: 1701642176}
+  rankBadgeImage: {fileID: 389611324}
+  rankText: {fileID: 1291330511}
+  comboValueText: {fileID: 1712532091}
+  progressFillImage: {fileID: 1318692706}
+  progressBackgroundImage: {fileID: 439898150}
+  defaultBadgeSprite: {fileID: 0}
+  defaultBadgeTint: {r: 1, g: 1, b: 1, a: 1}
+  defaultRankTextColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultComboValueTextColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultProgressFillColor: {r: 1, g: 1, b: 1, a: 1}
+  defaultProgressBackgroundColor: {r: 1, g: 1, b: 1, a: 0.25}
+  showRankBadgeImage: 1
+  showProgressBar: 1
+  hideWhenPlayerMissing: 1
+  hideWhenZeroCombo: 1
+  hideWhenNoActiveRank: 1
+  fadeInDuration: 0.18
+  fadeOutDuration: 0.18
+  idleRankLabel: COMBO
+  rankVisuals: []
 --- !u!1 &1706463923
 GameObject:
   m_ObjectHideFlags: 0
@@ -17558,7 +17510,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1076552935320926401, guid: ebe4ca2171cb9424dab256914c345362, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1835769327}
   m_SourcePrefab: {fileID: 100100000, guid: ebe4ca2171cb9424dab256914c345362, type: 3}
 --- !u!224 &1835769322 stripped
 RectTransform:
@@ -17603,6 +17558,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1835769327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835769325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ede14611a782e84b89e442de9cc1ec3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDMilestoneSelectionSection
+  panelRoot: {fileID: 1835769325}
+  headerText: {fileID: 1835769324}
+  hideOptionTitleNumbers: 1
+  skipButton: {fileID: 1835769323}
+  skipHoldFillImage: {fileID: 1835769326}
+  skipHoldFillImageName: SkipHoldFill
+  configureSkipHoldFillImage: 1
+  autoDiscoverOptionViewsFromPanelRoot: 1
+  navigationInputDeadzone: 0.5
+  navigationRepeatCooldownSeconds: 0.15
+  wrapNavigation: 1
+  followPointerHoverSelection: 1
+  suspendEventSystemNavigationWhileSelectionActive: 1
+  autoSelectFirstOfferWhenUiMissing: 1
+  lockButtonsAfterSelectionClick: 1
 --- !u!1 &1897494637
 GameObject:
   m_ObjectHideFlags: 0
@@ -19854,19 +19836,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5796598729692728480, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 539589476735432991}
   m_SourcePrefab: {fileID: 100100000, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
---- !u!114 &539589476735432983 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1447832409141591889, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
-  m_PrefabInstance: {fileID: 539589476735432982}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &539589476735432984 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1073441766425596109, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
@@ -19889,17 +19863,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!114 &539589476735432986 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3306053108887879570, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
-  m_PrefabInstance: {fileID: 539589476735432982}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!114 &539589476735432987 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2048017815229795923, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
@@ -19938,6 +19901,26 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5796598729692728480, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
   m_PrefabInstance: {fileID: 539589476735432982}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &539589476735432991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 539589476735432990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 333f0def6e1e7f946962f9fe86ff9f35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDPowerUpContainerInteractionSection
+  overlayPanelRoot: {fileID: 539589476735432990}
+  overlayTitleText: {fileID: 539589476735432989}
+  overlayDescriptionText: {fileID: 539589476735432988}
+  overlayIconImage: {fileID: 539589476735432987}
+  replacePrimaryButton: {fileID: 539589476735432985}
+  replacePrimaryButtonText: {fileID: 0}
+  replaceSecondaryButton: {fileID: 539589476735432984}
+  replaceSecondaryButtonText: {fileID: 0}
 --- !u!1001 &1325478539928992792
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21658,19 +21641,44 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 207234350767494301, guid: b093a083690acae4e9f42a747dd06ace, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2313405592280617170}
   m_SourcePrefab: {fileID: 100100000, guid: b093a083690acae4e9f42a747dd06ace, type: 3}
 --- !u!114 &2313405592280617168 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8643691559575961597, guid: b093a083690acae4e9f42a747dd06ace, type: 3}
   m_PrefabInstance: {fileID: 2313405592280617167}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2313405592280617169}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &2313405592280617169 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 207234350767494301, guid: b093a083690acae4e9f42a747dd06ace, type: 3}
+  m_PrefabInstance: {fileID: 2313405592280617167}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2313405592280617170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2313405592280617169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f045b8da65e24d789ee411b5a0148bed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDRunTimerSection
+  isEnabled: 1
+  timerText: {fileID: 2313405592280617168}
+  direction: 0
+  initialSeconds: 300
+  hideWhenPlayerMissing: 1
 --- !u!224 &2518212418986322748
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21921,8 +21929,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1368282857084399509, guid: 16ae30619710c3b44b80ebe05c61c40c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4889486650585192685}
   m_SourcePrefab: {fileID: 100100000, guid: 16ae30619710c3b44b80ebe05c61c40c, type: 3}
+--- !u!1 &4889486650585192684 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1368282857084399509, guid: 16ae30619710c3b44b80ebe05c61c40c, type: 3}
+  m_PrefabInstance: {fileID: 4889486650585192683}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4889486650585192685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4889486650585192684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e066e39adc7c89429ca6a12472fa92a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDPlayerDamageVignetteSection
+  isEnabled: 1
+  shieldVignetteImage: {fileID: 880000010}
+  shieldVignetteRootObject: {fileID: 880000007}
+  healthVignetteImage: {fileID: 880000006}
+  healthVignetteRootObject: {fileID: 880000003}
+  hideWhenPlayerMissing: 1
 --- !u!1001 &5998807979436900096
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -21962,6 +21996,14 @@ PrefabInstance:
     - target: {fileID: 286386263134962100, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 307350980384422169, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 307350980384422169, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 532952025515637046, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
@@ -22153,11 +22195,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1856665401778457095, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 1856665401778457095, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 1
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 1893253716124149567, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
@@ -22493,11 +22535,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4804671728868667048, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.6666667
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4804671728868667048, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.6666667
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4894795269594261335, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
@@ -22607,6 +22649,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5182119776805643568, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 5182119776805643568, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 5275065536784538428, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -22642,7 +22692,7 @@ PrefabInstance:
     - target: {fileID: 5395652751484188279, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 3172050056534276195, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 5422649777989219457, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_fontMaterial
       value: 
@@ -22697,7 +22747,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5871217640782372545, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6126453310040913367, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.x
@@ -22801,7 +22851,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6546003769463203738, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 160
+      value: 240
       objectReference: {fileID: 0}
     - target: {fileID: 6569672073749977334, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.y
@@ -22825,7 +22875,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6699722941161766021, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6847115729226137703, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_fontMaterial
@@ -22909,11 +22959,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8000684380820865922, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.33333334
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8000684380820865922, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.33333334
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8012562850870282523, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
@@ -23026,7 +23076,7 @@ PrefabInstance:
     - target: {fileID: 8684721800683162663, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 3172050056534276195, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 9024942695374202156, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -23082,7 +23132,16 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1451165685435678976, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1053845447}
+    - targetCorrespondingSourceObject: {fileID: 4689743778167780270, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5998807979436900103}
+    - targetCorrespondingSourceObject: {fileID: 934825835639801613, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5998807979436900102}
   m_SourcePrefab: {fileID: 100100000, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
 --- !u!114 &5998807979436900097 stripped
 MonoBehaviour:
@@ -23102,9 +23161,58 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &5998807979436900099 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5945461626210166404, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+  m_CorrespondingSourceObject: {fileID: 934825835639801613, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
   m_PrefabInstance: {fileID: 5998807979436900096}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5998807979436900100 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4700373143483682139, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+  m_PrefabInstance: {fileID: 5998807979436900096}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!1 &5998807979436900101 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4689743778167780270, guid: d9bebed60d79de743bf4634be7ddc7c0, type: 3}
+  m_PrefabInstance: {fileID: 5998807979436900096}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5998807979436900102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5998807979436900099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fff9f18513b34c22b381f1d057c3d5f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDGrowthSequenceSection
+  rootObject: {fileID: 5998807979436900099}
+  textSlots: []
+  imageSlots: []
+  autoDiscoverReferences: 1
+  growthSequenceContainerName: GrowthSequence Container
+--- !u!114 &5998807979436900103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5998807979436900101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cc6b312a4e0ec24a88dbaeded4ea656, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDLevelExperienceSection
+  playerLevelText: {fileID: 1174546166}
+  playerExperienceFillImage: {fileID: 5998807979436900100}
+  experienceLiquidMaterialTemplate: {fileID: 0}
+  experiencePistonRoot: {fileID: 0}
 --- !u!114 &6028893027734872586
 MonoBehaviour:
   m_ObjectHideFlags: 0

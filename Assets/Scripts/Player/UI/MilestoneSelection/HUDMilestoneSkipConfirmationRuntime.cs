@@ -36,6 +36,19 @@ public sealed class HUDMilestoneSkipConfirmationRuntime
 
     #endregion
 
+    #region Properties
+    /// <summary>
+    /// Reports whether a skip hold confirmation is currently being timed.
+    /// </summary>
+    public bool IsHoldActive
+    {
+        get
+        {
+            return holdActive;
+        }
+    }
+    #endregion
+
     #region Methods
 
     #region Public Methods

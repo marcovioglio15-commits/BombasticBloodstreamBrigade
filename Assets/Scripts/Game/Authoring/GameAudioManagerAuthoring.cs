@@ -3,7 +3,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Scene authoring component that bakes selected Audio and Settings Manager presets into ECS singletons.
+/// Scene authoring component that bakes selected Audio, Settings and HUD Manager presets into ECS singletons.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameAudioManagerAuthoring : MonoBehaviour
@@ -20,6 +20,9 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
 
     [Tooltip("Direct Settings Manager preset fallback used when Master Preset is missing or has no Settings Manager assigned.")]
     [SerializeField] private GameSettingsManagerPreset settingsManagerPreset;
+
+    [Tooltip("Direct HUD Manager preset fallback used when Master Preset is missing or has no HUD Manager assigned.")]
+    [SerializeField] private GameHudManagerPreset hudManagerPreset;
     #endregion
 
     #endregion
@@ -46,6 +49,14 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
         get
         {
             return settingsManagerPreset;
+        }
+    }
+
+    public GameHudManagerPreset HudManagerPreset
+    {
+        get
+        {
+            return hudManagerPreset;
         }
     }
     #endregion
@@ -75,6 +86,18 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
             return masterPreset.SettingsManagerPreset;
 
         return settingsManagerPreset;
+    }
+
+    /// <summary>
+    /// Resolves the effective HUD Manager preset used by baking.
+    /// </summary>
+    /// <returns>HUD Manager preset from MasterPreset or direct fallback.</returns>
+    public GameHudManagerPreset ResolveHudManagerPreset()
+    {
+        if (masterPreset != null && masterPreset.HudManagerPreset != null)
+            return masterPreset.HudManagerPreset;
+
+        return hudManagerPreset;
     }
     #endregion
 
@@ -110,9 +133,11 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         DeclarePresetDependencies(authoring);
         GameAudioManagerPreset audioPreset = authoring.ResolveAudioManagerPreset();
         GameSettingsManagerPreset settingsPreset = authoring.ResolveSettingsManagerPreset();
+        GameHudManagerPreset hudPreset = authoring.ResolveHudManagerPreset();
 
         Entity entity = GetEntity(TransformUsageFlags.None);
         AddComponent(entity, BuildSettingsRuntimeConfig(settingsPreset));
+        AddComponent(entity, GameHudManagerPresetBakeUtility.BuildConfig(hudPreset));
 
         if (audioPreset == null)
             return;
@@ -143,6 +168,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
             if (authoring.MasterPreset.SettingsManagerPreset != null)
                 DependsOn(authoring.MasterPreset.SettingsManagerPreset);
+
+            if (authoring.MasterPreset.HudManagerPreset != null)
+                DependsOn(authoring.MasterPreset.HudManagerPreset);
         }
 
         if (authoring.AudioManagerPreset != null)
@@ -150,6 +178,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
         if (authoring.SettingsManagerPreset != null)
             DependsOn(authoring.SettingsManagerPreset);
+
+        if (authoring.HudManagerPreset != null)
+            DependsOn(authoring.HudManagerPreset);
     }
 
     /// <summary>

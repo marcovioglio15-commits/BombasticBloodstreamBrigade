@@ -19,6 +19,11 @@ public sealed class HUDRunTimerSectionPropertyDrawer : PropertyDrawer
     /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
+        if (HUDSectionPropertyDrawerUtility.TryCreateObjectReferenceField(property,
+                                                                         "Scene HUD run timer section component referenced by HUDManager.",
+                                                                         out VisualElement referenceField))
+            return referenceField;
+
         VisualElement root = new VisualElement();
         SerializedProperty isEnabledProperty = property.FindPropertyRelative("isEnabled");
         SerializedProperty timerTextProperty = property.FindPropertyRelative("timerText");

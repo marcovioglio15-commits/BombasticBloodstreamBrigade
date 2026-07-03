@@ -441,6 +441,14 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new HUD Manager preset and assigns it to the selected master preset.
+    /// </summary>
+    internal void CreateHudManagerPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateHudManagerPreset(this);
+    }
+
+    /// <summary>
     /// Creates a new Scene Manager preset and assigns it to the selected master preset.
     /// </summary>
     internal void CreateSceneManagerPreset()
@@ -553,6 +561,7 @@ public sealed class GameMasterPresetsPanel
         public GameAudioManagerPresetsPanel AudioPanel;
         public GameSceneManagerPresetsPanel ScenePanel;
         public GameSettingsManagerPresetsPanel SettingsPanel;
+        public GameHudManagerPresetsPanel HudPanel;
     }
     #endregion
 }

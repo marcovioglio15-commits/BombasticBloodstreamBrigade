@@ -218,7 +218,7 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
 
     #region Scene
     /// <summary>
-    /// Validates HUDManager scene bindings to the redesigned active power-up slot views.
+    /// Validates scene bindings to the redesigned active power-up slot views.
     /// </summary>
     private static void ValidateMainUiSceneBindings()
     {
@@ -232,10 +232,15 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
             if (hudManager == null)
                 throw new InvalidOperationException("SCN_MainScene_UI is missing HUDManager.");
 
-            SerializedObject hudObject = new SerializedObject(hudManager);
-            ValidateHudSlotReference(hudObject, "primaryPowerUpSlotView");
-            ValidateHudSlotReference(hudObject, "secondaryPowerUpSlotView");
-            ValidateSceneSlotReferences(hudObject);
+            HUDPowerUpOverlaySectionComponent overlaySection = FindComponentInScene<HUDPowerUpOverlaySectionComponent>(scene);
+
+            if (overlaySection == null)
+                throw new InvalidOperationException("SCN_MainScene_UI is missing HUDPowerUpOverlaySectionComponent.");
+
+            SerializedObject overlayObject = new SerializedObject(overlaySection);
+            ValidateHudSlotReference(overlayObject, "primaryPowerUpSlotView");
+            ValidateHudSlotReference(overlayObject, "secondaryPowerUpSlotView");
+            ValidateSceneSlotReferences(overlayObject);
             ValidateBossHudSceneReferences(scene);
             ValidateNoNegativeScale(hudManager.transform.root);
             ValidateNoMissingScripts(hudManager.transform.root);
@@ -248,19 +253,19 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
     }
 
     /// <summary>
-    /// Validates one serialized HUDManager slot view reference.
+    /// Validates one serialized active power-up overlay slot view reference.
     /// </summary>
-    /// <param name="hudObject">Serialized HUDManager object.</param>
+    /// <param name="overlayObject">Serialized active power-up overlay section object.</param>
     /// <param name="propertyName">Slot view property name.</param>
-    private static void ValidateHudSlotReference(SerializedObject hudObject, string propertyName)
+    private static void ValidateHudSlotReference(SerializedObject overlayObject, string propertyName)
     {
-        SerializedProperty property = hudObject.FindProperty(propertyName);
+        SerializedProperty property = overlayObject.FindProperty(propertyName);
         PlayerActivePowerUpSlotHudView slotView = property != null
             ? property.objectReferenceValue as PlayerActivePowerUpSlotHudView
             : null;
 
         if (slotView == null || !slotView.HasAnyVisuals)
-            throw new InvalidOperationException("HUDManager is missing redesigned slot view binding: " + propertyName);
+            throw new InvalidOperationException("HUDPowerUpOverlaySectionComponent is missing redesigned slot view binding: " + propertyName);
 
         ValidatePreviewPreset(slotView);
     }
@@ -298,12 +303,12 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
     /// <summary>
     /// Validates that scene active slots keep self-contained references without enforcing designer-authored placement.
     /// </summary>
-    /// <param name="hudObject">Serialized HUDManager object containing slot view references.</param>
-    private static void ValidateSceneSlotReferences(SerializedObject hudObject)
+    /// <param name="overlayObject">Serialized active power-up overlay section containing slot view references.</param>
+    private static void ValidateSceneSlotReferences(SerializedObject overlayObject)
     {
-        ValidateSlotReferencesBelongToSlot(ResolveSlotView(hudObject, "primaryPowerUpSlotView"),
+        ValidateSlotReferencesBelongToSlot(ResolveSlotView(overlayObject, "primaryPowerUpSlotView"),
                                            "Primary Active Slot");
-        ValidateSlotReferencesBelongToSlot(ResolveSlotView(hudObject, "secondaryPowerUpSlotView"),
+        ValidateSlotReferencesBelongToSlot(ResolveSlotView(overlayObject, "secondaryPowerUpSlotView"),
                                            "Secondary Active Slot");
     }
 
@@ -551,14 +556,14 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
     }
 
     /// <summary>
-    /// Resolves one active slot view from a serialized HUDManager object.
+    /// Resolves one active slot view from a serialized active power-up overlay section.
     /// </summary>
-    /// <param name="hudObject">Serialized HUDManager object.</param>
+    /// <param name="overlayObject">Serialized active power-up overlay section object.</param>
     /// <param name="propertyName">Serialized slot-view property name.</param>
     /// <returns>Resolved slot view, or null when missing.</returns>
-    private static PlayerActivePowerUpSlotHudView ResolveSlotView(SerializedObject hudObject, string propertyName)
+    private static PlayerActivePowerUpSlotHudView ResolveSlotView(SerializedObject overlayObject, string propertyName)
     {
-        SerializedProperty property = hudObject.FindProperty(propertyName);
+        SerializedProperty property = overlayObject.FindProperty(propertyName);
         return property != null ? property.objectReferenceValue as PlayerActivePowerUpSlotHudView : null;
     }
 

@@ -166,23 +166,34 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
             PlayerHudExperienceBossPortraitAssetSetupUtility.ConfigureBossPortrait(bossPresentation.gameObject);
         }
 
-        SerializedObject hudObject = new SerializedObject(hudManager);
-        PlayerActivePowerUpSlotHudView primaryView = ConfigureScenePowerUpSlot(hudObject,
-                                                                               "primaryPowerUpSlotRootObject",
+        HUDPowerUpOverlaySectionComponent overlaySection = EnsureComponent<HUDPowerUpOverlaySectionComponent>(ResolvePowerUpOverlayHost(hudManager));
+        SerializedObject overlayObject = new SerializedObject(overlaySection);
+        GameObject primarySlotRoot = ResolveScenePowerUpSlotRoot(overlayObject, "primaryPowerUpSlotRootObject", "Primary");
+        GameObject secondarySlotRoot = ResolveScenePowerUpSlotRoot(overlayObject, "secondaryPowerUpSlotRootObject", "Secondary");
+        PlayerActivePowerUpSlotHudView primaryView = ConfigureScenePowerUpSlot(primarySlotRoot,
                                                                                sourceHealthSyringe,
                                                                                chargeRingMaterial,
                                                                                cooldownIconMaterial,
                                                                                editorPreviewPreset);
-        PlayerActivePowerUpSlotHudView secondaryView = BindExistingScenePowerUpSlot(hudObject,
-                                                                                    "secondaryPowerUpSlotRootObject",
+        PlayerActivePowerUpSlotHudView secondaryView = BindExistingScenePowerUpSlot(secondarySlotRoot,
                                                                                     editorPreviewPreset);
 
-        SetObjectReference(hudObject, "primaryPowerUpSlotView", primaryView);
-        SetObjectReference(hudObject, "secondaryPowerUpSlotView", secondaryView);
+        SetObjectReference(overlayObject, "primaryPowerUpSlotView", primaryView);
+        SetObjectReference(overlayObject, "secondaryPowerUpSlotView", secondaryView);
+        SetObjectReference(overlayObject, "primaryPowerUpIconImage", primaryView != null ? primaryView.IconImage : null);
+        SetObjectReference(overlayObject, "secondaryPowerUpIconImage", secondaryView != null ? secondaryView.IconImage : null);
+        SetObjectReference(overlayObject, "primaryPowerUpSlotRootObject", primaryView != null ? primaryView.gameObject : primarySlotRoot);
+        SetObjectReference(overlayObject, "secondaryPowerUpSlotRootObject", secondaryView != null ? secondaryView.gameObject : secondarySlotRoot);
+        overlayObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(overlaySection);
 
         if (playerLevelText != null)
-            SetObjectReference(hudObject, "playerLevelText", playerLevelText);
+            WireLevelExperienceSection(hudManager, healthBarsView, playerLevelText);
 
+        SerializedObject hudObject = new SerializedObject(hudManager);
+        SetObjectReference(hudObject, "playerHealthBarsView", healthBarsView);
+        SetObjectReference(hudObject, "levelExperienceSection", healthBarsView != null ? healthBarsView.GetComponent<HUDLevelExperienceSection>() : null);
+        SetObjectReference(hudObject, "powerUpOverlaySection", overlaySection);
         hudObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(hudManager);
         EditorSceneManager.MarkSceneDirty(scene);
@@ -190,25 +201,20 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     }
 
     /// <summary>
-    /// Configures one scene slot referenced by HUDManager and returns its redesigned view.
+    /// Configures one scene slot and returns its redesigned view.
     /// </summary>
-    /// <param name="hudObject">Serialized HUDManager object containing the slot root reference.</param>
-    /// <param name="slotRootPropertyName">Serialized property name for the slot root GameObject.</param>
+    /// <param name="slotRoot">Scene slot root GameObject.</param>
     /// <param name="sourceEnergySyringe">Preauthored syringe used when the scene instance still needs generated children.</param>
     /// <param name="chargeRingMaterial">Material template for charge semiring generation.</param>
     /// <param name="cooldownIconMaterial">Material template for cooldown icon generation.</param>
     /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
     /// <returns>The configured slot view, or null when the slot root is missing.</returns>
-    private static PlayerActivePowerUpSlotHudView ConfigureScenePowerUpSlot(SerializedObject hudObject,
-                                                                            string slotRootPropertyName,
+    private static PlayerActivePowerUpSlotHudView ConfigureScenePowerUpSlot(GameObject slotRoot,
                                                                             PlayerSyringeBarView sourceEnergySyringe,
                                                                             Material chargeRingMaterial,
                                                                             Material cooldownIconMaterial,
                                                                             PlayerVisualPreset editorPreviewPreset)
     {
-        SerializedProperty rootProperty = hudObject.FindProperty(slotRootPropertyName);
-        GameObject slotRoot = rootProperty != null ? rootProperty.objectReferenceValue as GameObject : null;
-
         if (slotRoot == null)
             return null;
 
@@ -225,17 +231,12 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// <summary>
     /// Binds an existing scene slot view without rewriting its authored child layout.
     /// </summary>
-    /// <param name="hudObject">Serialized HUDManager object containing the slot root reference.</param>
-    /// <param name="slotRootPropertyName">Serialized property name for the slot root GameObject.</param>
+    /// <param name="slotRoot">Scene slot root GameObject.</param>
     /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
     /// <returns>The existing or newly attached slot view, or null when the slot root is missing.</returns>
-    private static PlayerActivePowerUpSlotHudView BindExistingScenePowerUpSlot(SerializedObject hudObject,
-                                                                               string slotRootPropertyName,
+    private static PlayerActivePowerUpSlotHudView BindExistingScenePowerUpSlot(GameObject slotRoot,
                                                                                PlayerVisualPreset editorPreviewPreset)
     {
-        SerializedProperty rootProperty = hudObject.FindProperty(slotRootPropertyName);
-        GameObject slotRoot = rootProperty != null ? rootProperty.objectReferenceValue as GameObject : null;
-
         if (slotRoot == null)
             return null;
 
@@ -423,6 +424,102 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
 
         rootRect.anchoredPosition = new Vector2(maximumAnchoredX, rootRect.anchoredPosition.y);
         EditorUtility.SetDirty(rootRect);
+    }
+
+    /// <summary>
+    /// Resolves the scene object that should own the active power-up overlay section.
+    /// </summary>
+    /// <param name="hudManager">HUD manager used as the final fallback.</param>
+    /// <returns>Overlay section host object.</returns>
+    private static GameObject ResolvePowerUpOverlayHost(HUDManager hudManager)
+    {
+        HUDPowerUpOverlaySectionComponent existingSection = UnityEngine.Object.FindFirstObjectByType<HUDPowerUpOverlaySectionComponent>(FindObjectsInactive.Include);
+
+        if (existingSection != null)
+            return existingSection.gameObject;
+
+        PlayerActivePowerUpSlotHudView primarySlot = ResolveSlotViewByName("Primary");
+
+        if (primarySlot != null && primarySlot.transform.parent != null)
+            return primarySlot.transform.parent.gameObject;
+
+        return hudManager.gameObject;
+    }
+
+    /// <summary>
+    /// Resolves one active power-up slot root from an overlay section or scene slot name.
+    /// </summary>
+    /// <param name="overlayObject">Serialized overlay section object.</param>
+    /// <param name="rootPropertyName">Serialized root property name.</param>
+    /// <param name="slotNameToken">Name token used when the section has no root assigned yet.</param>
+    /// <returns>Resolved slot root or null.</returns>
+    private static GameObject ResolveScenePowerUpSlotRoot(SerializedObject overlayObject, string rootPropertyName, string slotNameToken)
+    {
+        SerializedProperty rootProperty = overlayObject.FindProperty(rootPropertyName);
+        GameObject slotRoot = rootProperty != null ? rootProperty.objectReferenceValue as GameObject : null;
+
+        if (slotRoot != null)
+            return slotRoot;
+
+        PlayerActivePowerUpSlotHudView slotView = ResolveSlotViewByName(slotNameToken);
+
+        if (slotView != null)
+            return slotView.gameObject;
+
+        GameObject[] sceneObjects = UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        for (int objectIndex = 0; objectIndex < sceneObjects.Length; objectIndex++)
+        {
+            GameObject sceneObject = sceneObjects[objectIndex];
+
+            if (sceneObject != null && sceneObject.name.IndexOf(slotNameToken, StringComparison.OrdinalIgnoreCase) >= 0)
+                return sceneObject;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Resolves one active power-up slot view by object name token.
+    /// </summary>
+    /// <param name="slotNameToken">Name token used to distinguish primary and secondary slots.</param>
+    /// <returns>Matching slot view or null.</returns>
+    private static PlayerActivePowerUpSlotHudView ResolveSlotViewByName(string slotNameToken)
+    {
+        PlayerActivePowerUpSlotHudView[] slotViews = UnityEngine.Object.FindObjectsByType<PlayerActivePowerUpSlotHudView>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+        for (int slotIndex = 0; slotIndex < slotViews.Length; slotIndex++)
+        {
+            PlayerActivePowerUpSlotHudView slotView = slotViews[slotIndex];
+
+            if (slotView != null && slotView.gameObject.name.IndexOf(slotNameToken, StringComparison.OrdinalIgnoreCase) >= 0)
+                return slotView;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Ensures the level and legacy experience section owns the moved player level reference.
+    /// </summary>
+    /// <param name="hudManager">HUD manager receiving the section reference.</param>
+    /// <param name="healthBarsView">Health-bars view used as section host.</param>
+    /// <param name="playerLevelText">Player level text generated by the experience syringe setup.</param>
+    private static void WireLevelExperienceSection(HUDManager hudManager, PlayerHealthBarsHudView healthBarsView, TMP_Text playerLevelText)
+    {
+        if (healthBarsView == null || playerLevelText == null)
+            return;
+
+        HUDLevelExperienceSection section = EnsureComponent<HUDLevelExperienceSection>(healthBarsView.gameObject);
+        SerializedObject sectionObject = new SerializedObject(section);
+        SetObjectReference(sectionObject, "playerLevelText", playerLevelText);
+        sectionObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(section);
+
+        SerializedObject hudObject = new SerializedObject(hudManager);
+        SetObjectReference(hudObject, "levelExperienceSection", section);
+        hudObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(hudManager);
     }
     #endregion
 

@@ -8,8 +8,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Handles milestone power-up card rendering, custom UI navigation, pointer selection, and ECS command submission.
 /// </summary>
-[System.Serializable]
-public sealed class HUDMilestoneSelectionSection
+[DisallowMultipleComponent]
+public sealed class HUDMilestoneSelectionSection : MonoBehaviour
 {
     #region Fields
 
@@ -78,15 +78,39 @@ public sealed class HUDMilestoneSelectionSection
     private bool isPanelVisible;
     private bool interactionLocked;
     private bool navigationInputReleased = true;
+    private bool skipOnlyFromExitInput;
+    private bool skipInputModeCached;
     private int activeOfferCount;
     private int renderedHeaderPlayerLevel = int.MinValue;
     private int selectedOfferIndex = -1;
+    private Entity cachedSkipInputModeEntity = Entity.Null;
+    private uint cachedSkipInputModeScalingHash;
+    private int cachedSkipInputModeConfigHash;
     private float nextAllowedNavigateUnscaledTime;
     #endregion
 
     #region Methods
 
     #region Public Methods
+    /// <summary>
+    /// Applies the baked HUD Manager preset values before initialization or runtime update.
+    /// </summary>
+    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    public void ApplySettings(in GameHudRuntimeConfig config)
+    {
+        hideOptionTitleNumbers = config.MilestoneHideOptionTitleNumbers != 0;
+        skipHoldFillImageName = config.MilestoneSkipHoldFillImageName.ToString();
+        configureSkipHoldFillImage = config.MilestoneConfigureSkipHoldFillImage != 0;
+        autoDiscoverOptionViewsFromPanelRoot = config.MilestoneAutoDiscoverOptionViewsFromPanelRoot != 0;
+        navigationInputDeadzone = Mathf.Clamp01(config.MilestoneNavigationInputDeadzone);
+        navigationRepeatCooldownSeconds = Mathf.Max(0f, config.MilestoneNavigationRepeatCooldownSeconds);
+        wrapNavigation = config.MilestoneWrapNavigation != 0;
+        followPointerHoverSelection = config.MilestoneFollowPointerHoverSelection != 0;
+        suspendEventSystemNavigationWhileSelectionActive = config.MilestoneSuspendEventSystemNavigation != 0;
+        autoSelectFirstOfferWhenUiMissing = config.MilestoneAutoSelectFirstOfferWhenUiMissing != 0;
+        lockButtonsAfterSelectionClick = config.MilestoneLockButtonsAfterSelectionClick != 0;
+    }
+
     /// <summary>
     /// Registers UI listeners, resolves option-card views, and applies the initial hidden state.
     /// </summary>
@@ -125,7 +149,7 @@ public sealed class HUDMilestoneSelectionSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read and write milestone selection data.</param>
     /// <param name="runtimePlayerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity runtimePlayerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity runtimePlayerEntity)
     {
         RefreshDiscoveredOptionViews();
         RegisterSkipButton();
@@ -314,7 +338,10 @@ public sealed class HUDMilestoneSelectionSection
                            DynamicBuffer<PlayerMilestonePowerUpSelectionOfferElement> selectionOffers)
     {
         activeOfferCount = Mathf.Min(selectionOffers.Length, MaxSelectableOffers);
-        selectedOfferIndex = HUDMilestoneSelectionNavigationUtility.NormalizeSelectedIndex(selectedOfferIndex, activeOfferCount, skipButton != null);
+        RefreshSkipInputModeSetting();
+        selectedOfferIndex = HUDMilestoneSelectionNavigationUtility.NormalizeSelectedIndex(selectedOfferIndex,
+                                                                                          activeOfferCount,
+                                                                                          HasNavigableSkipButton());
 
         if (panelRoot != null && !panelRoot.activeSelf)
             panelRoot.SetActive(true);
@@ -323,12 +350,15 @@ public sealed class HUDMilestoneSelectionSection
         skipConfirmation.RefreshSettings(entityManager, playerEntity);
 
         ApplyPanelVisibleState(true);
-        HUDMilestoneSelectionOptionUtility.SetSkipButtonVisible(skipButton, true, !interactionLocked);
+        HUDMilestoneSelectionOptionUtility.SetSkipButtonVisible(skipButton, ShouldShowSkipButton(), CanInteractWithSkipButton());
         HUDMilestoneSelectionOptionUtility.RenderOptionViews(discoveredOptionViews,
                                                              selectionOffers,
                                                              activeOfferCount,
                                                              hideOptionTitleNumbers);
-        HUDMilestoneSelectionOptionUtility.SetOptionInputsInteractable(discoveredOptionViews, skipButton, !interactionLocked);
+        HUDMilestoneSelectionOptionUtility.SetOptionInputsInteractable(discoveredOptionViews,
+                                                                       skipButton,
+                                                                       !interactionLocked,
+                                                                       CanInteractWithSkipButton());
         HUDMilestoneSelectionOptionUtility.ApplySelectionVisuals(discoveredOptionViews, skipButton, selectedOfferIndex, activeOfferCount);
         skipConfirmation.Tick(Time.unscaledDeltaTime);
     }
@@ -349,6 +379,8 @@ public sealed class HUDMilestoneSelectionSection
         activeOfferCount = 0;
         selectedOfferIndex = -1;
         navigationInputReleased = true;
+        skipOnlyFromExitInput = false;
+        ClearSkipInputModeCache();
         skipConfirmation.ResetState();
         renderedHeaderPlayerLevel = int.MinValue;
         renderedHeaderText = null;
@@ -459,7 +491,7 @@ public sealed class HUDMilestoneSelectionSection
         if (nextOptionIndex == selectedOfferIndex)
             return;
 
-        if (!HUDMilestoneSelectionNavigationUtility.IsSkipSelectionIndex(nextOptionIndex, activeOfferCount, skipButton != null))
+        if (!HUDMilestoneSelectionNavigationUtility.IsSkipSelectionIndex(nextOptionIndex, activeOfferCount, HasNavigableSkipButton()))
             skipConfirmation.CancelHold();
 
         selectedOfferIndex = nextOptionIndex;
@@ -488,7 +520,7 @@ public sealed class HUDMilestoneSelectionSection
         if (!CanHandleCurrentSelectionInput())
             return;
 
-        if (HUDMilestoneSelectionNavigationUtility.IsSkipSelectionIndex(selectedOfferIndex, activeOfferCount, skipButton != null))
+        if (HUDMilestoneSelectionNavigationUtility.IsSkipSelectionIndex(selectedOfferIndex, activeOfferCount, HasNavigableSkipButton()))
         {
             skipConfirmation.StartHold();
             return;
@@ -520,6 +552,7 @@ public sealed class HUDMilestoneSelectionSection
             return;
 
         skipConfirmation.StartHold();
+        RefreshSkipButtonVisibility();
     }
 
     /// <summary>
@@ -529,6 +562,7 @@ public sealed class HUDMilestoneSelectionSection
     private void HandleCancelCanceled(InputAction.CallbackContext context)
     {
         skipConfirmation.CancelHold();
+        RefreshSkipButtonVisibility();
     }
     #endregion
 
@@ -576,13 +610,16 @@ public sealed class HUDMilestoneSelectionSection
     /// </summary>
     private void HandleSkipButtonHovered()
     {
+        if (skipOnlyFromExitInput)
+            return;
+
         if (!followPointerHoverSelection)
             return;
 
         if (!CanHandleCurrentSelectionInput())
             return;
 
-        int skipSelectionIndex = HUDMilestoneSelectionNavigationUtility.ResolveSkipSelectionIndex(activeOfferCount, skipButton != null);
+        int skipSelectionIndex = HUDMilestoneSelectionNavigationUtility.ResolveSkipSelectionIndex(activeOfferCount, HasNavigableSkipButton());
 
         if (skipSelectionIndex < 0 || skipSelectionIndex == selectedOfferIndex)
             return;
@@ -640,7 +677,7 @@ public sealed class HUDMilestoneSelectionSection
             return;
 
         interactionLocked = true;
-        HUDMilestoneSelectionOptionUtility.SetOptionInputsInteractable(discoveredOptionViews, skipButton, false);
+        HUDMilestoneSelectionOptionUtility.SetOptionInputsInteractable(discoveredOptionViews, skipButton, false, false);
     }
 
     /// <summary>
@@ -688,7 +725,90 @@ public sealed class HUDMilestoneSelectionSection
     /// <returns>Total selectable count, including the optional Skip button.</returns>
     private int ResolveActiveSelectableCount()
     {
-        return HUDMilestoneSelectionNavigationUtility.ResolveSelectableCount(activeOfferCount, skipButton != null);
+        return HUDMilestoneSelectionNavigationUtility.ResolveSelectableCount(activeOfferCount, HasNavigableSkipButton());
+    }
+
+    /// <summary>
+    /// Resolves whether the authored Skip button can participate in custom UI navigation.
+    /// </summary>
+    /// <returns>True when Skip exists and is not restricted to Cancel or Exit input.</returns>
+    private bool HasNavigableSkipButton()
+    {
+        return skipButton != null && !skipOnlyFromExitInput;
+    }
+
+    /// <summary>
+    /// Resolves whether pointer and EventSystem interaction should be allowed on the Skip button.
+    /// </summary>
+    /// <returns>True when the button is visible, unlocked, and not restricted to Cancel or Exit input.</returns>
+    private bool CanInteractWithSkipButton()
+    {
+        return skipButton != null && !interactionLocked && !skipOnlyFromExitInput;
+    }
+
+    /// <summary>
+    /// Resolves whether the authored Skip button should be visible in the current input mode.
+    /// </summary>
+    /// <returns>True when the button should be visible to the player.</returns>
+    private bool ShouldShowSkipButton()
+    {
+        if (skipButton == null)
+            return false;
+
+        if (!skipOnlyFromExitInput)
+            return true;
+
+        return skipConfirmation.IsHoldActive;
+    }
+
+    /// <summary>
+    /// Applies the current Skip button visibility without waiting for the next ECS HUD refresh.
+    /// </summary>
+    private void RefreshSkipButtonVisibility()
+    {
+        HUDMilestoneSelectionOptionUtility.SetSkipButtonVisible(skipButton, ShouldShowSkipButton(), CanInteractWithSkipButton());
+    }
+
+    /// <summary>
+    /// Refreshes the runtime skip input-mode setting from the progression blob only when its cache key changes.
+    /// </summary>
+    private void RefreshSkipInputModeSetting()
+    {
+        if (!HUDMilestoneSkipConfirmationRuntimeUtility.TryResolveSkipOnlyFromExitInput(entityManager,
+                                                                                       playerEntity,
+                                                                                       out bool resolvedSkipOnlyFromExitInput,
+                                                                                       out uint scalingHash,
+                                                                                       out int configHash))
+        {
+            skipOnlyFromExitInput = false;
+            ClearSkipInputModeCache();
+            return;
+        }
+
+        if (skipInputModeCached &&
+            cachedSkipInputModeEntity == playerEntity &&
+            cachedSkipInputModeScalingHash == scalingHash &&
+            cachedSkipInputModeConfigHash == configHash)
+        {
+            return;
+        }
+
+        skipOnlyFromExitInput = resolvedSkipOnlyFromExitInput;
+        cachedSkipInputModeEntity = playerEntity;
+        cachedSkipInputModeScalingHash = scalingHash;
+        cachedSkipInputModeConfigHash = configHash;
+        skipInputModeCached = true;
+    }
+
+    /// <summary>
+    /// Clears the cached skip input-mode key when the panel closes or runtime player context changes.
+    /// </summary>
+    private void ClearSkipInputModeCache()
+    {
+        skipInputModeCached = false;
+        cachedSkipInputModeEntity = Entity.Null;
+        cachedSkipInputModeScalingHash = 0u;
+        cachedSkipInputModeConfigHash = 0;
     }
     #endregion
 

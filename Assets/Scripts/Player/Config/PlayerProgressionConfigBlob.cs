@@ -15,12 +15,15 @@ public struct PlayerProgressionConfigBlob
     public float BaseMilestoneSkipHoldConfirmationSeconds;
     public float4 MilestoneSkipHoldFillColor;
     public float4 BaseMilestoneSkipHoldFillColor;
+    public byte MilestoneSkipOnlyFromExitInput;
+    public byte BaseMilestoneSkipOnlyFromExitInput;
     public BlobString ExperiencePickupRadiusScalingFormula;
     public BlobString MilestoneSkipHoldConfirmationSecondsScalingFormula;
     public BlobString MilestoneSkipHoldFillColorRScalingFormula;
     public BlobString MilestoneSkipHoldFillColorGScalingFormula;
     public BlobString MilestoneSkipHoldFillColorBScalingFormula;
     public BlobString MilestoneSkipHoldFillColorAScalingFormula;
+    public BlobString MilestoneSkipOnlyFromExitInputScalingFormula;
     public BlobArray<PlayerGamePhaseBlob> GamePhases;
     public BlobArray<PlayerScalableStatBlob> ScalableStats;
     public BlobArray<PlayerLevelUpScheduleBlob> Schedules;

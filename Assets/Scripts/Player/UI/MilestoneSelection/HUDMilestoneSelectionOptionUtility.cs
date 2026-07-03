@@ -283,11 +283,13 @@ public static class HUDMilestoneSelectionOptionUtility
     /// </summary>
     /// <param name="optionViews">Auto-discovered card views under the panel hierarchy.</param>
     /// <param name="skipButton">Optional skip button configured for the panel.</param>
-    /// <param name="interactable">True to allow input; false to block it.</param>
+    /// <param name="optionInteractable">True to allow option-card input; false to block it.</param>
+    /// <param name="skipButtonInteractable">True to allow skip-button pointer or UI submit input; false to block it.</param>
 
     public static void SetOptionInputsInteractable(IReadOnlyList<MilestonePowerUpSelectionOptionView> optionViews,
                                                    Button skipButton,
-                                                   bool interactable)
+                                                   bool optionInteractable,
+                                                   bool skipButtonInteractable)
     {
         if (optionViews != null)
         {
@@ -298,11 +300,11 @@ public static class HUDMilestoneSelectionOptionUtility
                 if (optionView == null)
                     continue;
 
-                optionView.SetInteractable(interactable);
+                optionView.SetInteractable(optionInteractable);
             }
         }
 
-        SetSkipButtonInteractable(skipButton, interactable);
+        SetSkipButtonInteractable(skipButton, skipButtonInteractable);
     }
 
     /// <summary>

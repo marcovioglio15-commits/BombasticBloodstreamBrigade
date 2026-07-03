@@ -582,7 +582,7 @@ public static class PlayerPowerUpContainerSceneSetupUtility
     }
 
     /// <summary>
-    /// Writes generated overlay references into the HUDManager serialized dropped-container section.
+    /// Writes generated overlay references into the dropped-container HUD section component.
     /// </summary>
     /// <param name="hudManager">HUD manager updated in the testing scene.</param>
     /// <param name="overlayPanelReferences">Generated overlay hierarchy references assigned into the serialized section.</param>
@@ -591,20 +591,32 @@ public static class PlayerPowerUpContainerSceneSetupUtility
         if (hudManager == null)
             return;
 
-        SerializedObject hudSerializedObject = new SerializedObject(hudManager);
-        SerializedProperty sectionProperty = hudSerializedObject.FindProperty("powerUpContainerInteractionSection");
-
-        if (sectionProperty == null)
+        if (overlayPanelReferences.OverlayRoot == null)
             return;
 
-        sectionProperty.FindPropertyRelative("overlayPanelRoot").objectReferenceValue = overlayPanelReferences.OverlayRoot;
-        sectionProperty.FindPropertyRelative("overlayTitleText").objectReferenceValue = overlayPanelReferences.TitleText;
-        sectionProperty.FindPropertyRelative("overlayDescriptionText").objectReferenceValue = overlayPanelReferences.DescriptionText;
-        sectionProperty.FindPropertyRelative("overlayIconImage").objectReferenceValue = overlayPanelReferences.IconImage;
-        sectionProperty.FindPropertyRelative("replacePrimaryButton").objectReferenceValue = overlayPanelReferences.PrimaryButton;
-        sectionProperty.FindPropertyRelative("replacePrimaryButtonText").objectReferenceValue = overlayPanelReferences.PrimaryButtonText;
-        sectionProperty.FindPropertyRelative("replaceSecondaryButton").objectReferenceValue = overlayPanelReferences.SecondaryButton;
-        sectionProperty.FindPropertyRelative("replaceSecondaryButtonText").objectReferenceValue = overlayPanelReferences.SecondaryButtonText;
+        HUDPowerUpContainerInteractionSection section = overlayPanelReferences.OverlayRoot.GetComponent<HUDPowerUpContainerInteractionSection>();
+
+        if (section == null)
+            section = overlayPanelReferences.OverlayRoot.AddComponent<HUDPowerUpContainerInteractionSection>();
+
+        SerializedObject sectionObject = new SerializedObject(section);
+        sectionObject.FindProperty("overlayPanelRoot").objectReferenceValue = overlayPanelReferences.OverlayRoot;
+        sectionObject.FindProperty("overlayTitleText").objectReferenceValue = overlayPanelReferences.TitleText;
+        sectionObject.FindProperty("overlayDescriptionText").objectReferenceValue = overlayPanelReferences.DescriptionText;
+        sectionObject.FindProperty("overlayIconImage").objectReferenceValue = overlayPanelReferences.IconImage;
+        sectionObject.FindProperty("replacePrimaryButton").objectReferenceValue = overlayPanelReferences.PrimaryButton;
+        sectionObject.FindProperty("replacePrimaryButtonText").objectReferenceValue = overlayPanelReferences.PrimaryButtonText;
+        sectionObject.FindProperty("replaceSecondaryButton").objectReferenceValue = overlayPanelReferences.SecondaryButton;
+        sectionObject.FindProperty("replaceSecondaryButtonText").objectReferenceValue = overlayPanelReferences.SecondaryButtonText;
+        sectionObject.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(section);
+
+        SerializedObject hudSerializedObject = new SerializedObject(hudManager);
+        SerializedProperty managerSectionProperty = hudSerializedObject.FindProperty("powerUpContainerInteractionSection");
+
+        if (managerSectionProperty != null)
+            managerSectionProperty.objectReferenceValue = section;
+
         hudSerializedObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(hudManager);
     }

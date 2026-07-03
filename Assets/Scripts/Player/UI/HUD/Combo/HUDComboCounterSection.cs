@@ -9,8 +9,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Renders the runtime combo counter, current rank label, and progress toward the next combo rank from ECS data.
 /// </summary>
-[Serializable]
-public sealed class HUDComboCounterSection
+[DisallowMultipleComponent]
+public sealed class HUDComboCounterSection : MonoBehaviour
 {
     #region Constants
     private const float ProgressComparisonEpsilon = 0.0001f;
@@ -105,6 +105,28 @@ public sealed class HUDComboCounterSection
 
     #region Public Methods
     /// <summary>
+    /// Applies the baked HUD Manager preset values before initialization or runtime update.
+    /// </summary>
+    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    public void ApplySettings(in GameHudRuntimeConfig config)
+    {
+        isEnabled = config.ComboCounterEnabled != 0;
+        defaultBadgeTint = ToColor(config.ComboDefaultBadgeTint);
+        defaultRankTextColor = ToColor(config.ComboDefaultRankTextColor);
+        defaultComboValueTextColor = ToColor(config.ComboDefaultValueTextColor);
+        defaultProgressFillColor = ToColor(config.ComboDefaultProgressFillColor);
+        defaultProgressBackgroundColor = ToColor(config.ComboDefaultProgressBackgroundColor);
+        showRankBadgeImage = config.ComboShowRankBadgeImage != 0;
+        showProgressBar = config.ComboShowProgressBar != 0;
+        hideWhenPlayerMissing = config.ComboHideWhenPlayerMissing != 0;
+        hideWhenZeroCombo = config.ComboHideWhenZero != 0;
+        hideWhenNoActiveRank = config.ComboHideWhenNoActiveRank != 0;
+        fadeInDuration = Mathf.Max(0f, config.ComboFadeInDuration);
+        fadeOutDuration = Mathf.Max(0f, config.ComboFadeOutDuration);
+        idleRankLabel = config.ComboIdleRankLabel.ToString();
+    }
+
+    /// <summary>
     /// Applies the initial authored visual state before runtime ECS data becomes available.
     /// </summary>
     public void Initialize()
@@ -169,7 +191,7 @@ public sealed class HUDComboCounterSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read combo runtime components.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!isEnabled)
         {
@@ -617,6 +639,16 @@ public sealed class HUDComboCounterSection
         }
 
         graphic.canvasRenderer.SetAlpha(Mathf.Clamp01(alpha));
+    }
+
+    /// <summary>
+    /// Converts a baked ECS color into a Unity UI color.
+    /// </summary>
+    /// <param name="color">Baked RGBA color channels.</param>
+    /// <returns>Unity color used by managed UI components.</returns>
+    private static Color ToColor(Unity.Mathematics.float4 color)
+    {
+        return new Color(color.x, color.y, color.z, color.w);
     }
     #endregion
 

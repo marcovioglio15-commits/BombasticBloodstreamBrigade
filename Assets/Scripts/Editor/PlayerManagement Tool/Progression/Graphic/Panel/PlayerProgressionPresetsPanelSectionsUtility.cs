@@ -178,6 +178,9 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         SerializedProperty iterator = panel.presetSerializedObject.GetIterator();
         bool enterChildren = true;
         bool hasVisibleMilestonesField = false;
+        Foldout progressionFoldout = null;
+        Foldout skipButtonFoldout = null;
+        Foldout droppedPowerUpsFoldout = null;
 
         while (iterator.NextVisible(enterChildren))
         {
@@ -195,10 +198,8 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
 
             if (string.Equals(rootProperty.name, "gamePhasesDefinition", StringComparison.Ordinal))
             {
-                Foldout gamePhasesFoldout = new Foldout();
-                gamePhasesFoldout.text = "Game Phases Definition";
-                gamePhasesFoldout.value = true;
-                gamePhasesFoldout.style.marginBottom = 4f;
+                Foldout gamePhasesFoldout = CreateMilestoneFoldout("Game Phases Definition",
+                                                                    "Level-up phase thresholds, milestone levels, offers, and skip compensations.");
                 milestonesContainer.Add(gamePhasesFoldout);
 
                 VisualElement scalableGamePhasesField = PlayerScalingFieldElementFactory.CreateField(rootProperty,
@@ -208,15 +209,17 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
                 continue;
             }
 
-            string labelOverride = rootProperty.displayName;
-
-            if (string.Equals(rootProperty.name, "experiencePickupRadius", StringComparison.Ordinal))
-                labelOverride = "Experience Pickup Radius";
+            VisualElement targetContainer = ResolveMilestoneRootFieldContainer(milestonesContainer,
+                                                                               ref progressionFoldout,
+                                                                               ref skipButtonFoldout,
+                                                                               ref droppedPowerUpsFoldout,
+                                                                               rootProperty);
+            string labelOverride = ResolveMilestoneRootFieldLabel(rootProperty);
 
             VisualElement scalableField = PlayerScalingFieldElementFactory.CreateField(rootProperty,
                                                                                         scalingRulesProperty,
                                                                                         labelOverride);
-            milestonesContainer.Add(scalableField);
+            targetContainer.Add(scalableField);
         }
 
         if (hasVisibleMilestonesField)
@@ -322,6 +325,118 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
             return true;
 
         return excludedRootPropertyNames != null && excludedRootPropertyNames.Contains(property.name);
+    }
+
+    /// <summary>
+    /// Resolves the themed milestone foldout that should receive one root-level progression field.
+    /// </summary>
+    /// <param name="milestonesContainer">Main Milestones container.</param>
+    /// <param name="progressionFoldout">Cached progression runtime foldout.</param>
+    /// <param name="skipButtonFoldout">Cached skip-button foldout.</param>
+    /// <param name="droppedPowerUpsFoldout">Cached dropped power-ups foldout.</param>
+    /// <param name="rootProperty">Root serialized property being placed.</param>
+    /// <returns>Target visual element for the field.</returns>
+    private static VisualElement ResolveMilestoneRootFieldContainer(VisualElement milestonesContainer,
+                                                                    ref Foldout progressionFoldout,
+                                                                    ref Foldout skipButtonFoldout,
+                                                                    ref Foldout droppedPowerUpsFoldout,
+                                                                    SerializedProperty rootProperty)
+    {
+        if (rootProperty == null)
+            return milestonesContainer;
+
+        switch (rootProperty.name)
+        {
+            case "levelCap":
+            case "experiencePickupRadius":
+            case "milestoneTimeScaleResumeDurationSeconds":
+                return GetOrCreateMilestoneFoldout(milestonesContainer,
+                                                   ref progressionFoldout,
+                                                   "Progression Runtime",
+                                                   "Level cap, experience collection radius, and post-selection time-scale recovery.");
+            case "milestoneSkipHoldConfirmationSeconds":
+            case "milestoneSkipHoldFillColor":
+            case "milestoneSkipOnlyFromExitInput":
+                return GetOrCreateMilestoneFoldout(milestonesContainer,
+                                                   ref skipButtonFoldout,
+                                                   "Skip Button",
+                                                   "Skip-button input mode, hold confirmation timing, and hold fill presentation.");
+            case "powerUpContainerSettings":
+                return GetOrCreateMilestoneFoldout(milestonesContainer,
+                                                   ref droppedPowerUpsFoldout,
+                                                   "Dropped Power-Ups",
+                                                   "Dropped active power-up container behavior after replacement.");
+            default:
+                return milestonesContainer;
+        }
+    }
+
+    /// <summary>
+    /// Resolves the display label used by one root-level milestone field.
+    /// </summary>
+    /// <param name="rootProperty">Root serialized property being rendered.</param>
+    /// <returns>User-facing field label.</returns>
+    private static string ResolveMilestoneRootFieldLabel(SerializedProperty rootProperty)
+    {
+        if (rootProperty == null)
+            return string.Empty;
+
+        switch (rootProperty.name)
+        {
+            case "levelCap":
+                return "Level Cap";
+            case "experiencePickupRadius":
+                return "Experience Pickup Radius";
+            case "milestoneTimeScaleResumeDurationSeconds":
+                return "Time Scale Resume Duration Seconds";
+            case "milestoneSkipHoldConfirmationSeconds":
+                return "Hold Confirmation Seconds";
+            case "milestoneSkipHoldFillColor":
+                return "Hold Fill Color";
+            case "milestoneSkipOnlyFromExitInput":
+                return "Skip Only From Exit Input";
+            case "powerUpContainerSettings":
+                return "Container Interaction";
+            default:
+                return rootProperty.displayName;
+        }
+    }
+
+    /// <summary>
+    /// Creates or returns a cached foldout owned by the Milestones section.
+    /// </summary>
+    /// <param name="parent">Parent container receiving the foldout on first use.</param>
+    /// <param name="foldout">Cached foldout reference.</param>
+    /// <param name="title">Foldout title.</param>
+    /// <param name="tooltip">Tooltip describing the grouped fields.</param>
+    /// <returns>Configured foldout.</returns>
+    private static Foldout GetOrCreateMilestoneFoldout(VisualElement parent,
+                                                       ref Foldout foldout,
+                                                       string title,
+                                                       string tooltip)
+    {
+        if (foldout != null)
+            return foldout;
+
+        foldout = CreateMilestoneFoldout(title, tooltip);
+        parent.Add(foldout);
+        return foldout;
+    }
+
+    /// <summary>
+    /// Creates one standard foldout used by the Player progression Milestones section.
+    /// </summary>
+    /// <param name="title">Foldout title.</param>
+    /// <param name="tooltip">Tooltip describing the grouped fields.</param>
+    /// <returns>Configured foldout.</returns>
+    private static Foldout CreateMilestoneFoldout(string title, string tooltip)
+    {
+        Foldout foldout = new Foldout();
+        foldout.text = title;
+        foldout.tooltip = tooltip;
+        foldout.value = true;
+        foldout.style.marginBottom = 4f;
+        return foldout;
     }
 
     private static List<string> BuildScheduleIdOptions(SerializedProperty schedulesProperty)

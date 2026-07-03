@@ -63,6 +63,52 @@ internal static class HUDMilestoneSkipConfirmationRuntimeUtility
         settings = new HUDMilestoneSkipConfirmationSettings(holdSeconds, fillColor);
         return true;
     }
+
+    /// <summary>
+    /// Resolves whether the milestone Skip flow should be started only from the UI Cancel or Exit action.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to read progression and scalable-stat runtime data.</param>
+    /// <param name="playerEntity">Player entity that owns the current progression config.</param>
+    /// <param name="skipOnlyFromExitInput">Resolved input-mode value.</param>
+    /// <param name="scalingHash">Current runtime scaling hash used by callers to cache the resolved value.</param>
+    /// <param name="configHash">Progression blob reference hash used by callers to invalidate cache after rebake.</param>
+    /// <returns>True when the value was resolved from ECS data; otherwise false.</returns>
+    public static bool TryResolveSkipOnlyFromExitInput(EntityManager entityManager,
+                                                       Entity playerEntity,
+                                                       out bool skipOnlyFromExitInput,
+                                                       out uint scalingHash,
+                                                       out int configHash)
+    {
+        skipOnlyFromExitInput = false;
+        scalingHash = 0u;
+        configHash = 0;
+
+        if (!entityManager.Exists(playerEntity))
+            return false;
+
+        if (!entityManager.HasComponent<PlayerProgressionConfig>(playerEntity))
+            return false;
+
+        PlayerProgressionConfig progressionConfig = entityManager.GetComponentData<PlayerProgressionConfig>(playerEntity);
+
+        if (!progressionConfig.Config.IsCreated)
+            return false;
+
+        ref PlayerProgressionConfigBlob root = ref progressionConfig.Config.Value;
+        string formula = root.MilestoneSkipOnlyFromExitInputScalingFormula.ToString();
+        scalingHash = ResolveScalingHash(entityManager, playerEntity);
+        configHash = progressionConfig.Config.GetHashCode();
+
+        if (!string.IsNullOrWhiteSpace(formula))
+            BuildVariableContext(entityManager, playerEntity);
+        else
+            VariableContext.Clear();
+
+        skipOnlyFromExitInput = ResolveBooleanValue(root.MilestoneSkipOnlyFromExitInput,
+                                                    root.BaseMilestoneSkipOnlyFromExitInput,
+                                                    formula);
+        return true;
+    }
     #endregion
 
     #region Resolution
@@ -193,6 +239,31 @@ internal static class HUDMilestoneSkipConfirmationRuntimeUtility
                                           root.BaseMilestoneSkipHoldFillColor.w,
                                           root.MilestoneSkipHoldFillColorAScalingFormula.ToString());
         return new Color(red, green, blue, alpha);
+    }
+
+    /// <summary>
+    /// Resolves one Boolean setting from its baked runtime value and optional formula.
+    /// </summary>
+    /// <param name="runtimeValue">Scaled Boolean value baked into the progression blob.</param>
+    /// <param name="baseValue">Unscaled Boolean base value used as [this] for runtime formulas.</param>
+    /// <param name="formula">Optional formula evaluated against current scalable stats.</param>
+    /// <returns>Resolved Boolean value used by the HUD.</returns>
+    private static bool ResolveBooleanValue(byte runtimeValue, byte baseValue, string formula)
+    {
+        bool resolvedValue = runtimeValue != 0;
+
+        if (string.IsNullOrWhiteSpace(formula))
+            return resolvedValue;
+
+        if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(formula,
+                                                                                  baseValue != 0,
+                                                                                  VariableContext,
+                                                                                  out bool evaluatedValue))
+        {
+            return resolvedValue;
+        }
+
+        return evaluatedValue;
     }
 
     /// <summary>

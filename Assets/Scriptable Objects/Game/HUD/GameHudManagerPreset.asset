@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93da8d1d43105df49a1662f5aaff76c2, type: 3}
+  m_Name: GameHudManagerPreset
+  m_EditorClassIdentifier: Assembly-CSharp::GameHudManagerPreset
+  presetId: 87d9d5d456bf41b883268881266b224d
+  presetName: GameHudManagerPreset
+  description: 
+  version: 1.0.0
+  levelExperienceSettings:
+    hideLevelTextWhenPlayerMissing: 1
+    experienceBarSmoothingSeconds: 0.08
+    hideExperienceBarWhenPlayerMissing: 1
+    enableLegacyExperienceLiquidShader: 1
+    enableLegacyExperiencePiston: 0
+    legacyExperiencePistonLocalOffsetX: 0
+    legacyExperiencePistonLocalOffsetY: 0
+    enableLegacyExperienceValueDeltaMotion: 1
+    legacyExperienceDeltaTriggerThreshold: 0.0125
+    legacyExperienceDeltaMotionStrength: 0.9
+    legacyExperienceDeltaMotionDecaySeconds: 0.3
+  activePowerUpSettings:
+    energyBarSmoothingSeconds: 0.08
+    hideEnergyBarsWhenPlayerMissing: 1
+    hideEnergyBarsWhenModuleMissing: 1
+    chargeBarSmoothingSeconds: 0.05
+    hideChargeBarsWhenPlayerMissing: 1
+    hideChargeBarsWhenModuleMissing: 1
+  runTimerSettings:
+    isEnabled: 1
+    direction: 1
+    initialSeconds: 450
+    hideWhenPlayerMissing: 1
+  comboCounterSettings:
+    isEnabled: 1
+    defaultBadgeTint: {r: 1, g: 1, b: 1, a: 1}
+    defaultRankTextColor: {r: 1, g: 1, b: 1, a: 1}
+    defaultComboValueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    defaultProgressFillColor: {r: 1, g: 1, b: 1, a: 1}
+    defaultProgressBackgroundColor: {r: 1, g: 1, b: 1, a: 0.25}
+    showRankBadgeImage: 1
+    showProgressBar: 1
+    hideWhenPlayerMissing: 1
+    hideWhenZeroCombo: 1
+    hideWhenNoActiveRank: 1
+    fadeInDuration: 0.18
+    fadeOutDuration: 0.18
+    idleRankLabel: COMBO
+  milestoneSelectionSettings:
+    hideOptionTitleNumbers: 1
+    skipHoldFillImageName: SkipHoldFill
+    configureSkipHoldFillImage: 1
+    autoDiscoverOptionViewsFromPanelRoot: 1
+    navigationInputDeadzone: 0.5
+    navigationRepeatCooldownSeconds: 0.15
+    wrapNavigation: 1
+    followPointerHoverSelection: 1
+    suspendEventSystemNavigationWhileSelectionActive: 1
+    autoSelectFirstOfferWhenUiMissing: 1
+    lockButtonsAfterSelectionClick: 1
+  damageVignetteSettings:
+    isEnabled: 1
+    hideWhenPlayerMissing: 1

@@ -4,10 +4,9 @@ using UnityEngine;
 
 /// <summary>
 /// Handles authored HUD timer configuration, ECS component setup, and TMP clock rendering.
-/// none.
 /// </summary>
-[System.Serializable]
-public sealed class HUDRunTimerSection
+[DisallowMultipleComponent]
+public sealed class HUDRunTimerSection : MonoBehaviour
 {
     #region Fields
 
@@ -38,8 +37,19 @@ public sealed class HUDRunTimerSection
 
     #region Public Methods
     /// <summary>
+    /// Applies the baked HUD Manager preset values before initialization or runtime update.
+    /// </summary>
+    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    public void ApplySettings(in GameHudRuntimeConfig config)
+    {
+        isEnabled = config.RunTimerEnabled != 0;
+        direction = config.RunTimerDirection;
+        initialSeconds = Mathf.Max(0f, config.RunTimerInitialSeconds);
+        hideWhenPlayerMissing = config.RunTimerHideWhenPlayerMissing != 0;
+    }
+
+    /// <summary>
     /// Applies the initial visual state before runtime ECS data becomes available.
-    /// none.
     /// </summary>
     public void Initialize()
     {
@@ -48,7 +58,6 @@ public sealed class HUDRunTimerSection
 
     /// <summary>
     /// Applies the initial authored timer text or hides it when the section is not visible without a player.
-    /// none.
     /// </summary>
     public void ApplyInitialVisualState()
     {
@@ -71,7 +80,6 @@ public sealed class HUDRunTimerSection
 
     /// <summary>
     /// Clears cached runtime bindings and applies the missing-player visual state.
-    /// none.
     /// </summary>
     public void HandleMissingPlayer()
     {
@@ -98,7 +106,7 @@ public sealed class HUDRunTimerSection
     /// </summary>
     /// <param name="runtimeEntityManager">Entity manager used to read and write timer components.</param>
     /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    public void Update(EntityManager runtimeEntityManager, Entity playerEntity)
+    public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!isEnabled || timerText == null)
         {
@@ -181,7 +189,6 @@ public sealed class HUDRunTimerSection
 
     /// <summary>
     /// Hides the timer text immediately.
-    /// none.
     /// </summary>
     private void HideTimerImmediate()
     {

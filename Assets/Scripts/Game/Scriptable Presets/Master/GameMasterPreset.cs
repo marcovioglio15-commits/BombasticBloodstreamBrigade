@@ -30,6 +30,9 @@ public sealed class GameMasterPreset : ScriptableObject
     [Tooltip("Settings manager preset used to configure runtime Settings menu defaults and preview behavior.")]
     [SerializeField] private GameSettingsManagerPreset settingsManagerPreset;
 
+    [Tooltip("HUD manager preset used to configure gameplay HUD runtime behavior that is not a scene reference.")]
+    [SerializeField] private GameHudManagerPreset hudManagerPreset;
+
     [Tooltip("Scene manager preset used to configure scene loading, transitions, fade and scene trigger defaults.")]
     [SerializeField] private GameSceneManagerPreset sceneManagerPreset;
     #endregion
@@ -82,6 +85,14 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return settingsManagerPreset;
+        }
+    }
+
+    public GameHudManagerPreset HudManagerPreset
+    {
+        get
+        {
+            return hudManagerPreset;
         }
     }
 

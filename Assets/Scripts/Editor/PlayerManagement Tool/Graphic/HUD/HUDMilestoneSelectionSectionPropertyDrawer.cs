@@ -18,6 +18,11 @@ public sealed class HUDMilestoneSelectionSectionPropertyDrawer : PropertyDrawer
     /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
+        if (HUDSectionPropertyDrawerUtility.TryCreateObjectReferenceField(property,
+                                                                         "Scene HUD milestone selection section component referenced by HUDManager.",
+                                                                         out VisualElement referenceField))
+            return referenceField;
+
         VisualElement root = new VisualElement();
         SerializedProperty panelRootProperty = property.FindPropertyRelative("panelRoot");
         SerializedProperty headerTextProperty = property.FindPropertyRelative("headerText");

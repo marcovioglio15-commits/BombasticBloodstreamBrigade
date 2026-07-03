@@ -77,6 +77,9 @@ public sealed class PlayerProgressionPreset : ScriptableObject
     [Tooltip("Color used by the milestone skip button hold-confirmation fill. The runtime clamps individual channels for presentation without mutating the authored value.")]
     [SerializeField] private Color milestoneSkipHoldFillColor = DefaultMilestoneSkipHoldFillColor;
 
+    [Tooltip("When enabled, the milestone Skip button cannot be reached through UI navigation or pointer submission. Skip can only start from the UI Cancel or Exit action, and hold confirmation still applies.")]
+    [SerializeField] private bool milestoneSkipOnlyFromExitInput;
+
     [Tooltip("Settings used to drop replaced active power ups as interactable world containers.")]
     [SerializeField] private PlayerPowerUpContainerInteractionSettings powerUpContainerSettings = new PlayerPowerUpContainerInteractionSettings();
 
@@ -219,6 +222,14 @@ public sealed class PlayerProgressionPreset : ScriptableObject
         get
         {
             return milestoneSkipHoldFillColor;
+        }
+    }
+
+    public bool MilestoneSkipOnlyFromExitInput
+    {
+        get
+        {
+            return milestoneSkipOnlyFromExitInput;
         }
     }
 

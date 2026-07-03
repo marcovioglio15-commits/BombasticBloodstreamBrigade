@@ -29,6 +29,7 @@ public static class GameSceneManagementProjectSetupUtility
     private const string DefaultMasterPresetPath = "Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset";
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
     private const string DefaultSettingsPresetPath = "Assets/Scriptable Objects/Game/Settings/GameSettingsManagerPreset.asset";
+    private const string DefaultHudPresetPath = "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset";
     private const string BootstrapManagerObjectName = "GameSceneManager";
     private const string FadeCanvasObjectName = "Canvas_SceneTransitionFade";
     private const string FadeSurfaceObjectName = "FadeSurface";
@@ -84,14 +85,16 @@ public static class GameSceneManagementProjectSetupUtility
         GameSceneTransitionLayerUtility.TryCreateLayer(GameSceneTriggerSettings.DefaultTransitionLayerName);
 
         GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
+        GameHudManagerPreset hudPreset = EnsureHudManagerPreset();
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
-        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset);
+        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset);
         GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
         SynchronizeSceneManagerPreset(scenePreset);
         ApplyDefaultBuildSettings();
         SynchronizeSceneManagerPreset(scenePreset);
         GameSceneAddressablesEditorUtility.EnsureSceneEntries(scenePreset);
+        AssetDatabase.SaveAssets();
         EnsureBootstrapScene(masterPreset, scenePreset);
 
         AssetDatabase.SaveAssets();
@@ -116,6 +119,29 @@ public static class GameSceneManagementProjectSetupUtility
             throw new InvalidOperationException("Unable to create the default GameSettingsManagerPreset asset.");
 
         GameSettingsManagerPresetLibrary library = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+        library.AddPreset(preset);
+        EditorUtility.SetDirty(library);
+        return preset;
+    }
+
+    /// <summary>
+    /// Loads or creates the default HUD Manager preset and registers it in the HUD Manager library.
+    /// </summary>
+    /// <returns>Default HUD Manager preset asset.</returns>
+    private static GameHudManagerPreset EnsureHudManagerPreset()
+    {
+        GameHudManagerPreset preset = AssetDatabase.LoadAssetAtPath<GameHudManagerPreset>(DefaultHudPresetPath);
+
+        if (preset == null)
+            preset = GameHudManagerPresetLibraryUtility.CreatePresetAsset("GameHudManagerPreset");
+
+        if (preset == null)
+            throw new InvalidOperationException("Unable to create the default GameHudManagerPreset asset.");
+
+        preset.EnsureInitialized();
+        EditorUtility.SetDirty(preset);
+
+        GameHudManagerPresetLibrary library = GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         library.AddPreset(preset);
         EditorUtility.SetDirty(library);
         return preset;
@@ -146,10 +172,13 @@ public static class GameSceneManagementProjectSetupUtility
     /// <summary>
     /// Loads or creates the default Game Master preset and links the Settings and Scene Manager sub-presets.
     /// </summary>
-    /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
     /// <param name="settingsPreset">Settings Manager preset assigned as the master sub-preset.</param>
+    /// <param name="hudPreset">HUD Manager preset assigned as the master sub-preset.</param>
+    /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
     /// <returns>Default Game Master preset asset.</returns>
-    private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset, GameSettingsManagerPreset settingsPreset)
+    private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset,
+                                                           GameSettingsManagerPreset settingsPreset,
+                                                           GameHudManagerPreset hudPreset)
     {
         GameMasterPreset masterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
 
@@ -166,6 +195,7 @@ public static class GameSceneManagementProjectSetupUtility
         SerializedObject serializedMaster = new SerializedObject(masterPreset);
         serializedMaster.Update();
         SetObjectReference(serializedMaster, "settingsManagerPreset", settingsPreset);
+        SetObjectReference(serializedMaster, "hudManagerPreset", hudPreset);
         SetObjectReference(serializedMaster, "sceneManagerPreset", scenePreset);
         serializedMaster.ApplyModifiedPropertiesWithoutUndo();
         masterPreset.ValidateValues();
@@ -473,6 +503,9 @@ public static class GameSceneManagementProjectSetupUtility
     /// <param name="scenePreset">Scene Manager fallback assigned to authoring.</param>
     private static void EnsureSceneManagerAuthoring(Scene scene, GameMasterPreset masterPreset, GameSceneManagerPreset scenePreset)
     {
+        masterPreset = ResolveDefaultSetupAsset(masterPreset, DefaultMasterPresetPath, "Game Master preset");
+        scenePreset = ResolveDefaultSetupAsset(scenePreset, DefaultScenePresetPath, "Scene Manager preset");
+
         List<GameSceneManagerAuthoring> managers = FindComponentsInScene<GameSceneManagerAuthoring>(scene);
         GameSceneManagerAuthoring manager = managers.Count > 0 ? managers[0] : null;
 
@@ -493,7 +526,53 @@ public static class GameSceneManagementProjectSetupUtility
         SetObjectReference(serializedManager, "sceneManagerPreset", scenePreset);
         SetBool(serializedManager, "createRuntimeSingletonWhenNotBaked", true);
         serializedManager.ApplyModifiedPropertiesWithoutUndo();
+        ValidateSceneManagerAuthoringReferences(manager, masterPreset, scenePreset);
         EditorUtility.SetDirty(manager);
+    }
+
+    /// <summary>
+    /// Resolves a default setup asset from its canonical project path before scene references are written.
+    /// </summary>
+    /// <param name="candidate">Candidate object already resolved by the setup pipeline.</param>
+    /// <param name="assetPath">Project-relative canonical asset path.</param>
+    /// <param name="assetLabel">Human-readable asset label used in failure messages.</param>
+    /// <returns>Resolved persistent asset reference.</returns>
+    private static TAsset ResolveDefaultSetupAsset<TAsset>(TAsset candidate,
+                                                           string assetPath,
+                                                           string assetLabel) where TAsset : UnityEngine.Object
+    {
+        AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceSynchronousImport);
+        TAsset asset = AssetDatabase.LoadAssetAtPath<TAsset>(assetPath);
+
+        if (asset != null)
+            return asset;
+
+        if (candidate != null)
+            return candidate;
+
+        throw new InvalidOperationException(assetLabel + " could not be resolved at " + assetPath + ".");
+    }
+
+    /// <summary>
+    /// Fails setup immediately when bootstrap authoring references were not serialized correctly.
+    /// </summary>
+    /// <param name="manager">Bootstrap authoring component being validated.</param>
+    /// <param name="masterPreset">Expected Game Master preset reference.</param>
+    /// <param name="scenePreset">Expected Scene Manager preset reference.</param>
+    private static void ValidateSceneManagerAuthoringReferences(GameSceneManagerAuthoring manager,
+                                                                GameMasterPreset masterPreset,
+                                                                GameSceneManagerPreset scenePreset)
+    {
+        SerializedObject serializedManager = new SerializedObject(manager);
+        serializedManager.Update();
+        SerializedProperty masterProperty = serializedManager.FindProperty("masterPreset");
+        SerializedProperty sceneProperty = serializedManager.FindProperty("sceneManagerPreset");
+
+        if (masterProperty == null || sceneProperty == null)
+            throw new InvalidOperationException("Bootstrap GameSceneManagerAuthoring preset fields could not be found.");
+
+        if (masterProperty.objectReferenceValue != masterPreset || sceneProperty.objectReferenceValue != scenePreset)
+            throw new InvalidOperationException("Bootstrap GameSceneManagerAuthoring preset references were not serialized correctly.");
     }
 
     /// <summary>

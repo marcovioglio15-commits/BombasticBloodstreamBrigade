@@ -127,6 +127,30 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates, registers and assigns a new HUD Manager preset to the selected master preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    public static void CreateHudManagerPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameHudManagerPreset newPreset = GameHudManagerPresetLibraryUtility.CreatePresetAsset("GameHudManagerPreset");
+
+        if (newPreset == null)
+            return;
+
+        GameHudManagerPresetLibrary hudLibrary = GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create HUD Manager Preset");
+        Undo.RecordObject(hudLibrary, "Add HUD Manager Preset");
+        hudLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(hudLibrary);
+
+        AssignSubPreset(panel, "hudManagerPreset", newPreset);
+        panel.OpenSidePanel(GameManagementWindow.PanelType.HudManager);
+    }
+
+    /// <summary>
     /// Creates, registers and assigns a new Scene Manager preset to the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel with selected master preset context.</param>
@@ -224,6 +248,15 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.SettingsManager,
                             "Settings Manager",
                             panel.CreateSettingsManagerPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "HUD Manager Preset",
+                            "hudManagerPreset",
+                            typeof(GameHudManagerPreset),
+                            "HUD Manager preset used for gameplay HUD behavior that is not a scene object reference.",
+                            GameManagementWindow.PanelType.HudManager,
+                            "HUD Manager",
+                            panel.CreateHudManagerPreset);
         AddSubPresetControl(panel,
                             section,
                             "Scene Manager Preset",
@@ -338,6 +371,14 @@ internal static class GameMasterPresetsPanelSectionsUtility
         settingsButton.style.minWidth = 164f;
         settingsButton.style.marginTop = 4f;
         section.Add(settingsButton);
+
+        Button hudButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.HudManager));
+        hudButton.text = "Open HUD Manager";
+        hudButton.tooltip = "Open the HUD Manager preset panel.";
+        hudButton.style.flexShrink = 0f;
+        hudButton.style.minWidth = 148f;
+        hudButton.style.marginTop = 4f;
+        section.Add(hudButton);
 
         Button sceneButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.SceneManager));
         sceneButton.text = "Open Scene Manager";

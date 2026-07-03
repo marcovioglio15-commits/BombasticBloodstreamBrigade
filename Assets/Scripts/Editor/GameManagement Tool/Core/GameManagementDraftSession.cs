@@ -268,6 +268,8 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameAudioManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSettingsManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSettingsManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameHudManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameHudManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
@@ -313,6 +315,7 @@ public static class GameManagementDraftSession
         GameMasterPresetLibraryUtility.GetOrCreateLibrary();
         GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+        GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
     }
 
@@ -450,6 +453,7 @@ public static class GameManagementDraftSession
         return assetObject is GameMasterPreset ||
                assetObject is GameAudioManagerPreset ||
                assetObject is GameSettingsManagerPreset ||
+               assetObject is GameHudManagerPreset ||
                assetObject is GameSceneManagerPreset;
     }
 
@@ -586,6 +590,11 @@ public static class GameManagementDraftSession
         GameSettingsManagerPresetLibrary settingsLibrary = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
 
         if (LibraryContainsPath(settingsLibrary.Presets, assetPath))
+            return true;
+
+        GameHudManagerPresetLibrary hudLibrary = GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
+
+        if (LibraryContainsPath(hudLibrary.Presets, assetPath))
             return true;
 
         GameSceneManagerPresetLibrary sceneLibrary = GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
