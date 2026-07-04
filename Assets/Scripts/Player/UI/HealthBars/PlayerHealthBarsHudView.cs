@@ -29,14 +29,20 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
 
     #if UNITY_EDITOR
     [Header("Editor Preview")]
-    [Tooltip("Optional Player Master Preset used to resolve the same Visual Preset plus health, shield, and experience defaults shown at runtime. When assigned, it overrides the standalone preview values below.")]
+    [Tooltip("Optional Player Master Preset used to resolve the same UI Visual Preset plus health, shield, and experience defaults shown at runtime. When assigned, it overrides the standalone preview values below.")]
     [SerializeField] private PlayerMasterPreset editorPreviewMasterPreset;
 
     [Tooltip("Optional Player Controller Preset used to resolve the same health and shield defaults shown at runtime. This is used when the master preset is not assigned or has no controller preset.")]
     [SerializeField] private PlayerControllerPreset editorPreviewControllerPreset;
 
-    [Tooltip("Player Visual Preset used to render the health, shield, and experience syringes outside Play Mode through the same configuration builder used at runtime.")]
-    [SerializeField] private PlayerVisualPreset editorPreviewPreset;
+    [Tooltip("Player UI Visual Preset used to render the health, shield, and experience syringes outside Play Mode through the same configuration builder used at runtime.")]
+    [SerializeField]
+    private PlayerUiVisualPreset editorPreviewUiPreset;
+
+    [Tooltip("Legacy Player Visual Preset fallback used only by older prefabs that have not assigned an Editor Preview UI Preset yet.")]
+    [SerializeField]
+    [HideInInspector]
+    private PlayerVisualPreset editorPreviewPreset;
 
     [Tooltip("Current health shown only by the Edit Mode preview.")]
     [Min(0f)]
@@ -426,7 +432,7 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     /// </summary>
     public void RefreshEditorPreview()
     {
-        PlayerVisualPreset previewPreset = ResolveEditorPreviewVisualPreset();
+        IPlayerUiVisualPresetData previewPreset = ResolveEditorPreviewVisualPreset();
 
         if (Application.isPlaying || !isActiveAndEnabled || previewPreset == null)
             return;
@@ -473,13 +479,19 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves the visual preset that should drive Edit Mode preview, preferring the selected master preset so editor geometry matches the runtime player.
+    /// Resolves the UI visual preset that should drive Edit Mode preview, preferring the selected master preset so editor geometry matches the runtime player.
     /// </summary>
-    /// <returns>Player visual preset used by the preview, or null when no source is available.</returns>
-    private PlayerVisualPreset ResolveEditorPreviewVisualPreset()
+    /// <returns>Player UI visual preset data used by the preview, or null when no source is available.</returns>
+    private IPlayerUiVisualPresetData ResolveEditorPreviewVisualPreset()
     {
+        if (editorPreviewMasterPreset != null && editorPreviewMasterPreset.UiVisualPreset != null)
+            return editorPreviewMasterPreset.UiVisualPreset;
+
         if (editorPreviewMasterPreset != null && editorPreviewMasterPreset.VisualPreset != null)
             return editorPreviewMasterPreset.VisualPreset;
+
+        if (editorPreviewUiPreset != null)
+            return editorPreviewUiPreset;
 
         return editorPreviewPreset;
     }

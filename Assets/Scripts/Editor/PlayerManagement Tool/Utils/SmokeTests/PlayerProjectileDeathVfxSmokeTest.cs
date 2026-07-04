@@ -77,6 +77,7 @@ public static class PlayerProjectileDeathVfxSmokeTest
                                                                                                      null,
                                                                                                      null,
                                                                                                      visualPreset,
+                                                                                                     null,
                                                                                                      null))
             {
                 float scaledWallScale = scaledScope.VisualPreset.ProjectileDeathVfx.TerminalWallHit.ScaleMultiplier;

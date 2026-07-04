@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds scalable Player Visual Preset controls for active power-up HUD icon, energy syringe, and charge ring visuals.
+/// Builds scalable UI Visual Preset controls for active power-up HUD icon, energy syringe, and charge ring visuals.
 /// </summary>
 internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
 {
@@ -12,11 +12,11 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the Active Power-Up HUD visual-preset subsection.
+    /// Builds the Active Power-Up HUD UI visual-preset subsection.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized authoring data.</param>
     /// <returns>Configured Active Power-Up HUD subsection.</returns>
-    public static VisualElement Build(PlayerVisualPresetsPanel panel)
+    public static VisualElement Build(IPlayerVisualPresetEditorPanel panel)
     {
         Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Active Power-Up HUD",
                                                                         "NashCore.PlayerManagement.Visual.ActivePowerUpHud",
@@ -32,7 +32,7 @@ internal static class PlayerVisualPresetsPanelActivePowerUpHudSectionUtility
 
         if (settings == null)
         {
-            root.Add(new HelpBox("Active Power-Up HUD settings are missing from the selected Player Visual Preset.",
+            root.Add(new HelpBox("Active Power-Up HUD settings are missing from the selected UI Visual Preset.",
                                  HelpBoxMessageType.Warning));
             return root;
         }

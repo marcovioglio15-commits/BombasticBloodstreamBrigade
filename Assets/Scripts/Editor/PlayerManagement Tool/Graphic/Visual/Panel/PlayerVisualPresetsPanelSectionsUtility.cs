@@ -91,7 +91,7 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
         if (panel == null)
             return;
 
-        VisualElement sectionContainer = CreateDetailsSectionContainer(panel, "Visual");
+        VisualElement sectionContainer = CreateDetailsSectionContainer(panel, "Gameplay Visual");
 
         if (sectionContainer == null)
             return;
@@ -147,22 +147,6 @@ internal static class PlayerVisualPresetsPanelSectionsUtility
                                PlayerVisualPresetsPanel.VisualSubSectionType.GroundShadow,
                                "Ground Shadow",
                                () => PlayerVisualPresetsPanelGroundShadowSectionUtility.Build(panel));
-        AddVisualSubSectionTab(panel,
-                               PlayerVisualPresetsPanel.VisualSubSectionType.HealthBars,
-                               "Health Bars",
-                               () => PlayerVisualPresetsPanelHealthBarsSectionUtility.Build(panel));
-        AddVisualSubSectionTab(panel,
-                               PlayerVisualPresetsPanel.VisualSubSectionType.ActivePowerUpHud,
-                               "Active HUD",
-                               () => PlayerVisualPresetsPanelActivePowerUpHudSectionUtility.Build(panel));
-        AddVisualSubSectionTab(panel,
-                               PlayerVisualPresetsPanel.VisualSubSectionType.Portrait,
-                               "Portrait",
-                               () => PlayerVisualPresetsPanelPortraitSectionUtility.Build(panel));
-        AddVisualSubSectionTab(panel,
-                               PlayerVisualPresetsPanel.VisualSubSectionType.GrowthSequence,
-                               "Growth Sequence",
-                               () => PlayerVisualPresetsPanelGrowthSequenceSectionUtility.Build(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = PlayerVisualPresetsPanel.VisualSubSectionType.RuntimeBridge;

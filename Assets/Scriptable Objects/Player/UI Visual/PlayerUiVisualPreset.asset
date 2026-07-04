@@ -1,0 +1,692 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7a6d1dfb7624b0d8af7f31856b0fe87, type: 3}
+  m_Name: PlayerUiVisualPreset_A
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUiVisualPreset
+  presetId: 2ec2de05974141e2921a440e6d837c6d
+  presetName: PlayerUiVisualPreset_A
+  description: UI settings migrated from PlayerVisualPreset_A.
+  version: 1.0.0
+  healthBars:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    verticalSpacing: 0
+    unitsPerMajorDivision: 1
+    pixelsPerMajorDivision: 40
+    graduationMode: 0
+    uniformLabelCount: 5
+    minimumLength: 80
+    maximumLength: 800
+    minorDivisionsPerMajor: 1
+    labelEveryMajorDivision: 1
+    maximumLabelCount: 10
+    labelMinimumSpacing: 40
+    graduationEndPadding: 0
+    labelPlacement: 0
+    fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+    labelFontSize: 18
+    labelOffset: {x: 0, y: -2}
+    labelOutlineWidth: 0.2
+    graduationVerticalOffset: -0.04
+    bodyStyle: 0
+    barHeight: 85
+    outlineThickness: 0.05
+    chamberInset: 0.15
+    plungerWidth: 0.08
+    clampPlungerStartInsideBody: 1
+    clampPlungerEndInsideBody: 0
+    stopLiquidAtPlunger: 1
+    terminationEnabled: 1
+    endCapWidth: 20
+    terminationOffset: 10
+    terminationStyle: 1
+    paintDrips:
+      enabled: 1
+      density: 0.3
+      length: 0.15
+      width: 0.025
+      irregularity: 0.5
+    health:
+      enabled: 1
+      hideWhenMaximumUnavailable: 0
+      smoothingSeconds: 1
+      sloshAffectsBubblesOnly: 1
+      palette:
+        outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        body: {r: 0.36, g: 0.16, b: 0.19, a: 0.7529412}
+        bodyShadow: {r: 0.17, g: 0.075, b: 0.105, a: 0.5686275}
+        chamber: {r: 0.28, g: 0.16, b: 0.24, a: 0.6156863}
+        liquid: {r: 0.09803922, g: 0.88235295, b: 0.09803922, a: 0.84313726}
+        liquidHighlight: {r: 0.09803922, g: 0.88235295, b: 0.09803922, a: 0}
+        bubbles: {r: 0.4117647, g: 0.92156863, b: 0.4117647, a: 0.92156863}
+        graduation: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        label: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        labelOutline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 0.9}
+        plunger: {r: 0.15, g: 0.15, b: 0.15, a: 1}
+        plungerWindow: {r: 0.65, g: 0.65, b: 0.65, a: 0.45}
+        terminationOutline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        terminationInterior: {r: 0.65, g: 0.65, b: 0.65, a: 0.45}
+      fluid:
+        flowEnabled: 1
+        flowSpeed: 0.15
+        waveAmplitude: 0
+        waveFrequency: 0
+        viscosity: 0.85
+        bubblesEnabled: 1
+        bubbleDensity: 0.15
+        bubbleMinimumSize: 0.02
+        bubbleMaximumSize: 0.05
+        bubbleRiseSpeed: 0
+        bubbleDrift: 0.3
+      motion:
+        movementReactionEnabled: 1
+        sloshStrength: 0.5
+        surfaceSloshStrength: 0.35
+        horizontalSloshEnabled: 1
+        horizontalSloshStrength: 0.05
+        sloshSpring: 45
+        sloshDamping: 5
+        maximumSlosh: 0.35
+        tiltEnabled: 0
+        maximumTiltDegrees: 5
+        tiltSpring: 15
+        tiltDamping: 10
+        valueImpulseEnabled: 1
+        valueImpulseStrength: 1
+        valueImpulseDecay: 1
+      outlineStyle:
+        enabled: 0
+        edgeWobbleStrength: 1
+        edgeWobbleFrequency: 64
+        innerStreakStrength: 1
+        innerStreakDensity: 1
+        innerStreakLength: 0.5
+    shield:
+      enabled: 1
+      hideWhenMaximumUnavailable: 1
+      smoothingSeconds: 1
+      sloshAffectsBubblesOnly: 1
+      palette:
+        outline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        body: {r: 0.36078432, g: 0.16078432, b: 0.1882353, a: 0.7529412}
+        bodyShadow: {r: 0.16862746, g: 0.07450981, b: 0.105882354, a: 0.5568628}
+        chamber: {r: 0.2784314, g: 0.16078432, b: 0.23921569, a: 0.6156863}
+        liquid: {r: 0.5529412, g: 0.92941177, b: 0.90588236, a: 0.84313726}
+        liquidHighlight: {r: 0.5529412, g: 0.92941177, b: 0.90588236, a: 0}
+        bubbles: {r: 0.7254902, g: 1, b: 1, a: 0.92156863}
+        graduation: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+        label: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        labelOutline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        plunger: {r: 0.15, g: 0.15, b: 0.15, a: 1}
+        plungerWindow: {r: 0.65, g: 0.65, b: 0.65, a: 0.45}
+        terminationOutline: {r: 0.1176471, g: 0.1176471, b: 0.1176471, a: 1}
+        terminationInterior: {r: 0.65, g: 0.65, b: 0.65, a: 0.45}
+      fluid:
+        flowEnabled: 1
+        flowSpeed: 0.15
+        waveAmplitude: 0
+        waveFrequency: 0
+        viscosity: 0.85
+        bubblesEnabled: 1
+        bubbleDensity: 0.15
+        bubbleMinimumSize: 0.02
+        bubbleMaximumSize: 0.05
+        bubbleRiseSpeed: 0
+        bubbleDrift: 0.3
+      motion:
+        movementReactionEnabled: 1
+        sloshStrength: 0.5
+        surfaceSloshStrength: 0.35
+        horizontalSloshEnabled: 1
+        horizontalSloshStrength: 0.05
+        sloshSpring: 45
+        sloshDamping: 5
+        maximumSlosh: 0.35
+        tiltEnabled: 0
+        maximumTiltDegrees: 5
+        tiltSpring: 15
+        tiltDamping: 10
+        valueImpulseEnabled: 1
+        valueImpulseStrength: 1
+        valueImpulseDecay: 1
+      outlineStyle:
+        enabled: 0
+        edgeWobbleStrength: 0.35
+        edgeWobbleFrequency: 16
+        innerStreakStrength: 0.25
+        innerStreakDensity: 0.3
+        innerStreakLength: 0.16
+    experiencePalettePreset: 5
+    experienceShape:
+      unitsPerMajorDivision: 1
+      pixelsPerMajorDivision: 46
+      graduationMode: 2
+      uniformLabelCount: 5
+      minimumLength: 140
+      maximumLength: 200
+      minorDivisionsPerMajor: 1
+      labelEveryMajorDivision: 1
+      maximumLabelCount: 24
+      labelMinimumSpacing: 40
+      graduationEndPadding: 0
+      labelPlacement: 0
+      labelFontSize: 15
+      labelOffset: {x: 0, y: 0}
+      labelOutlineWidth: 0.12
+      graduationVerticalOffset: 0
+      bodyStyle: 0
+      barHeight: 24
+      outlineThickness: 0.1529
+      chamberInset: 0.16
+      plungerWidth: 0.08
+      clampPlungerStartInsideBody: 1
+      clampPlungerEndInsideBody: 0
+      stopLiquidAtPlunger: 1
+      terminationEnabled: 0
+      endCapWidth: 20
+      terminationOffset: 4
+      terminationStyle: 1
+      paintDrips:
+        enabled: 0
+        density: 0.38
+        length: 0.1
+        width: 0.018
+        irregularity: 0.65
+    experience:
+      enabled: 1
+      hideWhenMaximumUnavailable: 1
+      smoothingSeconds: 0.08
+      sloshAffectsBubblesOnly: 1
+      palette:
+        outline: {r: 0.055, g: 0.04, b: 0.02, a: 1}
+        body: {r: 0.36078432, g: 0.16078432, b: 0.1882353, a: 0.7529412}
+        bodyShadow: {r: 0.16862746, g: 0.07450981, b: 0.105882354, a: 0.6156863}
+        chamber: {r: 0.2784314, g: 0.16078432, b: 0.23921569, a: 0.6156863}
+        liquid: {r: 0.07843135, g: 0.12847945, b: 0.98039216, a: 1}
+        liquidHighlight: {r: 0.23921567, g: 0.26539353, b: 1, a: 1}
+        bubbles: {r: 0.5803922, g: 0.601204, b: 1, a: 0.72}
+        graduation: {r: 0.12, g: 0.08, b: 0.03, a: 1}
+        label: {r: 0.035, g: 0.025, b: 0.015, a: 1}
+        labelOutline: {r: 0, g: 0, b: 0, a: 0.9}
+        plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
+        plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
+        terminationOutline: {r: 0.055, g: 0.04, b: 0.02, a: 1}
+        terminationInterior: {r: 0, g: 0, b: 0, a: 1}
+      fluid:
+        flowEnabled: 1
+        flowSpeed: 0.15
+        waveAmplitude: 0.035
+        waveFrequency: 3
+        viscosity: 0.85
+        bubblesEnabled: 1
+        bubbleDensity: 0.15
+        bubbleMinimumSize: 0.025
+        bubbleMaximumSize: 0.07
+        bubbleRiseSpeed: 0
+        bubbleDrift: 0.3
+      motion:
+        movementReactionEnabled: 1
+        sloshStrength: 0.5
+        surfaceSloshStrength: 0.45
+        horizontalSloshEnabled: 1
+        horizontalSloshStrength: 0.16
+        sloshSpring: 45
+        sloshDamping: 5
+        maximumSlosh: 0.35
+        tiltEnabled: 0
+        maximumTiltDegrees: 2.5
+        tiltSpring: 16
+        tiltDamping: 8
+        valueImpulseEnabled: 1
+        valueImpulseStrength: 1
+        valueImpulseDecay: 1
+      outlineStyle:
+        enabled: 0
+        edgeWobbleStrength: 0.35
+        edgeWobbleFrequency: 16
+        innerStreakStrength: 0.25
+        innerStreakDensity: 0.3
+        innerStreakLength: 0.16
+  activePowerUpHud:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    hideEnergyWhenModuleMissing: 1
+    hideChargeWhenModuleMissing: 1
+    chargeSmoothingSeconds: 0.05
+    energySyringe:
+      enabled: 1
+      hideWhenPlayerMissing: 1
+      verticalSpacing: 0
+      unitsPerMajorDivision: 10
+      pixelsPerMajorDivision: 40
+      graduationMode: 2
+      uniformLabelCount: 5
+      minimumLength: 300
+      maximumLength: 300
+      minorDivisionsPerMajor: 1
+      labelEveryMajorDivision: 1
+      maximumLabelCount: 5
+      labelMinimumSpacing: 40
+      graduationEndPadding: 0
+      labelPlacement: 0
+      fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+      labelFontSize: 15
+      labelOffset: {x: 0, y: 0}
+      labelOutlineWidth: 0.12
+      graduationVerticalOffset: 0
+      bodyStyle: 0
+      barHeight: 85
+      outlineThickness: 0.05
+      chamberInset: 0.15
+      plungerWidth: 0.08
+      clampPlungerStartInsideBody: 1
+      clampPlungerEndInsideBody: 0
+      stopLiquidAtPlunger: 1
+      terminationEnabled: 1
+      endCapWidth: 30
+      terminationOffset: 10
+      terminationStyle: 1
+      paintDrips:
+        enabled: 0
+        density: 0.38
+        length: 0.1
+        width: 0.018
+        irregularity: 0.65
+      health:
+        enabled: 1
+        hideWhenMaximumUnavailable: 1
+        smoothingSeconds: 1
+        sloshAffectsBubblesOnly: 1
+        palette:
+          outline: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+          body: {r: 0.29803923, g: 0.10980392, b: 0.12156863, a: 1}
+          bodyShadow: {r: 0.16862746, g: 0.07450981, b: 0.105882354, a: 1}
+          chamber: {r: 0.2784314, g: 0.16078432, b: 0.23921569, a: 0.82}
+          liquid: {r: 1, g: 0.78431374, b: 0.05882353, a: 1}
+          liquidHighlight: {r: 1, g: 0.78431374, b: 0.05882353, a: 1}
+          bubbles: {r: 1, g: 0.92156863, b: 0.47058824, a: 1}
+          graduation: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0}
+          label: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0}
+          labelOutline: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 0}
+          plunger: {r: 0.14901961, g: 0.15, b: 0.15, a: 1}
+          plungerWindow: {r: 0.6509804, g: 0.6509804, b: 0.6509804, a: 0.4509804}
+          terminationOutline: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+          terminationInterior: {r: 0.6509804, g: 0.6509804, b: 0.6509804, a: 0.4509804}
+        fluid:
+          flowEnabled: 1
+          flowSpeed: 0.15
+          waveAmplitude: 0.035
+          waveFrequency: 3
+          viscosity: 0.85
+          bubblesEnabled: 1
+          bubbleDensity: 0.15
+          bubbleMinimumSize: 0.02
+          bubbleMaximumSize: 0.05
+          bubbleRiseSpeed: 0.1
+          bubbleDrift: 0.1
+        motion:
+          movementReactionEnabled: 1
+          sloshStrength: 0.5
+          surfaceSloshStrength: 0.45
+          horizontalSloshEnabled: 1
+          horizontalSloshStrength: 0.05
+          sloshSpring: 45
+          sloshDamping: 5
+          maximumSlosh: 0.35
+          tiltEnabled: 0
+          maximumTiltDegrees: 2.5
+          tiltSpring: 16
+          tiltDamping: 8
+          valueImpulseEnabled: 1
+          valueImpulseStrength: 1
+          valueImpulseDecay: 1
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
+      shield:
+        enabled: 0
+        hideWhenMaximumUnavailable: 1
+        smoothingSeconds: 0.08
+        sloshAffectsBubblesOnly: 0
+        palette:
+          outline: {r: 0.05, g: 0.065, b: 0.04, a: 1}
+          body: {r: 0.28, g: 0.31, b: 0.17, a: 1}
+          bodyShadow: {r: 0.12, g: 0.14, b: 0.075, a: 1}
+          chamber: {r: 0.12, g: 0.2, b: 0.11, a: 0.82}
+          liquid: {r: 0.52, g: 1, b: 0.02, a: 1}
+          liquidHighlight: {r: 0.78, g: 1, b: 0.12, a: 1}
+          bubbles: {r: 0.92, g: 1, b: 0.62, a: 0.7}
+          graduation: {r: 0.96, g: 0.82, b: 0.22, a: 1}
+          label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
+          labelOutline: {r: 0.96, g: 0.82, b: 0.22, a: 0.9}
+          plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
+          plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
+          terminationOutline: {r: 0.05, g: 0.065, b: 0.04, a: 1}
+          terminationInterior: {r: 0.24, g: 0.28, b: 0.13, a: 1}
+        fluid:
+          flowEnabled: 1
+          flowSpeed: 0.45
+          waveAmplitude: 0.035
+          waveFrequency: 3
+          viscosity: 0.72
+          bubblesEnabled: 1
+          bubbleDensity: 0.35
+          bubbleMinimumSize: 0.025
+          bubbleMaximumSize: 0.07
+          bubbleRiseSpeed: 0.18
+          bubbleDrift: 0.12
+        motion:
+          movementReactionEnabled: 1
+          sloshStrength: 0.08
+          surfaceSloshStrength: 0.45
+          horizontalSloshEnabled: 1
+          horizontalSloshStrength: 0.16
+          sloshSpring: 18
+          sloshDamping: 8
+          maximumSlosh: 0.25
+          tiltEnabled: 1
+          maximumTiltDegrees: 2.5
+          tiltSpring: 16
+          tiltDamping: 8
+          valueImpulseEnabled: 1
+          valueImpulseStrength: 0.65
+          valueImpulseDecay: 7
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
+      experiencePalettePreset: 2
+      experienceShape:
+        unitsPerMajorDivision: 1
+        pixelsPerMajorDivision: 46
+        graduationMode: 1
+        uniformLabelCount: 5
+        minimumLength: 260
+        maximumLength: 620
+        minorDivisionsPerMajor: 1
+        labelEveryMajorDivision: 1
+        maximumLabelCount: 24
+        labelMinimumSpacing: 40
+        graduationEndPadding: 0
+        labelPlacement: 0
+        labelFontSize: 15
+        labelOffset: {x: 0, y: 0}
+        labelOutlineWidth: 0.12
+        graduationVerticalOffset: 0
+        bodyStyle: 0
+        barHeight: 58
+        outlineThickness: 0.035
+        chamberInset: 0.16
+        plungerWidth: 0.032
+        clampPlungerStartInsideBody: 1
+        clampPlungerEndInsideBody: 0
+        stopLiquidAtPlunger: 1
+        terminationEnabled: 1
+        endCapWidth: 30
+        terminationOffset: 4
+        terminationStyle: 1
+        paintDrips:
+          enabled: 0
+          density: 0.38
+          length: 0.1
+          width: 0.018
+          irregularity: 0.65
+      experience:
+        enabled: 0
+        hideWhenMaximumUnavailable: 1
+        smoothingSeconds: 0.08
+        sloshAffectsBubblesOnly: 0
+        palette:
+          outline: {r: 0.05, g: 0.065, b: 0.04, a: 1}
+          body: {r: 0.28, g: 0.31, b: 0.17, a: 1}
+          bodyShadow: {r: 0.12, g: 0.14, b: 0.075, a: 1}
+          chamber: {r: 0.12, g: 0.2, b: 0.11, a: 0.82}
+          liquid: {r: 0.52, g: 1, b: 0.02, a: 1}
+          liquidHighlight: {r: 0.78, g: 1, b: 0.12, a: 1}
+          bubbles: {r: 0.92, g: 1, b: 0.62, a: 0.7}
+          graduation: {r: 0.96, g: 0.82, b: 0.22, a: 1}
+          label: {r: 0.035, g: 0.025, b: 0.035, a: 1}
+          labelOutline: {r: 0.96, g: 0.82, b: 0.22, a: 0.9}
+          plunger: {r: 0.16, g: 0.15, b: 0.15, a: 1}
+          plungerWindow: {r: 0.62, g: 0.64, b: 0.62, a: 0.38}
+          terminationOutline: {r: 0.05, g: 0.065, b: 0.04, a: 1}
+          terminationInterior: {r: 0.24, g: 0.28, b: 0.13, a: 1}
+        fluid:
+          flowEnabled: 1
+          flowSpeed: 0.45
+          waveAmplitude: 0.035
+          waveFrequency: 3
+          viscosity: 0.72
+          bubblesEnabled: 1
+          bubbleDensity: 0.35
+          bubbleMinimumSize: 0.025
+          bubbleMaximumSize: 0.07
+          bubbleRiseSpeed: 0.18
+          bubbleDrift: 0.12
+        motion:
+          movementReactionEnabled: 1
+          sloshStrength: 0.08
+          surfaceSloshStrength: 0.45
+          horizontalSloshEnabled: 1
+          horizontalSloshStrength: 0.16
+          sloshSpring: 18
+          sloshDamping: 8
+          maximumSlosh: 0.25
+          tiltEnabled: 1
+          maximumTiltDegrees: 2.5
+          tiltSpring: 16
+          tiltDamping: 8
+          valueImpulseEnabled: 1
+          valueImpulseStrength: 0.65
+          valueImpulseDecay: 7
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
+    requirementMarker:
+      enabled: 1
+      color: {r: 0.84313726, g: 0.09803922, b: 0.05882353, a: 1}
+      width: 0.02
+      height: 0.1
+      verticalOffset: 0
+    chargeRing:
+      enabled: 1
+      backgroundColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+      fillColor: {r: 1, g: 0.39215687, b: 0, a: 1}
+      outlineColor: {r: 0.11764706, g: 0.11764706, b: 0.11764706, a: 1}
+      fillDirection: 1
+      thickness: 0.3
+      outlineThickness: 0.05
+      startAngleDegrees: 110
+      arcDegrees: 140
+    iconCooldown:
+      enabled: 1
+      fillDirection: 1
+      desaturationStrength: 0.95
+      lockedTint: {r: 0.3137255, g: 0.3137255, b: 0.3137255, a: 0.84313726}
+      revealFeather: 0.025
+  portrait:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    idleAnimation:
+      animationId: Idle
+      frames:
+      - {fileID: 21300000, guid: e4f2b00e5b0de1f4994733596d02a814, type: 3}
+      secondsPerFrame: 0.12
+      staticFrameDurationSeconds: 0.35
+      playbackSpeedMultiplier: 1
+      playbackMode: 0
+      maximumCompletedCycles: 0
+      priority: 0
+      restartWhenReentered: 1
+    damageAnimation:
+      animationId: DamageTaken
+      frames:
+      - {fileID: 21300000, guid: d47b46e58d4fdc74c8e31af96fcb1dc0, type: 3}
+      secondsPerFrame: 0.12
+      staticFrameDurationSeconds: 0.8
+      playbackSpeedMultiplier: 1
+      playbackMode: 1
+      maximumCompletedCycles: 0
+      priority: 1
+      restartWhenReentered: 1
+    deathAnimation:
+      animationId: Death
+      frames:
+      - {fileID: 21300000, guid: 6a0b1d07def993649a48cc9aca31ab30, type: 3}
+      secondsPerFrame: 0.12
+      staticFrameDurationSeconds: 0.35
+      playbackSpeedMultiplier: 1
+      playbackMode: 0
+      maximumCompletedCycles: 0
+      priority: 0
+      restartWhenReentered: 1
+    comboRankAnimations: []
+    powerUpAnimations: []
+  growthSequence:
+    enabled: 1
+    hideWhenPlayerMissing: 1
+    maximumVisibleSteps: 5
+    schedules:
+    - scheduleId: ScheduleRookie
+      steps:
+      - stepIndex: 0
+        statName: FireRate
+        textOverride: ROF
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 1, g: 0.8235294, b: 0, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+      - stepIndex: 1
+        statName: ShotRange
+        textOverride: RNG
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 1, g: 0.8235294, b: 0, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+      - stepIndex: 2
+        statName: MovementSpeed
+        textOverride: SPD
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 1, g: 0.8235294, b: 0, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+      - stepIndex: 3
+        statName: Damage
+        textOverride: DMG
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 1, g: 0.8235294, b: 0, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+      - stepIndex: 4
+        statName: Luck
+        textOverride: LCK
+        presentationMode: 0
+        nextSprite: {fileID: 0}
+        normalSprite: {fileID: 0}
+        nextText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 1, g: 0.8235294, b: 0, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+        normalText:
+          fontAsset: {fileID: 11400000, guid: 20da2da38bbb1924c968fcc59e0cd0b7, type: 2}
+          fontSize: 18
+          enableAutoSize: 0
+          autoSizeMin: 9
+          autoSizeMax: 36
+          color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+          outlineColor: {r: 0, g: 0, b: 0, a: 0}
+          outlineWidth: 0
+  scalingRules: []

@@ -9,14 +9,14 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Provides a UI panel for creating, editing, duplicating and deleting enemy visual presets.
 /// </summary>
-public sealed class EnemyVisualPresetsPanel
+public sealed class EnemyVisualPresetsPanel : IEnemyVisualPresetEditorPanel
 {
     #region Constants
     private const float LeftPaneWidth = 280f;
+    private const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.Visual.SelectedPreset";
     private const string ActiveSectionStateKey = "NashCore.EnemyManagement.Visual.ActiveSection";
     private const string ActiveSubSectionStateKey = "NashCore.EnemyManagement.Visual.ActiveSubSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.EnemyManagement.Visual.DetailsScroll";
-    private const string SelectedPresetPathStateKey = "NashCore.EnemyManagement.Visual.SelectedPreset";
     #endregion
 
     #region Fields
@@ -49,6 +49,14 @@ public sealed class EnemyVisualPresetsPanel
     }
 
     internal SerializedObject PresetSerializedObject
+    {
+        get
+        {
+            return presetSerializedObject;
+        }
+    }
+
+    SerializedObject IEnemyVisualPresetEditorPanel.PresetSerializedObject
     {
         get
         {
@@ -110,6 +118,9 @@ public sealed class EnemyVisualPresetsPanel
     #endregion
 
     #region Constructors
+    /// <summary>
+    /// Initializes the gameplay enemy visual preset panel.
+    /// </summary>
     public EnemyVisualPresetsPanel()
     {
         root = new VisualElement();
@@ -680,6 +691,16 @@ public sealed class EnemyVisualPresetsPanel
     {
         BuildActiveDetailsSection();
     }
+
+    void IEnemyVisualPresetEditorPanel.RefreshPresetList()
+    {
+        RefreshPresetList();
+    }
+
+    void IEnemyVisualPresetEditorPanel.RebuildActiveDetailsSection()
+    {
+        RebuildActiveDetailsSection();
+    }
     #endregion
 
     #endregion
@@ -700,10 +721,7 @@ public sealed class EnemyVisualPresetsPanel
         OffensiveEngagementFeedback = 4,
         BossPatternChangeFeedback = 5,
         SpawnOverrides = 6,
-        BossUi = 7,
-        ProjectileOffscreenWarning = 8,
-        Footprint = 9,
-        FaceFlipbook = 10
+        FaceFlipbook = 7
     }
 
     internal sealed class VisualSubSectionTabEntry

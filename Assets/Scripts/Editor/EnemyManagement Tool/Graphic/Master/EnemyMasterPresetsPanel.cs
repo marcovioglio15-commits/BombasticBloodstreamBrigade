@@ -513,6 +513,11 @@ public sealed class EnemyMasterPresetsPanel
         EnemyMasterPresetsPanelSectionsUtility.CreateVisualPreset(this);
     }
 
+    internal void CreateUiVisualPreset()
+    {
+        EnemyMasterPresetsPanelSectionsUtility.CreateUiVisualPreset(this);
+    }
+
     internal void CreateAdvancedPatternPreset()
     {
         EnemyMasterPresetsPanelSectionsUtility.CreateAdvancedPatternPreset(this);
@@ -631,6 +636,7 @@ public sealed class EnemyMasterPresetsPanel
         public VisualElement Content;
         public EnemyBrainPresetsPanel BrainPanel;
         public EnemyVisualPresetsPanel VisualPanel;
+        public EnemyUiVisualPresetsPanel UiVisualPanel;
         public EnemyAdvancedPatternPresetsPanel AdvancedPatternPanel;
         public EnemyBossPatternPresetsPanel BossPatternPanel;
     }

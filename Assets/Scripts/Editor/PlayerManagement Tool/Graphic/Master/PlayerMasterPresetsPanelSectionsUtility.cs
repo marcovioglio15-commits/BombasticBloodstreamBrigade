@@ -97,6 +97,7 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         SerializedProperty progressionProperty = presetSerializedObject.FindProperty("m_ProgressionPreset");
         SerializedProperty powerUpsProperty = presetSerializedObject.FindProperty("m_PowerUpsPreset");
         SerializedProperty visualProperty = presetSerializedObject.FindProperty("visualPreset");
+        SerializedProperty uiVisualProperty = presetSerializedObject.FindProperty("uiVisualPreset");
         SerializedProperty animationProperty = presetSerializedObject.FindProperty("m_AnimationBindingsPreset");
 
         sectionContainer.Add(BuildSubPresetRow(panel,
@@ -121,12 +122,19 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
                                                () => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PowerUps),
                                                PlayerManagementWindow.PanelType.PowerUps));
         sectionContainer.Add(BuildSubPresetRow(panel,
-                                               "Visual Preset",
+                                               "Gameplay Visual Preset",
                                                typeof(PlayerVisualPreset),
                                                visualProperty,
                                                panel.CreateVisualPreset,
                                                () => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PlayerVisualPresets),
                                                PlayerManagementWindow.PanelType.PlayerVisualPresets));
+        sectionContainer.Add(BuildSubPresetRow(panel,
+                                               "UI Visual Preset",
+                                               typeof(PlayerUiVisualPreset),
+                                               uiVisualProperty,
+                                               panel.CreateUiVisualPreset,
+                                               () => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PlayerUiVisualPresets),
+                                               PlayerManagementWindow.PanelType.PlayerUiVisualPresets));
         sectionContainer.Add(BuildSubPresetRow(panel,
                                                "Animation Bindings Preset",
                                                typeof(PlayerAnimationBindingsPreset),
@@ -215,10 +223,15 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         powerUpsButton.style.marginLeft = 4f;
         row.Add(powerUpsButton);
 
-        Button visualButton = new Button(() => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PlayerVisualPresets));
-        visualButton.text = "Open Visual";
-        visualButton.style.marginLeft = 4f;
-        row.Add(visualButton);
+        Button gameplayVisualButton = new Button(() => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PlayerVisualPresets));
+        gameplayVisualButton.text = "Open Gameplay Visual";
+        gameplayVisualButton.style.marginLeft = 4f;
+        row.Add(gameplayVisualButton);
+
+        Button uiVisualButton = new Button(() => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.PlayerUiVisualPresets));
+        uiVisualButton.text = "Open UI Visual";
+        uiVisualButton.style.marginLeft = 4f;
+        row.Add(uiVisualButton);
 
         Button animationButton = new Button(() => PlayerMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, PlayerManagementWindow.PanelType.AnimationBindings));
         animationButton.text = "Open Animations";
@@ -538,6 +551,30 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates one new UI visual sub-preset and assigns it to the selected master preset.
+    /// </summary>
+    /// <param name="panel">Owning panel that stores selected preset state.</param>
+    public static void CreateUiVisualPreset(PlayerMasterPresetsPanel panel)
+    {
+        if (panel == null)
+            return;
+
+        PlayerUiVisualPreset newPreset = CreateSubPresetAsset<PlayerUiVisualPreset>("PlayerUiVisualPreset", PlayerMasterPresetsPanel.UiVisualPresetsFolder);
+
+        if (newPreset != null)
+        {
+            PlayerUiVisualPresetLibrary uiVisualLibrary = PlayerUiVisualPresetLibraryUtility.GetOrCreateLibrary();
+            Undo.RegisterCreatedObjectUndo(newPreset, "Create UI Visual Preset Asset");
+            Undo.RecordObject(uiVisualLibrary, "Add UI Visual Preset");
+            uiVisualLibrary.AddPreset(newPreset);
+            EditorUtility.SetDirty(uiVisualLibrary);
+            PlayerManagementDraftSession.MarkDirty();
+        }
+
+        AssignSubPreset(panel, "uiVisualPreset", newPreset);
+    }
+
+    /// <summary>
     /// Assigns one sub-preset reference on the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel that stores the selected preset and serialized object.</param>
@@ -560,8 +597,11 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         panel.PresetSerializedObject.ApplyModifiedProperties();
         PlayerManagementDraftSession.MarkDirty();
 
-        if (string.Equals(propertyName, "visualPreset", StringComparison.Ordinal))
+        if (string.Equals(propertyName, "visualPreset", StringComparison.Ordinal) ||
+            string.Equals(propertyName, "uiVisualPreset", StringComparison.Ordinal))
+        {
             PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
+        }
     }
     #endregion
 
@@ -576,6 +616,9 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
     /// <param name="createAction">Callback that creates and assigns a new preset.</param>
     /// <param name="openSectionAction">Callback that opens the related management section.</param>
     /// <param name="panelType">Panel type associated with the referenced preset.</param>
+    /// <param name="openButtonLabel">Visible label for the primary open button.</param>
+    /// <param name="secondaryOpenSectionAction">Optional callback that opens an additional related section.</param>
+    /// <param name="secondaryOpenButtonLabel">Optional visible label for the secondary open button.</param>
     /// <returns>Returns the constructed sub-preset row.</returns>
     private static VisualElement BuildSubPresetRow(PlayerMasterPresetsPanel panel,
                                                    string label,
@@ -583,7 +626,10 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
                                                    SerializedProperty presetProperty,
                                                    Action createAction,
                                                    Action openSectionAction,
-                                                   PlayerManagementWindow.PanelType panelType)
+                                                   PlayerManagementWindow.PanelType panelType,
+                                                   string openButtonLabel = "Open Section",
+                                                   Action secondaryOpenSectionAction = null,
+                                                   string secondaryOpenButtonLabel = null)
     {
         VisualElement container = new VisualElement();
         container.style.marginBottom = 6f;
@@ -595,8 +641,11 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         {
             PlayerManagementDraftSession.MarkDirty();
 
-            if (panelType == PlayerManagementWindow.PanelType.PlayerVisualPresets)
+            if (panelType == PlayerManagementWindow.PanelType.PlayerVisualPresets ||
+                panelType == PlayerManagementWindow.PanelType.PlayerUiVisualPresets)
+            {
                 PlayerManagementSelectionContext.NotifyVisualPresetContentChanged();
+            }
         });
         container.Add(presetField);
 
@@ -605,9 +654,18 @@ internal static class PlayerMasterPresetsPanelSectionsUtility
         buttonsRow.style.marginTop = 2f;
 
         Button openButton = new Button(openSectionAction);
-        openButton.text = "Open Section";
+        openButton.text = openButtonLabel;
         openButton.tooltip = "Open the corresponding section.";
         buttonsRow.Add(openButton);
+
+        if (secondaryOpenSectionAction != null && !string.IsNullOrWhiteSpace(secondaryOpenButtonLabel))
+        {
+            Button secondaryOpenButton = new Button(secondaryOpenSectionAction);
+            secondaryOpenButton.text = secondaryOpenButtonLabel;
+            secondaryOpenButton.tooltip = "Open the corresponding section.";
+            secondaryOpenButton.style.marginLeft = 4f;
+            buttonsRow.Add(secondaryOpenButton);
+        }
 
         Button newButton = new Button(createAction);
         newButton.text = "New";

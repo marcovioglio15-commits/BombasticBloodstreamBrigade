@@ -48,6 +48,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         PlayerProgressionPresetsPanel progressionPanel;
         PlayerPowerUpsPresetsPanel powerUpsPanel;
         PlayerVisualPresetsPanel visualPanel;
+        PlayerUiVisualPresetsPanel uiVisualPanel;
         PlayerAnimationBindingsPresetsPanel animationPanel;
         VisualElement content = BuildSidePanelContent(panel,
                                                       panelType,
@@ -55,12 +56,13 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                                                       out progressionPanel,
                                                       out powerUpsPanel,
                                                       out visualPanel,
+                                                      out uiVisualPanel,
                                                       out animationPanel);
 
         if (content == null)
             return;
 
-        AddTab(panel, panelType, GetPanelTitle(panelType), content, controllerPanel, progressionPanel, powerUpsPanel, visualPanel, animationPanel);
+        AddTab(panel, panelType, GetPanelTitle(panelType), content, controllerPanel, progressionPanel, powerUpsPanel, visualPanel, uiVisualPanel, animationPanel);
         SetActivePanel(panel, panelType);
     }
 
@@ -98,8 +100,9 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         panel.SuppressStateWrite = true;
         AddTab(panel,
                PlayerManagementWindow.PanelType.PlayerMasterPresets,
-               "Player Master Presets",
+               "Master Presets",
                panel.MainContentRoot,
+               null,
                null,
                null,
                null,
@@ -152,6 +155,9 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
 
             if (entry.VisualPanel != null)
                 entry.VisualPanel.RefreshFromSessionChange();
+
+            if (entry.UiVisualPanel != null)
+                entry.UiVisualPanel.RefreshFromSessionChange();
 
             if (entry.AnimationPanel != null)
                 entry.AnimationPanel.RefreshFromSessionChange();
@@ -248,17 +254,19 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         switch (panelType)
         {
             case PlayerManagementWindow.PanelType.PlayerControllerPresets:
-                return "Player Controller Presets";
+                return "Controller Presets";
             case PlayerManagementWindow.PanelType.LevelUpProgression:
                 return "Level-Up & Progression";
             case PlayerManagementWindow.PanelType.PowerUps:
                 return "Power-Ups";
             case PlayerManagementWindow.PanelType.PlayerVisualPresets:
-                return "Visual Presets";
+                return "Gameplay Visual Presets";
+            case PlayerManagementWindow.PanelType.PlayerUiVisualPresets:
+                return "UI Visual Presets";
             case PlayerManagementWindow.PanelType.AnimationBindings:
                 return "Animation Bindings";
             default:
-                return "Player Master Presets";
+                return "Master Presets";
         }
     }
 
@@ -278,12 +286,14 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                                                        out PlayerProgressionPresetsPanel progressionPanel,
                                                        out PlayerPowerUpsPresetsPanel powerUpsPanel,
                                                        out PlayerVisualPresetsPanel visualPanel,
+                                                       out PlayerUiVisualPresetsPanel uiVisualPanel,
                                                        out PlayerAnimationBindingsPresetsPanel animationPanel)
     {
         controllerPanel = null;
         progressionPanel = null;
         powerUpsPanel = null;
         visualPanel = null;
+        uiVisualPanel = null;
         animationPanel = null;
 
         VisualElement panelRoot = new VisualElement();
@@ -326,6 +336,10 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                 visualPanel = new PlayerVisualPresetsPanel();
                 panelRoot.Add(visualPanel.Root);
                 return panelRoot;
+            case PlayerManagementWindow.PanelType.PlayerUiVisualPresets:
+                uiVisualPanel = new PlayerUiVisualPresetsPanel();
+                panelRoot.Add(uiVisualPanel.Root);
+                return panelRoot;
             case PlayerManagementWindow.PanelType.AnimationBindings:
                 animationPanel = new PlayerAnimationBindingsPresetsPanel();
                 panelRoot.Add(animationPanel.Root);
@@ -364,6 +378,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
                                PlayerProgressionPresetsPanel progressionPanel,
                                PlayerPowerUpsPresetsPanel powerUpsPanel,
                                PlayerVisualPresetsPanel visualPanel,
+                               PlayerUiVisualPresetsPanel uiVisualPanel,
                                PlayerAnimationBindingsPresetsPanel animationPanel)
     {
         if (panel == null || panel.TabBar == null)
@@ -388,6 +403,7 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
         sidePanelEntry.ProgressionPanel = progressionPanel;
         sidePanelEntry.PowerUpsPanel = powerUpsPanel;
         sidePanelEntry.VisualPanel = visualPanel;
+        sidePanelEntry.UiVisualPanel = uiVisualPanel;
         sidePanelEntry.AnimationPanel = animationPanel;
         panel.SidePanels[panelType] = sidePanelEntry;
 
@@ -501,6 +517,9 @@ internal static class PlayerMasterPresetsPanelSidePanelUtility
 
         if (panel.SidePanels.ContainsKey(PlayerManagementWindow.PanelType.PlayerVisualPresets))
             openPanels.Add(PlayerManagementWindow.PanelType.PlayerVisualPresets);
+
+        if (panel.SidePanels.ContainsKey(PlayerManagementWindow.PanelType.PlayerUiVisualPresets))
+            openPanels.Add(PlayerManagementWindow.PanelType.PlayerUiVisualPresets);
 
         if (panel.SidePanels.ContainsKey(PlayerManagementWindow.PanelType.AnimationBindings))
             openPanels.Add(PlayerManagementWindow.PanelType.AnimationBindings);

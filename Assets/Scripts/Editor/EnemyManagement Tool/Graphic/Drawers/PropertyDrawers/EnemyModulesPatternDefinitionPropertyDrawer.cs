@@ -45,7 +45,7 @@ public sealed class EnemyModulesPatternDefinitionPropertyDrawer : PropertyDrawer
             return root;
         }
 
-        AddDelayedTextField(root, patternIdProperty, "Pattern ID", "Stable identifier used by Enemy Advanced Pattern Presets loadouts.", false);
+        AddDelayedTextField(root, patternIdProperty, "Pattern ID", "Stable identifier used by Advanced Pattern Presets loadouts.", false);
         AddDelayedTextField(root, displayNameProperty, "Display Name", " label shown in shared pattern selection.", false);
         AddDelayedTextField(root, descriptionProperty, "Description", "Optional editor-facing notes for this shared pattern.", true);
         EnemyAdvancedPatternDrawerUtility.AddField(root, unreplaceableProperty, "Unreplaceable");

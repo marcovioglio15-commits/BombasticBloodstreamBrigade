@@ -75,7 +75,7 @@ public sealed class PlayerVisualOutlineSettings
 /// Stores runtime bridge, damage feedback and player-facing power-up VFX settings shared by one visual setup.
 /// </summary>
 [CreateAssetMenu(fileName = "PlayerVisualPreset", menuName = "Player/Visual Preset", order = 10)]
-public sealed class PlayerVisualPreset : ScriptableObject
+public sealed class PlayerVisualPreset : ScriptableObject, IPlayerUiVisualPresetData
 {
     #region Fields
 
@@ -240,19 +240,27 @@ public sealed class PlayerVisualPreset : ScriptableObject
 
     [Header("Health Bars")]
     [Tooltip("ECS-authoritative procedural syringe settings used by the player health, shield, and experience HUD views.")]
-    [SerializeField] private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
+    [HideInInspector]
+    [SerializeField]
+    private PlayerHealthBarsVisualSettings healthBars = new PlayerHealthBarsVisualSettings();
 
     [Header("Active Power-Up HUD")]
     [Tooltip("ECS-authoritative active power-up HUD settings for icon cooldown, energy syringes, requirement markers, and charge semirings.")]
-    [SerializeField] private PlayerActivePowerUpHudVisualSettings activePowerUpHud = new PlayerActivePowerUpHudVisualSettings();
+    [HideInInspector]
+    [SerializeField]
+    private PlayerActivePowerUpHudVisualSettings activePowerUpHud = new PlayerActivePowerUpHudVisualSettings();
 
     [Header("Portrait")]
     [Tooltip("ECS-authoritative HUD portrait animations selected from damage, combo-rank, death and power-up runtime state.")]
-    [SerializeField] private PlayerPortraitHudSettings portrait = new PlayerPortraitHudSettings();
+    [HideInInspector]
+    [SerializeField]
+    private PlayerPortraitHudSettings portrait = new PlayerPortraitHudSettings();
 
     [Header("Growth Sequence")]
     [Tooltip("ECS-authoritative HUD growth sequence visuals mapped to the Level-up & Progression schedule steps.")]
-    [SerializeField] private PlayerGrowthSequenceHudSettings growthSequence = new PlayerGrowthSequenceHudSettings();
+    [HideInInspector]
+    [SerializeField]
+    private PlayerGrowthSequenceHudSettings growthSequence = new PlayerGrowthSequenceHudSettings();
 
     #region Muzzle Flash VFX
     [Tooltip("Optional one-shot VFX prefab spawned at the projectile origin every time the player fires a shot.")]

@@ -64,6 +64,7 @@ public sealed class PlayerScaledPresetScope : IDisposable
     public PlayerProgressionPreset ProgressionPreset { get; private set; }
     public PlayerPowerUpsPreset PowerUpsPreset { get; private set; }
     public PlayerVisualPreset VisualPreset { get; private set; }
+    public PlayerUiVisualPreset UiVisualPreset { get; private set; }
     public PlayerAnimationBindingsPreset AnimationBindingsPreset { get; private set; }
     public IReadOnlyList<PlayerScalingDebugRuleSnapshot> DebugRuleSnapshots { get; private set; }
     #endregion
@@ -76,6 +77,7 @@ public sealed class PlayerScaledPresetScope : IDisposable
     /// <param name="progressionPreset">Resolved progression preset used by bake.</param>
     /// <param name="powerUpsPreset">Resolved power-ups preset used by bake.</param>
     /// <param name="visualPreset">Resolved visual preset used by bake.</param>
+    /// <param name="uiVisualPreset">Resolved UI visual preset used by bake.</param>
     /// <param name="animationBindingsPreset">Resolved animation preset used by bake.</param>
     /// <param name="instantiatedPresetsValue">Owned clone instances to destroy on dispose.</param>
     /// <param name="debugRuleSnapshotsValue">Collected debug snapshots for rules with Debug in Console enabled.</param>
@@ -84,6 +86,7 @@ public sealed class PlayerScaledPresetScope : IDisposable
                                    PlayerProgressionPreset progressionPreset,
                                    PlayerPowerUpsPreset powerUpsPreset,
                                    PlayerVisualPreset visualPreset,
+                                   PlayerUiVisualPreset uiVisualPreset,
                                    PlayerAnimationBindingsPreset animationBindingsPreset,
                                    List<UnityEngine.Object> instantiatedPresetsValue,
                                    List<PlayerScalingDebugRuleSnapshot> debugRuleSnapshotsValue)
@@ -92,6 +95,7 @@ public sealed class PlayerScaledPresetScope : IDisposable
         ProgressionPreset = progressionPreset;
         PowerUpsPreset = powerUpsPreset;
         VisualPreset = visualPreset;
+        UiVisualPreset = uiVisualPreset;
         AnimationBindingsPreset = animationBindingsPreset;
         instantiatedPresets = instantiatedPresetsValue;
         DebugRuleSnapshots = debugRuleSnapshotsValue;
@@ -142,12 +146,14 @@ public static class PlayerPresetScalingBakeUtility
     /// <param name="progressionPreset">Original progression preset reference.</param>
     /// <param name="powerUpsPreset">Original power-ups preset reference.</param>
     /// <param name="visualPreset">Original visual preset reference.</param>
+    /// <param name="uiVisualPreset">Original UI visual preset reference.</param>
     /// <param name="animationBindingsPreset">Original animation preset reference.</param>
     /// <returns>Disposable scope containing scaled or original preset references.</returns>
     public static PlayerScaledPresetScope CreateScope(PlayerControllerPreset controllerPreset,
                                                       PlayerProgressionPreset progressionPreset,
                                                       PlayerPowerUpsPreset powerUpsPreset,
                                                       PlayerVisualPreset visualPreset,
+                                                      PlayerUiVisualPreset uiVisualPreset,
                                                       PlayerAnimationBindingsPreset animationBindingsPreset)
     {
         List<UnityEngine.Object> instantiatedPresets = new List<UnityEngine.Object>();
@@ -156,20 +162,28 @@ public static class PlayerPresetScalingBakeUtility
         PlayerControllerPreset resolvedControllerPreset = controllerPreset;
         PlayerPowerUpsPreset resolvedPowerUpsPreset = powerUpsPreset;
         PlayerVisualPreset resolvedVisualPreset = visualPreset;
+        PlayerUiVisualPreset resolvedUiVisualPreset = uiVisualPreset;
         PlayerAnimationBindingsPreset resolvedAnimationBindingsPreset = animationBindingsPreset;
 
         bool progressionHasScaling = HasEnabledScalingRules(progressionPreset != null ? progressionPreset.ScalingRules : null);
         bool controllerHasScaling = HasEnabledScalingRules(controllerPreset != null ? controllerPreset.ScalingRules : null);
         bool powerUpsHasScaling = HasEnabledScalingRules(powerUpsPreset != null ? powerUpsPreset.ScalingRules : null);
         bool visualHasScaling = HasEnabledScalingRules(visualPreset != null ? visualPreset.ScalingRules : null);
+        bool uiVisualHasScaling = HasEnabledScalingRules(uiVisualPreset != null ? uiVisualPreset.ScalingRules : null);
         bool animationHasScaling = HasEnabledScalingRules(animationBindingsPreset != null ? animationBindingsPreset.ScalingRules : null);
-        bool hasAnyScaling = progressionHasScaling || controllerHasScaling || powerUpsHasScaling || visualHasScaling || animationHasScaling;
+        bool hasAnyScaling = progressionHasScaling ||
+                             controllerHasScaling ||
+                             powerUpsHasScaling ||
+                             visualHasScaling ||
+                             uiVisualHasScaling ||
+                             animationHasScaling;
 
-        if (hasAnyScaling == false)
+        if (!hasAnyScaling)
             return new PlayerScaledPresetScope(resolvedControllerPreset,
                                                resolvedProgressionPreset,
                                                resolvedPowerUpsPreset,
                                                resolvedVisualPreset,
+                                               resolvedUiVisualPreset,
                                                resolvedAnimationBindingsPreset,
                                                instantiatedPresets,
                                                debugRuleSnapshots);
@@ -226,6 +240,17 @@ public static class PlayerPresetScalingBakeUtility
                               debugRuleSnapshots);
         }
 
+        if (uiVisualHasScaling)
+        {
+            resolvedUiVisualPreset = CreateClone(uiVisualPreset, instantiatedPresets);
+            ApplyScalingRules(resolvedUiVisualPreset,
+                              resolvedUiVisualPreset.ScalingRules,
+                              variableContext,
+                              allowedVariables,
+                              "PlayerUiVisualPreset",
+                              debugRuleSnapshots);
+        }
+
         if (animationHasScaling)
         {
             resolvedAnimationBindingsPreset = CreateClone(animationBindingsPreset, instantiatedPresets);
@@ -241,6 +266,7 @@ public static class PlayerPresetScalingBakeUtility
                                            resolvedProgressionPreset,
                                            resolvedPowerUpsPreset,
                                            resolvedVisualPreset,
+                                           resolvedUiVisualPreset,
                                            resolvedAnimationBindingsPreset,
                                            instantiatedPresets,
                                            debugRuleSnapshots);

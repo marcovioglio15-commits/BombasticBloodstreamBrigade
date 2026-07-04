@@ -101,6 +101,7 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         SerializedObject presetSerializedObject = panel.PresetSerializedObject;
         SerializedProperty brainProperty = presetSerializedObject.FindProperty("brainPreset");
         SerializedProperty visualProperty = presetSerializedObject.FindProperty("visualPreset");
+        SerializedProperty uiVisualProperty = presetSerializedObject.FindProperty("uiVisualPreset");
         SerializedProperty advancedPatternProperty = presetSerializedObject.FindProperty("advancedPatternPreset");
         SerializedProperty bossPatternProperty = presetSerializedObject.FindProperty("bossPatternPreset");
 
@@ -112,12 +113,19 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
                                                () => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyBrainPresets),
                                                EnemyManagementWindow.PanelType.EnemyBrainPresets));
         sectionContainer.Add(BuildSubPresetRow(panel,
-                                               "Visual Preset",
+                                               "Gameplay Visual Preset",
                                                typeof(EnemyVisualPreset),
                                                visualProperty,
                                                panel.CreateVisualPreset,
                                                () => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyVisualPresets),
                                                EnemyManagementWindow.PanelType.EnemyVisualPresets));
+        sectionContainer.Add(BuildSubPresetRow(panel,
+                                               "UI Visual Preset",
+                                               typeof(EnemyUiVisualPreset),
+                                               uiVisualProperty,
+                                               panel.CreateUiVisualPreset,
+                                               () => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyUiVisualPresets),
+                                               EnemyManagementWindow.PanelType.EnemyUiVisualPresets));
         sectionContainer.Add(BuildSubPresetRow(panel,
                                                "Advanced Pattern Preset",
                                                typeof(EnemyAdvancedPatternPreset),
@@ -223,10 +231,15 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         openBrainButton.text = "Open Brain";
         row.Add(openBrainButton);
 
-        Button openVisualButton = new Button(() => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyVisualPresets));
-        openVisualButton.text = "Open Visual";
-        openVisualButton.style.marginLeft = 4f;
-        row.Add(openVisualButton);
+        Button openGameplayVisualButton = new Button(() => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyVisualPresets));
+        openGameplayVisualButton.text = "Open Gameplay Visual";
+        openGameplayVisualButton.style.marginLeft = 4f;
+        row.Add(openGameplayVisualButton);
+
+        Button openUiVisualButton = new Button(() => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyUiVisualPresets));
+        openUiVisualButton.text = "Open UI Visual";
+        openUiVisualButton.style.marginLeft = 4f;
+        row.Add(openUiVisualButton);
 
         Button openAdvancedPatternButton = new Button(() => EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets));
         openAdvancedPatternButton.text = "Open Advanced Pattern";
@@ -464,6 +477,29 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates one new enemy UI visual preset, registers it in the library, assigns it and opens the related side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel that provides assignment callbacks and selection sync.</param>
+
+    public static void CreateUiVisualPreset(EnemyMasterPresetsPanel panel)
+    {
+        EnemyUiVisualPreset newPreset = EnemyUiVisualPresetLibraryUtility.CreatePresetAsset("EnemyUiVisualPreset");
+
+        if (newPreset == null)
+            return;
+
+        EnemyUiVisualPresetLibrary uiVisualLibrary = EnemyUiVisualPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create Enemy UI Visual Preset Asset");
+        Undo.RecordObject(uiVisualLibrary, "Add Enemy UI Visual Preset");
+        uiVisualLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(uiVisualLibrary);
+        EnemyManagementDraftSession.MarkDirty();
+
+        AssignSubPreset(panel, "uiVisualPreset", newPreset);
+        EnemyMasterPresetsPanelSidePanelUtility.OpenSidePanel(panel, EnemyManagementWindow.PanelType.EnemyUiVisualPresets);
+    }
+
+    /// <summary>
     /// Assigns one linked sub preset reference on the currently selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized context and side-panel synchronization.</param>
@@ -488,6 +524,9 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         property.objectReferenceValue = preset;
         panel.PresetSerializedObject.ApplyModifiedProperties();
         EnemyManagementDraftSession.MarkDirty();
+
+        if (propertyName == "visualPreset" || propertyName == "uiVisualPreset")
+            EnemyManagementDraftSession.RecomputePendingChanges();
     }
     #endregion
 
@@ -528,6 +567,9 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
     /// <param name="createAction">Callback used to create and assign a new sub preset.</param>
     /// <param name="openSectionAction">Callback used to open the related side panel.</param>
     /// <param name="panelType">Target side panel type associated with the sub preset.</param>
+    /// <param name="openButtonLabel">Visible label for the primary open button.</param>
+    /// <param name="secondaryOpenSectionAction">Optional callback that opens an additional related section.</param>
+    /// <param name="secondaryOpenButtonLabel">Optional visible label for the secondary open button.</param>
     /// <returns>Returns the constructed row container.</returns>
     private static VisualElement BuildSubPresetRow(EnemyMasterPresetsPanel panel,
                                                    string label,
@@ -535,7 +577,10 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
                                                    SerializedProperty presetProperty,
                                                    Action createAction,
                                                    Action openSectionAction,
-                                                   EnemyManagementWindow.PanelType panelType)
+                                                   EnemyManagementWindow.PanelType panelType,
+                                                   string openButtonLabel = "Open Section",
+                                                   Action secondaryOpenSectionAction = null,
+                                                   string secondaryOpenButtonLabel = null)
     {
         VisualElement container = new VisualElement();
         container.style.marginBottom = 6f;
@@ -566,9 +611,18 @@ internal static class EnemyMasterPresetsPanelSectionsUtility
         buttonsRow.style.marginTop = 2f;
 
         Button openButton = new Button(openSectionAction);
-        openButton.text = "Open Section";
+        openButton.text = openButtonLabel;
         openButton.tooltip = "Open the corresponding sub preset section.";
         buttonsRow.Add(openButton);
+
+        if (secondaryOpenSectionAction != null && !string.IsNullOrWhiteSpace(secondaryOpenButtonLabel))
+        {
+            Button secondaryOpenButton = new Button(secondaryOpenSectionAction);
+            secondaryOpenButton.text = secondaryOpenButtonLabel;
+            secondaryOpenButton.tooltip = "Open the corresponding sub preset section.";
+            secondaryOpenButton.style.marginLeft = 4f;
+            buttonsRow.Add(secondaryOpenButton);
+        }
 
         Button newButton = new Button(createAction);
         newButton.text = "New";

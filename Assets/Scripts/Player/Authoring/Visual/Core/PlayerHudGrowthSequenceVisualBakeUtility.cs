@@ -7,7 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Converts Player Visual Preset HUD growth sequence authoring into ECS runtime configuration.
+/// Converts Player UI visual preset HUD growth sequence authoring into ECS runtime configuration.
 /// </summary>
 public static class PlayerHudGrowthSequenceVisualBakeUtility
 {
@@ -21,11 +21,11 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the mutable runtime growth-sequence HUD configuration from the resolved visual preset.
+    /// Builds the mutable runtime growth-sequence HUD configuration from the resolved UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Resolved visual preset after bake-time scaling.</param>
+    /// <param name="visualPreset">Resolved UI visual preset after bake-time scaling.</param>
     /// <returns>Runtime growth-sequence HUD visual config.</returns>
-    public static PlayerGrowthSequenceHudVisualConfig BuildGrowthSequenceConfig(PlayerVisualPreset visualPreset)
+    public static PlayerGrowthSequenceHudVisualConfig BuildGrowthSequenceConfig(IPlayerUiVisualPresetData visualPreset)
     {
         PlayerGrowthSequenceHudSettings settings = visualPreset != null ? visualPreset.GrowthSequence : null;
 
@@ -38,11 +38,11 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     }
 
     /// <summary>
-    /// Builds the immutable growth-sequence HUD baseline from the unscaled source visual preset.
+    /// Builds the immutable growth-sequence HUD baseline from the unscaled source UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <returns>Baseline growth-sequence HUD visual config.</returns>
-    public static PlayerBaseGrowthSequenceHudVisualConfig BuildBaseGrowthSequenceConfig(PlayerVisualPreset visualPreset)
+    public static PlayerBaseGrowthSequenceHudVisualConfig BuildBaseGrowthSequenceConfig(IPlayerUiVisualPresetData visualPreset)
     {
         return new PlayerBaseGrowthSequenceHudVisualConfig
         {
@@ -51,12 +51,12 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates runtime growth-sequence step visuals from visual preset mappings and progression fallback steps.
+    /// Populates runtime growth-sequence step visuals from UI visual preset mappings and progression fallback steps.
     /// </summary>
-    /// <param name="visualPreset">Resolved visual preset after bake-time scaling.</param>
+    /// <param name="visualPreset">Resolved UI visual preset after bake-time scaling.</param>
     /// <param name="progressionPreset">Resolved progression preset after bake-time scaling.</param>
     /// <param name="stepBuffer">Destination runtime growth step buffer.</param>
-    public static void PopulateGrowthSequenceBuffer(PlayerVisualPreset visualPreset,
+    public static void PopulateGrowthSequenceBuffer(IPlayerUiVisualPresetData visualPreset,
                                                     PlayerProgressionPreset progressionPreset,
                                                     DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> stepBuffer)
     {
@@ -65,12 +65,12 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates immutable growth-sequence step baselines from visual preset mappings and progression fallback steps.
+    /// Populates immutable growth-sequence step baselines from UI visual preset mappings and progression fallback steps.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <param name="progressionPreset">Unscaled source progression preset.</param>
     /// <param name="baseStepBuffer">Destination baseline growth step buffer.</param>
-    public static void PopulateBaseGrowthSequenceBuffer(PlayerVisualPreset visualPreset,
+    public static void PopulateBaseGrowthSequenceBuffer(IPlayerUiVisualPresetData visualPreset,
                                                         PlayerProgressionPreset progressionPreset,
                                                         DynamicBuffer<PlayerBaseGrowthSequenceHudStepVisualElement> baseStepBuffer)
     {
@@ -115,10 +115,10 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     /// <summary>
     /// Populates a dynamic growth sequence buffer through a temporary managed list.
     /// </summary>
-    /// <param name="visualPreset">Resolved visual preset after bake-time scaling.</param>
+    /// <param name="visualPreset">Resolved UI visual preset after bake-time scaling.</param>
     /// <param name="progressionPreset">Resolved progression preset after bake-time scaling.</param>
     /// <param name="stepBuffer">Destination runtime growth step buffer.</param>
-    private static void PopulateGrowthSequenceBufferInternal(PlayerVisualPreset visualPreset,
+    private static void PopulateGrowthSequenceBufferInternal(IPlayerUiVisualPresetData visualPreset,
                                                              PlayerProgressionPreset progressionPreset,
                                                              DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> stepBuffer)
     {
@@ -132,10 +132,10 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     /// <summary>
     /// Builds growth sequence visual steps from progression schedules and visual preset overrides.
     /// </summary>
-    /// <param name="visualPreset">Visual preset that owns optional growth visual overrides.</param>
+    /// <param name="visualPreset">UI visual preset that owns optional growth visual overrides.</param>
     /// <param name="progressionPreset">Progression preset that owns authoritative level-up schedules.</param>
     /// <param name="steps">Destination managed step list.</param>
-    private static void PopulateGrowthSequenceListInternal(PlayerVisualPreset visualPreset,
+    private static void PopulateGrowthSequenceListInternal(IPlayerUiVisualPresetData visualPreset,
                                                            PlayerProgressionPreset progressionPreset,
                                                            List<PlayerGrowthSequenceHudStepVisualElement> steps)
     {

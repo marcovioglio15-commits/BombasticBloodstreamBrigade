@@ -2,7 +2,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Builds safe ECS health-bar visual configurations from Player Visual Preset authoring data.
+/// Builds safe ECS health-bar visual configurations from Player UI visual preset authoring data.
 /// </summary>
 public static class PlayerHealthBarVisualBakeUtility
 {
@@ -10,11 +10,11 @@ public static class PlayerHealthBarVisualBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the runtime player health-bar visual configuration from the currently scaled visual preset.
+    /// Builds the runtime player health-bar visual configuration from the currently scaled UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Scaled visual preset currently used by the baker.</param>
+    /// <param name="visualPreset">Scaled UI visual preset currently used by the baker.</param>
     /// <returns>Safe runtime player health-bar visual configuration.</returns>
-    public static PlayerHealthBarVisualConfig BuildConfig(PlayerVisualPreset visualPreset)
+    public static PlayerHealthBarVisualConfig BuildConfig(IPlayerUiVisualPresetData visualPreset)
     {
         PlayerHealthBarsVisualSettings settings = visualPreset != null && visualPreset.HealthBars != null
             ? visualPreset.HealthBars
@@ -75,11 +75,11 @@ public static class PlayerHealthBarVisualBakeUtility
     }
 
     /// <summary>
-    /// Builds the immutable player health-bar visual baseline from the unscaled visual preset.
+    /// Builds the immutable player health-bar visual baseline from the unscaled UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <returns>Immutable player health-bar visual baseline.</returns>
-    public static PlayerBaseHealthBarVisualConfig BuildBaseConfig(PlayerVisualPreset visualPreset)
+    public static PlayerBaseHealthBarVisualConfig BuildBaseConfig(IPlayerUiVisualPresetData visualPreset)
     {
         return new PlayerBaseHealthBarVisualConfig
         {

@@ -161,6 +161,7 @@ MonoBehaviour:
   masterPreset: {fileID: 11400000, guid: 11c7c9887851de14697a987a8d644a56, type: 2}
   brainPreset: {fileID: 11400000, guid: e5a60022610859e4eb11cb10fe239e7e, type: 2}
   visualPreset: {fileID: 11400000, guid: 1ea0c014fe20466a88a3ba177cb37289, type: 2}
+  uiVisualPreset: {fileID: 11400000, guid: c27fc40d716a4d8aa11b3dd9c5d99656, type: 2}
   advancedPatternPreset: {fileID: 11400000, guid: dc685c0758c6c0949b9ab458b91c206f, type: 2}
   bossPatternPreset: {fileID: 0}
   moveSpeed: 3

@@ -9,14 +9,14 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Provides a UI panel for creating, editing, duplicating and deleting player visual presets.
 /// </summary>
-public sealed class PlayerVisualPresetsPanel
+public sealed class PlayerVisualPresetsPanel : IPlayerVisualPresetEditorPanel
 {
     #region Constants
     private const float LeftPaneWidth = 280f;
+    private const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.Visual.SelectedPreset";
     private const string ActiveSectionStateKey = "NashCore.PlayerManagement.Visual.ActiveSection";
     private const string ActiveSubSectionStateKey = "NashCore.PlayerManagement.Visual.ActiveSubSection";
     private const string DetailsScrollOffsetStateKey = "NashCore.PlayerManagement.Visual.DetailsScroll";
-    private const string SelectedPresetPathStateKey = "NashCore.PlayerManagement.Visual.SelectedPreset";
     #endregion
 
     #region Fields
@@ -48,6 +48,14 @@ public sealed class PlayerVisualPresetsPanel
     }
 
     internal SerializedObject PresetSerializedObject
+    {
+        get
+        {
+            return presetSerializedObject;
+        }
+    }
+
+    SerializedObject IPlayerVisualPresetEditorPanel.PresetSerializedObject
     {
         get
         {
@@ -110,8 +118,7 @@ public sealed class PlayerVisualPresetsPanel
 
     #region Constructors
     /// <summary>
-    /// Initializes the player visual presets panel and restores the previously selected sections.
-    /// None.
+    /// Initializes the gameplay player visual preset panel and restores the previously selected sections.
     /// </summary>
     public PlayerVisualPresetsPanel()
     {
@@ -692,6 +699,11 @@ public sealed class PlayerVisualPresetsPanel
     {
         BuildActiveDetailsSection();
     }
+
+    void IPlayerVisualPresetEditorPanel.RebuildDetails()
+    {
+        RebuildDetails();
+    }
     #endregion
 
     #endregion
@@ -712,11 +724,7 @@ public sealed class PlayerVisualPresetsPanel
         PowerUpVfx = 4,
         VisualPointer = 5,
         DeathAnimation = 6,
-        HealthBars = 7,
-        GroundShadow = 8,
-        ActivePowerUpHud = 9,
-        Portrait = 10,
-        GrowthSequence = 11
+        GroundShadow = 7
     }
 
     internal sealed class VisualSubSectionTabEntry

@@ -31,8 +31,11 @@ public sealed class PlayerMasterPreset : ScriptableObject
     [Tooltip("Craftable power-ups preset reference.")]
     [SerializeField] private PlayerPowerUpsPreset m_PowerUpsPreset;
 
-    [Tooltip("Visual presentation preset reference.")]
+    [Tooltip("Gameplay visual presentation preset reference for weapon visuals, VFX, outline, damage feedback and world presentation.")]
     [SerializeField] private PlayerVisualPreset visualPreset;
+
+    [Tooltip("UI visual presentation preset reference for HUD syringes, active power-up widgets, portrait and growth sequence visuals.")]
+    [SerializeField] private PlayerUiVisualPreset uiVisualPreset;
 
     [Tooltip("Animation bindings preset reference.")]
     [SerializeField] private PlayerAnimationBindingsPreset m_AnimationBindingsPreset;
@@ -107,6 +110,14 @@ public sealed class PlayerMasterPreset : ScriptableObject
         }
     }
 
+    public PlayerUiVisualPreset UiVisualPreset
+    {
+        get
+        {
+            return uiVisualPreset;
+        }
+    }
+
     public PlayerAnimationBindingsPreset AnimationBindingsPreset
     {
         get
@@ -132,6 +143,9 @@ public sealed class PlayerMasterPreset : ScriptableObject
 
         if (string.IsNullOrWhiteSpace(wallsLayerName))
             wallsLayerName = "Walls";
+
+        if (uiVisualPreset != null)
+            uiVisualPreset.ValidateValues();
 
         TryMigrateLegacyProgressionHealth();
         TryMigrateLegacyElementalEnemyVfx();

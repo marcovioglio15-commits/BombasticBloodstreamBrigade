@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 /// Stores presentation settings resolved by enemy master presets and wave tools.
 /// </summary>
 [CreateAssetMenu(fileName = "EnemyVisualPreset", menuName = "Enemy/Visual Preset", order = 11)]
-public sealed class EnemyVisualPreset : ScriptableObject
+public sealed class EnemyVisualPreset : ScriptableObject, IEnemyUiVisualPresetData
 {
     #region Fields
 
@@ -41,7 +41,9 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [SerializeField] private EnemyVisualOutlineSettings outline = new EnemyVisualOutlineSettings();
 
     [Tooltip("Ground footprint settings used by enemy shadows and spatial health or shield UI.")]
-    [SerializeField] private EnemyVisualFootprintSettings footprint = new EnemyVisualFootprintSettings();
+    [HideInInspector]
+    [SerializeField]
+    private EnemyVisualFootprintSettings footprint = new EnemyVisualFootprintSettings();
 
     [Tooltip("Generic visual feedback authored for offensive behaviour engagements.")]
     [FormerlySerializedAs("shooterWarning")]
@@ -60,10 +62,14 @@ public sealed class EnemyVisualPreset : ScriptableObject
     [SerializeField] private EnemyVisualSpawnOverridesSettings spawnOverrides = new EnemyVisualSpawnOverridesSettings();
 
     [Tooltip("Projectile offscreen warning settings block.")]
-    [SerializeField] private EnemyProjectileOffscreenWarningSettings projectileOffscreenWarning = new EnemyProjectileOffscreenWarningSettings();
+    [HideInInspector]
+    [SerializeField]
+    private EnemyProjectileOffscreenWarningSettings projectileOffscreenWarning = new EnemyProjectileOffscreenWarningSettings();
 
     [Tooltip("Boss-specific screen-space UI block used when an enemy has a Boss Pattern Preset.")]
-    [SerializeField] private EnemyBossVisualUiSettings bossUi = new EnemyBossVisualUiSettings();
+    [HideInInspector]
+    [SerializeField]
+    private EnemyBossVisualUiSettings bossUi = new EnemyBossVisualUiSettings();
     #endregion
 
     #endregion

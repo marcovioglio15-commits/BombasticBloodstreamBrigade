@@ -28,8 +28,11 @@ public sealed class EnemyMasterPreset : ScriptableObject
     [Tooltip("Brain preset reference used by this enemy master preset.")]
     [SerializeField] private EnemyBrainPreset brainPreset;
 
-    [Tooltip("Visual preset reference used by this enemy master preset.")]
+    [Tooltip("Gameplay visual preset reference used by this enemy master preset.")]
     [SerializeField] private EnemyVisualPreset visualPreset;
+
+    [Tooltip("UI visual preset reference used by this enemy master preset for footprint, boss HUD, and projectile offscreen warnings.")]
+    [SerializeField] private EnemyUiVisualPreset uiVisualPreset;
 
     [Tooltip("Advanced pattern preset reference used by this enemy master preset.")]
     [SerializeField] private EnemyAdvancedPatternPreset advancedPatternPreset;
@@ -97,6 +100,14 @@ public sealed class EnemyMasterPreset : ScriptableObject
         }
     }
 
+    public EnemyUiVisualPreset UiVisualPreset
+    {
+        get
+        {
+            return uiVisualPreset;
+        }
+    }
+
     public EnemyBossPatternPreset BossPatternPreset
     {
         get
@@ -122,6 +133,9 @@ public sealed class EnemyMasterPreset : ScriptableObject
 
         if (visualPreset != null)
             visualPreset.ValidateValues();
+
+        if (uiVisualPreset != null)
+            uiVisualPreset.ValidateValues();
 
         if (advancedPatternPreset != null)
             advancedPatternPreset.ValidateValues();

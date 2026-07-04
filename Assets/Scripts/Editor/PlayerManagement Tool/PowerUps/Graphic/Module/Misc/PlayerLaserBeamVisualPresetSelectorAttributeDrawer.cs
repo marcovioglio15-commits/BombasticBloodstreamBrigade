@@ -61,7 +61,7 @@ public sealed class PlayerLaserBeamVisualPresetSelectorAttributeDrawer : Propert
                 popupLabels.Add(string.Format("Missing Preset [{0}]", property.intValue));
                 popupIds.Add(property.intValue);
                 selectedIndex = 0;
-                warningBox.text = "The selected Laser Beam visual preset ID does not exist in the currently authored Player Visual Presets. Runtime will fall back to the default beam colors until a matching ID is added.";
+                warningBox.text = "The selected Laser Beam visual preset ID does not exist in the currently authored Gameplay Visual Presets. Runtime will fall back to the default beam colors until a matching ID is added.";
                 warningBox.style.display = DisplayStyle.Flex;
             }
             else

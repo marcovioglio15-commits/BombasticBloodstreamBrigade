@@ -90,7 +90,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         if (panel == null)
             return;
 
-        VisualElement sectionContainer = CreateDetailsSectionContainer(panel, "Visual");
+        VisualElement sectionContainer = CreateDetailsSectionContainer(panel, "Gameplay Visual");
 
         if (sectionContainer == null)
             return;
@@ -127,10 +127,6 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                "Outline",
                                BuildOutlineSubSection(panel));
         AddVisualSubSectionTab(panel,
-                               EnemyVisualPresetsPanel.VisualSubSectionType.Footprint,
-                               "Footprint UI",
-                               EnemyVisualPresetsPanelFootprintSectionUtility.BuildFootprintSubSection(panel));
-        AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.DamageFeedback,
                                "Damage Feedback",
                                BuildDamageFeedbackSubSection(panel));
@@ -150,14 +146,6 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
                                EnemyVisualPresetsPanel.VisualSubSectionType.SpawnOverrides,
                                "Spawn Overrides",
                                BuildSpawnOverridesSubSection(panel));
-        AddVisualSubSectionTab(panel,
-                               EnemyVisualPresetsPanel.VisualSubSectionType.BossUi,
-                               "Boss UI",
-                               BuildBossUiSubSection(panel));
-        AddVisualSubSectionTab(panel,
-                               EnemyVisualPresetsPanel.VisualSubSectionType.ProjectileOffscreenWarning,
-                               "Projectile Warnings",
-                               BuildProjectileOffscreenWarningSubSection(panel));
 
         if (!panel.VisualSubSectionTabs.ContainsKey(panel.ActiveVisualSubSection))
             panel.ActiveVisualSubSection = EnemyVisualPresetsPanel.VisualSubSectionType.Visibility;
@@ -222,7 +210,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         return foldout;
     }
 
-    internal static void AddPropertyField(EnemyVisualPresetsPanel panel,
+    internal static void AddPropertyField(IEnemyVisualPresetEditorPanel panel,
                                           VisualElement target,
                                           SerializedProperty parentProperty,
                                           string relativePropertyName,
@@ -417,7 +405,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         return container;
     }
 
-    private static VisualElement BuildBossUiSubSection(EnemyVisualPresetsPanel panel)
+    internal static VisualElement BuildBossUiSubSection(IEnemyVisualPresetEditorPanel panel)
     {
         SerializedProperty bossUiProperty = panel.PresetSerializedObject.FindProperty("bossUi");
         VisualElement container = CreateSubSectionContainer("Boss UI");
@@ -488,7 +476,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// </summary>
     /// <param name="panel">Visual preset panel that owns the serialized preset context.</param>
     /// <returns>Projectile offscreen-warning subsection content.</returns>
-    private static VisualElement BuildProjectileOffscreenWarningSubSection(EnemyVisualPresetsPanel panel)
+    internal static VisualElement BuildProjectileOffscreenWarningSubSection(IEnemyVisualPresetEditorPanel panel)
     {
         SerializedProperty warningProperty = panel.PresetSerializedObject.FindProperty("projectileOffscreenWarning");
         VisualElement container = CreateSubSectionContainer("Projectile Warnings");
@@ -530,7 +518,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         target.Add(sectionLabel);
     }
 
-    internal static void AddSliderField(EnemyVisualPresetsPanel panel,
+    internal static void AddSliderField(IEnemyVisualPresetEditorPanel panel,
                                         VisualElement target,
                                         SerializedProperty property,
                                         string label,
@@ -573,7 +561,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="property">Serialized boolean property.</param>
     /// <param name="label">Visible control label.</param>
     /// <param name="tooltip">Tooltip explaining the setting.</param>
-    internal static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
+    internal static void AddReactiveToggleField(IEnemyVisualPresetEditorPanel panel,
                                                 VisualElement target,
                                                 SerializedProperty property,
                                                 string label,
@@ -591,7 +579,7 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
     /// <param name="label">Visible control label.</param>
     /// <param name="tooltip">Tooltip explaining the setting.</param>
     /// <param name="undoLabel">Undo label used for the serialized edit.</param>
-    internal static void AddReactiveToggleField(EnemyVisualPresetsPanel panel,
+    internal static void AddReactiveToggleField(IEnemyVisualPresetEditorPanel panel,
                                                 VisualElement target,
                                                 SerializedProperty property,
                                                 string label,

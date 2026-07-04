@@ -270,6 +270,8 @@ public static class PlayerManagementDraftSession
         AddAssetPathsOfType<PlayerPowerUpsPreset>(uniquePaths, TrackedPlayerAssetsRoot);
         AddAssetPathsOfType<PlayerVisualPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
         AddAssetPathsOfType<PlayerVisualPreset>(uniquePaths, TrackedPlayerAssetsRoot);
+        AddAssetPathsOfType<PlayerUiVisualPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
+        AddAssetPathsOfType<PlayerUiVisualPreset>(uniquePaths, TrackedPlayerAssetsRoot);
         AddAssetPathsOfType<PlayerAnimationBindingsPreset>(uniquePaths, TrackedPlayerAssetsRoot);
         AddAssetPathsOfType<InputActionAsset>(uniquePaths, TrackedProjectRoot);
         AddPlayerPrefabPaths(uniquePaths);
@@ -484,6 +486,9 @@ public static class PlayerManagementDraftSession
         if (assetObject is PlayerVisualPreset)
             return true;
 
+        if (assetObject is PlayerUiVisualPreset)
+            return true;
+
         if (assetObject is PlayerAnimationBindingsPreset)
             return true;
 
@@ -622,6 +627,11 @@ public static class PlayerManagementDraftSession
         PlayerVisualPresetLibrary visualLibrary = PlayerVisualPresetLibraryUtility.GetOrCreateLibrary();
 
         if (LibraryContainsPath(visualLibrary.Presets, assetPath))
+            return true;
+
+        PlayerUiVisualPresetLibrary uiVisualLibrary = PlayerUiVisualPresetLibraryUtility.GetOrCreateLibrary();
+
+        if (LibraryContainsPath(uiVisualLibrary.Presets, assetPath))
             return true;
 
         return false;

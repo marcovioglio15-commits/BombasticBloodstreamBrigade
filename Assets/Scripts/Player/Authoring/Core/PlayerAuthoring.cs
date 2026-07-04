@@ -383,7 +383,9 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerProgressionPreset progressionPreset = authoring.GetProgressionPreset();
         PlayerPowerUpsPreset powerUpsPreset = authoring.GetPowerUpsPreset();
         PlayerVisualPreset visualPreset = authoring.MasterPreset != null ? authoring.MasterPreset.VisualPreset : null;
+        PlayerUiVisualPreset uiVisualPreset = authoring.MasterPreset != null ? authoring.MasterPreset.UiVisualPreset : null;
         PlayerVisualPreset sourceVisualPreset = visualPreset;
+        PlayerUiVisualPreset sourceUiVisualPreset = uiVisualPreset;
         PlayerProgressionPreset sourceProgressionPreset = progressionPreset;
         PlayerPowerUpsPreset sourcePowerUpsPreset = powerUpsPreset;
         PlayerAnimationBindingsPreset animationBindingsPreset = authoring.MasterPreset != null ? authoring.MasterPreset.AnimationBindingsPreset : null;
@@ -393,16 +395,25 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                                progressionPreset,
                                                                                                powerUpsPreset,
                                                                                                visualPreset,
+                                                                                               uiVisualPreset,
                                                                                                animationBindingsPreset);
         controllerPreset = scaledPresetScope.ControllerPreset;
         progressionPreset = scaledPresetScope.ProgressionPreset;
         powerUpsPreset = scaledPresetScope.PowerUpsPreset;
         visualPreset = scaledPresetScope.VisualPreset;
+        uiVisualPreset = scaledPresetScope.UiVisualPreset;
         animationBindingsPreset = scaledPresetScope.AnimationBindingsPreset;
 
         try
         {
 #endif
+
+        IPlayerUiVisualPresetData resolvedUiVisualPreset = uiVisualPreset != null
+            ? uiVisualPreset
+            : visualPreset;
+        IPlayerUiVisualPresetData sourceUiVisualPresetData = sourceUiVisualPreset != null
+            ? sourceUiVisualPreset
+            : sourceVisualPreset;
 
         // Create entity and build configuration blob
         Entity entity = GetEntity(TransformUsageFlags.Dynamic);
@@ -625,12 +636,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         {
             PlayerEntity = entity
         });
-        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildConfig(visualPreset));
-        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildConfig(resolvedUiVisualPreset));
+        AddComponent(healthBarVisualEntity, PlayerHealthBarVisualBakeUtility.BuildBaseConfig(sourceUiVisualPresetData));
         AddComponent(healthBarVisualEntity, new PlayerHealthBarVisualScalingState());
         DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> healthBarVisualScalingBuffer = AddBuffer<PlayerRuntimeHealthBarVisualScalingElement>(healthBarVisualEntity);
 #if UNITY_EDITOR
-        PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(sourceVisualPreset,
+        PlayerRuntimeScalingVisualBakeUtility.PopulateHealthBarVisualScalingMetadata(sourceUiVisualPresetData,
                                                                                      healthBarVisualScalingBuffer);
 #endif
 
@@ -645,12 +656,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         {
             PlayerEntity = entity
         });
-        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(visualPreset));
-        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(resolvedUiVisualPreset));
+        AddComponent(activePowerUpHudVisualEntity, PlayerActivePowerUpHudVisualBakeUtility.BuildBaseConfig(sourceUiVisualPresetData));
         AddComponent(activePowerUpHudVisualEntity, new PlayerActivePowerUpHudVisualScalingState());
         DynamicBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement> activePowerUpHudVisualScalingBuffer = AddBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement>(activePowerUpHudVisualEntity);
 #if UNITY_EDITOR
-        PlayerRuntimeScalingVisualBakeUtility.PopulateActivePowerUpHudVisualScalingMetadata(sourceVisualPreset,
+        PlayerRuntimeScalingVisualBakeUtility.PopulateActivePowerUpHudVisualScalingMetadata(sourceUiVisualPresetData,
                                                                                            activePowerUpHudVisualScalingBuffer);
 #endif
 
@@ -665,20 +676,20 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         {
             PlayerEntity = entity
         });
-        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildPortraitConfig(visualPreset));
-        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildBasePortraitConfig(sourceVisualPreset));
+        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildPortraitConfig(resolvedUiVisualPreset));
+        AddComponent(portraitHudVisualEntity, PlayerHudPortraitGrowthVisualBakeUtility.BuildBasePortraitConfig(sourceUiVisualPresetData));
         AddComponent(portraitHudVisualEntity, new PlayerPortraitHudVisualScalingState());
         DynamicBuffer<PlayerPortraitHudAnimationElement> portraitAnimationBuffer = AddBuffer<PlayerPortraitHudAnimationElement>(portraitHudVisualEntity);
         DynamicBuffer<PlayerBasePortraitHudAnimationElement> basePortraitAnimationBuffer = AddBuffer<PlayerBasePortraitHudAnimationElement>(portraitHudVisualEntity);
         DynamicBuffer<PlayerPortraitHudFrameElement> portraitFrameBuffer = AddBuffer<PlayerPortraitHudFrameElement>(portraitHudVisualEntity);
         DynamicBuffer<PlayerRuntimePortraitHudVisualScalingElement> portraitHudScalingBuffer = AddBuffer<PlayerRuntimePortraitHudVisualScalingElement>(portraitHudVisualEntity);
-        PlayerHudPortraitGrowthVisualBakeUtility.PopulatePortraitBuffers(visualPreset,
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulatePortraitBuffers(resolvedUiVisualPreset,
                                                                          portraitAnimationBuffer,
                                                                          portraitFrameBuffer);
-        PlayerHudPortraitGrowthVisualBakeUtility.PopulateBasePortraitBuffers(sourceVisualPreset,
+        PlayerHudPortraitGrowthVisualBakeUtility.PopulateBasePortraitBuffers(sourceUiVisualPresetData,
                                                                              basePortraitAnimationBuffer);
 #if UNITY_EDITOR
-        PlayerRuntimeScalingVisualBakeUtility.PopulatePortraitHudVisualScalingMetadata(sourceVisualPreset,
+        PlayerRuntimeScalingVisualBakeUtility.PopulatePortraitHudVisualScalingMetadata(sourceUiVisualPresetData,
                                                                                        portraitHudScalingBuffer);
 #endif
 
@@ -693,20 +704,20 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         {
             PlayerEntity = entity
         });
-        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildGrowthSequenceConfig(visualPreset));
-        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildBaseGrowthSequenceConfig(sourceVisualPreset));
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildGrowthSequenceConfig(resolvedUiVisualPreset));
+        AddComponent(growthSequenceHudVisualEntity, PlayerHudGrowthSequenceVisualBakeUtility.BuildBaseGrowthSequenceConfig(sourceUiVisualPresetData));
         AddComponent(growthSequenceHudVisualEntity, new PlayerGrowthSequenceHudVisualScalingState());
         DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> growthSequenceStepBuffer = AddBuffer<PlayerGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
         DynamicBuffer<PlayerBaseGrowthSequenceHudStepVisualElement> baseGrowthSequenceStepBuffer = AddBuffer<PlayerBaseGrowthSequenceHudStepVisualElement>(growthSequenceHudVisualEntity);
         DynamicBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement> growthSequenceHudScalingBuffer = AddBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement>(growthSequenceHudVisualEntity);
-        PlayerHudGrowthSequenceVisualBakeUtility.PopulateGrowthSequenceBuffer(visualPreset,
+        PlayerHudGrowthSequenceVisualBakeUtility.PopulateGrowthSequenceBuffer(resolvedUiVisualPreset,
                                                                               progressionPreset,
                                                                               growthSequenceStepBuffer);
-        PlayerHudGrowthSequenceVisualBakeUtility.PopulateBaseGrowthSequenceBuffer(sourceVisualPreset,
+        PlayerHudGrowthSequenceVisualBakeUtility.PopulateBaseGrowthSequenceBuffer(sourceUiVisualPresetData,
                                                                                   sourceProgressionPreset,
                                                                                   baseGrowthSequenceStepBuffer);
 #if UNITY_EDITOR
-        PlayerRuntimeScalingVisualBakeUtility.PopulateGrowthSequenceHudVisualScalingMetadata(sourceVisualPreset,
+        PlayerRuntimeScalingVisualBakeUtility.PopulateGrowthSequenceHudVisualScalingMetadata(sourceUiVisualPresetData,
                                                                                             growthSequenceHudScalingBuffer);
 #endif
 
@@ -1187,6 +1198,9 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
             if (masterPreset.VisualPreset != null)
                 DependsOn(masterPreset.VisualPreset);
+
+            if (masterPreset.UiVisualPreset != null)
+                DependsOn(masterPreset.UiVisualPreset);
 
             if (masterPreset.AnimationBindingsPreset != null)
                 DependsOn(masterPreset.AnimationBindingsPreset);

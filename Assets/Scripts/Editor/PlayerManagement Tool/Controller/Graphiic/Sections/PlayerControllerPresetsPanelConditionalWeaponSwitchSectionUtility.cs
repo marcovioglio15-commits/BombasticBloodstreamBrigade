@@ -609,7 +609,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
 
         if (!PlayerWeaponIdSelectorUtility.ContainsWeaponId(availableWeaponIds, weaponId))
         {
-            warningBox.text = "Weapon Id does not match any mountable entry in the registered Player Visual Presets.";
+            warningBox.text = "Weapon Id does not match any mountable entry in the registered Gameplay Visual Presets.";
             warningBox.style.display = DisplayStyle.Flex;
             return;
         }

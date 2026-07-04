@@ -17,7 +17,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// </summary>
     /// <param name="panel">Owning visual preset panel exposing the serialized preset and refresh hooks.</param>
     /// <returns>Subsection container with all footprint controls.</returns>
-    public static VisualElement BuildFootprintSubSection(EnemyVisualPresetsPanel panel)
+    public static VisualElement BuildFootprintSubSection(IEnemyVisualPresetEditorPanel panel)
     {
         SerializedProperty footprintProperty = panel.PresetSerializedObject.FindProperty("footprint");
         VisualElement container = EnemyVisualPresetsPanelSectionsUtility.CreateSubSectionContainer("Footprint UI");
@@ -84,7 +84,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// </summary>
     /// <param name="panel">Visual preset panel exposing the serialized preset.</param>
     /// <returns>True when ring controls should be hidden from the subsection.</returns>
-    private static bool ResolveRingsSuppressedByBossUi(EnemyVisualPresetsPanel panel)
+    private static bool ResolveRingsSuppressedByBossUi(IEnemyVisualPresetEditorPanel panel)
     {
         SerializedProperty bossUiProperty = panel.PresetSerializedObject.FindProperty("bossUi");
 
@@ -130,7 +130,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildShadowLayoutControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildShadowLayoutControls(IEnemyVisualPresetEditorPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 container,
@@ -160,7 +160,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildShadowProjectionControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildShadowProjectionControls(IEnemyVisualPresetEditorPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         SerializedProperty projectionModeProperty = footprintProperty.FindPropertyRelative("projectionMode");
 
@@ -196,7 +196,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildShadowAppearanceControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildShadowAppearanceControls(IEnemyVisualPresetEditorPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         EnemyVisualPresetsPanelSectionsUtility.AddPropertyField(panel,
                                                                 container,
@@ -226,7 +226,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildRingControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildRingControls(IEnemyVisualPresetEditorPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         Foldout layoutFoldout = CreateFootprintFoldout(footprintProperty,
                                                        "Ring Layout",
@@ -334,7 +334,7 @@ internal static class EnemyVisualPresetsPanelFootprintSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Container receiving the controls.</param>
     /// <param name="footprintProperty">Serialized footprint settings property.</param>
-    private static void BuildRingOrientationControls(EnemyVisualPresetsPanel panel, VisualElement container, SerializedProperty footprintProperty)
+    private static void BuildRingOrientationControls(IEnemyVisualPresetEditorPanel panel, VisualElement container, SerializedProperty footprintProperty)
     {
         SerializedProperty lockProperty = footprintProperty.FindPropertyRelative("lockRingsToWorld");
 

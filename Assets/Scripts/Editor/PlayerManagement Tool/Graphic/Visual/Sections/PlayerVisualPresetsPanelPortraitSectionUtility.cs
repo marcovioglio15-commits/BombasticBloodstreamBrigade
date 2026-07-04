@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the Player Visual Preset Portrait subsection with scalable animation timing and closed ID selectors.
+/// Builds the UI Visual Preset Portrait subsection with scalable animation timing and closed ID selectors.
 /// </summary>
 internal static class PlayerVisualPresetsPanelPortraitSectionUtility
 {
@@ -13,11 +13,11 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the complete Portrait visual-preset subsection.
+    /// Builds the complete Portrait UI visual-preset subsection.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized authoring data.</param>
     /// <returns>Configured Portrait subsection.</returns>
-    public static VisualElement Build(PlayerVisualPresetsPanel panel)
+    public static VisualElement Build(IPlayerVisualPresetEditorPanel panel)
     {
         Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Portrait",
                                                                         "NashCore.PlayerManagement.Visual.Portrait",
@@ -33,7 +33,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
 
         if (settings == null)
         {
-            root.Add(new HelpBox("Portrait settings are missing from the selected Player Visual Preset.",
+            root.Add(new HelpBox("Portrait settings are missing from the selected UI Visual Preset.",
                                  HelpBoxMessageType.Warning));
             return root;
         }
@@ -188,7 +188,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="parent">Parent container receiving the section.</param>
     /// <param name="entries">Serialized combo-rank animation array.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    private static void BuildComboRankAnimations(PlayerVisualPresetsPanel panel,
+    private static void BuildComboRankAnimations(IPlayerVisualPresetEditorPanel panel,
                                                  VisualElement parent,
                                                  SerializedProperty entries,
                                                  SerializedProperty scalingRules)
@@ -218,7 +218,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="parent">Parent container receiving the section.</param>
     /// <param name="entries">Serialized power-up animation array.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    private static void BuildPowerUpAnimations(PlayerVisualPresetsPanel panel,
+    private static void BuildPowerUpAnimations(IPlayerVisualPresetEditorPanel panel,
                                                VisualElement parent,
                                                SerializedProperty entries,
                                                SerializedProperty scalingRules)
@@ -271,7 +271,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="selectorPropertyName">Relative string property used by the selector.</param>
     /// <param name="addButtonText">Text for the add-entry button.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
-    private static void BuildArrayEntries(PlayerVisualPresetsPanel panel,
+    private static void BuildArrayEntries(IPlayerVisualPresetEditorPanel panel,
                                           VisualElement parent,
                                           SerializedProperty entries,
                                           string entryTitle,
@@ -314,7 +314,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="parent">Parent container receiving selector rows.</param>
     /// <param name="powerUpIds">Serialized string array of power-up IDs.</param>
     /// <param name="options">Closed power-up options.</param>
-    private static void BuildPowerUpIdList(PlayerVisualPresetsPanel panel,
+    private static void BuildPowerUpIdList(IPlayerVisualPresetEditorPanel panel,
                                            VisualElement parent,
                                            SerializedProperty powerUpIds,
                                            List<string> options)
@@ -361,7 +361,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// </summary>
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="entries">Serialized array to mutate.</param>
-    private static void AddArrayEntry(PlayerVisualPresetsPanel panel, SerializedProperty entries)
+    private static void AddArrayEntry(IPlayerVisualPresetEditorPanel panel, SerializedProperty entries)
     {
         if (entries == null)
             return;
@@ -379,7 +379,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="entries">Serialized array to mutate.</param>
     /// <param name="entryIndex">Entry index to remove.</param>
     /// <param name="label">Button text.</param>
-    private static void AddRemoveButton(PlayerVisualPresetsPanel panel,
+    private static void AddRemoveButton(IPlayerVisualPresetEditorPanel panel,
                                         VisualElement parent,
                                         SerializedProperty entries,
                                         int entryIndex,
@@ -464,7 +464,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// <param name="property">Serialized string property to update.</param>
     /// <param name="options">Closed selector options.</param>
     /// <param name="label">Field label.</param>
-    private static void BuildClosedStringSelector(PlayerVisualPresetsPanel panel,
+    private static void BuildClosedStringSelector(IPlayerVisualPresetEditorPanel panel,
                                                   VisualElement parent,
                                                   SerializedProperty property,
                                                   List<string> options,
@@ -571,7 +571,7 @@ internal static class PlayerVisualPresetsPanelPortraitSectionUtility
     /// Applies serialized changes and marks the draft session dirty.
     /// </summary>
     /// <param name="panel">Owning visual preset panel.</param>
-    private static void Apply(PlayerVisualPresetsPanel panel)
+    private static void Apply(IPlayerVisualPresetEditorPanel panel)
     {
         if (panel == null || panel.PresetSerializedObject == null)
             return;

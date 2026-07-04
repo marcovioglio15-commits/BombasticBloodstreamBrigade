@@ -2,7 +2,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Builds safe ECS active power-up HUD visual configurations from Player Visual Preset authoring data.
+/// Builds safe ECS active power-up HUD visual configurations from Player UI visual preset authoring data.
 /// </summary>
 public static class PlayerActivePowerUpHudVisualBakeUtility
 {
@@ -10,11 +10,11 @@ public static class PlayerActivePowerUpHudVisualBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the runtime active power-up HUD visual configuration from the currently scaled visual preset.
+    /// Builds the runtime active power-up HUD visual configuration from the currently scaled UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Scaled visual preset currently used by the baker.</param>
+    /// <param name="visualPreset">Scaled UI visual preset currently used by the baker.</param>
     /// <returns>Safe runtime active power-up HUD visual configuration.</returns>
-    public static PlayerActivePowerUpHudVisualConfig BuildConfig(PlayerVisualPreset visualPreset)
+    public static PlayerActivePowerUpHudVisualConfig BuildConfig(IPlayerUiVisualPresetData visualPreset)
     {
         PlayerActivePowerUpHudVisualSettings settings = visualPreset != null && visualPreset.ActivePowerUpHud != null
             ? visualPreset.ActivePowerUpHud
@@ -63,11 +63,11 @@ public static class PlayerActivePowerUpHudVisualBakeUtility
     }
 
     /// <summary>
-    /// Builds the immutable active power-up HUD visual baseline from the unscaled source visual preset.
+    /// Builds the immutable active power-up HUD visual baseline from the unscaled source UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <returns>Immutable active power-up HUD visual baseline.</returns>
-    public static PlayerBaseActivePowerUpHudVisualConfig BuildBaseConfig(PlayerVisualPreset visualPreset)
+    public static PlayerBaseActivePowerUpHudVisualConfig BuildBaseConfig(IPlayerUiVisualPresetData visualPreset)
     {
         return new PlayerBaseActivePowerUpHudVisualConfig
         {

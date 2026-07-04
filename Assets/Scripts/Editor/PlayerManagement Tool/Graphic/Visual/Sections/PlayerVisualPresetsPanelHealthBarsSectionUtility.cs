@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds scalable and conditionally visible Player Visual Preset controls for health, shield, and experience syringe HUD views.
+/// Builds scalable and conditionally visible UI Visual Preset controls for health, shield, and experience syringe HUD views.
 /// </summary>
 internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 {
@@ -12,11 +12,11 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the complete Health Bars & Experience visual-preset subsection.
+    /// Builds the complete Health Bars & Experience UI visual-preset subsection.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized authoring data.</param>
     /// <returns>Configured Health Bars subsection.</returns>
-    public static VisualElement Build(PlayerVisualPresetsPanel panel)
+    public static VisualElement Build(IPlayerVisualPresetEditorPanel panel)
     {
         Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Health Bars & Experience",
                                                                         "NashCore.PlayerManagement.Visual.HealthBarsExperience",
@@ -32,7 +32,7 @@ internal static class PlayerVisualPresetsPanelHealthBarsSectionUtility
 
         if (settings == null)
         {
-            root.Add(new HelpBox("Health Bars settings are missing from the selected Player Visual Preset.",
+            root.Add(new HelpBox("Health Bars settings are missing from the selected UI Visual Preset.",
                                  HelpBoxMessageType.Warning));
             return root;
         }

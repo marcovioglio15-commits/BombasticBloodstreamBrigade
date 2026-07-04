@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8a3676f5c454fa6b1e2b69f68847a3a, type: 3}
+  m_Name: EnemyUiVisualPresetLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyUiVisualPresetLibrary
+  presets:
+  - {fileID: 11400000, guid: 73bab68d52764cabad411efb35cf79bb, type: 2}
+  - {fileID: 11400000, guid: c27fc40d716a4d8aa11b3dd9c5d99656, type: 2}
+  - {fileID: 11400000, guid: aa8cfe84f89d43a6be3aca3bb9b71d4a, type: 2}
+  - {fileID: 11400000, guid: 68c5644d545a4ae8a042eccabea61396, type: 2}
+  - {fileID: 11400000, guid: 21eb11152d2d4a32a06808bdece1837c, type: 2}
+  - {fileID: 11400000, guid: 3ee3a6bdb2be463981a9e6790a12c931, type: 2}
+  - {fileID: 11400000, guid: 206f68f1eeb34d2b9c38a5c70b32ae40, type: 2}
+  - {fileID: 11400000, guid: 9afe0ac4e364431c8c4b8740c0a7ef5a, type: 2}
+  - {fileID: 11400000, guid: 603331818be746e79f52a2299d9c8553, type: 2}
+  - {fileID: 11400000, guid: 0d41c9c3d9cc42b388120b7fba62da0f, type: 2}

@@ -40,6 +40,39 @@ public static class EnemyAuthoringPresetResolverUtility
         return fallbackVisualPreset;
     }
 
+    /// <summary>
+    /// Resolves the active enemy UI visual preset from the master preset or direct authoring fallback.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override the direct UI visual preset.</param>
+    /// <param name="fallbackUiVisualPreset">Fallback UI visual preset assigned directly on the authoring component.</param>
+    /// <returns>Resolved UI visual preset, or null when no UI visual preset is available.</returns>
+    public static EnemyUiVisualPreset ResolveUiVisualPreset(EnemyMasterPreset masterPreset, EnemyUiVisualPreset fallbackUiVisualPreset)
+    {
+        if (masterPreset != null && masterPreset.UiVisualPreset != null)
+            return masterPreset.UiVisualPreset;
+
+        return fallbackUiVisualPreset;
+    }
+
+    /// <summary>
+    /// Resolves UI visual data from the new UI visual preset, falling back to legacy visual preset data for non-migrated assets.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override direct fallback presets.</param>
+    /// <param name="fallbackUiVisualPreset">Fallback UI visual preset assigned directly on the authoring component.</param>
+    /// <param name="legacyFallbackVisualPreset">Legacy gameplay visual preset used only when no UI visual preset is assigned.</param>
+    /// <returns>Resolved UI visual data, or null when no compatible preset is available.</returns>
+    public static IEnemyUiVisualPresetData ResolveUiVisualPresetData(EnemyMasterPreset masterPreset,
+                                                                     EnemyUiVisualPreset fallbackUiVisualPreset,
+                                                                     EnemyVisualPreset legacyFallbackVisualPreset)
+    {
+        EnemyUiVisualPreset resolvedUiVisualPreset = ResolveUiVisualPreset(masterPreset, fallbackUiVisualPreset);
+
+        if (resolvedUiVisualPreset != null)
+            return resolvedUiVisualPreset;
+
+        return ResolveVisualPreset(masterPreset, legacyFallbackVisualPreset);
+    }
+
     public static EnemyBrainMovementSettings ResolveMovementSettings(EnemyMasterPreset masterPreset, EnemyBrainPreset fallbackBrainPreset)
     {
         EnemyBrainPreset resolvedBrainPreset = ResolveBrainPreset(masterPreset, fallbackBrainPreset);
@@ -150,6 +183,69 @@ public static class EnemyAuthoringPresetResolverUtility
             return null;
 
         return resolvedVisualPreset.Footprint;
+    }
+
+    /// <summary>
+    /// Resolves ground-footprint settings from the active UI visual preset, with legacy visual fallback for older assets.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override direct fallback presets.</param>
+    /// <param name="fallbackUiVisualPreset">Fallback UI visual preset assigned directly on the authoring component.</param>
+    /// <param name="legacyFallbackVisualPreset">Legacy gameplay visual preset used only when no UI visual preset is assigned.</param>
+    /// <returns>Footprint settings, or null when no compatible preset is available.</returns>
+    public static EnemyVisualFootprintSettings ResolveFootprintSettings(EnemyMasterPreset masterPreset,
+                                                                        EnemyUiVisualPreset fallbackUiVisualPreset,
+                                                                        EnemyVisualPreset legacyFallbackVisualPreset)
+    {
+        IEnemyUiVisualPresetData resolvedUiVisualPreset = ResolveUiVisualPresetData(masterPreset,
+                                                                                   fallbackUiVisualPreset,
+                                                                                   legacyFallbackVisualPreset);
+
+        if (resolvedUiVisualPreset == null)
+            return null;
+
+        return resolvedUiVisualPreset.Footprint;
+    }
+
+    /// <summary>
+    /// Resolves boss HUD settings from the active UI visual preset, with legacy visual fallback for older assets.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override direct fallback presets.</param>
+    /// <param name="fallbackUiVisualPreset">Fallback UI visual preset assigned directly on the authoring component.</param>
+    /// <param name="legacyFallbackVisualPreset">Legacy gameplay visual preset used only when no UI visual preset is assigned.</param>
+    /// <returns>Boss HUD settings, or null when no compatible preset is available.</returns>
+    public static EnemyBossVisualUiSettings ResolveBossUiSettings(EnemyMasterPreset masterPreset,
+                                                                  EnemyUiVisualPreset fallbackUiVisualPreset,
+                                                                  EnemyVisualPreset legacyFallbackVisualPreset)
+    {
+        IEnemyUiVisualPresetData resolvedUiVisualPreset = ResolveUiVisualPresetData(masterPreset,
+                                                                                   fallbackUiVisualPreset,
+                                                                                   legacyFallbackVisualPreset);
+
+        if (resolvedUiVisualPreset == null)
+            return null;
+
+        return resolvedUiVisualPreset.BossUi;
+    }
+
+    /// <summary>
+    /// Resolves projectile offscreen-warning settings from the active UI visual preset, with legacy visual fallback for older assets.
+    /// </summary>
+    /// <param name="masterPreset">Optional master preset that can override direct fallback presets.</param>
+    /// <param name="fallbackUiVisualPreset">Fallback UI visual preset assigned directly on the authoring component.</param>
+    /// <param name="legacyFallbackVisualPreset">Legacy gameplay visual preset used only when no UI visual preset is assigned.</param>
+    /// <returns>Projectile offscreen-warning settings, or null when no compatible preset is available.</returns>
+    public static EnemyProjectileOffscreenWarningSettings ResolveProjectileOffscreenWarningSettings(EnemyMasterPreset masterPreset,
+                                                                                                    EnemyUiVisualPreset fallbackUiVisualPreset,
+                                                                                                    EnemyVisualPreset legacyFallbackVisualPreset)
+    {
+        IEnemyUiVisualPresetData resolvedUiVisualPreset = ResolveUiVisualPresetData(masterPreset,
+                                                                                   fallbackUiVisualPreset,
+                                                                                   legacyFallbackVisualPreset);
+
+        if (resolvedUiVisualPreset == null)
+            return null;
+
+        return resolvedUiVisualPreset.ProjectileOffscreenWarning;
     }
 
     public static EnemyOffensiveEngagementFeedbackSettings ResolveOffensiveEngagementFeedbackSettings(EnemyMasterPreset masterPreset,

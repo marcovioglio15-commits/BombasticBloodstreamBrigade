@@ -241,6 +241,7 @@ MonoBehaviour:
       clampPlungerStartInsideBody: 1
       clampPlungerEndInsideBody: 0
       stopLiquidAtPlunger: 1
+      terminationEnabled: 1
       endCapWidth: 20
       terminationOffset: 10
       terminationStyle: 1
@@ -298,6 +299,13 @@ MonoBehaviour:
           valueImpulseEnabled: 1
           valueImpulseStrength: 1
           valueImpulseDecay: 1
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
       shield:
         enabled: 1
         hideWhenMaximumUnavailable: 1
@@ -346,7 +354,49 @@ MonoBehaviour:
           valueImpulseEnabled: 1
           valueImpulseStrength: 1
           valueImpulseDecay: 1
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
       experiencePalettePreset: 5
+      experienceShape:
+        unitsPerMajorDivision: 1
+        pixelsPerMajorDivision: 46
+        graduationMode: 1
+        uniformLabelCount: 5
+        minimumLength: 260
+        maximumLength: 620
+        minorDivisionsPerMajor: 1
+        labelEveryMajorDivision: 1
+        maximumLabelCount: 24
+        labelMinimumSpacing: 40
+        graduationEndPadding: 0
+        labelPlacement: 0
+        labelFontSize: 15
+        labelOffset: {x: 0, y: 0}
+        labelOutlineWidth: 0.12
+        graduationVerticalOffset: 0
+        bodyStyle: 0
+        barHeight: 58
+        outlineThickness: 0.035
+        chamberInset: 0.16
+        plungerWidth: 0.032
+        clampPlungerStartInsideBody: 1
+        clampPlungerEndInsideBody: 0
+        stopLiquidAtPlunger: 1
+        terminationEnabled: 1
+        endCapWidth: 30
+        terminationOffset: 4
+        terminationStyle: 1
+        paintDrips:
+          enabled: 0
+          density: 0.38
+          length: 0.1
+          width: 0.018
+          irregularity: 0.65
       experience:
         enabled: 1
         hideWhenMaximumUnavailable: 1
@@ -395,6 +445,13 @@ MonoBehaviour:
           valueImpulseEnabled: 1
           valueImpulseStrength: 0.65
           valueImpulseDecay: 7
+        outlineStyle:
+          enabled: 0
+          edgeWobbleStrength: 0.35
+          edgeWobbleFrequency: 16
+          innerStreakStrength: 0.25
+          innerStreakDensity: 0.3
+          innerStreakLength: 0.16
     offscreenIndicatorSprite: {fileID: 21300000, guid: 53d6eb3725de4164185265b18768cfdf, type: 3}
     offscreenIndicatorColor: {r: 0.02114594, g: 1, b: 0, a: 0.95}
     offscreenIndicatorSizePixels: 100

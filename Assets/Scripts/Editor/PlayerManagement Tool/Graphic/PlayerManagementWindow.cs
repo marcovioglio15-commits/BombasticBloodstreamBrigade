@@ -149,7 +149,7 @@ public sealed class PlayerManagementWindow : EditorWindow
         // Create toolbar root and the main panel toggle.
         Toolbar toolbar = new Toolbar();
 
-        ToolbarToggle masterToggle = CreatePanelToggle("Player Master Presets", PanelType.PlayerMasterPresets, true);
+        ToolbarToggle masterToggle = CreatePanelToggle("Master Presets", PanelType.PlayerMasterPresets, true);
         toolbar.Add(masterToggle);
 
         // Add flex spacer before action controls.
@@ -317,10 +317,10 @@ public sealed class PlayerManagementWindow : EditorWindow
     private string GetPanelLabel(PanelType panelType)
     {
         if (panelType == PanelType.PlayerMasterPresets)
-            return "Player Master Presets";
+            return "Master Presets";
 
         if (panelType == PanelType.PlayerControllerPresets)
-            return "Player Controller Presets";
+            return "Controller Presets";
 
         if (panelType == PanelType.LevelUpProgression)
             return "Level-Up & Progression";
@@ -329,7 +329,10 @@ public sealed class PlayerManagementWindow : EditorWindow
             return "Power-Ups";
 
         if (panelType == PanelType.PlayerVisualPresets)
-            return "Visual Presets";
+            return "Gameplay Visual Preset";
+
+        if (panelType == PanelType.PlayerUiVisualPresets)
+            return "UI Visual Preset";
 
         return "Animation Bindings";
     }
@@ -437,7 +440,8 @@ public sealed class PlayerManagementWindow : EditorWindow
         LevelUpProgression = 2,
         PowerUps = 3,
         AnimationBindings = 4,
-        PlayerVisualPresets = 5
+        PlayerVisualPresets = 5,
+        PlayerUiVisualPresets = 6
     }
     #endregion
 }

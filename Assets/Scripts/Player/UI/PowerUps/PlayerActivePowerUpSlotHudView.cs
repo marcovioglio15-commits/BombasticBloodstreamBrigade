@@ -30,8 +30,14 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
 
     #if UNITY_EDITOR
     [Header("Editor Preview")]
-    [Tooltip("Player Visual Preset used to render this active slot outside Play Mode through the same configuration builder used at runtime.")]
-    [SerializeField] private PlayerVisualPreset editorPreviewPreset;
+    [Tooltip("Player UI Visual Preset used to render this active slot outside Play Mode through the same configuration builder used at runtime.")]
+    [SerializeField]
+    private PlayerUiVisualPreset editorPreviewUiPreset;
+
+    [Tooltip("Legacy Player Visual Preset fallback used only by older prefabs that have not assigned an Editor Preview UI Preset yet.")]
+    [SerializeField]
+    [HideInInspector]
+    private PlayerVisualPreset editorPreviewPreset;
 
     [Tooltip("Current energy shown only by the Edit Mode preview.")]
     [Min(0f)]
@@ -284,10 +290,12 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
     /// </summary>
     public void RefreshEditorPreview()
     {
-        if (Application.isPlaying || !isActiveAndEnabled || editorPreviewPreset == null)
+        IPlayerUiVisualPresetData previewPreset = ResolveEditorPreviewVisualPreset();
+
+        if (Application.isPlaying || !isActiveAndEnabled || previewPreset == null)
             return;
 
-        PlayerActivePowerUpHudVisualConfig previewConfig = PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(editorPreviewPreset);
+        PlayerActivePowerUpHudVisualConfig previewConfig = PlayerActivePowerUpHudVisualBakeUtility.BuildConfig(previewPreset);
         float safeMaximum = Mathf.Max(0.0001f, editorPreviewEnergyMaximum);
         float requirementNormalized = Mathf.Clamp01(editorPreviewActivationRequirement / safeMaximum);
         ApplyConfiguration(in previewConfig);
@@ -301,6 +309,18 @@ public sealed class PlayerActivePowerUpSlotHudView : MonoBehaviour
         UpdateCooldown(editorPreviewCooldownProgress);
         EditorApplication.QueuePlayerLoopUpdate();
         SceneView.RepaintAll();
+    }
+
+    /// <summary>
+    /// Resolves the UI visual preset data used by Edit Mode preview without creating runtime entities.
+    /// </summary>
+    /// <returns>Player UI visual preset data used by preview, or null when no source is assigned.</returns>
+    private IPlayerUiVisualPresetData ResolveEditorPreviewVisualPreset()
+    {
+        if (editorPreviewUiPreset != null)
+            return editorPreviewUiPreset;
+
+        return editorPreviewPreset;
     }
 
     /// <summary>

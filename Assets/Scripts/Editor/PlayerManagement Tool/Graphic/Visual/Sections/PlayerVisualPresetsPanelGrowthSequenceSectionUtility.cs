@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the Player Visual Preset Growth Sequence subsection and synchronizes entries from progression schedules.
+/// Builds the UI Visual Preset Growth Sequence subsection and synchronizes entries from progression schedules.
 /// </summary>
 internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 {
@@ -13,11 +13,11 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the complete Growth Sequence visual-preset subsection.
+    /// Builds the complete Growth Sequence UI visual-preset subsection.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized authoring data.</param>
     /// <returns>Configured Growth Sequence subsection.</returns>
-    public static VisualElement Build(PlayerVisualPresetsPanel panel)
+    public static VisualElement Build(IPlayerVisualPresetEditorPanel panel)
     {
         Foldout root = ManagementToolFoldoutStateUtility.CreateFoldout("Growth Sequence",
                                                                         "NashCore.PlayerManagement.Visual.GrowthSequence",
@@ -33,7 +33,7 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
 
         if (settings == null)
         {
-            root.Add(new HelpBox("Growth Sequence settings are missing from the selected Player Visual Preset.",
+            root.Add(new HelpBox("Growth Sequence settings are missing from the selected UI Visual Preset.",
                                  HelpBoxMessageType.Warning));
             return root;
         }
@@ -240,7 +240,7 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="parent">Parent container receiving the button.</param>
     /// <param name="schedules">Serialized growth schedule visual array.</param>
-    private static void AddSyncButton(PlayerVisualPresetsPanel panel,
+    private static void AddSyncButton(IPlayerVisualPresetEditorPanel panel,
                                       VisualElement parent,
                                       SerializedProperty schedules)
     {
@@ -265,7 +265,7 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     /// </summary>
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="schedules">Serialized growth schedule visual array.</param>
-    private static void SyncFromProgression(PlayerVisualPresetsPanel panel, SerializedProperty schedules)
+    private static void SyncFromProgression(IPlayerVisualPresetEditorPanel panel, SerializedProperty schedules)
     {
         PlayerProgressionPreset progressionPreset = PlayerManagementSelectionContext.ActiveProgressionPreset;
 

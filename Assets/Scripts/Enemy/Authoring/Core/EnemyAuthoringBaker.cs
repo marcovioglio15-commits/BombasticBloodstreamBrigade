@@ -799,14 +799,14 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <returns>Baked boss HUD config component.</returns>
     private static EnemyBossHudConfig BuildBossHudConfig(EnemyAuthoring authoring)
     {
-        EnemyVisualPreset visualPreset = authoring != null ? authoring.VisualPreset : null;
-        EnemyBossVisualUiSettings bossUi = visualPreset != null ? visualPreset.BossUi : null;
+        IEnemyUiVisualPresetData uiVisualPreset = ResolveUiVisualPresetData(authoring);
+        EnemyBossVisualUiSettings bossUi = uiVisualPreset != null ? uiVisualPreset.BossUi : null;
         string displayName = "Boss";
 
         if (bossUi != null && !string.IsNullOrWhiteSpace(bossUi.BossDisplayName))
             displayName = bossUi.BossDisplayName;
-        else if (visualPreset != null && !string.IsNullOrWhiteSpace(visualPreset.PresetName))
-            displayName = visualPreset.PresetName;
+        else if (uiVisualPreset != null && !string.IsNullOrWhiteSpace(uiVisualPreset.PresetName))
+            displayName = uiVisualPreset.PresetName;
 
         Color offscreenIndicatorColor = bossUi != null ? bossUi.OffscreenIndicatorColor : new Color(1f, 0.2f, 0.1f, 0.95f);
         Color portraitColor = bossUi != null ? bossUi.PortraitColor : Color.white;
@@ -839,8 +839,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
     /// <returns>Baked projectile offscreen-warning config component.</returns>
     private static EnemyProjectileOffscreenWarningConfig BuildProjectileOffscreenWarningConfig(EnemyAuthoring authoring)
     {
-        EnemyVisualPreset visualPreset = authoring != null ? authoring.VisualPreset : null;
-        EnemyProjectileOffscreenWarningSettings warningSettings = visualPreset != null ? visualPreset.ProjectileOffscreenWarning : null;
+        IEnemyUiVisualPresetData uiVisualPreset = ResolveUiVisualPresetData(authoring);
+        EnemyProjectileOffscreenWarningSettings warningSettings = uiVisualPreset != null ? uiVisualPreset.ProjectileOffscreenWarning : null;
         Color indicatorColor = warningSettings != null ? warningSettings.IndicatorColor : new Color(1f, 0.48f, 0.05f, 0.95f);
 
         return new EnemyProjectileOffscreenWarningConfig
@@ -862,20 +862,21 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         if (authoring == null)
             return;
 
-        EnemyVisualPreset visualPreset = authoring.VisualPreset;
+        IEnemyUiVisualPresetData uiVisualPreset = ResolveUiVisualPresetData(authoring);
+        EnemyProjectileOffscreenWarningSettings warningSettings = uiVisualPreset != null ? uiVisualPreset.ProjectileOffscreenWarning : null;
 
-        if (visualPreset == null || visualPreset.ProjectileOffscreenWarning == null)
+        if (warningSettings == null)
             return;
 
-        if (!visualPreset.ProjectileOffscreenWarning.Enabled)
+        if (!warningSettings.Enabled)
             return;
 
-        if (visualPreset.ProjectileOffscreenWarning.IndicatorSprite == null)
+        if (warningSettings.IndicatorSprite == null)
             return;
 
         AddComponentObject(entity, new EnemyProjectileOffscreenWarningManagedConfig
         {
-            IndicatorSprite = visualPreset.ProjectileOffscreenWarning.IndicatorSprite
+            IndicatorSprite = warningSettings.IndicatorSprite
         });
     }
 
@@ -889,19 +890,35 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         if (authoring == null)
             return;
 
-        EnemyVisualPreset visualPreset = authoring.VisualPreset;
+        IEnemyUiVisualPresetData uiVisualPreset = ResolveUiVisualPresetData(authoring);
+        EnemyBossVisualUiSettings bossUi = uiVisualPreset != null ? uiVisualPreset.BossUi : null;
 
-        if (visualPreset == null || visualPreset.BossUi == null)
+        if (bossUi == null)
             return;
 
-        if (!HasBossHudManagedConfig(visualPreset.BossUi))
+        if (!HasBossHudManagedConfig(bossUi))
             return;
 
         AddComponentObject(entity, new EnemyBossHudManagedConfig
         {
-            OffscreenIndicatorSprite = visualPreset.BossUi.ShowOffscreenIndicator ? visualPreset.BossUi.OffscreenIndicatorSprite : null,
-            PortraitSprite = visualPreset.BossUi.ShowPortrait ? visualPreset.BossUi.PortraitSprite : null
+            OffscreenIndicatorSprite = bossUi.ShowOffscreenIndicator ? bossUi.OffscreenIndicatorSprite : null,
+            PortraitSprite = bossUi.ShowPortrait ? bossUi.PortraitSprite : null
         });
+    }
+
+    /// <summary>
+    /// Resolves enemy UI visual data for bake-time UI components, preserving legacy visual fallback for non-migrated assets.
+    /// </summary>
+    /// <param name="authoring">Source authoring component used to resolve master and fallback presets.</param>
+    /// <returns>Resolved enemy UI visual data, or null when no compatible preset is available.</returns>
+    private static IEnemyUiVisualPresetData ResolveUiVisualPresetData(EnemyAuthoring authoring)
+    {
+        if (authoring == null)
+            return null;
+
+        return EnemyAuthoringPresetResolverUtility.ResolveUiVisualPresetData(authoring.MasterPreset,
+                                                                            authoring.UiVisualPreset,
+                                                                            authoring.VisualPreset);
     }
 
     /// <summary>
@@ -930,6 +947,7 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         EnemyMasterPreset masterPreset = authoring.MasterPreset;
         EnemyBrainPreset brainPreset = authoring.BrainPreset;
         EnemyVisualPreset visualPreset = authoring.VisualPreset;
+        EnemyUiVisualPreset uiVisualPreset = authoring.UiVisualPreset;
         EnemyAdvancedPatternPreset advancedPatternPreset = authoring.AdvancedPatternPreset;
         EnemyBossPatternPreset bossPatternPreset = authoring.BossPatternPreset;
 
@@ -941,6 +959,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
 
         if (visualPreset != null)
             DependsOn(visualPreset);
+
+        if (uiVisualPreset != null)
+            DependsOn(uiVisualPreset);
 
         if (advancedPatternPreset != null)
         {
@@ -1145,12 +1166,12 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         if (authoring == null)
             return false;
 
-        EnemyVisualPreset visualPreset = authoring.VisualPreset;
+        IEnemyUiVisualPresetData uiVisualPreset = ResolveUiVisualPresetData(authoring);
 
-        if (visualPreset == null)
+        if (uiVisualPreset == null)
             return false;
 
-        EnemyBossVisualUiSettings bossUi = visualPreset.BossUi;
+        EnemyBossVisualUiSettings bossUi = uiVisualPreset.BossUi;
 
         if (bossUi == null || !bossUi.Enabled || !bossUi.ShowHealthBar)
             return false;

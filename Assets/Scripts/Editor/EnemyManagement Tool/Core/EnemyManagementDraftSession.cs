@@ -263,6 +263,8 @@ public static class EnemyManagementDraftSession
         AddAssetPathsOfType<EnemyBrainPreset>(uniquePaths, TrackedEnemyAssetsRoot);
         AddAssetPathsOfType<EnemyVisualPresetLibrary>(uniquePaths, TrackedEnemyAssetsRoot);
         AddAssetPathsOfType<EnemyVisualPreset>(uniquePaths, TrackedEnemyAssetsRoot);
+        AddAssetPathsOfType<EnemyUiVisualPresetLibrary>(uniquePaths, TrackedEnemyAssetsRoot);
+        AddAssetPathsOfType<EnemyUiVisualPreset>(uniquePaths, TrackedEnemyAssetsRoot);
         AddAssetPathsOfType<EnemyAdvancedPatternPresetLibrary>(uniquePaths, TrackedEnemyAssetsRoot);
         AddAssetPathsOfType<EnemyAdvancedPatternPreset>(uniquePaths, TrackedEnemyAssetsRoot);
         AddAssetPathsOfType<EnemyModulesAndPatternsPreset>(uniquePaths, TrackedEnemyAssetsRoot);
@@ -445,6 +447,9 @@ public static class EnemyManagementDraftSession
         if (assetObject is EnemyVisualPreset)
             return true;
 
+        if (assetObject is EnemyUiVisualPreset)
+            return true;
+
         if (assetObject is EnemyAdvancedPatternPreset)
             return true;
 
@@ -541,6 +546,11 @@ public static class EnemyManagementDraftSession
         EnemyVisualPresetLibrary visualLibrary = EnemyVisualPresetLibraryUtility.GetOrCreateLibrary();
 
         if (LibraryContainsPath(visualLibrary.Presets, assetPath))
+            return true;
+
+        EnemyUiVisualPresetLibrary uiVisualLibrary = EnemyUiVisualPresetLibraryUtility.GetOrCreateLibrary();
+
+        if (LibraryContainsPath(uiVisualLibrary.Presets, assetPath))
             return true;
 
         EnemyAdvancedPatternPresetLibrary advancedPatternLibrary = EnemyAdvancedPatternPresetLibraryUtility.GetOrCreateLibrary();

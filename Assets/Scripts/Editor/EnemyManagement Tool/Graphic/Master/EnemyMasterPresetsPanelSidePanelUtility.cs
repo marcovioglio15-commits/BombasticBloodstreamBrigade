@@ -46,14 +46,21 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
 
         EnemyBrainPresetsPanel brainPanel;
         EnemyVisualPresetsPanel visualPanel;
+        EnemyUiVisualPresetsPanel uiVisualPanel;
         EnemyAdvancedPatternPresetsPanel advancedPatternPanel;
         EnemyBossPatternPresetsPanel bossPatternPanel;
-        VisualElement content = BuildSidePanelContent(panel, panelType, out brainPanel, out visualPanel, out advancedPatternPanel, out bossPatternPanel);
+        VisualElement content = BuildSidePanelContent(panel,
+                                                      panelType,
+                                                      out brainPanel,
+                                                      out visualPanel,
+                                                      out uiVisualPanel,
+                                                      out advancedPatternPanel,
+                                                      out bossPatternPanel);
 
         if (content == null)
             return;
 
-        AddTab(panel, panelType, GetPanelTitle(panelType), content, brainPanel, visualPanel, advancedPatternPanel, bossPatternPanel);
+        AddTab(panel, panelType, GetPanelTitle(panelType), content, brainPanel, visualPanel, uiVisualPanel, advancedPatternPanel, bossPatternPanel);
         SetActivePanel(panel, panelType);
     }
 
@@ -93,19 +100,21 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     /// <returns>Returns the display title used by tab headers.</returns>
     public static string GetPanelTitle(EnemyManagementWindow.PanelType panelType)
     {
-        if (panelType == EnemyManagementWindow.PanelType.EnemyBrainPresets)
-            return "Enemy Brain Presets";
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyVisualPresets)
-            return "Enemy Visual Presets";
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets)
-            return "Enemy Advanced Pattern Presets";
-
-        if (panelType == EnemyManagementWindow.PanelType.EnemyBossPatternPresets)
-            return "Boss Patterns Presets";
-
-        return "Enemy Master Presets";
+        switch (panelType)
+        {
+            case EnemyManagementWindow.PanelType.EnemyBrainPresets:
+                return "Brain Presets";
+            case EnemyManagementWindow.PanelType.EnemyVisualPresets:
+                return "Gameplay Visual Presets";
+            case EnemyManagementWindow.PanelType.EnemyUiVisualPresets:
+                return "UI Visual Presets";
+            case EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets:
+                return "Advanced Pattern Presets";
+            case EnemyManagementWindow.PanelType.EnemyBossPatternPresets:
+                return "Boss Pattern Presets";
+            default:
+                return "Master Presets";
+        }
     }
 
     /// <summary>
@@ -142,8 +151,9 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
         panel.SuppressStateWrite = true;
         AddTab(panel,
                EnemyManagementWindow.PanelType.EnemyMasterPresets,
-               "Enemy Master Presets",
+               "Master Presets",
                panel.MainContentRoot,
+               null,
                null,
                null,
                null,
@@ -169,17 +179,22 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     /// <param name="panel">Owning panel used for close callbacks.</param>
     /// <param name="panelType">Panel type to build.</param>
     /// <param name="brainPanel">Resolved brain panel controller when built.</param>
+    /// <param name="visualPanel">Resolved gameplay visual panel controller when built.</param>
+    /// <param name="uiVisualPanel">Resolved UI visual panel controller when built.</param>
     /// <param name="advancedPatternPanel">Resolved advanced pattern panel controller when built.</param>
+    /// <param name="bossPatternPanel">Resolved boss pattern panel controller when built.</param>
     /// <returns>Returns the panel root shown in the content host.</returns>
     public static VisualElement BuildSidePanelContent(EnemyMasterPresetsPanel panel,
                                                       EnemyManagementWindow.PanelType panelType,
                                                       out EnemyBrainPresetsPanel brainPanel,
                                                       out EnemyVisualPresetsPanel visualPanel,
+                                                      out EnemyUiVisualPresetsPanel uiVisualPanel,
                                                       out EnemyAdvancedPatternPresetsPanel advancedPatternPanel,
                                                       out EnemyBossPatternPresetsPanel bossPatternPanel)
     {
         brainPanel = null;
         visualPanel = null;
+        uiVisualPanel = null;
         advancedPatternPanel = null;
         bossPatternPanel = null;
 
@@ -219,6 +234,13 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
             return panelRoot;
         }
 
+        if (panelType == EnemyManagementWindow.PanelType.EnemyUiVisualPresets)
+        {
+            uiVisualPanel = new EnemyUiVisualPresetsPanel();
+            panelRoot.Add(uiVisualPanel.Root);
+            return panelRoot;
+        }
+
         if (panelType == EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets)
         {
             advancedPatternPanel = new EnemyAdvancedPatternPresetsPanel();
@@ -253,7 +275,10 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
     /// <param name="label">Tab label.</param>
     /// <param name="content">Content root shown when the tab is active.</param>
     /// <param name="brainPanel">Optional brain panel controller.</param>
+    /// <param name="visualPanel">Optional gameplay visual panel controller.</param>
+    /// <param name="uiVisualPanel">Optional UI visual panel controller.</param>
     /// <param name="advancedPatternPanel">Optional advanced pattern panel controller.</param>
+    /// <param name="bossPatternPanel">Optional boss pattern panel controller.</param>
 
     public static void AddTab(EnemyMasterPresetsPanel panel,
                               EnemyManagementWindow.PanelType panelType,
@@ -261,6 +286,7 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
                               VisualElement content,
                               EnemyBrainPresetsPanel brainPanel,
                               EnemyVisualPresetsPanel visualPanel,
+                              EnemyUiVisualPresetsPanel uiVisualPanel,
                               EnemyAdvancedPatternPresetsPanel advancedPatternPanel,
                               EnemyBossPatternPresetsPanel bossPatternPanel)
     {
@@ -288,6 +314,7 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
         sidePanelEntry.Content = content;
         sidePanelEntry.BrainPanel = brainPanel;
         sidePanelEntry.VisualPanel = visualPanel;
+        sidePanelEntry.UiVisualPanel = uiVisualPanel;
         sidePanelEntry.AdvancedPatternPanel = advancedPatternPanel;
         sidePanelEntry.BossPatternPanel = bossPatternPanel;
         panel.SidePanels[panelType] = sidePanelEntry;
@@ -318,6 +345,9 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
 
             if (entry.VisualPanel != null)
                 entry.VisualPanel.RefreshFromSessionChange();
+
+            if (entry.UiVisualPanel != null)
+                entry.UiVisualPanel.RefreshFromSessionChange();
 
             if (entry.AdvancedPatternPanel != null)
                 entry.AdvancedPatternPanel.RefreshFromSessionChange();
@@ -448,6 +478,9 @@ internal static class EnemyMasterPresetsPanelSidePanelUtility
 
         if (panel.SidePanels.ContainsKey(EnemyManagementWindow.PanelType.EnemyVisualPresets))
             openPanels.Add(EnemyManagementWindow.PanelType.EnemyVisualPresets);
+
+        if (panel.SidePanels.ContainsKey(EnemyManagementWindow.PanelType.EnemyUiVisualPresets))
+            openPanels.Add(EnemyManagementWindow.PanelType.EnemyUiVisualPresets);
 
         if (panel.SidePanels.ContainsKey(EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets))
             openPanels.Add(EnemyManagementWindow.PanelType.EnemyAdvancedPatternPresets);

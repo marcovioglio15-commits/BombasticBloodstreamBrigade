@@ -49,6 +49,7 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
                                                                                                   SourceHealthSyringeName);
             PlayerSyringeBarView sourceShieldSyringe = FindComponentByName<PlayerSyringeBarView>(sourceRoot.transform,
                                                                                                   SourceShieldSyringeName);
+            PlayerUiVisualPreset editorPreviewUiPreset = PlayerActiveHudBossSyringeUiAssetSetupPreviewUtility.ResolveEditorPreviewUiPreset(sourceRoot);
             PlayerVisualPreset editorPreviewPreset = PlayerActiveHudBossSyringeUiAssetSetupPreviewUtility.ResolveEditorPreviewPreset(sourceRoot);
 
             if (sourceHealthSyringe == null || sourceShieldSyringe == null)
@@ -56,12 +57,13 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
 
             PlayerHudExperienceBossPortraitAssetSetupUtility.ConfigurePlayerExperienceSyringe(sourceRoot, sourceHealthSyringe);
             PrefabUtility.SaveAsPrefabAsset(sourceRoot, PlayerBarsPrefabPath);
-            UpdatePowerUpSlotPrefab(sourceHealthSyringe, chargeRingMaterial, cooldownIconMaterial, editorPreviewPreset);
+            UpdatePowerUpSlotPrefab(sourceHealthSyringe, chargeRingMaterial, cooldownIconMaterial, editorPreviewUiPreset, editorPreviewPreset);
             UpdateBossHudPrefab(sourceHealthSyringe, sourceShieldSyringe);
             UpdateMainUiScene(sourceHealthSyringe,
                               sourceShieldSyringe,
                               chargeRingMaterial,
                               cooldownIconMaterial,
+                              editorPreviewUiPreset,
                               editorPreviewPreset);
         }
         finally
@@ -82,10 +84,12 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// <param name="sourceEnergySyringe">Preauthored player syringe used as the clone source for active energy.</param>
     /// <param name="chargeRingMaterial">Material template assigned to the charge semiring graphic.</param>
     /// <param name="cooldownIconMaterial">Material template assigned to the cooldown icon view.</param>
-    /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewUiPreset">Player UI Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewPreset">Legacy Player Visual Preset fallback used by Edit Mode active-slot previews.</param>
     private static void UpdatePowerUpSlotPrefab(PlayerSyringeBarView sourceEnergySyringe,
                                                 Material chargeRingMaterial,
                                                 Material cooldownIconMaterial,
+                                                PlayerUiVisualPreset editorPreviewUiPreset,
                                                 PlayerVisualPreset editorPreviewPreset)
     {
         GameObject prefabRoot = PrefabUtility.LoadPrefabContents(PowerUpSlotPrefabPath);
@@ -96,6 +100,7 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
                                           sourceEnergySyringe,
                                           chargeRingMaterial,
                                           cooldownIconMaterial,
+                                          editorPreviewUiPreset,
                                           editorPreviewPreset);
             PrefabUtility.SaveAsPrefabAsset(prefabRoot, PowerUpSlotPrefabPath);
         }
@@ -136,11 +141,13 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// <param name="sourceShieldSyringe">Preauthored player shield syringe used as the clone source for boss shield.</param>
     /// <param name="chargeRingMaterial">Material template assigned to scene charge semiring graphics.</param>
     /// <param name="cooldownIconMaterial">Material template assigned to scene cooldown icon views.</param>
-    /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewUiPreset">Player UI Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewPreset">Legacy Player Visual Preset fallback used by Edit Mode active-slot previews.</param>
     private static void UpdateMainUiScene(PlayerSyringeBarView sourceHealthSyringe,
                                           PlayerSyringeBarView sourceShieldSyringe,
                                           Material chargeRingMaterial,
                                           Material cooldownIconMaterial,
+                                          PlayerUiVisualPreset editorPreviewUiPreset,
                                           PlayerVisualPreset editorPreviewPreset)
     {
         Scene scene = EditorSceneManager.OpenScene(MainUiScenePath, OpenSceneMode.Single);
@@ -174,8 +181,10 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
                                                                                sourceHealthSyringe,
                                                                                chargeRingMaterial,
                                                                                cooldownIconMaterial,
+                                                                               editorPreviewUiPreset,
                                                                                editorPreviewPreset);
         PlayerActivePowerUpSlotHudView secondaryView = BindExistingScenePowerUpSlot(secondarySlotRoot,
+                                                                                    editorPreviewUiPreset,
                                                                                     editorPreviewPreset);
 
         SetObjectReference(overlayObject, "primaryPowerUpSlotView", primaryView);
@@ -207,12 +216,14 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// <param name="sourceEnergySyringe">Preauthored syringe used when the scene instance still needs generated children.</param>
     /// <param name="chargeRingMaterial">Material template for charge semiring generation.</param>
     /// <param name="cooldownIconMaterial">Material template for cooldown icon generation.</param>
-    /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewUiPreset">Player UI Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewPreset">Legacy Player Visual Preset fallback used by Edit Mode active-slot previews.</param>
     /// <returns>The configured slot view, or null when the slot root is missing.</returns>
     private static PlayerActivePowerUpSlotHudView ConfigureScenePowerUpSlot(GameObject slotRoot,
                                                                             PlayerSyringeBarView sourceEnergySyringe,
                                                                             Material chargeRingMaterial,
                                                                             Material cooldownIconMaterial,
+                                                                            PlayerUiVisualPreset editorPreviewUiPreset,
                                                                             PlayerVisualPreset editorPreviewPreset)
     {
         if (slotRoot == null)
@@ -222,6 +233,7 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
                                                                                 sourceEnergySyringe,
                                                                                 chargeRingMaterial,
                                                                                 cooldownIconMaterial,
+                                                                                editorPreviewUiPreset,
                                                                                 editorPreviewPreset,
                                                                                 false);
         KeepRightAnchoredSceneSlotInsideScreen(slotRoot);
@@ -232,9 +244,11 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// Binds an existing scene slot view without rewriting its authored child layout.
     /// </summary>
     /// <param name="slotRoot">Scene slot root GameObject.</param>
-    /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewUiPreset">Player UI Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewPreset">Legacy Player Visual Preset fallback used by Edit Mode active-slot previews.</param>
     /// <returns>The existing or newly attached slot view, or null when the slot root is missing.</returns>
     private static PlayerActivePowerUpSlotHudView BindExistingScenePowerUpSlot(GameObject slotRoot,
+                                                                               PlayerUiVisualPreset editorPreviewUiPreset,
                                                                                PlayerVisualPreset editorPreviewPreset)
     {
         if (slotRoot == null)
@@ -254,6 +268,7 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
         SetObjectReference(slotObject, "energySyringe", energySyringe);
         SetObjectReference(slotObject, "chargeRing", chargeRing);
         SetObjectReference(slotObject, "iconCooldown", cooldownView);
+        SetObjectReference(slotObject, "editorPreviewUiPreset", editorPreviewUiPreset);
         SetObjectReference(slotObject, "editorPreviewPreset", editorPreviewPreset);
         slotObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(slotView);
@@ -269,13 +284,15 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
     /// <param name="sourceEnergySyringe">Preauthored syringe source cloned into the slot.</param>
     /// <param name="chargeRingMaterial">Material template assigned to the charge semiring.</param>
     /// <param name="cooldownIconMaterial">Material template assigned to the icon cooldown view.</param>
-    /// <param name="editorPreviewPreset">Player Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewUiPreset">Player UI Visual Preset used by Edit Mode active-slot previews.</param>
+    /// <param name="editorPreviewPreset">Legacy Player Visual Preset fallback used by Edit Mode active-slot previews.</param>
     /// <param name="resizeRoot">Whether the slot root should receive the prefab default dimensions.</param>
     /// <returns>The slot view component configured on the slot root.</returns>
     private static PlayerActivePowerUpSlotHudView ConfigurePowerUpSlotHierarchy(GameObject slotRoot,
                                                                                 PlayerSyringeBarView sourceEnergySyringe,
                                                                                 Material chargeRingMaterial,
                                                                                 Material cooldownIconMaterial,
+                                                                                PlayerUiVisualPreset editorPreviewUiPreset,
                                                                                 PlayerVisualPreset editorPreviewPreset,
                                                                                 bool resizeRoot = true)
     {
@@ -309,6 +326,7 @@ public static class PlayerActiveHudBossSyringeUiAssetSetupUtility
         SetObjectReference(slotObject, "energySyringe", energySyringe);
         SetObjectReference(slotObject, "chargeRing", chargeRing);
         SetObjectReference(slotObject, "iconCooldown", cooldownView);
+        SetObjectReference(slotObject, "editorPreviewUiPreset", editorPreviewUiPreset);
         SetObjectReference(slotObject, "editorPreviewPreset", editorPreviewPreset);
         slotObject.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(slotView);

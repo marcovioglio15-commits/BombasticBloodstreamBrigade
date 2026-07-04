@@ -113,6 +113,7 @@ public static class PlayerJetpackVfxSmokeTest
                                                                                                      null,
                                                                                                      null,
                                                                                                      visualPreset,
+                                                                                                     null,
                                                                                                      null))
             {
                 PlayerJetpackVfxSettings scaledSettings = scaledScope.VisualPreset.PlayerJetpackVfx;

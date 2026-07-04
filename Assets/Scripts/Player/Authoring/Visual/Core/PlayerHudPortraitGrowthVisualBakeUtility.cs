@@ -6,7 +6,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Converts Player Visual Preset HUD portrait authoring into ECS runtime configuration.
+/// Converts Player UI visual preset HUD portrait authoring into ECS runtime configuration.
 /// </summary>
 public static class PlayerHudPortraitGrowthVisualBakeUtility
 {
@@ -22,11 +22,11 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
 
     #region Portrait
     /// <summary>
-    /// Builds the mutable runtime portrait HUD configuration from the resolved visual preset.
+    /// Builds the mutable runtime portrait HUD configuration from the resolved UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Resolved visual preset after bake-time scaling.</param>
+    /// <param name="visualPreset">Resolved UI visual preset after bake-time scaling.</param>
     /// <returns>Runtime portrait HUD visual config.</returns>
-    public static PlayerPortraitHudVisualConfig BuildPortraitConfig(PlayerVisualPreset visualPreset)
+    public static PlayerPortraitHudVisualConfig BuildPortraitConfig(IPlayerUiVisualPresetData visualPreset)
     {
         PlayerPortraitHudSettings settings = visualPreset != null ? visualPreset.Portrait : null;
 
@@ -38,11 +38,11 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
     }
 
     /// <summary>
-    /// Builds the immutable portrait HUD baseline from the unscaled source visual preset.
+    /// Builds the immutable portrait HUD baseline from the unscaled source UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <returns>Baseline portrait HUD visual config.</returns>
-    public static PlayerBasePortraitHudVisualConfig BuildBasePortraitConfig(PlayerVisualPreset visualPreset)
+    public static PlayerBasePortraitHudVisualConfig BuildBasePortraitConfig(IPlayerUiVisualPresetData visualPreset)
     {
         return new PlayerBasePortraitHudVisualConfig
         {
@@ -51,12 +51,12 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates runtime portrait animation and frame buffers from the resolved visual preset.
+    /// Populates runtime portrait animation and frame buffers from the resolved UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Resolved visual preset after bake-time scaling.</param>
+    /// <param name="visualPreset">Resolved UI visual preset after bake-time scaling.</param>
     /// <param name="animationBuffer">Destination runtime animation buffer.</param>
     /// <param name="frameBuffer">Destination runtime frame buffer.</param>
-    public static void PopulatePortraitBuffers(PlayerVisualPreset visualPreset,
+    public static void PopulatePortraitBuffers(IPlayerUiVisualPresetData visualPreset,
                                                DynamicBuffer<PlayerPortraitHudAnimationElement> animationBuffer,
                                                DynamicBuffer<PlayerPortraitHudFrameElement> frameBuffer)
     {
@@ -91,11 +91,11 @@ public static class PlayerHudPortraitGrowthVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates immutable portrait animation baselines from the unscaled source visual preset.
+    /// Populates immutable portrait animation baselines from the unscaled source UI visual preset.
     /// </summary>
-    /// <param name="visualPreset">Unscaled source visual preset.</param>
+    /// <param name="visualPreset">Unscaled source UI visual preset.</param>
     /// <param name="baseAnimationBuffer">Destination baseline animation buffer.</param>
-    public static void PopulateBasePortraitBuffers(PlayerVisualPreset visualPreset,
+    public static void PopulateBasePortraitBuffers(IPlayerUiVisualPresetData visualPreset,
                                                    DynamicBuffer<PlayerBasePortraitHudAnimationElement> baseAnimationBuffer)
     {
         baseAnimationBuffer.Clear();

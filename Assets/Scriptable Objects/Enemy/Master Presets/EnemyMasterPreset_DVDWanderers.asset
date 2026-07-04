@@ -18,5 +18,6 @@ MonoBehaviour:
   version: 1.0.0
   brainPreset: {fileID: 11400000, guid: 5d60b6728435c7648bad438d5dcf771c, type: 2}
   visualPreset: {fileID: 11400000, guid: 4d3e2973981d476aa50b7e61afec2407, type: 2}
+  uiVisualPreset: {fileID: 11400000, guid: 3ee3a6bdb2be463981a9e6790a12c931, type: 2}
   advancedPatternPreset: {fileID: 11400000, guid: 958231ce8f7174a4d8239616dbcbd199, type: 2}
   bossPatternPreset: {fileID: 0}

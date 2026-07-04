@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 #if UNITY_EDITOR
@@ -258,23 +259,23 @@ public static class PlayerRuntimeScalingVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates player health-bar visual scaling metadata from the source visual preset Add Scaling rules.
+    /// Populates player health-bar visual scaling metadata from the source UI visual preset Add Scaling rules.
     /// </summary>
-    /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>
+    /// <param name="sourcePreset">Source UI visual preset used to resolve unscaled fields and scaling formulas.</param>
     /// <param name="scalingBuffer">Destination runtime health-bar visual scaling buffer.</param>
-    public static void PopulateHealthBarVisualScalingMetadata(PlayerVisualPreset sourcePreset,
+    public static void PopulateHealthBarVisualScalingMetadata(IPlayerUiVisualPresetData sourcePreset,
                                                               DynamicBuffer<PlayerRuntimeHealthBarVisualScalingElement> scalingBuffer)
     {
         scalingBuffer.Clear();
 
-        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+        if (!TryResolveUiVisualScalingSource(sourcePreset,
+                                             out IReadOnlyList<PlayerStatScalingRule> scalingRules,
+                                             out SerializedObject serializedPreset))
             return;
 
-        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
-
-        for (int ruleIndex = 0; ruleIndex < sourcePreset.ScalingRules.Count; ruleIndex++)
+        for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
         {
-            PlayerStatScalingRule scalingRule = sourcePreset.ScalingRules[ruleIndex];
+            PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
 
             if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
                 continue;
@@ -317,23 +318,23 @@ public static class PlayerRuntimeScalingVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates active power-up HUD visual scaling metadata from the source visual preset Add Scaling rules.
+    /// Populates active power-up HUD visual scaling metadata from the source UI visual preset Add Scaling rules.
     /// </summary>
-    /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>
+    /// <param name="sourcePreset">Source UI visual preset used to resolve unscaled fields and scaling formulas.</param>
     /// <param name="scalingBuffer">Destination runtime active power-up HUD visual scaling buffer.</param>
-    public static void PopulateActivePowerUpHudVisualScalingMetadata(PlayerVisualPreset sourcePreset,
+    public static void PopulateActivePowerUpHudVisualScalingMetadata(IPlayerUiVisualPresetData sourcePreset,
                                                                      DynamicBuffer<PlayerRuntimeActivePowerUpHudVisualScalingElement> scalingBuffer)
     {
         scalingBuffer.Clear();
 
-        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+        if (!TryResolveUiVisualScalingSource(sourcePreset,
+                                             out IReadOnlyList<PlayerStatScalingRule> scalingRules,
+                                             out SerializedObject serializedPreset))
             return;
 
-        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
-
-        for (int ruleIndex = 0; ruleIndex < sourcePreset.ScalingRules.Count; ruleIndex++)
+        for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
         {
-            PlayerStatScalingRule scalingRule = sourcePreset.ScalingRules[ruleIndex];
+            PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
 
             if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
                 continue;
@@ -376,23 +377,23 @@ public static class PlayerRuntimeScalingVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates player portrait HUD scaling metadata from the source visual preset Add Scaling rules.
+    /// Populates player portrait HUD scaling metadata from the source UI visual preset Add Scaling rules.
     /// </summary>
-    /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>
+    /// <param name="sourcePreset">Source UI visual preset used to resolve unscaled fields and scaling formulas.</param>
     /// <param name="scalingBuffer">Destination runtime portrait HUD visual scaling buffer.</param>
-    public static void PopulatePortraitHudVisualScalingMetadata(PlayerVisualPreset sourcePreset,
+    public static void PopulatePortraitHudVisualScalingMetadata(IPlayerUiVisualPresetData sourcePreset,
                                                                 DynamicBuffer<PlayerRuntimePortraitHudVisualScalingElement> scalingBuffer)
     {
         scalingBuffer.Clear();
 
-        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+        if (!TryResolveUiVisualScalingSource(sourcePreset,
+                                             out IReadOnlyList<PlayerStatScalingRule> scalingRules,
+                                             out SerializedObject serializedPreset))
             return;
 
-        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
-
-        for (int ruleIndex = 0; ruleIndex < sourcePreset.ScalingRules.Count; ruleIndex++)
+        for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
         {
-            PlayerStatScalingRule scalingRule = sourcePreset.ScalingRules[ruleIndex];
+            PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
 
             if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
                 continue;
@@ -436,23 +437,23 @@ public static class PlayerRuntimeScalingVisualBakeUtility
     }
 
     /// <summary>
-    /// Populates player growth-sequence HUD scaling metadata from the source visual preset Add Scaling rules.
+    /// Populates player growth-sequence HUD scaling metadata from the source UI visual preset Add Scaling rules.
     /// </summary>
-    /// <param name="sourcePreset">Source visual preset used to resolve unscaled fields and scaling formulas.</param>
+    /// <param name="sourcePreset">Source UI visual preset used to resolve unscaled fields and scaling formulas.</param>
     /// <param name="scalingBuffer">Destination runtime growth-sequence HUD visual scaling buffer.</param>
-    public static void PopulateGrowthSequenceHudVisualScalingMetadata(PlayerVisualPreset sourcePreset,
+    public static void PopulateGrowthSequenceHudVisualScalingMetadata(IPlayerUiVisualPresetData sourcePreset,
                                                                       DynamicBuffer<PlayerRuntimeGrowthSequenceHudVisualScalingElement> scalingBuffer)
     {
         scalingBuffer.Clear();
 
-        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+        if (!TryResolveUiVisualScalingSource(sourcePreset,
+                                             out IReadOnlyList<PlayerStatScalingRule> scalingRules,
+                                             out SerializedObject serializedPreset))
             return;
 
-        SerializedObject serializedPreset = new SerializedObject(sourcePreset);
-
-        for (int ruleIndex = 0; ruleIndex < sourcePreset.ScalingRules.Count; ruleIndex++)
+        for (int ruleIndex = 0; ruleIndex < scalingRules.Count; ruleIndex++)
         {
-            PlayerStatScalingRule scalingRule = sourcePreset.ScalingRules[ruleIndex];
+            PlayerStatScalingRule scalingRule = scalingRules[ruleIndex];
 
             if (scalingRule == null || !scalingRule.AddScaling || string.IsNullOrWhiteSpace(scalingRule.Formula))
                 continue;
@@ -494,6 +495,35 @@ public static class PlayerRuntimeScalingVisualBakeUtility
                                                                                                         null))
             });
         }
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Resolves serialized scaling data from either the new UI visual preset or the legacy gameplay visual preset fallback.
+    /// </summary>
+    /// <param name="sourcePreset">Source UI visual data used by bake-time metadata generation.</param>
+    /// <param name="scalingRules">Resolved Add Scaling rules when available.</param>
+    /// <param name="serializedPreset">Serialized object used to resolve stat-key target properties.</param>
+    /// <returns>True when a serialized scaling source is available.</returns>
+    private static bool TryResolveUiVisualScalingSource(IPlayerUiVisualPresetData sourcePreset,
+                                                        out IReadOnlyList<PlayerStatScalingRule> scalingRules,
+                                                        out SerializedObject serializedPreset)
+    {
+        scalingRules = null;
+        serializedPreset = null;
+
+        if (sourcePreset == null || sourcePreset.ScalingRules == null || sourcePreset.ScalingRules.Count <= 0)
+            return false;
+
+        UnityEngine.Object sourceObject = sourcePreset as UnityEngine.Object;
+
+        if (sourceObject == null)
+            return false;
+
+        scalingRules = sourcePreset.ScalingRules;
+        serializedPreset = new SerializedObject(sourceObject);
+        return true;
     }
     #endregion
 

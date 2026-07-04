@@ -20,5 +20,6 @@ MonoBehaviour:
   m_ProgressionPreset: {fileID: 11400000, guid: 28011fec0de976b488e06fd6c9965d1f, type: 2}
   m_PowerUpsPreset: {fileID: 11400000, guid: 6d0f84c1e80d53a44999e8dedd17f116, type: 2}
   visualPreset: {fileID: 11400000, guid: 3d67950319294a109127fbf43e4bf9f6, type: 2}
+  uiVisualPreset: {fileID: 11400000, guid: 7c8b06d4301332245a5cc48731c035aa, type: 2}
   m_AnimationBindingsPreset: {fileID: 11400000, guid: cd0f565040636d9468c6d4155efd4542, type: 2}
   wallsLayerName: Walls

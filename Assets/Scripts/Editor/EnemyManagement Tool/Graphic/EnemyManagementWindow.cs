@@ -152,7 +152,7 @@ public sealed class EnemyManagementWindow : EditorWindow
         // Create toolbar container and top-level panel toggle.
         Toolbar toolbar = new Toolbar();
 
-        ToolbarToggle masterToggle = CreatePanelToggle("Enemy Master Presets", PanelType.EnemyMasterPresets, true);
+        ToolbarToggle masterToggle = CreatePanelToggle("Master Presets", PanelType.EnemyMasterPresets, true);
         toolbar.Add(masterToggle);
 
         // Push action buttons to the right side.
@@ -309,21 +309,24 @@ public sealed class EnemyManagementWindow : EditorWindow
     private string GetPanelLabel(PanelType panelType)
     {
         if (panelType == PanelType.EnemyMasterPresets)
-            return "Enemy Master Presets";
+            return "Master Presets";
 
         if (panelType == PanelType.EnemyBrainPresets)
-            return "Enemy Brain Presets";
+            return "Brain Presets";
 
         if (panelType == PanelType.EnemyVisualPresets)
-            return "Enemy Visual Presets";
+            return "Gameplay Visual Preset";
+
+        if (panelType == PanelType.EnemyUiVisualPresets)
+            return "UI Visual Preset";
 
         if (panelType == PanelType.EnemyAdvancedPatternPresets)
-            return "Enemy Advanced Pattern Presets";
+            return "Advanced Pattern Presets";
 
         if (panelType == PanelType.EnemyBossPatternPresets)
-            return "Boss Patterns Presets";
+            return "Boss Pattern Presets";
 
-        return "Enemy Master Presets";
+        return "Master Presets";
     }
     #endregion
 
@@ -425,7 +428,8 @@ public sealed class EnemyManagementWindow : EditorWindow
         EnemyBrainPresets = 1,
         EnemyVisualPresets = 2,
         EnemyAdvancedPatternPresets = 3,
-        EnemyBossPatternPresets = 4
+        EnemyBossPatternPresets = 4,
+        EnemyUiVisualPresets = 5
     }
     #endregion
 }

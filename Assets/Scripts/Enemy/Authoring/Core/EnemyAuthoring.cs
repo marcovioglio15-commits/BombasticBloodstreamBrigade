@@ -64,6 +64,9 @@ public sealed class EnemyAuthoring : MonoBehaviour
     [Tooltip("Direct visual preset fallback used when MasterPreset is missing or has no Visual preset assigned.")]
     [SerializeField] private EnemyVisualPreset visualPreset;
 
+    [Tooltip("Direct UI visual preset fallback used when MasterPreset is missing or has no UI Visual preset assigned.")]
+    [SerializeField] private EnemyUiVisualPreset uiVisualPreset;
+
     [Tooltip("Direct advanced pattern preset fallback used when MasterPreset is missing or has no Advanced Pattern preset assigned.")]
     [SerializeField] private EnemyAdvancedPatternPreset advancedPatternPreset;
 
@@ -207,6 +210,14 @@ public sealed class EnemyAuthoring : MonoBehaviour
         get
         {
             return EnemyAuthoringPresetResolverUtility.ResolveVisualPreset(masterPreset, visualPreset);
+        }
+    }
+
+    public EnemyUiVisualPreset UiVisualPreset
+    {
+        get
+        {
+            return EnemyAuthoringPresetResolverUtility.ResolveUiVisualPreset(masterPreset, uiVisualPreset);
         }
     }
 
@@ -1422,6 +1433,9 @@ public sealed class EnemyAuthoring : MonoBehaviour
         if (visualPreset != null)
             visualPreset.ValidateValues();
 
+        if (uiVisualPreset != null)
+            uiVisualPreset.ValidateValues();
+
         if (advancedPatternPreset != null)
             advancedPatternPreset.ValidateValues();
     }
@@ -1728,7 +1742,7 @@ public sealed class EnemyAuthoring : MonoBehaviour
     /// <returns>Resolved footprint settings or null when no preset source is available.</returns>
     private EnemyVisualFootprintSettings ResolveFootprintSettings()
     {
-        return EnemyAuthoringPresetResolverUtility.ResolveFootprintSettings(masterPreset, visualPreset);
+        return EnemyAuthoringPresetResolverUtility.ResolveFootprintSettings(masterPreset, uiVisualPreset, visualPreset);
     }
 
     /// <summary>

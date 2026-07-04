@@ -70,7 +70,7 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
 
         if (availableWeaponIds.Count <= 0)
         {
-            ShowWarning(warningBox, "No mountable Weapon Id is available from the scoped or registered Player Visual Presets.");
+            ShowWarning(warningBox, "No mountable Weapon Id is available from the scoped or registered Gameplay Visual Presets.");
             return;
         }
 
@@ -89,7 +89,7 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
 
         if (!PlayerWeaponIdSelectorUtility.ContainsWeaponId(availableWeaponIds, weaponId.Trim()))
         {
-            ShowWarning(warningBox, "Weapon Id does not match any mountable entry in the registered Player Visual Presets.");
+            ShowWarning(warningBox, "Weapon Id does not match any mountable entry in the registered Gameplay Visual Presets.");
             return;
         }
 

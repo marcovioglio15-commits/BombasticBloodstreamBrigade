@@ -15,6 +15,7 @@ public sealed class PlayerMasterPresetsPanel
     internal const string ProgressionPresetsFolder = "Assets/Scriptable Objects/Player/Progression";
     internal const string PowerUpsPresetsFolder = "Assets/Scriptable Objects/Player/Power-Ups";
     internal const string VisualPresetsFolder = "Assets/Scriptable Objects/Player/Visual";
+    internal const string UiVisualPresetsFolder = "Assets/Scriptable Objects/Player/UI Visual";
     internal const string AnimationPresetsFolder = "Assets/Scriptable Objects/Player/Animation Bindings";
     #endregion
 
@@ -448,6 +449,11 @@ public sealed class PlayerMasterPresetsPanel
         PlayerMasterPresetsPanelSectionsUtility.CreateVisualPreset(this);
     }
 
+    internal void CreateUiVisualPreset()
+    {
+        PlayerMasterPresetsPanelSectionsUtility.CreateUiVisualPreset(this);
+    }
+
     internal void AssignSubPreset(string propertyName, UnityEngine.Object preset)
     {
         PlayerMasterPresetsPanelSectionsUtility.AssignSubPreset(this, propertyName, preset);
@@ -513,6 +519,7 @@ public sealed class PlayerMasterPresetsPanel
         public PlayerProgressionPresetsPanel ProgressionPanel;
         public PlayerPowerUpsPresetsPanel PowerUpsPanel;
         public PlayerVisualPresetsPanel VisualPanel;
+        public PlayerUiVisualPresetsPanel UiVisualPanel;
         public PlayerAnimationBindingsPresetsPanel AnimationPanel;
     }
     #endregion
