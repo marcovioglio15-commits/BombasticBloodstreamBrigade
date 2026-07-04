@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4943409589521362668}
+  - component: {fileID: 1390866836042977746}
   m_Layer: 5
   m_Name: HUD_DamageVignettes
   m_TagString: Untagged
@@ -37,6 +38,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1390866836042977746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368282857084399509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e066e39adc7c89429ca6a12472fa92a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDPlayerDamageVignetteSection
+  isEnabled: 1
+  shieldVignetteImage: {fileID: 8751089778611466067}
+  shieldVignetteRootObject: {fileID: 4320807446377091283}
+  healthVignetteImage: {fileID: 3712317843878871595}
+  healthVignetteRootObject: {fileID: 7519111099856030764}
+  hideWhenPlayerMissing: 1
 --- !u!1 &4320807446377091283
 GameObject:
   m_ObjectHideFlags: 0
