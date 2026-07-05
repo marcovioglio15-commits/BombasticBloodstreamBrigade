@@ -6670,9 +6670,9 @@ MonoBehaviour:
         damage: 1
         affectAllEnemiesInRadius: 1
         triggerOffset: {x: 0, y: 0, z: 0}
-        explosionVfxPrefab: {fileID: 1211940420721360282, guid: 28a3caab1d07a7941b99718216a0fea3, type: 3}
+        explosionVfxPrefab: {fileID: 6772806930511986391, guid: 530ec3e9a9782ab46bb896d2258bd398, type: 3}
         scaleVfxToRadius: 1
-        vfxScaleMultiplier: 1
+        vfxScaleMultiplier: 0.5
       projectileOrbitOverride:
         pathMode: 0
         radialEntrySpeed: 12
@@ -43523,7 +43523,8 @@ MonoBehaviour:
     stealProtected: 0
   primaryActivePowerUpId: ActiveBulletTime
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveEnemiesExplodeOnDeath
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
