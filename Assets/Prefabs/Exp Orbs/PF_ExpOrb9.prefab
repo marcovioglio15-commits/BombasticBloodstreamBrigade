@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 347747346632071832}
-  m_Layer: 10
+  m_Layer: 3
   m_Name: PF_ExpOrb9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
