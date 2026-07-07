@@ -22925,7 +22925,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: ActivePortableHealthPack
       displayName: Portable Health Pack
@@ -33027,7 +33027,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: Passive_AdditionalBarrel
       displayName: Additional Barrel
@@ -36082,7 +36082,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0.01
         stackable:
           maxAcquisitions: 10
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: Passive_ElementalBullets_Fire
       displayName: Fire Bullets
@@ -40973,7 +40973,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: Passive_MultivitaminAdults
       displayName: Multivitamin Adults
@@ -41401,7 +41401,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: Passive_VisualAcuity
       displayName: Improved Visual Acuity
@@ -42253,7 +42253,7 @@ MonoBehaviour:
           applyIntervalSeconds: 0
         stackable:
           maxAcquisitions: 0
-    stealProtected: 0
+    stealProtected: 1
   - commonData:
       powerUpId: Passive_AdrenalineRush
       displayName: 'Adrenaline Rush '
@@ -43521,10 +43521,10 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     stealProtected: 0
-  primaryActivePowerUpId: ActiveBulletTime
+  primaryActivePowerUpId: ActiveBasicDash
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds:
-  - PassiveEnemiesExplodeOnDeath
+  - Passive_AllRoundProtection
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
