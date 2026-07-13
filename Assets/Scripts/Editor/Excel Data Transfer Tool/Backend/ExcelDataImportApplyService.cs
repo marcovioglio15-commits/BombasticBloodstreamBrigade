@@ -33,13 +33,20 @@ internal static class ExcelDataImportApplyService
         ExcelDataImportPreviewResult approvedPreview =
             ResolveApprovedPreview(masterPreset, overrideWorkbookPath, resolvedPath, previewResult);
         ValidateApprovedPreview(masterPreset.LayoutPreset, resolvedPath, approvedPreview);
-        List<PreparedWrite> preparedWrites = BuildPreparedWrites(approvedPreview, importPreset);
-        ApplyPreparedWrites(preparedWrites, importPreset);
+        ExcelDataPlayerScalingImportPlan scalingPlan =
+            ExcelDataPlayerScalingApplyPlanUtility.Build(approvedPreview, importPreset);
+        List<PreparedWrite> preparedWrites = BuildPreparedWrites(approvedPreview,
+                                                                 importPreset,
+                                                                 scalingPlan);
+        ApplyPreparedWrites(preparedWrites, importPreset, scalingPlan);
         AssetDatabase.SaveAssets();
+        string authoringStatus =
+            ExcelDataPlayerScalingBakeRefreshUtility.Refresh(scalingPlan.AffectedAssets);
         return new ExcelDataImportApplyResult(resolvedPath,
                                               preparedWrites.Count,
                                               approvedPreview.TotalRowCount - preparedWrites.Count,
-                                              approvedPreview.WarningCount);
+                                              approvedPreview.WarningCount,
+                                              authoringStatus);
     }
     #endregion
 
@@ -122,9 +129,11 @@ internal static class ExcelDataImportApplyService
     /// </summary>
     /// <param name="previewResult">Approved coordinate-exact preview.</param>
     /// <param name="importPreset">Import preset controlling reference resolution.</param>
+    /// <param name="scalingPlan">Fresh Player scaling routes and controlled list appends.</param>
     /// <returns>Fully resolved writes that can enter the mutation transaction.</returns>
     private static List<PreparedWrite> BuildPreparedWrites(ExcelDataImportPreviewResult previewResult,
-                                                           ExcelDataImportPreset importPreset)
+                                                           ExcelDataImportPreset importPreset,
+                                                           ExcelDataPlayerScalingImportPlan scalingPlan)
     {
         List<PreparedWrite> preparedWrites = new List<PreparedWrite>();
 
@@ -153,6 +162,17 @@ internal static class ExcelDataImportApplyService
                                                                     out warning))
                 throw BuildPreflightException(previewRow, warning);
 
+            if (scalingPlan.TryGetRoute(cell,
+                                        out ExcelDataPlayerScalingWriteRoute scalingRoute))
+            {
+                preparedWrites.Add(new PreparedWrite(scalingRoute.Asset,
+                                                     cell.FieldBinding,
+                                                     previewRow.IncomingValue,
+                                                     previewRow.Address,
+                                                     scalingRoute.PropertyPath));
+                continue;
+            }
+
             if (!ExcelDataImportPropertyWriterUtility.TryWriteProperty(property,
                                                                        previewRow.IncomingValue,
                                                                        importPreset,
@@ -163,7 +183,11 @@ internal static class ExcelDataImportApplyService
             }
 
             serializedObject.Update();
-            preparedWrites.Add(new PreparedWrite(asset, cell.FieldBinding, previewRow.IncomingValue, previewRow.Address));
+            preparedWrites.Add(new PreparedWrite(asset,
+                                                 cell.FieldBinding,
+                                                 previewRow.IncomingValue,
+                                                 previewRow.Address,
+                                                 string.Empty));
         }
 
         if (preparedWrites.Count <= 0)
@@ -192,25 +216,44 @@ internal static class ExcelDataImportApplyService
     /// </summary>
     /// <param name="preparedWrites">Fully resolved writes produced by preflight.</param>
     /// <param name="importPreset">Import preset controlling reference resolution.</param>
+    /// <param name="scalingPlan">Validated Player scaling appends and direct routes.</param>
     private static void ApplyPreparedWrites(List<PreparedWrite> preparedWrites,
-                                            ExcelDataImportPreset importPreset)
+                                            ExcelDataImportPreset importPreset,
+                                            ExcelDataPlayerScalingImportPlan scalingPlan)
     {
         List<Object> targetAssets = BuildUniqueTargetAssets(preparedWrites);
         Dictionary<Object, SerializedObject> serializedObjects = new Dictionary<Object, SerializedObject>();
+        List<string> resolvedPaths = ResolvePreparedWritePaths(preparedWrites, serializedObjects);
         Undo.RecordObjects(targetAssets.ToArray(), "Apply Excel Data Import");
 
         try
         {
+            // Append fully initialized scaling rules before their direct routed members are staged.
+            for (int creationIndex = 0; creationIndex < scalingPlan.Creations.Count; creationIndex++)
+            {
+                ExcelDataPlayerScalingRuleCreation creation = scalingPlan.Creations[creationIndex];
+                SerializedObject serializedObject = GetOrCreateSerializedObject(creation.Asset, serializedObjects);
+                string rulePropertyPath;
+                string warning;
+
+                if (!ExcelDataPlayerScalingRuleSerializedUtility.TryAppendInitializedRule(serializedObject,
+                                                                                          creation,
+                                                                                          out rulePropertyPath,
+                                                                                          out warning))
+                    throw new InvalidOperationException("Scaling-rule append failed: " + warning);
+            }
+
             // Stage every pending property value without committing any target asset yet.
             for (int writeIndex = 0; writeIndex < preparedWrites.Count; writeIndex++)
             {
                 PreparedWrite preparedWrite = preparedWrites[writeIndex];
                 SerializedObject serializedObject = GetOrCreateSerializedObject(preparedWrite.Asset, serializedObjects);
-                SerializedProperty property = serializedObject.FindProperty(preparedWrite.Binding.SerializedPath);
+                SerializedProperty property = serializedObject.FindProperty(resolvedPaths[writeIndex]);
                 string warning;
 
                 if (property == null)
-                    throw new InvalidOperationException("Serialized property disappeared before apply at " + preparedWrite.Address + ".");
+                    throw new InvalidOperationException("Resolved serialized property disappeared before apply at " +
+                                                        preparedWrite.Address + ": " + resolvedPaths[writeIndex] + ".");
 
                 if (!ExcelDataImportPropertyWriterUtility.TryWriteProperty(property,
                                                                            preparedWrite.IncomingValue,
@@ -231,6 +274,46 @@ internal static class ExcelDataImportApplyService
             DiscardPendingChanges(serializedObjects);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Resolves every final target through stable list identities before any value is staged.
+    /// </summary>
+    /// <param name="preparedWrites">Fully preflighted writes whose current paths must be confirmed.</param>
+    /// <param name="serializedObjects">Shared owner wrappers reused by the mutation transaction.</param>
+    /// <returns>Concrete current property paths aligned with the prepared-write order.</returns>
+    private static List<string> ResolvePreparedWritePaths(List<PreparedWrite> preparedWrites,
+                                                          Dictionary<Object, SerializedObject> serializedObjects)
+    {
+        List<string> resolvedPaths = new List<string>(preparedWrites.Count);
+
+        // Resolve all keys against the unmodified owner state so identifier writes cannot affect later targets.
+        for (int writeIndex = 0; writeIndex < preparedWrites.Count; writeIndex++)
+        {
+            PreparedWrite preparedWrite = preparedWrites[writeIndex];
+
+            if (!string.IsNullOrWhiteSpace(preparedWrite.DirectPropertyPath))
+            {
+                resolvedPaths.Add(preparedWrite.DirectPropertyPath);
+                continue;
+            }
+
+            SerializedObject serializedObject = GetOrCreateSerializedObject(preparedWrite.Asset, serializedObjects);
+            string resolvedPath;
+            string warning;
+
+            if (!ExcelDataStableFieldBindingResolver.TryResolveProperty(preparedWrite.Binding,
+                                                                        serializedObject,
+                                                                        out SerializedProperty _,
+                                                                        out resolvedPath,
+                                                                        out warning))
+                throw new InvalidOperationException("Import target resolution failed before staging at " +
+                                                    preparedWrite.Address + ": " + warning);
+
+            resolvedPaths.Add(resolvedPath);
+        }
+
+        return resolvedPaths;
     }
 
     /// <summary>
@@ -312,6 +395,11 @@ internal static class ExcelDataImportApplyService
         {
             get;
         }
+
+        public string DirectPropertyPath
+        {
+            get;
+        }
         #endregion
 
         #region Methods
@@ -324,15 +412,18 @@ internal static class ExcelDataImportApplyService
         /// <param name="binding">Concrete target field binding.</param>
         /// <param name="incomingValue">Parsed workbook cell value source.</param>
         /// <param name="address">Readable Excel address for diagnostics.</param>
+        /// <param name="directPropertyPath">Final route for a formula-aware scaling member, or empty for stable binding resolution.</param>
         public PreparedWrite(Object asset,
                              ExcelDataFieldBinding binding,
                              ExcelDataImportCellValue incomingValue,
-                             string address)
+                             string address,
+                             string directPropertyPath)
         {
             Asset = asset;
             Binding = binding;
             IncomingValue = incomingValue;
             Address = address;
+            DirectPropertyPath = directPropertyPath ?? string.Empty;
         }
         #endregion
 

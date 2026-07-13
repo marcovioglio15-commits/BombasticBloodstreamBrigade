@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the coordinate-labelled workbook grid and structural row or column insertion separators.
+/// Builds the coordinate-labelled workbook grid and structural row or column edit separators.
 /// </summary>
 internal static class ExcelDataLayoutBrushGridUtility
 {
@@ -21,7 +21,7 @@ internal static class ExcelDataLayoutBrushGridUtility
 
     #region Public Methods
     /// <summary>
-    /// Rebuilds the active worksheet with Excel headers, exact cells and right-click insertion separators.
+    /// Rebuilds the active worksheet with Excel headers, exact cells and right-click structural separators.
     /// </summary>
     /// <param name="gridRoot">Visual root receiving the grid.</param>
     /// <param name="sheet">Active grid-authoritative worksheet.</param>
@@ -32,6 +32,8 @@ internal static class ExcelDataLayoutBrushGridUtility
     /// <param name="cellClicked">Callback invoked when a grid cell is left-clicked.</param>
     /// <param name="insertRow">Callback invoked with the one-based new empty row index.</param>
     /// <param name="insertColumn">Callback invoked with the one-based new empty column index.</param>
+    /// <param name="removeRow">Callback invoked with the one-based row index to remove.</param>
+    /// <param name="removeColumn">Callback invoked with the one-based column index to remove.</param>
     public static void RebuildGrid(VisualElement gridRoot,
                                    ExcelDataWorkbookSheetDefinition sheet,
                                    ExcelDataBrushPalettePreset brushPalettePreset,
@@ -40,7 +42,9 @@ internal static class ExcelDataLayoutBrushGridUtility
                                    int selectedColumnIndex,
                                    Action<int, int> cellClicked,
                                    Action<int> insertRow,
-                                   Action<int> insertColumn)
+                                   Action<int> insertColumn,
+                                   Action<int> removeRow,
+                                   Action<int> removeColumn)
     {
         if (gridRoot == null)
             return;
@@ -65,7 +69,11 @@ internal static class ExcelDataLayoutBrushGridUtility
         ScrollView scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
         scrollView.style.flexGrow = 1f;
         gridRoot.Add(scrollView);
-        scrollView.Add(CreateColumnHeaderRow(visibleColumns, cellWidth, cellHeight, insertColumn));
+        scrollView.Add(CreateColumnHeaderRow(visibleColumns,
+                                             cellWidth,
+                                             cellHeight,
+                                             insertColumn,
+                                             removeColumn));
 
         // Build each row with a real gutter and dedicated vertical insertion hit areas.
         for (int rowIndex = 1; rowIndex <= visibleRows; rowIndex++)
@@ -80,10 +88,11 @@ internal static class ExcelDataLayoutBrushGridUtility
                                          selectedRowIndex,
                                          selectedColumnIndex,
                                          cellClicked,
-                                         insertColumn));
+                                         insertColumn,
+                                         removeColumn));
 
             if (rowIndex < visibleRows)
-                scrollView.Add(CreateRowSeparator(rowIndex + 1, gridWidth, insertRow));
+                scrollView.Add(CreateRowSeparator(rowIndex + 1, gridWidth, insertRow, removeRow));
         }
     }
     #endregion
@@ -96,11 +105,13 @@ internal static class ExcelDataLayoutBrushGridUtility
     /// <param name="cellWidth">Stable cell width.</param>
     /// <param name="cellHeight">Stable cell height.</param>
     /// <param name="insertColumn">Structural insertion callback.</param>
+    /// <param name="removeColumn">Structural removal callback.</param>
     /// <returns>Configured header row.</returns>
     private static VisualElement CreateColumnHeaderRow(int visibleColumns,
                                                        float cellWidth,
                                                        float cellHeight,
-                                                       Action<int> insertColumn)
+                                                       Action<int> insertColumn,
+                                                       Action<int> removeColumn)
     {
         VisualElement row = CreateFixedRow(cellHeight);
         row.Add(CreateHeaderLabel(string.Empty, RowGutterWidth, cellHeight));
@@ -112,7 +123,10 @@ internal static class ExcelDataLayoutBrushGridUtility
                                       cellHeight));
 
             if (columnIndex < visibleColumns)
-                row.Add(CreateColumnSeparator(columnIndex + 1, cellHeight, insertColumn));
+                row.Add(CreateColumnSeparator(columnIndex + 1,
+                                              cellHeight,
+                                              insertColumn,
+                                              removeColumn));
         }
 
         return row;
@@ -132,6 +146,7 @@ internal static class ExcelDataLayoutBrushGridUtility
     /// <param name="selectedColumnIndex">Selected column index.</param>
     /// <param name="cellClicked">Cell click callback.</param>
     /// <param name="insertColumn">Structural insertion callback.</param>
+    /// <param name="removeColumn">Structural removal callback.</param>
     /// <returns>Configured data row.</returns>
     private static VisualElement CreateDataRow(ExcelDataWorkbookSheetDefinition sheet,
                                                ExcelDataBrushPalettePreset brushPalettePreset,
@@ -143,7 +158,8 @@ internal static class ExcelDataLayoutBrushGridUtility
                                                int selectedRowIndex,
                                                int selectedColumnIndex,
                                                Action<int, int> cellClicked,
-                                               Action<int> insertColumn)
+                                               Action<int> insertColumn,
+                                               Action<int> removeColumn)
     {
         VisualElement row = CreateFixedRow(cellHeight);
         row.Add(CreateHeaderLabel(rowIndex.ToString(System.Globalization.CultureInfo.InvariantCulture),
@@ -163,7 +179,10 @@ internal static class ExcelDataLayoutBrushGridUtility
                                      cellClicked));
 
             if (columnIndex < visibleColumns)
-                row.Add(CreateColumnSeparator(columnIndex + 1, cellHeight, insertColumn));
+                row.Add(CreateColumnSeparator(columnIndex + 1,
+                                              cellHeight,
+                                              insertColumn,
+                                              removeColumn));
         }
 
         return row;
@@ -239,7 +258,10 @@ internal static class ExcelDataLayoutBrushGridUtility
         button.style.overflow = Overflow.Hidden;
 
         if (cell != null)
-            button.style.backgroundColor = ResolveCellColor(cell, brushPalettePreset, allEntries);
+        {
+            button.style.backgroundColor = ExcelDataBrushPaletteColorUtility.ResolveCellColor(cell, brushPalettePreset);
+            button.style.color = ExcelDataBrushPaletteColorUtility.ResolveCellTextColor(cell, brushPalettePreset);
+        }
 
         if (selected)
         {
@@ -323,18 +345,31 @@ internal static class ExcelDataLayoutBrushGridUtility
     /// <param name="insertionColumnIndex">One-based new empty column index.</param>
     /// <param name="height">Separator height matching its row.</param>
     /// <param name="insertColumn">Structural insertion callback.</param>
+    /// <param name="removeColumn">Structural removal callback.</param>
     /// <returns>Configured separator.</returns>
     private static VisualElement CreateColumnSeparator(int insertionColumnIndex,
                                                        float height,
-                                                       Action<int> insertColumn)
+                                                       Action<int> insertColumn,
+                                                       Action<int> removeColumn)
     {
         VisualElement separator = CreateSeparator(SeparatorSize, height);
         separator.AddToClassList("excel-data-column-insert-separator");
-        separator.tooltip = "Right-click to insert an empty column here.";
+        separator.tooltip = "Right-click to insert a column here or remove the column on either side.";
         separator.AddManipulator(new ContextualMenuManipulator(evt =>
+        {
             evt.menu.AppendAction("Insert Empty Column Here",
                                   action => insertColumn(insertionColumnIndex),
-                                  DropdownMenuAction.AlwaysEnabled)));
+                                  DropdownMenuAction.AlwaysEnabled);
+            evt.menu.AppendSeparator();
+            AppendColumnRemovalAction(evt.menu,
+                                      "Remove Column Left",
+                                      insertionColumnIndex - 1,
+                                      removeColumn);
+            AppendColumnRemovalAction(evt.menu,
+                                      "Remove Column Right",
+                                      insertionColumnIndex,
+                                      removeColumn);
+        }));
         return separator;
     }
 
@@ -344,19 +379,67 @@ internal static class ExcelDataLayoutBrushGridUtility
     /// <param name="insertionRowIndex">One-based new empty row index.</param>
     /// <param name="width">Separator width spanning gutter and visible cells.</param>
     /// <param name="insertRow">Structural insertion callback.</param>
+    /// <param name="removeRow">Structural removal callback.</param>
     /// <returns>Configured separator.</returns>
     private static VisualElement CreateRowSeparator(int insertionRowIndex,
                                                     float width,
-                                                    Action<int> insertRow)
+                                                    Action<int> insertRow,
+                                                    Action<int> removeRow)
     {
         VisualElement separator = CreateSeparator(width, SeparatorSize);
         separator.AddToClassList("excel-data-row-insert-separator");
-        separator.tooltip = "Right-click to insert an empty row here.";
+        separator.tooltip = "Right-click to insert a row here or remove the row on either side.";
         separator.AddManipulator(new ContextualMenuManipulator(evt =>
+        {
             evt.menu.AppendAction("Insert Empty Row Here",
                                   action => insertRow(insertionRowIndex),
-                                  DropdownMenuAction.AlwaysEnabled)));
+                                  DropdownMenuAction.AlwaysEnabled);
+            evt.menu.AppendSeparator();
+            AppendRowRemovalAction(evt.menu,
+                                   "Remove Row Above",
+                                   insertionRowIndex - 1,
+                                   removeRow);
+            AppendRowRemovalAction(evt.menu,
+                                   "Remove Row Below",
+                                   insertionRowIndex,
+                                   removeRow);
+        }));
         return separator;
+    }
+
+    /// <summary>
+    /// Adds one unambiguous column-removal action with its Excel column name.
+    /// </summary>
+    /// <param name="menu">Context menu receiving the removal action.</param>
+    /// <param name="label">Relative side label shown to the user.</param>
+    /// <param name="columnIndex">One-based column index removed by the action.</param>
+    /// <param name="removeColumn">Structural removal callback.</param>
+    private static void AppendColumnRemovalAction(DropdownMenu menu,
+                                                  string label,
+                                                  int columnIndex,
+                                                  Action<int> removeColumn)
+    {
+        string columnName = ExcelDataWorkbookCoordinateUtility.ColumnIndexToName(columnIndex);
+        menu.AppendAction(label + " (" + columnName + ")",
+                          action => removeColumn(columnIndex),
+                          DropdownMenuAction.AlwaysEnabled);
+    }
+
+    /// <summary>
+    /// Adds one unambiguous row-removal action with its one-based row number.
+    /// </summary>
+    /// <param name="menu">Context menu receiving the removal action.</param>
+    /// <param name="label">Relative side label shown to the user.</param>
+    /// <param name="rowIndex">One-based row index removed by the action.</param>
+    /// <param name="removeRow">Structural removal callback.</param>
+    private static void AppendRowRemovalAction(DropdownMenu menu,
+                                               string label,
+                                               int rowIndex,
+                                               Action<int> removeRow)
+    {
+        menu.AppendAction(label + " (" + rowIndex.ToString(System.Globalization.CultureInfo.InvariantCulture) + ")",
+                          action => removeRow(rowIndex),
+                          DropdownMenuAction.AlwaysEnabled);
     }
 
     /// <summary>
@@ -379,61 +462,7 @@ internal static class ExcelDataLayoutBrushGridUtility
     }
     #endregion
 
-    #region Color Resolution
-    /// <summary>
-    /// Resolves exact saved-brush color before payload-aware fallback colors.
-    /// </summary>
-    /// <param name="cell">Authored cell definition.</param>
-    /// <param name="brushPalettePreset">Brush palette containing exact IDs.</param>
-    /// <param name="allEntries">Cached field catalog.</param>
-    /// <returns>Cell background color.</returns>
-    private static Color ResolveCellColor(ExcelDataWorkbookCellDefinition cell,
-                                          ExcelDataBrushPalettePreset brushPalettePreset,
-                                          IReadOnlyList<ExcelDataFieldCatalogEntry> allEntries)
-    {
-        ExcelDataBrushDefinition exactBrush =
-            ExcelDataLayoutBrushPaletteUtility.FindBrushById(brushPalettePreset, cell.BrushId);
-
-        if (exactBrush != null)
-            return exactBrush.Color;
-
-        ExcelDataBrushTypeColorPalette typeColors = brushPalettePreset == null
-            ? null
-            : brushPalettePreset.DataTypeColors;
-
-        if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
-            return typeColors == null
-                ? new Color(0.82f, 0.72f, 0.32f, 1f)
-                : typeColors.LiteralText;
-
-        ExcelDataFieldCatalogEntry entry = FindEntryById(allEntries,
-                                                         cell.FieldBinding == null ? string.Empty : cell.FieldBinding.FieldId);
-
-        if (entry == null)
-            return typeColors == null
-                ? new Color(0.55f, 0.2f, 0.2f, 1f)
-                : typeColors.Unresolved;
-
-        if (typeColors != null)
-            return typeColors.ResolveColor(entry.DataKind, entry.IsConcreteListElement);
-
-        switch (entry.DataKind)
-        {
-            case ExcelDataBrushDataKind.Number:
-                return new Color(0.3f, 0.58f, 0.9f, 1f);
-            case ExcelDataBrushDataKind.Boolean:
-                return new Color(0.3f, 0.7f, 0.42f, 1f);
-            case ExcelDataBrushDataKind.Enum:
-                return new Color(0.32f, 0.7f, 0.78f, 1f);
-            case ExcelDataBrushDataKind.ObjectReference:
-                return new Color(0.84f, 0.35f, 0.35f, 1f);
-            case ExcelDataBrushDataKind.ListSize:
-                return new Color(0.86f, 0.55f, 0.24f, 1f);
-            default:
-                return new Color(0.65f, 0.65f, 0.65f, 1f);
-        }
-    }
-
+    #region Catalog Lookup
     /// <summary>
     /// Finds a catalog entry by stable field ID.
     /// </summary>

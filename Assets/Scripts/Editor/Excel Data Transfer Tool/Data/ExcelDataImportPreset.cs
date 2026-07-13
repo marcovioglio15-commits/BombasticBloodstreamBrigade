@@ -40,6 +40,9 @@ public sealed class ExcelDataImportPreset : ScriptableObject
     [Tooltip("Block import when an asset-name reference resolves to more than one project asset.")]
     [SerializeField] private bool blockAmbiguousReferences = true;
 
+    [Tooltip("Controls Player Add Scaling list semantics. Existing Rules Only preserves list structure; Merge Rules By Stat Key may append a rule only when statKey, addScaling and formula are all mapped and valid.")]
+    [SerializeField] private ExcelDataScalingRuleImportPolicy scalingRuleImportPolicy = ExcelDataScalingRuleImportPolicy.ExistingRulesOnly;
+
     [Header("Domains")]
     [Tooltip("Allow importing Player Management Tool ScriptableObject data.")]
     [SerializeField] private bool includePlayerData = true;
@@ -130,6 +133,14 @@ public sealed class ExcelDataImportPreset : ScriptableObject
         get
         {
             return blockAmbiguousReferences;
+        }
+    }
+
+    public ExcelDataScalingRuleImportPolicy ScalingRuleImportPolicy
+    {
+        get
+        {
+            return scalingRuleImportPolicy;
         }
     }
 

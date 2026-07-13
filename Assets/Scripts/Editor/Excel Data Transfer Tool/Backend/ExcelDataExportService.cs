@@ -26,7 +26,10 @@ internal static class ExcelDataExportService
         ExcelDataWorkbookExportBuildResult buildResult =
             ExcelDataWorkbookDocumentBuilder.BuildExportDocument(
                 layoutPreset,
-                binding => ResolveFieldValue(binding, exportPreset));
+                binding => ResolveFieldValue(binding, exportPreset),
+                masterPreset.BrushPalettePreset,
+                exportPreset.WriteBrushBackgroundColors,
+                exportPreset.WriteBrushTextColors);
         string layoutHash = ExcelDataWorkbookLayoutHashUtility.Calculate(layoutPreset);
         string exportedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture);
         int technicalRowCount =

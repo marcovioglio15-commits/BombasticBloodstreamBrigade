@@ -24,27 +24,16 @@ internal static class ExcelDataSerializedValueReader
                                                              bool writeReferenceGuids,
                                                              bool writeReferencePaths)
     {
-        if (binding == null || !binding.IsUsable())
-            return ExcelDataSerializedValueSnapshot.CreateWarning("Missing or unusable field binding.", string.Empty);
-
         string resolvedOwnerAssetPath = ExcelDataFieldBindingAssetUtility.ResolveOwnerAssetPath(binding);
+        SerializedProperty property;
+        string warning;
 
-        if (string.IsNullOrWhiteSpace(resolvedOwnerAssetPath))
-            return ExcelDataSerializedValueSnapshot.CreateWarning("Owner asset could not be resolved from GUID or stored path.", string.Empty);
-
-        UnityEngine.Object asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(resolvedOwnerAssetPath);
-
-        if (asset == null)
-            return ExcelDataSerializedValueSnapshot.CreateWarning("Missing owner asset at path: " + resolvedOwnerAssetPath, resolvedOwnerAssetPath);
-
-        if (string.IsNullOrWhiteSpace(binding.SerializedPath))
-            return ExcelDataSerializedValueSnapshot.CreateWarning("Binding has no concrete serialized property path.", resolvedOwnerAssetPath);
-
-        SerializedObject serializedObject = new SerializedObject(asset);
-        SerializedProperty property = serializedObject.FindProperty(binding.SerializedPath);
-
-        if (property == null)
-            return ExcelDataSerializedValueSnapshot.CreateWarning("Missing serialized property: " + binding.SerializedPath, resolvedOwnerAssetPath);
+        if (!ExcelDataFieldBindingAssetUtility.TryResolveTarget(binding,
+                                                                out UnityEngine.Object _,
+                                                                out SerializedObject _,
+                                                                out property,
+                                                                out warning))
+            return ExcelDataSerializedValueSnapshot.CreateWarning(warning, resolvedOwnerAssetPath);
 
         return ReadPropertyValue(property,
                                  resolvedOwnerAssetPath,

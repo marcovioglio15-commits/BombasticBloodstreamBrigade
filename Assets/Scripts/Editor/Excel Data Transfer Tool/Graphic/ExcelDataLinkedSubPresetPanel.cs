@@ -409,24 +409,55 @@ internal sealed class ExcelDataLinkedSubPresetPanel
     private void BuildPoliciesSection()
     {
         SerializedObject serializedObject = new SerializedObject(selectedPreset);
-        VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, panelType == ExcelDataTransferPanelType.ImportPreset ? "Policies" : "Filters");
 
         if (panelType == ExcelDataTransferPanelType.ImportPreset)
         {
+            VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Policies");
             ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "conflictPolicy", "Conflict Policy", "Policy used when workbook values target existing Unity data.");
             ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "missingRowPolicy", "Missing Row Policy", "Policy used when workbook rows are absent but Unity data exists.");
             ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "referenceResolutionMode", "Reference Resolution", "Resolver used for asset-name, GUID and path metadata.");
             ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "requirePreviewBeforeApply", "Require Preview Before Apply", "Require preview before import mutates assets.");
             ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "blockAmbiguousReferences", "Block Ambiguous References", "Block import when an asset name is ambiguous.");
+            ExcelDataTransferMasterPanelFieldUtility.AddDomainFields(parentPanel,
+                                                                      section,
+                                                                      serializedObject,
+                                                                      true);
+            SerializedProperty includePlayerDataProperty = serializedObject.FindProperty("includePlayerData");
+            SerializedProperty includeConcreteListElementsProperty = serializedObject.FindProperty("includeConcreteListElements");
+
+            if (includePlayerDataProperty != null && includePlayerDataProperty.boolValue &&
+                includeConcreteListElementsProperty != null && includeConcreteListElementsProperty.boolValue)
+            {
+                VisualElement scalingSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot,
+                                                                                                         "Player Scaling Rules");
+                ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(
+                    scalingSection,
+                    serializedObject,
+                    "scalingRuleImportPolicy",
+                    "Scaling Rule Import Policy",
+                    "Existing Rules Only updates a rule only when its mapped statKey still identifies that rule. Merge Rules By Stat Key may redirect to an existing unique statKey or append a new rule only when statKey, addScaling and formula are all mapped in the same source group. Neither mode deletes rules.");
+            }
         }
         else
         {
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "writeAssetNames", "Write Asset Names", "Write readable asset names for object references.");
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "writeReferenceGuids", "Write Reference GUIDs", "Write GUID metadata to disambiguate references.");
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "writeReferencePaths", "Write Reference Paths", "Write asset paths for diagnostics.");
+            VisualElement presentationSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Workbook Presentation");
+            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(presentationSection,
+                                                                       serializedObject,
+                                                                       "writeBrushBackgroundColors",
+                                                                       "Write Brush Background Colors",
+                                                                       "Apply Layout Brush colors to authored workbook cells. Disable this for a neutral Excel grid while retaining full-range borders.");
+            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(presentationSection,
+                                                                       serializedObject,
+                                                                       "writeBrushTextColors",
+                                                                       "Write Brush Text Colors",
+                                                                       "Apply each saved Layout Brush text color to authored workbook cells. Disable this to retain the workbook's default font color.");
+            VisualElement referenceSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "References");
+            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(referenceSection, serializedObject, "writeAssetNames", "Write Asset Names", "Write readable asset names for object references.");
+            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(referenceSection, serializedObject, "writeReferenceGuids", "Write Reference GUIDs", "Write GUID metadata to disambiguate references.");
+            ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(referenceSection, serializedObject, "writeReferencePaths", "Write Reference Paths", "Write asset paths for diagnostics.");
+            VisualElement domainSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Domain Guardrails");
+            ExcelDataTransferMasterPanelFieldUtility.AddDomainFields(parentPanel, domainSection, serializedObject);
         }
-
-        ExcelDataTransferMasterPanelFieldUtility.AddDomainFields(parentPanel, section, serializedObject);
     }
 
     /// <summary>

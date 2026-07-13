@@ -21,6 +21,7 @@ MonoBehaviour:
   referenceResolutionMode: 1
   requirePreviewBeforeApply: 1
   blockAmbiguousReferences: 1
+  scalingRuleImportPolicy: 0
   includePlayerData: 1
   includeEnemyData: 1
   includeGameData: 1

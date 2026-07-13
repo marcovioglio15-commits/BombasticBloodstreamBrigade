@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Stores a cell-oriented workbook in memory before an editor-only adapter writes it to disk.
@@ -34,13 +35,15 @@ internal sealed class ExcelDataWorkbookDocument
     /// <param name="visibility">Workbook visibility assigned by the adapter.</param>
     /// <param name="minimumColumnWidthPixels">Minimum exported column width derived from the authoring preview.</param>
     /// <param name="autoSizeColumns">True when the adapter should fit columns to their actual exported values.</param>
+    /// <param name="formatLayoutGrid">True when every matrix cell must receive the workbook layout border style.</param>
     /// <returns>Created worksheet document.</returns>
     public ExcelDataWorkbookSheetDocument AddSheet(string sheetName,
                                                    int rowCount,
                                                    int columnCount,
                                                    ExcelDataWorkbookSheetVisibility visibility,
                                                    int minimumColumnWidthPixels = 0,
-                                                   bool autoSizeColumns = false)
+                                                   bool autoSizeColumns = false,
+                                                   bool formatLayoutGrid = false)
     {
         // Validate identity and dimensions before allocating a potentially large matrix.
         if (string.IsNullOrWhiteSpace(sheetName))
@@ -62,7 +65,8 @@ internal sealed class ExcelDataWorkbookDocument
                                                columnCount,
                                                visibility,
                                                minimumColumnWidthPixels,
-                                               autoSizeColumns);
+                                               autoSizeColumns,
+                                               formatLayoutGrid);
         sheets.Add(sheet);
         sheetsByName.Add(sheetName, sheet);
         return sheet;
@@ -93,6 +97,8 @@ internal sealed class ExcelDataWorkbookSheetDocument
 {
     #region Fields
     private readonly object[,] values;
+    private readonly Color32?[,] backgroundColors;
+    private readonly Color32?[,] textColors;
     #endregion
 
     #region Properties
@@ -125,6 +131,11 @@ internal sealed class ExcelDataWorkbookSheetDocument
     {
         get;
     }
+
+    public bool FormatLayoutGrid
+    {
+        get;
+    }
     #endregion
 
     #region Methods
@@ -139,12 +150,14 @@ internal sealed class ExcelDataWorkbookSheetDocument
     /// <param name="visibility">Workbook worksheet visibility.</param>
     /// <param name="minimumColumnWidthPixels">Minimum exported column width in pixels.</param>
     /// <param name="autoSizeColumns">True when content-based widths should be written after export.</param>
+    /// <param name="formatLayoutGrid">True when the complete matrix must receive workbook grid formatting.</param>
     public ExcelDataWorkbookSheetDocument(string sheetName,
                                           int rowCount,
                                           int columnCount,
                                           ExcelDataWorkbookSheetVisibility visibility,
                                           int minimumColumnWidthPixels,
-                                          bool autoSizeColumns)
+                                          bool autoSizeColumns,
+                                          bool formatLayoutGrid)
     {
         SheetName = sheetName;
         RowCount = rowCount;
@@ -152,7 +165,10 @@ internal sealed class ExcelDataWorkbookSheetDocument
         Visibility = visibility;
         MinimumColumnWidthPixels = minimumColumnWidthPixels;
         AutoSizeColumns = autoSizeColumns;
+        FormatLayoutGrid = formatLayoutGrid;
         values = new object[rowCount, columnCount];
+        backgroundColors = new Color32?[rowCount, columnCount];
+        textColors = new Color32?[rowCount, columnCount];
     }
     #endregion
 
@@ -179,6 +195,76 @@ internal sealed class ExcelDataWorkbookSheetDocument
     {
         ValidateCoordinate(rowIndex, columnIndex);
         return values[rowIndex - 1, columnIndex - 1];
+    }
+
+    /// <summary>
+    /// Stores one opaque presentation color for a workbook cell without changing its value.
+    /// </summary>
+    /// <param name="rowIndex">One-based Excel row index.</param>
+    /// <param name="columnIndex">One-based Excel column index.</param>
+    /// <param name="color">Unity brush color converted to an Open XML-compatible RGB value.</param>
+    public void SetBackgroundColor(int rowIndex, int columnIndex, Color color)
+    {
+        ValidateCoordinate(rowIndex, columnIndex);
+        backgroundColors[rowIndex - 1, columnIndex - 1] = (Color32)color;
+    }
+
+    /// <summary>
+    /// Reads the optional brush background color stored for one exact worksheet coordinate.
+    /// </summary>
+    /// <param name="rowIndex">One-based Excel row index.</param>
+    /// <param name="columnIndex">One-based Excel column index.</param>
+    /// <param name="color">Resolved opaque RGB color when one was authored.</param>
+    /// <returns>True when the coordinate owns a brush background color.</returns>
+    public bool TryGetBackgroundColor(int rowIndex, int columnIndex, out Color32 color)
+    {
+        ValidateCoordinate(rowIndex, columnIndex);
+        Color32? storedColor = backgroundColors[rowIndex - 1, columnIndex - 1];
+
+        if (!storedColor.HasValue)
+        {
+            color = default;
+            return false;
+        }
+
+        color = storedColor.Value;
+        color.a = byte.MaxValue;
+        return true;
+    }
+
+    /// <summary>
+    /// Stores one opaque text color for a workbook cell without changing its value or background.
+    /// </summary>
+    /// <param name="rowIndex">One-based Excel row index.</param>
+    /// <param name="columnIndex">One-based Excel column index.</param>
+    /// <param name="color">Unity brush text color converted to an Open XML-compatible RGB value.</param>
+    public void SetTextColor(int rowIndex, int columnIndex, Color color)
+    {
+        ValidateCoordinate(rowIndex, columnIndex);
+        textColors[rowIndex - 1, columnIndex - 1] = (Color32)color;
+    }
+
+    /// <summary>
+    /// Reads the optional brush text color stored for one exact worksheet coordinate.
+    /// </summary>
+    /// <param name="rowIndex">One-based Excel row index.</param>
+    /// <param name="columnIndex">One-based Excel column index.</param>
+    /// <param name="color">Resolved opaque RGB text color when one was authored.</param>
+    /// <returns>True when the coordinate owns a brush text color.</returns>
+    public bool TryGetTextColor(int rowIndex, int columnIndex, out Color32 color)
+    {
+        ValidateCoordinate(rowIndex, columnIndex);
+        Color32? storedColor = textColors[rowIndex - 1, columnIndex - 1];
+
+        if (!storedColor.HasValue)
+        {
+            color = default;
+            return false;
+        }
+
+        color = storedColor.Value;
+        color.a = byte.MaxValue;
+        return true;
     }
     #endregion
 

@@ -14,10 +14,16 @@ internal static class ExcelDataWorkbookDocumentBuilder
     /// </summary>
     /// <param name="layoutPreset">Layout preset containing sheet and cell definitions.</param>
     /// <param name="fieldValueResolver">Callback that resolves typed snapshots for Data Field cells.</param>
+    /// <param name="brushPalettePreset">Palette used to preserve authored cell background and text colors.</param>
+    /// <param name="writeBrushBackgroundColors">True when user-sheet cells should retain Unity brush colors.</param>
+    /// <param name="writeBrushTextColors">True when user-sheet cells should retain Unity brush text colors.</param>
     /// <returns>Workbook document plus sheet, cell, count and warning records.</returns>
     public static ExcelDataWorkbookExportBuildResult BuildExportDocument(
         ExcelDataWorkbookLayoutPreset layoutPreset,
-        Func<ExcelDataFieldBinding, ExcelDataSerializedValueSnapshot> fieldValueResolver)
+        Func<ExcelDataFieldBinding, ExcelDataSerializedValueSnapshot> fieldValueResolver,
+        ExcelDataBrushPalettePreset brushPalettePreset,
+        bool writeBrushBackgroundColors,
+        bool writeBrushTextColors)
     {
         if (layoutPreset == null)
             throw new ArgumentNullException(nameof(layoutPreset));
@@ -33,7 +39,12 @@ internal static class ExcelDataWorkbookDocumentBuilder
             if (sheetDefinition == null || !sheetDefinition.ExportEnabled)
                 continue;
 
-            AddExportSheet(result, sheetDefinition, fieldValueResolver);
+            AddExportSheet(result,
+                           sheetDefinition,
+                           fieldValueResolver,
+                           brushPalettePreset,
+                           writeBrushBackgroundColors,
+                           writeBrushTextColors);
         }
 
         return result;
@@ -42,42 +53,48 @@ internal static class ExcelDataWorkbookDocumentBuilder
 
     #region Sheet Building
     /// <summary>
-    /// Adds one export-enabled sheet when it contains at least one authored export cell.
+    /// Adds one complete export-enabled layout sheet, including empty preview coordinates.
     /// </summary>
     /// <param name="result">Build result receiving the worksheet and exported cell records.</param>
     /// <param name="sheetDefinition">Authored worksheet definition.</param>
     /// <param name="fieldValueResolver">Typed data-field snapshot resolver.</param>
+    /// <param name="brushPalettePreset">Palette used to resolve exact and semantic cell colors.</param>
+    /// <param name="writeBrushBackgroundColors">True when authored brush backgrounds should be exported.</param>
+    /// <param name="writeBrushTextColors">True when authored brush text colors should be exported.</param>
     private static void AddExportSheet(ExcelDataWorkbookExportBuildResult result,
                                        ExcelDataWorkbookSheetDefinition sheetDefinition,
-                                       Func<ExcelDataFieldBinding, ExcelDataSerializedValueSnapshot> fieldValueResolver)
+                                       Func<ExcelDataFieldBinding, ExcelDataSerializedValueSnapshot> fieldValueResolver,
+                                       ExcelDataBrushPalettePreset brushPalettePreset,
+                                       bool writeBrushBackgroundColors,
+                                       bool writeBrushTextColors)
     {
         List<ExcelDataWorkbookCellDefinition> cells = sheetDefinition.Cells;
         HashSet<long> coordinates = new HashSet<long>();
-        int maximumRowIndex = 0;
-        int maximumColumnIndex = 0;
+        int maximumRowIndex = Math.Max(1, sheetDefinition.PreviewRowCount);
+        int maximumColumnIndex = Math.Max(1, sheetDefinition.PreviewColumnCount);
 
-        // Validate ownership, reject duplicate export coordinates and determine exact used dimensions.
+        // Validate every authored coordinate and expand dimensions for payloads beyond the preview bounds.
         for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
         {
             ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
 
-            if (!IncludesExportCell(cell))
+            if (cell == null || cell.RowIndex <= 0 || cell.ColumnIndex <= 0)
                 continue;
 
             if (!string.Equals(cell.SheetId, sheetDefinition.SheetId, StringComparison.Ordinal))
                 throw new InvalidOperationException("Workbook cell references a different owner sheet: " + cell.SheetId);
 
+            maximumRowIndex = Math.Max(maximumRowIndex, cell.RowIndex);
+            maximumColumnIndex = Math.Max(maximumColumnIndex, cell.ColumnIndex);
+
+            if (!IncludesExportCell(cell))
+                continue;
+
             long coordinate = ExcelDataWorkbookCoordinateUtility.BuildKey(cell.RowIndex, cell.ColumnIndex);
 
             if (!coordinates.Add(coordinate))
                 throw new InvalidOperationException("Duplicate export cell at " + sheetDefinition.SheetName + "!" + cell.RowIndex + "," + cell.ColumnIndex + ".");
-
-            maximumRowIndex = Math.Max(maximumRowIndex, cell.RowIndex);
-            maximumColumnIndex = Math.Max(maximumColumnIndex, cell.ColumnIndex);
         }
-
-        if (maximumRowIndex <= 0 || maximumColumnIndex <= 0)
-            return;
 
         ExcelDataWorkbookSheetDocument sheet =
             result.Document.AddSheet(sheetDefinition.SheetName,
@@ -85,8 +102,31 @@ internal static class ExcelDataWorkbookDocumentBuilder
                                      maximumColumnIndex,
                                      sheetDefinition.Visibility,
                                      sheetDefinition.PreviewCellWidth,
+                                     true,
                                      true);
         result.RegisterSheet(sheetDefinition);
+
+        // Preserve presentation for export, import-only and literal cells without writing disabled values.
+        if (writeBrushBackgroundColors || writeBrushTextColors)
+        {
+            for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+            {
+                ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+                if (cell == null || cell.RowIndex <= 0 || cell.ColumnIndex <= 0)
+                    continue;
+
+                if (writeBrushBackgroundColors)
+                    sheet.SetBackgroundColor(cell.RowIndex,
+                                             cell.ColumnIndex,
+                                             ExcelDataBrushPaletteColorUtility.ResolveCellColor(cell, brushPalettePreset));
+
+                if (writeBrushTextColors)
+                    sheet.SetTextColor(cell.RowIndex,
+                                       cell.ColumnIndex,
+                                       ExcelDataBrushPaletteColorUtility.ResolveCellTextColor(cell, brushPalettePreset));
+            }
+        }
 
         // Resolve each data field once and write its typed value at the exact one-based coordinate.
         for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)

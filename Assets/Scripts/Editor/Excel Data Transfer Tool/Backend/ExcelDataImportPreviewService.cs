@@ -31,6 +31,7 @@ internal static class ExcelDataImportPreviewService
         ValidateWorkbookCompatibility(readResult, layoutPreset, currentLayoutHash, blockingReasons);
         List<PreviewCandidate> candidates = BuildCandidates(layoutPreset, importPreset, readResult, blockingReasons);
         ValidateDuplicateFieldMappings(candidates, blockingReasons);
+        ExcelDataPlayerScalingPreviewUtility.Validate(candidates, importPreset, blockingReasons);
 
         if (importPreset.ConflictPolicy == ExcelDataImportConflictPolicy.PreviewOnly)
             AddUniqueReason(blockingReasons, "Import preset conflict policy is Preview Only.");
@@ -270,7 +271,7 @@ internal static class ExcelDataImportPreviewService
         candidate.AssetName = asset.name;
         ExcelDataSerializedValueSnapshot currentSnapshot =
             ExcelDataSerializedValueReader.ReadValue(binding, true, true, true);
-        candidate.CurrentValue = ConvertToInvariantText(currentSnapshot.Value);
+        candidate.CurrentValue = ExcelDataInvariantValueUtility.ToText(currentSnapshot.Value);
 
         if (!string.IsNullOrWhiteSpace(currentSnapshot.Warning))
             candidate.AddWarning(currentSnapshot.Warning);
@@ -504,24 +505,6 @@ internal static class ExcelDataImportPreviewService
     }
 
     /// <summary>
-    /// Converts a current typed Unity value into invariant preview text.
-    /// </summary>
-    /// <param name="value">Typed serialized value.</param>
-    /// <returns>Invariant text, or an empty string.</returns>
-    private static string ConvertToInvariantText(object value)
-    {
-        if (value == null)
-            return string.Empty;
-
-        IFormattable formattable = value as IFormattable;
-
-        if (formattable != null)
-            return formattable.ToString(null, CultureInfo.InvariantCulture);
-
-        return value.ToString() ?? string.Empty;
-    }
-
-    /// <summary>
     /// Adds one workbook-level diagnostic only when it is not already present.
     /// </summary>
     /// <param name="blockingReasons">Blocking diagnostic collection.</param>
@@ -539,7 +522,7 @@ internal static class ExcelDataImportPreviewService
     /// <summary>
     /// Mutable preflight state used until duplicate-coordinate and duplicate-field validation completes.
     /// </summary>
-    private sealed class PreviewCandidate
+    internal sealed class PreviewCandidate
     {
         #region Properties
         public string SheetName

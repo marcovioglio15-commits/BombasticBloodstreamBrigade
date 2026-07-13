@@ -9,6 +9,14 @@ using UnityEngine.UIElements;
 /// </summary>
 internal sealed class ExcelDataLayoutBrushPanelControls
 {
+    #region Constants
+    private const string WorksheetFoldoutKey = "ExcelDataTransfer.LayoutBrush.Worksheet";
+    private const string BrushStyleFoldoutKey = "ExcelDataTransfer.LayoutBrush.BrushStyle";
+    private const string CatalogFiltersFoldoutKey = "ExcelDataTransfer.LayoutBrush.CatalogFilters";
+    private const string FieldResultsFoldoutKey = "ExcelDataTransfer.LayoutBrush.FieldResults";
+    private const string StatusFoldoutKey = "ExcelDataTransfer.LayoutBrush.Status";
+    #endregion
+
     #region Fields
     private readonly List<ExcelDataFieldCatalogEntry> allEntries = new List<ExcelDataFieldCatalogEntry>();
     private readonly List<ExcelDataFieldCatalogEntry> filteredEntries = new List<ExcelDataFieldCatalogEntry>();
@@ -19,22 +27,24 @@ internal sealed class ExcelDataLayoutBrushPanelControls
     private readonly Action catalogSelectionChanged;
 
     private readonly VisualElement root;
-    private readonly VisualElement brushStyleRoot;
+    private readonly Foldout brushStyleRoot;
     private readonly VisualElement fieldCatalogRoot;
     private readonly ObjectField masterPresetField;
     private readonly PopupField<string> sheetField;
     private ToolbarSearchField searchField;
     private EnumField domainField;
-    private EnumField dataKindField;
+    private PopupField<ExcelDataBrushDataKind> dataKindField;
     private EnumField listModeField;
     private ToolbarSearchField sourceTypeSearchField;
     private ToolbarSearchField sourceAssetSearchField;
     private VisualElement sourceAssetRoot;
     private PopupField<string> savedBrushField;
     private ColorField brushColorField;
+    private ColorField brushTextColorField;
     private ListView listView;
-    private readonly Label selectionLabel;
-    private readonly Label statusLabel;
+    private Label selectionLabel;
+    private Label statusLabel;
+    private Foldout statusFoldout;
 
     private ExcelDataFieldCatalogEntry selectedEntry;
     #endregion
@@ -87,6 +97,14 @@ internal sealed class ExcelDataLayoutBrushPanelControls
             return brushColorField;
         }
     }
+
+    public ColorField BrushTextColorField
+    {
+        get
+        {
+            return brushTextColorField;
+        }
+    }
     #endregion
 
     #region Methods
@@ -122,15 +140,22 @@ internal sealed class ExcelDataLayoutBrushPanelControls
         titleLabel.style.marginBottom = 6f;
         root.Add(titleLabel);
 
+        Foldout worksheetFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Worksheet",
+                                                                                    WorksheetFoldoutKey,
+                                                                                    true);
+        worksheetFoldout.tooltip = "Choose the transfer graph and grid-authoritative worksheet edited by the layout brush.";
+        worksheetFoldout.style.flexShrink = 0f;
+
         if (showMasterPresetField)
         {
             masterPresetField = BuildMasterPresetField();
-            root.Add(masterPresetField);
+            worksheetFoldout.Add(masterPresetField);
         }
 
         sheetField = BuildSheetField();
         sheetField.style.flexShrink = 0f;
-        root.Add(sheetField);
+        worksheetFoldout.Add(sheetField);
+        root.Add(worksheetFoldout);
         root.Add(brushInspector.Root);
         brushStyleRoot = BuildBrushStyleSection();
         brushStyleRoot.style.flexShrink = 0f;
@@ -142,17 +167,7 @@ internal sealed class ExcelDataLayoutBrushPanelControls
         fieldCatalogRoot.style.minHeight = 180f;
         fieldCatalogRoot.style.overflow = Overflow.Hidden;
         root.Add(fieldCatalogRoot);
-
-        selectionLabel = new Label();
-        selectionLabel.style.marginTop = 8f;
-        selectionLabel.style.whiteSpace = WhiteSpace.Normal;
-        selectionLabel.style.flexShrink = 0f;
-        root.Add(selectionLabel);
-        statusLabel = new Label();
-        statusLabel.style.marginTop = 8f;
-        statusLabel.style.whiteSpace = WhiteSpace.Normal;
-        statusLabel.style.flexShrink = 0f;
-        root.Add(statusLabel);
+        root.Add(BuildStatusSection());
     }
     #endregion
 
@@ -165,6 +180,24 @@ internal sealed class ExcelDataLayoutBrushPanelControls
         allEntries.Clear();
         allEntries.AddRange(ExcelDataFieldCatalogBuilder.BuildCatalog());
         RefreshSavedBrushOptions();
+        RefreshDataKindChoices();
+    }
+
+    /// <summary>
+    /// Rebuilds the Kind dropdown from current catalog capabilities and active transfer direction.
+    /// </summary>
+    public void RefreshDataKindChoices()
+    {
+        if (dataKindField == null)
+            return;
+
+        ExcelDataBrushDataKind previousKind = dataKindField.value;
+        List<ExcelDataBrushDataKind> choices =
+            ExcelDataBrushDataKindFilterUtility.BuildChoices(allEntries, brushInspector.Direction);
+        dataKindField.choices = choices;
+        dataKindField.SetValueWithoutNotify(choices.Contains(previousKind)
+            ? previousKind
+            : ExcelDataBrushDataKind.All);
         ApplyFilters();
     }
 
@@ -209,7 +242,10 @@ internal sealed class ExcelDataLayoutBrushPanelControls
     /// <param name="message">User-facing result.</param>
     public void SetStatus(string message)
     {
-        statusLabel.text = message;
+        statusLabel.text = string.IsNullOrWhiteSpace(message) ? "No pending layout operation." : message;
+
+        if (!string.IsNullOrWhiteSpace(message) && statusFoldout != null)
+            statusFoldout.value = true;
     }
 
     /// <summary>
@@ -253,20 +289,25 @@ internal sealed class ExcelDataLayoutBrushPanelControls
     /// <summary>
     /// Builds saved-brush style controls used by Data and Text modes.
     /// </summary>
-    /// <returns>Configured style section.</returns>
-    private VisualElement BuildBrushStyleSection()
+    /// <returns>Configured collapsible style section.</returns>
+    private Foldout BuildBrushStyleSection()
     {
-        VisualElement section = new VisualElement();
+        Foldout section = ManagementToolFoldoutStateUtility.CreateFoldout("Brush Style",
+                                                                          BrushStyleFoldoutKey,
+                                                                          true);
+        section.tooltip = "Choose a retained saved brush, inspect its background and text colors, and store reusable brush configurations.";
         List<string> options = ExcelDataLayoutBrushPaletteUtility.BuildSavedBrushOptions(brushPaletteResolver());
         savedBrushField = new PopupField<string>("Brush", options, 0);
         savedBrushField.tooltip = "Apply a named saved brush and retain its stable ID on newly painted cells.";
         savedBrushField.RegisterValueChangedCallback(evt => ApplySavedBrushConfiguration(evt.newValue));
         brushColorField = ExcelDataLayoutBrushPaletteUtility.CreateBrushColorField();
+        brushTextColorField = ExcelDataLayoutBrushPaletteUtility.CreateBrushTextColorField();
         section.Add(savedBrushField);
         section.Add(brushColorField);
+        section.Add(brushTextColorField);
         Button saveBrushButton = new Button(SaveCurrentBrushConfiguration);
         saveBrushButton.text = "Save Brush";
-        saveBrushButton.tooltip = "Save current filters and color into the linked brush palette preset.";
+        saveBrushButton.tooltip = "Save current filters, background color and text color into the linked brush palette preset.";
         GameManagementPanelLayoutUtility.ConfigureToolbarButton(saveBrushButton, 112f);
         section.Add(saveBrushButton);
         return section;
@@ -279,29 +320,93 @@ internal sealed class ExcelDataLayoutBrushPanelControls
     private VisualElement BuildFieldCatalogSection()
     {
         VisualElement section = new VisualElement();
+        section.style.flexGrow = 1f;
+        section.style.overflow = Overflow.Hidden;
+        Foldout filtersFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Catalog Filters",
+                                                                                 CatalogFiltersFoldoutKey,
+                                                                                 true);
+        filtersFoldout.tooltip = "Narrow fields by owner, transferable value family, list position, ScriptableObject type and concrete source asset.";
+        filtersFoldout.style.flexShrink = 0f;
         searchField = new ToolbarSearchField();
         searchField.tooltip = "Search field, asset, type or aliases such as ref, list, wave, bool, enum, number and scaling.";
         searchField.RegisterValueChangedCallback(evt => ApplyFilters());
         GameManagementPanelLayoutUtility.ConfigureSearchField(searchField);
-        section.Add(searchField);
+        filtersFoldout.Add(searchField);
         domainField = CreateEnumFilter("Domain", ExcelDataTransferDomain.All,
                                        "Limit fields by management owner. Example: Player or Waves.");
-        dataKindField = CreateEnumFilter("Kind", ExcelDataBrushDataKind.All,
-                                         "Limit fields by value family. Example: Number, Boolean or Object Reference.");
+        dataKindField = CreateDataKindFilter();
         listModeField = CreateEnumFilter("List Entries", ExcelDataListElementFilterMode.OutsideListsOnly,
                                          "Choose all fields, fields outside lists, list values by nesting depth, or list sizes only. Example: Top Level List Values shows fields belonging to `_1`, `_2` and sibling elements.");
         sourceTypeSearchField = CreateSourceSearchFilter("Filter ScriptableObject types by partial name. Example: PlayerControllerPreset or EnemyWavePreset.");
         sourceAssetSearchField = CreateSourceSearchFilter("Filter concrete assets by partial name or path. Example: ConeVision_ForwardAndBackward.");
-        section.Add(domainField);
-        section.Add(dataKindField);
-        section.Add(listModeField);
-        AddSearchFilter(section, "Source Type", sourceTypeSearchField);
+        filtersFoldout.Add(domainField);
+        filtersFoldout.Add(dataKindField);
+        filtersFoldout.Add(listModeField);
+        AddSearchFilter(filtersFoldout, "Source Type", sourceTypeSearchField);
         sourceAssetRoot = new VisualElement();
         AddSearchFilter(sourceAssetRoot, "Source Asset", sourceAssetSearchField);
-        section.Add(sourceAssetRoot);
+        filtersFoldout.Add(sourceAssetRoot);
+        section.Add(filtersFoldout);
+
+        Foldout resultsFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Field Results",
+                                                                                 FieldResultsFoldoutKey,
+                                                                                 true);
+        resultsFoldout.tooltip = "Virtualized list of fields that pass every active catalog filter.";
+        resultsFoldout.style.flexGrow = 1f;
+        resultsFoldout.style.flexShrink = 1f;
+        resultsFoldout.style.minHeight = 140f;
+        resultsFoldout.contentContainer.style.flexGrow = 1f;
+        resultsFoldout.contentContainer.style.overflow = Overflow.Hidden;
         listView = BuildListView();
-        section.Add(listView);
+        listView.style.flexGrow = 1f;
+        resultsFoldout.Add(listView);
+        selectionLabel = new Label();
+        selectionLabel.tooltip = "Current brush mode, selected serialized field and filtered-result count.";
+        selectionLabel.style.marginTop = 4f;
+        selectionLabel.style.whiteSpace = WhiteSpace.Normal;
+        selectionLabel.style.flexShrink = 0f;
+        resultsFoldout.Add(selectionLabel);
+        section.Add(resultsFoldout);
         return section;
+    }
+
+    /// <summary>
+    /// Builds the persistent operation-status foldout shown below catalog results.
+    /// </summary>
+    /// <returns>Configured status foldout.</returns>
+    private Foldout BuildStatusSection()
+    {
+        statusFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Status",
+                                                                        StatusFoldoutKey,
+                                                                        false);
+        statusFoldout.tooltip = "Shows the latest paint, structural edit, brush save or validation result.";
+        statusFoldout.style.flexShrink = 0f;
+        statusLabel = new Label("No pending layout operation.");
+        statusLabel.style.whiteSpace = WhiteSpace.Normal;
+        statusLabel.style.flexShrink = 0f;
+        statusFoldout.Add(statusLabel);
+        return statusFoldout;
+    }
+
+    /// <summary>
+    /// Creates a compact Kind dropdown backed only by current, direction-compatible catalog families.
+    /// </summary>
+    /// <returns>Configured data-kind dropdown.</returns>
+    private PopupField<ExcelDataBrushDataKind> CreateDataKindFilter()
+    {
+        List<ExcelDataBrushDataKind> choices = new List<ExcelDataBrushDataKind>
+        {
+            ExcelDataBrushDataKind.All
+        };
+        PopupField<ExcelDataBrushDataKind> field =
+            new PopupField<ExcelDataBrushDataKind>("Kind",
+                                                   choices,
+                                                   0,
+                                                   ExcelDataBrushDataKindFilterUtility.BuildLabel,
+                                                   ExcelDataBrushDataKindFilterUtility.BuildLabel);
+        field.tooltip = "Limit fields to a value family that is actually present and supported by the selected Direction. Example: Animation Curve and List Size appear only for Export cells.";
+        field.RegisterValueChangedCallback(evt => ApplyFilters());
+        return field;
     }
 
     /// <summary>
@@ -390,7 +495,7 @@ internal sealed class ExcelDataLayoutBrushPanelControls
             if (ExcelDataFieldCatalogFilterUtility.MatchesFilters(entry,
                                                                   searchField.value,
                                                                   (ExcelDataTransferDomain)domainField.value,
-                                                                  (ExcelDataBrushDataKind)dataKindField.value,
+                                                                  dataKindField.value,
                                                                   (ExcelDataListElementFilterMode)listModeField.value,
                                                                   sourceTypeSearchField.value,
                                                                   sourceAssetSearchField.value))
@@ -419,7 +524,7 @@ internal sealed class ExcelDataLayoutBrushPanelControls
             if (!ExcelDataFieldCatalogFilterUtility.MatchesFilters(entry,
                                                                    searchField.value,
                                                                    (ExcelDataTransferDomain)domainField.value,
-                                                                   (ExcelDataBrushDataKind)dataKindField.value,
+                                                                   dataKindField.value,
                                                                    (ExcelDataListElementFilterMode)listModeField.value,
                                                                    sourceTypeSearchField.value,
                                                                    string.Empty))
@@ -501,10 +606,11 @@ internal sealed class ExcelDataLayoutBrushPanelControls
                                                                             sourceAssetSearchField,
                                                                             searchField,
                                                                             brushColorField,
+                                                                            brushTextColorField,
                                                                             out direction))
         {
             brushInspector.SetPaintDirection(direction);
-            ApplyFilters();
+            RefreshDataKindChoices();
         }
     }
 
@@ -522,6 +628,7 @@ internal sealed class ExcelDataLayoutBrushPanelControls
                                                                                       sourceTypeSearchField,
                                                                                       sourceAssetSearchField,
                                                                                       brushColorField,
+                                                                                      brushTextColorField,
                                                                                       searchField,
                                                                                       brushInspector.Direction,
                                                                                       out selectedOption,

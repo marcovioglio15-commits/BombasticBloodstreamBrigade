@@ -16,14 +16,14 @@ MonoBehaviour:
   presetName: Player Tuning Transfer Layout
   objectsSheetName: Player Tuning
   defaultGridRows: 28
-  defaultGridColumns: 4
+  defaultGridColumns: 5
   defaultCellWidth: 210
   defaultCellHeight: 30
   sheetDefinitions:
   - sheetId: 381cb682e86e41f093f0523bbd9764a0
     sheetName: Player Tuning
     previewRowCount: 28
-    previewColumnCount: 4
+    previewColumnCount: 5
     previewCellWidth: 210
     previewCellHeight: 30
     freezeRowCount: 4
@@ -95,7 +95,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 4
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -115,7 +115,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 4
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -135,7 +135,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 4
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -195,7 +195,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 8
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -215,7 +215,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 8
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -235,7 +235,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 8
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -275,7 +275,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 9
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -295,7 +295,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 9
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -315,7 +315,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 9
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -375,7 +375,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 12
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -395,7 +395,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 12
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -415,7 +415,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 12
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -455,7 +455,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 13
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -475,7 +475,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 13
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -495,7 +495,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 13
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -535,7 +535,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 14
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -555,7 +555,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 14
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -575,7 +575,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 14
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -615,7 +615,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 15
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -635,7 +635,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 15
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -655,7 +655,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 15
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -715,7 +715,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 18
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -735,7 +735,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 18
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -755,7 +755,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 18
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:
@@ -795,7 +795,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 19
-      columnIndex: 3
+      columnIndex: 4
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -815,7 +815,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 19
-      columnIndex: 4
+      columnIndex: 5
       contentKind: 1
       direction: 2
       fieldBinding:
@@ -835,7 +835,7 @@ MonoBehaviour:
       validateLiteralDuringImport: 0
     - sheetId: 381cb682e86e41f093f0523bbd9764a0
       rowIndex: 19
-      columnIndex: 2
+      columnIndex: 3
       contentKind: 0
       direction: 0
       fieldBinding:

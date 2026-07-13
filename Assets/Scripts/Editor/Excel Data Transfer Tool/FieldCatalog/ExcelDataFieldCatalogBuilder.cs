@@ -283,14 +283,14 @@ internal static class ExcelDataFieldCatalogBuilder
     /// Checks whether a property can be exposed to brush filters in this tranche.
     /// </summary>
     /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property is a leaf, list container, list size or concrete list element.</returns>
+    /// <returns>True when the property has an implemented import or export value serializer.</returns>
     private static bool IsBrushableProperty(SerializedProperty property)
     {
         if (IsListSizeProperty(property))
             return true;
 
-        // Generic containers serialize as Complex and are not directly useful to workbook users.
-        return property.propertyType != SerializedPropertyType.Generic;
+        // Exclude vague fallback values so every catalog Kind represents an actionable transfer path.
+        return ResolveDataKind(property) != ExcelDataBrushDataKind.Unsupported;
     }
 
     /// <summary>
@@ -343,7 +343,7 @@ internal static class ExcelDataFieldCatalogBuilder
             case SerializedPropertyType.AnimationCurve:
                 return ExcelDataBrushDataKind.Curve;
             default:
-                return ExcelDataBrushDataKind.Primitive;
+                return ExcelDataBrushDataKind.Unsupported;
         }
     }
 

@@ -20,13 +20,15 @@ internal static class ExcelDataTransferMasterPanelFieldUtility
     /// <param name="label">Field label.</param>
     /// <param name="tooltip">Field tooltip.</param>
     /// <param name="refreshPresetList">True when sidebar labels should refresh after edits.</param>
+    /// <param name="refreshActiveDetails">True when conditional fields in the active details section must be rebuilt.</param>
     public static void AddPropertyField(ExcelDataTransferMasterPanel panel,
                                         VisualElement parent,
                                         SerializedObject serializedObject,
                                         string propertyName,
                                         string label,
                                         string tooltip,
-                                        bool refreshPresetList)
+                                        bool refreshPresetList,
+                                        bool refreshActiveDetails = false)
     {
         if (parent == null || serializedObject == null)
             return;
@@ -45,6 +47,9 @@ internal static class ExcelDataTransferMasterPanelFieldUtility
 
             if (refreshPresetList && panel != null)
                 panel.RefreshPresetList();
+
+            if (refreshActiveDetails && panel != null)
+                panel.ScheduleActiveDetailsRefresh();
         });
         parent.Add(propertyField);
     }
@@ -84,15 +89,17 @@ internal static class ExcelDataTransferMasterPanelFieldUtility
     /// <param name="panel">Owning master panel.</param>
     /// <param name="parent">Parent section.</param>
     /// <param name="serializedObject">Serialized preset object.</param>
+    /// <param name="refreshActiveDetails">True when Player-dependent options should update after domain edits.</param>
     public static void AddDomainFields(ExcelDataTransferMasterPanel panel,
                                        VisualElement parent,
-                                       SerializedObject serializedObject)
+                                       SerializedObject serializedObject,
+                                       bool refreshActiveDetails = false)
     {
-        AddPropertyField(panel, parent, serializedObject, "includePlayerData", "Include Player Data", "Allow Player Management Tool data.", false);
-        AddPropertyField(panel, parent, serializedObject, "includeEnemyData", "Include Enemy Data", "Allow Enemy Management Tool data.", false);
-        AddPropertyField(panel, parent, serializedObject, "includeGameData", "Include Game Data", "Allow Game Management Tool data.", false);
-        AddPropertyField(panel, parent, serializedObject, "includeWaveData", "Include Wave Data", "Allow EnemyWavePreset wave data.", false);
-        AddPropertyField(panel, parent, serializedObject, "includeConcreteListElements", "Include Concrete List Elements", "Allow individual list elements to be imported.", false);
+        AddPropertyField(panel, parent, serializedObject, "includePlayerData", "Include Player Data", "Allow Player Management Tool data.", false, refreshActiveDetails);
+        AddPropertyField(panel, parent, serializedObject, "includeEnemyData", "Include Enemy Data", "Allow Enemy Management Tool data.", false, refreshActiveDetails);
+        AddPropertyField(panel, parent, serializedObject, "includeGameData", "Include Game Data", "Allow Game Management Tool data.", false, refreshActiveDetails);
+        AddPropertyField(panel, parent, serializedObject, "includeWaveData", "Include Wave Data", "Allow EnemyWavePreset wave data.", false, refreshActiveDetails);
+        AddPropertyField(panel, parent, serializedObject, "includeConcreteListElements", "Include Concrete List Elements", "Allow individual list elements to be imported.", false, refreshActiveDetails);
     }
 
     /// <summary>

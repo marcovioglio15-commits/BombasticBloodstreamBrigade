@@ -11,20 +11,9 @@ using System.Xml.Linq;
 internal static class ExcelDataWorkbookColumnWidthUtility
 {
     #region Constants
-    private const string WorkbookEntryPath = "xl/workbook.xml";
-    private const string WorkbookRelationshipsEntryPath = "xl/_rels/workbook.xml.rels";
     private const double MaximumExcelColumnWidth = 255d;
     private const double DefaultCharacterPixelWidth = 7d;
     private const double CellPaddingPixels = 10d;
-    #endregion
-
-    #region Fields
-    private static readonly XNamespace SpreadsheetNamespace =
-        "http://schemas.openxmlformats.org/spreadsheetml/2006/main";
-    private static readonly XNamespace OfficeRelationshipsNamespace =
-        "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
-    private static readonly XNamespace PackageRelationshipsNamespace =
-        "http://schemas.openxmlformats.org/package/2006/relationships";
     #endregion
 
     #region Methods
@@ -46,7 +35,8 @@ internal static class ExcelDataWorkbookColumnWidthUtility
         using (FileStream stream = new FileStream(workbookPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
         using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Update, false))
         {
-            Dictionary<string, string> worksheetEntries = BuildWorksheetEntryLookup(archive);
+            Dictionary<string, string> worksheetEntries =
+                ExcelDataOpenXmlPackageUtility.BuildWorksheetEntryLookup(archive);
 
             // Update only user sheets that explicitly request content fitting.
             for (int sheetIndex = 0; sheetIndex < document.Sheets.Count; sheetIndex++)
@@ -69,87 +59,6 @@ internal static class ExcelDataWorkbookColumnWidthUtility
     }
     #endregion
 
-    #region Package Mapping
-    /// <summary>
-    /// Maps workbook-visible sheet names to their ZIP worksheet entry paths through relationship IDs.
-    /// </summary>
-    /// <param name="archive">Open .xlsx ZIP package.</param>
-    /// <returns>Case-insensitive worksheet entry lookup by visible sheet name.</returns>
-    private static Dictionary<string, string> BuildWorksheetEntryLookup(ZipArchive archive)
-    {
-        XDocument workbook = LoadXmlEntry(archive, WorkbookEntryPath);
-        XDocument relationships = LoadXmlEntry(archive, WorkbookRelationshipsEntryPath);
-        Dictionary<string, string> targetsByRelationshipId = new Dictionary<string, string>(StringComparer.Ordinal);
-
-        // Index package relationships before joining them with workbook sheet records.
-        foreach (XElement relationship in relationships.Root.Elements(PackageRelationshipsNamespace + "Relationship"))
-        {
-            string relationshipId = ReadAttribute(relationship, "Id");
-            string target = ReadAttribute(relationship, "Target");
-
-            if (!string.IsNullOrWhiteSpace(relationshipId) && !string.IsNullOrWhiteSpace(target))
-                targetsByRelationshipId[relationshipId] = NormalizeWorksheetEntryPath(target);
-        }
-
-        Dictionary<string, string> entriesBySheetName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        XElement sheets = workbook.Root.Element(SpreadsheetNamespace + "sheets");
-
-        if (sheets == null)
-            throw new InvalidDataException("Open XML workbook has no sheets collection.");
-
-        // Resolve each visible sheet through its office-document relationship attribute.
-        foreach (XElement sheet in sheets.Elements(SpreadsheetNamespace + "sheet"))
-        {
-            string sheetName = ReadAttribute(sheet, "name");
-            XAttribute relationshipAttribute = sheet.Attribute(OfficeRelationshipsNamespace + "id");
-            string target;
-
-            if (relationshipAttribute == null ||
-                !targetsByRelationshipId.TryGetValue(relationshipAttribute.Value, out target))
-                continue;
-
-            entriesBySheetName[sheetName] = target;
-        }
-
-        return entriesBySheetName;
-    }
-
-    /// <summary>
-    /// Loads one required XML entry from an Open XML ZIP package.
-    /// </summary>
-    /// <param name="archive">Open .xlsx ZIP package.</param>
-    /// <param name="entryPath">Forward-slash ZIP entry path.</param>
-    /// <returns>Parsed XML document.</returns>
-    private static XDocument LoadXmlEntry(ZipArchive archive, string entryPath)
-    {
-        ZipArchiveEntry entry = archive.GetEntry(entryPath);
-
-        if (entry == null)
-            throw new InvalidDataException("Open XML package is missing required entry: " + entryPath);
-
-        using (Stream entryStream = entry.Open())
-            return XDocument.Load(entryStream, LoadOptions.PreserveWhitespace);
-    }
-
-    /// <summary>
-    /// Normalizes a workbook relationship target into a root-relative ZIP entry path.
-    /// </summary>
-    /// <param name="target">Relationship target from workbook.xml.rels.</param>
-    /// <returns>Normalized worksheet ZIP entry path.</returns>
-    private static string NormalizeWorksheetEntryPath(string target)
-    {
-        string normalizedTarget = target.Replace('\\', '/').TrimStart('/');
-
-        if (normalizedTarget.StartsWith("xl/", StringComparison.OrdinalIgnoreCase))
-            return normalizedTarget;
-
-        while (normalizedTarget.StartsWith("../", StringComparison.Ordinal))
-            normalizedTarget = normalizedTarget.Substring(3);
-
-        return "xl/" + normalizedTarget;
-    }
-    #endregion
-
     #region Width Writing
     /// <summary>
     /// Replaces one worksheet cols collection with deterministic content-fitted widths.
@@ -161,17 +70,18 @@ internal static class ExcelDataWorkbookColumnWidthUtility
                                           string entryPath,
                                           ExcelDataWorkbookSheetDocument sheet)
     {
-        XDocument worksheet = LoadXmlEntry(archive, entryPath);
+        XDocument worksheet = ExcelDataOpenXmlPackageUtility.LoadXmlEntry(archive, entryPath);
         XElement root = worksheet.Root;
-        XElement existingColumns = root.Element(SpreadsheetNamespace + "cols");
+        XNamespace spreadsheetNamespace = ExcelDataOpenXmlPackageUtility.SpreadsheetNamespace;
+        XElement existingColumns = root.Element(spreadsheetNamespace + "cols");
         existingColumns?.Remove();
-        XElement columns = new XElement(SpreadsheetNamespace + "cols");
+        XElement columns = new XElement(spreadsheetNamespace + "cols");
         double[] widths = CalculateColumnWidths(sheet);
 
         // Emit one explicit column record so every width remains deterministic across spreadsheet viewers.
         for (int columnIndex = 1; columnIndex <= widths.Length; columnIndex++)
         {
-            columns.Add(new XElement(SpreadsheetNamespace + "col",
+            columns.Add(new XElement(spreadsheetNamespace + "col",
                                      new XAttribute("min", columnIndex),
                                      new XAttribute("max", columnIndex),
                                      new XAttribute("width", widths[columnIndex - 1].ToString("0.###", CultureInfo.InvariantCulture)),
@@ -179,33 +89,13 @@ internal static class ExcelDataWorkbookColumnWidthUtility
                                      new XAttribute("customWidth", 1)));
         }
 
-        XElement sheetData = root.Element(SpreadsheetNamespace + "sheetData");
+        XElement sheetData = root.Element(spreadsheetNamespace + "sheetData");
 
         if (sheetData == null)
             throw new InvalidDataException("Open XML worksheet has no sheetData element: " + entryPath);
 
         sheetData.AddBeforeSelf(columns);
-        ReplaceXmlEntry(archive, entryPath, worksheet);
-    }
-
-    /// <summary>
-    /// Replaces one XML ZIP entry after its previous stream has been closed.
-    /// </summary>
-    /// <param name="archive">Open update-mode ZIP package.</param>
-    /// <param name="entryPath">Entry path to replace.</param>
-    /// <param name="document">Updated XML document.</param>
-    private static void ReplaceXmlEntry(ZipArchive archive, string entryPath, XDocument document)
-    {
-        ZipArchiveEntry existingEntry = archive.GetEntry(entryPath);
-
-        if (existingEntry == null)
-            throw new InvalidDataException("Cannot replace missing Open XML entry: " + entryPath);
-
-        existingEntry.Delete();
-        ZipArchiveEntry replacementEntry = archive.CreateEntry(entryPath, CompressionLevel.Optimal);
-
-        using (Stream replacementStream = replacementEntry.Open())
-            document.Save(replacementStream, SaveOptions.DisableFormatting);
+        ExcelDataOpenXmlPackageUtility.ReplaceXmlEntry(archive, entryPath, worksheet);
     }
     #endregion
 
@@ -328,20 +218,6 @@ internal static class ExcelDataWorkbookColumnWidthUtility
         }
 
         return false;
-    }
-    #endregion
-
-    #region XML Helpers
-    /// <summary>
-    /// Reads one unqualified XML attribute as text.
-    /// </summary>
-    /// <param name="element">XML element containing the attribute.</param>
-    /// <param name="attributeName">Unqualified attribute name.</param>
-    /// <returns>Attribute text, or an empty string.</returns>
-    private static string ReadAttribute(XElement element, string attributeName)
-    {
-        XAttribute attribute = element.Attribute(attributeName);
-        return attribute == null ? string.Empty : attribute.Value;
     }
     #endregion
 

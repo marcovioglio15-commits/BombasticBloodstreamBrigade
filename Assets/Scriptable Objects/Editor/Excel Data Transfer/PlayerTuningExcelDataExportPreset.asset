@@ -15,7 +15,8 @@ MonoBehaviour:
   presetId: 8de2b9c0c65c4537bfcbeaf8041e50ff
   presetName: Player Tuning Transfer Export
   targetWorkbookProfile: 4
-  targetWorkbookPath: Logs/Excel Data Transfer Test Workbooks/PlayerTuning.xlsx
+  targetWorkbookPath: Assets/Excell Data Exchange/Export/PlayerTuning.xlsx
+  writeBrushBackgroundColors: 1
   includePlayerData: 1
   includeEnemyData: 0
   includeGameData: 0

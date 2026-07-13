@@ -249,6 +249,40 @@ internal static class ExcelDataWorkbookLayoutAuthoringUtility
     }
 
     /// <summary>
+    /// Removes one worksheet row and shifts authoritative coordinates below it upward.
+    /// </summary>
+    /// <param name="layoutPreset">Layout preset receiving the structural edit.</param>
+    /// <param name="sheetName">Visible worksheet losing the row.</param>
+    /// <param name="removalRowIndex">One-based row removed from the layout.</param>
+    /// <returns>Number of authored payloads deleted with the row.</returns>
+    public static int RemoveRow(ExcelDataWorkbookLayoutPreset layoutPreset,
+                                string sheetName,
+                                int removalRowIndex)
+    {
+        ExcelDataWorkbookSheetDefinition sheet = ResolveOrCreateSheet(layoutPreset, sheetName);
+        int removedCellCount = sheet.RemoveRow(removalRowIndex);
+        SynchronizePrimaryGridDefaults(layoutPreset, sheet);
+        return removedCellCount;
+    }
+
+    /// <summary>
+    /// Removes one worksheet column and shifts authoritative coordinates to its right leftward.
+    /// </summary>
+    /// <param name="layoutPreset">Layout preset receiving the structural edit.</param>
+    /// <param name="sheetName">Visible worksheet losing the column.</param>
+    /// <param name="removalColumnIndex">One-based column removed from the layout.</param>
+    /// <returns>Number of authored payloads deleted with the column.</returns>
+    public static int RemoveColumn(ExcelDataWorkbookLayoutPreset layoutPreset,
+                                   string sheetName,
+                                   int removalColumnIndex)
+    {
+        ExcelDataWorkbookSheetDefinition sheet = ResolveOrCreateSheet(layoutPreset, sheetName);
+        int removedCellCount = sheet.RemoveColumn(removalColumnIndex);
+        SynchronizePrimaryGridDefaults(layoutPreset, sheet);
+        return removedCellCount;
+    }
+
+    /// <summary>
     /// Updates active-sheet preview dimensions after an explicit toolbar edit.
     /// </summary>
     /// <param name="layoutPreset">Layout preset containing the sheet.</param>

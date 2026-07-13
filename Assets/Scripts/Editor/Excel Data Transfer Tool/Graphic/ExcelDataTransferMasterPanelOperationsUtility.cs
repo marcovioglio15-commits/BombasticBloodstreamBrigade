@@ -130,7 +130,8 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
             ExcelDataTransferDraftSession.MarkDirty();
             panel.OperationStatus = "Applied " + result.AppliedRowCount +
                                     " mapped cells. Skipped: " + result.SkippedRowCount +
-                                    ". Warnings: " + result.WarningCount + ".";
+                                    ". Warnings: " + result.WarningCount + ". " +
+                                    result.AuthoringStatus;
         }
         catch (System.Exception exception)
         {

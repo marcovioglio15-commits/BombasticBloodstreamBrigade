@@ -37,8 +37,11 @@ public sealed class ExcelDataBrushDefinition
     [Tooltip("Import/export direction restored when this brush is selected for painting.")]
     [SerializeField] private ExcelDataTransferDirection direction;
 
-    [Tooltip("Brush color used by the layout grid cell overlay.")]
+    [Tooltip("Background color used by cells painted with this brush in the layout grid and optional Excel presentation.")]
     [SerializeField] private Color color = Color.white;
+
+    [Tooltip("Text color used by cells painted with this brush in the layout grid and optional Excel presentation.")]
+    [SerializeField] private Color textColor = Color.white;
 
     [Tooltip("Additional search tokens that make this brush easier to find in large palettes.")]
     [SerializeField] private string searchTokens;
@@ -129,6 +132,14 @@ public sealed class ExcelDataBrushDefinition
             return color;
         }
     }
+
+    public Color TextColor
+    {
+        get
+        {
+            return textColor;
+        }
+    }
     #endregion
 
     #region Methods
@@ -145,7 +156,8 @@ public sealed class ExcelDataBrushDefinition
     /// <param name="newSourceAssetFilter">Partial concrete source asset filter applied by this brush.</param>
     /// <param name="newFieldSearchFilter">General field search restored by this brush.</param>
     /// <param name="newDirection">Import/export direction restored by this brush.</param>
-    /// <param name="newColor">Grid overlay color used by this brush.</param>
+    /// <param name="newColor">Grid and workbook background color used by this brush.</param>
+    /// <param name="newTextColor">Grid and workbook text color used by this brush.</param>
     /// <param name="newSearchTokens">Extra text tokens used by smart search.</param>
     /// <param name="newDescription">Short editor note describing this brush.</param>
     public void Configure(string newBrushName,
@@ -157,6 +169,7 @@ public sealed class ExcelDataBrushDefinition
                           string newFieldSearchFilter,
                           ExcelDataTransferDirection newDirection,
                           Color newColor,
+                          Color newTextColor,
                           string newSearchTokens,
                           string newDescription)
     {
@@ -172,6 +185,7 @@ public sealed class ExcelDataBrushDefinition
         fieldSearchFilter = newFieldSearchFilter;
         direction = newDirection;
         color = newColor;
+        textColor = newTextColor;
         searchTokens = newSearchTokens;
         description = newDescription;
     }

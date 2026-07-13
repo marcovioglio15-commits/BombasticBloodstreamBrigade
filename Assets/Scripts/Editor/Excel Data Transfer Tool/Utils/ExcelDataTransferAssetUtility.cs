@@ -614,6 +614,7 @@ public static class ExcelDataTransferAssetUtility
                         string.Empty,
                         direction,
                         color,
+                        Color.white,
                         searchTokens,
                         description);
         return brush;

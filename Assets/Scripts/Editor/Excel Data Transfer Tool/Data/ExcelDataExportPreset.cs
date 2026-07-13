@@ -24,6 +24,13 @@ public sealed class ExcelDataExportPreset : ScriptableObject
     [Tooltip("Advanced custom absolute or project-relative .xlsx destination used only by Custom Path. Validation reports extension and write-access problems without changing this value.")]
     [SerializeField] private string targetWorkbookPath;
 
+    [Header("Presentation")]
+    [Tooltip("Apply the authored Layout Brush background color to every authored layout cell in visible exported worksheets. Empty layout cells still receive the complete grid border formatting.")]
+    [SerializeField] private bool writeBrushBackgroundColors = true;
+
+    [Tooltip("Apply the authored Layout Brush text color to every authored layout cell in visible exported worksheets without changing imported values.")]
+    [SerializeField] private bool writeBrushTextColors = true;
+
     [Header("Domains")]
     [Tooltip("Allow exporting Player Management Tool ScriptableObject data.")]
     [SerializeField] private bool includePlayerData = true;
@@ -81,6 +88,22 @@ public sealed class ExcelDataExportPreset : ScriptableObject
         get
         {
             return targetWorkbookProfile;
+        }
+    }
+
+    public bool WriteBrushBackgroundColors
+    {
+        get
+        {
+            return writeBrushBackgroundColors;
+        }
+    }
+
+    public bool WriteBrushTextColors
+    {
+        get
+        {
+            return writeBrushTextColors;
         }
     }
 

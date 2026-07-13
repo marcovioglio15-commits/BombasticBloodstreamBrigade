@@ -23,6 +23,11 @@ public sealed class ExcelDataImportApplyResult
     {
         get;
     }
+
+    public string AuthoringStatus
+    {
+        get;
+    }
     #endregion
 
     #region Methods
@@ -35,15 +40,18 @@ public sealed class ExcelDataImportApplyResult
     /// <param name="appliedRowCount">Rows successfully applied to Unity assets.</param>
     /// <param name="skippedRowCount">Rows skipped by filters, policies or unsupported value types.</param>
     /// <param name="warningCount">Rows that reported a warning while applying.</param>
+    /// <param name="authoringStatus">Explicit authoring-save and Player bake dependency refresh status.</param>
     public ExcelDataImportApplyResult(string workbookPath,
                                       int appliedRowCount,
                                       int skippedRowCount,
-                                      int warningCount)
+                                      int warningCount,
+                                      string authoringStatus)
     {
         WorkbookPath = workbookPath;
         AppliedRowCount = appliedRowCount;
         SkippedRowCount = skippedRowCount;
         WarningCount = warningCount;
+        AuthoringStatus = authoringStatus ?? string.Empty;
     }
     #endregion
 

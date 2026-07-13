@@ -15,12 +15,13 @@ MonoBehaviour:
   presetId: 9b765a38a71e4b62a6abad2298214bce
   presetName: Player Tuning Transfer Import
   sourceWorkbookProfile: 4
-  sourceWorkbookPath: Logs/Excel Data Transfer Test Workbooks/PlayerTuning.xlsx
+  sourceWorkbookPath: Assets/Excell Data Exchange/Import/PlayerTuning_ImportTest.xlsx
   conflictPolicy: 2
   missingRowPolicy: 0
   referenceResolutionMode: 1
   requirePreviewBeforeApply: 1
   blockAmbiguousReferences: 1
+  scalingRuleImportPolicy: 0
   includePlayerData: 1
   includeEnemyData: 0
   includeGameData: 0

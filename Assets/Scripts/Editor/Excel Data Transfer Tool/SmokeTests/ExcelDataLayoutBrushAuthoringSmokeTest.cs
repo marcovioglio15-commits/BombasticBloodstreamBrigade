@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Validates authoritative workbook brush modes, coordinate rendering and structural row or column insertion.
+/// Validates authoritative workbook brush modes, coordinate rendering and structural row or column edits.
 /// </summary>
 public static class ExcelDataLayoutBrushAuthoringSmokeTest
 {
@@ -29,6 +29,7 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
         try
         {
             ValidateStructuralInsertion(layoutPreset);
+            ValidateStructuralRemoval();
             ValidateLiteralAuthoring(layoutPreset);
             ValidateCoordinateGrid(layoutPreset);
             ValidateSidebarLayoutContract();
@@ -66,6 +67,45 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
         AssertLiteral(sheet.FindCell(4, 4), "C3", "shifted D4 after row insertion");
         Assert(sheet.FindCell(2, 1) == null && sheet.FindCell(2, 4) == null,
                "Inserted row 2 is not empty.");
+    }
+
+    /// <summary>
+    /// Verifies empty and populated removals delete exact payloads and shift following coordinates once.
+    /// </summary>
+    private static void ValidateStructuralRemoval()
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = CreateLayout();
+
+        try
+        {
+            ExcelDataWorkbookSheetDefinition sheet = layoutPreset.SheetDefinitions[0];
+            ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyRow(layoutPreset, SheetName, 2);
+            ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyColumn(layoutPreset, SheetName, 2);
+            int removedEmptyRowCells = ExcelDataWorkbookLayoutAuthoringUtility.RemoveRow(layoutPreset, SheetName, 2);
+            int removedEmptyColumnCells = ExcelDataWorkbookLayoutAuthoringUtility.RemoveColumn(layoutPreset, SheetName, 2);
+
+            Assert(removedEmptyRowCells == 0 && removedEmptyColumnCells == 0,
+                   "Removing inserted empty structures reported deleted payloads.");
+            Assert(sheet.PreviewRowCount == 3 && sheet.PreviewColumnCount == 3,
+                   "Removing inserted empty structures did not restore worksheet dimensions.");
+            Assert(sheet.CountAuthoredCellsInRow(2) == 1 && sheet.CountAuthoredCellsInColumn(2) == 1,
+                   "Populated row or column detection did not find the authored B2 payload.");
+
+            int removedRowCells = ExcelDataWorkbookLayoutAuthoringUtility.RemoveRow(layoutPreset, SheetName, 2);
+            Assert(removedRowCells == 1 && sheet.FindCell(2, 2) == null,
+                   "Populated row removal did not delete B2.");
+            AssertLiteral(sheet.FindCell(2, 3), "C3", "shifted C2 after populated row removal");
+
+            int removedColumnCells = ExcelDataWorkbookLayoutAuthoringUtility.RemoveColumn(layoutPreset, SheetName, 3);
+            Assert(removedColumnCells == 1 && sheet.FindCell(2, 2) == null,
+                   "Populated column removal did not delete the shifted C3 payload.");
+            Assert(sheet.PreviewRowCount == 2 && sheet.PreviewColumnCount == 2,
+                   "Populated structural removals did not decrement worksheet dimensions.");
+        }
+        finally
+        {
+            ScriptableObject.DestroyImmediate(layoutPreset);
+        }
     }
     #endregion
 
@@ -128,6 +168,8 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
                                                     1,
                                                     IgnoreCellClick,
                                                     IgnoreInsertion,
+                                                    IgnoreInsertion,
+                                                    IgnoreInsertion,
                                                     IgnoreInsertion);
 
         int columnSeparatorCount = CountElementsWithClass(gridRoot, ColumnSeparatorClass);
@@ -149,7 +191,8 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
         ExcelDataBrushPalettePreset palette = ScriptableObject.CreateInstance<ExcelDataBrushPalettePreset>();
         ExcelDataBrushDefinition brush = CreateBrush("Identity Brush",
                                                      ExcelDataTransferDirection.Both,
-                                                     new Color(0.2f, 0.4f, 0.6f, 1f));
+                                                     new Color(0.2f, 0.4f, 0.6f, 1f),
+                                                     Color.white);
         palette.Brushes.Add(brush);
 
         try
@@ -181,8 +224,12 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
     private static void ValidateSemanticCellColor(ExcelDataWorkbookLayoutPreset layoutPreset)
     {
         Color expectedColor = new Color(0.18f, 0.47f, 0.73f, 1f);
+        Color expectedTextColor = new Color(0.95f, 0.82f, 0.24f, 1f);
         ExcelDataBrushPalettePreset palette = ScriptableObject.CreateInstance<ExcelDataBrushPalettePreset>();
-        ExcelDataBrushDefinition brush = CreateBrush("Semantic Color", ExcelDataTransferDirection.Export, expectedColor);
+        ExcelDataBrushDefinition brush = CreateBrush("Semantic Color",
+                                                     ExcelDataTransferDirection.Export,
+                                                     expectedColor,
+                                                     expectedTextColor);
         palette.Brushes.Add(brush);
         ExcelDataWorkbookSheetDefinition sheet = layoutPreset.SheetDefinitions[0];
         ExcelDataWorkbookCellDefinition cell = sheet.FindCell(1, 1);
@@ -207,6 +254,8 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
                                                         1,
                                                         IgnoreCellClick,
                                                         IgnoreInsertion,
+                                                        IgnoreInsertion,
+                                                        IgnoreInsertion,
                                                         IgnoreInsertion);
             ManagementToolInteractiveElementColorUtility.RegisterHierarchy(managementRoot,
                                                                             "NashCore.ExcelDataTransfer.SemanticColorSmoke");
@@ -215,6 +264,8 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
             Assert(workbookCell != null, "Workbook grid did not expose a semantic cell element.");
             Assert(AreColorsEqual(workbookCell.style.backgroundColor.value, expectedColor),
                    "Management-tool color refresh overwrote the exact saved-brush color.");
+            Assert(AreColorsEqual(workbookCell.style.color.value, expectedTextColor),
+                   "Workbook grid did not retain the exact saved-brush text color.");
         }
         finally
         {
@@ -351,10 +402,12 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
     /// <param name="brushName">Readable brush name.</param>
     /// <param name="direction">Transfer direction retained by the brush.</param>
     /// <param name="color">Exact semantic cell color.</param>
+    /// <param name="textColor">Exact semantic cell text color.</param>
     /// <returns>Configured brush definition.</returns>
     private static ExcelDataBrushDefinition CreateBrush(string brushName,
                                                         ExcelDataTransferDirection direction,
-                                                        Color color)
+                                                        Color color,
+                                                        Color textColor)
     {
         ExcelDataBrushDefinition brush = new ExcelDataBrushDefinition();
         brush.Configure(brushName,
@@ -366,6 +419,7 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
                         string.Empty,
                         direction,
                         color,
+                        textColor,
                         string.Empty,
                         "Smoke brush.");
         return brush;

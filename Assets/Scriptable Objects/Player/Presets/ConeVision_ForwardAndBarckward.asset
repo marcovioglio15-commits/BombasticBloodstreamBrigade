@@ -23,7 +23,7 @@ MonoBehaviour:
     movementReference: 1
     values:
       baseSpeed: 4
-      maxSpeed: 6
+      maxSpeed: 4
       acceleration: -1
       deceleration: -1
       oppositeDirectionBrakeMultiplier: 2.25

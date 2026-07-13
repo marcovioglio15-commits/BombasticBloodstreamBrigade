@@ -16,6 +16,7 @@ MonoBehaviour:
   presetName: Wave Encounters Transfer Export
   targetWorkbookProfile: 4
   targetWorkbookPath: Logs/Excel Data Transfer Test Workbooks/WaveEncounters.xlsx
+  writeBrushBackgroundColors: 1
   includePlayerData: 0
   includeEnemyData: 0
   includeGameData: 0

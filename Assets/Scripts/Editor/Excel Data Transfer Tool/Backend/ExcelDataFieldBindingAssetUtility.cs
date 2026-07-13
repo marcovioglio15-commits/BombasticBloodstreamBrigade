@@ -3,7 +3,7 @@ using UnityEditor;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// Resolves grid field bindings to their current owner asset and concrete SerializedProperty.
+/// Resolves grid field bindings to their current owner asset and stable current SerializedProperty.
 /// </summary>
 internal static class ExcelDataFieldBindingAssetUtility
 {
@@ -80,20 +80,12 @@ internal static class ExcelDataFieldBindingAssetUtility
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(binding.SerializedPath))
-        {
-            warning = "Binding has no concrete serialized property path.";
-            return false;
-        }
-
         serializedObject = new SerializedObject(asset);
-        property = serializedObject.FindProperty(binding.SerializedPath);
-
-        if (property != null)
-            return true;
-
-        warning = "Missing serialized property: " + binding.SerializedPath + ".";
-        return false;
+        return ExcelDataStableFieldBindingResolver.TryResolveProperty(binding,
+                                                                      serializedObject,
+                                                                      out property,
+                                                                      out string _,
+                                                                      out warning);
     }
     #endregion
 

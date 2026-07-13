@@ -74,9 +74,21 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// <returns>Configured brush color field.</returns>
     public static ColorField CreateBrushColorField()
     {
-        ColorField field = new ColorField("Brush Color");
-        field.tooltip = "Color assigned to cells painted by fields that match the selected brush configuration.";
+        ColorField field = new ColorField("Background Color");
+        field.tooltip = "Background color assigned to cells painted with this saved brush in the Unity grid and optional Excel presentation.";
         field.SetValueWithoutNotify(new Color(0.85f, 0.85f, 0.85f, 1f));
+        return field;
+    }
+
+    /// <summary>
+    /// Creates the text color field used by newly saved brush configurations.
+    /// </summary>
+    /// <returns>Configured brush text color field.</returns>
+    public static ColorField CreateBrushTextColorField()
+    {
+        ColorField field = new ColorField("Text Color");
+        field.tooltip = "Text color assigned to cells painted with this saved brush in the Unity grid and optional Excel presentation.";
+        field.SetValueWithoutNotify(Color.white);
         return field;
     }
 
@@ -92,17 +104,19 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// <param name="sourceAssetSearchField">Concrete source asset search control.</param>
     /// <param name="fieldSearchField">General field search control.</param>
     /// <param name="brushColorField">Brush color control.</param>
+    /// <param name="brushTextColorField">Brush text color control.</param>
     /// <param name="direction">Saved transfer direction when a brush is resolved.</param>
     /// <returns>True when a saved brush was found and applied.</returns>
     public static bool ApplySavedBrushConfiguration(ExcelDataBrushPalettePreset brushPalettePreset,
                                                     string optionLabel,
                                                     EnumField domainField,
-                                                    EnumField dataKindField,
+                                                    PopupField<ExcelDataBrushDataKind> dataKindField,
                                                     EnumField listModeField,
                                                     ToolbarSearchField sourceTypeSearchField,
                                                     ToolbarSearchField sourceAssetSearchField,
                                                     ToolbarSearchField fieldSearchField,
                                                     ColorField brushColorField,
+                                                    ColorField brushTextColorField,
                                                     out ExcelDataTransferDirection direction)
     {
         direction = ExcelDataTransferDirection.Both;
@@ -132,6 +146,9 @@ internal static class ExcelDataLayoutBrushPaletteUtility
         if (brushColorField != null)
             brushColorField.SetValueWithoutNotify(brush.Color);
 
+        if (brushTextColorField != null)
+            brushTextColorField.SetValueWithoutNotify(brush.TextColor);
+
         direction = brush.Direction;
         return true;
     }
@@ -146,6 +163,7 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// <param name="sourceTypeSearchField">Source type search control.</param>
     /// <param name="sourceAssetSearchField">Concrete source asset search control.</param>
     /// <param name="brushColorField">Brush color control.</param>
+    /// <param name="brushTextColorField">Brush text color control.</param>
     /// <param name="searchField">Main catalog search control.</param>
     /// <param name="direction">Transfer direction saved with the brush.</param>
     /// <param name="selectedOption">Dropdown option for the saved brush.</param>
@@ -153,11 +171,12 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// <returns>True when the brush was saved.</returns>
     public static bool SaveCurrentBrushConfiguration(ExcelDataBrushPalettePreset brushPalettePreset,
                                                      EnumField domainField,
-                                                     EnumField dataKindField,
+                                                     PopupField<ExcelDataBrushDataKind> dataKindField,
                                                      EnumField listModeField,
                                                      ToolbarSearchField sourceTypeSearchField,
                                                      ToolbarSearchField sourceAssetSearchField,
                                                      ColorField brushColorField,
+                                                     ColorField brushTextColorField,
                                                      ToolbarSearchField searchField,
                                                      ExcelDataTransferDirection direction,
                                                      out string selectedOption,
@@ -177,13 +196,14 @@ internal static class ExcelDataLayoutBrushPaletteUtility
 
         brush.Configure(brushName,
                         domainField == null ? ExcelDataTransferDomain.All : (ExcelDataTransferDomain)domainField.value,
-                        dataKindField == null ? ExcelDataBrushDataKind.All : (ExcelDataBrushDataKind)dataKindField.value,
+                        dataKindField == null ? ExcelDataBrushDataKind.All : dataKindField.value,
                         listModeField == null ? ExcelDataListElementFilterMode.AllBrushableFields : (ExcelDataListElementFilterMode)listModeField.value,
                         sourceTypeSearchField == null ? string.Empty : sourceTypeSearchField.value,
                         sourceAssetSearchField == null ? string.Empty : sourceAssetSearchField.value,
                         searchField == null ? string.Empty : searchField.value,
                         direction,
                         brushColorField == null ? Color.white : brushColorField.value,
+                        brushTextColorField == null ? Color.white : brushTextColorField.value,
                         searchField == null ? string.Empty : searchField.value,
                         "Saved from the Layout Brush panel.");
         brushes.Add(brush);

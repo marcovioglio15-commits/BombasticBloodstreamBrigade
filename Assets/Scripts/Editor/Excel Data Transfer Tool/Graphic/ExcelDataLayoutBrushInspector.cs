@@ -8,6 +8,11 @@ using UnityEngine.UIElements;
 /// </summary>
 internal sealed class ExcelDataLayoutBrushInspector
 {
+    #region Constants
+    private const string AuthoringFoldoutKey = "ExcelDataTransfer.LayoutBrush.CellAuthoring";
+    private const string SelectedCellFoldoutKey = "ExcelDataTransfer.LayoutBrush.SelectedCell";
+    #endregion
+
     #region Fields
     private readonly VisualElement root = new VisualElement();
     private readonly VisualElement settingsRoot = new VisualElement();
@@ -17,6 +22,7 @@ internal sealed class ExcelDataLayoutBrushInspector
         new Dictionary<ExcelDataLayoutBrushMode, ToolbarToggle>();
     private readonly Action modeChanged;
     private readonly Action selectedCellSettingsChanged;
+    private readonly Action directionChanged;
 
     private Label addressLabel;
     private Label contentKindLabel;
@@ -93,11 +99,14 @@ internal sealed class ExcelDataLayoutBrushInspector
     /// </summary>
     /// <param name="newModeChanged">Callback invoked after the active brush mode changes.</param>
     /// <param name="newSelectedCellSettingsChanged">Callback invoked after an editable selected-cell setting changes.</param>
+    /// <param name="newDirectionChanged">Optional callback invoked when the active import/export direction changes.</param>
     public ExcelDataLayoutBrushInspector(Action newModeChanged,
-                                         Action newSelectedCellSettingsChanged)
+                                         Action newSelectedCellSettingsChanged,
+                                         Action newDirectionChanged = null)
     {
         modeChanged = newModeChanged;
         selectedCellSettingsChanged = newSelectedCellSettingsChanged;
+        directionChanged = newDirectionChanged;
         BuildInterface();
         SetMode(ExcelDataLayoutBrushMode.Select);
         ClearSelectedCell();
@@ -188,11 +197,17 @@ internal sealed class ExcelDataLayoutBrushInspector
         root.style.flexGrow = 0f;
         root.style.flexShrink = 0f;
         root.style.minHeight = 0f;
+        Foldout authoringFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Cell Authoring",
+                                                                                    AuthoringFoldoutKey,
+                                                                                    true);
+        authoringFoldout.tooltip = "Choose a paint mode and configure settings that will be stored by the selected workbook cell.";
+        authoringFoldout.style.flexShrink = 0f;
+        root.Add(authoringFoldout);
 
         Label modeLabel = new Label("Mode");
         modeLabel.tooltip = "Choose whether a cell click selects, paints data, paints literal text or erases content.";
         modeLabel.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
-        root.Add(modeLabel);
+        authoringFoldout.Add(modeLabel);
 
         Toolbar modeToolbar = new Toolbar();
         GameManagementPanelLayoutUtility.ConfigureWrappingToolbar(modeToolbar);
@@ -212,11 +227,11 @@ internal sealed class ExcelDataLayoutBrushInspector
                       ExcelDataLayoutBrushMode.Erase,
                       "Erase",
                       "Remove the selected cell payload from the active worksheet.");
-        root.Add(modeToolbar);
+        authoringFoldout.Add(modeToolbar);
 
         directionField = new EnumField("Direction", ExcelDataTransferDirection.Both);
         directionField.tooltip = "Choose whether the painted or selected cell participates in import, export or both operations.";
-        directionField.RegisterValueChangedCallback(evt => NotifySettingsChanged());
+        directionField.RegisterValueChangedCallback(evt => NotifyDirectionChanged());
         settingsRoot.Add(directionField);
 
         literalTextField = new TextField("Text");
@@ -237,18 +252,19 @@ internal sealed class ExcelDataLayoutBrushInspector
         numberFormatField.RegisterValueChangedCallback(evt => NotifySettingsChanged());
         numberFormatRoot.Add(numberFormatField);
         settingsRoot.Add(numberFormatRoot);
-        root.Add(settingsRoot);
+        authoringFoldout.Add(settingsRoot);
 
-        Label inspectorLabel = new Label("Selected Cell");
-        inspectorLabel.tooltip = "Coordinate-exact details for the currently selected workbook cell.";
-        inspectorLabel.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
-        inspectorLabel.style.marginTop = 6f;
-        root.Add(inspectorLabel);
-        addressLabel = AddDetailLabel();
-        contentKindLabel = AddDetailLabel();
-        sourceLabel = AddDetailLabel();
-        valueLabel = AddDetailLabel();
-        styleLabel = AddDetailLabel();
+        Foldout selectedCellFoldout = ManagementToolFoldoutStateUtility.CreateFoldout("Selected Cell",
+                                                                                      SelectedCellFoldoutKey,
+                                                                                      true);
+        selectedCellFoldout.tooltip = "Inspect the exact coordinate, payload source, current value and retained style of the selected cell.";
+        selectedCellFoldout.style.flexShrink = 0f;
+        root.Add(selectedCellFoldout);
+        addressLabel = AddDetailLabel(selectedCellFoldout);
+        contentKindLabel = AddDetailLabel(selectedCellFoldout);
+        sourceLabel = AddDetailLabel(selectedCellFoldout);
+        valueLabel = AddDetailLabel(selectedCellFoldout);
+        styleLabel = AddDetailLabel(selectedCellFoldout);
     }
 
     /// <summary>
@@ -274,15 +290,16 @@ internal sealed class ExcelDataLayoutBrushInspector
     /// <summary>
     /// Adds one wrapped selected-cell detail label.
     /// </summary>
+    /// <param name="parent">Selected-cell foldout receiving the label.</param>
     /// <returns>Created detail label.</returns>
-    private Label AddDetailLabel()
+    private static Label AddDetailLabel(VisualElement parent)
     {
         Label label = new Label();
         label.style.whiteSpace = WhiteSpace.NoWrap;
         label.style.overflow = Overflow.Hidden;
         label.style.textOverflow = TextOverflow.Ellipsis;
         label.style.flexShrink = 0f;
-        root.Add(label);
+        parent.Add(label);
         return label;
     }
     #endregion
@@ -367,6 +384,21 @@ internal sealed class ExcelDataLayoutBrushInspector
     {
         if (!refreshingControls && selectedCellSettingsChanged != null)
             selectedCellSettingsChanged();
+    }
+
+    /// <summary>
+    /// Forwards direction changes to cell persistence and direction-aware catalog choices.
+    /// </summary>
+    private void NotifyDirectionChanged()
+    {
+        if (refreshingControls)
+            return;
+
+        if (selectedCellSettingsChanged != null)
+            selectedCellSettingsChanged();
+
+        if (directionChanged != null)
+            directionChanged();
     }
     #endregion
 

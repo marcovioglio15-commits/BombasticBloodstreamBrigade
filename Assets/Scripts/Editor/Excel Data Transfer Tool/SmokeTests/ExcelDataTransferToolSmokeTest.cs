@@ -85,6 +85,9 @@ public static class ExcelDataTransferToolSmokeTest
         bool hasConcreteListElement = false;
         bool hasReadableListIdentifier = false;
         bool hasObjectReference = false;
+        bool hasScalingStatKey = false;
+        bool hasScalingToggle = false;
+        bool hasScalingFormula = false;
 
         for (int entryIndex = 0; entryIndex < entries.Count; entryIndex++)
         {
@@ -111,6 +114,22 @@ public static class ExcelDataTransferToolSmokeTest
 
             if (entry.DataKind == ExcelDataBrushDataKind.ObjectReference)
                 hasObjectReference = true;
+
+            if (entry.Domain != ExcelDataTransferDomain.Player ||
+                entry.SerializedPath.IndexOf("scalingRules.Array.data[", StringComparison.Ordinal) < 0)
+                continue;
+
+            if (entry.SerializedPath.EndsWith(".statKey", StringComparison.Ordinal) &&
+                entry.DataKind == ExcelDataBrushDataKind.String)
+                hasScalingStatKey = true;
+
+            if (entry.SerializedPath.EndsWith(".addScaling", StringComparison.Ordinal) &&
+                entry.DataKind == ExcelDataBrushDataKind.Boolean)
+                hasScalingToggle = true;
+
+            if (entry.SerializedPath.EndsWith(".formula", StringComparison.Ordinal) &&
+                entry.DataKind == ExcelDataBrushDataKind.String)
+                hasScalingFormula = true;
         }
 
         if (!hasWaveEntry)
@@ -124,6 +143,9 @@ public static class ExcelDataTransferToolSmokeTest
 
         if (!hasObjectReference)
             throw new InvalidOperationException("Field catalog does not expose object reference fields.");
+
+        if (!hasScalingStatKey || !hasScalingToggle || !hasScalingFormula)
+            throw new InvalidOperationException("Field catalog does not expose complete Player Add Scaling rule fields.");
     }
 
     /// <summary>

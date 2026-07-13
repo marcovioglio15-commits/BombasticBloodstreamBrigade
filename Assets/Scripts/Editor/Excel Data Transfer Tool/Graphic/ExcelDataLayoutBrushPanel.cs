@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -59,7 +58,9 @@ public sealed class ExcelDataLayoutBrushPanel
     public ExcelDataLayoutBrushPanel(bool newShowMasterPresetField)
     {
         selectedMasterPreset = ExcelDataTransferAssetUtility.LoadSelectedOrDefaultMasterPreset();
-        brushInspector = new ExcelDataLayoutBrushInspector(OnBrushModeChanged, OnSelectedCellSettingsChanged);
+        brushInspector = new ExcelDataLayoutBrushInspector(OnBrushModeChanged,
+                                                            OnSelectedCellSettingsChanged,
+                                                            OnBrushDirectionChanged);
         controls = new ExcelDataLayoutBrushPanelControls(newShowMasterPresetField,
                                                          brushInspector,
                                                          GetBrushPalettePreset,
@@ -156,7 +157,9 @@ public sealed class ExcelDataLayoutBrushPanel
                                                     selectedColumnIndex,
                                                     HandleCellClick,
                                                     InsertEmptyRow,
-                                                    InsertEmptyColumn);
+                                                    InsertEmptyColumn,
+                                                    RemoveRow,
+                                                    RemoveColumn);
         RefreshSelectedCellInspector();
     }
 
@@ -301,22 +304,7 @@ public sealed class ExcelDataLayoutBrushPanel
     /// <param name="insertionRowIndex">One-based row that becomes empty.</param>
     private void InsertEmptyRow(int insertionRowIndex)
     {
-        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
-        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
-
-        if (layoutPreset == null || sheet == null)
-            return;
-
-        Undo.RecordObject(layoutPreset, "Insert Excel Workbook Row");
-        ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyRow(layoutPreset, sheet.SheetName, insertionRowIndex);
-
-        if (selectedRowIndex >= insertionRowIndex)
-            selectedRowIndex++;
-
-        CommitLayoutEdit(layoutPreset,
-                         "Inserted empty row " + insertionRowIndex.ToString(CultureInfo.InvariantCulture) +
-                         " in " + sheet.SheetName + ".");
-        RefreshDimensionFields(sheet);
+        ApplyStructuralEdit(ExcelDataLayoutStructuralEditKind.InsertRow, insertionRowIndex);
     }
 
     /// <summary>
@@ -325,22 +313,55 @@ public sealed class ExcelDataLayoutBrushPanel
     /// <param name="insertionColumnIndex">One-based column that becomes empty.</param>
     private void InsertEmptyColumn(int insertionColumnIndex)
     {
+        ApplyStructuralEdit(ExcelDataLayoutStructuralEditKind.InsertColumn, insertionColumnIndex);
+    }
+
+    /// <summary>
+    /// Removes one row selected from a horizontal separator context menu.
+    /// </summary>
+    /// <param name="removalRowIndex">One-based row removed from the active worksheet.</param>
+    private void RemoveRow(int removalRowIndex)
+    {
+        ApplyStructuralEdit(ExcelDataLayoutStructuralEditKind.RemoveRow, removalRowIndex);
+    }
+
+    /// <summary>
+    /// Removes one column selected from a vertical separator context menu.
+    /// </summary>
+    /// <param name="removalColumnIndex">One-based column removed from the active worksheet.</param>
+    private void RemoveColumn(int removalColumnIndex)
+    {
+        ApplyStructuralEdit(ExcelDataLayoutStructuralEditKind.RemoveColumn, removalColumnIndex);
+    }
+
+    /// <summary>
+    /// Applies one structural grid edit and refreshes dimensions only after a successful transaction.
+    /// </summary>
+    /// <param name="editKind">Requested row or column insertion or removal.</param>
+    /// <param name="coordinateIndex">One-based row or column index used by the operation.</param>
+    private void ApplyStructuralEdit(ExcelDataLayoutStructuralEditKind editKind, int coordinateIndex)
+    {
         ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
         ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
 
         if (layoutPreset == null || sheet == null)
             return;
 
-        Undo.RecordObject(layoutPreset, "Insert Excel Workbook Column");
-        ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyColumn(layoutPreset, sheet.SheetName, insertionColumnIndex);
+        string status;
 
-        if (selectedColumnIndex >= insertionColumnIndex)
-            selectedColumnIndex++;
+        if (!ExcelDataLayoutBrushStructuralEditUtility.TryExecute(editKind,
+                                                                  layoutPreset,
+                                                                  sheet,
+                                                                  coordinateIndex,
+                                                                  ref selectedRowIndex,
+                                                                  ref selectedColumnIndex,
+                                                                  out status))
+        {
+            controls.SetStatus(status);
+            return;
+        }
 
-        CommitLayoutEdit(layoutPreset,
-                         "Inserted empty column " +
-                         ExcelDataWorkbookCoordinateUtility.ColumnIndexToName(insertionColumnIndex) +
-                         " in " + sheet.SheetName + ".");
+        CommitLayoutEdit(layoutPreset, status);
         RefreshDimensionFields(sheet);
     }
 
@@ -579,7 +600,17 @@ public sealed class ExcelDataLayoutBrushPanel
     private void OnBrushModeChanged()
     {
         controls.SetModeVisibility(brushInspector.Mode);
+        controls.RefreshDataKindChoices();
         RefreshSelectedCellInspector();
+        UpdateSelectionLabel();
+    }
+
+    /// <summary>
+    /// Refreshes direction-compatible Kind choices after the active cell direction changes.
+    /// </summary>
+    private void OnBrushDirectionChanged()
+    {
+        controls.RefreshDataKindChoices();
         UpdateSelectionLabel();
     }
 
@@ -619,7 +650,7 @@ public sealed class ExcelDataLayoutBrushPanel
                 sourceText = cell.FieldBinding.OwnerAssetPath + " | " + cell.FieldBinding.SerializedPath;
                 ExcelDataSerializedValueSnapshot snapshot =
                     ExcelDataSerializedValueReader.ReadValue(cell.FieldBinding, true, true, true);
-                valueText = ConvertToInvariantText(snapshot.Value);
+                valueText = ExcelDataInvariantValueUtility.ToText(snapshot.Value);
 
                 if (!string.IsNullOrWhiteSpace(snapshot.Warning))
                     valueText = snapshot.Warning;
@@ -635,21 +666,6 @@ public sealed class ExcelDataLayoutBrushPanel
                                        styleText);
     }
 
-    /// <summary>
-    /// Converts a typed Unity snapshot into invariant inspector text.
-    /// </summary>
-    /// <param name="value">Typed serialized value.</param>
-    /// <returns>Invariant readable text.</returns>
-    private static string ConvertToInvariantText(object value)
-    {
-        if (value == null)
-            return string.Empty;
-
-        IFormattable formattable = value as IFormattable;
-        return formattable == null
-            ? value.ToString()
-            : formattable.ToString(null, CultureInfo.InvariantCulture);
-    }
     #endregion
 
     #region UI Helpers

@@ -73,6 +73,15 @@ public enum ExcelDataImportConflictPolicy
 }
 
 /// <summary>
+/// Controls whether Player scaling-rule imports may create rules that do not yet exist in Unity authoring.
+/// </summary>
+public enum ExcelDataScalingRuleImportPolicy
+{
+    ExistingRulesOnly = 0,
+    MergeRulesByStatKey = 1
+}
+
+/// <summary>
 /// Controls how imports treat rows that are absent from a workbook but present in Unity assets.
 /// </summary>
 public enum ExcelDataMissingRowPolicy

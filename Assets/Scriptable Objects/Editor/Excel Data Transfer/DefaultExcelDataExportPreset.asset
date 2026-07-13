@@ -16,6 +16,7 @@ MonoBehaviour:
   presetName: Default Export
   targetWorkbookProfile: 0
   targetWorkbookPath: 
+  writeBrushBackgroundColors: 1
   includePlayerData: 1
   includeEnemyData: 1
   includeGameData: 1

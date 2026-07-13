@@ -283,6 +283,50 @@ public sealed class ExcelDataWorkbookSheetDefinition
     }
 
     /// <summary>
+    /// Counts authored payloads owned by one worksheet row before a destructive structural edit.
+    /// </summary>
+    /// <param name="targetRowIndex">One-based row index to inspect.</param>
+    /// <returns>Number of sparse authored cells stored on the requested row.</returns>
+    public int CountAuthoredCellsInRow(int targetRowIndex)
+    {
+        EnsureCollections();
+        int authoredCellCount = 0;
+
+        // Count only concrete payload definitions; empty preview coordinates are not serialized.
+        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell != null && cell.RowIndex == targetRowIndex)
+                authoredCellCount++;
+        }
+
+        return authoredCellCount;
+    }
+
+    /// <summary>
+    /// Counts authored payloads owned by one worksheet column before a destructive structural edit.
+    /// </summary>
+    /// <param name="targetColumnIndex">One-based column index to inspect.</param>
+    /// <returns>Number of sparse authored cells stored in the requested column.</returns>
+    public int CountAuthoredCellsInColumn(int targetColumnIndex)
+    {
+        EnsureCollections();
+        int authoredCellCount = 0;
+
+        // Count only concrete payload definitions; empty preview coordinates are not serialized.
+        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell != null && cell.ColumnIndex == targetColumnIndex)
+                authoredCellCount++;
+        }
+
+        return authoredCellCount;
+    }
+
+    /// <summary>
     /// Updates preview dimensions after an explicit toolbar edit without modifying authored cell coordinates.
     /// </summary>
     /// <param name="newPreviewRowCount">New preview row count.</param>
@@ -344,6 +388,92 @@ public sealed class ExcelDataWorkbookSheetDefinition
         }
 
         previewColumnCount++;
+    }
+
+    /// <summary>
+    /// Removes one row, deletes payloads on it and shifts every following authored cell upward.
+    /// </summary>
+    /// <param name="removalRowIndex">One-based row removed from the worksheet layout.</param>
+    /// <returns>Number of authored cells deleted with the row.</returns>
+    public int RemoveRow(int removalRowIndex)
+    {
+        if (previewRowCount <= 1)
+            throw new InvalidOperationException("A workbook worksheet must retain at least one preview row.");
+
+        if (removalRowIndex < 1 || removalRowIndex > previewRowCount)
+            throw new ArgumentOutOfRangeException(nameof(removalRowIndex), removalRowIndex, "Removed row is outside the preview bounds.");
+
+        EnsureCollections();
+        int removedCellCount = 0;
+
+        // Iterate backwards so deleting sparse payloads cannot invalidate remaining indices.
+        for (int cellIndex = cells.Count - 1; cellIndex >= 0; cellIndex--)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell == null)
+                continue;
+
+            if (cell.RowIndex == removalRowIndex)
+            {
+                cells.RemoveAt(cellIndex);
+                removedCellCount++;
+                continue;
+            }
+
+            if (cell.RowIndex > removalRowIndex)
+                cell.MoveTo(sheetId, cell.RowIndex - 1, cell.ColumnIndex);
+        }
+
+        previewRowCount--;
+
+        if (freezeRowCount >= removalRowIndex)
+            freezeRowCount--;
+
+        return removedCellCount;
+    }
+
+    /// <summary>
+    /// Removes one column, deletes payloads in it and shifts every following authored cell left.
+    /// </summary>
+    /// <param name="removalColumnIndex">One-based column removed from the worksheet layout.</param>
+    /// <returns>Number of authored cells deleted with the column.</returns>
+    public int RemoveColumn(int removalColumnIndex)
+    {
+        if (previewColumnCount <= 1)
+            throw new InvalidOperationException("A workbook worksheet must retain at least one preview column.");
+
+        if (removalColumnIndex < 1 || removalColumnIndex > previewColumnCount)
+            throw new ArgumentOutOfRangeException(nameof(removalColumnIndex), removalColumnIndex, "Removed column is outside the preview bounds.");
+
+        EnsureCollections();
+        int removedCellCount = 0;
+
+        // Iterate backwards so deleting sparse payloads cannot invalidate remaining indices.
+        for (int cellIndex = cells.Count - 1; cellIndex >= 0; cellIndex--)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell == null)
+                continue;
+
+            if (cell.ColumnIndex == removalColumnIndex)
+            {
+                cells.RemoveAt(cellIndex);
+                removedCellCount++;
+                continue;
+            }
+
+            if (cell.ColumnIndex > removalColumnIndex)
+                cell.MoveTo(sheetId, cell.RowIndex, cell.ColumnIndex - 1);
+        }
+
+        previewColumnCount--;
+
+        if (freezeColumnCount >= removalColumnIndex)
+            freezeColumnCount--;
+
+        return removedCellCount;
     }
     #endregion
 

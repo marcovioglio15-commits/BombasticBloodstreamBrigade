@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 
 /// <summary>
 /// Stores one immutable raw workbook value and its hidden reference metadata for import processing.
@@ -54,7 +53,7 @@ internal sealed class ExcelDataImportCellValue
                                     string referencePath)
     {
         RawValue = rawValue;
-        ValueText = ConvertToInvariantText(rawValue);
+        ValueText = ExcelDataInvariantValueUtility.ToText(rawValue);
         ReferenceName = referenceName ?? string.Empty;
         ReferenceGuid = referenceGuid ?? string.Empty;
         ReferencePath = referencePath ?? string.Empty;
@@ -63,24 +62,6 @@ internal sealed class ExcelDataImportCellValue
     #endregion
 
     #region Conversion
-    /// <summary>
-    /// Converts a raw workbook scalar into the invariant text consumed by SerializedProperty writers.
-    /// </summary>
-    /// <param name="value">Raw MiniExcel scalar.</param>
-    /// <returns>Invariant text, or an empty string for an empty cell.</returns>
-    private static string ConvertToInvariantText(object value)
-    {
-        if (value == null || value == DBNull.Value)
-            return string.Empty;
-
-        IFormattable formattable = value as IFormattable;
-
-        if (formattable != null)
-            return formattable.ToString(null, CultureInfo.InvariantCulture);
-
-        return value.ToString() ?? string.Empty;
-    }
-
     /// <summary>
     /// Builds a type-aware token used to compare duplicate mappings without locale-dependent formatting.
     /// </summary>
@@ -91,7 +72,7 @@ internal sealed class ExcelDataImportCellValue
         if (value == null || value == DBNull.Value)
             return "Null:";
 
-        return value.GetType().FullName + ":" + ConvertToInvariantText(value);
+        return value.GetType().FullName + ":" + ExcelDataInvariantValueUtility.ToText(value);
     }
     #endregion
 
