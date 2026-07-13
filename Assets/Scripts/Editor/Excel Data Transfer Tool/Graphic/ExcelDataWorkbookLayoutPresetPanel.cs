@@ -391,25 +391,20 @@ internal sealed class ExcelDataWorkbookLayoutPresetPanel
     }
 
     /// <summary>
-    /// Builds sheet names and grid sizing fields for the selected layout preset.
+    /// Builds default worksheet and grid sizing fields for the selected layout preset.
     /// </summary>
     private void BuildSheetsSection()
     {
         ScrollView scrollView = BuildSectionScrollView();
         SerializedObject serializedObject = new SerializedObject(selectedLayoutPreset);
-        VisualElement sheetsSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(scrollView, "Sheets");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(sheetsSection, serializedObject, "manifestSheetName", "Manifest Sheet", "Worksheet name used for workbook metadata.");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(sheetsSection, serializedObject, "objectsSheetName", "Objects Sheet", "Worksheet name used for normalized object rows and brush-grid mappings.");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(sheetsSection, serializedObject, "referencesSheetName", "References Sheet", "Worksheet name reserved for object-reference metadata.");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(sheetsSection, serializedObject, "wavesSheetName", "Waves Sheet", "Worksheet name reserved for enemy wave data.");
+        VisualElement sheetsSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(scrollView, "Sheet Defaults");
+        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(sheetsSection, serializedObject, "objectsSheetName", "Default Sheet Name", "Visible name used only when a new layout creates its first authoritative worksheet. Existing worksheet names live in Authoritative Sheets.");
 
         VisualElement gridSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(scrollView, "Grid Preview");
         ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "defaultGridRows", "Rows", "Visible row count for the brush grid preview.");
         ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "defaultGridColumns", "Columns", "Visible column count for the brush grid preview.");
         ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "defaultCellWidth", "Cell Width", "Brush grid cell width in pixels.");
         ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "defaultCellHeight", "Cell Height", "Brush grid cell height in pixels.");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "dataStartRow", "Data Start Row", "One-based row where generated workbook data starts.");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(gridSection, serializedObject, "dataStartColumn", "Data Start Column", "One-based column where generated workbook data starts.");
     }
 
     /// <summary>
@@ -429,14 +424,14 @@ internal sealed class ExcelDataWorkbookLayoutPresetPanel
     }
 
     /// <summary>
-    /// Builds the raw mapping list for detailed per-cell inspection.
+    /// Builds the authoritative sheet and sparse cell list for detailed inspection.
     /// </summary>
     private void BuildMappingsSection()
     {
         ScrollView scrollView = BuildSectionScrollView();
         SerializedObject serializedObject = new SerializedObject(selectedLayoutPreset);
-        VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(scrollView, "Cell Mappings");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "cellMappings", "Cell Mappings", "Painted cells stored by this workbook layout preset.");
+        VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(scrollView, "Authoritative Sheets and Cells");
+        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "sheetDefinitions", "Authoritative Sheets", "Ordered workbook sheets and every exact Data Field or Literal Text cell. This is the only import/export layout source.");
     }
 
     /// <summary>

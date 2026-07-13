@@ -19,6 +19,9 @@ public sealed class ExcelDataBrushPalettePreset : ScriptableObject
     [SerializeField] private string presetName = "Default Brush Palette";
 
     [Header("Palette")]
+    [Tooltip("Fallback colors used by each data family when a cell has no exact saved-brush ID.")]
+    [SerializeField] private ExcelDataBrushTypeColorPalette dataTypeColors = new ExcelDataBrushTypeColorPalette();
+
     [Tooltip("Brushes available to the workbook layout grid.")]
     [SerializeField] private List<ExcelDataBrushDefinition> brushes = new List<ExcelDataBrushDefinition>();
     #endregion
@@ -26,6 +29,15 @@ public sealed class ExcelDataBrushPalettePreset : ScriptableObject
     #endregion
 
     #region Properties
+    public ExcelDataBrushTypeColorPalette DataTypeColors
+    {
+        get
+        {
+            EnsureCollections();
+            return dataTypeColors;
+        }
+    }
+
     public List<ExcelDataBrushDefinition> Brushes
     {
         get
@@ -82,6 +94,9 @@ public sealed class ExcelDataBrushPalettePreset : ScriptableObject
     {
         if (brushes == null)
             brushes = new List<ExcelDataBrushDefinition>();
+
+        if (dataTypeColors == null)
+            dataTypeColors = new ExcelDataBrushTypeColorPalette();
     }
     #endregion
 

@@ -193,6 +193,37 @@ public sealed class ExcelDataFieldBinding
     {
         return !string.IsNullOrWhiteSpace(fieldId);
     }
+
+    /// <summary>
+    /// Restores concrete list indexes and stable keys captured by workbook technical metadata.
+    /// </summary>
+    /// <param name="newConcreteListIndices">Concrete zero-based indexes in nesting order.</param>
+    /// <param name="newStableListKeys">Stable element keys in nesting order.</param>
+    internal void ConfigureListIdentity(IReadOnlyList<int> newConcreteListIndices,
+                                        IReadOnlyList<string> newStableListKeys)
+    {
+        EnsureCollections();
+        concreteListIndices.Clear();
+        stableListKeys.Clear();
+
+        // Restore concrete positions in nesting order as deterministic resolution fallbacks.
+        if (newConcreteListIndices != null)
+        {
+            for (int indexPosition = 0; indexPosition < newConcreteListIndices.Count; indexPosition++)
+                concreteListIndices.Add(newConcreteListIndices[indexPosition]);
+        }
+
+        // Restore authored stable keys independently because older entries may only provide indexes.
+        if (newStableListKeys != null)
+        {
+            for (int keyPosition = 0; keyPosition < newStableListKeys.Count; keyPosition++)
+                stableListKeys.Add(newStableListKeys[keyPosition]);
+        }
+
+        // Keep both nested identity sequences aligned for downstream per-element resolution.
+        while (stableListKeys.Count < concreteListIndices.Count)
+            stableListKeys.Add(string.Empty);
+    }
     #endregion
 
     #region Internal Methods
@@ -213,6 +244,12 @@ public sealed class ExcelDataFieldBinding
                   entry.SerializedPath,
                   entry.PathTemplate,
                   entry.DataKind);
+
+        // Preserve stable authoring keys while retaining concrete indices as deterministic fallbacks.
+        stableListKeys.Clear();
+
+        for (int keyIndex = 0; keyIndex < entry.StableListKeys.Count; keyIndex++)
+            stableListKeys.Add(entry.StableListKeys[keyIndex]);
     }
     #endregion
 

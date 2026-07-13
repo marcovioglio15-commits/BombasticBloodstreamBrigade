@@ -1,0 +1,855 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: EnemyBalanceExcelDataWorkbookLayoutPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: 01ebeb4d36dd4881a4ca0150e8b71309
+  presetName: Enemy Balance Transfer Layout
+  objectsSheetName: Enemy Balance
+  defaultGridRows: 28
+  defaultGridColumns: 4
+  defaultCellWidth: 210
+  defaultCellHeight: 30
+  sheetDefinitions:
+  - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+    sheetName: Enemy Balance
+    previewRowCount: 28
+    previewColumnCount: 4
+    previewCellWidth: 210
+    previewCellHeight: 30
+    freezeRowCount: 4
+    freezeColumnCount: 1
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ENEMY BALANCE WORKBOOK
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 2
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Combat, movement and presentation values used by Enemy Management
+        Tool presets.
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SETTING
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 4
+      columnIndex: 2
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: VALUE
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 4
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SOURCE ASSET
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 4
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SERIALIZED PATH
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: IDENTITY
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 8
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Name
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 8
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyMasterPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 8
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: presetName
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 8
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:presetName
+        domain: 2
+        ownerAssetGuid: 9f65ffa9659e02a458f01071aafed820
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_AcidWanderer.asset
+        serializedPath: presetName
+        pathTemplate: presetName
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 0858c7cc53d74b72aae545e6bf61f1a8
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 9
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 9
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyMasterPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 9
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 9
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:version
+        domain: 2
+        ownerAssetGuid: 9f65ffa9659e02a458f01071aafed820
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_AcidWanderer.asset
+        serializedPath: version
+        pathTemplate: version
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 0858c7cc53d74b72aae545e6bf61f1a8
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 10
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PRESENTATION
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 12
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Visual Preset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 12
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyMasterPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 12
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: visualPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 12
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:visualPreset
+        domain: 2
+        ownerAssetGuid: 9f65ffa9659e02a458f01071aafed820
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_AcidWanderer.asset
+        serializedPath: visualPreset
+        pathTemplate: visualPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 6783f6b3cb3a41879a933b758fd96799
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 13
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: UI Visual Preset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 13
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyMasterPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 13
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: uiVisualPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 13
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:uiVisualPreset
+        domain: 2
+        ownerAssetGuid: 9f65ffa9659e02a458f01071aafed820
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_AcidWanderer.asset
+        serializedPath: uiVisualPreset
+        pathTemplate: uiVisualPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 6783f6b3cb3a41879a933b758fd96799
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 14
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: COMBAT AND MOVEMENT
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 16
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Health Value
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 16
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyBrainPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 16
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: healthStatistics.maxHealth
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 16
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:d8116fa4a909db84d9a5504d20ce08c5:EnemyBrainPreset:healthStatistics.maxHealth
+        domain: 2
+        ownerAssetGuid: d8116fa4a909db84d9a5504d20ce08c5
+        ownerAssetTypeName: EnemyBrainPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Brain/EnemyBrainPreset_AcidWanderer.asset
+        serializedPath: healthStatistics.maxHealth
+        pathTemplate: healthStatistics.maxHealth
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 249d51e90c444750889f7d4d8504a914
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 17
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Damage Value
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 17
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyBrainPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 17
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: damage.contactRadius
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 17
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:d8116fa4a909db84d9a5504d20ce08c5:EnemyBrainPreset:damage.contactRadius
+        domain: 2
+        ownerAssetGuid: d8116fa4a909db84d9a5504d20ce08c5
+        ownerAssetTypeName: EnemyBrainPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Brain/EnemyBrainPreset_AcidWanderer.asset
+        serializedPath: damage.contactRadius
+        pathTemplate: damage.contactRadius
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 249d51e90c444750889f7d4d8504a914
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 18
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Movement Speed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 18
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyBrainPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 18
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movement.moveSpeed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 18
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:d8116fa4a909db84d9a5504d20ce08c5:EnemyBrainPreset:movement.moveSpeed
+        domain: 2
+        ownerAssetGuid: d8116fa4a909db84d9a5504d20ce08c5
+        ownerAssetTypeName: EnemyBrainPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Brain/EnemyBrainPreset_AcidWanderer.asset
+        serializedPath: movement.moveSpeed
+        pathTemplate: movement.moveSpeed
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 249d51e90c444750889f7d4d8504a914
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 19
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Enabled Toggle
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 19
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: EnemyBrainPreset_AcidWanderer
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 19
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: damage.contactDamageEnabled
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 423ae0444ecc4a0aa3d3f443330de676
+      rowIndex: 19
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:d8116fa4a909db84d9a5504d20ce08c5:EnemyBrainPreset:damage.contactDamageEnabled
+        domain: 2
+        ownerAssetGuid: d8116fa4a909db84d9a5504d20ce08c5
+        ownerAssetTypeName: EnemyBrainPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Brain/EnemyBrainPreset_AcidWanderer.asset
+        serializedPath: damage.contactDamageEnabled
+        pathTemplate: damage.contactDamageEnabled
+        expectedDataKind: 3
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 0939f7c8eda14b0e934218a5f2f66811
+      numberFormat: 
+      validateLiteralDuringImport: 0

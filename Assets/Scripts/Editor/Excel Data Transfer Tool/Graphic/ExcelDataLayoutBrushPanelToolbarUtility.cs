@@ -31,26 +31,26 @@ internal static class ExcelDataLayoutBrushPanelToolbarUtility
         GameManagementPanelLayoutUtility.ConfigureWrappingToolbar(toolbar);
 
         rowCountField = CreateLayoutIntField("Rows",
-                                             "Default brush-grid row count stored in the layout preset.",
-                                             "defaultGridRows",
+                                             "Preview row count for the active worksheet. Structural insertion also increases this count.",
+                                             "previewRowCount",
                                              updateLayoutInt);
         toolbar.Add(rowCountField);
 
         columnCountField = CreateLayoutIntField("Columns",
-                                                "Default brush-grid column count stored in the layout preset.",
-                                                "defaultGridColumns",
+                                                "Preview column count for the active worksheet. Structural insertion also increases this count.",
+                                                "previewColumnCount",
                                                 updateLayoutInt);
         toolbar.Add(columnCountField);
 
         cellWidthField = CreateLayoutIntField("Cell W",
                                               "Visible grid cell width in pixels. Increase it when long field names need more room.",
-                                              "defaultCellWidth",
+                                              "previewCellWidth",
                                               updateLayoutInt);
         toolbar.Add(cellWidthField);
 
         cellHeightField = CreateLayoutIntField("Cell H",
                                                "Visible grid cell height in pixels used by the layout brush preview.",
-                                               "defaultCellHeight",
+                                               "previewCellHeight",
                                                updateLayoutInt);
         toolbar.Add(cellHeightField);
 

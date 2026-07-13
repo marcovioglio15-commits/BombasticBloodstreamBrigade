@@ -27,7 +27,7 @@ internal static class ExcelDataSerializedValueReader
         if (binding == null || !binding.IsUsable())
             return ExcelDataSerializedValueSnapshot.CreateWarning("Missing or unusable field binding.", string.Empty);
 
-        string resolvedOwnerAssetPath = ResolveOwnerAssetPath(binding);
+        string resolvedOwnerAssetPath = ExcelDataFieldBindingAssetUtility.ResolveOwnerAssetPath(binding);
 
         if (string.IsNullOrWhiteSpace(resolvedOwnerAssetPath))
             return ExcelDataSerializedValueSnapshot.CreateWarning("Owner asset could not be resolved from GUID or stored path.", string.Empty);
@@ -157,26 +157,6 @@ internal static class ExcelDataSerializedValueReader
                                                     writeReferenceGuids ? referenceGuid : string.Empty,
                                                     writeReferencePaths ? referencePath : string.Empty,
                                                     string.Empty);
-    }
-    #endregion
-
-    #region Owner Resolution
-    /// <summary>
-    /// Resolves the current owner path from the stable GUID before falling back to the recorded path.
-    /// </summary>
-    /// <param name="binding">Field binding containing GUID and readable path metadata.</param>
-    /// <returns>Current project-relative owner path, or an empty string when neither identity resolves.</returns>
-    private static string ResolveOwnerAssetPath(ExcelDataFieldBinding binding)
-    {
-        if (!string.IsNullOrWhiteSpace(binding.OwnerAssetGuid))
-        {
-            string guidPath = AssetDatabase.GUIDToAssetPath(binding.OwnerAssetGuid);
-
-            if (!string.IsNullOrWhiteSpace(guidPath))
-                return guidPath;
-        }
-
-        return binding.OwnerAssetPath;
     }
     #endregion
 

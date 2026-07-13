@@ -67,7 +67,7 @@ internal static class ExcelDataWorkbookDocumentBuilder
             if (!string.Equals(cell.SheetId, sheetDefinition.SheetId, StringComparison.Ordinal))
                 throw new InvalidOperationException("Workbook cell references a different owner sheet: " + cell.SheetId);
 
-            long coordinate = BuildCoordinateKey(cell.RowIndex, cell.ColumnIndex);
+            long coordinate = ExcelDataWorkbookCoordinateUtility.BuildKey(cell.RowIndex, cell.ColumnIndex);
 
             if (!coordinates.Add(coordinate))
                 throw new InvalidOperationException("Duplicate export cell at " + sheetDefinition.SheetName + "!" + cell.RowIndex + "," + cell.ColumnIndex + ".");
@@ -83,7 +83,9 @@ internal static class ExcelDataWorkbookDocumentBuilder
             result.Document.AddSheet(sheetDefinition.SheetName,
                                      maximumRowIndex,
                                      maximumColumnIndex,
-                                     sheetDefinition.Visibility);
+                                     sheetDefinition.Visibility,
+                                     sheetDefinition.PreviewCellWidth,
+                                     true);
         result.RegisterSheet(sheetDefinition);
 
         // Resolve each data field once and write its typed value at the exact one-based coordinate.
@@ -147,19 +149,6 @@ internal static class ExcelDataWorkbookDocumentBuilder
             default:
                 return ExcelDataSerializedValueSnapshot.CreateWarning("Unsupported workbook cell content kind: " + cell.ContentKind, string.Empty);
         }
-    }
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Packs a positive row and column into one allocation-free duplicate-detection key.
-    /// </summary>
-    /// <param name="rowIndex">One-based row index.</param>
-    /// <param name="columnIndex">One-based column index.</param>
-    /// <returns>Unique coordinate key for valid Int32 coordinates.</returns>
-    private static long BuildCoordinateKey(int rowIndex, int columnIndex)
-    {
-        return ((long)rowIndex << 32) | (uint)columnIndex;
     }
     #endregion
 

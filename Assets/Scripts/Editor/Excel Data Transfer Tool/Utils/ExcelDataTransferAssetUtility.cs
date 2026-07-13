@@ -401,120 +401,120 @@ public static class ExcelDataTransferAssetUtility
         AddBrushIfMissing(brushes,
                           "Any Field",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.All,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.85f, 0.85f, 0.85f, 1f),
                           "all any field",
                           "Generic brush that opens the full field catalog.");
         AddBrushIfMissing(brushes,
                           "Numbers",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.Number,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.45f, 0.68f, 1f, 1f),
                           "number float int stat scaling",
                           "Brush for numeric tuning values, stats and scaling-friendly fields.");
         AddBrushIfMissing(brushes,
                           "Booleans",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.Boolean,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.48f, 0.86f, 0.58f, 1f),
                           "bool toggle enabled disabled",
                           "Brush for boolean toggle fields.");
         AddBrushIfMissing(brushes,
                           "Enums",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.Enum,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.88f, 0.68f, 1f, 1f),
                           "enum mode type policy",
                           "Brush for enum mode and policy fields.");
         AddBrushIfMissing(brushes,
                           "Strings",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.String,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.9f, 0.82f, 0.48f, 1f),
                           "string label id name description",
                           "Brush for text identifiers, labels and descriptions.");
         AddBrushIfMissing(brushes,
                           "References",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.Reference,
                           ExcelDataBrushDataKind.ObjectReference,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.45f, 0.7f, 1f, 1f),
                           "asset reference prefab material guid name",
                           "Brush for asset reference fields resolved through the project AssetDatabase.");
         AddBrushIfMissing(brushes,
                           "Lists",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
-                          ExcelDataBrushDataKind.ListElement,
-                          ExcelDataListElementFilterMode.ListsOnly,
+                          ExcelDataBrushDataKind.All,
+                          ExcelDataListElementFilterMode.InsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(0.45f, 1f, 0.65f, 1f),
                           "list array element concrete item wave cell",
                           "Brush for concrete list elements and nested list data.");
         AddBrushIfMissing(brushes,
                           "Waves",
                           ExcelDataTransferDomain.Waves,
-                          ExcelDataFieldCategory.Wave,
                           ExcelDataBrushDataKind.All,
-                          ExcelDataListElementFilterMode.All,
+                          ExcelDataListElementFilterMode.AllBrushableFields,
                           string.Empty,
+                          ExcelDataTransferDirection.Both,
                           new Color(1f, 0.74f, 0.36f, 1f),
                           "enemy wave painted cell spawn",
                           "Brush for EnemyWavePreset wave and painted-cell data.");
         AddBrushIfMissing(brushes,
                           "Export - Player Numbers",
                           ExcelDataTransferDomain.Player,
-                          ExcelDataFieldCategory.All,
                           ExcelDataBrushDataKind.Number,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Export,
                           new Color(0.34f, 0.62f, 1f, 1f),
                           "export player number tuning speed damage cooldown",
                           "Test brush for exporting readable player numeric tuning fields.");
         AddBrushIfMissing(brushes,
                           "Export - Enemy Waves",
                           ExcelDataTransferDomain.Waves,
-                          ExcelDataFieldCategory.Wave,
                           ExcelDataBrushDataKind.All,
-                          ExcelDataListElementFilterMode.All,
+                          ExcelDataListElementFilterMode.AllBrushableFields,
                           "Wave",
+                          ExcelDataTransferDirection.Export,
                           new Color(1f, 0.62f, 0.28f, 1f),
                           "export wave enemy spawn timing group",
                           "Test brush for exporting enemy wave and spawn-related data.");
         AddBrushIfMissing(brushes,
                           "Import - References",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.Reference,
                           ExcelDataBrushDataKind.ObjectReference,
-                          ExcelDataListElementFilterMode.HideConcreteListElements,
+                          ExcelDataListElementFilterMode.OutsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Import,
                           new Color(0.42f, 0.82f, 0.95f, 1f),
                           "import reference asset prefab guid name path",
                           "Test brush for importing asset references by readable asset name with ambiguity checks.");
         AddBrushIfMissing(brushes,
                           "Import - Lists",
                           ExcelDataTransferDomain.All,
-                          ExcelDataFieldCategory.All,
-                          ExcelDataBrushDataKind.ListElement,
-                          ExcelDataListElementFilterMode.All,
+                          ExcelDataBrushDataKind.All,
+                          ExcelDataListElementFilterMode.InsideListsOnly,
                           string.Empty,
+                          ExcelDataTransferDirection.Import,
                           new Color(0.5f, 0.95f, 0.52f, 1f),
                           "import list concrete array element item",
                           "Test brush for importing concrete list elements and list-backed values.");
@@ -527,6 +527,9 @@ public static class ExcelDataTransferAssetUtility
     /// <param name="brushName">Readable brush name shown in the palette.</param>
     /// <param name="domain">Domain filter applied by this brush.</param>
     /// <param name="dataKind">Data-kind filter applied by this brush.</param>
+    /// <param name="listFilter">List participation filter applied by this brush.</param>
+    /// <param name="sourceFilter">Partial source type filter applied by this brush.</param>
+    /// <param name="direction">Import/export direction restored by this brush.</param>
     /// <param name="color">Grid overlay color used by this brush.</param>
     /// <param name="searchTokens">Search tokens used by smart filtering.</param>
     /// <param name="description">Short editor-only brush description.</param>
@@ -534,10 +537,10 @@ public static class ExcelDataTransferAssetUtility
     private static void AddBrushIfMissing(List<ExcelDataBrushDefinition> brushes,
                                           string brushName,
                                           ExcelDataTransferDomain domain,
-                                          ExcelDataFieldCategory category,
                                           ExcelDataBrushDataKind dataKind,
                                           ExcelDataListElementFilterMode listFilter,
                                           string sourceFilter,
+                                          ExcelDataTransferDirection direction,
                                           Color color,
                                           string searchTokens,
                                           string description)
@@ -547,10 +550,10 @@ public static class ExcelDataTransferAssetUtility
 
         brushes.Add(CreateBrush(brushName,
                                 domain,
-                                category,
                                 dataKind,
                                 listFilter,
                                 sourceFilter,
+                                direction,
                                 color,
                                 searchTokens,
                                 description));
@@ -583,26 +586,36 @@ public static class ExcelDataTransferAssetUtility
     /// </summary>
     /// <param name="brushName">Readable brush name shown in the palette.</param>
     /// <param name="domain">Domain filter applied by this brush.</param>
-    /// <param name="category">Category filter applied by this brush.</param>
     /// <param name="dataKind">Data-kind filter applied by this brush.</param>
     /// <param name="listFilter">List filter applied by this brush.</param>
     /// <param name="sourceFilter">Source type filter applied by this brush.</param>
+    /// <param name="direction">Import/export direction restored by this brush.</param>
     /// <param name="color">Grid overlay color used by this brush.</param>
     /// <param name="searchTokens">Search tokens used by smart filtering.</param>
     /// <param name="description">Short editor-only brush description.</param>
     /// <returns>Configured brush definition.</returns>
     private static ExcelDataBrushDefinition CreateBrush(string brushName,
                                                         ExcelDataTransferDomain domain,
-                                                        ExcelDataFieldCategory category,
                                                         ExcelDataBrushDataKind dataKind,
                                                         ExcelDataListElementFilterMode listFilter,
                                                         string sourceFilter,
+                                                        ExcelDataTransferDirection direction,
                                                         Color color,
                                                         string searchTokens,
                                                         string description)
     {
         ExcelDataBrushDefinition brush = new ExcelDataBrushDefinition();
-        brush.Configure(brushName, domain, category, dataKind, listFilter, sourceFilter, color, searchTokens, description);
+        brush.Configure(brushName,
+                        domain,
+                        dataKind,
+                        listFilter,
+                        sourceFilter,
+                        string.Empty,
+                        string.Empty,
+                        direction,
+                        color,
+                        searchTokens,
+                        description);
         return brush;
     }
     #endregion

@@ -77,6 +77,8 @@ internal sealed class MiniExcelDataWorkbookAdapter : IExcelDataWorkbookAdapter
                          configuration: configuration,
                          overwriteFile: true);
 
+        ExcelDataWorkbookColumnWidthUtility.Apply(resolvedPath, document);
+
         ExcelDataWorkbookPathUtility.RefreshAssetDatabaseIfNeeded(resolvedPath);
         return resolvedPath;
     }

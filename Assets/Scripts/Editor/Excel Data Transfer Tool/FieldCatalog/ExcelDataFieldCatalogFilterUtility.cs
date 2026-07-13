@@ -15,25 +15,23 @@ internal static class ExcelDataFieldCatalogFilterUtility
     /// <param name="entry">Catalog entry to test.</param>
     /// <param name="searchText">Search text entered by the user.</param>
     /// <param name="domainFilter">Domain dropdown filter.</param>
-    /// <param name="categoryFilter">Category dropdown filter.</param>
     /// <param name="dataKindFilter">Data-kind dropdown filter.</param>
     /// <param name="listFilter">List participation dropdown filter.</param>
+    /// <param name="sourceTypeFilter">Partial ScriptableObject type filter.</param>
+    /// <param name="sourceAssetFilter">Partial concrete asset name filter.</param>
     /// <returns>True when the entry should be shown.</returns>
     public static bool MatchesFilters(ExcelDataFieldCatalogEntry entry,
                                       string searchText,
                                       ExcelDataTransferDomain domainFilter,
-                                      ExcelDataFieldCategory categoryFilter,
                                       ExcelDataBrushDataKind dataKindFilter,
                                       ExcelDataListElementFilterMode listFilter,
-                                      string sourceFilter)
+                                      string sourceTypeFilter,
+                                      string sourceAssetFilter)
     {
         if (entry == null)
             return false;
 
         if (domainFilter != ExcelDataTransferDomain.All && entry.Domain != domainFilter)
-            return false;
-
-        if (categoryFilter != ExcelDataFieldCategory.All && entry.Category != categoryFilter)
             return false;
 
         if (dataKindFilter != ExcelDataBrushDataKind.All && entry.DataKind != dataKindFilter)
@@ -42,7 +40,10 @@ internal static class ExcelDataFieldCatalogFilterUtility
         if (!MatchesListFilter(entry, listFilter))
             return false;
 
-        if (!MatchesSourceFilter(entry, sourceFilter))
+        if (!MatchesSourceTypeFilter(entry, sourceTypeFilter))
+            return false;
+
+        if (!MatchesSourceAssetFilter(entry, sourceAssetFilter))
             return false;
 
         return MatchesSearchText(entry, searchText);
@@ -54,12 +55,12 @@ internal static class ExcelDataFieldCatalogFilterUtility
     /// <param name="entry">Catalog entry to test.</param>
     /// <param name="sourceFilter">Source type option selected by the user.</param>
     /// <returns>True when the source filter is empty, all, or matches the entry source type.</returns>
-    public static bool MatchesSourceFilter(ExcelDataFieldCatalogEntry entry, string sourceFilter)
+    public static bool MatchesSourceTypeFilter(ExcelDataFieldCatalogEntry entry, string sourceFilter)
     {
         if (entry == null)
             return false;
 
-        if (string.IsNullOrWhiteSpace(sourceFilter) || sourceFilter == ExcelDataFieldCatalogSourceFilterUtility.AllSourcesOption)
+        if (string.IsNullOrWhiteSpace(sourceFilter))
             return true;
 
         if (string.IsNullOrWhiteSpace(entry.AssetTypeName))
@@ -67,6 +68,25 @@ internal static class ExcelDataFieldCatalogFilterUtility
 
         string normalizedSource = sourceFilter.Trim().ToLowerInvariant();
         return entry.AssetTypeName.ToLowerInvariant().Contains(normalizedSource);
+    }
+
+    /// <summary>
+    /// Checks whether one concrete source asset matches a partial asset-name filter.
+    /// </summary>
+    /// <param name="entry">Catalog entry to test.</param>
+    /// <param name="sourceAssetFilter">Partial source asset name or path.</param>
+    /// <returns>True when no filter is active or the entry belongs to a matching asset.</returns>
+    public static bool MatchesSourceAssetFilter(ExcelDataFieldCatalogEntry entry, string sourceAssetFilter)
+    {
+        if (entry == null)
+            return false;
+
+        if (string.IsNullOrWhiteSpace(sourceAssetFilter))
+            return true;
+
+        string normalizedFilter = sourceAssetFilter.Trim().ToLowerInvariant();
+        return entry.AssetName.ToLowerInvariant().Contains(normalizedFilter) ||
+               entry.AssetPath.ToLowerInvariant().Contains(normalizedFilter);
     }
     #endregion
 
@@ -168,12 +188,16 @@ internal static class ExcelDataFieldCatalogFilterUtility
     {
         switch (listFilter)
         {
-            case ExcelDataListElementFilterMode.HideConcreteListElements:
-                return !entry.IsConcreteListElement;
-            case ExcelDataListElementFilterMode.ConcreteListElementsOnly:
-                return entry.IsConcreteListElement;
-            case ExcelDataListElementFilterMode.ListsOnly:
+            case ExcelDataListElementFilterMode.OutsideListsOnly:
+                return !entry.IsConcreteListElement && !entry.IsListContainer;
+            case ExcelDataListElementFilterMode.InsideListsOnly:
                 return entry.IsConcreteListElement || entry.IsListContainer;
+            case ExcelDataListElementFilterMode.TopLevelListValues:
+                return entry.IsConcreteListElement && entry.ListDepth == 1;
+            case ExcelDataListElementFilterMode.NestedListValues:
+                return entry.ListDepth > 1;
+            case ExcelDataListElementFilterMode.ListSizesOnly:
+                return entry.DataKind == ExcelDataBrushDataKind.ListSize;
             default:
                 return true;
         }

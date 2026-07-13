@@ -18,10 +18,11 @@ public sealed class ExcelDataFieldCatalogPanel
     private ListView listView;
     private ToolbarSearchField searchField;
     private EnumField domainField;
-    private EnumField categoryField;
     private EnumField dataKindField;
     private EnumField listModeField;
-    private PopupField<string> sourceField;
+    private ToolbarSearchField sourceTypeSearchField;
+    private ToolbarSearchField sourceAssetSearchField;
+    private VisualElement sourceAssetRoot;
     #endregion
 
     #region Properties
@@ -97,16 +98,18 @@ public sealed class ExcelDataFieldCatalogPanel
         pane.Add(searchField);
 
         domainField = CreateEnumFilter("Domain", ExcelDataTransferDomain.All);
-        categoryField = CreateEnumFilter("Category", ExcelDataFieldCategory.All);
         dataKindField = CreateEnumFilter("Kind", ExcelDataBrushDataKind.All);
-        listModeField = CreateEnumFilter("Lists", ExcelDataListElementFilterMode.HideConcreteListElements);
-        sourceField = CreateSourceFilter();
+        listModeField = CreateEnumFilter("List Entries", ExcelDataListElementFilterMode.OutsideListsOnly);
+        sourceTypeSearchField = CreateSearchFilter("Filter ScriptableObject types by partial name. Example: PlayerControllerPreset.");
+        sourceAssetSearchField = CreateSearchFilter("Filter concrete source assets by partial name or path. Example: ConeVision_ForwardAndBackward.");
 
         pane.Add(domainField);
-        pane.Add(categoryField);
         pane.Add(dataKindField);
         pane.Add(listModeField);
-        pane.Add(sourceField);
+        AddSearchFilter(pane, "Source Type", sourceTypeSearchField);
+        sourceAssetRoot = new VisualElement();
+        AddSearchFilter(sourceAssetRoot, "Source Asset", sourceAssetSearchField);
+        pane.Add(sourceAssetRoot);
 
         Button refreshButton = new Button(RefreshCatalog);
         refreshButton.text = "Refresh";
@@ -137,17 +140,33 @@ public sealed class ExcelDataFieldCatalogPanel
     }
 
     /// <summary>
-    /// Creates the dynamic source-type dropdown used to reduce large catalog searches.
+    /// Creates one searchable source filter that cannot expand into an oversized dropdown.
     /// </summary>
-    /// <returns>Configured source filter dropdown.</returns>
-    private PopupField<string> CreateSourceFilter()
+    /// <param name="tooltip">Explicit filter behavior and example.</param>
+    /// <returns>Configured source search field.</returns>
+    private ToolbarSearchField CreateSearchFilter(string tooltip)
     {
-        List<string> options = new List<string>();
-        options.Add(ExcelDataFieldCatalogSourceFilterUtility.AllSourcesOption);
-        PopupField<string> field = new PopupField<string>("Source", options, 0);
-        field.tooltip = "Limit the catalog to one ScriptableObject source type before searching individual fields.";
+        ToolbarSearchField field = new ToolbarSearchField();
+        field.tooltip = tooltip;
         field.RegisterValueChangedCallback(evt => ApplyFilters());
+        GameManagementPanelLayoutUtility.ConfigureSearchField(field);
         return field;
+    }
+
+    /// <summary>
+    /// Adds one labelled source search filter to the filter pane.
+    /// </summary>
+    /// <param name="parent">Parent receiving label and field.</param>
+    /// <param name="labelText">Visible filter label.</param>
+    /// <param name="field">Search field controlled by the label.</param>
+    private static void AddSearchFilter(VisualElement parent,
+                                        string labelText,
+                                        ToolbarSearchField field)
+    {
+        Label label = new Label(labelText);
+        label.tooltip = field.tooltip;
+        parent.Add(label);
+        parent.Add(field);
     }
 
     /// <summary>
@@ -198,8 +217,8 @@ public sealed class ExcelDataFieldCatalogPanel
         }
 
         ExcelDataFieldCatalogEntry entry = filteredEntries[index];
-        label.text = entry.Domain + " | " + entry.AssetTypeName + " | " + entry.PathTemplate;
-        label.tooltip = entry.DisplayName + "\n" + entry.AssetPath;
+        label.text = entry.Domain + " | " + entry.AssetTypeName + " | " + entry.AssetName + " | " + entry.ReadablePath;
+        label.tooltip = entry.DisplayName + "\n" + entry.AssetPath + "\n" + entry.SerializedPath;
     }
     #endregion
 
@@ -212,7 +231,6 @@ public sealed class ExcelDataFieldCatalogPanel
         allEntries.Clear();
         filteredEntries.Clear();
         allEntries.AddRange(ExcelDataFieldCatalogBuilder.BuildCatalog());
-        RefreshSourceOptions();
         ApplyFilters();
     }
 
@@ -222,12 +240,13 @@ public sealed class ExcelDataFieldCatalogPanel
     private void ApplyFilters()
     {
         filteredEntries.Clear();
+        RefreshSourceAssetVisibility();
         string searchText = searchField == null ? string.Empty : searchField.value;
         ExcelDataTransferDomain domainFilter = domainField == null ? ExcelDataTransferDomain.All : (ExcelDataTransferDomain)domainField.value;
-        ExcelDataFieldCategory categoryFilter = categoryField == null ? ExcelDataFieldCategory.All : (ExcelDataFieldCategory)categoryField.value;
         ExcelDataBrushDataKind dataKindFilter = dataKindField == null ? ExcelDataBrushDataKind.All : (ExcelDataBrushDataKind)dataKindField.value;
-        ExcelDataListElementFilterMode listFilter = listModeField == null ? ExcelDataListElementFilterMode.All : (ExcelDataListElementFilterMode)listModeField.value;
-        string sourceFilter = sourceField == null ? ExcelDataFieldCatalogSourceFilterUtility.AllSourcesOption : sourceField.value;
+        ExcelDataListElementFilterMode listFilter = listModeField == null ? ExcelDataListElementFilterMode.AllBrushableFields : (ExcelDataListElementFilterMode)listModeField.value;
+        string sourceTypeFilter = sourceTypeSearchField == null ? string.Empty : sourceTypeSearchField.value;
+        string sourceAssetFilter = sourceAssetSearchField == null ? string.Empty : sourceAssetSearchField.value;
 
         for (int entryIndex = 0; entryIndex < allEntries.Count; entryIndex++)
         {
@@ -236,10 +255,10 @@ public sealed class ExcelDataFieldCatalogPanel
             if (!ExcelDataFieldCatalogFilterUtility.MatchesFilters(entry,
                                                                    searchText,
                                                                    domainFilter,
-                                                                   categoryFilter,
                                                                    dataKindFilter,
                                                                    listFilter,
-                                                                   sourceFilter))
+                                                                   sourceTypeFilter,
+                                                                   sourceAssetFilter))
                 continue;
 
             filteredEntries.Add(entry);
@@ -252,24 +271,39 @@ public sealed class ExcelDataFieldCatalogPanel
     }
 
     /// <summary>
-    /// Rebuilds the source dropdown from catalog asset types while preserving the previous selection when possible.
+    /// Shows Source Asset only when preceding filters leave multiple concrete assets.
     /// </summary>
-    private void RefreshSourceOptions()
+    private void RefreshSourceAssetVisibility()
     {
-        if (sourceField == null)
+        if (sourceAssetRoot == null || sourceAssetSearchField == null)
             return;
 
-        string previousValue = string.IsNullOrWhiteSpace(sourceField.value) ?
-                               ExcelDataFieldCatalogSourceFilterUtility.AllSourcesOption :
-                               sourceField.value;
-        List<string> options = ExcelDataFieldCatalogSourceFilterUtility.BuildSourceOptions(allEntries);
+        HashSet<string> sourceAssets = new HashSet<string>(StringComparer.Ordinal);
 
-        sourceField.choices = options;
+        for (int entryIndex = 0; entryIndex < allEntries.Count; entryIndex++)
+        {
+            ExcelDataFieldCatalogEntry entry = allEntries[entryIndex];
 
-        if (options.Contains(previousValue))
-            sourceField.SetValueWithoutNotify(previousValue);
-        else
-            sourceField.SetValueWithoutNotify(ExcelDataFieldCatalogSourceFilterUtility.AllSourcesOption);
+            if (!ExcelDataFieldCatalogFilterUtility.MatchesFilters(entry,
+                                                                   searchField.value,
+                                                                   (ExcelDataTransferDomain)domainField.value,
+                                                                   (ExcelDataBrushDataKind)dataKindField.value,
+                                                                   (ExcelDataListElementFilterMode)listModeField.value,
+                                                                   sourceTypeSearchField.value,
+                                                                   string.Empty))
+                continue;
+
+            sourceAssets.Add(entry.AssetPath);
+
+            if (sourceAssets.Count > 1)
+                break;
+        }
+
+        bool useful = sourceAssets.Count > 1;
+        sourceAssetRoot.style.display = useful ? DisplayStyle.Flex : DisplayStyle.None;
+
+        if (!useful && !string.IsNullOrWhiteSpace(sourceAssetSearchField.value))
+            sourceAssetSearchField.SetValueWithoutNotify(string.Empty);
     }
 
     /// <summary>
@@ -304,11 +338,12 @@ public sealed class ExcelDataFieldCatalogPanel
             detailsLabel.text =
                 "Field ID: " + entry.FieldId + "\n" +
                 "Asset: " + entry.AssetName + "\n" +
+                "Readable Path: " + entry.ReadablePath + "\n" +
                 "Path: " + entry.SerializedPath + "\n" +
                 "Template: " + entry.PathTemplate + "\n" +
                 "Kind: " + entry.DataKind + "\n" +
-                "Category: " + entry.Category + "\n" +
-                "List Depth: " + entry.ListDepth;
+                "List Depth: " + entry.ListDepth + "\n" +
+                "Stable List Keys: " + ExcelDataListIdentityUtility.BuildStableKeySearchText(entry.StableListKeys);
             return;
         }
 

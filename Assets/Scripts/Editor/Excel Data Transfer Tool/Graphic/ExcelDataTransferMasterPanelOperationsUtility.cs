@@ -87,14 +87,7 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         applyButton.style.marginLeft = 4f;
         row.Add(applyButton);
 
-        Button clearSelectionButton = new Button(() => ClearImportSelection(panel));
-        clearSelectionButton.text = "Clear Selection";
-        clearSelectionButton.tooltip = "Clear explicit import field selections on this import preset.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(clearSelectionButton, 112f);
-        clearSelectionButton.style.marginLeft = 4f;
-        row.Add(clearSelectionButton);
         parent.Add(row);
-        AddSelectionSummary(parent, panel.SelectedMasterPreset.ImportPreset.SelectedFields.Count, "Import selections");
         AddOperationStatus(panel, parent);
         AddPreviewList(panel, parent);
     }
@@ -111,8 +104,9 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
             panel.PreviewRows.Clear();
             panel.PreviewRows.AddRange(panel.ImportPreviewResult.Rows);
             panel.OperationStatus = "Previewed " + panel.ImportPreviewResult.TotalRowCount +
-                                    " rows. Importable: " + panel.ImportPreviewResult.ImportableRowCount +
-                                    ". Warnings: " + panel.ImportPreviewResult.WarningCount + ".";
+                                    " mapped cells. Importable: " + panel.ImportPreviewResult.ImportableRowCount +
+                                    ". Warnings: " + panel.ImportPreviewResult.WarningCount + ". " +
+                                    panel.ImportPreviewResult.ValidationMessage;
         }
         catch (System.Exception exception)
         {
@@ -135,7 +129,7 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
                 ExcelDataImportApplyService.ApplyWorkbook(panel.SelectedMasterPreset, string.Empty, panel.ImportPreviewResult);
             ExcelDataTransferDraftSession.MarkDirty();
             panel.OperationStatus = "Applied " + result.AppliedRowCount +
-                                    " rows. Skipped: " + result.SkippedRowCount +
+                                    " mapped cells. Skipped: " + result.SkippedRowCount +
                                     ". Warnings: " + result.WarningCount + ".";
         }
         catch (System.Exception exception)
@@ -147,21 +141,6 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         panel.RefreshAfterOperation();
     }
 
-    /// <summary>
-    /// Clears explicit import field selections.
-    /// </summary>
-    /// <param name="panel">Owning master panel.</param>
-    private static void ClearImportSelection(ExcelDataTransferMasterPanel panel)
-    {
-        if (panel.SelectedMasterPreset.ImportPreset == null)
-            return;
-
-        panel.SelectedMasterPreset.ImportPreset.ClearSelectedFields();
-        EditorUtility.SetDirty(panel.SelectedMasterPreset.ImportPreset);
-        ExcelDataTransferDraftSession.MarkDirty();
-        panel.OperationStatus = "Import field selection cleared.";
-        panel.RefreshAfterOperation();
-    }
     #endregion
 
     #region Export Actions
@@ -186,14 +165,7 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         GameManagementPanelLayoutUtility.ConfigureToolbarButton(exportButton, 104f);
         row.Add(exportButton);
 
-        Button clearSelectionButton = new Button(() => ClearExportSelection(panel));
-        clearSelectionButton.text = "Clear Selection";
-        clearSelectionButton.tooltip = "Clear explicit export field selections on this export preset.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(clearSelectionButton, 112f);
-        clearSelectionButton.style.marginLeft = 4f;
-        row.Add(clearSelectionButton);
         parent.Add(row);
-        AddSelectionSummary(parent, panel.SelectedMasterPreset.ExportPreset.SelectedFields.Count, "Export selections");
         AddOperationStatus(panel, parent);
     }
 
@@ -217,21 +189,6 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         panel.RefreshAfterOperation();
     }
 
-    /// <summary>
-    /// Clears explicit export field selections.
-    /// </summary>
-    /// <param name="panel">Owning master panel.</param>
-    private static void ClearExportSelection(ExcelDataTransferMasterPanel panel)
-    {
-        if (panel.SelectedMasterPreset.ExportPreset == null)
-            return;
-
-        panel.SelectedMasterPreset.ExportPreset.ClearSelectedFields();
-        EditorUtility.SetDirty(panel.SelectedMasterPreset.ExportPreset);
-        ExcelDataTransferDraftSession.MarkDirty();
-        panel.OperationStatus = "Export field selection cleared.";
-        panel.RefreshAfterOperation();
-    }
     #endregion
 
     #region UI Helpers
@@ -286,23 +243,14 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         }
 
         ExcelDataImportPreviewRow row = panel.PreviewRows[index];
-        string state = row.CatalogMatched && row.IncludedByPreset ? "Ready" : "Skipped";
-        label.text = state + " | " + row.Section + " | " + row.AssetName + " | " + row.SerializedPath + " | " + row.Value;
-        label.tooltip = row.Warning;
-    }
-
-    /// <summary>
-    /// Adds a compact count summary for explicit field selections.
-    /// </summary>
-    /// <param name="parent">Parent section.</param>
-    /// <param name="count">Selection count.</param>
-    /// <param name="label">Summary label.</param>
-    private static void AddSelectionSummary(VisualElement parent, int count, string label)
-    {
-        Label countLabel = new Label(label + ": " + count);
-        countLabel.tooltip = "Explicit field selection count. Empty means preset domain and layout filters decide.";
-        countLabel.style.marginTop = 6f;
-        parent.Add(countLabel);
+        string state = row.CanApply && panel.ImportPreviewResult != null && panel.ImportPreviewResult.CanApply
+            ? "Ready"
+            : "Skipped";
+        label.text = state + " | " + row.SheetName + "!" + row.Address + " | " + row.AssetName +
+                     " | " + row.SerializedPath + " | " + row.CurrentValue + " -> " + row.Value;
+        label.tooltip = string.IsNullOrWhiteSpace(row.Warning)
+            ? panel.ImportPreviewResult == null ? string.Empty : panel.ImportPreviewResult.ValidationMessage
+            : row.Warning;
     }
 
     /// <summary>

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2001e592a311547ba193492c98b9b9, type: 3}
+  m_Name: EnemyBalanceExcelDataTransferMasterPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataTransferMasterPreset
+  presetId: a65412f0006940dc92fd94d7a32a32a9
+  presetName: Enemy Balance Transfer
+  description: Combat, movement and presentation values used by Enemy Management
+    Tool presets.
+  version: 2.0.0
+  layoutPreset: {fileID: 11400000, guid: 54895ab107d20e844922f53d3940760a, type: 2}
+  brushPalettePreset: {fileID: 11400000, guid: 8fe74865989298b4b8a6f80d35f2167d, type: 2}
+  importPreset: {fileID: 11400000, guid: f5154357275503a41bb5d81034931b25, type: 2}
+  exportPreset: {fileID: 11400000, guid: 4cdde7854323b084899cb26fd6353237, type: 2}

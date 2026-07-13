@@ -1,33 +1,54 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.IO;
 using UnityEditor;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
 /// <summary>
-/// Applies importable workbook rows to Unity ScriptableObject assets through SerializedProperty APIs.
+/// Applies approved grid-authoritative import cells through a full preflight and batched SerializedObject transaction.
 /// </summary>
 internal static class ExcelDataImportApplyService
 {
-    #region Constants
-    private const string ObjectSection = "Object";
-    private const string BrushGridSection = "BrushGrid";
-    #endregion
-
     #region Methods
 
     #region Public Methods
     /// <summary>
-    /// Applies workbook values to mapped serialized fields after optional preview validation.
+    /// Applies only cells approved by a compatible, non-stale preview after validating every write first.
     /// </summary>
-    /// <param name="masterPreset">Master preset that links import and layout settings.</param>
-    /// <param name="overrideWorkbookPath">Optional workbook path used by tests or manual commands.</param>
-    /// <param name="previewResult">Latest preview result, required when the import preset requires preview.</param>
-    /// <returns>Import apply result with applied/skipped/warning row counts.</returns>
+    /// <param name="masterPreset">Master preset linking import policy and workbook layout.</param>
+    /// <param name="overrideWorkbookPath">Optional workbook path used by tests and direct commands.</param>
+    /// <param name="previewResult">Latest coordinate-exact preview result.</param>
+    /// <returns>Import result with applied, skipped and warning cell counts.</returns>
     public static ExcelDataImportApplyResult ApplyWorkbook(ExcelDataTransferMasterPreset masterPreset,
                                                            string overrideWorkbookPath,
                                                            ExcelDataImportPreviewResult previewResult)
+    {
+        ValidatePresetGraph(masterPreset);
+        ExcelDataImportPreset importPreset = masterPreset.ImportPreset;
+
+        if (importPreset.ConflictPolicy == ExcelDataImportConflictPolicy.PreviewOnly)
+            throw new InvalidOperationException("Import preset conflict policy is Preview Only.");
+
+        string resolvedPath = ExcelDataWorkbookPathUtility.ResolveImportWorkbookPath(importPreset, overrideWorkbookPath);
+        ExcelDataImportPreviewResult approvedPreview =
+            ResolveApprovedPreview(masterPreset, overrideWorkbookPath, resolvedPath, previewResult);
+        ValidateApprovedPreview(masterPreset.LayoutPreset, resolvedPath, approvedPreview);
+        List<PreparedWrite> preparedWrites = BuildPreparedWrites(approvedPreview, importPreset);
+        ApplyPreparedWrites(preparedWrites, importPreset);
+        AssetDatabase.SaveAssets();
+        return new ExcelDataImportApplyResult(resolvedPath,
+                                              preparedWrites.Count,
+                                              approvedPreview.TotalRowCount - preparedWrites.Count,
+                                              approvedPreview.WarningCount);
+    }
+    #endregion
+
+    #region Validation
+    /// <summary>
+    /// Validates the minimum preset graph required by grid-exact import apply.
+    /// </summary>
+    /// <param name="masterPreset">Master preset graph to validate.</param>
+    private static void ValidatePresetGraph(ExcelDataTransferMasterPreset masterPreset)
     {
         if (masterPreset == null)
             throw new ArgumentNullException(nameof(masterPreset));
@@ -39,225 +60,283 @@ internal static class ExcelDataImportApplyService
 
         if (masterPreset.LayoutPreset == null)
             throw new InvalidOperationException("Missing Excel workbook layout preset.");
-
-        if (masterPreset.ImportPreset.ConflictPolicy == ExcelDataImportConflictPolicy.PreviewOnly)
-            throw new InvalidOperationException("Import preset conflict policy is Preview Only.");
-
-        string resolvedPath = ExcelDataWorkbookPathUtility.ResolveImportWorkbookPath(masterPreset.ImportPreset, overrideWorkbookPath);
-        ValidatePreviewRequirement(masterPreset.ImportPreset, previewResult, resolvedPath);
-
-        List<ExcelDataWorkbookRow> workbookRows = ExcelDataWorkbookReader.LoadWorkbookRows(resolvedPath, masterPreset.LayoutPreset.ObjectsSheetName);
-        Dictionary<string, ExcelDataFieldCatalogEntry> entriesById = BuildEntryLookup(ExcelDataFieldCatalogBuilder.BuildCatalog());
-        HashSet<string> selectedFieldIds = BuildSelectedFieldSet(masterPreset.ImportPreset);
-        HashSet<Object> recordedAssets = new HashSet<Object>();
-        int appliedRows = 0;
-        int skippedRows = 0;
-        int warningRows = 0;
-
-        for (int rowIndex = 0; rowIndex < workbookRows.Count; rowIndex++)
-        {
-            string warning;
-
-            if (TryApplyWorkbookRow(workbookRows[rowIndex],
-                                    masterPreset.ImportPreset,
-                                    entriesById,
-                                    selectedFieldIds,
-                                    recordedAssets,
-                                    out warning))
-            {
-                appliedRows++;
-                continue;
-            }
-
-            skippedRows++;
-
-            if (!string.IsNullOrWhiteSpace(warning))
-                warningRows++;
-        }
-
-        AssetDatabase.SaveAssets();
-        return new ExcelDataImportApplyResult(resolvedPath, appliedRows, skippedRows, warningRows);
     }
-    #endregion
 
-    #region Row Application
     /// <summary>
-    /// Applies one workbook row when it maps to an allowed catalog field.
+    /// Uses the supplied preview or performs an internal preflight when the preset explicitly permits it.
     /// </summary>
-    /// <param name="workbookRow">Workbook row read from disk.</param>
-    /// <param name="importPreset">Import preset controlling filters and policies.</param>
-    /// <param name="entriesById">Catalog entries keyed by stable field id.</param>
-    /// <param name="selectedFieldIds">Explicit import selection set.</param>
-    /// <param name="recordedAssets">Assets already recorded for Undo in this operation.</param>
-    /// <param name="warning">Warning generated for skipped rows.</param>
-    /// <returns>True when the row was applied.</returns>
-    private static bool TryApplyWorkbookRow(ExcelDataWorkbookRow workbookRow,
-                                            ExcelDataImportPreset importPreset,
-                                            Dictionary<string, ExcelDataFieldCatalogEntry> entriesById,
-                                            HashSet<string> selectedFieldIds,
-                                            HashSet<Object> recordedAssets,
-                                            out string warning)
+    /// <param name="masterPreset">Active transfer preset graph.</param>
+    /// <param name="overrideWorkbookPath">Optional direct workbook path.</param>
+    /// <param name="resolvedPath">Resolved import workbook path.</param>
+    /// <param name="previewResult">Latest UI preview, when available.</param>
+    /// <returns>Preview result that must authorize the apply transaction.</returns>
+    private static ExcelDataImportPreviewResult ResolveApprovedPreview(ExcelDataTransferMasterPreset masterPreset,
+                                                                       string overrideWorkbookPath,
+                                                                       string resolvedPath,
+                                                                       ExcelDataImportPreviewResult previewResult)
     {
-        warning = string.Empty;
+        if (previewResult != null)
+            return previewResult;
 
-        if (workbookRow == null || !IsImportDataSection(workbookRow.Section))
-            return false;
-
-        if (string.IsNullOrWhiteSpace(workbookRow.FieldId))
-        {
-            warning = "Workbook row has no field id.";
-            return false;
-        }
-
-        ExcelDataFieldCatalogEntry entry = null;
-
-        if (!entriesById.TryGetValue(workbookRow.FieldId, out entry))
-        {
-            warning = "Field id is not present in the current Unity catalog.";
-            return false;
-        }
-
-        if (!AllowsDomain(entry, importPreset))
-            return false;
-
-        if (selectedFieldIds.Count > 0 && !selectedFieldIds.Contains(workbookRow.FieldId))
-            return false;
-
-        Object asset = AssetDatabase.LoadAssetAtPath<Object>(entry.AssetPath);
-
-        if (asset == null)
-        {
-            warning = "Missing target asset: " + entry.AssetPath;
-            return false;
-        }
-
-        SerializedObject serializedObject = new SerializedObject(asset);
-        SerializedProperty property = serializedObject.FindProperty(entry.SerializedPath);
-
-        if (property == null)
-        {
-            warning = "Missing serialized property: " + entry.SerializedPath;
-            return false;
-        }
-
-        if (!ExcelDataImportPropertyWriterUtility.TryWriteProperty(property, workbookRow, importPreset, out warning))
-            return false;
-
-        if (!recordedAssets.Contains(asset))
-        {
-            Undo.RecordObject(asset, "Apply Excel Data Import");
-            recordedAssets.Add(asset);
-        }
-
-        serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(asset);
-        return true;
-    }
-    #endregion
-
-    #region Filtering
-    /// <summary>
-    /// Validates that a recent preview exists when required by the preset.
-    /// </summary>
-    /// <param name="importPreset">Import preset controlling preview requirement.</param>
-    /// <param name="previewResult">Latest preview result from the UI.</param>
-    /// <param name="resolvedPath">Resolved workbook path about to be applied.</param>
-    private static void ValidatePreviewRequirement(ExcelDataImportPreset importPreset,
-                                                   ExcelDataImportPreviewResult previewResult,
-                                                   string resolvedPath)
-    {
-        if (!importPreset.RequirePreviewBeforeApply)
-            return;
-
-        if (previewResult == null)
+        if (masterPreset.ImportPreset.RequirePreviewBeforeApply)
             throw new InvalidOperationException("Run Preview Import before Apply Import.");
 
+        return ExcelDataImportPreviewService.PreviewWorkbook(masterPreset, overrideWorkbookPath);
+    }
+
+    /// <summary>
+    /// Rejects blocked previews, changed source files and layout edits made after preview approval.
+    /// </summary>
+    /// <param name="layoutPreset">Current active layout preset.</param>
+    /// <param name="resolvedPath">Resolved import workbook path.</param>
+    /// <param name="previewResult">Preview result being authorized.</param>
+    private static void ValidateApprovedPreview(ExcelDataWorkbookLayoutPreset layoutPreset,
+                                                string resolvedPath,
+                                                ExcelDataImportPreviewResult previewResult)
+    {
         if (!string.Equals(previewResult.WorkbookPath, resolvedPath, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Preview result does not match the configured workbook path.");
-    }
 
-    /// <summary>
-    /// Checks whether one normalized workbook section can participate in import apply.
-    /// </summary>
-    /// <param name="section">Workbook section value.</param>
-    /// <returns>True when the section can contain imported object data.</returns>
-    private static bool IsImportDataSection(string section)
-    {
-        return string.Equals(section, ObjectSection, StringComparison.Ordinal) ||
-               string.Equals(section, BrushGridSection, StringComparison.Ordinal);
-    }
+        if (!previewResult.CanApply)
+            throw new InvalidOperationException("Import preview is blocked: " + previewResult.ValidationMessage);
 
-    /// <summary>
-    /// Checks whether the import preset allows the catalog entry domain.
-    /// </summary>
-    /// <param name="entry">Catalog entry to test.</param>
-    /// <param name="importPreset">Import preset containing domain toggles.</param>
-    /// <returns>True when the domain is enabled.</returns>
-    private static bool AllowsDomain(ExcelDataFieldCatalogEntry entry, ExcelDataImportPreset importPreset)
-    {
-        switch (entry.Domain)
-        {
-            case ExcelDataTransferDomain.Player:
-                return importPreset.IncludePlayerData;
-            case ExcelDataTransferDomain.Enemy:
-                return importPreset.IncludeEnemyData;
-            case ExcelDataTransferDomain.Game:
-                return importPreset.IncludeGameData;
-            case ExcelDataTransferDomain.Waves:
-                return importPreset.IncludeWaveData;
-            default:
-                return false;
-        }
-    }
+        if (!File.Exists(resolvedPath))
+            throw new FileNotFoundException("Import workbook was removed after preview.", resolvedPath);
 
-    /// <summary>
-    /// Builds the explicit import selection set from the import preset.
-    /// </summary>
-    /// <param name="importPreset">Import preset that stores selected fields.</param>
-    /// <returns>Set of selected field ids enabled for import.</returns>
-    private static HashSet<string> BuildSelectedFieldSet(ExcelDataImportPreset importPreset)
-    {
-        HashSet<string> selectedFieldIds = new HashSet<string>();
-        List<ExcelDataFieldSelection> selectedFields = importPreset.SelectedFields;
+        if (File.GetLastWriteTimeUtc(resolvedPath).Ticks != previewResult.WorkbookLastWriteUtcTicks)
+            throw new InvalidOperationException("Workbook changed after preview. Run Preview Import again before applying.");
 
-        for (int selectionIndex = 0; selectionIndex < selectedFields.Count; selectionIndex++)
-        {
-            ExcelDataFieldSelection selection = selectedFields[selectionIndex];
+        string currentLayoutHash = ExcelDataWorkbookLayoutHashUtility.Calculate(layoutPreset);
 
-            if (selection == null || !selection.ImportEnabled)
-                continue;
+        if (!string.Equals(currentLayoutHash, previewResult.CurrentLayoutHash, StringComparison.Ordinal))
+            throw new InvalidOperationException("Workbook layout changed after preview. Run Preview Import again before applying.");
 
-            if (string.IsNullOrWhiteSpace(selection.FieldId))
-                continue;
-
-            selectedFieldIds.Add(selection.FieldId);
-        }
-
-        return selectedFieldIds;
-    }
-
-    /// <summary>
-    /// Builds a field-id lookup for catalog entries.
-    /// </summary>
-    /// <param name="entries">Catalog entries to index.</param>
-    /// <returns>Dictionary keyed by field id.</returns>
-    private static Dictionary<string, ExcelDataFieldCatalogEntry> BuildEntryLookup(List<ExcelDataFieldCatalogEntry> entries)
-    {
-        Dictionary<string, ExcelDataFieldCatalogEntry> entriesById = new Dictionary<string, ExcelDataFieldCatalogEntry>();
-
-        for (int entryIndex = 0; entryIndex < entries.Count; entryIndex++)
-        {
-            ExcelDataFieldCatalogEntry entry = entries[entryIndex];
-
-            if (entry == null || string.IsNullOrWhiteSpace(entry.FieldId))
-                continue;
-
-            entriesById[entry.FieldId] = entry;
-        }
-
-        return entriesById;
+        if (!string.Equals(previewResult.WorkbookLayoutHash, currentLayoutHash, StringComparison.Ordinal))
+            throw new InvalidOperationException("Workbook layout hash no longer matches the active layout preset.");
     }
     #endregion
 
+    #region Preflight
+    /// <summary>
+    /// Resolves every approved target and repeats value parsing without persisting any change.
+    /// </summary>
+    /// <param name="previewResult">Approved coordinate-exact preview.</param>
+    /// <param name="importPreset">Import preset controlling reference resolution.</param>
+    /// <returns>Fully resolved writes that can enter the mutation transaction.</returns>
+    private static List<PreparedWrite> BuildPreparedWrites(ExcelDataImportPreviewResult previewResult,
+                                                           ExcelDataImportPreset importPreset)
+    {
+        List<PreparedWrite> preparedWrites = new List<PreparedWrite>();
+
+        // Resolve and parse every approved cell before recording Undo or applying any SerializedObject.
+        for (int rowIndex = 0; rowIndex < previewResult.Rows.Count; rowIndex++)
+        {
+            ExcelDataImportPreviewRow previewRow = previewResult.Rows[rowIndex];
+
+            if (!previewRow.CanApply)
+                continue;
+
+            ExcelDataWorkbookCellDefinition cell = previewRow.CellDefinition;
+
+            if (cell == null || cell.ContentKind != ExcelDataWorkbookCellContentKind.DataField)
+                continue;
+
+            Object asset;
+            SerializedObject serializedObject;
+            SerializedProperty property;
+            string warning;
+
+            if (!ExcelDataFieldBindingAssetUtility.TryResolveTarget(cell.FieldBinding,
+                                                                    out asset,
+                                                                    out serializedObject,
+                                                                    out property,
+                                                                    out warning))
+                throw BuildPreflightException(previewRow, warning);
+
+            if (!ExcelDataImportPropertyWriterUtility.TryWriteProperty(property,
+                                                                       previewRow.IncomingValue,
+                                                                       importPreset,
+                                                                       out warning))
+            {
+                serializedObject.Update();
+                throw BuildPreflightException(previewRow, warning);
+            }
+
+            serializedObject.Update();
+            preparedWrites.Add(new PreparedWrite(asset, cell.FieldBinding, previewRow.IncomingValue, previewRow.Address));
+        }
+
+        if (preparedWrites.Count <= 0)
+            throw new InvalidOperationException("Import preview contains no approved Data Field cells.");
+
+        return preparedWrites;
+    }
+
+    /// <summary>
+    /// Builds a coordinate-specific exception for a write that changed between preview and apply preflight.
+    /// </summary>
+    /// <param name="previewRow">Preview row whose target or value failed.</param>
+    /// <param name="warning">Detailed failure diagnostic.</param>
+    /// <returns>Preflight exception that identifies the exact workbook cell.</returns>
+    private static InvalidOperationException BuildPreflightException(ExcelDataImportPreviewRow previewRow,
+                                                                     string warning)
+    {
+        return new InvalidOperationException("Import preflight failed at " + previewRow.SheetName + "!" +
+                                             previewRow.Address + ": " + warning);
+    }
+    #endregion
+
+    #region Transaction
+    /// <summary>
+    /// Records all target assets, stages every approved value and applies each asset once.
+    /// </summary>
+    /// <param name="preparedWrites">Fully resolved writes produced by preflight.</param>
+    /// <param name="importPreset">Import preset controlling reference resolution.</param>
+    private static void ApplyPreparedWrites(List<PreparedWrite> preparedWrites,
+                                            ExcelDataImportPreset importPreset)
+    {
+        List<Object> targetAssets = BuildUniqueTargetAssets(preparedWrites);
+        Dictionary<Object, SerializedObject> serializedObjects = new Dictionary<Object, SerializedObject>();
+        Undo.RecordObjects(targetAssets.ToArray(), "Apply Excel Data Import");
+
+        try
+        {
+            // Stage every pending property value without committing any target asset yet.
+            for (int writeIndex = 0; writeIndex < preparedWrites.Count; writeIndex++)
+            {
+                PreparedWrite preparedWrite = preparedWrites[writeIndex];
+                SerializedObject serializedObject = GetOrCreateSerializedObject(preparedWrite.Asset, serializedObjects);
+                SerializedProperty property = serializedObject.FindProperty(preparedWrite.Binding.SerializedPath);
+                string warning;
+
+                if (property == null)
+                    throw new InvalidOperationException("Serialized property disappeared before apply at " + preparedWrite.Address + ".");
+
+                if (!ExcelDataImportPropertyWriterUtility.TryWriteProperty(property,
+                                                                           preparedWrite.IncomingValue,
+                                                                           importPreset,
+                                                                           out warning))
+                    throw new InvalidOperationException("Import staging failed at " + preparedWrite.Address + ": " + warning);
+            }
+
+            // Commit each owner asset once so multiple mapped fields remain one coherent Undo operation.
+            foreach (KeyValuePair<Object, SerializedObject> serializedPair in serializedObjects)
+            {
+                serializedPair.Value.ApplyModifiedProperties();
+                EditorUtility.SetDirty(serializedPair.Key);
+            }
+        }
+        catch
+        {
+            DiscardPendingChanges(serializedObjects);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Builds an ordered unique target list for one Undo.RecordObjects call.
+    /// </summary>
+    /// <param name="preparedWrites">Prepared writes containing resolved target assets.</param>
+    /// <returns>Ordered unique target assets.</returns>
+    private static List<Object> BuildUniqueTargetAssets(List<PreparedWrite> preparedWrites)
+    {
+        List<Object> assets = new List<Object>();
+        HashSet<Object> assetSet = new HashSet<Object>();
+
+        for (int writeIndex = 0; writeIndex < preparedWrites.Count; writeIndex++)
+        {
+            Object asset = preparedWrites[writeIndex].Asset;
+
+            if (assetSet.Add(asset))
+                assets.Add(asset);
+        }
+
+        return assets;
+    }
+
+    /// <summary>
+    /// Returns the shared pending SerializedObject for one target asset.
+    /// </summary>
+    /// <param name="asset">Target asset.</param>
+    /// <param name="serializedObjects">Pending wrappers keyed by target asset.</param>
+    /// <returns>Existing or newly created SerializedObject.</returns>
+    private static SerializedObject GetOrCreateSerializedObject(Object asset,
+                                                                Dictionary<Object, SerializedObject> serializedObjects)
+    {
+        SerializedObject serializedObject;
+
+        if (serializedObjects.TryGetValue(asset, out serializedObject))
+            return serializedObject;
+
+        serializedObject = new SerializedObject(asset);
+        serializedObjects.Add(asset, serializedObject);
+        return serializedObject;
+    }
+
+    /// <summary>
+    /// Discards every uncommitted SerializedObject change after a staging failure.
+    /// </summary>
+    /// <param name="serializedObjects">Pending wrappers to reset from their target assets.</param>
+    private static void DiscardPendingChanges(Dictionary<Object, SerializedObject> serializedObjects)
+    {
+        foreach (KeyValuePair<Object, SerializedObject> serializedPair in serializedObjects)
+            serializedPair.Value.Update();
+    }
+    #endregion
+
+    #endregion
+
+    #region Nested Types
+    /// <summary>
+    /// Stores one fully preflighted Data Field mutation without retaining temporary SerializedProperty handles.
+    /// </summary>
+    private sealed class PreparedWrite
+    {
+        #region Properties
+        public Object Asset
+        {
+            get;
+        }
+
+        public ExcelDataFieldBinding Binding
+        {
+            get;
+        }
+
+        public ExcelDataImportCellValue IncomingValue
+        {
+            get;
+        }
+
+        public string Address
+        {
+            get;
+        }
+        #endregion
+
+        #region Methods
+
+        #region Constructors
+        /// <summary>
+        /// Creates one immutable mutation record after target and value preflight succeed.
+        /// </summary>
+        /// <param name="asset">Resolved target asset.</param>
+        /// <param name="binding">Concrete target field binding.</param>
+        /// <param name="incomingValue">Parsed workbook cell value source.</param>
+        /// <param name="address">Readable Excel address for diagnostics.</param>
+        public PreparedWrite(Object asset,
+                             ExcelDataFieldBinding binding,
+                             ExcelDataImportCellValue incomingValue,
+                             string address)
+        {
+            Asset = asset;
+            Binding = binding;
+            IncomingValue = incomingValue;
+            Address = address;
+        }
+        #endregion
+
+        #endregion
+    }
     #endregion
 }

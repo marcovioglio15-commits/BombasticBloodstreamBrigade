@@ -189,9 +189,33 @@ internal static class ExcelDataLinkedSubPresetPanelFieldUtility
         TextField field = new TextField(label);
         field.tooltip = tooltip;
         field.SetValueWithoutNotify(property.stringValue);
-        field.RegisterValueChangedCallback(evt => WriteStringProperty(serializedObject, propertyName, evt.newValue));
+        field.RegisterValueChangedCallback(evt => SetStringPropertyValue(serializedObject, propertyName, evt.newValue));
         parent.Add(field);
         return field;
+    }
+
+    /// <summary>
+    /// Writes a string property through SerializedObject and marks the edited preset dirty.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the string field.</param>
+    /// <param name="propertyName">Serialized string property name.</param>
+    /// <param name="newValue">String value selected or entered by the user.</param>
+    public static void SetStringPropertyValue(SerializedObject serializedObject,
+                                              string propertyName,
+                                              string newValue)
+    {
+        serializedObject.Update();
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return;
+
+        if (property.stringValue == newValue)
+            return;
+
+        property.stringValue = newValue;
+        serializedObject.ApplyModifiedProperties();
+        MarkDirty(serializedObject.targetObject);
     }
 
     /// <summary>
@@ -266,28 +290,6 @@ internal static class ExcelDataLinkedSubPresetPanelFieldUtility
             return;
 
         property.enumValueIndex = newIndex;
-        serializedObject.ApplyModifiedProperties();
-        MarkDirty(serializedObject.targetObject);
-    }
-
-    /// <summary>
-    /// Writes a string property through SerializedObject and marks the edited preset dirty.
-    /// </summary>
-    /// <param name="serializedObject">Serialized object that owns the string field.</param>
-    /// <param name="propertyName">Serialized string property name.</param>
-    /// <param name="newValue">String value entered by the user.</param>
-    private static void WriteStringProperty(SerializedObject serializedObject, string propertyName, string newValue)
-    {
-        serializedObject.Update();
-        SerializedProperty property = serializedObject.FindProperty(propertyName);
-
-        if (property == null)
-            return;
-
-        if (property.stringValue == newValue)
-            return;
-
-        property.stringValue = newValue;
         serializedObject.ApplyModifiedProperties();
         MarkDirty(serializedObject.targetObject);
     }

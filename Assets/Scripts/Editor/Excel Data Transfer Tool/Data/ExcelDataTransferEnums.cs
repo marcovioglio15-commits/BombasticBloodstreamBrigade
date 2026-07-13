@@ -95,16 +95,6 @@ public enum ExcelDataReferenceResolutionMode
 }
 
 /// <summary>
-/// Selects the workbook shape used by export and expected by import.
-/// </summary>
-public enum ExcelDataWorkbookLayoutMode
-{
-    NormalizedSheets = 0,
-    BrushGrid = 1,
-    NormalizedSheetsAndBrushGrid = 2
-}
-
-/// <summary>
 /// Selects one known editor workbook path profile without forcing users to type raw paths.
 /// </summary>
 public enum ExcelDataWorkbookPathProfile
@@ -117,24 +107,16 @@ public enum ExcelDataWorkbookPathProfile
 }
 
 /// <summary>
-/// Controls how list data is shown in the catalog and exported to workbook rows or brush cells.
-/// </summary>
-public enum ExcelDataListElementExportMode
-{
-    ListTemplates = 0,
-    ConcreteElements = 1,
-    TemplatesAndConcreteElements = 2
-}
-
-/// <summary>
 /// Filters catalog rows by their list participation while keeping list elements individually selectable.
 /// </summary>
 public enum ExcelDataListElementFilterMode
 {
-    All = 0,
-    HideConcreteListElements = 1,
-    ConcreteListElementsOnly = 2,
-    ListsOnly = 3
+    AllBrushableFields = 0,
+    OutsideListsOnly = 1,
+    InsideListsOnly = 2,
+    TopLevelListValues = 3,
+    NestedListValues = 4,
+    ListSizesOnly = 5
 }
 
 /// <summary>
@@ -144,6 +126,17 @@ public enum ExcelDataWorkbookCellContentKind
 {
     DataField = 0,
     LiteralText = 1
+}
+
+/// <summary>
+/// Selects how a left click interacts with one workbook-layout grid cell.
+/// </summary>
+public enum ExcelDataLayoutBrushMode
+{
+    Select = 0,
+    Data = 1,
+    Text = 2,
+    Erase = 3
 }
 
 /// <summary>

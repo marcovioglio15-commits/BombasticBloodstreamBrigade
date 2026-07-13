@@ -1,42 +1,32 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Hosts the workbook layout brush grid, field picker and first selective export actions.
+/// Hosts sheet selection, contextual brush controls, coordinate-exact cell inspection and the workbook grid.
 /// </summary>
 public sealed class ExcelDataLayoutBrushPanel
 {
+    #region Constants
+    private const float BrushPaneWidth = 440f;
+    #endregion
+
     #region Fields
     private readonly VisualElement root;
     private readonly VisualElement gridRoot;
-    private readonly bool showMasterPresetField;
-    private readonly List<ExcelDataFieldCatalogEntry> allEntries = new List<ExcelDataFieldCatalogEntry>();
-    private readonly List<ExcelDataFieldCatalogEntry> filteredEntries = new List<ExcelDataFieldCatalogEntry>();
+    private readonly ExcelDataLayoutBrushInspector brushInspector;
+    private readonly ExcelDataLayoutBrushPanelControls controls;
 
-    private ObjectField masterPresetField;
-    private ToolbarSearchField searchField;
-    private EnumField domainField;
-    private EnumField categoryField;
-    private EnumField dataKindField;
-    private EnumField listModeField;
-    private ToolbarSearchField sourceSearchField;
-    private PopupField<string> savedBrushField;
-    private ColorField brushColorField;
     private IntegerField rowCountField;
     private IntegerField columnCountField;
     private IntegerField cellWidthField;
     private IntegerField cellHeightField;
-    private ListView listView;
-    private Label statusLabel;
-    private Label selectionLabel;
-
     private ExcelDataTransferMasterPreset selectedMasterPreset;
     private ExcelDataWorkbookLayoutPreset layoutPresetOverride;
-    private ExcelDataFieldCatalogEntry selectedEntry;
+    private string activeSheetId;
     private int selectedRowIndex = 1;
     private int selectedColumnIndex = 1;
     #endregion
@@ -47,30 +37,6 @@ public sealed class ExcelDataLayoutBrushPanel
         get
         {
             return root;
-        }
-    }
-
-    internal ExcelDataTransferMasterPreset SelectedMasterPreset
-    {
-        get
-        {
-            return selectedMasterPreset;
-        }
-    }
-
-    internal ExcelDataFieldCatalogEntry SelectedEntry
-    {
-        get
-        {
-            return selectedEntry;
-        }
-    }
-
-    internal List<ExcelDataFieldCatalogEntry> FilteredEntries
-    {
-        get
-        {
-            return filteredEntries;
         }
     }
     #endregion
@@ -92,32 +58,35 @@ public sealed class ExcelDataLayoutBrushPanel
     /// <param name="newShowMasterPresetField">True when the panel should show its own master preset field.</param>
     public ExcelDataLayoutBrushPanel(bool newShowMasterPresetField)
     {
-        showMasterPresetField = newShowMasterPresetField;
         selectedMasterPreset = ExcelDataTransferAssetUtility.LoadSelectedOrDefaultMasterPreset();
-
+        brushInspector = new ExcelDataLayoutBrushInspector(OnBrushModeChanged, OnSelectedCellSettingsChanged);
+        controls = new ExcelDataLayoutBrushPanelControls(newShowMasterPresetField,
+                                                         brushInspector,
+                                                         GetBrushPalettePreset,
+                                                         HandleMasterPresetChanged,
+                                                         SelectSheet,
+                                                         UpdateSelectionLabel);
         root = new VisualElement();
         root.style.flexGrow = 1f;
 
-        TwoPaneSplitView splitView = GameManagementPanelLayoutUtility.CreateHorizontalSplitView(380f);
+        TwoPaneSplitView splitView = GameManagementPanelLayoutUtility.CreateHorizontalSplitView(BrushPaneWidth);
         root.Add(splitView);
-
-        splitView.Add(BuildBrushPane());
+        splitView.Add(controls.Root);
 
         VisualElement gridPane = new VisualElement();
         GameManagementPanelLayoutUtility.ConfigureDetailsPane(gridPane);
-        gridPane.Add(ExcelDataLayoutBrushPanelToolbarUtility.BuildGridToolbar(UpdateLayoutInt,
+        gridPane.Add(ExcelDataLayoutBrushPanelToolbarUtility.BuildGridToolbar(UpdateActiveSheetInt,
                                                                               RebuildGrid,
                                                                               out rowCountField,
                                                                               out columnCountField,
                                                                               out cellWidthField,
                                                                               out cellHeightField));
-
         gridRoot = new VisualElement();
         gridRoot.style.flexGrow = 1f;
         gridPane.Add(gridRoot);
         splitView.Add(gridPane);
 
-        RefreshCatalog();
+        controls.RefreshCatalog();
         RefreshPresetFields();
         RebuildGrid();
     }
@@ -125,14 +94,17 @@ public sealed class ExcelDataLayoutBrushPanel
 
     #region Public Methods
     /// <summary>
-    /// Refreshes master bindings and the field catalog after draft session changes.
+    /// Refreshes bindings and catalog data after draft session changes.
     /// </summary>
     public void RefreshFromSessionChange()
     {
         selectedMasterPreset = ExcelDataTransferAssetUtility.LoadSelectedOrDefaultMasterPreset();
-        if (masterPresetField != null)
-            masterPresetField.SetValueWithoutNotify(selectedMasterPreset);
-        RefreshCatalog();
+        activeSheetId = string.Empty;
+
+        if (controls.MasterPresetField != null)
+            controls.MasterPresetField.SetValueWithoutNotify(selectedMasterPreset);
+
+        controls.RefreshCatalog();
         RefreshPresetFields();
         RebuildGrid();
     }
@@ -140,546 +112,564 @@ public sealed class ExcelDataLayoutBrushPanel
     /// <summary>
     /// Assigns the master preset provided by the parent transfer panel.
     /// </summary>
-    /// <param name="masterPreset">Master preset whose layout and import/export selections should be edited.</param>
+    /// <param name="masterPreset">Master preset whose linked layout should be edited.</param>
     public void SetMasterPreset(ExcelDataTransferMasterPreset masterPreset)
     {
         selectedMasterPreset = masterPreset;
-        if (masterPresetField != null)
-            masterPresetField.SetValueWithoutNotify(selectedMasterPreset);
+
+        if (layoutPresetOverride == null)
+            activeSheetId = string.Empty;
+
+        if (controls.MasterPresetField != null)
+            controls.MasterPresetField.SetValueWithoutNotify(selectedMasterPreset);
+
         RefreshPresetFields();
         RebuildGrid();
     }
 
     /// <summary>
-    /// Assigns a layout preset selected by the parent layout browser without changing the active master preset.
+    /// Assigns a layout preset selected by the parent layout browser without changing the active master.
     /// </summary>
     /// <param name="layoutPreset">Layout preset edited by the brush grid.</param>
     public void SetLayoutPresetOverride(ExcelDataWorkbookLayoutPreset layoutPreset)
     {
+        if (layoutPresetOverride != layoutPreset)
+            activeSheetId = string.Empty;
+
         layoutPresetOverride = layoutPreset;
         RefreshPresetFields();
         RebuildGrid();
     }
     #endregion
 
-    #region Layout
+    #region Grid Interaction
     /// <summary>
-    /// Builds the left field picker and export action pane.
-    /// </summary>
-    /// <returns>Configured brush pane.</returns>
-    private VisualElement BuildBrushPane()
-    {
-        VisualElement pane = new VisualElement();
-        GameManagementPanelLayoutUtility.ConfigureBrowserPane(pane);
-
-        Label titleLabel = new Label("Layout Brush");
-        titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        titleLabel.style.marginBottom = 6f;
-        pane.Add(titleLabel);
-
-        if (showMasterPresetField)
-        {
-            masterPresetField = new ObjectField("Master");
-            masterPresetField.objectType = typeof(ExcelDataTransferMasterPreset);
-            masterPresetField.allowSceneObjects = false;
-            masterPresetField.tooltip = "Master preset whose layout/export settings are edited by this brush grid.";
-            masterPresetField.RegisterValueChangedCallback(evt =>
-            {
-                selectedMasterPreset = evt.newValue as ExcelDataTransferMasterPreset;
-                ExcelDataTransferAssetUtility.SaveSelectedMasterPreset(selectedMasterPreset);
-                RefreshPresetFields();
-                RebuildGrid();
-            });
-            pane.Add(masterPresetField);
-        }
-
-        searchField = new ToolbarSearchField();
-        searchField.tooltip = "Search by path, asset, type or aliases such as ref, list, wave, bool, enum, number, scaling.";
-        searchField.RegisterValueChangedCallback(evt => ApplyFilters());
-        GameManagementPanelLayoutUtility.ConfigureSearchField(searchField);
-        pane.Add(searchField);
-
-        domainField = CreateEnumFilter("Domain", ExcelDataTransferDomain.All);
-        categoryField = CreateEnumFilter("Category", ExcelDataFieldCategory.All);
-        dataKindField = CreateEnumFilter("Kind", ExcelDataBrushDataKind.All);
-        listModeField = CreateEnumFilter("Lists", ExcelDataListElementFilterMode.HideConcreteListElements);
-        sourceSearchField = CreateSourceSearchFilter();
-        savedBrushField = CreateSavedBrushField();
-        brushColorField = ExcelDataLayoutBrushPaletteUtility.CreateBrushColorField();
-        pane.Add(domainField);
-        pane.Add(categoryField);
-        pane.Add(dataKindField);
-        pane.Add(listModeField);
-        Label sourceSearchLabel = new Label("Source Search");
-        sourceSearchLabel.tooltip = "Text filter for source asset types. This replaces the previous oversized source dropdown.";
-        pane.Add(sourceSearchLabel);
-        pane.Add(sourceSearchField);
-        pane.Add(savedBrushField);
-        pane.Add(brushColorField);
-
-        Button saveBrushButton = new Button(SaveCurrentBrushConfiguration);
-        saveBrushButton.text = "Save Brush";
-        saveBrushButton.tooltip = "Save the current filters and color into the linked brush palette preset.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(saveBrushButton, 112f);
-        pane.Add(saveBrushButton);
-
-        listView = BuildListView();
-        pane.Add(listView);
-
-        Button addSelectedButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.AddSelectedFieldToExport(this));
-        addSelectedButton.text = "Add Selected";
-        addSelectedButton.tooltip = "Add the selected catalog field to the export preset selection.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(addSelectedButton, 112f);
-        pane.Add(addSelectedButton);
-
-        Button addFilteredButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.AddFilteredFieldsToExport(this));
-        addFilteredButton.text = "Add Filtered";
-        addFilteredButton.tooltip = "Add all currently filtered catalog fields to the export preset selection.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(addFilteredButton, 112f);
-        pane.Add(addFilteredButton);
-
-        Button addSelectedImportButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.AddSelectedFieldToImport(this));
-        addSelectedImportButton.text = "Add Import";
-        addSelectedImportButton.tooltip = "Add the selected catalog field to the import preset selection.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(addSelectedImportButton, 112f);
-        pane.Add(addSelectedImportButton);
-
-        Button addFilteredImportButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.AddFilteredFieldsToImport(this));
-        addFilteredImportButton.text = "Import Filter";
-        addFilteredImportButton.tooltip = "Add all currently filtered catalog fields to the import preset selection.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(addFilteredImportButton, 112f);
-        pane.Add(addFilteredImportButton);
-
-        Button clearButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.ClearExportSelection(this));
-        clearButton.text = "Clear Export";
-        clearButton.tooltip = "Clear explicit export selections. Empty selection exports all fields allowed by preset filters.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(clearButton, 112f);
-        pane.Add(clearButton);
-
-        Button clearImportButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.ClearImportSelection(this));
-        clearImportButton.text = "Clear Import";
-        clearImportButton.tooltip = "Clear explicit import selections. Empty selection imports mapped fields allowed by preset filters.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(clearImportButton, 112f);
-        pane.Add(clearImportButton);
-
-        Button exportButton = new Button(() => ExcelDataLayoutBrushPanelActionsUtility.ExportWorkbook(this));
-        exportButton.text = "Export .xlsx";
-        exportButton.tooltip = "Export the selected preset to the configured .xlsx workbook path.";
-        GameManagementPanelLayoutUtility.ConfigureToolbarButton(exportButton, 112f);
-        pane.Add(exportButton);
-
-        selectionLabel = new Label();
-        selectionLabel.style.marginTop = 8f;
-        selectionLabel.style.whiteSpace = WhiteSpace.Normal;
-        pane.Add(selectionLabel);
-
-        statusLabel = new Label();
-        statusLabel.style.marginTop = 8f;
-        statusLabel.style.whiteSpace = WhiteSpace.Normal;
-        pane.Add(statusLabel);
-        return pane;
-    }
-
-    /// <summary>
-    /// Creates one enum filter dropdown.
-    /// </summary>
-    /// <param name="label">Dropdown label.</param>
-    /// <param name="initialValue">Initial enum value.</param>
-    /// <returns>Configured enum field.</returns>
-    private EnumField CreateEnumFilter(string label, Enum initialValue)
-    {
-        EnumField field = new EnumField(label, initialValue);
-        field.tooltip = "Filter fields before painting them into workbook cells.";
-        field.RegisterValueChangedCallback(evt => ApplyFilters());
-        return field;
-    }
-
-    /// <summary>
-    /// Creates the source type text filter used instead of a large source dropdown.
-    /// </summary>
-    /// <returns>Configured source search field.</returns>
-    private ToolbarSearchField CreateSourceSearchFilter()
-    {
-        ToolbarSearchField field = new ToolbarSearchField();
-        field.tooltip = "Filter source asset types by text, for example PlayerControllerPreset or EnemyWavePreset.";
-        field.RegisterValueChangedCallback(evt => ApplyFilters());
-        GameManagementPanelLayoutUtility.ConfigureSearchField(field);
-        return field;
-    }
-
-    /// <summary>
-    /// Creates the saved brush selector backed by the linked brush palette preset.
-    /// </summary>
-    /// <returns>Configured saved brush dropdown.</returns>
-    private PopupField<string> CreateSavedBrushField()
-    {
-        List<string> options = ExcelDataLayoutBrushPaletteUtility.BuildSavedBrushOptions(GetBrushPalettePreset());
-        PopupField<string> field = new PopupField<string>("Brush", options, 0);
-        field.tooltip = "Apply a saved brush configuration from the linked brush palette preset.";
-        field.RegisterValueChangedCallback(evt => ApplySavedBrushConfiguration(evt.newValue));
-        return field;
-    }
-
-    /// <summary>
-    /// Builds the filtered field ListView used as a brush source.
-    /// </summary>
-    /// <returns>Configured ListView.</returns>
-    private ListView BuildListView()
-    {
-        ListView createdListView = new ListView();
-        createdListView.itemsSource = filteredEntries;
-        createdListView.makeItem = MakeListItem;
-        createdListView.bindItem = BindListItem;
-        createdListView.selectionChanged += OnFieldSelectionChanged;
-        createdListView.fixedItemHeight = 20f;
-        createdListView.virtualizationMethod = CollectionVirtualizationMethod.FixedHeight;
-        GameManagementPanelLayoutUtility.ConfigureListView(createdListView);
-        return createdListView;
-    }
-
-    /// <summary>
-    /// Creates one field picker row visual.
-    /// </summary>
-    /// <returns>Row label visual element.</returns>
-    private VisualElement MakeListItem()
-    {
-        Label label = new Label();
-        label.style.whiteSpace = WhiteSpace.NoWrap;
-        GameManagementPanelLayoutUtility.ConfigureListRowLabel(label);
-        return label;
-    }
-
-    /// <summary>
-    /// Binds one field picker row.
-    /// </summary>
-    /// <param name="element">Row element to bind.</param>
-    /// <param name="index">Filtered entry index.</param>
-    private void BindListItem(VisualElement element, int index)
-    {
-        Label label = element as Label;
-
-        if (label == null)
-            return;
-
-        if (index < 0 || index >= filteredEntries.Count)
-        {
-            label.text = string.Empty;
-            return;
-        }
-
-        ExcelDataFieldCatalogEntry entry = filteredEntries[index];
-        label.text = entry.Domain + " | " + entry.DataKind + " | " + entry.PathTemplate;
-        label.tooltip = entry.DisplayName + "\n" + entry.AssetPath;
-    }
-    #endregion
-
-    #region Catalog
-    /// <summary>
-    /// Rebuilds the field catalog from current project assets.
-    /// </summary>
-    private void RefreshCatalog()
-    {
-        allEntries.Clear();
-        allEntries.AddRange(ExcelDataFieldCatalogBuilder.BuildCatalog());
-        RefreshSavedBrushOptions();
-        ApplyFilters();
-    }
-
-    /// <summary>
-    /// Applies active smart filters to the field picker list.
-    /// </summary>
-    private void ApplyFilters()
-    {
-        filteredEntries.Clear();
-        string searchText = searchField == null ? string.Empty : searchField.value;
-        ExcelDataTransferDomain domainFilter = domainField == null ? ExcelDataTransferDomain.All : (ExcelDataTransferDomain)domainField.value;
-        ExcelDataFieldCategory categoryFilter = categoryField == null ? ExcelDataFieldCategory.All : (ExcelDataFieldCategory)categoryField.value;
-        ExcelDataBrushDataKind dataKindFilter = dataKindField == null ? ExcelDataBrushDataKind.All : (ExcelDataBrushDataKind)dataKindField.value;
-        ExcelDataListElementFilterMode listFilter = listModeField == null ? ExcelDataListElementFilterMode.All : (ExcelDataListElementFilterMode)listModeField.value;
-        string sourceFilter = sourceSearchField == null ? string.Empty : sourceSearchField.value;
-
-        for (int entryIndex = 0; entryIndex < allEntries.Count; entryIndex++)
-        {
-            ExcelDataFieldCatalogEntry entry = allEntries[entryIndex];
-
-            if (!ExcelDataFieldCatalogFilterUtility.MatchesFilters(entry,
-                                                                   searchText,
-                                                                   domainFilter,
-                                                                   categoryFilter,
-                                                                   dataKindFilter,
-                                                                   listFilter,
-                                                                   sourceFilter))
-                continue;
-
-            filteredEntries.Add(entry);
-        }
-
-        if (listView != null)
-            listView.Rebuild();
-
-        UpdateSelectionLabel();
-    }
-
-    /// <summary>
-    /// Rebuilds saved brush dropdown options while preserving the selected brush when still valid.
-    /// </summary>
-    private void RefreshSavedBrushOptions()
-    {
-        ExcelDataLayoutBrushPaletteUtility.RefreshSavedBrushOptions(savedBrushField, GetBrushPalettePreset());
-    }
-
-    /// <summary>
-    /// Stores the selected field entry used by paint and export-selection actions.
-    /// </summary>
-    /// <param name="selection">Selected ListView payload.</param>
-    private void OnFieldSelectionChanged(IEnumerable<object> selection)
-    {
-        selectedEntry = null;
-
-        foreach (object selectedObject in selection)
-        {
-            selectedEntry = selectedObject as ExcelDataFieldCatalogEntry;
-
-            if (selectedEntry != null)
-                break;
-        }
-
-        UpdateSelectionLabel();
-    }
-    #endregion
-
-    #region Grid
-    /// <summary>
-    /// Rebuilds the visible brush grid from the selected layout preset mappings.
+    /// Rebuilds the active worksheet with selected coordinate and structural separator callbacks.
     /// </summary>
     private void RebuildGrid()
     {
-        ExcelDataLayoutBrushGridUtility.RebuildGrid(gridRoot, GetLayoutPreset(), GetBrushPalettePreset(), allEntries, PaintOrSelectCell);
+        ExcelDataLayoutBrushGridUtility.RebuildGrid(gridRoot,
+                                                    GetActiveSheet(),
+                                                    GetBrushPalettePreset(),
+                                                    controls.AllEntries,
+                                                    selectedRowIndex,
+                                                    selectedColumnIndex,
+                                                    HandleCellClick,
+                                                    InsertEmptyRow,
+                                                    InsertEmptyColumn);
+        RefreshSelectedCellInspector();
     }
 
     /// <summary>
-    /// Paints the selected field into the clicked cell or only selects the cell when no field is selected.
+    /// Applies the active Select, Data, Text or Erase behavior to one exact coordinate.
     /// </summary>
     /// <param name="rowIndex">One-based grid row index.</param>
     /// <param name="columnIndex">One-based grid column index.</param>
-    private void PaintOrSelectCell(int rowIndex, int columnIndex)
+    private void HandleCellClick(int rowIndex, int columnIndex)
     {
         selectedRowIndex = rowIndex;
         selectedColumnIndex = columnIndex;
 
-        if (selectedEntry == null)
+        switch (brushInspector.Mode)
         {
-            UpdateSelectionLabel();
+            case ExcelDataLayoutBrushMode.Data:
+                PaintDataCell();
+                break;
+            case ExcelDataLayoutBrushMode.Text:
+                PaintLiteralCell();
+                break;
+            case ExcelDataLayoutBrushMode.Erase:
+                EraseSelectedCell();
+                break;
+            default:
+                RebuildGrid();
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Paints the selected catalog field using current direction, style and number format.
+    /// </summary>
+    private void PaintDataCell()
+    {
+        if (controls.SelectedEntry == null)
+        {
+            controls.SetStatus("Select a catalog field before painting in Data mode.");
+            RefreshSelectedCellInspector();
             return;
         }
 
         ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
 
-        if (layoutPreset == null)
+        if (layoutPreset == null || sheet == null)
             return;
 
+        Undo.RecordObject(layoutPreset, "Paint Excel Data Field Cell");
         ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset,
-                                                                  selectedEntry,
-                                                                  rowIndex,
-                                                                  columnIndex);
+                                                                  sheet.SheetName,
+                                                                  controls.SelectedEntry,
+                                                                  selectedRowIndex,
+                                                                  selectedColumnIndex,
+                                                                  brushInspector.Direction,
+                                                                  controls.GetSelectedBrushId(),
+                                                                  brushInspector.NumberFormat);
+        CommitLayoutEdit(layoutPreset, "Painted Data Field at " + BuildSelectedAddress(sheet) + ".");
+    }
+
+    /// <summary>
+    /// Paints exact literal text using current direction, brush and validation settings.
+    /// </summary>
+    private void PaintLiteralCell()
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Paint Excel Literal Text Cell");
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintLiteralCell(layoutPreset,
+                                                                sheet.SheetName,
+                                                                selectedRowIndex,
+                                                                selectedColumnIndex,
+                                                                brushInspector.LiteralText,
+                                                                brushInspector.Direction,
+                                                                controls.GetSelectedBrushId(),
+                                                                brushInspector.ValidateLiteralDuringImport);
+        CommitLayoutEdit(layoutPreset, "Painted Literal Text at " + BuildSelectedAddress(sheet) + ".");
+    }
+
+    /// <summary>
+    /// Removes the selected authoritative cell in Erase mode.
+    /// </summary>
+    private void EraseSelectedCell()
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Erase Excel Workbook Cell");
+
+        if (!ExcelDataWorkbookLayoutAuthoringUtility.EraseCell(layoutPreset,
+                                                               sheet.SheetName,
+                                                               selectedRowIndex,
+                                                               selectedColumnIndex))
+        {
+            controls.SetStatus("Selected workbook cell is already empty.");
+            RebuildGrid();
+            return;
+        }
+
+        CommitLayoutEdit(layoutPreset, "Erased " + BuildSelectedAddress(sheet) + ".");
+    }
+
+    /// <summary>
+    /// Applies inspector settings to an existing selected cell only while Select mode is active.
+    /// </summary>
+    private void OnSelectedCellSettingsChanged()
+    {
+        if (brushInspector.Mode != ExcelDataLayoutBrushMode.Select)
+            return;
+
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null || sheet.FindCell(selectedRowIndex, selectedColumnIndex) == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Edit Excel Workbook Cell");
+
+        if (!ExcelDataWorkbookLayoutAuthoringUtility.UpdateCellSettings(layoutPreset,
+                                                                        sheet.SheetName,
+                                                                        selectedRowIndex,
+                                                                        selectedColumnIndex,
+                                                                        brushInspector.Direction,
+                                                                        brushInspector.LiteralText,
+                                                                        brushInspector.ValidateLiteralDuringImport,
+                                                                        brushInspector.NumberFormat))
+            return;
+
+        CommitLayoutEdit(layoutPreset, "Updated " + BuildSelectedAddress(sheet) + ".");
+    }
+
+    /// <summary>
+    /// Inserts an empty row from a horizontal separator context menu.
+    /// </summary>
+    /// <param name="insertionRowIndex">One-based row that becomes empty.</param>
+    private void InsertEmptyRow(int insertionRowIndex)
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Insert Excel Workbook Row");
+        ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyRow(layoutPreset, sheet.SheetName, insertionRowIndex);
+
+        if (selectedRowIndex >= insertionRowIndex)
+            selectedRowIndex++;
+
+        CommitLayoutEdit(layoutPreset,
+                         "Inserted empty row " + insertionRowIndex.ToString(CultureInfo.InvariantCulture) +
+                         " in " + sheet.SheetName + ".");
+        RefreshDimensionFields(sheet);
+    }
+
+    /// <summary>
+    /// Inserts an empty column from a vertical separator context menu.
+    /// </summary>
+    /// <param name="insertionColumnIndex">One-based column that becomes empty.</param>
+    private void InsertEmptyColumn(int insertionColumnIndex)
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Insert Excel Workbook Column");
+        ExcelDataWorkbookLayoutAuthoringUtility.InsertEmptyColumn(layoutPreset, sheet.SheetName, insertionColumnIndex);
+
+        if (selectedColumnIndex >= insertionColumnIndex)
+            selectedColumnIndex++;
+
+        CommitLayoutEdit(layoutPreset,
+                         "Inserted empty column " +
+                         ExcelDataWorkbookCoordinateUtility.ColumnIndexToName(insertionColumnIndex) +
+                         " in " + sheet.SheetName + ".");
+        RefreshDimensionFields(sheet);
+    }
+
+    /// <summary>
+    /// Marks one layout edit dirty, refreshes the grid and reports its result.
+    /// </summary>
+    /// <param name="layoutPreset">Edited layout preset.</param>
+    /// <param name="status">User-facing edit result.</param>
+    private void CommitLayoutEdit(ExcelDataWorkbookLayoutPreset layoutPreset, string status)
+    {
         EditorUtility.SetDirty(layoutPreset);
         ExcelDataTransferDraftSession.MarkDirty();
+        controls.SetStatus(status);
         RebuildGrid();
         UpdateSelectionLabel();
     }
-
     #endregion
 
-    #region Preset Helpers
+    #region Sheet And Preset State
     /// <summary>
-    /// Refreshes object fields and dimension controls from the selected master preset.
+    /// Applies a master preset selected by the independent sidebar field.
+    /// </summary>
+    /// <param name="masterPreset">New master preset, or null to clear the selection.</param>
+    private void HandleMasterPresetChanged(ExcelDataTransferMasterPreset masterPreset)
+    {
+        selectedMasterPreset = masterPreset;
+        activeSheetId = string.Empty;
+        ExcelDataTransferAssetUtility.SaveSelectedMasterPreset(selectedMasterPreset);
+        RefreshPresetFields();
+        RebuildGrid();
+    }
+
+    /// <summary>
+    /// Refreshes sheet choices and active-sheet dimensions from the selected layout.
     /// </summary>
     private void RefreshPresetFields()
     {
         if (selectedMasterPreset == null)
             selectedMasterPreset = ExcelDataTransferAssetUtility.LoadSelectedOrDefaultMasterPreset();
 
-        if (masterPresetField != null)
-            masterPresetField.SetValueWithoutNotify(selectedMasterPreset);
+        controls.MasterPresetField?.SetValueWithoutNotify(selectedMasterPreset);
+        RefreshSheetOptions();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (sheet != null)
+            RefreshDimensionFields(sheet);
+
+        controls.RefreshSavedBrushOptions();
+        controls.SetModeVisibility(brushInspector.Mode);
+        RefreshSelectedCellInspector();
+        UpdateSelectionLabel();
+    }
+
+    /// <summary>
+    /// Rebuilds sheet dropdown choices and preserves active sheet ID when possible.
+    /// </summary>
+    private void RefreshSheetOptions()
+    {
+        if (controls.SheetField == null)
+            return;
 
         ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        List<string> options = new List<string>();
 
         if (layoutPreset != null)
         {
-            rowCountField.SetValueWithoutNotify(layoutPreset.DefaultGridRows);
-            columnCountField.SetValueWithoutNotify(layoutPreset.DefaultGridColumns);
-            cellWidthField.SetValueWithoutNotify(layoutPreset.DefaultCellWidth);
-            cellHeightField.SetValueWithoutNotify(layoutPreset.DefaultCellHeight);
+            for (int sheetIndex = 0; sheetIndex < layoutPreset.SheetDefinitions.Count; sheetIndex++)
+            {
+                ExcelDataWorkbookSheetDefinition sheet = layoutPreset.SheetDefinitions[sheetIndex];
+
+                if (sheet != null)
+                    options.Add(sheet.SheetName);
+            }
         }
 
-        RefreshSavedBrushOptions();
-        UpdateSelectionLabel();
+        if (options.Count <= 0)
+            options.Add("No Worksheet");
+
+        controls.SheetField.choices = options;
+        ExcelDataWorkbookSheetDefinition activeSheet = FindActiveSheetById(layoutPreset);
+        controls.SheetField.SetValueWithoutNotify(activeSheet == null ? options[0] : activeSheet.SheetName);
     }
 
     /// <summary>
-    /// Updates an integer field on the layout preset through SerializedObject so authored data remains Unity-serialized.
+    /// Selects one visible worksheet by dropdown name.
     /// </summary>
-    /// <param name="propertyName">Serialized layout preset property name.</param>
-    /// <param name="newValue">New value entered by the user.</param>
-    private void UpdateLayoutInt(string propertyName, int newValue)
+    /// <param name="sheetName">Visible selected worksheet name.</param>
+    private void SelectSheet(string sheetName)
     {
         ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet =
+            ExcelDataWorkbookLayoutAuthoringUtility.FindSheet(layoutPreset, sheetName);
 
-        if (layoutPreset == null)
+        if (sheet == null)
             return;
 
-        SerializedObject serializedObject = new SerializedObject(layoutPreset);
-        SerializedProperty property = serializedObject.FindProperty(propertyName);
-
-        if (property == null)
-            return;
-
-        property.intValue = newValue;
-        serializedObject.ApplyModifiedProperties();
-        EditorUtility.SetDirty(layoutPreset);
-        ExcelDataTransferDraftSession.MarkDirty();
+        activeSheetId = sheet.SheetId;
+        selectedRowIndex = 1;
+        selectedColumnIndex = 1;
+        RefreshDimensionFields(sheet);
         RebuildGrid();
-        UpdateSelectionLabel();
     }
 
     /// <summary>
-    /// Gets the layout preset linked by the selected master preset.
+    /// Updates one explicit active-sheet preview value without snapping invalid authored input.
     /// </summary>
-    /// <returns>Layout preset, or null when the master graph is incomplete.</returns>
+    /// <param name="propertyName">Preview property selected by the toolbar.</param>
+    /// <param name="newValue">New authored value.</param>
+    private void UpdateActiveSheetInt(string propertyName, int newValue)
+    {
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        int rows = sheet.PreviewRowCount;
+        int columns = sheet.PreviewColumnCount;
+        int cellWidth = sheet.PreviewCellWidth;
+        int cellHeight = sheet.PreviewCellHeight;
+
+        switch (propertyName)
+        {
+            case "previewRowCount":
+                rows = newValue;
+                break;
+            case "previewColumnCount":
+                columns = newValue;
+                break;
+            case "previewCellWidth":
+                cellWidth = newValue;
+                break;
+            case "previewCellHeight":
+                cellHeight = newValue;
+                break;
+        }
+
+        Undo.RecordObject(layoutPreset, "Edit Excel Worksheet Preview");
+        ExcelDataWorkbookLayoutAuthoringUtility.ConfigureSheetPreview(layoutPreset,
+                                                                     sheet,
+                                                                     rows,
+                                                                     columns,
+                                                                     cellWidth,
+                                                                     cellHeight);
+        EditorUtility.SetDirty(layoutPreset);
+        ExcelDataTransferDraftSession.MarkDirty();
+
+        if (rows < 1 || columns < 1 || cellWidth < 24 || cellHeight < 18)
+            controls.SetStatus("Worksheet preview contains values below the recommended minimum; authored values were preserved.");
+
+        RebuildGrid();
+    }
+
+    /// <summary>
+    /// Updates toolbar values from one active worksheet without dispatching callbacks.
+    /// </summary>
+    /// <param name="sheet">Active worksheet definition.</param>
+    private void RefreshDimensionFields(ExcelDataWorkbookSheetDefinition sheet)
+    {
+        rowCountField.SetValueWithoutNotify(sheet.PreviewRowCount);
+        columnCountField.SetValueWithoutNotify(sheet.PreviewColumnCount);
+        cellWidthField.SetValueWithoutNotify(sheet.PreviewCellWidth);
+        cellHeightField.SetValueWithoutNotify(sheet.PreviewCellHeight);
+    }
+
+    /// <summary>
+    /// Gets the selected or overridden workbook layout preset.
+    /// </summary>
+    /// <returns>Layout preset, or null.</returns>
     private ExcelDataWorkbookLayoutPreset GetLayoutPreset()
     {
         if (layoutPresetOverride != null)
             return layoutPresetOverride;
 
-        if (selectedMasterPreset == null)
-            return null;
-
-        return selectedMasterPreset.LayoutPreset;
+        return selectedMasterPreset == null ? null : selectedMasterPreset.LayoutPreset;
     }
 
     /// <summary>
-    /// Gets the export preset linked by the selected master preset.
+    /// Gets the active worksheet by stable ID and falls back to the first available sheet.
     /// </summary>
-    /// <returns>Export preset, or null when the master graph is incomplete.</returns>
-    internal ExcelDataExportPreset GetExportPreset()
+    /// <returns>Active grid-authoritative worksheet, or null.</returns>
+    private ExcelDataWorkbookSheetDefinition GetActiveSheet()
     {
-        if (selectedMasterPreset == null)
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+
+        if (layoutPreset == null)
             return null;
 
-        return selectedMasterPreset.ExportPreset;
+        ExcelDataWorkbookSheetDefinition sheet = FindActiveSheetById(layoutPreset);
+
+        if (sheet == null && layoutPreset.SheetDefinitions.Count > 0)
+            sheet = layoutPreset.SheetDefinitions[0];
+
+        if (sheet == null)
+            return null;
+
+        activeSheetId = sheet.SheetId;
+        return sheet;
     }
 
     /// <summary>
-    /// Gets the import preset linked by the selected master preset.
+    /// Finds the active worksheet without creating serialized data.
     /// </summary>
-    /// <returns>Import preset, or null when the master graph is incomplete.</returns>
-    internal ExcelDataImportPreset GetImportPreset()
+    /// <param name="layoutPreset">Layout preset to search.</param>
+    /// <returns>Sheet matching active ID, or null.</returns>
+    private ExcelDataWorkbookSheetDefinition FindActiveSheetById(ExcelDataWorkbookLayoutPreset layoutPreset)
     {
-        if (selectedMasterPreset == null)
+        if (layoutPreset == null || string.IsNullOrWhiteSpace(activeSheetId))
             return null;
 
-        return selectedMasterPreset.ImportPreset;
+        for (int sheetIndex = 0; sheetIndex < layoutPreset.SheetDefinitions.Count; sheetIndex++)
+        {
+            ExcelDataWorkbookSheetDefinition sheet = layoutPreset.SheetDefinitions[sheetIndex];
+
+            if (sheet != null && string.Equals(sheet.SheetId, activeSheetId, StringComparison.Ordinal))
+                return sheet;
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Gets the brush palette preset linked by the selected master preset.
+    /// Gets the linked brush palette preset.
     /// </summary>
-    /// <returns>Brush palette preset, or null when the graph is incomplete.</returns>
-    internal ExcelDataBrushPalettePreset GetBrushPalettePreset()
+    /// <returns>Brush palette preset, or null.</returns>
+    private ExcelDataBrushPalettePreset GetBrushPalettePreset()
     {
-        if (selectedMasterPreset == null)
-            return null;
-
-        return selectedMasterPreset.BrushPalettePreset;
+        return selectedMasterPreset == null ? null : selectedMasterPreset.BrushPalettePreset;
     }
     #endregion
 
-    #region Saved Brushes
+    #region Brushes And Inspector
     /// <summary>
-    /// Applies a saved brush configuration to all filter controls.
+    /// Refreshes mode-dependent catalog and style visibility.
     /// </summary>
-    /// <param name="optionLabel">Visible brush option selected by the user.</param>
-    private void ApplySavedBrushConfiguration(string optionLabel)
+    private void OnBrushModeChanged()
     {
-        if (ExcelDataLayoutBrushPaletteUtility.ApplySavedBrushConfiguration(GetBrushPalettePreset(),
-                                                                            optionLabel,
-                                                                            domainField,
-                                                                            categoryField,
-                                                                            dataKindField,
-                                                                            listModeField,
-                                                                            sourceSearchField,
-                                                                            brushColorField))
-            ApplyFilters();
+        controls.SetModeVisibility(brushInspector.Mode);
+        RefreshSelectedCellInspector();
+        UpdateSelectionLabel();
     }
 
     /// <summary>
-    /// Saves the current filter and color state into the linked brush palette preset.
+    /// Refreshes selected-cell address, payload, current value and style descriptions.
     /// </summary>
-    private void SaveCurrentBrushConfiguration()
+    private void RefreshSelectedCellInspector()
     {
-        string selectedOption;
-        string statusMessage;
-        bool saved = ExcelDataLayoutBrushPaletteUtility.SaveCurrentBrushConfiguration(GetBrushPalettePreset(),
-                                                                                      domainField,
-                                                                                      categoryField,
-                                                                                      dataKindField,
-                                                                                      listModeField,
-                                                                                      sourceSearchField,
-                                                                                      brushColorField,
-                                                                                      searchField,
-                                                                                      out selectedOption,
-                                                                                      out statusMessage);
-        SetStatus(statusMessage);
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
 
-        if (!saved)
+        if (sheet == null)
+        {
+            brushInspector.ClearSelectedCell();
             return;
+        }
 
-        RefreshSavedBrushOptions();
+        ExcelDataWorkbookCellDefinition cell = sheet.FindCell(selectedRowIndex, selectedColumnIndex);
+        string sourceText = string.Empty;
+        string valueText = string.Empty;
+        string styleText = string.Empty;
 
-        if (savedBrushField != null)
-            savedBrushField.SetValueWithoutNotify(selectedOption);
+        if (cell != null)
+        {
+            ExcelDataBrushDefinition brush = ExcelDataLayoutBrushPaletteUtility.FindBrushById(GetBrushPalettePreset(), cell.BrushId);
+            styleText = brush == null ? cell.BrushId : brush.BrushName;
+
+            if (!string.IsNullOrWhiteSpace(cell.NumberFormat))
+                styleText += " | " + cell.NumberFormat;
+
+            if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
+            {
+                sourceText = "Authored literal text";
+                valueText = cell.LiteralText;
+            }
+            else if (cell.FieldBinding != null)
+            {
+                sourceText = cell.FieldBinding.OwnerAssetPath + " | " + cell.FieldBinding.SerializedPath;
+                ExcelDataSerializedValueSnapshot snapshot =
+                    ExcelDataSerializedValueReader.ReadValue(cell.FieldBinding, true, true, true);
+                valueText = ConvertToInvariantText(snapshot.Value);
+
+                if (!string.IsNullOrWhiteSpace(snapshot.Warning))
+                    valueText = snapshot.Warning;
+            }
+        }
+
+        brushInspector.SetSelectedCell(sheet.SheetName,
+                                       selectedRowIndex,
+                                       selectedColumnIndex,
+                                       cell,
+                                       sourceText,
+                                       valueText,
+                                       styleText);
+    }
+
+    /// <summary>
+    /// Converts a typed Unity snapshot into invariant inspector text.
+    /// </summary>
+    /// <param name="value">Typed serialized value.</param>
+    /// <returns>Invariant readable text.</returns>
+    private static string ConvertToInvariantText(object value)
+    {
+        if (value == null)
+            return string.Empty;
+
+        IFormattable formattable = value as IFormattable;
+        return formattable == null
+            ? value.ToString()
+            : formattable.ToString(null, CultureInfo.InvariantCulture);
     }
     #endregion
 
     #region UI Helpers
     /// <summary>
-    /// Updates the selection summary label.
+    /// Updates the compact brush and catalog selection summary.
     /// </summary>
-    internal void UpdateSelectionLabel()
+    private void UpdateSelectionLabel()
     {
-        if (selectionLabel == null)
-            return;
-
-        ExcelDataExportPreset exportPreset = GetExportPreset();
-        ExcelDataImportPreset importPreset = GetImportPreset();
-        int exportSelectionCount = exportPreset == null ? 0 : exportPreset.SelectedFields.Count;
-        int importSelectionCount = importPreset == null ? 0 : importPreset.SelectedFields.Count;
-        string fieldText = selectedEntry == null ? "No field selected" : selectedEntry.PathTemplate;
-        selectionLabel.text = "Selected Cell: " + selectedRowIndex + "," + selectedColumnIndex +
-                              "\nSelected Field: " + fieldText +
-                              "\nFiltered Fields: " + filteredEntries.Count + " / " + allEntries.Count +
-                              "\nImport Selections: " + importSelectionCount +
-                              "\nExport Selections: " + exportSelectionCount;
+        controls.UpdateSelectionLabel(brushInspector.Mode);
     }
 
     /// <summary>
-    /// Updates the status label with a short user-facing message.
+    /// Builds the selected sheet and coordinate string used by edit results.
     /// </summary>
-    /// <param name="message">Status message to show.</param>
-    internal void SetStatus(string message)
+    /// <param name="sheet">Active worksheet.</param>
+    /// <returns>Address such as Objects!A1.</returns>
+    private string BuildSelectedAddress(ExcelDataWorkbookSheetDefinition sheet)
     {
-        if (statusLabel != null)
-            statusLabel.text = message;
-    }
-
-    /// <summary>
-    /// Checks whether workbook operations would use the layout currently edited by this brush panel.
-    /// </summary>
-    /// <returns>True when the active layout is the layout linked by the selected master preset.</returns>
-    internal bool IsEditingLinkedLayoutPreset()
-    {
-        return layoutPresetOverride == null ||
-               selectedMasterPreset != null && selectedMasterPreset.LayoutPreset == layoutPresetOverride;
+        return sheet.SheetName + "!" +
+               ExcelDataWorkbookCoordinateUtility.BuildAddress(selectedRowIndex, selectedColumnIndex);
     }
     #endregion
 

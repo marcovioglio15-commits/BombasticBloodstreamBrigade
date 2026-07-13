@@ -1,0 +1,855 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: PlayerTuningExcelDataWorkbookLayoutPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: 91f9048d266b41f6b1659a02215dc61a
+  presetName: Player Tuning Transfer Layout
+  objectsSheetName: Player Tuning
+  defaultGridRows: 28
+  defaultGridColumns: 4
+  defaultCellWidth: 210
+  defaultCellHeight: 30
+  sheetDefinitions:
+  - sheetId: 381cb682e86e41f093f0523bbd9764a0
+    sheetName: Player Tuning
+    previewRowCount: 28
+    previewColumnCount: 4
+    previewCellWidth: 210
+    previewCellHeight: 30
+    freezeRowCount: 4
+    freezeColumnCount: 1
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PLAYER TUNING WORKBOOK
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 2
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Movement, targeting and identity values used by Player Management
+        Tool presets.
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SETTING
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 4
+      columnIndex: 2
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: VALUE
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 4
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SOURCE ASSET
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 4
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SERIALIZED PATH
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: IDENTITY
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 8
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Name
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 8
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PlayerMasterPreset_A
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 8
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: m_PresetName
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 8
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_PresetName
+        domain: 1
+        ownerAssetGuid: 2aa7920f2d0dab444bbb97e34b3f90d8
+        ownerAssetTypeName: PlayerMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Master Presets/PlayerMasterPreset_A.asset
+        serializedPath: m_PresetName
+        pathTemplate: m_PresetName
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: dee3b17fe9324731ba25185974b13f63
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 9
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 9
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PlayerMasterPreset_A
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 9
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: m_Version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 9
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_Version
+        domain: 1
+        ownerAssetGuid: 2aa7920f2d0dab444bbb97e34b3f90d8
+        ownerAssetTypeName: PlayerMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Master Presets/PlayerMasterPreset_A.asset
+        serializedPath: m_Version
+        pathTemplate: m_Version
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: dee3b17fe9324731ba25185974b13f63
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 10
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: MOVEMENT
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 12
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Base Speed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 12
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 12
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movementSettings.values.baseSpeed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 12
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.baseSpeed
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.baseSpeed
+        pathTemplate: movementSettings.values.baseSpeed
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 16f2c99af3ae4566a8c2d4a33e934c0c
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 13
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Max Speed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 13
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 13
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movementSettings.values.maxSpeed
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 13
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.maxSpeed
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.maxSpeed
+        pathTemplate: movementSettings.values.maxSpeed
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 16f2c99af3ae4566a8c2d4a33e934c0c
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 14
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Acceleration
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 14
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 14
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movementSettings.values.acceleration
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 14
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.acceleration
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.acceleration
+        pathTemplate: movementSettings.values.acceleration
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 16f2c99af3ae4566a8c2d4a33e934c0c
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 15
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Deceleration
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 15
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 15
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movementSettings.values.deceleration
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 15
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.deceleration
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.deceleration
+        pathTemplate: movementSettings.values.deceleration
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 16f2c99af3ae4566a8c2d4a33e934c0c
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 16
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: TARGETING
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 18
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Directions Mode
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 18
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 18
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: movementSettings.directionsMode
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 18
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.directionsMode
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.directionsMode
+        pathTemplate: movementSettings.directionsMode
+        expectedDataKind: 4
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 9a3ebcf82ea44f40b6e38814cf0af5d6
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 19
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Front Cone Enabled
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 19
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: ConeVision_ForwardAndBarckward
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 19
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: lookSettings.m_FrontConeEnabled
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 381cb682e86e41f093f0523bbd9764a0
+      rowIndex: 19
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeEnabled
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: lookSettings.m_FrontConeEnabled
+        pathTemplate: lookSettings.m_FrontConeEnabled
+        expectedDataKind: 3
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: c7de7218539a4143abb96020bd7e4284
+      numberFormat: 
+      validateLiteralDuringImport: 0

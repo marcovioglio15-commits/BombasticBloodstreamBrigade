@@ -1,209 +1,267 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using MiniExcelLibs;
-using MiniExcelLibs.OpenXml;
 using UnityEditor;
+using UnityEngine;
 
 /// <summary>
-/// Rebuilds workbook layout preset mappings from BrushGrid rows saved inside exported workbooks.
+/// Restores complete grid-authoritative workbook layouts from the reserved v2 technical worksheet.
 /// </summary>
 internal static class ExcelDataWorkbookLayoutImportService
 {
-    #region Constants
-    private const string BrushGridSection = "BrushGrid";
-    private const string DefaultObjectsSheetName = "Objects";
-    #endregion
-
     #region Methods
 
     #region Public Methods
     /// <summary>
-    /// Imports painted brush-grid mappings from one workbook into the selected layout preset.
+    /// Replaces one selected layout only after a complete workbook snapshot passes structural and hash validation.
     /// </summary>
-    /// <param name="layoutPreset">Layout preset that receives imported brush-grid mappings.</param>
+    /// <param name="layoutPreset">Layout preset that receives the restored sheets and cells.</param>
     /// <param name="workbookPath">Absolute or project-relative workbook path to read.</param>
-    /// <param name="preferredSheetName">Worksheet name to read before falling back to the default Objects sheet.</param>
-    /// <returns>Summary of imported, skipped and warning rows.</returns>
-    public static ExcelDataWorkbookLayoutImportResult ImportBrushGridMappings(ExcelDataWorkbookLayoutPreset layoutPreset,
-                                                                              string workbookPath,
-                                                                              string preferredSheetName)
+    /// <returns>Summary of restored worksheets, cells and deterministic hash validation.</returns>
+    public static ExcelDataWorkbookLayoutImportResult ImportLayoutSnapshot(ExcelDataWorkbookLayoutPreset layoutPreset,
+                                                                           string workbookPath)
     {
         if (layoutPreset == null)
             throw new ArgumentNullException(nameof(layoutPreset));
 
-        string resolvedPath = ExcelDataWorkbookPathUtility.ResolveWorkbookPath(workbookPath, ExcelDataWorkbookPathUtility.LogExportRelativePath);
+        string resolvedPath = ExcelDataWorkbookPathUtility.ResolveWorkbookPath(workbookPath,
+                                                                               ExcelDataWorkbookPathUtility.LogExportRelativePath);
+        ExcelDataWorkbookLayoutSnapshot snapshot = ExcelDataWorkbookLayoutSnapshotReader.Read(resolvedPath);
+        ValidateSnapshot(snapshot);
+        List<ExcelDataWorkbookSheetDefinition> restoredSheets = BuildRestoredSheets(snapshot);
+        string restoredHash = CalculateRestoredHash(restoredSheets);
 
-        if (ContainsGridAuthoritativeTechnicalSheet(resolvedPath))
-            throw new InvalidOperationException("Grid-authoritative workbook layout restoration is not supported by the current loader. The layout preset was not modified.");
+        if (!string.Equals(restoredHash, snapshot.LayoutHash, StringComparison.Ordinal))
+            throw new InvalidOperationException("Workbook layout snapshot hash does not match its reconstructed content. The layout preset was not modified.");
 
-        List<ExcelDataWorkbookRow> workbookRows = LoadWorkbookRowsWithFallback(resolvedPath, preferredSheetName);
-        List<ExcelDataCellBrushMapping> importedMappings = new List<ExcelDataCellBrushMapping>();
-        int importedRows = 0;
-        int skippedRows = 0;
-        int warningRows = 0;
-        int maxRowIndex = layoutPreset.DefaultGridRows;
-        int maxColumnIndex = layoutPreset.DefaultGridColumns;
+        Undo.RecordObject(layoutPreset, "Load Excel Workbook Layout Snapshot");
+        layoutPreset.SheetDefinitions.Clear();
+        layoutPreset.SheetDefinitions.AddRange(restoredSheets);
 
-        // Parse every legacy row into a temporary collection before mutating the selected preset.
-        for (int rowIndex = 0; rowIndex < workbookRows.Count; rowIndex++)
+        if (restoredSheets.Count > 0)
         {
-            ExcelDataWorkbookRow workbookRow = workbookRows[rowIndex];
-
-            if (!IsBrushGridRow(workbookRow))
-                continue;
-
-            if (!CanImportMapping(workbookRow))
-            {
-                skippedRows++;
-                continue;
-            }
-
-            ExcelDataCellBrushMapping mapping = new ExcelDataCellBrushMapping();
-            mapping.Configure(ResolveSheetName(workbookRow, layoutPreset),
-                              workbookRow.WorkbookRow,
-                              workbookRow.WorkbookColumn,
-                              workbookRow.FieldId,
-                              ExcelDataTransferDirection.Both,
-                              workbookRow.PathTemplate,
-                              string.Empty);
-            importedMappings.Add(mapping);
-            importedRows++;
-            maxRowIndex = Math.Max(maxRowIndex, workbookRow.WorkbookRow);
-            maxColumnIndex = Math.Max(maxColumnIndex, workbookRow.WorkbookColumn);
-
-            if (!string.IsNullOrWhiteSpace(workbookRow.Warning))
-                warningRows++;
+            ExcelDataWorkbookSheetDefinition primarySheet = restoredSheets[0];
+            layoutPreset.ConfigureGridDefaults(primarySheet.PreviewRowCount,
+                                               primarySheet.PreviewColumnCount,
+                                               primarySheet.PreviewCellWidth,
+                                               primarySheet.PreviewCellHeight);
         }
 
-        if (importedRows <= 0)
-            throw new InvalidOperationException("Workbook contains no usable legacy BrushGrid mappings. The layout preset was not modified.");
-
-        Undo.RecordObject(layoutPreset, "Load Excel Workbook Layout");
-        layoutPreset.CellMappings.Clear();
-        layoutPreset.CellMappings.AddRange(importedMappings);
-        Dictionary<string, ExcelDataFieldCatalogEntry> entriesById =
-            ExcelDataGridAuthoritativeLayoutMigrationUtility.BuildEntryLookup(ExcelDataFieldCatalogBuilder.BuildCatalog());
-        ExcelDataGridAuthoritativeLayoutMigrationUtility.ConvertPreset(layoutPreset, entriesById, true);
-
-        ApplyGridPreviewSize(layoutPreset, maxRowIndex, maxColumnIndex);
         EditorUtility.SetDirty(layoutPreset);
         ExcelDataTransferDraftSession.MarkDirty();
-        return new ExcelDataWorkbookLayoutImportResult(resolvedPath, workbookRows.Count, importedRows, skippedRows, warningRows);
+        return new ExcelDataWorkbookLayoutImportResult(resolvedPath,
+                                                       restoredSheets.Count,
+                                                       snapshot.Cells.Count,
+                                                       true,
+                                                       restoredHash);
     }
     #endregion
 
-    #region Row Loading
+    #region Snapshot Validation
     /// <summary>
-    /// Detects the reserved v2 technical worksheet before the legacy loader can mutate layout assets.
+    /// Validates workbook-level snapshot identity before constructing serialized definitions.
     /// </summary>
-    /// <param name="resolvedPath">Absolute workbook path to inspect.</param>
-    /// <returns>True when the workbook uses the grid-authoritative schema.</returns>
-    private static bool ContainsGridAuthoritativeTechnicalSheet(string resolvedPath)
+    /// <param name="snapshot">Parsed technical worksheet snapshot.</param>
+    private static void ValidateSnapshot(ExcelDataWorkbookLayoutSnapshot snapshot)
     {
-        if (!File.Exists(resolvedPath))
-            return false;
+        if (snapshot == null || !snapshot.TechnicalSheetFound)
+            throw new InvalidOperationException("Workbook does not contain the required _NashCoreTransfer technical worksheet.");
 
-        List<SheetInfo> sheets = MiniExcel.GetSheetInformations(resolvedPath, new OpenXmlConfiguration());
+        if (!snapshot.WorkbookRecordFound)
+            throw new InvalidOperationException("Workbook technical worksheet has no Workbook identity record.");
 
-        for (int sheetIndex = 0; sheetIndex < sheets.Count; sheetIndex++)
+        if (!string.Equals(snapshot.SchemaVersion,
+                           ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion,
+                           StringComparison.Ordinal))
+            throw new InvalidOperationException("Workbook layout schema " + snapshot.SchemaVersion +
+                                                " is not supported. Expected " +
+                                                ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion + ".");
+
+        if (snapshot.Sheets.Count <= 0)
+            throw new InvalidOperationException("Workbook technical worksheet contains no authored Sheet records.");
+
+        if (snapshot.Cells.Count <= 0)
+            throw new InvalidOperationException("Workbook technical worksheet contains no authored Cell records.");
+
+        if (string.IsNullOrWhiteSpace(snapshot.LayoutHash))
+            throw new InvalidOperationException("Workbook technical worksheet contains no deterministic layout hash.");
+    }
+    #endregion
+
+    #region Restoration
+    /// <summary>
+    /// Builds a detached authoritative sheet graph so malformed workbooks cannot partially mutate project assets.
+    /// </summary>
+    /// <param name="snapshot">Validated workbook layout snapshot.</param>
+    /// <returns>Detached worksheet definitions ready for one atomic assignment.</returns>
+    private static List<ExcelDataWorkbookSheetDefinition> BuildRestoredSheets(ExcelDataWorkbookLayoutSnapshot snapshot)
+    {
+        List<ExcelDataWorkbookSheetDefinition> sheets = new List<ExcelDataWorkbookSheetDefinition>();
+        Dictionary<string, ExcelDataWorkbookSheetDefinition> sheetsById =
+            new Dictionary<string, ExcelDataWorkbookSheetDefinition>(StringComparer.Ordinal);
+        HashSet<string> sanitizedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // Restore worksheets first so every subsequent cell resolves a stable owner identity.
+        for (int sheetIndex = 0; sheetIndex < snapshot.Sheets.Count; sheetIndex++)
         {
-            if (string.Equals(sheets[sheetIndex].Name,
-                              ExcelDataWorkbookTechnicalSheetBuilder.TechnicalSheetName,
-                              StringComparison.OrdinalIgnoreCase))
-                return true;
+            ExcelDataWorkbookLayoutSheetSnapshot sourceSheet = snapshot.Sheets[sheetIndex];
+            ValidateSheet(sourceSheet, sheetsById, sanitizedNames);
+            ExcelDataWorkbookSheetDefinition sheet = new ExcelDataWorkbookSheetDefinition();
+            sheet.ConfigureFromSnapshot(sourceSheet.SheetId,
+                                        sourceSheet.SheetName,
+                                        sourceSheet.PreviewRowCount,
+                                        sourceSheet.PreviewColumnCount,
+                                        sourceSheet.PreviewCellWidth,
+                                        sourceSheet.PreviewCellHeight,
+                                        sourceSheet.FreezeRowCount,
+                                        sourceSheet.FreezeColumnCount,
+                                        sourceSheet.ImportEnabled,
+                                        sourceSheet.ExportEnabled,
+                                        sourceSheet.Visibility);
+            sheets.Add(sheet);
+            sheetsById.Add(sourceSheet.SheetId, sheet);
         }
 
-        return false;
+        Dictionary<string, HashSet<long>> coordinatesBySheet = new Dictionary<string, HashSet<long>>(StringComparer.Ordinal);
+
+        // Restore sparse cells only after every referenced sheet has passed validation.
+        for (int cellIndex = 0; cellIndex < snapshot.Cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookLayoutCellSnapshot sourceCell = snapshot.Cells[cellIndex];
+            ExcelDataWorkbookSheetDefinition sheet;
+
+            if (sourceCell == null || !sheetsById.TryGetValue(sourceCell.SheetId, out sheet))
+                throw new InvalidOperationException("Technical Cell record references an unknown worksheet ID.");
+
+            ValidateCellCoordinate(sourceCell, coordinatesBySheet);
+            sheet.Cells.Add(BuildRestoredCell(sourceCell, sheet.SheetId));
+        }
+
+        return sheets;
     }
 
     /// <summary>
-    /// Reads workbook rows from the preferred sheet and falls back to Objects for older exported files.
+    /// Recreates one Data Field or Literal Text cell from complete technical metadata.
     /// </summary>
-    /// <param name="resolvedPath">Resolved workbook path.</param>
-    /// <param name="preferredSheetName">Preferred worksheet name.</param>
-    /// <returns>Rows read from the workbook.</returns>
-    private static List<ExcelDataWorkbookRow> LoadWorkbookRowsWithFallback(string resolvedPath, string preferredSheetName)
+    /// <param name="sourceCell">Parsed cell snapshot.</param>
+    /// <param name="sheetId">Validated owner worksheet identifier.</param>
+    /// <returns>Restored authoritative cell definition.</returns>
+    private static ExcelDataWorkbookCellDefinition BuildRestoredCell(ExcelDataWorkbookLayoutCellSnapshot sourceCell,
+                                                                     string sheetId)
     {
-        string safePreferredSheetName = string.IsNullOrWhiteSpace(preferredSheetName) ? DefaultObjectsSheetName : preferredSheetName;
+        ExcelDataWorkbookCellDefinition cell = new ExcelDataWorkbookCellDefinition();
+
+        switch (sourceCell.ContentKind)
+        {
+            case ExcelDataWorkbookCellContentKind.LiteralText:
+                cell.ConfigureLiteralText(sheetId,
+                                          sourceCell.RowIndex,
+                                          sourceCell.ColumnIndex,
+                                          sourceCell.LiteralText,
+                                          sourceCell.Direction,
+                                          sourceCell.BrushId,
+                                          sourceCell.ValidateLiteralDuringImport);
+                return cell;
+            case ExcelDataWorkbookCellContentKind.DataField:
+                if (string.IsNullOrWhiteSpace(sourceCell.FieldId))
+                    throw new InvalidOperationException("Technical Data Field cell has no stable FieldId.");
+
+                ExcelDataFieldBinding binding = new ExcelDataFieldBinding();
+                binding.Configure(sourceCell.FieldId,
+                                  sourceCell.Domain,
+                                  sourceCell.OwnerAssetGuid,
+                                  sourceCell.OwnerAssetTypeName,
+                                  sourceCell.OwnerAssetPath,
+                                  sourceCell.SerializedPath,
+                                  sourceCell.PathTemplate,
+                                  sourceCell.DataKind);
+                binding.ConfigureListIdentity(sourceCell.ConcreteListIndices, sourceCell.StableListKeys);
+                cell.ConfigureDataField(sheetId,
+                                        sourceCell.RowIndex,
+                                        sourceCell.ColumnIndex,
+                                        binding,
+                                        sourceCell.Direction,
+                                        sourceCell.BrushId,
+                                        sourceCell.NumberFormat);
+                return cell;
+            default:
+                throw new InvalidOperationException("Unsupported technical cell content kind: " + sourceCell.ContentKind + ".");
+        }
+    }
+    #endregion
+
+    #region Record Validation
+    /// <summary>
+    /// Validates one sheet record and reserves its stable and visible identities.
+    /// </summary>
+    /// <param name="sheet">Sheet snapshot to validate.</param>
+    /// <param name="sheetsById">Already reserved stable sheet IDs.</param>
+    /// <param name="sanitizedNames">Already reserved workbook-visible names.</param>
+    private static void ValidateSheet(ExcelDataWorkbookLayoutSheetSnapshot sheet,
+                                      Dictionary<string, ExcelDataWorkbookSheetDefinition> sheetsById,
+                                      HashSet<string> sanitizedNames)
+    {
+        if (sheet == null || string.IsNullOrWhiteSpace(sheet.SheetId) || string.IsNullOrWhiteSpace(sheet.SheetName))
+            throw new InvalidOperationException("Technical Sheet record has missing stable or visible identity.");
+
+        if (sheet.PreviewRowCount < 1 || sheet.PreviewColumnCount < 1 ||
+            sheet.PreviewCellWidth < 24 || sheet.PreviewCellHeight < 18 ||
+            sheet.FreezeRowCount < 0 || sheet.FreezeColumnCount < 0)
+            throw new InvalidOperationException("Technical Sheet record contains invalid preview or freeze-pane dimensions: " + sheet.SheetName + ".");
+
+        if (sheetsById.ContainsKey(sheet.SheetId))
+            throw new InvalidOperationException("Duplicate technical worksheet ID: " + sheet.SheetId + ".");
+
+        string sanitizedName = ExcelDataWorkbookPathUtility.SanitizeSheetName(sheet.SheetName, "Sheet");
+
+        if (!sanitizedNames.Add(sanitizedName))
+            throw new InvalidOperationException("Technical worksheet names collide after Excel sanitization: " + sanitizedName + ".");
+    }
+
+    /// <summary>
+    /// Validates one exact coordinate and rejects duplicate payloads before asset mutation.
+    /// </summary>
+    /// <param name="cell">Cell snapshot to validate.</param>
+    /// <param name="coordinatesBySheet">Reserved coordinate keys grouped by sheet ID.</param>
+    private static void ValidateCellCoordinate(ExcelDataWorkbookLayoutCellSnapshot cell,
+                                               Dictionary<string, HashSet<long>> coordinatesBySheet)
+    {
+        if (cell.RowIndex < 1 || cell.ColumnIndex < 1)
+            throw new InvalidOperationException("Technical Cell record contains an invalid one-based coordinate.");
+
+        HashSet<long> coordinates;
+
+        if (!coordinatesBySheet.TryGetValue(cell.SheetId, out coordinates))
+        {
+            coordinates = new HashSet<long>();
+            coordinatesBySheet.Add(cell.SheetId, coordinates);
+        }
+
+        if (!coordinates.Add(ExcelDataWorkbookCoordinateUtility.BuildKey(cell.RowIndex, cell.ColumnIndex)))
+            throw new InvalidOperationException("Duplicate technical Cell coordinate at " +
+                                                ExcelDataWorkbookCoordinateUtility.BuildAddress(cell.RowIndex, cell.ColumnIndex) + ".");
+    }
+    #endregion
+
+    #region Hash Validation
+    /// <summary>
+    /// Calculates the reconstructed hash on a transient owner without touching the selected project asset.
+    /// </summary>
+    /// <param name="restoredSheets">Detached restored worksheet definitions.</param>
+    /// <returns>Deterministic reconstructed layout hash.</returns>
+    private static string CalculateRestoredHash(List<ExcelDataWorkbookSheetDefinition> restoredSheets)
+    {
+        ExcelDataWorkbookLayoutPreset transientLayout = ScriptableObject.CreateInstance<ExcelDataWorkbookLayoutPreset>();
 
         try
         {
-            return ExcelDataWorkbookReader.LoadWorkbookRows(resolvedPath, safePreferredSheetName);
+            transientLayout.SheetDefinitions.AddRange(restoredSheets);
+            return ExcelDataWorkbookLayoutHashUtility.Calculate(transientLayout);
         }
-        catch
+        finally
         {
-            if (string.Equals(safePreferredSheetName, DefaultObjectsSheetName, StringComparison.Ordinal))
-                throw;
-
-            return ExcelDataWorkbookReader.LoadWorkbookRows(resolvedPath, DefaultObjectsSheetName);
+            transientLayout.SheetDefinitions.Clear();
+            ScriptableObject.DestroyImmediate(transientLayout);
         }
-    }
-    #endregion
-
-    #region Mapping Conversion
-    /// <summary>
-    /// Checks whether one workbook row represents a brush-grid mapping row.
-    /// </summary>
-    /// <param name="workbookRow">Workbook row to inspect.</param>
-    /// <returns>True when the row belongs to the BrushGrid section.</returns>
-    private static bool IsBrushGridRow(ExcelDataWorkbookRow workbookRow)
-    {
-        return workbookRow != null &&
-               string.Equals(workbookRow.Section, BrushGridSection, StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
-    /// Checks whether a BrushGrid row has the minimum data required to recreate a mapping.
-    /// </summary>
-    /// <param name="workbookRow">Workbook row to inspect.</param>
-    /// <returns>True when field id and cell coordinates are usable.</returns>
-    private static bool CanImportMapping(ExcelDataWorkbookRow workbookRow)
-    {
-        if (workbookRow.WorkbookRow < 1 || workbookRow.WorkbookColumn < 1)
-            return false;
-
-        return !string.IsNullOrWhiteSpace(workbookRow.FieldId);
-    }
-
-    /// <summary>
-    /// Resolves the sheet name for one imported mapping.
-    /// </summary>
-    /// <param name="workbookRow">Workbook row being converted.</param>
-    /// <param name="layoutPreset">Layout preset receiving the mapping.</param>
-    /// <returns>Workbook sheet name used by the mapping.</returns>
-    private static string ResolveSheetName(ExcelDataWorkbookRow workbookRow,
-                                           ExcelDataWorkbookLayoutPreset layoutPreset)
-    {
-        if (!string.IsNullOrWhiteSpace(workbookRow.WorkbookSheet))
-            return workbookRow.WorkbookSheet;
-
-        return string.IsNullOrWhiteSpace(layoutPreset.ObjectsSheetName) ? DefaultObjectsSheetName : layoutPreset.ObjectsSheetName;
-    }
-    #endregion
-
-    #region Serialized Updates
-    /// <summary>
-    /// Expands the visible grid preview so imported mappings are immediately visible.
-    /// </summary>
-    /// <param name="layoutPreset">Layout preset receiving the preview dimensions.</param>
-    /// <param name="rowCount">Minimum row count needed by imported mappings.</param>
-    /// <param name="columnCount">Minimum column count needed by imported mappings.</param>
-    private static void ApplyGridPreviewSize(ExcelDataWorkbookLayoutPreset layoutPreset,
-                                             int rowCount,
-                                             int columnCount)
-    {
-        SerializedObject serializedObject = new SerializedObject(layoutPreset);
-        SerializedProperty rowsProperty = serializedObject.FindProperty("defaultGridRows");
-        SerializedProperty columnsProperty = serializedObject.FindProperty("defaultGridColumns");
-
-        if (rowsProperty != null && rowsProperty.intValue < rowCount)
-            rowsProperty.intValue = rowCount;
-
-        if (columnsProperty != null && columnsProperty.intValue < columnCount)
-            columnsProperty.intValue = columnCount;
-
-        serializedObject.ApplyModifiedProperties();
     }
     #endregion
 
@@ -211,59 +269,40 @@ internal static class ExcelDataWorkbookLayoutImportService
 }
 
 /// <summary>
-/// Summarizes one layout import operation from workbook BrushGrid rows.
+/// Summarizes one complete layout restoration from grid-authoritative workbook metadata.
 /// </summary>
 internal sealed class ExcelDataWorkbookLayoutImportResult
 {
     #region Properties
-    public string WorkbookPath
-    {
-        get;
-    }
-
-    public int TotalRowCount
-    {
-        get;
-    }
-
-    public int ImportedMappingCount
-    {
-        get;
-    }
-
-    public int SkippedMappingCount
-    {
-        get;
-    }
-
-    public int WarningCount
-    {
-        get;
-    }
+    public string WorkbookPath { get; }
+    public int ImportedSheetCount { get; }
+    public int ImportedCellCount { get; }
+    public bool LayoutHashMatches { get; }
+    public string LayoutHash { get; }
     #endregion
 
     #region Methods
 
     #region Constructors
     /// <summary>
-    /// Creates an immutable result for layout-import UI feedback.
+    /// Creates an immutable result for layout-restoration UI feedback.
     /// </summary>
-    /// <param name="workbookPath">Workbook path read during layout import.</param>
-    /// <param name="totalRowCount">Total workbook rows scanned.</param>
-    /// <param name="importedMappingCount">Brush-grid mappings imported into the layout preset.</param>
-    /// <param name="skippedMappingCount">Brush-grid rows skipped because they were incomplete.</param>
-    /// <param name="warningCount">Imported rows that carried workbook warnings.</param>
+    /// <param name="workbookPath">Workbook path read during restoration.</param>
+    /// <param name="importedSheetCount">Authoritative worksheets restored.</param>
+    /// <param name="importedCellCount">Exact Data Field and Literal Text cells restored.</param>
+    /// <param name="layoutHashMatches">True when reconstructed and workbook hashes match.</param>
+    /// <param name="layoutHash">Validated deterministic layout hash.</param>
     public ExcelDataWorkbookLayoutImportResult(string workbookPath,
-                                               int totalRowCount,
-                                               int importedMappingCount,
-                                               int skippedMappingCount,
-                                               int warningCount)
+                                               int importedSheetCount,
+                                               int importedCellCount,
+                                               bool layoutHashMatches,
+                                               string layoutHash)
     {
         WorkbookPath = workbookPath;
-        TotalRowCount = totalRowCount;
-        ImportedMappingCount = importedMappingCount;
-        SkippedMappingCount = skippedMappingCount;
-        WarningCount = warningCount;
+        ImportedSheetCount = importedSheetCount;
+        ImportedCellCount = importedCellCount;
+        LayoutHashMatches = layoutHashMatches;
+        LayoutHash = layoutHash;
     }
     #endregion
 

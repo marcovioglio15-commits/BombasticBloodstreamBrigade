@@ -193,6 +193,57 @@ public sealed class ExcelDataWorkbookSheetDefinition
     }
 
     /// <summary>
+    /// Restores complete worksheet identity and behavior from a trusted grid-authoritative workbook snapshot.
+    /// </summary>
+    /// <param name="newSheetId">Stable worksheet identifier stored in the technical sheet.</param>
+    /// <param name="newSheetName">Authored visible worksheet name.</param>
+    /// <param name="newPreviewRowCount">Rows displayed by the Unity preview.</param>
+    /// <param name="newPreviewColumnCount">Columns displayed by the Unity preview.</param>
+    /// <param name="newPreviewCellWidth">Preview cell width in pixels.</param>
+    /// <param name="newPreviewCellHeight">Preview cell height in pixels.</param>
+    /// <param name="newFreezeRowCount">Leading rows frozen by formatting-capable adapters.</param>
+    /// <param name="newFreezeColumnCount">Leading columns frozen by formatting-capable adapters.</param>
+    /// <param name="newImportEnabled">True when this sheet participates in import.</param>
+    /// <param name="newExportEnabled">True when this sheet participates in export.</param>
+    /// <param name="newVisibility">Workbook worksheet visibility.</param>
+    public void ConfigureFromSnapshot(string newSheetId,
+                                      string newSheetName,
+                                      int newPreviewRowCount,
+                                      int newPreviewColumnCount,
+                                      int newPreviewCellWidth,
+                                      int newPreviewCellHeight,
+                                      int newFreezeRowCount,
+                                      int newFreezeColumnCount,
+                                      bool newImportEnabled,
+                                      bool newExportEnabled,
+                                      ExcelDataWorkbookSheetVisibility newVisibility)
+    {
+        sheetId = newSheetId;
+        sheetName = newSheetName;
+        previewRowCount = newPreviewRowCount;
+        previewColumnCount = newPreviewColumnCount;
+        previewCellWidth = newPreviewCellWidth;
+        previewCellHeight = newPreviewCellHeight;
+        freezeRowCount = newFreezeRowCount;
+        freezeColumnCount = newFreezeColumnCount;
+        importEnabled = newImportEnabled;
+        exportEnabled = newExportEnabled;
+        visibility = newVisibility;
+        EnsureCollections();
+    }
+
+    /// <summary>
+    /// Updates freeze-pane counts used by workbook formatting without changing worksheet dimensions.
+    /// </summary>
+    /// <param name="newFreezeRowCount">Leading rows frozen in the workbook.</param>
+    /// <param name="newFreezeColumnCount">Leading columns frozen in the workbook.</param>
+    public void ConfigureFreezePanes(int newFreezeRowCount, int newFreezeColumnCount)
+    {
+        freezeRowCount = newFreezeRowCount;
+        freezeColumnCount = newFreezeColumnCount;
+    }
+
+    /// <summary>
     /// Ensures stable identity and serialized collections without snapping authored dimensions.
     /// </summary>
     public void ValidateValues()
@@ -229,6 +280,70 @@ public sealed class ExcelDataWorkbookSheetDefinition
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Updates preview dimensions after an explicit toolbar edit without modifying authored cell coordinates.
+    /// </summary>
+    /// <param name="newPreviewRowCount">New preview row count.</param>
+    /// <param name="newPreviewColumnCount">New preview column count.</param>
+    /// <param name="newPreviewCellWidth">New preview cell width in pixels.</param>
+    /// <param name="newPreviewCellHeight">New preview cell height in pixels.</param>
+    public void ConfigurePreview(int newPreviewRowCount,
+                                 int newPreviewColumnCount,
+                                 int newPreviewCellWidth,
+                                 int newPreviewCellHeight)
+    {
+        previewRowCount = newPreviewRowCount;
+        previewColumnCount = newPreviewColumnCount;
+        previewCellWidth = newPreviewCellWidth;
+        previewCellHeight = newPreviewCellHeight;
+    }
+
+    /// <summary>
+    /// Inserts one empty row and shifts every authored cell at or below that coordinate down by one.
+    /// </summary>
+    /// <param name="insertionRowIndex">One-based row that becomes the new empty row.</param>
+    public void InsertEmptyRow(int insertionRowIndex)
+    {
+        if (insertionRowIndex < 1 || insertionRowIndex > previewRowCount + 1)
+            throw new ArgumentOutOfRangeException(nameof(insertionRowIndex), insertionRowIndex, "Inserted row is outside the preview bounds.");
+
+        EnsureCollections();
+
+        // Shift every sparse cell independently so authored payload and style remain intact.
+        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell != null && cell.RowIndex >= insertionRowIndex)
+                cell.MoveTo(sheetId, cell.RowIndex + 1, cell.ColumnIndex);
+        }
+
+        previewRowCount++;
+    }
+
+    /// <summary>
+    /// Inserts one empty column and shifts every authored cell at or right of that coordinate by one.
+    /// </summary>
+    /// <param name="insertionColumnIndex">One-based column that becomes the new empty column.</param>
+    public void InsertEmptyColumn(int insertionColumnIndex)
+    {
+        if (insertionColumnIndex < 1 || insertionColumnIndex > previewColumnCount + 1)
+            throw new ArgumentOutOfRangeException(nameof(insertionColumnIndex), insertionColumnIndex, "Inserted column is outside the preview bounds.");
+
+        EnsureCollections();
+
+        // Shift every sparse cell independently so authored payload and style remain intact.
+        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
+
+            if (cell != null && cell.ColumnIndex >= insertionColumnIndex)
+                cell.MoveTo(sheetId, cell.RowIndex, cell.ColumnIndex + 1);
+        }
+
+        previewColumnCount++;
     }
     #endregion
 

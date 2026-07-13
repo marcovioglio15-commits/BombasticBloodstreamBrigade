@@ -55,6 +55,7 @@ public static class ManagementToolInteractiveElementColorUtility
     #region Constants
     private const string RootRegisteredClassName = "management-tool-interactive-colors-root";
     private const string InteractiveRightClickRegisteredClassName = "management-tool-interactive-colors-right-click";
+    private const string HierarchyColorExcludedClassName = "management-tool-interactive-colors-excluded";
     #endregion
 
     #region Fields
@@ -67,6 +68,26 @@ public static class ManagementToolInteractiveElementColorUtility
     #region Methods
 
     #region Public Methods
+    /// <summary>
+    /// Excludes one semantically colored control subtree from generic management-tool recoloring.
+    /// </summary>
+    /// <param name="element">Control or subtree whose authored colors must remain authoritative.</param>
+    public static void ExcludeFromHierarchyColors(VisualElement element)
+    {
+        if (element != null && !element.ClassListContains(HierarchyColorExcludedClassName))
+            element.AddToClassList(HierarchyColorExcludedClassName);
+    }
+
+    /// <summary>
+    /// Reports whether generic hierarchy recoloring must ignore one control subtree.
+    /// </summary>
+    /// <param name="element">Candidate control or subtree.</param>
+    /// <returns>True when semantic authored colors own the element presentation.</returns>
+    public static bool IsExcludedFromHierarchyColors(VisualElement element)
+    {
+        return element != null && element.ClassListContains(HierarchyColorExcludedClassName);
+    }
+
     /// <summary>
     /// Registers the provided root so current and future interactive descendants expose persistent color customization.
     /// </summary>

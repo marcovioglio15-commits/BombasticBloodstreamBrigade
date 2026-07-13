@@ -14,114 +14,150 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataBrushPalettePreset
   presetId: 79b961f8d83f4d0a838151d5fb348dde
   presetName: Default Brush Palette
+  dataTypeColors:
+    primitive: {r: 0.62, g: 0.64, b: 0.67, a: 1}
+    number: {r: 0.3, g: 0.58, b: 0.9, a: 1}
+    boolean: {r: 0.3, g: 0.7, b: 0.42, a: 1}
+    enumeration: {r: 0.32, g: 0.7, b: 0.78, a: 1}
+    text: {r: 0.72, g: 0.73, b: 0.76, a: 1}
+    objectReference: {r: 0.84, g: 0.35, b: 0.35, a: 1}
+    color: {r: 0.78, g: 0.42, b: 0.66, a: 1}
+    vector: {r: 0.3, g: 0.68, b: 0.62, a: 1}
+    curve: {r: 0.58, g: 0.46, b: 0.76, a: 1}
+    listSize: {r: 0.86, g: 0.55, b: 0.24, a: 1}
+    listValue: {r: 0.34, g: 0.72, b: 0.5, a: 1}
+    literalText: {r: 0.82, g: 0.72, b: 0.32, a: 1}
+    unresolved: {r: 0.55, g: 0.2, b: 0.2, a: 1}
   brushes:
   - brushId: 0db334234f1c4f91a2e82fcb7e0db10c
     brushName: Any Field
     domain: 0
-    category: 0
     dataKind: 0
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.9150943, g: 0.06474723, b: 0.06474723, a: 1}
     searchTokens: all any field
     description: Generic brush that opens the full field catalog.
   - brushId: 3405cbc0c8f743cc97c0ea72f4819609
     brushName: References
     domain: 0
-    category: 0
     dataKind: 6
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.45, g: 0.7, b: 1, a: 1}
     searchTokens: asset reference prefab material guid name
     description: Brush for asset reference fields resolved through the project AssetDatabase.
   - brushId: 30b520f6ee9749329cf0afbd99f11c20
     brushName: Lists
     domain: 0
-    category: 0
-    dataKind: 12
-    listFilter: 1
+    dataKind: 0
+    listFilter: 2
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.45, g: 1, b: 0.65, a: 1}
     searchTokens: list array element concrete item wave cell
     description: Brush for concrete list elements and nested list data.
   - brushId: a79502cee46649ae981562f864b73b66
     brushName: Waves
     domain: 4
-    category: 0
     dataKind: 0
-    listFilter: 1
+    listFilter: 0
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 1, g: 0.74, b: 0.36, a: 1}
     searchTokens: enemy wave painted cell spawn
     description: Brush for EnemyWavePreset wave and painted-cell data.
   - brushId: ebbdeb1003564340a1a0198ccf4f7515
     brushName: Numbers
     domain: 0
-    category: 0
     dataKind: 2
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.45, g: 0.68, b: 1, a: 1}
     searchTokens: number float int stat scaling
     description: Brush for numeric tuning values, stats and scaling-friendly fields.
   - brushId: 1838a3ce8e6b4217a2d677e0f6a64ef1
     brushName: Booleans
     domain: 0
-    category: 0
     dataKind: 3
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.48, g: 0.86, b: 0.58, a: 1}
     searchTokens: bool toggle enabled disabled
     description: Brush for boolean toggle fields.
   - brushId: af28b11564ce40469d108e66881b73cb
     brushName: Enums
     domain: 0
-    category: 0
     dataKind: 4
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.88, g: 0.68, b: 1, a: 1}
     searchTokens: enum mode type policy
     description: Brush for enum mode and policy fields.
   - brushId: f4ad40b938c44d24808c1d1c094c3be4
     brushName: Strings
     domain: 0
-    category: 0
     dataKind: 5
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 0
     color: {r: 0.9, g: 0.82, b: 0.48, a: 1}
     searchTokens: string label id name description
     description: Brush for text identifiers, labels and descriptions.
   - brushId: 652cfdf62b8b4321ab632a2ad16b5330
     brushName: Export - Player Numbers
     domain: 1
-    category: 0
     dataKind: 2
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 2
     color: {r: 0.34, g: 0.62, b: 1, a: 1}
     searchTokens: export player number tuning speed damage cooldown
     description: Test brush for exporting readable player numeric tuning fields.
   - brushId: fdbba9bbefb04e4da7a9aa7bf925a1fc
     brushName: Export - Enemy Waves
     domain: 4
-    category: 8
     dataKind: 0
     listFilter: 0
     sourceFilter: Wave
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 2
     color: {r: 1, g: 0.62, b: 0.28, a: 1}
     searchTokens: export wave enemy spawn timing group
     description: Test brush for exporting enemy wave and spawn-related data.
   - brushId: 8d09236a85804bdea8246adc15a65dae
     brushName: Import - References
     domain: 0
-    category: 9
     dataKind: 6
     listFilter: 1
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 1
     color: {r: 0.42, g: 0.82, b: 0.95, a: 1}
     searchTokens: import reference asset prefab guid name path
     description: Test brush for importing asset references by readable asset name
@@ -129,10 +165,12 @@ MonoBehaviour:
   - brushId: 75be3dedaa9947ce811e4581dfaec45f
     brushName: Import - Lists
     domain: 0
-    category: 0
-    dataKind: 12
-    listFilter: 0
+    dataKind: 0
+    listFilter: 2
     sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
+    direction: 1
     color: {r: 0.5, g: 0.95, b: 0.52, a: 1}
     searchTokens: import list concrete array element item
     description: Test brush for importing concrete list elements and list-backed

@@ -4,7 +4,7 @@ using System.IO;
 using UnityEngine;
 
 /// <summary>
-/// Editor-only smoke test for the first Excel Data Transfer Tool implementation tranche.
+/// Editor-only smoke test for the complete grid-authoritative Excel Data Transfer Tool pipeline.
 /// </summary>
 public static class ExcelDataTransferToolSmokeTest
 {
@@ -57,17 +57,22 @@ public static class ExcelDataTransferToolSmokeTest
         if (masterPreset.BrushPalettePreset.Brushes.Count <= 0)
             throw new InvalidOperationException("Default Excel data transfer brush palette has no brushes.");
 
-        if (masterPreset.LayoutPreset.CellMappings.Count <= 0)
-            throw new InvalidOperationException("Default Excel data transfer layout preset has no practical mappings.");
-
         if (masterPreset.LayoutPreset.SheetDefinitions.Count <= 0)
             throw new InvalidOperationException("Default Excel data transfer layout preset has no grid-authoritative worksheets.");
 
-        if (masterPreset.ImportPreset.SelectedFields.Count <= 0)
-            throw new InvalidOperationException("Default Excel data transfer import preset has no selected fields.");
+        int authoritativeCellCount = 0;
 
-        if (masterPreset.ExportPreset.SelectedFields.Count <= 0)
-            throw new InvalidOperationException("Default Excel data transfer export preset has no selected fields.");
+        // Count exact cells across sheets instead of relying on removed parallel selection or mapping lists.
+        for (int sheetIndex = 0; sheetIndex < masterPreset.LayoutPreset.SheetDefinitions.Count; sheetIndex++)
+        {
+            ExcelDataWorkbookSheetDefinition sheet = masterPreset.LayoutPreset.SheetDefinitions[sheetIndex];
+
+            if (sheet != null)
+                authoritativeCellCount += sheet.Cells.Count;
+        }
+
+        if (authoritativeCellCount <= 0)
+            throw new InvalidOperationException("Default Excel data transfer layout preset has no authoritative cells.");
     }
 
     /// <summary>
@@ -78,6 +83,7 @@ public static class ExcelDataTransferToolSmokeTest
     {
         bool hasWaveEntry = false;
         bool hasConcreteListElement = false;
+        bool hasReadableListIdentifier = false;
         bool hasObjectReference = false;
 
         for (int entryIndex = 0; entryIndex < entries.Count; entryIndex++)
@@ -91,7 +97,17 @@ public static class ExcelDataTransferToolSmokeTest
                 hasWaveEntry = true;
 
             if (entry.IsConcreteListElement)
+            {
                 hasConcreteListElement = true;
+
+                if (entry.ReadablePath.Contains("_1", StringComparison.Ordinal) ||
+                    entry.ReadablePath.Contains("_2", StringComparison.Ordinal))
+                    hasReadableListIdentifier = true;
+            }
+
+            if (entry.DataKind == ExcelDataBrushDataKind.ListContainer ||
+                entry.DataKind == ExcelDataBrushDataKind.ListElement)
+                throw new InvalidOperationException("Field catalog still exposes a Generic/Complex list entry: " + entry.SerializedPath);
 
             if (entry.DataKind == ExcelDataBrushDataKind.ObjectReference)
                 hasObjectReference = true;
@@ -102,6 +118,9 @@ public static class ExcelDataTransferToolSmokeTest
 
         if (!hasConcreteListElement)
             throw new InvalidOperationException("Field catalog does not expose concrete list element paths.");
+
+        if (!hasReadableListIdentifier)
+            throw new InvalidOperationException("Concrete list elements do not expose readable one-based identifiers.");
 
         if (!hasObjectReference)
             throw new InvalidOperationException("Field catalog does not expose object reference fields.");

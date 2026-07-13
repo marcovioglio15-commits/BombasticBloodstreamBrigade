@@ -45,28 +45,13 @@ internal static class ExcelDataLinkedSubPresetPanelWorkbookUtility
     /// <param name="section">Section receiving the controls.</param>
     private static void BuildImportWorkbookSection(SerializedObject serializedObject, VisualElement section)
     {
-        TextField customPathField = null;
-
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "sourceWorkbookProfile",
-                                                                    "Source Workbook Profile",
-                                                                    "Known workbook source profile used for import.",
-                                                                    index => SetCustomPathVisibility(customPathField, index));
-        customPathField =
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddStringField(section,
-                                                                     serializedObject,
-                                                                     "sourceWorkbookPath",
-                                                                     "Custom Source Workbook Path",
-                                                                     "Custom path shown only when Source Workbook Profile is Custom Path.");
-        SetCustomPathVisibility(customPathField,
-                                ExcelDataLinkedSubPresetPanelFieldUtility.ResolveEnumValueIndex(serializedObject, "sourceWorkbookProfile"));
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "expectedLayoutMode",
-                                                                    "Expected Layout Mode",
-                                                                    "Workbook shape expected by this import preset.",
-                                                                    null);
+        ExcelDataWorkbookPathFieldUtility.Build(section,
+                                                serializedObject,
+                                                "sourceWorkbookProfile",
+                                                "sourceWorkbookPath",
+                                                ExcelDataWorkbookPathAccess.Import,
+                                                "Source Workbook Profile",
+                                                "Select a known import source or Custom Path. Every profile shows its exact project-relative and absolute path; Custom Path also exposes Assets and external .xlsx pickers.");
     }
 
     /// <summary>
@@ -76,49 +61,15 @@ internal static class ExcelDataLinkedSubPresetPanelWorkbookUtility
     /// <param name="section">Section receiving the controls.</param>
     private static void BuildExportWorkbookSection(SerializedObject serializedObject, VisualElement section)
     {
-        TextField customPathField = null;
-
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "targetWorkbookProfile",
-                                                                    "Target Workbook Profile",
-                                                                    "Known workbook destination profile used by export.",
-                                                                    index => SetCustomPathVisibility(customPathField, index));
-        customPathField =
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddStringField(section,
-                                                                     serializedObject,
-                                                                     "targetWorkbookPath",
-                                                                     "Custom Target Workbook Path",
-                                                                     "Custom path shown only when Target Workbook Profile is Custom Path.");
-        SetCustomPathVisibility(customPathField,
-                                ExcelDataLinkedSubPresetPanelFieldUtility.ResolveEnumValueIndex(serializedObject, "targetWorkbookProfile"));
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "layoutMode",
-                                                                    "Layout Mode",
-                                                                    "Workbook shape written by this export preset.",
-                                                                    null);
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "listElementMode",
-                                                                    "List Element Mode",
-                                                                    "Controls list template and concrete-element export.",
-                                                                    null);
+        ExcelDataWorkbookPathFieldUtility.Build(section,
+                                                serializedObject,
+                                                "targetWorkbookProfile",
+                                                "targetWorkbookPath",
+                                                ExcelDataWorkbookPathAccess.Export,
+                                                "Target Workbook Profile",
+                                                "Select a known export destination or Custom Path. Every profile shows its exact project-relative and absolute path; Custom Path also exposes Assets-folder and external .xlsx pickers.");
     }
 
-    /// <summary>
-    /// Shows custom path fields only when the selected workbook profile requires them.
-    /// </summary>
-    /// <param name="customPathField">Text field to show or hide.</param>
-    /// <param name="profileIndex">Selected workbook profile enum index.</param>
-    private static void SetCustomPathVisibility(VisualElement customPathField, int profileIndex)
-    {
-        if (customPathField == null)
-            return;
-
-        customPathField.style.display =
-            profileIndex == (int)ExcelDataWorkbookPathProfile.CustomPath ? DisplayStyle.Flex : DisplayStyle.None;
-    }
     #endregion
 
     #endregion

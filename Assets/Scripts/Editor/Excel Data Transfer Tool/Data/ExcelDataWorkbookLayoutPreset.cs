@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Editor-only workbook layout preset that stores sheet names, grid dimensions and painted cell mappings.
+/// Editor-only workbook layout preset that stores grid-authoritative sheets and exact authored cells.
 /// </summary>
 [CreateAssetMenu(fileName = "ExcelDataWorkbookLayoutPreset", menuName = "Tools/Excel Data Transfer/Workbook Layout Preset", order = 203)]
 public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
@@ -18,18 +18,9 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
     [Tooltip("Readable layout preset name shown in the Excel Data Transfer Tool.")]
     [SerializeField] private string presetName = "Default Workbook Layout";
 
-    [Header("Sheets")]
-    [Tooltip("Manifest worksheet name used for tool/version metadata.")]
-    [SerializeField] private string manifestSheetName = "Manifest";
-
-    [Tooltip("Object worksheet name used by normalized ScriptableObject rows.")]
+    [Header("Sheet Defaults")]
+    [Tooltip("Default visible worksheet name used when a new layout has no authored sheet yet.")]
     [SerializeField] private string objectsSheetName = "Objects";
-
-    [Tooltip("Reference worksheet name used to record asset-name, GUID and path metadata.")]
-    [SerializeField] private string referencesSheetName = "References";
-
-    [Tooltip("Wave worksheet name used by normalized enemy wave rows.")]
-    [SerializeField] private string wavesSheetName = "Waves";
 
     [Header("Brush Grid")]
     [Tooltip("Default number of rows shown by the brush layout grid.")]
@@ -48,20 +39,8 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
     [Min(18)]
     [SerializeField] private int defaultCellHeight = 28;
 
-    [Tooltip("One-based row where generated data starts in brush-grid exports.")]
-    [Min(1)]
-    [SerializeField] private int dataStartRow = 2;
-
-    [Tooltip("One-based column where generated data starts in brush-grid exports.")]
-    [Min(1)]
-    [SerializeField] private int dataStartColumn = 1;
-
-    [Header("Mappings")]
-    [Tooltip("Painted cell mappings used to bind workbook cells to catalog fields.")]
-    [SerializeField] private List<ExcelDataCellBrushMapping> cellMappings = new List<ExcelDataCellBrushMapping>();
-
-    [Header("Grid-Authoritative Sheets")]
-    [Tooltip("Cell-oriented worksheet definitions staged for the grid-authoritative import and export pipeline.")]
+    [Header("Authoritative Sheets")]
+    [Tooltip("Ordered worksheet definitions containing every exact Data Field and Literal Text cell used by import and export.")]
     [SerializeField] private List<ExcelDataWorkbookSheetDefinition> sheetDefinitions = new List<ExcelDataWorkbookSheetDefinition>();
     #endregion
 
@@ -84,35 +63,11 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
         }
     }
 
-    public string ManifestSheetName
-    {
-        get
-        {
-            return manifestSheetName;
-        }
-    }
-
     public string ObjectsSheetName
     {
         get
         {
             return objectsSheetName;
-        }
-    }
-
-    public string ReferencesSheetName
-    {
-        get
-        {
-            return referencesSheetName;
-        }
-    }
-
-    public string WavesSheetName
-    {
-        get
-        {
-            return wavesSheetName;
         }
     }
 
@@ -148,31 +103,6 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
         }
     }
 
-    public int DataStartRow
-    {
-        get
-        {
-            return dataStartRow;
-        }
-    }
-
-    public int DataStartColumn
-    {
-        get
-        {
-            return dataStartColumn;
-        }
-    }
-
-    public List<ExcelDataCellBrushMapping> CellMappings
-    {
-        get
-        {
-            EnsureCollections();
-            return cellMappings;
-        }
-    }
-
     public List<ExcelDataWorkbookSheetDefinition> SheetDefinitions
     {
         get
@@ -187,7 +117,7 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
 
     #region Public Methods
     /// <summary>
-    /// Ensures this layout preset owns stable metadata, valid dimensions and non-null mappings.
+    /// Ensures this layout preset owns stable metadata and non-null authoritative sheet definitions.
     /// </summary>
     public void ValidateValues()
     {
@@ -197,17 +127,8 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
         if (string.IsNullOrWhiteSpace(presetName))
             presetName = "Workbook Layout";
 
-        if (string.IsNullOrWhiteSpace(manifestSheetName))
-            manifestSheetName = "Manifest";
-
         if (string.IsNullOrWhiteSpace(objectsSheetName))
             objectsSheetName = "Objects";
-
-        if (string.IsNullOrWhiteSpace(referencesSheetName))
-            referencesSheetName = "References";
-
-        if (string.IsNullOrWhiteSpace(wavesSheetName))
-            wavesSheetName = "Waves";
 
         EnsureCollections();
 
@@ -222,11 +143,29 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
             sheetDefinition.ValidateValues();
         }
     }
+
+    /// <summary>
+    /// Synchronizes defaults used by newly created sheets after the primary sheet preview is edited or restored.
+    /// </summary>
+    /// <param name="rowCount">Preview row count.</param>
+    /// <param name="columnCount">Preview column count.</param>
+    /// <param name="cellWidth">Preview cell width in pixels.</param>
+    /// <param name="cellHeight">Preview cell height in pixels.</param>
+    internal void ConfigureGridDefaults(int rowCount,
+                                        int columnCount,
+                                        int cellWidth,
+                                        int cellHeight)
+    {
+        defaultGridRows = rowCount;
+        defaultGridColumns = columnCount;
+        defaultCellWidth = cellWidth;
+        defaultCellHeight = cellHeight;
+    }
     #endregion
 
     #region Unity Methods
     /// <summary>
-    /// Keeps serialized mappings valid when the preset is edited directly.
+    /// Keeps authoritative sheet metadata valid when the preset is edited directly.
     /// </summary>
     private void OnValidate()
     {
@@ -240,9 +179,6 @@ public sealed class ExcelDataWorkbookLayoutPreset : ScriptableObject
     /// </summary>
     private void EnsureCollections()
     {
-        if (cellMappings == null)
-            cellMappings = new List<ExcelDataCellBrushMapping>();
-
         if (sheetDefinitions == null)
             sheetDefinitions = new List<ExcelDataWorkbookSheetDefinition>();
     }

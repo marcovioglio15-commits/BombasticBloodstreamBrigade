@@ -90,7 +90,8 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
             throw new ArgumentNullException(nameof(buildResult));
 
         ValidateUserSheets(buildResult);
-        int rowCount = 2 + buildResult.Sheets.Count + buildResult.Cells.Count;
+        List<ExcelDataWorkbookSheetDefinition> authoredSheets = masterPreset.LayoutPreset.SheetDefinitions;
+        int rowCount = 2 + authoredSheets.Count + CountAuthoredCells(authoredSheets);
         ExcelDataWorkbookSheetDocument technicalSheet =
             buildResult.Document.AddSheet(TechnicalSheetName,
                                           rowCount,
@@ -99,19 +100,32 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
         WriteHeaders(technicalSheet);
         WriteWorkbookRecord(technicalSheet, masterPreset, layoutHash, exportedUtc);
         int nextRowIndex = 3;
+        Dictionary<string, ExcelDataSerializedValueSnapshot> snapshotsByCell = BuildSnapshotLookup(buildResult.Cells);
 
-        // Record every materialized user sheet before its cells for deterministic round-trip parsing.
-        for (int sheetIndex = 0; sheetIndex < buildResult.Sheets.Count; sheetIndex++)
+        // Record every authored sheet, including import-only sheets omitted from visible export output.
+        for (int sheetIndex = 0; sheetIndex < authoredSheets.Count; sheetIndex++)
         {
-            WriteSheetRecord(technicalSheet, nextRowIndex, buildResult.Sheets[sheetIndex].Definition);
-            nextRowIndex++;
-        }
+            ExcelDataWorkbookSheetDefinition sheet = authoredSheets[sheetIndex];
 
-        // Record every exact cell, including blank warning cells and reference metadata.
-        for (int cellIndex = 0; cellIndex < buildResult.Cells.Count; cellIndex++)
-        {
-            WriteCellRecord(technicalSheet, nextRowIndex, buildResult.Cells[cellIndex]);
+            if (sheet == null)
+                continue;
+
+            WriteSheetRecord(technicalSheet, nextRowIndex, sheet);
             nextRowIndex++;
+
+            // Store every authored cell so import-only directions and literal organizers round-trip exactly.
+            for (int cellIndex = 0; cellIndex < sheet.Cells.Count; cellIndex++)
+            {
+                ExcelDataWorkbookCellDefinition cell = sheet.Cells[cellIndex];
+
+                if (cell == null || !cell.IsUsable())
+                    continue;
+
+                ExcelDataSerializedValueSnapshot snapshot;
+                snapshotsByCell.TryGetValue(BuildCellKey(sheet.SheetId, cell.RowIndex, cell.ColumnIndex), out snapshot);
+                WriteCellRecord(technicalSheet, nextRowIndex, sheet, cell, snapshot);
+                nextRowIndex++;
+            }
         }
 
         return rowCount;
@@ -218,18 +232,20 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
     /// </summary>
     /// <param name="technicalSheet">Technical worksheet receiving the record.</param>
     /// <param name="rowIndex">One-based technical row index.</param>
-    /// <param name="record">Exported cell record.</param>
+    /// <param name="sheet">Authored worksheet containing the cell.</param>
+    /// <param name="cell">Exact authored cell definition.</param>
+    /// <param name="snapshot">Optional exported value and reference metadata.</param>
     private static void WriteCellRecord(ExcelDataWorkbookSheetDocument technicalSheet,
                                         int rowIndex,
-                                        ExcelDataWorkbookExportCellRecord record)
+                                        ExcelDataWorkbookSheetDefinition sheet,
+                                        ExcelDataWorkbookCellDefinition cell,
+                                        ExcelDataSerializedValueSnapshot snapshot)
     {
-        ExcelDataWorkbookCellDefinition cell = record.CellDefinition;
         ExcelDataFieldBinding binding = cell.FieldBinding;
-        ExcelDataSerializedValueSnapshot snapshot = record.Snapshot;
         technicalSheet.SetValue(rowIndex, 1, CellRecordType);
-        technicalSheet.SetValue(rowIndex, 10, record.SheetDefinition.SheetId);
-        technicalSheet.SetValue(rowIndex, 11, record.SheetDefinition.SheetName);
-        technicalSheet.SetValue(rowIndex, 12, ExcelDataWorkbookPathUtility.SanitizeSheetName(record.SheetDefinition.SheetName, "Sheet"));
+        technicalSheet.SetValue(rowIndex, 10, sheet.SheetId);
+        technicalSheet.SetValue(rowIndex, 11, sheet.SheetName);
+        technicalSheet.SetValue(rowIndex, 12, ExcelDataWorkbookPathUtility.SanitizeSheetName(sheet.SheetName, "Sheet"));
         technicalSheet.SetValue(rowIndex, 22, cell.RowIndex);
         technicalSheet.SetValue(rowIndex, 23, cell.ColumnIndex);
         technicalSheet.SetValue(rowIndex, 24, cell.ContentKind.ToString());
@@ -283,6 +299,77 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
         technicalSheet.SetValue(rowIndex, 42, snapshot.ReferenceGuid);
         technicalSheet.SetValue(rowIndex, 43, snapshot.ReferencePath);
         technicalSheet.SetValue(rowIndex, 44, snapshot.Warning);
+    }
+    #endregion
+
+    #region Snapshot Lookup
+    /// <summary>
+    /// Counts every usable authored cell included in the complete hidden layout snapshot.
+    /// </summary>
+    /// <param name="sheets">Authoritative worksheet definitions.</param>
+    /// <returns>Number of usable cells across all sheets.</returns>
+    private static int CountAuthoredCells(List<ExcelDataWorkbookSheetDefinition> sheets)
+    {
+        int cellCount = 0;
+
+        // Count sparse authored cells without allocating an intermediate flattened collection.
+        for (int sheetIndex = 0; sheetIndex < sheets.Count; sheetIndex++)
+        {
+            ExcelDataWorkbookSheetDefinition sheet = sheets[sheetIndex];
+
+            if (sheet == null)
+                continue;
+
+            for (int cellIndex = 0; cellIndex < sheet.Cells.Count; cellIndex++)
+            {
+                ExcelDataWorkbookCellDefinition cell = sheet.Cells[cellIndex];
+
+                if (cell != null && cell.IsUsable())
+                    cellCount++;
+            }
+        }
+
+        return cellCount;
+    }
+
+    /// <summary>
+    /// Indexes materialized export snapshots so complete layout metadata can reuse reference diagnostics when available.
+    /// </summary>
+    /// <param name="records">Visible export cell records.</param>
+    /// <returns>Snapshots keyed by stable worksheet ID and exact coordinate.</returns>
+    private static Dictionary<string, ExcelDataSerializedValueSnapshot> BuildSnapshotLookup(
+        IReadOnlyList<ExcelDataWorkbookExportCellRecord> records)
+    {
+        Dictionary<string, ExcelDataSerializedValueSnapshot> snapshots =
+            new Dictionary<string, ExcelDataSerializedValueSnapshot>(StringComparer.Ordinal);
+
+        // Keep the latest record for a duplicate key; duplicate visible coordinates are blocked earlier by document building.
+        for (int recordIndex = 0; recordIndex < records.Count; recordIndex++)
+        {
+            ExcelDataWorkbookExportCellRecord record = records[recordIndex];
+
+            if (record == null || record.SheetDefinition == null || record.CellDefinition == null)
+                continue;
+
+            snapshots[BuildCellKey(record.SheetDefinition.SheetId,
+                                   record.CellDefinition.RowIndex,
+                                   record.CellDefinition.ColumnIndex)] = record.Snapshot;
+        }
+
+        return snapshots;
+    }
+
+    /// <summary>
+    /// Builds one collision-safe hidden snapshot coordinate key.
+    /// </summary>
+    /// <param name="sheetId">Stable worksheet identifier.</param>
+    /// <param name="rowIndex">One-based worksheet row.</param>
+    /// <param name="columnIndex">One-based worksheet column.</param>
+    /// <returns>Stable worksheet and coordinate key.</returns>
+    private static string BuildCellKey(string sheetId, int rowIndex, int columnIndex)
+    {
+        return (sheetId ?? string.Empty) + ":" + rowIndex.ToString(CultureInfo.InvariantCulture) +
+               ":" + columnIndex.ToString(CultureInfo.InvariantCulture);
     }
     #endregion
 

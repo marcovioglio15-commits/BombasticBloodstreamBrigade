@@ -114,6 +114,7 @@ internal static class ExcelDataFieldCatalogBuilder
     {
         SerializedObject serializedObject = new SerializedObject(assetObject);
         SerializedProperty iterator = serializedObject.GetIterator();
+        Dictionary<string, string> stableKeyCache = new Dictionary<string, string>(StringComparer.Ordinal);
 
         // Enter every visible serialized child so list elements and nested structs are individually discoverable.
         while (iterator.NextVisible(true))
@@ -126,7 +127,13 @@ internal static class ExcelDataFieldCatalogBuilder
             if (!IsBrushableProperty(propertyCopy))
                 continue;
 
-            entries.Add(CreateEntry(source, assetObject, assetPath, assetGuid, propertyCopy));
+            entries.Add(CreateEntry(source,
+                                    assetObject,
+                                    assetPath,
+                                    assetGuid,
+                                    serializedObject,
+                                    stableKeyCache,
+                                    propertyCopy));
         }
     }
     #endregion
@@ -139,24 +146,35 @@ internal static class ExcelDataFieldCatalogBuilder
     /// <param name="assetObject">Asset instance that owns the property.</param>
     /// <param name="assetPath">Project-relative asset path.</param>
     /// <param name="assetGuid">Asset GUID used by stable field identifiers.</param>
+    /// <param name="serializedObject">Serialized owner used to resolve stable list keys.</param>
+    /// <param name="stableKeyCache">Per-asset stable list-key cache.</param>
     /// <param name="property">Serialized property copy used to infer metadata.</param>
     /// <returns>Catalog entry for the provided property.</returns>
     private static ExcelDataFieldCatalogEntry CreateEntry(ExcelDataFieldCatalogSourceDefinition source,
                                                           UnityEngine.Object assetObject,
                                                           string assetPath,
                                                           string assetGuid,
+                                                          SerializedObject serializedObject,
+                                                          IDictionary<string, string> stableKeyCache,
                                                           SerializedProperty property)
     {
         string serializedPath = property.propertyPath;
         string pathTemplate = BuildPathTemplate(serializedPath);
         int listDepth = CountListDepth(serializedPath);
         bool isConcreteListElement = listDepth > 0;
-        bool isListContainer = IsListContainer(property) || IsListSizeProperty(property);
-        ExcelDataBrushDataKind dataKind = ResolveDataKind(property, isConcreteListElement, isListContainer);
+        bool isListContainer = IsListSizeProperty(property);
+        ExcelDataBrushDataKind dataKind = ResolveDataKind(property);
         ExcelDataFieldCategory category = ResolveCategory(source.Domain, serializedPath, dataKind);
         string assetTypeName = source.AssetType.Name;
         string fieldId = source.Domain + ":" + assetGuid + ":" + assetTypeName + ":" + serializedPath;
-        string displayName = assetObject.name + " / " + pathTemplate;
+        List<int> concreteListIndices;
+        List<string> stableListKeys;
+        string readablePath = ExcelDataListIdentityUtility.BuildReadablePath(serializedObject,
+                                                                             serializedPath,
+                                                                             stableKeyCache,
+                                                                             out concreteListIndices,
+                                                                             out stableListKeys);
+        string displayName = assetObject.name + " / " + readablePath;
         string valueTypeName = ResolveValueTypeName(property);
         string searchText = BuildSearchText(source.Domain,
                                             category,
@@ -166,9 +184,11 @@ internal static class ExcelDataFieldCatalogBuilder
                                             assetPath,
                                             serializedPath,
                                             pathTemplate,
+                                            readablePath,
                                             valueTypeName,
                                             isConcreteListElement,
-                                            listDepth);
+                                            listDepth,
+                                            stableListKeys);
 
         return new ExcelDataFieldCatalogEntry(fieldId,
                                               source.Domain,
@@ -179,12 +199,15 @@ internal static class ExcelDataFieldCatalogBuilder
                                               assetPath,
                                               serializedPath,
                                               pathTemplate,
+                                              readablePath,
                                               displayName,
                                               valueTypeName,
                                               searchText,
                                               isConcreteListElement,
                                               isListContainer,
-                                              listDepth);
+                                              listDepth,
+                                              concreteListIndices,
+                                              stableListKeys);
     }
 
     /// <summary>
@@ -198,9 +221,11 @@ internal static class ExcelDataFieldCatalogBuilder
     /// <param name="assetPath">Project-relative asset path.</param>
     /// <param name="serializedPath">Concrete serialized property path.</param>
     /// <param name="pathTemplate">Tokenized serialized property path.</param>
+    /// <param name="readablePath">Readable one-based serialized path.</param>
     /// <param name="valueTypeName">Readable value type name.</param>
     /// <param name="isConcreteListElement">True when the field belongs to a concrete list item.</param>
     /// <param name="listDepth">Nested list depth of the field path.</param>
+    /// <param name="stableListKeys">Stable list keys discovered for the field.</param>
     /// <returns>Searchable text with domain, type, path and smart aliases.</returns>
     private static string BuildSearchText(ExcelDataTransferDomain domain,
                                           ExcelDataFieldCategory category,
@@ -210,9 +235,11 @@ internal static class ExcelDataFieldCatalogBuilder
                                           string assetPath,
                                           string serializedPath,
                                           string pathTemplate,
+                                          string readablePath,
                                           string valueTypeName,
                                           bool isConcreteListElement,
-                                          int listDepth)
+                                          int listDepth,
+                                          IReadOnlyList<string> stableListKeys)
     {
         string aliases = string.Empty;
 
@@ -225,9 +252,12 @@ internal static class ExcelDataFieldCatalogBuilder
         if (listDepth > 1)
             aliases += " nested list";
 
+        string stableKeyText = ExcelDataListIdentityUtility.BuildStableKeySearchText(stableListKeys);
+
         string rawText = domain + " " + category + " " + dataKind + " " + assetTypeName + " " +
                          assetName + " " + assetPath + " " + serializedPath + " " +
-                         pathTemplate + " " + valueTypeName + aliases;
+                         pathTemplate + " " + readablePath + " " + stableKeyText + " " +
+                         valueTypeName + aliases;
         return rawText.ToLowerInvariant();
     }
     #endregion
@@ -256,32 +286,11 @@ internal static class ExcelDataFieldCatalogBuilder
     /// <returns>True when the property is a leaf, list container, list size or concrete list element.</returns>
     private static bool IsBrushableProperty(SerializedProperty property)
     {
-        if (IsListContainer(property))
-            return true;
-
         if (IsListSizeProperty(property))
             return true;
 
-        if (property.propertyPath.Contains(UnityListToken) && property.propertyType == SerializedPropertyType.Generic)
-            return true;
-
+        // Generic containers serialize as Complex and are not directly useful to workbook users.
         return property.propertyType != SerializedPropertyType.Generic;
-    }
-
-    /// <summary>
-    /// Checks whether a property is the serialized list container row.
-    /// </summary>
-    /// <param name="property">Serialized property to inspect.</param>
-    /// <returns>True when the property is an array/list container and not a string.</returns>
-    private static bool IsListContainer(SerializedProperty property)
-    {
-        if (property == null)
-            return false;
-
-        if (property.propertyType == SerializedPropertyType.String)
-            return false;
-
-        return property.isArray && property.propertyType == SerializedPropertyType.Generic;
     }
 
     /// <summary>
@@ -303,21 +312,11 @@ internal static class ExcelDataFieldCatalogBuilder
     /// Resolves the brush value kind from one serialized property.
     /// </summary>
     /// <param name="property">Serialized property to inspect.</param>
-    /// <param name="isConcreteListElement">True when the property path contains concrete list indexes.</param>
-    /// <param name="isListContainer">True when the property describes a list container or list size.</param>
     /// <returns>Brush data kind used by filters and workbook formatting.</returns>
-    private static ExcelDataBrushDataKind ResolveDataKind(SerializedProperty property,
-                                                          bool isConcreteListElement,
-                                                          bool isListContainer)
+    private static ExcelDataBrushDataKind ResolveDataKind(SerializedProperty property)
     {
         if (IsListSizeProperty(property))
             return ExcelDataBrushDataKind.ListSize;
-
-        if (isListContainer)
-            return ExcelDataBrushDataKind.ListContainer;
-
-        if (isConcreteListElement && property.propertyType == SerializedPropertyType.Generic)
-            return ExcelDataBrushDataKind.ListElement;
 
         switch (property.propertyType)
         {

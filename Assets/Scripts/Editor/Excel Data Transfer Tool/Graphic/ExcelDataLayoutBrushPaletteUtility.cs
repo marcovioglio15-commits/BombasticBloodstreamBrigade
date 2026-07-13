@@ -86,21 +86,26 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// <param name="brushPalettePreset">Brush palette searched by dropdown option.</param>
     /// <param name="optionLabel">Visible brush option selected by the user.</param>
     /// <param name="domainField">Domain filter control.</param>
-    /// <param name="categoryField">Category filter control.</param>
     /// <param name="dataKindField">Data kind filter control.</param>
     /// <param name="listModeField">List element filter control.</param>
-    /// <param name="sourceSearchField">Source search filter control.</param>
+    /// <param name="sourceTypeSearchField">Source type search control.</param>
+    /// <param name="sourceAssetSearchField">Concrete source asset search control.</param>
+    /// <param name="fieldSearchField">General field search control.</param>
     /// <param name="brushColorField">Brush color control.</param>
+    /// <param name="direction">Saved transfer direction when a brush is resolved.</param>
     /// <returns>True when a saved brush was found and applied.</returns>
     public static bool ApplySavedBrushConfiguration(ExcelDataBrushPalettePreset brushPalettePreset,
                                                     string optionLabel,
                                                     EnumField domainField,
-                                                    EnumField categoryField,
                                                     EnumField dataKindField,
                                                     EnumField listModeField,
-                                                    ToolbarSearchField sourceSearchField,
-                                                    ColorField brushColorField)
+                                                    ToolbarSearchField sourceTypeSearchField,
+                                                    ToolbarSearchField sourceAssetSearchField,
+                                                    ToolbarSearchField fieldSearchField,
+                                                    ColorField brushColorField,
+                                                    out ExcelDataTransferDirection direction)
     {
+        direction = ExcelDataTransferDirection.Both;
         ExcelDataBrushDefinition brush = FindBrushByOption(brushPalettePreset, optionLabel);
 
         if (brush == null)
@@ -109,21 +114,25 @@ internal static class ExcelDataLayoutBrushPaletteUtility
         if (domainField != null)
             domainField.SetValueWithoutNotify(brush.Domain);
 
-        if (categoryField != null)
-            categoryField.SetValueWithoutNotify(brush.Category);
-
         if (dataKindField != null)
             dataKindField.SetValueWithoutNotify(brush.DataKind);
 
         if (listModeField != null)
             listModeField.SetValueWithoutNotify(brush.ListFilter);
 
-        if (sourceSearchField != null)
-            sourceSearchField.SetValueWithoutNotify(string.IsNullOrWhiteSpace(brush.SourceFilter) ? string.Empty : brush.SourceFilter);
+        if (sourceTypeSearchField != null)
+            sourceTypeSearchField.SetValueWithoutNotify(string.IsNullOrWhiteSpace(brush.SourceFilter) ? string.Empty : brush.SourceFilter);
+
+        if (sourceAssetSearchField != null)
+            sourceAssetSearchField.SetValueWithoutNotify(string.IsNullOrWhiteSpace(brush.SourceAssetFilter) ? string.Empty : brush.SourceAssetFilter);
+
+        if (fieldSearchField != null)
+            fieldSearchField.SetValueWithoutNotify(string.IsNullOrWhiteSpace(brush.FieldSearchFilter) ? string.Empty : brush.FieldSearchFilter);
 
         if (brushColorField != null)
             brushColorField.SetValueWithoutNotify(brush.Color);
 
+        direction = brush.Direction;
         return true;
     }
 
@@ -132,23 +141,25 @@ internal static class ExcelDataLayoutBrushPaletteUtility
     /// </summary>
     /// <param name="brushPalettePreset">Brush palette receiving the saved configuration.</param>
     /// <param name="domainField">Domain filter control.</param>
-    /// <param name="categoryField">Category filter control.</param>
     /// <param name="dataKindField">Data kind filter control.</param>
     /// <param name="listModeField">List element filter control.</param>
-    /// <param name="sourceSearchField">Source search filter control.</param>
+    /// <param name="sourceTypeSearchField">Source type search control.</param>
+    /// <param name="sourceAssetSearchField">Concrete source asset search control.</param>
     /// <param name="brushColorField">Brush color control.</param>
     /// <param name="searchField">Main catalog search control.</param>
+    /// <param name="direction">Transfer direction saved with the brush.</param>
     /// <param name="selectedOption">Dropdown option for the saved brush.</param>
     /// <param name="statusMessage">User-facing status message.</param>
     /// <returns>True when the brush was saved.</returns>
     public static bool SaveCurrentBrushConfiguration(ExcelDataBrushPalettePreset brushPalettePreset,
                                                      EnumField domainField,
-                                                     EnumField categoryField,
                                                      EnumField dataKindField,
                                                      EnumField listModeField,
-                                                     ToolbarSearchField sourceSearchField,
+                                                     ToolbarSearchField sourceTypeSearchField,
+                                                     ToolbarSearchField sourceAssetSearchField,
                                                      ColorField brushColorField,
                                                      ToolbarSearchField searchField,
+                                                     ExcelDataTransferDirection direction,
                                                      out string selectedOption,
                                                      out string statusMessage)
     {
@@ -166,10 +177,12 @@ internal static class ExcelDataLayoutBrushPaletteUtility
 
         brush.Configure(brushName,
                         domainField == null ? ExcelDataTransferDomain.All : (ExcelDataTransferDomain)domainField.value,
-                        categoryField == null ? ExcelDataFieldCategory.All : (ExcelDataFieldCategory)categoryField.value,
                         dataKindField == null ? ExcelDataBrushDataKind.All : (ExcelDataBrushDataKind)dataKindField.value,
-                        listModeField == null ? ExcelDataListElementFilterMode.All : (ExcelDataListElementFilterMode)listModeField.value,
-                        sourceSearchField == null ? string.Empty : sourceSearchField.value,
+                        listModeField == null ? ExcelDataListElementFilterMode.AllBrushableFields : (ExcelDataListElementFilterMode)listModeField.value,
+                        sourceTypeSearchField == null ? string.Empty : sourceTypeSearchField.value,
+                        sourceAssetSearchField == null ? string.Empty : sourceAssetSearchField.value,
+                        searchField == null ? string.Empty : searchField.value,
+                        direction,
                         brushColorField == null ? Color.white : brushColorField.value,
                         searchField == null ? string.Empty : searchField.value,
                         "Saved from the Layout Brush panel.");
@@ -180,6 +193,44 @@ internal static class ExcelDataLayoutBrushPaletteUtility
         selectedOption = brushes.Count.ToString(CultureInfo.InvariantCulture) + ". " + brushName;
         statusMessage = "Saved brush configuration: " + brushName;
         return true;
+    }
+
+    /// <summary>
+    /// Resolves the stable brush ID represented by one saved-brush dropdown option.
+    /// </summary>
+    /// <param name="brushPalettePreset">Brush palette searched by dropdown option.</param>
+    /// <param name="optionLabel">Displayed saved-brush option.</param>
+    /// <returns>Stable brush ID, or an empty string when the option is not a saved brush.</returns>
+    public static string ResolveBrushId(ExcelDataBrushPalettePreset brushPalettePreset,
+                                        string optionLabel)
+    {
+        ExcelDataBrushDefinition brush = FindBrushByOption(brushPalettePreset, optionLabel);
+        return brush == null ? string.Empty : brush.BrushId;
+    }
+
+    /// <summary>
+    /// Finds one saved brush by the stable ID stored in an authored workbook cell.
+    /// </summary>
+    /// <param name="brushPalettePreset">Brush palette to search.</param>
+    /// <param name="brushId">Stable authored brush ID.</param>
+    /// <returns>Matching brush, or null.</returns>
+    public static ExcelDataBrushDefinition FindBrushById(ExcelDataBrushPalettePreset brushPalettePreset,
+                                                         string brushId)
+    {
+        if (brushPalettePreset == null || string.IsNullOrWhiteSpace(brushId))
+            return null;
+
+        List<ExcelDataBrushDefinition> brushes = brushPalettePreset.Brushes;
+
+        for (int brushIndex = 0; brushIndex < brushes.Count; brushIndex++)
+        {
+            ExcelDataBrushDefinition brush = brushes[brushIndex];
+
+            if (brush != null && string.Equals(brush.BrushId, brushId, StringComparison.Ordinal))
+                return brush;
+        }
+
+        return null;
     }
     #endregion
 

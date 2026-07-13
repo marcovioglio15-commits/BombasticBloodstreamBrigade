@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0deb0f4ef439eb14ebc1025bd5c7b141, type: 3}
+  m_Name: PlayerTuningExcelDataExportPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataExportPreset
+  presetId: 8de2b9c0c65c4537bfcbeaf8041e50ff
+  presetName: Player Tuning Transfer Export
+  targetWorkbookProfile: 4
+  targetWorkbookPath: Logs/Excel Data Transfer Test Workbooks/PlayerTuning.xlsx
+  includePlayerData: 1
+  includeEnemyData: 0
+  includeGameData: 0
+  includeWaveData: 0
+  writeAssetNames: 1
+  writeReferenceGuids: 1
+  writeReferencePaths: 1

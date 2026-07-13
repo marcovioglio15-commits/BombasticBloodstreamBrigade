@@ -241,6 +241,19 @@ public sealed class ExcelDataWorkbookCellDefinition
     {
         return direction != ExcelDataTransferDirection.Export;
     }
+
+    /// <summary>
+    /// Moves this authored payload to another exact coordinate without changing its binding or style.
+    /// </summary>
+    /// <param name="newSheetId">Stable owner worksheet identifier.</param>
+    /// <param name="newRowIndex">New one-based Excel row index.</param>
+    /// <param name="newColumnIndex">New one-based Excel column index.</param>
+    public void MoveTo(string newSheetId, int newRowIndex, int newColumnIndex)
+    {
+        sheetId = newSheetId;
+        rowIndex = newRowIndex;
+        columnIndex = newColumnIndex;
+    }
     #endregion
 
     #endregion

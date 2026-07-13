@@ -84,9 +84,30 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
         sheet.Cells.Add(CreateLiteralCell(sheet.SheetId, 1, 1, "Player Label"));
         sheet.Cells.Add(CreateLiteralCell(sheet.SheetId, 1, 4, "=A1"));
         layoutPreset.SheetDefinitions.Add(sheet);
-        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset, numberEntry, 2, 3);
-        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset, booleanEntry, 3, 2);
-        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset, referenceEntry, 4, 6);
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset,
+                                                                  layoutPreset.ObjectsSheetName,
+                                                                  numberEntry,
+                                                                  2,
+                                                                  3,
+                                                                  ExcelDataTransferDirection.Both,
+                                                                  string.Empty,
+                                                                  string.Empty);
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset,
+                                                                  layoutPreset.ObjectsSheetName,
+                                                                  booleanEntry,
+                                                                  3,
+                                                                  2,
+                                                                  ExcelDataTransferDirection.Both,
+                                                                  string.Empty,
+                                                                  string.Empty);
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset,
+                                                                  layoutPreset.ObjectsSheetName,
+                                                                  referenceEntry,
+                                                                  4,
+                                                                  6,
+                                                                  ExcelDataTransferDirection.Both,
+                                                                  string.Empty,
+                                                                  string.Empty);
         sheet.Cells.Add(CreateUnresolvedCell(sheet.SheetId, 5, 7));
     }
 

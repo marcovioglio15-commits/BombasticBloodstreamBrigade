@@ -1,0 +1,774 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: GameFlowExcelDataWorkbookLayoutPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: e7a3f72310d14b22966fb7ee08a38421
+  presetName: Game Flow Transfer Layout
+  objectsSheetName: Game Flow
+  defaultGridRows: 28
+  defaultGridColumns: 4
+  defaultCellWidth: 210
+  defaultCellHeight: 30
+  sheetDefinitions:
+  - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+    sheetName: Game Flow
+    previewRowCount: 28
+    previewColumnCount: 4
+    previewCellWidth: 210
+    previewCellHeight: 30
+    freezeRowCount: 4
+    freezeColumnCount: 1
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GAME FLOW WORKBOOK
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 2
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Game settings, scene flow, audio and HUD authoring values.
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SETTING
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 4
+      columnIndex: 2
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: VALUE
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 4
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SOURCE ASSET
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 4
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SERIALIZED PATH
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: IDENTITY
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 8
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Name
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 8
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameMasterPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 8
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: presetName
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 8
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:bb0def9f47982654eab79c983db7c947:GameMasterPreset:presetName
+        domain: 3
+        ownerAssetGuid: bb0def9f47982654eab79c983db7c947
+        ownerAssetTypeName: GameMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset
+        serializedPath: presetName
+        pathTemplate: presetName
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 4454ef416bf345088ec4ce3b8ab59c1e
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 9
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 9
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameMasterPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 9
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: version
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 9
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:bb0def9f47982654eab79c983db7c947:GameMasterPreset:version
+        domain: 3
+        ownerAssetGuid: bb0def9f47982654eab79c983db7c947
+        ownerAssetTypeName: GameMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset
+        serializedPath: version
+        pathTemplate: version
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 4454ef416bf345088ec4ce3b8ab59c1e
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 10
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SETTINGS
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 12
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Numeric Setting
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 12
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameAudioManagerPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 12
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: playbackSettings.masterVolume
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 12
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:4762fb1f960c08e40b031f534d613690:GameAudioManagerPreset:playbackSettings.masterVolume
+        domain: 3
+        ownerAssetGuid: 4762fb1f960c08e40b031f534d613690
+        ownerAssetTypeName: GameAudioManagerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Audio/GameAudioManagerPreset.asset
+        serializedPath: playbackSettings.masterVolume
+        pathTemplate: playbackSettings.masterVolume
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: d59ed2a86cbd445986ec10a48b0907bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 13
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Enabled Setting
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 13
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameAudioManagerPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 13
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: playbackSettings.enabled
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 13
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:4762fb1f960c08e40b031f534d613690:GameAudioManagerPreset:playbackSettings.enabled
+        domain: 3
+        ownerAssetGuid: 4762fb1f960c08e40b031f534d613690
+        ownerAssetTypeName: GameAudioManagerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Audio/GameAudioManagerPreset.asset
+        serializedPath: playbackSettings.enabled
+        pathTemplate: playbackSettings.enabled
+        expectedDataKind: 3
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 2e5c8c66241b4bdda761bece3254e76f
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 14
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Mode Setting
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 14
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameSettingsManagerPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 14
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: controllerNavigationSettings.gamepadNavigationMode
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 14
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:7863a90fb7b62c04b810ee60e0156cc3:GameSettingsManagerPreset:controllerNavigationSettings.gamepadNavigationMode
+        domain: 3
+        ownerAssetGuid: 7863a90fb7b62c04b810ee60e0156cc3
+        ownerAssetTypeName: GameSettingsManagerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Settings/GameSettingsManagerPreset.asset
+        serializedPath: controllerNavigationSettings.gamepadNavigationMode
+        pathTemplate: controllerNavigationSettings.gamepadNavigationMode
+        expectedDataKind: 4
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 57d39fcf374648568fe242e5239ba8b0
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 15
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: NAVIGATION AND PRESENTATION
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 17
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Scene Reference
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 17
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameMasterPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 17
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: sceneManagerPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 17
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:bb0def9f47982654eab79c983db7c947:GameMasterPreset:sceneManagerPreset
+        domain: 3
+        ownerAssetGuid: bb0def9f47982654eab79c983db7c947
+        ownerAssetTypeName: GameMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset
+        serializedPath: sceneManagerPreset
+        pathTemplate: sceneManagerPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 3b06bdc5926142b1ac3d79bc27b60fdc
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 18
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: HUD Reference
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 18
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: GameMasterPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 18
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: hudManagerPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 36795e4e79bb4baba4246edd335aa0f6
+      rowIndex: 18
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Game:bb0def9f47982654eab79c983db7c947:GameMasterPreset:hudManagerPreset
+        domain: 3
+        ownerAssetGuid: bb0def9f47982654eab79c983db7c947
+        ownerAssetTypeName: GameMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Game/Master Presets/GameMasterPreset.asset
+        serializedPath: hudManagerPreset
+        pathTemplate: hudManagerPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 3b06bdc5926142b1ac3d79bc27b60fdc
+      numberFormat: 
+      validateLiteralDuringImport: 0

@@ -16,7 +16,6 @@ MonoBehaviour:
   presetName: Default Import
   sourceWorkbookProfile: 0
   sourceWorkbookPath: 
-  expectedLayoutMode: 2
   conflictPolicy: 2
   missingRowPolicy: 0
   referenceResolutionMode: 1
@@ -27,44 +26,3 @@ MonoBehaviour:
   includeGameData: 1
   includeWaveData: 1
   includeConcreteListElements: 1
-  selectedFields:
-  - fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_ControllerPreset
-    displayName: PlayerMasterPreset_A / m_ControllerPreset
-    serializedPath: m_ControllerPreset
-    pathTemplate: m_ControllerPreset
-    domain: 1
-    dataKind: 6
-    importEnabled: 1
-    exportEnabled: 0
-  - fieldId: 'Player:5a3703589c6fd994ea8b4502a6cc4437:PlayerControllerPreset:scalingRules.Array.data[0]'
-    displayName: 'HoctagonStyle / scalingRules.Array.data[]'
-    serializedPath: 'scalingRules.Array.data[0]'
-    pathTemplate: 'scalingRules.Array.data[]'
-    domain: 1
-    dataKind: 12
-    importEnabled: 1
-    exportEnabled: 0
-  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.baseSpeed
-    displayName: ConeVision_ForwardAndBarckward / movementSettings.values.baseSpeed
-    serializedPath: movementSettings.values.baseSpeed
-    pathTemplate: movementSettings.values.baseSpeed
-    domain: 1
-    dataKind: 2
-    importEnabled: 1
-    exportEnabled: 0
-  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeEnabled
-    displayName: ConeVision_ForwardAndBarckward / lookSettings.m_FrontConeEnabled
-    serializedPath: lookSettings.m_FrontConeEnabled
-    pathTemplate: lookSettings.m_FrontConeEnabled
-    domain: 1
-    dataKind: 3
-    importEnabled: 1
-    exportEnabled: 0
-  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.directionsMode
-    displayName: ConeVision_ForwardAndBarckward / movementSettings.directionsMode
-    serializedPath: movementSettings.directionsMode
-    pathTemplate: movementSettings.directionsMode
-    domain: 1
-    dataKind: 4
-    importEnabled: 1
-    exportEnabled: 0

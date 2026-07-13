@@ -1,132 +1,4 @@
 /// <summary>
-/// Stores one row written by the normalized editor-only workbook export.
-/// </summary>
-public sealed class ExcelDataWorkbookRow
-{
-    #region Properties
-    public string Section
-    {
-        get;
-        set;
-    }
-
-    public string Domain
-    {
-        get;
-        set;
-    }
-
-    public string Category
-    {
-        get;
-        set;
-    }
-
-    public string DataKind
-    {
-        get;
-        set;
-    }
-
-    public string AssetType
-    {
-        get;
-        set;
-    }
-
-    public string AssetName
-    {
-        get;
-        set;
-    }
-
-    public string AssetPath
-    {
-        get;
-        set;
-    }
-
-    public string SerializedPath
-    {
-        get;
-        set;
-    }
-
-    public string PathTemplate
-    {
-        get;
-        set;
-    }
-
-    public string FieldId
-    {
-        get;
-        set;
-    }
-
-    public string Value
-    {
-        get;
-        set;
-    }
-
-    public string ReferenceName
-    {
-        get;
-        set;
-    }
-
-    public string ReferenceGuid
-    {
-        get;
-        set;
-    }
-
-    public string ReferencePath
-    {
-        get;
-        set;
-    }
-
-    public string WorkbookSheet
-    {
-        get;
-        set;
-    }
-
-    public int WorkbookRow
-    {
-        get;
-        set;
-    }
-
-    public int WorkbookColumn
-    {
-        get;
-        set;
-    }
-
-    public bool ConcreteListElement
-    {
-        get;
-        set;
-    }
-
-    public int ListDepth
-    {
-        get;
-        set;
-    }
-
-    public string Warning
-    {
-        get;
-        set;
-    }
-    #endregion
-}
-
-/// <summary>
 /// Stores one diagnostic row produced by an import preview without mutating Unity assets.
 /// </summary>
 public sealed class ExcelDataImportPreviewRow
@@ -137,6 +9,21 @@ public sealed class ExcelDataImportPreviewRow
         get;
     }
 
+    public int ColumnIndex
+    {
+        get;
+    }
+
+    public string SheetName
+    {
+        get;
+    }
+
+    public string Address
+    {
+        get;
+    }
+
     public string Section
     {
         get;
@@ -158,6 +45,11 @@ public sealed class ExcelDataImportPreviewRow
     }
 
     public string Value
+    {
+        get;
+    }
+
+    public string CurrentValue
     {
         get;
     }
@@ -172,7 +64,22 @@ public sealed class ExcelDataImportPreviewRow
         get;
     }
 
+    public bool CanApply
+    {
+        get;
+    }
+
     public string Warning
+    {
+        get;
+    }
+
+    internal ExcelDataWorkbookCellDefinition CellDefinition
+    {
+        get;
+    }
+
+    internal ExcelDataImportCellValue IncomingValue
     {
         get;
     }
@@ -184,26 +91,44 @@ public sealed class ExcelDataImportPreviewRow
     /// <summary>
     /// Creates one immutable import preview row for UI lists and smoke assertions.
     /// </summary>
-    /// <param name="rowIndex">One-based workbook row index including the header row offset.</param>
-    /// <param name="sourceRow">Workbook row read from MiniExcel.</param>
-    /// <param name="catalogMatched">True when the row field id exists in the current catalog.</param>
-    /// <param name="includedByPreset">True when import preset filters allow this row.</param>
-    /// <param name="warning">Warning text explaining skipped or risky rows.</param>
-    public ExcelDataImportPreviewRow(int rowIndex,
-                                     ExcelDataWorkbookRow sourceRow,
-                                     bool catalogMatched,
-                                     bool includedByPreset,
-                                     string warning)
+    /// <param name="sheetName">Visible worksheet name containing the incoming value.</param>
+    /// <param name="cellDefinition">Grid-authoritative cell definition read at its exact coordinate.</param>
+    /// <param name="incomingValue">Raw incoming value and hidden reference metadata.</param>
+    /// <param name="assetName">Resolved target asset name for readable preview output.</param>
+    /// <param name="currentValue">Current Unity serialized value before import.</param>
+    /// <param name="bindingResolved">True when the target asset and property were resolved.</param>
+    /// <param name="includedByPreset">True when domain guardrails allow this cell.</param>
+    /// <param name="canApply">True when this cell passed preflight and can mutate its target after approval.</param>
+    /// <param name="warning">Warning text explaining skipped, duplicated or risky cells.</param>
+    internal ExcelDataImportPreviewRow(string sheetName,
+                                       ExcelDataWorkbookCellDefinition cellDefinition,
+                                       ExcelDataImportCellValue incomingValue,
+                                       string assetName,
+                                       string currentValue,
+                                       bool bindingResolved,
+                                       bool includedByPreset,
+                                       bool canApply,
+                                       string warning)
     {
-        RowIndex = rowIndex;
-        Section = sourceRow == null ? string.Empty : sourceRow.Section;
-        FieldId = sourceRow == null ? string.Empty : sourceRow.FieldId;
-        AssetName = sourceRow == null ? string.Empty : sourceRow.AssetName;
-        SerializedPath = sourceRow == null ? string.Empty : sourceRow.SerializedPath;
-        Value = sourceRow == null ? string.Empty : sourceRow.Value;
-        CatalogMatched = catalogMatched;
+        ExcelDataFieldBinding binding = cellDefinition == null ? null : cellDefinition.FieldBinding;
+        RowIndex = cellDefinition == null ? 0 : cellDefinition.RowIndex;
+        ColumnIndex = cellDefinition == null ? 0 : cellDefinition.ColumnIndex;
+        SheetName = sheetName ?? string.Empty;
+        Address = RowIndex > 0 && ColumnIndex > 0
+            ? ExcelDataWorkbookCoordinateUtility.BuildAddress(RowIndex, ColumnIndex)
+            : string.Empty;
+        Section = SheetName;
+        FieldId = binding == null ? string.Empty : binding.FieldId;
+        AssetName = assetName ?? string.Empty;
+        SerializedPath = binding == null ? string.Empty : binding.SerializedPath;
+        Value = incomingValue == null ? string.Empty : incomingValue.ValueText;
+        CurrentValue = currentValue ?? string.Empty;
+        CatalogMatched = bindingResolved;
         IncludedByPreset = includedByPreset;
-        Warning = warning;
+        CanApply = canApply;
+        Warning = warning ?? string.Empty;
+        CellDefinition = cellDefinition;
+        IncomingValue = incomingValue;
     }
     #endregion
 
@@ -241,6 +166,36 @@ public sealed class ExcelDataImportPreviewResult
         get;
     }
 
+    public bool CanApply
+    {
+        get;
+    }
+
+    public bool LayoutHashMatches
+    {
+        get;
+    }
+
+    public string WorkbookLayoutHash
+    {
+        get;
+    }
+
+    public string CurrentLayoutHash
+    {
+        get;
+    }
+
+    public string ValidationMessage
+    {
+        get;
+    }
+
+    public long WorkbookLastWriteUtcTicks
+    {
+        get;
+    }
+
     public System.Collections.Generic.List<ExcelDataImportPreviewRow> Rows
     {
         get;
@@ -258,13 +213,25 @@ public sealed class ExcelDataImportPreviewResult
     /// <param name="importableRowCount">Rows that match the current catalog and import preset filters.</param>
     /// <param name="skippedRowCount">Rows skipped because they are metadata, disabled, or unmatched.</param>
     /// <param name="warningCount">Rows carrying warnings.</param>
-    /// <param name="rows">Detailed preview rows.</param>
+    /// <param name="rows">Detailed coordinate-exact preview cells.</param>
+    /// <param name="canApply">True when workbook-level validation allows apply.</param>
+    /// <param name="layoutHashMatches">True when the workbook and active layout hashes match.</param>
+    /// <param name="workbookLayoutHash">Layout hash stored in the workbook technical sheet.</param>
+    /// <param name="currentLayoutHash">Current active layout hash.</param>
+    /// <param name="validationMessage">Workbook-level validation summary.</param>
+    /// <param name="workbookLastWriteUtcTicks">File timestamp used to reject stale previews.</param>
     public ExcelDataImportPreviewResult(string workbookPath,
                                         int totalRowCount,
                                         int importableRowCount,
                                         int skippedRowCount,
                                         int warningCount,
-                                        System.Collections.Generic.List<ExcelDataImportPreviewRow> rows)
+                                        System.Collections.Generic.List<ExcelDataImportPreviewRow> rows,
+                                        bool canApply,
+                                        bool layoutHashMatches,
+                                        string workbookLayoutHash,
+                                        string currentLayoutHash,
+                                        string validationMessage,
+                                        long workbookLastWriteUtcTicks)
     {
         WorkbookPath = workbookPath;
         TotalRowCount = totalRowCount;
@@ -272,6 +239,12 @@ public sealed class ExcelDataImportPreviewResult
         SkippedRowCount = skippedRowCount;
         WarningCount = warningCount;
         Rows = rows == null ? new System.Collections.Generic.List<ExcelDataImportPreviewRow>() : rows;
+        CanApply = canApply;
+        LayoutHashMatches = layoutHashMatches;
+        WorkbookLayoutHash = workbookLayoutHash ?? string.Empty;
+        CurrentLayoutHash = currentLayoutHash ?? string.Empty;
+        ValidationMessage = validationMessage ?? string.Empty;
+        WorkbookLastWriteUtcTicks = workbookLastWriteUtcTicks;
     }
     #endregion
 

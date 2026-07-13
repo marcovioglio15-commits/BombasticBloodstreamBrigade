@@ -30,6 +30,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
         if (hierarchyRoot == null || currentElement == null)
             return;
 
+        if (ManagementToolInteractiveElementColorUtility.IsExcludedFromHierarchyColors(currentElement))
+            return;
+
         TryRegisterInteractiveElement(hierarchyRoot, currentElement, stateKeyPrefix);
 
         foreach (VisualElement child in currentElement.Children())
@@ -57,6 +60,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
             return;
 
         if (!ManagementToolVisualElementVisibilityUtility.IsBrowsable(currentElement))
+            return;
+
+        if (ManagementToolInteractiveElementColorUtility.IsExcludedFromHierarchyColors(currentElement))
             return;
 
         TryAppendBrowserEntry(hierarchyRoot, currentElement, stateKeyPrefix, results, registeredStateKeys);
@@ -88,6 +94,9 @@ internal static class ManagementToolInteractiveElementColorHierarchyUtility
 
         while (currentElement != null)
         {
+            if (ManagementToolInteractiveElementColorUtility.IsExcludedFromHierarchyColors(currentElement))
+                return false;
+
             if (TryResolveInteractiveKind(currentElement, out ManagementToolInteractiveElementColorUtility.InteractiveElementKind elementKind))
             {
                 string stateKey = BuildElementStateKey(hierarchyRoot, currentElement, stateKeyPrefix, elementKind);

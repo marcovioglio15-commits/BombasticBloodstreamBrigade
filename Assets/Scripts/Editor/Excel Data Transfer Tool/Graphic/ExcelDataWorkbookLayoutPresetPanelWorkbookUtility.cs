@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -67,37 +66,14 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
         }
 
         SerializedObject serializedObject = new SerializedObject(context.SelectedMasterPreset.ExportPreset);
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "targetWorkbookProfile",
-                                                                    "Target Workbook Profile",
-                                                                    "Known workbook destination profile used by export.",
-                                                                    index => OnExportProfileChanged(context, index));
-        context.ExportCustomPathField =
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddStringField(section,
-                                                                     serializedObject,
-                                                                     "targetWorkbookPath",
-                                                                     "Custom Target Workbook Path",
-                                                                     "Custom path used only by the Custom Path profile.");
-
-        if (context.ExportCustomPathField != null)
-            context.ExportCustomPathField.RegisterValueChangedCallback(evt => RefreshWorkbookPathLabels(context));
-
-        SetCustomPathVisibility(context.ExportCustomPathField,
-                                ExcelDataLinkedSubPresetPanelFieldUtility.ResolveEnumValueIndex(serializedObject, "targetWorkbookProfile"));
-        context.ExportPathLabel = BuildPathLabel("Resolved absolute path that Export Workbook will write.");
-        section.Add(context.ExportPathLabel);
-    }
-
-    /// <summary>
-    /// Updates export custom-path visibility after the profile popup changes.
-    /// </summary>
-    /// <param name="context">Workbook section state.</param>
-    /// <param name="profileIndex">Selected profile enum index.</param>
-    private static void OnExportProfileChanged(WorkbookSectionContext context, int profileIndex)
-    {
-        SetCustomPathVisibility(context.ExportCustomPathField, profileIndex);
-        RefreshWorkbookPathLabels(context);
+        context.ExportPathController =
+            ExcelDataWorkbookPathFieldUtility.Build(section,
+                                                    serializedObject,
+                                                    "targetWorkbookProfile",
+                                                    "targetWorkbookPath",
+                                                    ExcelDataWorkbookPathAccess.Export,
+                                                    "Target Workbook Profile",
+                                                    "Select the export destination used by this layout's Export Workbook operation. Resolved relative and absolute paths remain visible for every profile.");
     }
     #endregion
 
@@ -119,37 +95,14 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
         }
 
         SerializedObject serializedObject = new SerializedObject(context.SelectedMasterPreset.ImportPreset);
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(section,
-                                                                    serializedObject,
-                                                                    "sourceWorkbookProfile",
-                                                                    "Source Workbook Profile",
-                                                                    "Known workbook source profile used by import and layout loading.",
-                                                                    index => OnImportProfileChanged(context, index));
-        context.ImportCustomPathField =
-            ExcelDataLinkedSubPresetPanelFieldUtility.AddStringField(section,
-                                                                     serializedObject,
-                                                                     "sourceWorkbookPath",
-                                                                     "Custom Source Workbook Path",
-                                                                     "Custom path used only by the Custom Path profile.");
-
-        if (context.ImportCustomPathField != null)
-            context.ImportCustomPathField.RegisterValueChangedCallback(evt => RefreshWorkbookPathLabels(context));
-
-        SetCustomPathVisibility(context.ImportCustomPathField,
-                                ExcelDataLinkedSubPresetPanelFieldUtility.ResolveEnumValueIndex(serializedObject, "sourceWorkbookProfile"));
-        context.ImportPathLabel = BuildPathLabel("Resolved absolute path used by import preview and layout loading.");
-        section.Add(context.ImportPathLabel);
-    }
-
-    /// <summary>
-    /// Updates import custom-path visibility after the profile popup changes.
-    /// </summary>
-    /// <param name="context">Workbook section state.</param>
-    /// <param name="profileIndex">Selected profile enum index.</param>
-    private static void OnImportProfileChanged(WorkbookSectionContext context, int profileIndex)
-    {
-        SetCustomPathVisibility(context.ImportCustomPathField, profileIndex);
-        RefreshWorkbookPathLabels(context);
+        context.ImportPathController =
+            ExcelDataWorkbookPathFieldUtility.Build(section,
+                                                    serializedObject,
+                                                    "sourceWorkbookProfile",
+                                                    "sourceWorkbookPath",
+                                                    ExcelDataWorkbookPathAccess.Import,
+                                                    "Source Workbook Profile",
+                                                    "Select the workbook used by import preview and Load Import Layout. Resolved relative and absolute paths remain visible for every profile.");
     }
     #endregion
 
@@ -171,7 +124,7 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
         row.style.marginTop = 4f;
 
         AddOperationButton(row, "Export Workbook", "Write only export-enabled layout cells at their exact workbook coordinates.", () => ExportWorkbook(context), 124f);
-        AddOperationButton(row, "Load Import Layout", "Read BrushGrid mappings from the resolved import workbook path into the selected layout preset.", () => LoadLayoutFromImportWorkbook(context), 136f);
+        AddOperationButton(row, "Load Import Layout", "Restore complete sheets, Data Fields, Literal Text, directions, brush IDs and list identity from the resolved workbook technical snapshot.", () => LoadLayoutFromImportWorkbook(context), 136f);
         section.Add(row);
 
         context.OperationStatusLabel = new Label(operationStatus);
@@ -234,7 +187,7 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
     }
 
     /// <summary>
-    /// Loads BrushGrid mappings from the resolved import workbook path.
+    /// Loads a complete grid-authoritative layout snapshot from the resolved import workbook path.
     /// </summary>
     /// <param name="context">Workbook section state.</param>
     private static void LoadLayoutFromImportWorkbook(WorkbookSectionContext context)
@@ -247,7 +200,7 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
     }
 
     /// <summary>
-    /// Loads BrushGrid mappings from one resolved workbook path into the selected layout preset.
+    /// Loads one complete technical layout snapshot into the selected layout preset.
     /// </summary>
     /// <param name="context">Workbook section state.</param>
     /// <param name="workbookPath">Resolved workbook path to read.</param>
@@ -262,14 +215,13 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
         try
         {
             ExcelDataWorkbookLayoutImportResult result =
-                ExcelDataWorkbookLayoutImportService.ImportBrushGridMappings(context.SelectedLayoutPreset,
-                                                                             workbookPath,
-                                                                             context.SelectedLayoutPreset.ObjectsSheetName);
+                ExcelDataWorkbookLayoutImportService.ImportLayoutSnapshot(context.SelectedLayoutPreset,
+                                                                          workbookPath);
             SetOperationStatus(context,
-                               "Loaded " + result.ImportedMappingCount +
-                               " layout mappings from " + sourceLabel +
-                               " workbook. Skipped: " + result.SkippedMappingCount +
-                               ". Warnings: " + result.WarningCount +
+                               "Loaded " + result.ImportedSheetCount +
+                               " sheets and " + result.ImportedCellCount +
+                               " exact cells from " + sourceLabel +
+                               " workbook. Hash match: " + result.LayoutHashMatches +
                                ". Path: " + result.WorkbookPath);
 
             if (context.RebuildActiveSection != null)
@@ -285,50 +237,16 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
 
     #region Helpers
     /// <summary>
-    /// Creates a path label with shared wrapping and spacing.
-    /// </summary>
-    /// <param name="tooltip">Tooltip assigned to the label.</param>
-    /// <returns>Configured path label.</returns>
-    private static Label BuildPathLabel(string tooltip)
-    {
-        Label label = new Label();
-        label.tooltip = tooltip;
-        label.style.whiteSpace = WhiteSpace.Normal;
-        label.style.marginTop = 6f;
-        return label;
-    }
-
-    /// <summary>
-    /// Shows custom path text fields only when the Custom Path profile is selected.
-    /// </summary>
-    /// <param name="field">Path text field to show or hide.</param>
-    /// <param name="profileIndex">Selected workbook profile enum index.</param>
-    private static void SetCustomPathVisibility(VisualElement field, int profileIndex)
-    {
-        if (field == null)
-            return;
-
-        field.style.display =
-            profileIndex == (int)ExcelDataWorkbookPathProfile.CustomPath ? DisplayStyle.Flex : DisplayStyle.None;
-    }
-
-    /// <summary>
-    /// Refreshes resolved workbook path labels from the linked import/export presets.
+    /// Refreshes resolved workbook path controls from the linked import/export presets.
     /// </summary>
     /// <param name="context">Workbook section state.</param>
     private static void RefreshWorkbookPathLabels(WorkbookSectionContext context)
     {
-        if (context.ExportPathLabel != null && context.SelectedMasterPreset != null)
-        {
-            string exportPath = ExcelDataWorkbookPathUtility.ResolveExportWorkbookPath(context.SelectedMasterPreset.ExportPreset, string.Empty);
-            context.ExportPathLabel.text = "Resolved Export Path: " + exportPath + "\nExists: " + File.Exists(exportPath);
-        }
+        if (context.ExportPathController != null)
+            context.ExportPathController.Refresh();
 
-        if (context.ImportPathLabel != null && context.SelectedMasterPreset != null)
-        {
-            string importPath = ExcelDataWorkbookPathUtility.ResolveImportWorkbookPath(context.SelectedMasterPreset.ImportPreset, string.Empty);
-            context.ImportPathLabel.text = "Resolved Import Path: " + importPath + "\nExists: " + File.Exists(importPath);
-        }
+        if (context.ImportPathController != null)
+            context.ImportPathController.Refresh();
     }
 
     /// <summary>
@@ -384,10 +302,8 @@ internal static class ExcelDataWorkbookLayoutPresetPanelWorkbookUtility
         public readonly bool IsSelectedLayoutLinked;
         public readonly Action<string> SetOperationStatus;
         public readonly Action RebuildActiveSection;
-        public TextField ExportCustomPathField;
-        public TextField ImportCustomPathField;
-        public Label ExportPathLabel;
-        public Label ImportPathLabel;
+        public ExcelDataWorkbookPathFieldController ExportPathController;
+        public ExcelDataWorkbookPathFieldController ImportPathController;
         public Label OperationStatusLabel;
         #endregion
 

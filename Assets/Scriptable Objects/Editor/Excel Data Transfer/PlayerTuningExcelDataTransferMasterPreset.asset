@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2001e592a311547ba193492c98b9b9, type: 3}
+  m_Name: PlayerTuningExcelDataTransferMasterPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataTransferMasterPreset
+  presetId: ee448e0cc9af4d58a576081f765d81b0
+  presetName: Player Tuning Transfer
+  description: Movement, targeting and identity values used by Player Management
+    Tool presets.
+  version: 2.0.0
+  layoutPreset: {fileID: 11400000, guid: 806130f72d4875c41b4377143cc40669, type: 2}
+  brushPalettePreset: {fileID: 11400000, guid: 88d3962d7684ff847b361dcb53c8dbe8, type: 2}
+  importPreset: {fileID: 11400000, guid: 500dfae1228c8dc44b445ac8b71f9a3a, type: 2}
+  exportPreset: {fileID: 11400000, guid: 6840c986cfccbcd4fb56ec047470afcc, type: 2}

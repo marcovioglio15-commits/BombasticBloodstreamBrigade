@@ -321,9 +321,6 @@ internal sealed class ExcelDataLinkedSubPresetPanel
             case DetailsSectionType.Policies:
                 BuildPoliciesSection();
                 break;
-            case DetailsSectionType.FieldSelection:
-                BuildFieldSelectionSection();
-                break;
             case DetailsSectionType.Actions:
                 BuildActionsSection();
                 break;
@@ -359,7 +356,6 @@ internal sealed class ExcelDataLinkedSubPresetPanel
 
         AddSectionButton(buttonsRoot, DetailsSectionType.Workbook, "Workbook");
         AddSectionButton(buttonsRoot, DetailsSectionType.Policies, panelType == ExcelDataTransferPanelType.ImportPreset ? "Policies" : "Filters");
-        AddSectionButton(buttonsRoot, DetailsSectionType.FieldSelection, "Field Selection");
         AddSectionButton(buttonsRoot, DetailsSectionType.Actions, "Actions");
         return buttonsRoot;
     }
@@ -434,16 +430,6 @@ internal sealed class ExcelDataLinkedSubPresetPanel
     }
 
     /// <summary>
-    /// Builds the selected field list.
-    /// </summary>
-    private void BuildFieldSelectionSection()
-    {
-        SerializedObject serializedObject = new SerializedObject(selectedPreset);
-        VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Field Selection");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "selectedFields", "Selected Fields", "Fields explicitly selected for this transfer direction.");
-    }
-
-    /// <summary>
     /// Builds import/export action buttons.
     /// </summary>
     private void BuildActionsSection()
@@ -470,8 +456,10 @@ internal sealed class ExcelDataLinkedSubPresetPanel
     private void BuildBrushesSection()
     {
         SerializedObject serializedObject = new SerializedObject(selectedPreset);
-        VisualElement section = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Brushes");
-        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(section, serializedObject, "brushes", "Brushes", "Saved brush configurations available to the layout brush grid.");
+        VisualElement colorsSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Data Type Colors");
+        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(colorsSection, serializedObject, "dataTypeColors", "Data Type Colors", "Fallback semantic colors used when a cell does not retain an exact Saved Brush ID.");
+        VisualElement brushesSection = ExcelDataTransferMasterPanelSectionUtility.CreateSection(sectionContentRoot, "Saved Brushes");
+        ExcelDataLinkedSubPresetPanelFieldUtility.AddPropertyField(brushesSection, serializedObject, "brushes", "Saved Brushes", "Named filter, direction and color configurations available to the Layout Brush grid.");
     }
     #endregion
 
@@ -620,8 +608,6 @@ internal sealed class ExcelDataLinkedSubPresetPanel
     {
         switch (sectionType)
         {
-            case DetailsSectionType.FieldSelection:
-                return 116f;
             case DetailsSectionType.Workbook:
                 return 88f;
             default:
@@ -641,9 +627,8 @@ internal sealed class ExcelDataLinkedSubPresetPanel
         Metadata = 0,
         Workbook = 1,
         Policies = 2,
-        FieldSelection = 3,
-        Actions = 4,
-        Brushes = 5
+        Actions = 3,
+        Brushes = 4
     }
     #endregion
 }

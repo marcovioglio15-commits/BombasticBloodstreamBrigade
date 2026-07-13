@@ -32,11 +32,15 @@ internal sealed class ExcelDataWorkbookDocument
     /// <param name="rowCount">Number of rows allocated in the matrix.</param>
     /// <param name="columnCount">Number of columns allocated in the matrix.</param>
     /// <param name="visibility">Workbook visibility assigned by the adapter.</param>
+    /// <param name="minimumColumnWidthPixels">Minimum exported column width derived from the authoring preview.</param>
+    /// <param name="autoSizeColumns">True when the adapter should fit columns to their actual exported values.</param>
     /// <returns>Created worksheet document.</returns>
     public ExcelDataWorkbookSheetDocument AddSheet(string sheetName,
                                                    int rowCount,
                                                    int columnCount,
-                                                   ExcelDataWorkbookSheetVisibility visibility)
+                                                   ExcelDataWorkbookSheetVisibility visibility,
+                                                   int minimumColumnWidthPixels = 0,
+                                                   bool autoSizeColumns = false)
     {
         // Validate identity and dimensions before allocating a potentially large matrix.
         if (string.IsNullOrWhiteSpace(sheetName))
@@ -53,7 +57,12 @@ internal sealed class ExcelDataWorkbookDocument
 
         // Register the same immutable sheet document in ordered and keyed collections.
         ExcelDataWorkbookSheetDocument sheet =
-            new ExcelDataWorkbookSheetDocument(sheetName, rowCount, columnCount, visibility);
+            new ExcelDataWorkbookSheetDocument(sheetName,
+                                               rowCount,
+                                               columnCount,
+                                               visibility,
+                                               minimumColumnWidthPixels,
+                                               autoSizeColumns);
         sheets.Add(sheet);
         sheetsByName.Add(sheetName, sheet);
         return sheet;
@@ -106,6 +115,16 @@ internal sealed class ExcelDataWorkbookSheetDocument
     {
         get;
     }
+
+    public int MinimumColumnWidthPixels
+    {
+        get;
+    }
+
+    public bool AutoSizeColumns
+    {
+        get;
+    }
     #endregion
 
     #region Methods
@@ -118,15 +137,21 @@ internal sealed class ExcelDataWorkbookSheetDocument
     /// <param name="rowCount">Positive row count.</param>
     /// <param name="columnCount">Positive column count.</param>
     /// <param name="visibility">Workbook worksheet visibility.</param>
+    /// <param name="minimumColumnWidthPixels">Minimum exported column width in pixels.</param>
+    /// <param name="autoSizeColumns">True when content-based widths should be written after export.</param>
     public ExcelDataWorkbookSheetDocument(string sheetName,
                                           int rowCount,
                                           int columnCount,
-                                          ExcelDataWorkbookSheetVisibility visibility)
+                                          ExcelDataWorkbookSheetVisibility visibility,
+                                          int minimumColumnWidthPixels,
+                                          bool autoSizeColumns)
     {
         SheetName = sheetName;
         RowCount = rowCount;
         ColumnCount = columnCount;
         Visibility = visibility;
+        MinimumColumnWidthPixels = minimumColumnWidthPixels;
+        AutoSizeColumns = autoSizeColumns;
         values = new object[rowCount, columnCount];
     }
     #endregion
