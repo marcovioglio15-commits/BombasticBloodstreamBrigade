@@ -73,6 +73,30 @@ public enum ExcelDataImportConflictPolicy
 }
 
 /// <summary>
+/// Controls whether import-enabled Excel formulas use their persisted workbook result or are rejected.
+/// </summary>
+public enum ExcelDataFormulaImportPolicy
+{
+    UseCachedResult = 0,
+    RejectFormulas = 1
+}
+
+/// <summary>
+/// Describes how one formula cell was resolved before typed Unity import validation.
+/// </summary>
+public enum ExcelDataFormulaImportState
+{
+    NotFormula = 0,
+    CachedResult = 1,
+    CachedResultWithWarning = 2,
+    RejectedByPolicy = 3,
+    MissingCachedResult = 4,
+    CachedError = 5,
+    UntrustedCachedResult = 6,
+    UnsupportedCachedResult = 7
+}
+
+/// <summary>
 /// Controls whether Player scaling-rule imports may create rules that do not yet exist in Unity authoring.
 /// </summary>
 public enum ExcelDataScalingRuleImportPolicy

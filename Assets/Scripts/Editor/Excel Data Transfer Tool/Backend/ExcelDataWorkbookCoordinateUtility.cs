@@ -54,6 +54,57 @@ internal static class ExcelDataWorkbookCoordinateUtility
 
         return columnName.ToString();
     }
+
+    /// <summary>
+    /// Parses one absolute or relative A1 cell address into positive one-based coordinates.
+    /// </summary>
+    /// <param name="address">Cell address such as A1, $B$4 or AA12.</param>
+    /// <param name="rowIndex">Parsed one-based row index.</param>
+    /// <param name="columnIndex">Parsed one-based column index.</param>
+    /// <returns>True when the complete address contains a valid column and row.</returns>
+    public static bool TryParseAddress(string address, out int rowIndex, out int columnIndex)
+    {
+        rowIndex = 0;
+        columnIndex = 0;
+
+        if (string.IsNullOrWhiteSpace(address))
+            return false;
+
+        string normalizedAddress = address.Replace("$", string.Empty);
+        int position = 0;
+        long parsedColumn = 0;
+
+        // Parse the leading base-26 column token before reading the decimal row.
+        while (position < normalizedAddress.Length && char.IsLetter(normalizedAddress[position]))
+        {
+            char character = char.ToUpperInvariant(normalizedAddress[position]);
+
+            if (character < 'A' || character > 'Z')
+                return false;
+
+            parsedColumn = parsedColumn * 26L + character - 'A' + 1L;
+
+            if (parsedColumn > int.MaxValue)
+                return false;
+
+            position++;
+        }
+
+        if (position <= 0 || position >= normalizedAddress.Length)
+            return false;
+
+        int parsedRow;
+
+        if (!int.TryParse(normalizedAddress.Substring(position),
+                          NumberStyles.None,
+                          CultureInfo.InvariantCulture,
+                          out parsedRow) || parsedRow < 1)
+            return false;
+
+        rowIndex = parsedRow;
+        columnIndex = (int)parsedColumn;
+        return true;
+    }
     #endregion
 
     #endregion

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Restores complete grid-authoritative workbook layouts from the reserved v2 technical worksheet.
+/// Restores complete grid-authoritative workbook layouts from the reserved v3 technical worksheet.
 /// </summary>
 internal static class ExcelDataWorkbookLayoutImportService
 {
@@ -64,7 +64,9 @@ internal static class ExcelDataWorkbookLayoutImportService
     private static void ValidateSnapshot(ExcelDataWorkbookLayoutSnapshot snapshot)
     {
         if (snapshot == null || !snapshot.TechnicalSheetFound)
-            throw new InvalidOperationException("Workbook does not contain the required _NashCoreTransfer technical worksheet.");
+            throw new InvalidOperationException("Workbook does not contain the required " +
+                                                ExcelDataWorkbookTechnicalSheetBuilder.TechnicalSheetName +
+                                                " technical worksheet.");
 
         if (!snapshot.WorkbookRecordFound)
             throw new InvalidOperationException("Workbook technical worksheet has no Workbook identity record.");

@@ -74,6 +74,21 @@ public sealed class ExcelDataImportPreviewRow
         get;
     }
 
+    public bool IsFormula
+    {
+        get;
+    }
+
+    public string FormulaExpression
+    {
+        get;
+    }
+
+    public ExcelDataFormulaImportState FormulaState
+    {
+        get;
+    }
+
     internal ExcelDataWorkbookCellDefinition CellDefinition
     {
         get;
@@ -127,6 +142,11 @@ public sealed class ExcelDataImportPreviewRow
         IncludedByPreset = includedByPreset;
         CanApply = canApply;
         Warning = warning ?? string.Empty;
+        IsFormula = incomingValue != null && incomingValue.IsFormula;
+        FormulaExpression = incomingValue == null ? string.Empty : incomingValue.FormulaExpression;
+        FormulaState = incomingValue == null
+            ? ExcelDataFormulaImportState.NotFormula
+            : incomingValue.FormulaState;
         CellDefinition = cellDefinition;
         IncomingValue = incomingValue;
     }

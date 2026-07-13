@@ -17,6 +17,7 @@ MonoBehaviour:
   targetWorkbookProfile: 4
   targetWorkbookPath: Assets/Excell Data Exchange/Export/PlayerTuning.xlsx
   writeBrushBackgroundColors: 1
+  writeBrushTextColors: 1
   includePlayerData: 1
   includeEnemyData: 0
   includeGameData: 0

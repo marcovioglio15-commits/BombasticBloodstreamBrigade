@@ -39,6 +39,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.85, g: 0.85, b: 0.85, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: all any field
     description: Generic brush that opens the full field catalog.
   - brushId: Numbers
@@ -51,6 +52,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.45, g: 0.68, b: 1, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: number float int stat scaling
     description: Brush for numeric tuning values, stats and scaling-friendly fields.
   - brushId: Booleans
@@ -63,6 +65,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.48, g: 0.86, b: 0.58, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: bool toggle enabled disabled
     description: Brush for boolean toggle fields.
   - brushId: Enums
@@ -75,6 +78,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.88, g: 0.68, b: 1, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: enum mode type policy
     description: Brush for enum mode and policy fields.
   - brushId: Strings
@@ -87,6 +91,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.9, g: 0.82, b: 0.48, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: string label id name description
     description: Brush for text identifiers, labels and descriptions.
   - brushId: References
@@ -99,6 +104,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.45, g: 0.7, b: 1, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: asset reference prefab material guid name
     description: Brush for asset reference fields resolved through the project AssetDatabase.
   - brushId: Lists
@@ -111,6 +117,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 0.45, g: 1, b: 0.65, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: list array element concrete item wave cell
     description: Brush for concrete list elements and nested list data.
   - brushId: Waves
@@ -123,6 +130,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 0
     color: {r: 1, g: 0.74, b: 0.36, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: enemy wave painted cell spawn
     description: Brush for EnemyWavePreset wave and painted-cell data.
   - brushId: Export - Player Numbers
@@ -135,6 +143,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 2
     color: {r: 0.34, g: 0.62, b: 1, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: export player number tuning speed damage cooldown
     description: Test brush for exporting readable player numeric tuning fields.
   - brushId: Export - Enemy Waves
@@ -147,6 +156,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 2
     color: {r: 1, g: 0.62, b: 0.28, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: export wave enemy spawn timing group
     description: Test brush for exporting enemy wave and spawn-related data.
   - brushId: Import - References
@@ -159,6 +169,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 1
     color: {r: 0.42, g: 0.82, b: 0.95, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: import reference asset prefab guid name path
     description: Test brush for importing asset references by readable asset name
       with ambiguity checks.
@@ -172,6 +183,7 @@ MonoBehaviour:
     fieldSearchFilter: 
     direction: 1
     color: {r: 0.5, g: 0.95, b: 0.52, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     searchTokens: import list concrete array element item
     description: Test brush for importing concrete list elements and list-backed
       values.

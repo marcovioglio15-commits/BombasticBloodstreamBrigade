@@ -157,10 +157,48 @@ internal static class ExcelDataLinkedSubPresetPanelFieldUtility
             if (newIndex < 0)
                 return;
 
-            WriteEnumProperty(serializedObject, propertyName, newIndex);
+            if (!SetEnumPropertyValue(serializedObject, propertyName, newIndex))
+                return;
 
             if (valueChanged != null)
                 valueChanged(newIndex);
+        });
+        parent.Add(field);
+        return field;
+    }
+
+    /// <summary>
+    /// Adds a manually persisted toggle that avoids UI Toolkit SerializedProperty rebinding loops.
+    /// </summary>
+    /// <param name="parent">Parent visual element.</param>
+    /// <param name="serializedObject">Serialized object that owns the Boolean field.</param>
+    /// <param name="propertyName">Serialized Boolean property name.</param>
+    /// <param name="label">Visible field label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <param name="valueChanged">Optional callback invoked after the new value is persisted.</param>
+    /// <returns>Configured toggle, or null when the property is missing.</returns>
+    public static Toggle AddToggleField(VisualElement parent,
+                                        SerializedObject serializedObject,
+                                        string propertyName,
+                                        string label,
+                                        string tooltip,
+                                        Action<bool> valueChanged)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return null;
+
+        Toggle field = new Toggle(label);
+        field.tooltip = tooltip;
+        field.SetValueWithoutNotify(property.boolValue);
+        field.RegisterValueChangedCallback(evt =>
+        {
+            if (!SetBooleanPropertyValue(serializedObject, propertyName, evt.newValue))
+                return;
+
+            if (valueChanged != null)
+                valueChanged(evt.newValue);
         });
         parent.Add(field);
         return field;
@@ -233,6 +271,58 @@ internal static class ExcelDataLinkedSubPresetPanelFieldUtility
 
         return ResolveSafeEnumIndex(property, BuildEnumOptions(property));
     }
+
+    /// <summary>
+    /// Writes an enum property through SerializedObject and marks the edited preset dirty.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the enum field.</param>
+    /// <param name="propertyName">Serialized enum property name.</param>
+    /// <param name="newIndex">Enum index selected by the user.</param>
+    /// <returns>True when the serialized value changed.</returns>
+    public static bool SetEnumPropertyValue(SerializedObject serializedObject,
+                                            string propertyName,
+                                            int newIndex)
+    {
+        serializedObject.Update();
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return false;
+
+        if (property.enumValueIndex == newIndex)
+            return false;
+
+        property.enumValueIndex = newIndex;
+        serializedObject.ApplyModifiedProperties();
+        MarkDirty(serializedObject.targetObject);
+        return true;
+    }
+
+    /// <summary>
+    /// Writes a Boolean property through SerializedObject without binding a live PropertyField.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object that owns the Boolean field.</param>
+    /// <param name="propertyName">Serialized Boolean property name.</param>
+    /// <param name="newValue">Boolean value selected by the user.</param>
+    /// <returns>True when the serialized value changed.</returns>
+    public static bool SetBooleanPropertyValue(SerializedObject serializedObject,
+                                               string propertyName,
+                                               bool newValue)
+    {
+        serializedObject.Update();
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return false;
+
+        if (property.boolValue == newValue)
+            return false;
+
+        property.boolValue = newValue;
+        serializedObject.ApplyModifiedProperties();
+        MarkDirty(serializedObject.targetObject);
+        return true;
+    }
     #endregion
 
     #region Manual Field Persistence
@@ -270,28 +360,6 @@ internal static class ExcelDataLinkedSubPresetPanelFieldUtility
             return 0;
 
         return property.enumValueIndex;
-    }
-
-    /// <summary>
-    /// Writes an enum property through SerializedObject and marks the edited preset dirty.
-    /// </summary>
-    /// <param name="serializedObject">Serialized object that owns the enum field.</param>
-    /// <param name="propertyName">Serialized enum property name.</param>
-    /// <param name="newIndex">Enum index selected by the user.</param>
-    private static void WriteEnumProperty(SerializedObject serializedObject, string propertyName, int newIndex)
-    {
-        serializedObject.Update();
-        SerializedProperty property = serializedObject.FindProperty(propertyName);
-
-        if (property == null)
-            return;
-
-        if (property.enumValueIndex == newIndex)
-            return;
-
-        property.enumValueIndex = newIndex;
-        serializedObject.ApplyModifiedProperties();
-        MarkDirty(serializedObject.targetObject);
     }
 
     /// <summary>

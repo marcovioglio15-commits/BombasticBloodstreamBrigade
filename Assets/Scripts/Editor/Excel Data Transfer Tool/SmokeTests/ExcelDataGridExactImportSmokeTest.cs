@@ -15,6 +15,9 @@ public static class ExcelDataGridExactImportSmokeTest
     #region Constants
     private const string WorkbookRelativePath = "Logs/ExcelDataGridExactImportSmoke.xlsx";
     private const string DataSheetName = "Round Trip";
+    private const string FormulaCellAddress = "A3";
+    private const string FormulaExpression = "70+3";
+    private const string FormulaCachedValue = "73";
     private const string LongLiteral = "Grid-authoritative workbook values remain fully readable without a manual Excel column resize.";
     #endregion
 
@@ -41,6 +44,10 @@ public static class ExcelDataGridExactImportSmokeTest
             ExcelDataExportResult exportResult =
                 ExcelDataExportService.ExportWorkbook(assets.TransferMaster, WorkbookRelativePath);
             ValidateAutoSizedColumn(exportResult.WorkbookPath);
+            WriteFormulaCell(exportResult.WorkbookPath,
+                             FormulaExpression,
+                             FormulaCachedValue,
+                             string.Empty);
             ConfigureChangedValues(assets);
             AssetDatabase.SaveAssets();
             ExcelDataImportPreviewResult preview =
@@ -51,7 +58,8 @@ public static class ExcelDataGridExactImportSmokeTest
             ValidateApplyResult(applyResult);
             ValidateRestoredValues(assets);
             ValidateLayoutHashMutationIsBlocked(assets, preview);
-            Debug.Log("ExcelDataGridExactImportSmokeTest PASS: exact scalar, enum, bool, reference and auto-sized column round trip validated.");
+            ValidateBlockedFormulaStates(assets, exportResult.WorkbookPath);
+            Debug.Log("ExcelDataGridExactImportSmokeTest PASS: exact scalar, enum, bool, reference, cached formula validation and auto-sized column round trip validated.");
         }
         finally
         {
@@ -340,6 +348,14 @@ public static class ExcelDataGridExactImportSmokeTest
             if (!preview.Rows[rowIndex].CanApply)
                 throw new InvalidOperationException("Preview cell was not applicable: " + preview.Rows[rowIndex].Address);
         }
+
+        ExcelDataImportPreviewRow formulaRow = FindFormulaRow(preview);
+
+        if (!formulaRow.IsFormula ||
+            formulaRow.FormulaExpression != "=" + FormulaExpression ||
+            formulaRow.FormulaState != ExcelDataFormulaImportState.CachedResult ||
+            formulaRow.Value != FormulaCachedValue)
+            throw new InvalidOperationException("Valid cached formula metadata was not preserved by Preview Import.");
     }
 
     /// <summary>
@@ -383,20 +399,219 @@ public static class ExcelDataGridExactImportSmokeTest
                                                             ExcelDataImportPreviewResult approvedPreview)
     {
         ExcelDataWorkbookSheetDefinition sheet = assets.TransferLayout.SheetDefinitions[0];
+        int originalCellCount = sheet.Cells.Count;
         sheet.Cells.Add(CreateLiteralCell(sheet.SheetId, 8, 8, "Hash Mutation"));
         bool blocked = false;
 
         try
         {
-            ExcelDataImportApplyService.ApplyWorkbook(assets.TransferMaster, WorkbookRelativePath, approvedPreview);
+            try
+            {
+                ExcelDataImportApplyService.ApplyWorkbook(assets.TransferMaster,
+                                                          WorkbookRelativePath,
+                                                          approvedPreview);
+            }
+            catch (InvalidOperationException exception)
+            {
+                blocked = exception.Message.Contains("layout changed");
+            }
         }
-        catch (InvalidOperationException exception)
+        finally
         {
-            blocked = exception.Message.Contains("layout changed");
+            while (sheet.Cells.Count > originalCellCount)
+                sheet.Cells.RemoveAt(sheet.Cells.Count - 1);
         }
 
         if (!blocked)
             throw new InvalidOperationException("Apply did not block a layout change made after preview.");
+    }
+
+    /// <summary>
+    /// Verifies missing, erroneous, stale and policy-rejected formula caches block the complete preview.
+    /// </summary>
+    /// <param name="assets">Smoke asset graph.</param>
+    /// <param name="workbookPath">Exported workbook path mutated through OpenXML.</param>
+    private static void ValidateBlockedFormulaStates(SmokeAssets assets, string workbookPath)
+    {
+        WriteFormulaCell(workbookPath, FormulaExpression, null, string.Empty);
+        AssertBlockedFormulaState(assets,
+                                  ExcelDataFormulaImportState.MissingCachedResult,
+                                  "missing cached result");
+
+        WriteFormulaCell(workbookPath, "1/0", "#DIV/0!", "e");
+        AssertBlockedFormulaState(assets,
+                                  ExcelDataFormulaImportState.CachedError,
+                                  "cached Excel error");
+
+        WriteFormulaCell(workbookPath,
+                         FormulaExpression,
+                         FormulaCachedValue,
+                         string.Empty);
+        SetManualCalculation(workbookPath, true);
+        AssertBlockedFormulaState(assets,
+                                  ExcelDataFormulaImportState.UntrustedCachedResult,
+                                  "manual calculation mode");
+
+        SetManualCalculation(workbookPath, false);
+        SetSerializedValue(assets.ImportPreset,
+                           "formulaImportPolicy",
+                           property => property.enumValueIndex =
+                               (int)ExcelDataFormulaImportPolicy.RejectFormulas);
+        AssertBlockedFormulaState(assets,
+                                  ExcelDataFormulaImportState.RejectedByPolicy,
+                                  "formula rejection policy");
+    }
+
+    /// <summary>
+    /// Runs Preview Import and asserts one exact formula blocking state.
+    /// </summary>
+    /// <param name="assets">Smoke asset graph.</param>
+    /// <param name="expectedState">Expected formula resolution state.</param>
+    /// <param name="scenario">Readable assertion scenario.</param>
+    private static void AssertBlockedFormulaState(SmokeAssets assets,
+                                                  ExcelDataFormulaImportState expectedState,
+                                                  string scenario)
+    {
+        ExcelDataImportPreviewResult preview =
+            ExcelDataImportPreviewService.PreviewWorkbook(assets.TransferMaster, WorkbookRelativePath);
+        ExcelDataImportPreviewRow formulaRow = FindFormulaRow(preview);
+
+        if (preview.CanApply || formulaRow.CanApply || formulaRow.FormulaState != expectedState)
+            throw new InvalidOperationException("Preview did not block the " + scenario + ".");
+    }
+
+    /// <summary>
+    /// Finds the mapped numeric formula row by its authoritative worksheet address.
+    /// </summary>
+    /// <param name="preview">Formula-aware import preview.</param>
+    /// <returns>Mapped formula row.</returns>
+    private static ExcelDataImportPreviewRow FindFormulaRow(ExcelDataImportPreviewResult preview)
+    {
+        for (int rowIndex = 0; rowIndex < preview.Rows.Count; rowIndex++)
+        {
+            if (preview.Rows[rowIndex].Address == FormulaCellAddress)
+                return preview.Rows[rowIndex];
+        }
+
+        throw new InvalidOperationException("Formula smoke preview is missing " + FormulaCellAddress + ".");
+    }
+    #endregion
+
+    #region Workbook Formula Mutation
+    /// <summary>
+    /// Replaces one mapped scalar with a formula and an optional persisted OpenXML result.
+    /// </summary>
+    /// <param name="workbookPath">Workbook path to update.</param>
+    /// <param name="formulaExpression">Formula text without the leading equals sign.</param>
+    /// <param name="cachedValue">Persisted result, or null to omit the cache element.</param>
+    /// <param name="cachedDataType">Optional OpenXML cached-result type such as e for errors.</param>
+    private static void WriteFormulaCell(string workbookPath,
+                                         string formulaExpression,
+                                         string cachedValue,
+                                         string cachedDataType)
+    {
+        using (FileStream stream = new FileStream(workbookPath,
+                                                  FileMode.Open,
+                                                  FileAccess.ReadWrite,
+                                                  FileShare.None))
+        using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Update, false))
+        {
+            string worksheetEntryPath =
+                ExcelDataOpenXmlPackageUtility.BuildWorksheetEntryLookup(archive)[DataSheetName];
+            XDocument worksheet =
+                ExcelDataOpenXmlPackageUtility.LoadXmlEntry(archive, worksheetEntryPath);
+            XElement formulaCell = FindWorksheetCell(worksheet, FormulaCellAddress);
+            RemoveCellPayload(formulaCell);
+            formulaCell.SetAttributeValue("t",
+                                          string.IsNullOrWhiteSpace(cachedDataType)
+                                              ? null
+                                              : cachedDataType);
+            formulaCell.Add(new XElement(SpreadsheetNamespace + "f", formulaExpression));
+
+            if (cachedValue != null)
+                formulaCell.Add(new XElement(SpreadsheetNamespace + "v", cachedValue));
+
+            ExcelDataOpenXmlPackageUtility.ReplaceXmlEntry(archive,
+                                                            worksheetEntryPath,
+                                                            worksheet);
+        }
+    }
+
+    /// <summary>
+    /// Sets or removes Manual calculation mode in workbook.xml.
+    /// </summary>
+    /// <param name="workbookPath">Workbook path to update.</param>
+    /// <param name="manualCalculation">True to store Manual calculation; false to restore default automatic mode.</param>
+    private static void SetManualCalculation(string workbookPath, bool manualCalculation)
+    {
+        const string workbookEntryPath = "xl/workbook.xml";
+
+        using (FileStream stream = new FileStream(workbookPath,
+                                                  FileMode.Open,
+                                                  FileAccess.ReadWrite,
+                                                  FileShare.None))
+        using (ZipArchive archive = new ZipArchive(stream, ZipArchiveMode.Update, false))
+        {
+            XDocument workbook =
+                ExcelDataOpenXmlPackageUtility.LoadXmlEntry(archive, workbookEntryPath);
+            XElement calculationProperties = workbook.Root.Element(SpreadsheetNamespace + "calcPr");
+
+            if (manualCalculation)
+            {
+                if (calculationProperties == null)
+                {
+                    calculationProperties = new XElement(SpreadsheetNamespace + "calcPr");
+                    workbook.Root.Add(calculationProperties);
+                }
+
+                calculationProperties.SetAttributeValue("calcMode", "manual");
+            }
+            else if (calculationProperties != null)
+                calculationProperties.Remove();
+
+            ExcelDataOpenXmlPackageUtility.ReplaceXmlEntry(archive,
+                                                            workbookEntryPath,
+                                                            workbook);
+        }
+    }
+
+    /// <summary>
+    /// Finds one materialized worksheet cell by exact A1 address.
+    /// </summary>
+    /// <param name="worksheet">Worksheet XML document.</param>
+    /// <param name="address">Exact A1 address.</param>
+    /// <returns>Existing worksheet cell element.</returns>
+    private static XElement FindWorksheetCell(XDocument worksheet, string address)
+    {
+        foreach (XElement cell in worksheet.Descendants(SpreadsheetNamespace + "c"))
+        {
+            XAttribute addressAttribute = cell.Attribute("r");
+
+            if (addressAttribute != null && addressAttribute.Value == address)
+                return cell;
+        }
+
+        throw new InvalidOperationException("Workbook formula smoke cell was not found: " + address + ".");
+    }
+
+    /// <summary>
+    /// Removes scalar, formula and inline-string payload nodes while retaining style and address attributes.
+    /// </summary>
+    /// <param name="cell">Worksheet cell to clear.</param>
+    private static void RemoveCellPayload(XElement cell)
+    {
+        XElement formula = cell.Element(SpreadsheetNamespace + "f");
+        XElement value = cell.Element(SpreadsheetNamespace + "v");
+        XElement inlineString = cell.Element(SpreadsheetNamespace + "is");
+
+        if (formula != null)
+            formula.Remove();
+
+        if (value != null)
+            value.Remove();
+
+        if (inlineString != null)
+            inlineString.Remove();
     }
     #endregion
 

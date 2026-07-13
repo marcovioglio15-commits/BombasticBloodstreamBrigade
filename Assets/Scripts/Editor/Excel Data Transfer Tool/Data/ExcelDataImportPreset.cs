@@ -34,6 +34,12 @@ public sealed class ExcelDataImportPreset : ScriptableObject
     [Tooltip("Reference resolver used for asset-name cells and optional GUID/path metadata.")]
     [SerializeField] private ExcelDataReferenceResolutionMode referenceResolutionMode = ExcelDataReferenceResolutionMode.AssetNameOnlyBlockingAmbiguity;
 
+    [Tooltip("Controls Excel formula cells during import. Use Cached Result reads the value recalculated and persisted by Excel; Reject Formulas blocks every mapped formula cell.")]
+    [SerializeField] private ExcelDataFormulaImportPolicy formulaImportPolicy = ExcelDataFormulaImportPolicy.UseCachedResult;
+
+    [Tooltip("Block formula caches when workbook calculation is Manual or explicitly requests a full recalculation, because the persisted result may be stale. Disable only when Preview warnings are reviewed deliberately.")]
+    [SerializeField] private bool blockPotentiallyStaleFormulaCaches = true;
+
     [Tooltip("Require the import preview step before any workbook value can be applied to assets.")]
     [SerializeField] private bool requirePreviewBeforeApply = true;
 
@@ -117,6 +123,22 @@ public sealed class ExcelDataImportPreset : ScriptableObject
         get
         {
             return referenceResolutionMode;
+        }
+    }
+
+    public ExcelDataFormulaImportPolicy FormulaImportPolicy
+    {
+        get
+        {
+            return formulaImportPolicy;
+        }
+    }
+
+    public bool BlockPotentiallyStaleFormulaCaches
+    {
+        get
+        {
+            return blockPotentiallyStaleFormulaCaches;
         }
     }
 

@@ -247,11 +247,37 @@ internal static class ExcelDataTransferMasterPanelOperationsUtility
         string state = row.CanApply && panel.ImportPreviewResult != null && panel.ImportPreviewResult.CanApply
             ? "Ready"
             : "Skipped";
+        string formulaSuffix = row.IsFormula
+            ? " | " + row.FormulaExpression + " [" + row.FormulaState + "]"
+            : string.Empty;
         label.text = state + " | " + row.SheetName + "!" + row.Address + " | " + row.AssetName +
-                     " | " + row.SerializedPath + " | " + row.CurrentValue + " -> " + row.Value;
-        label.tooltip = string.IsNullOrWhiteSpace(row.Warning)
+                     " | " + row.SerializedPath + " | " + row.CurrentValue + " -> " + row.Value +
+                     formulaSuffix;
+        label.tooltip = BuildPreviewRowTooltip(panel, row);
+    }
+
+    /// <summary>
+    /// Builds formula-aware preview details without hiding workbook-level validation diagnostics.
+    /// </summary>
+    /// <param name="panel">Owning master panel.</param>
+    /// <param name="row">Preview row being rendered.</param>
+    /// <returns>Formula, cached-result state and validation text.</returns>
+    private static string BuildPreviewRowTooltip(ExcelDataTransferMasterPanel panel,
+                                                 ExcelDataImportPreviewRow row)
+    {
+        string validation = string.IsNullOrWhiteSpace(row.Warning)
             ? panel.ImportPreviewResult == null ? string.Empty : panel.ImportPreviewResult.ValidationMessage
             : row.Warning;
+
+        if (!row.IsFormula)
+            return validation;
+
+        string formulaDetails = "Excel formula: " + row.FormulaExpression +
+                                "\nCached result: " + row.Value +
+                                "\nResolution: " + row.FormulaState + ".";
+        return string.IsNullOrWhiteSpace(validation)
+            ? formulaDetails
+            : formulaDetails + "\n" + validation;
     }
 
     /// <summary>

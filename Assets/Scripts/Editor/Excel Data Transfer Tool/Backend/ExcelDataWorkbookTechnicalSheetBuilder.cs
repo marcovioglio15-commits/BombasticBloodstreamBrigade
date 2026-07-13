@@ -9,8 +9,8 @@ using System.Text;
 internal static class ExcelDataWorkbookTechnicalSheetBuilder
 {
     #region Constants
-    public const string TechnicalSheetName = "_NashCoreTransfer";
-    public const string SchemaVersion = "2";
+    public const string TechnicalSheetName = "_TransferData";
+    public const string SchemaVersion = "3";
 
     private const string WorkbookRecordType = "Workbook";
     private const string SheetRecordType = "Sheet";

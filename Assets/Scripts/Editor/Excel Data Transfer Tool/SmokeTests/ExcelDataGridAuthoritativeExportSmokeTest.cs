@@ -19,6 +19,7 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
     private const string DataSheetName = "Objects";
     private const string SmokeBrushBackgroundArgb = "FF315A7D";
     private const string SmokeBrushTextArgb = "FFF1C232";
+    private const string VisibleGridBorderArgb = "FF808080";
     #endregion
 
     #region Methods
@@ -371,6 +372,9 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
             List<XElement> fills = styles.Root.Element(spreadsheetNamespace + "fills")
                                                 .Elements(spreadsheetNamespace + "fill")
                                                 .ToList();
+            List<XElement> borders = styles.Root.Element(spreadsheetNamespace + "borders")
+                                                  .Elements(spreadsheetNamespace + "border")
+                                                  .ToList();
             XElement literalFormat = ResolveCellFormat(literalCell, cellFormats);
             XElement emptyFormat = ResolveCellFormat(emptyCell, cellFormats);
 
@@ -400,8 +404,11 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
             if (!expectBrushTextColor && hasExpectedTextColor)
                 throw new InvalidOperationException("Authored literal cell retained its brush text color while text-color export was disabled.");
 
-            if (ReadIntAttribute(emptyFormat, "borderId") <= 0)
-                throw new InvalidOperationException("Empty H8 layout cell did not receive complete grid borders.");
+            int emptyBorderId = ReadIntAttribute(emptyFormat, "borderId");
+
+            if (emptyBorderId <= 0 || emptyBorderId >= borders.Count ||
+                !HasRgbColor(borders[emptyBorderId], VisibleGridBorderArgb, spreadsheetNamespace))
+                throw new InvalidOperationException("Empty H8 layout cell did not receive the visible complete-grid border.");
         }
     }
 

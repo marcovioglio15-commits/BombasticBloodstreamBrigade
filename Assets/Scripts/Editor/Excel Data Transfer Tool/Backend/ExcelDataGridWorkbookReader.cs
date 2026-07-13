@@ -36,8 +36,12 @@ internal static class ExcelDataGridWorkbookReader
         List<SheetInfo> sheetInformations = MiniExcel.GetSheetInformations(workbookPath, new OpenXmlConfiguration());
         HashSet<string> workbookSheetNames = BuildSheetNameSet(sheetInformations);
         ExcelDataWorkbookTechnicalMetadata technicalMetadata = ReadTechnicalMetadata(workbookPath, workbookSheetNames);
+        ExcelDataWorkbookFormulaReadResult formulaReadResult =
+            ExcelDataWorkbookFormulaReader.Read(workbookPath, layoutPreset);
         ExcelDataGridWorkbookReadResult result =
-            new ExcelDataGridWorkbookReadResult(technicalMetadata, File.GetLastWriteTimeUtc(workbookPath).Ticks);
+            new ExcelDataGridWorkbookReadResult(technicalMetadata,
+                                                formulaReadResult,
+                                                File.GetLastWriteTimeUtc(workbookPath).Ticks);
         List<ExcelDataWorkbookSheetDefinition> sheets = layoutPreset.SheetDefinitions;
 
         // Read each authored user sheet once while retaining only requested import coordinates.
@@ -45,7 +49,8 @@ internal static class ExcelDataGridWorkbookReader
         {
             ExcelDataWorkbookSheetDefinition sheet = sheets[sheetIndex];
 
-            if (sheet == null || !sheet.ImportEnabled || !ContainsImportCells(sheet))
+            if (sheet == null || !sheet.ImportEnabled ||
+                !ExcelDataWorkbookImportCellUtility.ContainsImportCells(sheet))
                 continue;
 
             string workbookSheetName =
@@ -77,7 +82,8 @@ internal static class ExcelDataGridWorkbookReader
                                         ExcelDataWorkbookSheetDefinition sheetDefinition,
                                         ExcelDataGridWorkbookReadResult result)
     {
-        Dictionary<int, List<int>> requestedColumnsByRow = BuildRequestedColumnsByRow(sheetDefinition);
+        Dictionary<int, List<int>> requestedColumnsByRow =
+            ExcelDataWorkbookImportCellUtility.BuildRequestedColumnsByRow(sheetDefinition);
         OpenXmlConfiguration configuration = new OpenXmlConfiguration();
         configuration.IgnoreEmptyRows = false;
         IEnumerable<object> queriedRows =
@@ -116,68 +122,6 @@ internal static class ExcelDataGridWorkbookReader
         }
     }
 
-    /// <summary>
-    /// Groups import-enabled authored columns by their one-based worksheet row.
-    /// </summary>
-    /// <param name="sheetDefinition">Worksheet whose sparse cells are inspected.</param>
-    /// <returns>Requested column indexes grouped by row.</returns>
-    private static Dictionary<int, List<int>> BuildRequestedColumnsByRow(ExcelDataWorkbookSheetDefinition sheetDefinition)
-    {
-        Dictionary<int, List<int>> columnsByRow = new Dictionary<int, List<int>>();
-        List<ExcelDataWorkbookCellDefinition> cells = sheetDefinition.Cells;
-
-        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
-        {
-            ExcelDataWorkbookCellDefinition cell = cells[cellIndex];
-
-            if (!IncludesImportRead(cell))
-                continue;
-
-            List<int> columns;
-
-            if (!columnsByRow.TryGetValue(cell.RowIndex, out columns))
-            {
-                columns = new List<int>();
-                columnsByRow.Add(cell.RowIndex, columns);
-            }
-
-            if (!columns.Contains(cell.ColumnIndex))
-                columns.Add(cell.ColumnIndex);
-        }
-
-        return columnsByRow;
-    }
-
-    /// <summary>
-    /// Reports whether a sheet contains any coordinate needed by import preview.
-    /// </summary>
-    /// <param name="sheetDefinition">Worksheet definition to inspect.</param>
-    /// <returns>True when at least one Data Field or validated literal participates in import.</returns>
-    private static bool ContainsImportCells(ExcelDataWorkbookSheetDefinition sheetDefinition)
-    {
-        List<ExcelDataWorkbookCellDefinition> cells = sheetDefinition.Cells;
-
-        for (int cellIndex = 0; cellIndex < cells.Count; cellIndex++)
-        {
-            if (IncludesImportRead(cells[cellIndex]))
-                return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Reports whether one cell must be read for data import or literal validation.
-    /// </summary>
-    /// <param name="cell">Authored cell definition.</param>
-    /// <returns>True when preview needs the exact worksheet value.</returns>
-    private static bool IncludesImportRead(ExcelDataWorkbookCellDefinition cell)
-    {
-        if (cell == null || !cell.IncludesImport() || cell.RowIndex < 1 || cell.ColumnIndex < 1)
-            return false;
-
-        return cell.ContentKind == ExcelDataWorkbookCellContentKind.DataField || cell.ValidateLiteralDuringImport;
-    }
     #endregion
 
     #region Technical Metadata
@@ -206,7 +150,7 @@ internal static class ExcelDataGridWorkbookReader
                             "A1",
                             configuration);
 
-        // Parse records by the fixed v2 column contract without relying on worksheet row order.
+        // Parse records by the fixed v3 column contract without relying on worksheet row order.
         foreach (object queriedRow in queriedRows)
         {
             IDictionary<string, object> row = queriedRow as IDictionary<string, object>;
@@ -316,6 +260,7 @@ internal sealed class ExcelDataGridWorkbookReadResult
     private readonly Dictionary<string, Dictionary<long, object>> valuesBySheetId =
         new Dictionary<string, Dictionary<long, object>>(StringComparer.Ordinal);
     private readonly List<string> missingSheetNames = new List<string>();
+    private readonly ExcelDataWorkbookFormulaReadResult formulaReadResult;
     #endregion
 
     #region Properties
@@ -336,6 +281,14 @@ internal sealed class ExcelDataGridWorkbookReadResult
             return missingSheetNames;
         }
     }
+
+    public ExcelDataWorkbookCalculationMetadata CalculationMetadata
+    {
+        get
+        {
+            return formulaReadResult.CalculationMetadata;
+        }
+    }
     #endregion
 
     #region Methods
@@ -345,11 +298,16 @@ internal sealed class ExcelDataGridWorkbookReadResult
     /// Creates an empty raw workbook result for one source file timestamp.
     /// </summary>
     /// <param name="technicalMetadata">Parsed reserved technical metadata.</param>
+    /// <param name="newFormulaReadResult">Formula expressions, cached results and calculation metadata.</param>
     /// <param name="workbookLastWriteUtcTicks">Source file timestamp used for stale-preview detection.</param>
     public ExcelDataGridWorkbookReadResult(ExcelDataWorkbookTechnicalMetadata technicalMetadata,
+                                           ExcelDataWorkbookFormulaReadResult newFormulaReadResult,
                                            long workbookLastWriteUtcTicks)
     {
         TechnicalMetadata = technicalMetadata;
+        formulaReadResult = newFormulaReadResult ??
+                            new ExcelDataWorkbookFormulaReadResult(
+                                new ExcelDataWorkbookCalculationMetadata("auto", false, false));
         WorkbookLastWriteUtcTicks = workbookLastWriteUtcTicks;
     }
     #endregion
@@ -391,6 +349,18 @@ internal sealed class ExcelDataGridWorkbookReadResult
             return null;
 
         return values.TryGetValue(ExcelDataWorkbookCoordinateUtility.BuildKey(rowIndex, columnIndex), out value) ? value : null;
+    }
+
+    /// <summary>
+    /// Finds formula metadata at one exact requested coordinate.
+    /// </summary>
+    /// <param name="sheetId">Stable layout worksheet identity.</param>
+    /// <param name="rowIndex">One-based worksheet row.</param>
+    /// <param name="columnIndex">One-based worksheet column.</param>
+    /// <returns>Formula expression and persisted result, or null for a literal scalar cell.</returns>
+    public ExcelDataWorkbookFormulaCell FindFormula(string sheetId, int rowIndex, int columnIndex)
+    {
+        return formulaReadResult.FindFormula(sheetId, rowIndex, columnIndex);
     }
 
     /// <summary>

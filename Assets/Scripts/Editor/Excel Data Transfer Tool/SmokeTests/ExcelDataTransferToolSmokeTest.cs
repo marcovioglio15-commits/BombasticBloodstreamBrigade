@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Editor-only smoke test for the complete grid-authoritative Excel Data Transfer Tool pipeline.
@@ -22,6 +25,7 @@ public static class ExcelDataTransferToolSmokeTest
             throw new InvalidOperationException("Default Excel data transfer master preset was not created.");
 
         ValidateLinkedPresets(masterPreset);
+        ValidateManualPolicyFields();
 
         List<ExcelDataFieldCatalogEntry> entries = ExcelDataFieldCatalogBuilder.BuildCatalog();
 
@@ -73,6 +77,63 @@ public static class ExcelDataTransferToolSmokeTest
 
         if (authoritativeCellCount <= 0)
             throw new InvalidOperationException("Default Excel data transfer layout preset has no authoritative cells.");
+    }
+
+    /// <summary>
+    /// Verifies manual enum and Boolean policy controls persist once without SerializedProperty binding recursion.
+    /// </summary>
+    private static void ValidateManualPolicyFields()
+    {
+        ExcelDataImportPreset importPreset = ScriptableObject.CreateInstance<ExcelDataImportPreset>();
+
+        try
+        {
+            SerializedObject serializedObject = new SerializedObject(importPreset);
+            SerializedProperty enumProperty = serializedObject.FindProperty("conflictPolicy");
+            SerializedProperty toggleProperty = serializedObject.FindProperty("requirePreviewBeforeApply");
+            VisualElement controlsRoot = new VisualElement();
+            PopupField<string> enumField = ExcelDataLinkedSubPresetPanelFieldUtility.AddEnumPopupField(
+                controlsRoot,
+                serializedObject,
+                "conflictPolicy",
+                "Conflict Policy",
+                "Smoke-test enum policy.",
+                null);
+            Toggle toggleField = ExcelDataLinkedSubPresetPanelFieldUtility.AddToggleField(
+                controlsRoot,
+                serializedObject,
+                "requirePreviewBeforeApply",
+                "Require Preview Before Apply",
+                "Smoke-test Boolean policy.",
+                null);
+
+            if (enumProperty == null || toggleProperty == null || enumField == null || toggleField == null ||
+                enumField.choices.Count <= 1)
+                throw new InvalidOperationException("Manual policy controls could not be constructed.");
+
+            int targetEnumIndex = (enumProperty.enumValueIndex + 1) % enumField.choices.Count;
+            bool targetToggleValue = !toggleProperty.boolValue;
+            bool enumChanged = ExcelDataLinkedSubPresetPanelFieldUtility.SetEnumPropertyValue(serializedObject,
+                                                                                              "conflictPolicy",
+                                                                                              targetEnumIndex);
+            bool toggleChanged = ExcelDataLinkedSubPresetPanelFieldUtility.SetBooleanPropertyValue(serializedObject,
+                                                                                                    "requirePreviewBeforeApply",
+                                                                                                    targetToggleValue);
+            serializedObject.Update();
+            enumProperty = serializedObject.FindProperty("conflictPolicy");
+            toggleProperty = serializedObject.FindProperty("requirePreviewBeforeApply");
+
+            if (!enumChanged || !toggleChanged || enumProperty.enumValueIndex != targetEnumIndex ||
+                toggleProperty.boolValue != targetToggleValue)
+                throw new InvalidOperationException("Manual policy controls did not persist their selected values.");
+
+            if (controlsRoot.Q<PropertyField>() != null)
+                throw new InvalidOperationException("Manual scalar policy controls unexpectedly created an auto-bound PropertyField.");
+        }
+        finally
+        {
+            ScriptableObject.DestroyImmediate(importPreset);
+        }
     }
 
     /// <summary>

@@ -56,7 +56,7 @@ public static class ExcelDataThemedPresetsSmokeTest
     }
 
     /// <summary>
-    /// Checks graph ownership, paths, domain guardrails and the authored visible worksheet structure.
+    /// Checks graph ownership, independent import/export paths, domain guardrails and the authored visible worksheet structure.
     /// </summary>
     /// <param name="masterPreset">Thematic master graph to inspect.</param>
     /// <param name="expectation">Expected theme identity and content contract.</param>
@@ -70,11 +70,14 @@ public static class ExcelDataThemedPresetsSmokeTest
         if (masterPreset.LayoutPreset.SheetDefinitions.Count != 1)
             throw new InvalidOperationException(expectation.DisplayName + " must contain exactly one focused user worksheet.");
 
-        if (string.IsNullOrWhiteSpace(masterPreset.ImportPreset.SourceWorkbookPath) ||
-            !string.Equals(masterPreset.ImportPreset.SourceWorkbookPath,
-                           masterPreset.ExportPreset.TargetWorkbookPath,
-                           StringComparison.Ordinal))
-            throw new InvalidOperationException(expectation.DisplayName + " import and export paths are not paired.");
+        ExcelDataWorkbookPathState importPathState =
+            ExcelDataWorkbookPathUtility.EvaluateImportWorkbookPath(masterPreset.ImportPreset, string.Empty);
+        ExcelDataWorkbookPathState exportPathState =
+            ExcelDataWorkbookPathUtility.EvaluateExportWorkbookPath(masterPreset.ExportPreset, string.Empty);
+
+        if (!importPathState.HasValidExtension || !exportPathState.HasValidExtension)
+            throw new InvalidOperationException(expectation.DisplayName +
+                                                " import and export paths must independently target .xlsx workbooks.");
 
         ValidateDomainFlags(masterPreset.ImportPreset, expectation);
         ValidateDomainFlags(masterPreset.ExportPreset, expectation);
@@ -183,12 +186,43 @@ public static class ExcelDataThemedPresetsSmokeTest
         if (rows.Count < 4 ||
             !string.Equals(ReadText(rows[0], "A"), expectation.Title, StringComparison.Ordinal) ||
             string.IsNullOrWhiteSpace(ReadText(rows[1], "A")) ||
-            !string.Equals(ReadText(rows[3], "A"), "SETTING", StringComparison.Ordinal) ||
-            !string.Equals(ReadText(rows[3], "B"), "VALUE", StringComparison.Ordinal) ||
-            !string.Equals(ReadText(rows[3], "C"), "SOURCE ASSET", StringComparison.Ordinal) ||
-            !string.Equals(ReadText(rows[3], "D"), "SERIALIZED PATH", StringComparison.Ordinal))
+            !MatchesAuthoredLiteral(rows[3], sheet, 4, "SETTING") ||
+            !MatchesAuthoredLiteral(rows[3], sheet, 4, "VALUE") ||
+            !MatchesAuthoredLiteral(rows[3], sheet, 4, "SOURCE ASSET") ||
+            !MatchesAuthoredLiteral(rows[3], sheet, 4, "SERIALIZED PATH"))
             throw new InvalidOperationException(expectation.DisplayName +
                                                 " physical workbook does not match its visible authored organization.");
+    }
+
+    /// <summary>
+    /// Verifies one exported literal at the column currently authored by the workbook layout.
+    /// </summary>
+    /// <param name="row">Physical workbook row keyed by Excel column letter.</param>
+    /// <param name="sheet">Authoritative layout that owns the expected coordinate.</param>
+    /// <param name="rowIndex">One-based row containing the expected literal.</param>
+    /// <param name="literal">Exact literal text to locate and validate.</param>
+    /// <returns>True when the authored literal exists at its current exported coordinate.</returns>
+    private static bool MatchesAuthoredLiteral(IDictionary<string, object> row,
+                                               ExcelDataWorkbookSheetDefinition sheet,
+                                               int rowIndex,
+                                               string literal)
+    {
+        // Resolve the current authored column so structural grid edits remain valid test inputs.
+        for (int cellIndex = 0; cellIndex < sheet.Cells.Count; cellIndex++)
+        {
+            ExcelDataWorkbookCellDefinition cell = sheet.Cells[cellIndex];
+
+            if (cell == null || cell.RowIndex != rowIndex ||
+                !string.Equals(cell.LiteralText, literal, StringComparison.Ordinal))
+                continue;
+
+            return string.Equals(ReadText(row,
+                                          ExcelDataWorkbookCoordinateUtility.ColumnIndexToName(cell.ColumnIndex)),
+                                 literal,
+                                 StringComparison.Ordinal);
+        }
+
+        return false;
     }
 
     /// <summary>

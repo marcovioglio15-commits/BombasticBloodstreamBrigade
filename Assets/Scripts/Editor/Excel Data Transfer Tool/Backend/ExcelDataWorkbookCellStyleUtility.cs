@@ -14,7 +14,7 @@ internal static class ExcelDataWorkbookCellStyleUtility
 {
     #region Constants
     private const string StylesEntryPath = "xl/styles.xml";
-    private const string GridBorderColor = "FFD0D0D0";
+    private const string GridBorderColor = "FF808080";
     #endregion
 
     #region Methods

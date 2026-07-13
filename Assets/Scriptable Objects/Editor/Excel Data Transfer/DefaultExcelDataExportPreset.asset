@@ -17,6 +17,7 @@ MonoBehaviour:
   targetWorkbookProfile: 0
   targetWorkbookPath: 
   writeBrushBackgroundColors: 1
+  writeBrushTextColors: 1
   includePlayerData: 1
   includeEnemyData: 1
   includeGameData: 1

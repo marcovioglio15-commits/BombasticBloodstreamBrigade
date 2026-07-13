@@ -19,6 +19,8 @@ MonoBehaviour:
   conflictPolicy: 2
   missingRowPolicy: 0
   referenceResolutionMode: 1
+  formulaImportPolicy: 0
+  blockPotentiallyStaleFormulaCaches: 1
   requirePreviewBeforeApply: 1
   blockAmbiguousReferences: 1
   scalingRuleImportPolicy: 0

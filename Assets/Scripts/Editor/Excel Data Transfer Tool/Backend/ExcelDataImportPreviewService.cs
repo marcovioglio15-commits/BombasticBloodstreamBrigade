@@ -99,7 +99,11 @@ internal static class ExcelDataImportPreviewService
         ExcelDataWorkbookTechnicalMetadata metadata = readResult.TechnicalMetadata;
 
         if (!metadata.SheetFound)
-            AddUniqueReason(blockingReasons, "Workbook is missing the reserved _NashCoreTransfer worksheet required by schema v2 import.");
+            AddUniqueReason(blockingReasons,
+                            "Workbook is missing the reserved " +
+                            ExcelDataWorkbookTechnicalSheetBuilder.TechnicalSheetName +
+                            " worksheet required by schema " +
+                            ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion + " import.");
         else if (!metadata.WorkbookRecordFound)
             AddUniqueReason(blockingReasons, "Workbook technical worksheet has no Workbook record.");
         else if (!string.Equals(metadata.SchemaVersion, ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion, StringComparison.Ordinal))
@@ -187,6 +191,11 @@ internal static class ExcelDataImportPreviewService
                                                             readResult);
                 candidates.Add(candidate);
                 ValidateCoordinateOwnership(sheet, candidate, candidatesByCoordinate, blockingReasons);
+
+                if (candidate.IncomingValue.IsFormula && !candidate.IncomingValue.FormulaCanImport)
+                    AddUniqueReason(blockingReasons,
+                                    "Formula import is blocked at " + candidate.SheetName + "!" +
+                                    candidate.Address + ": " + candidate.IncomingValue.FormulaWarning);
             }
         }
 
@@ -211,12 +220,18 @@ internal static class ExcelDataImportPreviewService
         object rawValue = readResult.GetValue(sheet.SheetId, cell.RowIndex, cell.ColumnIndex);
         ExcelDataWorkbookTechnicalCellMetadata technicalCell =
             readResult.TechnicalMetadata.FindCell(workbookSheetName, cell.RowIndex, cell.ColumnIndex);
+        ExcelDataWorkbookFormulaCell formulaCell =
+            readResult.FindFormula(sheet.SheetId, cell.RowIndex, cell.ColumnIndex);
         ExcelDataImportCellValue incomingValue =
-            new ExcelDataImportCellValue(rawValue,
-                                         technicalCell == null ? string.Empty : technicalCell.ReferenceName,
-                                         technicalCell == null ? string.Empty : technicalCell.ReferenceGuid,
-                                         technicalCell == null ? string.Empty : technicalCell.ReferencePath);
+            ExcelDataFormulaImportUtility.CreateImportValue(rawValue,
+                                                            technicalCell,
+                                                            formulaCell,
+                                                            readResult.CalculationMetadata,
+                                                            importPreset);
         PreviewCandidate candidate = new PreviewCandidate(sheet.SheetName, cell, incomingValue);
+
+        if (!string.IsNullOrWhiteSpace(incomingValue.FormulaWarning))
+            candidate.AddWarning(incomingValue.FormulaWarning);
 
         if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
         {
@@ -275,6 +290,9 @@ internal static class ExcelDataImportPreviewService
 
         if (!string.IsNullOrWhiteSpace(currentSnapshot.Warning))
             candidate.AddWarning(currentSnapshot.Warning);
+
+        if (!incomingValue.FormulaCanImport)
+            return candidate;
 
         // Write only to the temporary SerializedObject state, then discard it through Update.
         candidate.CanApply = ExcelDataImportPropertyWriterUtility.TryWriteProperty(property,
