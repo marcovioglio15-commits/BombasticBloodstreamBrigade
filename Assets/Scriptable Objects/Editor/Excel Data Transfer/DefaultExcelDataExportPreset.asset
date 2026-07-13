@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0deb0f4ef439eb14ebc1025bd5c7b141, type: 3}
+  m_Name: DefaultExcelDataExportPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataExportPreset
+  presetId: 32c757c0f705435cb65882f62fd80200
+  presetName: Default Export
+  targetWorkbookProfile: 0
+  targetWorkbookPath: 
+  layoutMode: 2
+  listElementMode: 2
+  includePlayerData: 1
+  includeEnemyData: 1
+  includeGameData: 1
+  includeWaveData: 1
+  writeAssetNames: 1
+  writeReferenceGuids: 1
+  writeReferencePaths: 0
+  selectedFields:
+  - fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_PresetName
+    displayName: PlayerMasterPreset_A / m_PresetName
+    serializedPath: m_PresetName
+    pathTemplate: m_PresetName
+    domain: 1
+    dataKind: 5
+    importEnabled: 0
+    exportEnabled: 1
+  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.maxSpeed
+    displayName: ConeVision_ForwardAndBarckward / movementSettings.values.maxSpeed
+    serializedPath: movementSettings.values.maxSpeed
+    pathTemplate: movementSettings.values.maxSpeed
+    domain: 1
+    dataKind: 2
+    importEnabled: 0
+    exportEnabled: 1
+  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.acceleration
+    displayName: ConeVision_ForwardAndBarckward / movementSettings.values.acceleration
+    serializedPath: movementSettings.values.acceleration
+    pathTemplate: movementSettings.values.acceleration
+    domain: 1
+    dataKind: 2
+    importEnabled: 0
+    exportEnabled: 1
+  - fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.directionsMode
+    displayName: ConeVision_ForwardAndBarckward / movementSettings.directionsMode
+    serializedPath: movementSettings.directionsMode
+    pathTemplate: movementSettings.directionsMode
+    domain: 1
+    dataKind: 4
+    importEnabled: 0
+    exportEnabled: 1
+  - fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:visualPreset
+    displayName: EnemyMasterPreset_AcidWanderer / visualPreset
+    serializedPath: visualPreset
+    pathTemplate: visualPreset
+    domain: 2
+    dataKind: 6
+    importEnabled: 0
+    exportEnabled: 1
+  - fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves
+    displayName: PF_EnemySpawner_Empty / waves
+    serializedPath: waves
+    pathTemplate: waves
+    domain: 4
+    dataKind: 10
+    importEnabled: 0
+    exportEnabled: 1

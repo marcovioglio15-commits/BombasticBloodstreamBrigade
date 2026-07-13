@@ -1,0 +1,12 @@
+MiniExcel 1.44.1
+Source: https://www.nuget.org/packages/MiniExcel/1.44.1
+Project: https://github.com/mini-software/MiniExcel
+License: Apache-2.0
+
+Microsoft.Bcl.AsyncInterfaces 10.0.0
+Source: https://www.nuget.org/packages/Microsoft.Bcl.AsyncInterfaces/10.0.0
+License: MIT
+
+System.Threading.Tasks.Extensions 4.6.3
+Source: https://www.nuget.org/packages/System.Threading.Tasks.Extensions/4.6.3
+License: MIT

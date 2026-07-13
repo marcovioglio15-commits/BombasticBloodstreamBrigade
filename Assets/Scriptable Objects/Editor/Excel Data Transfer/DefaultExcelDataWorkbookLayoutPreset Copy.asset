@@ -1,0 +1,395 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: DefaultExcelDataWorkbookLayoutPreset Copy
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: ce2d88ec116d42ffb3a06396ba77485c
+  presetName: Default Workbook Layout Copy
+  manifestSheetName: Manifest
+  objectsSheetName: Objects
+  referencesSheetName: References
+  wavesSheetName: Waves
+  defaultGridRows: 32
+  defaultGridColumns: 16
+  defaultCellWidth: 217
+  defaultCellHeight: 35
+  dataStartRow: 2
+  dataStartColumn: 1
+  cellMappings:
+  - sheetName: Objects
+    rowIndex: 1
+    columnIndex: 1
+    fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_PresetName
+    direction: 0
+    headerOverride: m_PresetName
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 2
+    columnIndex: 4
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.maxSpeed
+    direction: 0
+    headerOverride: movementSettings.values.maxSpeed
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 2
+    columnIndex: 6
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_DiscreteDirectionCount
+    direction: 0
+    headerOverride: lookSettings.m_DiscreteDirectionCount
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 5
+    columnIndex: 2
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeAccelerationMultiplier
+    direction: 0
+    headerOverride: lookSettings.m_FrontConeAccelerationMultiplier
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 8
+    columnIndex: 4
+    fieldId: Enemy:5281a0b709fc544408ab13483cd552f8:EnemyMasterPreset:uiVisualPreset
+    direction: 0
+    headerOverride: uiVisualPreset
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 4
+    columnIndex: 4
+    fieldId: 'Player:b07b7a543694b12449339cf2aa39e63b:PlayerProgressionPreset:gamePhasesDefinition.Array.data[3].milestones.Array.data[1].powerUpUnlocks.Array.data[0]'
+    direction: 0
+    headerOverride: 'gamePhasesDefinition.Array.data[].milestones.Array.data[].powerUpUnlocks.Array.data[]'
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 1
+    columnIndex: 2
+    fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_Version
+    direction: 0
+    headerOverride: m_Version
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 2
+    columnIndex: 2
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.acceleration
+    direction: 0
+    headerOverride: movementSettings.values.acceleration
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 3
+    columnIndex: 1
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.directionsMode
+    direction: 0
+    headerOverride: movementSettings.directionsMode
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 3
+    columnIndex: 2
+    fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeEnabled
+    direction: 0
+    headerOverride: lookSettings.m_FrontConeEnabled
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 4
+    columnIndex: 1
+    fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:visualPreset
+    direction: 0
+    headerOverride: visualPreset
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 5
+    columnIndex: 1
+    fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves
+    direction: 0
+    headerOverride: waves
+    customNumberFormat: 
+  - sheetName: Objects
+    rowIndex: 6
+    columnIndex: 1
+    fieldId: 'Player:5a3703589c6fd994ea8b4502a6cc4437:PlayerControllerPreset:scalingRules.Array.data[0]'
+    direction: 0
+    headerOverride: 'scalingRules.Array.data[]'
+    customNumberFormat: 
+  sheetDefinitions:
+  - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+    sheetName: Objects
+    previewRowCount: 32
+    previewColumnCount: 16
+    previewCellWidth: 217
+    previewCellHeight: 35
+    freezeRowCount: 0
+    freezeColumnCount: 0
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_PresetName
+        domain: 1
+        ownerAssetGuid: 2aa7920f2d0dab444bbb97e34b3f90d8
+        ownerAssetTypeName: PlayerMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Master Presets/PlayerMasterPreset_A.asset
+        serializedPath: m_PresetName
+        pathTemplate: m_PresetName
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 2
+      columnIndex: 4
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.maxSpeed
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.maxSpeed
+        pathTemplate: movementSettings.values.maxSpeed
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 2
+      columnIndex: 6
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_DiscreteDirectionCount
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: lookSettings.m_DiscreteDirectionCount
+        pathTemplate: lookSettings.m_DiscreteDirectionCount
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 5
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeAccelerationMultiplier
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: lookSettings.m_FrontConeAccelerationMultiplier
+        pathTemplate: lookSettings.m_FrontConeAccelerationMultiplier
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 8
+      columnIndex: 4
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:5281a0b709fc544408ab13483cd552f8:EnemyMasterPreset:uiVisualPreset
+        domain: 2
+        ownerAssetGuid: 5281a0b709fc544408ab13483cd552f8
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_DVDWanderers.asset
+        serializedPath: uiVisualPreset
+        pathTemplate: uiVisualPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 4
+      columnIndex: 4
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: 'Player:b07b7a543694b12449339cf2aa39e63b:PlayerProgressionPreset:gamePhasesDefinition.Array.data[3].milestones.Array.data[1].powerUpUnlocks.Array.data[0]'
+        domain: 1
+        ownerAssetGuid: b07b7a543694b12449339cf2aa39e63b
+        ownerAssetTypeName: PlayerProgressionPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Progression/Immortal Preset.asset
+        serializedPath: 'gamePhasesDefinition.Array.data[3].milestones.Array.data[1].powerUpUnlocks.Array.data[0]'
+        pathTemplate: 'gamePhasesDefinition.Array.data[].milestones.Array.data[].powerUpUnlocks.Array.data[]'
+        expectedDataKind: 12
+        concreteListIndices: 030000000100000000000000
+        stableListKeys:
+        - 
+        - 
+        - 
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 1
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:2aa7920f2d0dab444bbb97e34b3f90d8:PlayerMasterPreset:m_Version
+        domain: 1
+        ownerAssetGuid: 2aa7920f2d0dab444bbb97e34b3f90d8
+        ownerAssetTypeName: PlayerMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Master Presets/PlayerMasterPreset_A.asset
+        serializedPath: m_Version
+        pathTemplate: m_Version
+        expectedDataKind: 5
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 2
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.values.acceleration
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.values.acceleration
+        pathTemplate: movementSettings.values.acceleration
+        expectedDataKind: 2
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 3
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:movementSettings.directionsMode
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: movementSettings.directionsMode
+        pathTemplate: movementSettings.directionsMode
+        expectedDataKind: 4
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 3
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:aa65d236feea8ab4c8c34e2d8c4b50f3:PlayerControllerPreset:lookSettings.m_FrontConeEnabled
+        domain: 1
+        ownerAssetGuid: aa65d236feea8ab4c8c34e2d8c4b50f3
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/ConeVision_ForwardAndBarckward.asset
+        serializedPath: lookSettings.m_FrontConeEnabled
+        pathTemplate: lookSettings.m_FrontConeEnabled
+        expectedDataKind: 3
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Enemy:9f65ffa9659e02a458f01071aafed820:EnemyMasterPreset:visualPreset
+        domain: 2
+        ownerAssetGuid: 9f65ffa9659e02a458f01071aafed820
+        ownerAssetTypeName: EnemyMasterPreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Master Presets/EnemyMasterPreset_AcidWanderer.asset
+        serializedPath: visualPreset
+        pathTemplate: visualPreset
+        expectedDataKind: 6
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 5
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves
+        pathTemplate: waves
+        expectedDataKind: 10
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 41ee68c0b9b54c7397fd2c1ec75ba54d
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: 'Player:5a3703589c6fd994ea8b4502a6cc4437:PlayerControllerPreset:scalingRules.Array.data[0]'
+        domain: 1
+        ownerAssetGuid: 5a3703589c6fd994ea8b4502a6cc4437
+        ownerAssetTypeName: PlayerControllerPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Presets/HoctagonStyle.asset
+        serializedPath: 'scalingRules.Array.data[0]'
+        pathTemplate: 'scalingRules.Array.data[]'
+        expectedDataKind: 12
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0

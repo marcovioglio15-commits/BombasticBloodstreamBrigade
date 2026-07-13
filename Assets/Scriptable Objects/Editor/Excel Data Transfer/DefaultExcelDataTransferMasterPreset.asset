@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2001e592a311547ba193492c98b9b9, type: 3}
+  m_Name: DefaultExcelDataTransferMasterPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataTransferMasterPreset
+  presetId: 355739ab81444be88a0498eea5787df5
+  presetName: Default Excel Data Transfer
+  description: 
+  version: 1.0.0
+  layoutPreset: {fileID: 11400000, guid: f761f33665479eb4fae5e0c1092134aa, type: 2}
+  brushPalettePreset: {fileID: 11400000, guid: c58a2fb38e07a754a8945d6554bb4277, type: 2}
+  importPreset: {fileID: 11400000, guid: 19cbaa0551fd95e4fbe27119eb6c03ca, type: 2}
+  exportPreset: {fileID: 11400000, guid: e2963340a7296474bbef1b05a45167ad, type: 2}
