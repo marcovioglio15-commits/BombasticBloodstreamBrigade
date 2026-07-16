@@ -1,5 +1,14 @@
 /// <summary>
-/// Resolves which offensive module kinds can emit predictive engagement feedback and which timing model they use.
+/// Identifies the runtime owner available to evaluate an offensive engagement timing window.
+/// </summary>
+public enum EnemyOffensiveEngagementTimingContext : byte
+{
+    SharedPattern = 0,
+    BossMixedPattern = 1
+}
+
+/// <summary>
+/// Resolves which offensive module kinds can emit engagement feedback in shared patterns or boss-owned mixed-pattern slots.
 /// </summary>
 public static class EnemyOffensiveEngagementSupportUtility
 {
@@ -15,6 +24,25 @@ public static class EnemyOffensiveEngagementSupportUtility
     public static EnemyOffensiveEngagementTimingMode ResolveTimingMode(EnemyPatternModuleCatalogSection section,
                                                                        EnemyPatternModuleKind moduleKind)
     {
+        return ResolveTimingMode(section,
+                                 moduleKind,
+                                 EnemyOffensiveEngagementTimingContext.SharedPattern);
+    }
+
+    /// <summary>
+    /// Resolves the engagement timing mode supported by one module for the runtime context that will evaluate it.
+    /// </summary>
+    /// <param name="section">Catalog section that owns the module binding.</param>
+    /// <param name="moduleKind">Resolved module kind selected in that section.</param>
+    /// <param name="timingContext">Runtime owner available to evaluate predictive or activation timing.</param>
+    /// <returns>Supported timing mode, or None when that context has no matching runtime hook.</returns>
+    public static EnemyOffensiveEngagementTimingMode ResolveTimingMode(EnemyPatternModuleCatalogSection section,
+                                                                       EnemyPatternModuleKind moduleKind,
+                                                                       EnemyOffensiveEngagementTimingContext timingContext)
+    {
+        if (timingContext == EnemyOffensiveEngagementTimingContext.SharedPattern)
+            return ResolveSharedPatternTimingMode(section, moduleKind);
+
         switch (section)
         {
             case EnemyPatternModuleCatalogSection.CoreMovement:
@@ -25,9 +53,6 @@ public static class EnemyOffensiveEngagementSupportUtility
 
             case EnemyPatternModuleCatalogSection.WeaponInteraction:
                 return ResolveWeaponTimingMode(moduleKind);
-
-            case EnemyPatternModuleCatalogSection.DropItems:
-                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
                 return EnemyOffensiveEngagementTimingMode.None;
@@ -45,9 +70,50 @@ public static class EnemyOffensiveEngagementSupportUtility
     {
         return ResolveTimingMode(section, moduleKind) != EnemyOffensiveEngagementTimingMode.None;
     }
+
+    /// <summary>
+    /// Returns whether one module kind has a runtime timing hook in the requested pattern context.
+    /// </summary>
+    /// <param name="section">Catalog section that owns the module binding.</param>
+    /// <param name="moduleKind">Resolved module kind selected in that section.</param>
+    /// <param name="timingContext">Runtime owner available to evaluate the warning window.</param>
+    /// <returns>True when the requested context can evaluate the resolved timing mode.</returns>
+    public static bool SupportsTimingMode(EnemyPatternModuleCatalogSection section,
+                                          EnemyPatternModuleKind moduleKind,
+                                          EnemyOffensiveEngagementTimingContext timingContext)
+    {
+        return ResolveTimingMode(section, moduleKind, timingContext) != EnemyOffensiveEngagementTimingMode.None;
+    }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Resolves predictive timing that can be evaluated without boss-owned module slot runtime state.
+    /// </summary>
+    /// <param name="section">Shared pattern catalog section.</param>
+    /// <param name="moduleKind">Module kind selected by the shared pattern.</param>
+    /// <returns>Predictive timing mode, or None when the normal enemy runtime exposes no matching hook.</returns>
+    private static EnemyOffensiveEngagementTimingMode ResolveSharedPatternTimingMode(EnemyPatternModuleCatalogSection section,
+                                                                                     EnemyPatternModuleKind moduleKind)
+    {
+        switch (section)
+        {
+            case EnemyPatternModuleCatalogSection.ShortRangeInteraction:
+                return moduleKind == EnemyPatternModuleKind.ShortRangeDash
+                    ? EnemyOffensiveEngagementTimingMode.ShortRangeDashRelease
+                    : EnemyOffensiveEngagementTimingMode.None;
+
+            case EnemyPatternModuleCatalogSection.WeaponInteraction:
+                return moduleKind == EnemyPatternModuleKind.Shooter ||
+                       moduleKind == EnemyPatternModuleKind.Bombardier
+                    ? EnemyOffensiveEngagementTimingMode.WeaponShot
+                    : EnemyOffensiveEngagementTimingMode.None;
+
+            default:
+                return EnemyOffensiveEngagementTimingMode.None;
+        }
+    }
+
     /// <summary>
     /// Resolves the visual engagement timing mode for Core Movement modules that do not own a more specific commit hook.
     /// </summary>
@@ -60,7 +126,6 @@ public static class EnemyOffensiveEngagementSupportUtility
             case EnemyPatternModuleKind.Stationary:
             case EnemyPatternModuleKind.Grunt:
             case EnemyPatternModuleKind.Wanderer:
-            case EnemyPatternModuleKind.Coward:
                 return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
@@ -69,10 +134,10 @@ public static class EnemyOffensiveEngagementSupportUtility
     }
 
     /// <summary>
-    /// Resolves the predictive engagement timing mode supported by one short-range module kind.
+    /// Resolves predictive commit timing or boss-owned activation timing for one short-range module kind.
     /// </summary>
     /// <param name="moduleKind">Selected short-range module kind.</param>
-    /// <returns>Supported timing mode, or None when no predictive trigger is currently implemented.</returns>
+    /// <returns>Supported predictive or activation timing mode, or None when no matching runtime trigger is implemented.</returns>
     private static EnemyOffensiveEngagementTimingMode ResolveShortRangeTimingMode(EnemyPatternModuleKind moduleKind)
     {
         switch (moduleKind)
@@ -81,9 +146,7 @@ public static class EnemyOffensiveEngagementSupportUtility
                 return EnemyOffensiveEngagementTimingMode.ShortRangeDashRelease;
 
             case EnemyPatternModuleKind.Grunt:
-            case EnemyPatternModuleKind.Wanderer:
             case EnemyPatternModuleKind.Coward:
-            case EnemyPatternModuleKind.Stationary:
                 return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:
@@ -92,10 +155,10 @@ public static class EnemyOffensiveEngagementSupportUtility
     }
 
     /// <summary>
-    /// Resolves the predictive engagement timing mode supported by one weapon module kind.
+    /// Resolves predictive commit timing or boss-owned activation timing for one weapon module kind.
     /// </summary>
     /// <param name="moduleKind">Selected weapon module kind.</param>
-    /// <returns>Supported timing mode, or None when no predictive trigger is currently implemented.</returns>
+    /// <returns>Supported predictive or activation timing mode, or None when no matching runtime trigger is implemented.</returns>
     private static EnemyOffensiveEngagementTimingMode ResolveWeaponTimingMode(EnemyPatternModuleKind moduleKind)
     {
         switch (moduleKind)
@@ -105,13 +168,6 @@ public static class EnemyOffensiveEngagementSupportUtility
                 return EnemyOffensiveEngagementTimingMode.WeaponShot;
 
             case EnemyPatternModuleKind.PowerUpStealer:
-                return EnemyOffensiveEngagementTimingMode.ModuleActivation;
-
-            case EnemyPatternModuleKind.Grunt:
-            case EnemyPatternModuleKind.Stationary:
-            case EnemyPatternModuleKind.Wanderer:
-            case EnemyPatternModuleKind.Coward:
-            case EnemyPatternModuleKind.ShortRangeDash:
                 return EnemyOffensiveEngagementTimingMode.ModuleActivation;
 
             default:

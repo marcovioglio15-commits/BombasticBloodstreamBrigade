@@ -26,7 +26,7 @@ MonoBehaviour:
     previewColumnCount: 4
     previewCellWidth: 210
     previewCellHeight: 30
-    freezeRowCount: 4
+    freezeRowCount: 3
     freezeColumnCount: 1
     visibility: 0
     importEnabled: 1

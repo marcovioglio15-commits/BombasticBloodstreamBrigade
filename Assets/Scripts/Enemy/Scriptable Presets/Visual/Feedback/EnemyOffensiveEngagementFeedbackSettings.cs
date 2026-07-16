@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 /// <summary>
-/// Stores generic visual feedback authored for offensive enemy behaviour engagements.
+/// Stores visual warning settings shared by predictive commits and boss-owned module activation windows.
 /// </summary>
 [Serializable]
 public sealed class EnemyOffensiveEngagementFeedbackSettings
@@ -23,7 +23,7 @@ public sealed class EnemyOffensiveEngagementFeedbackSettings
 
     #region Serialized Fields
     [Header("Color Blend")]
-    [Tooltip("When enabled, the offensive engagement warning blends enemy renderers toward the configured color before the behaviour commits.")]
+    [Tooltip("When enabled, blends enemy renderers toward the configured color during the engagement warning window. Supported commit hooks remain predictive in shared and boss patterns; activation-only boss modules warn immediately after candidate selection.")]
     [FormerlySerializedAs("enableAimPulse")]
     [SerializeField] private bool enableColorBlend = true;
 
@@ -31,7 +31,7 @@ public sealed class EnemyOffensiveEngagementFeedbackSettings
     [FormerlySerializedAs("aimPulseColor")]
     [SerializeField] private Color colorBlendColor = new Color(0.35f, 1f, 0.95f, 1f);
 
-    [Tooltip("Seconds before the behaviour commit when the color blend warning may begin. Shooter idle windows use this directly, while dash telegraphs clamp it to the authored dash aim duration.")]
+    [Tooltip("Color warning-window length in seconds. Predictive hooks use it as pre-commit lead time, with dash warnings clamped to their authored aim duration. Activation-only boss modules use it as post-selection display duration.")]
     [FormerlySerializedAs("aimPulseLeadTimeSeconds")]
     [SerializeField] private float colorBlendLeadTimeSeconds = DefaultColorBlendLeadTimeSeconds;
 
@@ -44,19 +44,20 @@ public sealed class EnemyOffensiveEngagementFeedbackSettings
     [SerializeField] private float colorBlendMaximumBlend = DefaultColorBlendMaximumBlend;
 
     [Header("Billboard")]
-    [Tooltip("When enabled, the offensive engagement warning displays a billboard sprite above the enemy before the behaviour commits.")]
+    [Tooltip("When enabled, displays an engagement-warning billboard above the enemy. Supported commit hooks remain predictive in shared and boss patterns; activation-only boss modules show it immediately after candidate selection.")]
     [SerializeField] private bool enableBillboard = true;
 
-    [Tooltip("Sprite rendered by the offensive engagement billboard. Leave empty to suppress the billboard while still allowing color blend feedback.")]
+    [Tooltip("Sprite rendered by the offensive engagement billboard. Empty candidate, mixed-pattern and normal-interaction overrides inherit the next lower-priority sprite; an empty top-level visual or boss pattern-change source suppresses its billboard.")]
     [SerializeField] private Sprite billboardSprite;
 
     [Tooltip("Tint multiplied with the billboard sprite color while the offensive engagement warning is active.")]
     [SerializeField] private Color billboardColor = Color.white;
 
     [Tooltip("World-space offset from the enemy pivot where the offensive engagement billboard is rendered.")]
-    [SerializeField] private Vector3 billboardLocalOffset = new Vector3(0f, 1.85f, 0f);
+    [FormerlySerializedAs("billboardLocalOffset")]
+    [SerializeField] private Vector3 billboardWorldOffset = new Vector3(0f, 1.85f, 0f);
 
-    [Tooltip("Seconds before the behaviour commit when the billboard may appear. Shooter idle windows use this directly, while dash telegraphs clamp it to the authored dash aim duration.")]
+    [Tooltip("Billboard warning-window length in seconds. Predictive hooks use it as pre-commit lead time, with dash warnings clamped to their authored aim duration. Activation-only boss modules use it as post-selection display duration.")]
     [SerializeField] private float billboardLeadTimeSeconds = DefaultBillboardLeadTimeSeconds;
 
     [Tooltip("Base uniform world scale applied to the billboard when no pulse is active.")]
@@ -139,11 +140,11 @@ public sealed class EnemyOffensiveEngagementFeedbackSettings
         }
     }
 
-    public Vector3 BillboardLocalOffset
+    public Vector3 BillboardWorldOffset
     {
         get
         {
-            return billboardLocalOffset;
+            return billboardWorldOffset;
         }
     }
 

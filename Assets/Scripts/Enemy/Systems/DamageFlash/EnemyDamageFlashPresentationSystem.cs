@@ -125,7 +125,9 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                 targetColor = offensiveColor;
             }
 
-            if (patternChangeResult.Blend > targetBlend)
+            if (ShouldUseBossPatternChangeBlend(offensiveBlendResult.IsActive,
+                                                patternChangeResult.Blend,
+                                                targetBlend))
             {
                 targetBlend = patternChangeResult.Blend;
                 targetColor = patternChangeResult.Color;
@@ -191,6 +193,51 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Resolves whether the generic boss pattern-change blend may render without masking an active behaviour engagement blend.
+    /// </summary>
+    /// <param name="engagementBlendActive">Whether a pattern-specific behaviour engagement color window is active.</param>
+    /// <param name="patternChangeBlend">Current generic boss pattern-change blend strength.</param>
+    /// <param name="currentBlend">Strongest damage or behaviour engagement blend already selected.</param>
+    /// <returns>True when the generic pattern-change blend is both unopposed and visually stronger.</returns>
+    public static bool ShouldUseBossPatternChangeBlend(bool engagementBlendActive,
+                                                       float patternChangeBlend,
+                                                       float currentBlend)
+    {
+        return !engagementBlendActive && patternChangeBlend > currentBlend;
+    }
+
+    /// <summary>
+    /// Resolves whether the generic boss pattern-change billboard may render without masking a pattern-specific behaviour warning.
+    /// </summary>
+    /// <param name="engagementBillboardActive">Whether a pattern-specific behaviour engagement billboard is active.</param>
+    /// <param name="patternChangeBillboardActive">Whether the generic boss pattern-change billboard window is active.</param>
+    /// <returns>True when only the generic pattern-change billboard should render.</returns>
+    public static bool ShouldUseBossPatternChangeBillboard(bool engagementBillboardActive,
+                                                           bool patternChangeBillboardActive)
+    {
+        return !engagementBillboardActive && patternChangeBillboardActive;
+    }
+
+    /// <summary>
+    /// Resolves one boss pattern-change channel against its own authored duration while the shared feedback lifetime remains open.
+    /// </summary>
+    /// <param name="feedbackWindowActive">Whether the shared pattern-change feedback lifetime was active at frame start.</param>
+    /// <param name="elapsedSeconds">Seconds elapsed since the pattern change.</param>
+    /// <param name="channelEnabled">Whether the evaluated visual channel is enabled.</param>
+    /// <param name="channelDurationSeconds">Independent display duration authored for the evaluated channel.</param>
+    /// <returns>True while this specific channel remains inside its own positive duration.</returns>
+    public static bool IsBossPatternChangeChannelActive(bool feedbackWindowActive,
+                                                        float elapsedSeconds,
+                                                        bool channelEnabled,
+                                                        float channelDurationSeconds)
+    {
+        return feedbackWindowActive &&
+               channelEnabled &&
+               channelDurationSeconds > 0f &&
+               elapsedSeconds <= channelDurationSeconds;
+    }
+
     /// <summary>
     /// Resolves the current main camera transform with a small retry interval so presentation systems do not repeatedly scan cameras every frame.
     /// </summary>
@@ -308,7 +355,12 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
         EnemyOffensiveEngagementBlendResult targetBlend = default(EnemyOffensiveEngagementBlendResult);
 
-        if (windowWasActive && config.EnableColorBlend != 0 && config.ColorBlendDurationSeconds > 0f)
+        bool colorBlendWindowActive = IsBossPatternChangeChannelActive(windowWasActive,
+                                                                       feedbackState.ElapsedSeconds,
+                                                                       config.EnableColorBlend != 0,
+                                                                       config.ColorBlendDurationSeconds);
+
+        if (colorBlendWindowActive)
         {
             targetBlend.IsActive = true;
             targetBlend.Blend = math.saturate(config.ColorBlendMaximumBlend);
@@ -331,7 +383,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         stateLookup[enemyEntity] = feedbackState;
         result.Blend = feedbackState.DisplayedBlend;
         result.Color = feedbackState.DisplayedColor;
-        result.BillboardActive = windowWasActive && config.EnableBillboard != 0 && config.BillboardDurationSeconds > 0f;
+        result.BillboardActive = IsBossPatternChangeChannelActive(windowWasActive,
+                                                                  feedbackState.ElapsedSeconds,
+                                                                  config.EnableBillboard != 0,
+                                                                  config.BillboardDurationSeconds);
         result.BillboardColor = config.BillboardColor;
         result.BillboardOffset = config.BillboardOffset;
         result.BillboardScale = EnemyOffensiveEngagementPresentationUtility.ResolvePulseScale(config.BillboardBaseScale,
@@ -412,7 +467,8 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         }
 
         Vector3 worldPosition = new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z);
-        bool usePatternChangeBillboard = patternChangeResult.BillboardActive;
+        bool usePatternChangeBillboard = ShouldUseBossPatternChangeBillboard(billboardResult.IsActive,
+                                                                            patternChangeResult.BillboardActive);
         EnemyOffensiveEngagementTriggerSource source = usePatternChangeBillboard
             ? EnemyOffensiveEngagementTriggerSource.BossPatternChange
             : billboardResult.Source;

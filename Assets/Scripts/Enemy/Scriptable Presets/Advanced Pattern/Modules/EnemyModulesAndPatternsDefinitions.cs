@@ -83,13 +83,13 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
     [Tooltip("Extra distance added after activation before the short-range interaction releases back to the core movement.")]
     [SerializeField] private float releaseDistanceBuffer = DefaultReleaseDistanceBuffer;
 
-    [Tooltip("When enabled, this short-range interaction emits offensive engagement feedback before each supported behaviour commit.")]
+    [Tooltip("When enabled, this interaction emits engagement feedback. Shared normal patterns and boss mixed patterns preserve predictive timing when the selected module exposes a commit hook; activation-only boss modules show a short post-selection warning.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
 
-    [Tooltip("When enabled, this short-range interaction overrides the generic offensive engagement feedback settings resolved from the visual preset.")]
+    [Tooltip("When enabled, this interaction uses its own engagement feedback settings. In shared normal patterns it overrides the visual preset default; in a boss mixed pattern it has candidate priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
 
-    [Tooltip("Optional offensive engagement feedback override applied only to this short-range interaction when the display trigger is enabled.")]
+    [Tooltip("Interaction-specific engagement warning settings used when Display Behaviour Engagement Trigger and Use Engagement Feedback Override are enabled. Boss resolution order is candidate override, mixed-pattern override, then visual preset default.")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings engagementFeedbackOverride = new EnemyOffensiveEngagementFeedbackSettings();
 
     [Tooltip("Short-range interaction module binding resolved from Short-Range Interaction definitions.")]
@@ -232,13 +232,13 @@ public sealed class EnemyPatternWeaponInteractionAssembly
     [Tooltip("Seconds after receiving damage during which Require Recently Damaged is considered true.")]
     [SerializeField] private float recentlyDamagedWindowSeconds = 1f;
 
-    [Tooltip("When enabled, this weapon interaction emits offensive engagement feedback before each supported behaviour commit.")]
+    [Tooltip("When enabled, this interaction emits engagement feedback. Shared normal patterns and boss mixed patterns preserve predictive timing when the selected module exposes a commit hook; activation-only boss modules show a short post-selection warning.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
 
-    [Tooltip("When enabled, this weapon interaction overrides the generic offensive engagement feedback settings resolved from the visual preset.")]
+    [Tooltip("When enabled, this interaction uses its own engagement feedback settings. In shared normal patterns it overrides the visual preset default; in a boss mixed pattern it has candidate priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
 
-    [Tooltip("Optional offensive engagement feedback override applied only to this weapon interaction when the display trigger is enabled.")]
+    [Tooltip("Interaction-specific engagement warning settings used when Display Behaviour Engagement Trigger and Use Engagement Feedback Override are enabled. Boss resolution order is candidate override, mixed-pattern override, then visual preset default.")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings engagementFeedbackOverride = new EnemyOffensiveEngagementFeedbackSettings();
 
     [Tooltip("Weapon interaction module binding resolved from Weapon Interaction definitions.")]

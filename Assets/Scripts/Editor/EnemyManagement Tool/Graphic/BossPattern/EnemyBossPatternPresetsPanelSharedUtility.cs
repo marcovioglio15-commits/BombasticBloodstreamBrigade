@@ -108,6 +108,19 @@ internal static class EnemyBossPatternPresetsPanelSharedUtility
     }
 
     /// <summary>
+    /// Creates a lightweight change callback for composite drawers that edit nested boss-preset settings without rebuilding the active section.
+    /// </summary>
+    /// <param name="panel">Owning panel whose serialized object and draft session must receive the nested edit.</param>
+    /// <returns>A callback that applies and tracks the edit, or null when no panel is available.</returns>
+    public static Action CreateTrackedPropertyChangeCallback(EnemyBossPatternPresetsPanel panel)
+    {
+        if (panel == null)
+            return null;
+
+        return () => ApplyTrackedPropertyChange(panel, false);
+    }
+
+    /// <summary>
     /// Creates a property field that rebuilds the active section after edits.
     /// </summary>
     /// <param name="panel">Owning panel used for rebuild callbacks.</param>

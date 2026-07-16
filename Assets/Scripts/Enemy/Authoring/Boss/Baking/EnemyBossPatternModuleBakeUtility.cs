@@ -27,9 +27,29 @@ internal static class EnemyBossPatternModuleBakeUtility
         if (sharedPreset == null || pattern == null || result == null)
             return;
 
-        CompileCoreMovementCandidates(sharedPreset, pattern.CoreMovementExtraction, patternIndex, globalEngagementSettings, result);
-        CompileShortRangeCandidates(sharedPreset, pattern.ShortRangeExtraction, patternIndex, globalEngagementSettings, result);
-        CompileWeaponCandidates(sharedPreset, pattern.WeaponExtraction, patternIndex, globalEngagementSettings, result);
+        bool usePatternEngagementOverride = pattern.UseEngagementFeedbackOverride &&
+                                            pattern.EngagementFeedbackOverride != null;
+        EnemyOffensiveEngagementFeedbackSettings resolvedEngagementSettings = usePatternEngagementOverride
+            ? pattern.EngagementFeedbackOverride
+            : globalEngagementSettings;
+        CompileCoreMovementCandidates(sharedPreset,
+                                      pattern.CoreMovementExtraction,
+                                      patternIndex,
+                                      resolvedEngagementSettings,
+                                      usePatternEngagementOverride,
+                                      result);
+        CompileShortRangeCandidates(sharedPreset,
+                                    pattern.ShortRangeExtraction,
+                                    patternIndex,
+                                    resolvedEngagementSettings,
+                                    usePatternEngagementOverride,
+                                    result);
+        CompileWeaponCandidates(sharedPreset,
+                                pattern.WeaponExtraction,
+                                patternIndex,
+                                resolvedEngagementSettings,
+                                usePatternEngagementOverride,
+                                result);
     }
     #endregion
 
@@ -40,13 +60,15 @@ internal static class EnemyBossPatternModuleBakeUtility
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="extraction">Authored Core Movement extraction definition.</param>
     /// <param name="patternIndex">Runtime pattern buffer index that owns the slot.</param>
-    /// <param name="globalEngagementSettings">Generic offensive engagement feedback settings resolved from the visual preset.</param>
+    /// <param name="resolvedEngagementSettings">Pattern-level or generic offensive engagement feedback settings inherited by candidates without their own override.</param>
+    /// <param name="usePatternEngagementOverride">Whether the resolved settings came from the boss-only mixed-pattern override.</param>
     /// <param name="result">Mutable boss compile result.</param>
     private static void CompileCoreMovementCandidates(EnemyModulesAndPatternsPreset sharedPreset,
-                                                      EnemyBossPatternCoreMovementExtractionDefinition extraction,
-                                                      int patternIndex,
-                                                      EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
-                                                      EnemyCompiledBossPatternBakeResult result)
+                                                       EnemyBossPatternCoreMovementExtractionDefinition extraction,
+                                                       int patternIndex,
+                                                       EnemyOffensiveEngagementFeedbackSettings resolvedEngagementSettings,
+                                                       bool usePatternEngagementOverride,
+                                                       EnemyCompiledBossPatternBakeResult result)
     {
         result.ModuleExtractions.Add(BuildExtractionElement(patternIndex,
                                                             EnemyBossPatternSlotKind.CoreMovement,
@@ -63,7 +85,10 @@ internal static class EnemyBossPatternModuleBakeUtility
         {
             EnemyBossPatternCoreMovementModuleCandidateDefinition candidate = candidates[candidateIndex];
 
-            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+            if (candidate == null ||
+                !EnemyBossPatternCandidateCompilationUtility.CanCompile(candidate.Eligibility,
+                                                                        candidate.ModuleMode,
+                                                                        candidate.Binding != null && candidate.Binding.IsEnabled))
                 continue;
 
             EnemyCompiledPatternBakeResult compiledPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
@@ -80,10 +105,12 @@ internal static class EnemyBossPatternModuleBakeUtility
 
                 if (EnemyOffensiveEngagementBakeUtility.TryBuildCoreMovementConfig(candidate,
                                                                                    sharedPreset,
-                                                                                   globalEngagementSettings,
+                                                                                   resolvedEngagementSettings,
                                                                                    out EnemyOffensiveEngagementConfigElement config))
                 {
-                    config.VisualSettingsKey = result.ModuleCandidates.Count;
+                    ConfigureVisualSettingsSource(ref config,
+                                                  result.ModuleCandidates.Count,
+                                                  usePatternEngagementOverride);
                     engagementConfigs.Add(config);
                 }
             }
@@ -115,13 +142,15 @@ internal static class EnemyBossPatternModuleBakeUtility
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="extraction">Authored Short-Range extraction definition.</param>
     /// <param name="patternIndex">Runtime pattern buffer index that owns the slot.</param>
-    /// <param name="globalEngagementSettings">Generic offensive engagement feedback settings resolved from the visual preset.</param>
+    /// <param name="resolvedEngagementSettings">Pattern-level or generic offensive engagement feedback settings inherited by candidates without their own override.</param>
+    /// <param name="usePatternEngagementOverride">Whether the resolved settings came from the boss-only mixed-pattern override.</param>
     /// <param name="result">Mutable boss compile result.</param>
     private static void CompileShortRangeCandidates(EnemyModulesAndPatternsPreset sharedPreset,
-                                                    EnemyBossPatternShortRangeExtractionDefinition extraction,
-                                                    int patternIndex,
-                                                    EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
-                                                    EnemyCompiledBossPatternBakeResult result)
+                                                     EnemyBossPatternShortRangeExtractionDefinition extraction,
+                                                     int patternIndex,
+                                                     EnemyOffensiveEngagementFeedbackSettings resolvedEngagementSettings,
+                                                     bool usePatternEngagementOverride,
+                                                     EnemyCompiledBossPatternBakeResult result)
     {
         result.ModuleExtractions.Add(BuildExtractionElement(patternIndex,
                                                             EnemyBossPatternSlotKind.ShortRangeInteraction,
@@ -138,7 +167,13 @@ internal static class EnemyBossPatternModuleBakeUtility
         {
             EnemyBossPatternShortRangeModuleCandidateDefinition candidate = candidates[candidateIndex];
 
-            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+            if (candidate == null ||
+                !EnemyBossPatternCandidateCompilationUtility.CanCompile(candidate.Eligibility,
+                                                                        candidate.ModuleMode,
+                                                                        candidate.Interaction != null &&
+                                                                        candidate.Interaction.IsEnabled &&
+                                                                        candidate.Interaction.Binding != null &&
+                                                                        candidate.Interaction.Binding.IsEnabled))
                 continue;
 
             EnemyCompiledPatternBakeResult compiledPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
@@ -153,10 +188,13 @@ internal static class EnemyBossPatternModuleBakeUtility
 
                 if (EnemyOffensiveEngagementBakeUtility.TryBuildShortRangeConfig(candidate.Interaction,
                                                                                  sharedPreset,
-                                                                                 globalEngagementSettings,
+                                                                                 resolvedEngagementSettings,
+                                                                                 EnemyOffensiveEngagementTimingContext.BossMixedPattern,
                                                                                  out EnemyOffensiveEngagementConfigElement config))
                 {
-                    config.VisualSettingsKey = result.ModuleCandidates.Count;
+                    ConfigureVisualSettingsSource(ref config,
+                                                  result.ModuleCandidates.Count,
+                                                  usePatternEngagementOverride);
                     engagementConfigs.Add(config);
                 }
             }
@@ -188,13 +226,15 @@ internal static class EnemyBossPatternModuleBakeUtility
     /// <param name="sharedPreset">Source shared preset containing module definitions.</param>
     /// <param name="extraction">Authored Weapon extraction definition.</param>
     /// <param name="patternIndex">Runtime pattern buffer index that owns the slot.</param>
-    /// <param name="globalEngagementSettings">Generic offensive engagement feedback settings resolved from the visual preset.</param>
+    /// <param name="resolvedEngagementSettings">Pattern-level or generic offensive engagement feedback settings inherited by candidates without their own override.</param>
+    /// <param name="usePatternEngagementOverride">Whether the resolved settings came from the boss-only mixed-pattern override.</param>
     /// <param name="result">Mutable boss compile result.</param>
     private static void CompileWeaponCandidates(EnemyModulesAndPatternsPreset sharedPreset,
-                                                EnemyBossPatternWeaponExtractionDefinition extraction,
-                                                int patternIndex,
-                                                EnemyOffensiveEngagementFeedbackSettings globalEngagementSettings,
-                                                EnemyCompiledBossPatternBakeResult result)
+                                                 EnemyBossPatternWeaponExtractionDefinition extraction,
+                                                 int patternIndex,
+                                                 EnemyOffensiveEngagementFeedbackSettings resolvedEngagementSettings,
+                                                 bool usePatternEngagementOverride,
+                                                 EnemyCompiledBossPatternBakeResult result)
     {
         result.ModuleExtractions.Add(BuildExtractionElement(patternIndex,
                                                             EnemyBossPatternSlotKind.WeaponInteraction,
@@ -211,7 +251,13 @@ internal static class EnemyBossPatternModuleBakeUtility
         {
             EnemyBossPatternWeaponModuleCandidateDefinition candidate = candidates[candidateIndex];
 
-            if (candidate == null || candidate.Eligibility == null || !candidate.Eligibility.Enabled)
+            if (candidate == null ||
+                !EnemyBossPatternCandidateCompilationUtility.CanCompile(candidate.Eligibility,
+                                                                        candidate.ModuleMode,
+                                                                        candidate.Interaction != null &&
+                                                                        candidate.Interaction.IsEnabled &&
+                                                                        candidate.Interaction.Binding != null &&
+                                                                        candidate.Interaction.Binding.IsEnabled))
                 continue;
 
             EnemyCompiledPatternBakeResult compiledPattern = EnemyAdvancedPatternBakeUtility.CreateDefaultResult(null);
@@ -226,10 +272,13 @@ internal static class EnemyBossPatternModuleBakeUtility
 
                 if (EnemyOffensiveEngagementBakeUtility.TryBuildWeaponConfig(candidate.Interaction,
                                                                              sharedPreset,
-                                                                             globalEngagementSettings,
+                                                                             resolvedEngagementSettings,
+                                                                             EnemyOffensiveEngagementTimingContext.BossMixedPattern,
                                                                              out EnemyOffensiveEngagementConfigElement config))
                 {
-                    config.VisualSettingsKey = result.ModuleCandidates.Count;
+                    ConfigureVisualSettingsSource(ref config,
+                                                  result.ModuleCandidates.Count,
+                                                  usePatternEngagementOverride);
                     engagementConfigs.Add(config);
                 }
             }
@@ -257,6 +306,22 @@ internal static class EnemyBossPatternModuleBakeUtility
     #endregion
 
     #region Element Builders
+    /// <summary>
+    /// Assigns the managed authoring lookup key and preserves the highest-priority visual override source for one baked warning config.
+    /// </summary>
+    /// <param name="config">Baked engagement config receiving managed visual-source metadata.</param>
+    /// <param name="visualSettingsKey">Compiled module candidate index used by the billboard view.</param>
+    /// <param name="usePatternEngagementOverride">Whether the mixed boss pattern supplies the inherited warning settings.</param>
+    private static void ConfigureVisualSettingsSource(ref EnemyOffensiveEngagementConfigElement config,
+                                                      int visualSettingsKey,
+                                                      bool usePatternEngagementOverride)
+    {
+        config.VisualSettingsKey = visualSettingsKey;
+
+        if (usePatternEngagementOverride)
+            config.UseOverrideVisualSettings = 1;
+    }
+
     /// <summary>
     /// Configures a null Core Movement candidate as an explicit stationary boss state instead of falling back to Grunt.
     /// </summary>

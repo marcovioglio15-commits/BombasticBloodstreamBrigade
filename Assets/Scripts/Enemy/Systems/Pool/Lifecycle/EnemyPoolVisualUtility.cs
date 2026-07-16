@@ -168,6 +168,10 @@ public static class EnemyPoolVisualUtility
         if (entityManager.HasComponent<EnemyVisualFlashPresentationState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultVisualFlashPresentationState());
 
+        if (entityManager.HasComponent<EnemyBossTag>(enemyEntity) &&
+            entityManager.HasBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity))
+            entityManager.GetBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity).Clear();
+
         if (entityManager.HasComponent<EnemyBossPatternChangeFeedbackState>(enemyEntity))
             entityManager.SetComponentData(enemyEntity, CreateDefaultBossPatternChangeFeedbackState());
 

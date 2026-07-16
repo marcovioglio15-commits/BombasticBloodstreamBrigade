@@ -49,7 +49,7 @@ public sealed class EnemyVisualPreset : ScriptableObject, IEnemyUiVisualPresetDa
     [FormerlySerializedAs("shooterWarning")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings offensiveEngagementFeedback = new EnemyOffensiveEngagementFeedbackSettings();
 
-    [Tooltip("Boss-only visual feedback shown immediately after a boss pattern extraction changes the active pattern.")]
+    [Tooltip("Boss-only visual feedback shown immediately after a boss pattern extraction changes the active pattern. Each channel yields to concurrently active behaviour engagement feedback so candidate or mixed-pattern warnings remain readable.")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings bossPatternChangeFeedback = new EnemyOffensiveEngagementFeedbackSettings();
 
     [Tooltip("Prefab and paint metadata block.")]

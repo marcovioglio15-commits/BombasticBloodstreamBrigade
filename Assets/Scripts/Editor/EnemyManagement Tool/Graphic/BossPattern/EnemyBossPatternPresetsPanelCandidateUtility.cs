@@ -403,6 +403,8 @@ internal static class EnemyBossPatternPresetsPanelCandidateUtility
     {
         ConfigureEligibility(candidateProperty.FindPropertyRelative("eligibility"),
                              BuildDefaultCandidateName(slotKind, candidateIndex, isNullCandidate));
+        EnemyBossPatternPresetsPanelDefaultsUtility.ConfigureCandidateWarningDefaults(candidateProperty,
+                                                                                       slotKind);
         EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(candidateProperty.FindPropertyRelative("moduleMode"),
                                                                Convert.ToInt32(isNullCandidate
                                                                    ? EnemyBossPatternModuleMode.NullModule

@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -28,6 +29,7 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         SerializedProperty engagementFeedbackOverrideProperty = property.FindPropertyRelative("engagementFeedbackOverride");
         SerializedProperty bindingProperty = property.FindPropertyRelative("binding");
         SerializedProperty moduleIdProperty = bindingProperty != null ? bindingProperty.FindPropertyRelative("moduleId") : null;
+        SerializedProperty bindingEnabledProperty = bindingProperty != null ? bindingProperty.FindPropertyRelative("isEnabled") : null;
 
         if (enabledProperty == null ||
             activationRangeProperty == null ||
@@ -57,9 +59,9 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         settingsContainer.Add(bindingField);
         EnemyAdvancedPatternDrawerUtility.AddField(settingsContainer,
                                                    displayBehaviourEngagementTriggerProperty,
-                                                   "Display Behaviour Engagement Trigger");
+                                                   "Enable Behaviour Engagement Warning");
 
-        HelpBox unsupportedModuleBox = new HelpBox("Display Behaviour Engagement Trigger currently supports only ShortRangeDash in the Short-Range Interaction slot.", HelpBoxMessageType.Warning);
+        HelpBox unsupportedModuleBox = new HelpBox("Normal-enemy Short-Range warnings require ShortRangeDash predictive aim timing. Activation-only warnings are available inside boss mixed-pattern slots.", HelpBoxMessageType.Warning);
         unsupportedModuleBox.style.marginTop = 4f;
         settingsContainer.Add(unsupportedModuleBox);
 
@@ -73,7 +75,9 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         VisualElement feedbackOverrideContainer = new VisualElement();
         feedbackOverrideContainer.style.marginLeft = 12f;
         feedbackOptionsContainer.Add(feedbackOverrideContainer);
-        feedbackOverrideContainer.Add(EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(engagementFeedbackOverrideProperty));
+        feedbackOverrideContainer.Add(EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(engagementFeedbackOverrideProperty,
+                                                                                                          null,
+                                                                                                          EnemyOffensiveEngagementFeedbackEditorUsage.PredictiveOverride));
 
         UpdateVisibility(enabledProperty,
                          displayBehaviourEngagementTriggerProperty,
@@ -117,20 +121,24 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
                              unsupportedModuleBox);
         });
 
-        if (moduleIdProperty != null)
+        // Keep timing support and dependent warning controls current for both binding properties.
+        Action<SerializedProperty> bindingChangedCallback = ignoredProperty =>
         {
-            root.TrackPropertyValue(moduleIdProperty, changedProperty =>
-            {
-                UpdateVisibility(enabledProperty,
-                                 displayBehaviourEngagementTriggerProperty,
-                                 useEngagementFeedbackOverrideProperty,
-                                 bindingProperty,
-                                 settingsContainer,
-                                 feedbackOptionsContainer,
-                                 feedbackOverrideContainer,
-                                 unsupportedModuleBox);
-            });
-        }
+            UpdateVisibility(enabledProperty,
+                             displayBehaviourEngagementTriggerProperty,
+                             useEngagementFeedbackOverrideProperty,
+                             bindingProperty,
+                             settingsContainer,
+                             feedbackOptionsContainer,
+                             feedbackOverrideContainer,
+                             unsupportedModuleBox);
+        };
+
+        if (moduleIdProperty != null)
+            root.TrackPropertyValue(moduleIdProperty, bindingChangedCallback);
+
+        if (bindingEnabledProperty != null)
+            root.TrackPropertyValue(bindingEnabledProperty, bindingChangedCallback);
 
         return root;
     }

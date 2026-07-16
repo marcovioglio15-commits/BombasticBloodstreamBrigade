@@ -37,7 +37,8 @@ public static class EnemyVisualFeedbackSmokeTest
         ValidatePresetDefaultsAndBakeConfig();
         ValidateDeathPuddleSpawnRuntime();
         ValidateElasticTriggerPolicy();
-        //Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
+        EnemyOffensiveEngagementSmokeTestUtility.Validate();
+        Debug.Log("[EnemyVisualFeedbackSmokeTest] All enemy visual feedback checks passed.");
     }
 
     /// <summary>

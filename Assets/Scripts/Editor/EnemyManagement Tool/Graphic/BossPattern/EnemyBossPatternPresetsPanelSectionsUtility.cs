@@ -50,7 +50,7 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
     }
 
     /// <summary>
-    /// Builds the source normal-pattern preset assignment subsection.
+    /// Builds the source module-catalog assignment subsection.
     /// </summary>
     /// <param name="panel">Owning panel that provides serialized preset context.</param>
     public static void BuildSourcePatternsSection(EnemyBossPatternPresetsPanel panel)
@@ -58,7 +58,7 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
         if (panel == null)
             return;
 
-        VisualElement sectionContainer = EnemyBossPatternPresetsPanelSharedUtility.CreateDetailsSectionContainer(panel, "Module & Patterns Preset");
+        VisualElement sectionContainer = EnemyBossPatternPresetsPanelSharedUtility.CreateDetailsSectionContainer(panel, "Source Module Catalog");
 
         if (sectionContainer == null)
             return;
@@ -66,17 +66,17 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
         SerializedObject presetSerializedObject = panel.PresetSerializedObject;
         SerializedProperty sourcePatternsProperty = presetSerializedObject.FindProperty("sourcePatternsPreset");
 
-        HelpBox infoBox = new HelpBox("Boss presets read assembled normal-enemy patterns from this source. Module definitions remain owned by Enemy Advanced Patterns Presets.", HelpBoxMessageType.Info);
+        HelpBox infoBox = new HelpBox("Pattern Assemble reads the Core Movement, Short-Range and Weapon module catalogs from this asset; Boss Drop Extraction reads its Drop Items catalog. Normal assembled patterns, their engagement toggles and their overrides are not inherited.", HelpBoxMessageType.Info);
         sectionContainer.Add(infoBox);
 
-        ObjectField sourceField = new ObjectField("Source Patterns Preset");
+        ObjectField sourceField = new ObjectField("Source Module Catalog");
         sourceField.objectType = typeof(EnemyModulesAndPatternsPreset);
         sourceField.allowSceneObjects = false;
-        sourceField.tooltip = "Normal enemy Modules & Patterns preset used as the source catalog for boss pattern switching.";
+        sourceField.tooltip = "Normal-enemy Modules & Patterns preset used only as the boss module definition catalog. Its assembled patterns and engagement settings are not inherited.";
         sourceField.SetValueWithoutNotify(sourcePatternsProperty.objectReferenceValue);
         sourceField.RegisterValueChangedCallback(evt =>
         {
-            Undo.RecordObject(panel.SelectedPreset, "Assign Boss Source Patterns Preset");
+            Undo.RecordObject(panel.SelectedPreset, "Assign Boss Source Module Catalog");
             presetSerializedObject.Update();
             sourcePatternsProperty.objectReferenceValue = evt.newValue as EnemyModulesAndPatternsPreset;
             presetSerializedObject.ApplyModifiedProperties();
@@ -91,14 +91,15 @@ internal static class EnemyBossPatternPresetsPanelSectionsUtility
 
         if (sourcePreset == null)
         {
-            sectionContainer.Add(new HelpBox("Assign a source preset before configuring boss Pattern Assemble slots.", HelpBoxMessageType.Warning));
+            sectionContainer.Add(new HelpBox("Assign a source module catalog before configuring boss Pattern Assemble slots.", HelpBoxMessageType.Warning));
             return;
         }
 
         int coreCount = sourcePreset.GetDefinitions(EnemyPatternModuleCatalogSection.CoreMovement).Count;
         int shortRangeCount = sourcePreset.GetDefinitions(EnemyPatternModuleCatalogSection.ShortRangeInteraction).Count;
         int weaponCount = sourcePreset.GetDefinitions(EnemyPatternModuleCatalogSection.WeaponInteraction).Count;
-        sectionContainer.Add(new HelpBox("Available boss module catalog entries - Core: " + coreCount + ", Short-Range: " + shortRangeCount + ", Weapon: " + weaponCount + ".", HelpBoxMessageType.Info));
+        int dropItemsCount = sourcePreset.GetDefinitions(EnemyPatternModuleCatalogSection.DropItems).Count;
+        sectionContainer.Add(new HelpBox("Available boss module catalog entries - Core: " + coreCount + ", Short-Range: " + shortRangeCount + ", Weapon: " + weaponCount + ", Drop Items: " + dropItemsCount + ".", HelpBoxMessageType.Info));
     }
 
     /// <summary>

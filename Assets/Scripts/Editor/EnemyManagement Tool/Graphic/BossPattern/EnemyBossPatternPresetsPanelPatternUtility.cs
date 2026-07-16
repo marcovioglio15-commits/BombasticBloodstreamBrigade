@@ -42,7 +42,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (sourcePreset == null)
             sectionContainer.Add(new HelpBox("Assign a source Modules & Patterns preset before configuring boss Pattern Assemble slots.", HelpBoxMessageType.Warning));
         else
-            sectionContainer.Add(new HelpBox("Bosses use the normal Core Movement, Short-Range Interaction and Weapon Interaction slots. Pattern Extraction rolls among eligible Pattern Candidates instead of always selecting the first valid entry.", HelpBoxMessageType.Info));
+            sectionContainer.Add(new HelpBox("Bosses use the normal Core Movement, Short-Range Interaction and Weapon Interaction slots. Pattern Extraction rolls among eligible Mixed Pattern Candidates instead of always selecting the first valid entry.", HelpBoxMessageType.Info));
 
         EnemyBossPatternPresetsPanelExtractionUtility.BuildExtractionSettingsCard(panel,
                                                                                   extractionSettingsProperty,
@@ -71,7 +71,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (interactionsProperty == null || parent == null)
             return;
 
-        Label header = new Label("Pattern Candidates");
+        Label header = new Label("Mixed Pattern Candidates");
         header.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
         header.style.marginTop = 8f;
         parent.Add(header);
@@ -90,8 +90,8 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         {
             AddInteraction(panel, interactionsProperty, sourcePreset);
         });
-        addButton.text = "Add Pattern Candidate";
-        addButton.tooltip = "Add one boss pattern candidate with independent eligibility and assembled slot overrides.";
+        addButton.text = "Add Mixed Pattern Candidate";
+        addButton.tooltip = "Add one boss mixed-pattern candidate with independent eligibility and assembled slot overrides.";
         addButton.style.marginTop = 4f;
         addButton.SetEnabled(sourcePreset != null && EnemyBossPatternPresetsPanelModuleUtility.HasAnySelectableModule(sourcePreset));
         parent.Add(addButton);
@@ -119,7 +119,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
                                                                                   "BossInteraction",
                                                                                   index == 0);
         card.Add(foldout);
-        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateArrayActionsRow(panel, interactionsProperty, index, "Boss Interaction"));
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateArrayActionsRow(panel, interactionsProperty, index, "Mixed Pattern Candidate"));
 
         SerializedProperty enabledProperty = interactionProperty.FindPropertyRelative("enabled");
         SerializedProperty interactionTypeProperty = interactionProperty.FindPropertyRelative("interactionType");
@@ -128,12 +128,13 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         SerializedProperty selectionWeightProperty = interactionProperty.FindPropertyRelative("selectionWeight");
         EnemyBossPatternInteractionType interactionType = ResolveInteractionType(interactionTypeProperty);
 
-        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, enabledProperty, "Enabled", "Enables this pattern candidate during bake and runtime extraction."));
-        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, interactionTypeProperty, "Eligibility Type", "Boss-only criterion that decides when this pattern candidate can be extracted."));
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, enabledProperty, "Enabled", "Enables this mixed-pattern candidate during bake and runtime extraction."));
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, interactionTypeProperty, "Eligibility Type", "Boss-only criterion that decides when this mixed-pattern candidate can be extracted."));
         EnemyBossPatternPresetsPanelSharedUtility.AddTrackedTextField(panel, foldout, displayNameProperty, "Candidate Name", "Readable candidate name shown by the Boss Pattern Assemble section.", false);
         AddInteractionTypeFields(panel, foldout, interactionProperty, interactionType);
         EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, foldout, minimumActiveSecondsProperty, "Minimum Active Seconds", 0f, 20f, "Minimum seconds this pattern remains active before extraction can replace it.");
         EnemyBossPatternPresetsPanelSharedUtility.AddFloatSliderField(panel, foldout, selectionWeightProperty, "Selection Weight", 0f, 100f, "Relative weight used when this candidate is eligible during a pattern extraction roll.");
+        BuildMixedPatternEngagementFeedbackFields(panel, foldout, interactionProperty);
         BuildInternalExtractionSlot(panel,
                                     foldout,
                                     interactionProperty.FindPropertyRelative("coreMovementExtraction"),
@@ -153,6 +154,43 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
                                     EnemyBossPatternSlotKind.WeaponInteraction,
                                     "Weapon Extraction");
         parent.Add(card);
+    }
+
+    /// <summary>
+    /// Adds the boss-only warning default inherited by module candidates in one mixed pattern and hides its payload until enabled.
+    /// </summary>
+    /// <param name="panel">Owning panel used for reactive rebuild callbacks.</param>
+    /// <param name="parent">Pattern card receiving the warning controls.</param>
+    /// <param name="interactionProperty">Serialized mixed-pattern definition.</param>
+    private static void BuildMixedPatternEngagementFeedbackFields(EnemyBossPatternPresetsPanel panel,
+                                                                  VisualElement parent,
+                                                                  SerializedProperty interactionProperty)
+    {
+        if (panel == null || parent == null || interactionProperty == null)
+            return;
+
+        SerializedProperty useOverrideProperty = interactionProperty.FindPropertyRelative("useEngagementFeedbackOverride");
+        SerializedProperty overrideProperty = interactionProperty.FindPropertyRelative("engagementFeedbackOverride");
+        Foldout foldout = ManagementToolFoldoutStateUtility.CreatePropertyFoldout(interactionProperty,
+                                                                                  "Boss Behaviour Engagement Feedback",
+                                                                                  "BossPatternEngagementFeedback",
+                                                                                  false);
+        foldout.tooltip = "Optional boss-only warning default inherited by every active module candidate in this mixed pattern. Candidate-specific overrides take priority.";
+        foldout.style.marginTop = 6f;
+        foldout.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel,
+                                                                                          useOverrideProperty,
+                                                                                          "Use Mixed Pattern Override",
+                                                                                          "Overrides the enemy visual preset warning for this mixed boss pattern only. Any override authored on the selected module candidate still takes priority."));
+
+        if (useOverrideProperty != null && useOverrideProperty.boolValue)
+        {
+            foldout.Add(new HelpBox("Precedence: module candidate override, then this mixed-pattern override, then the enemy visual preset default.", HelpBoxMessageType.Info));
+            foldout.Add(EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(overrideProperty,
+                                                                                           EnemyBossPatternPresetsPanelSharedUtility.CreateTrackedPropertyChangeCallback(panel),
+                                                                                           EnemyOffensiveEngagementFeedbackEditorUsage.BossMixedPattern));
+        }
+
+        parent.Add(foldout);
     }
 
     /// <summary>
@@ -407,7 +445,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (!supportsFeedback && (displayTriggerProperty == null || !displayTriggerProperty.boolValue))
             return;
 
-        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, displayTriggerProperty, "Display Behaviour Engagement Trigger", "When enabled, this " + labelPrefix + " slot emits offensive engagement feedback before supported commits or immediately after activation."));
+        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, displayTriggerProperty, "Enable Behaviour Engagement Warning", "When enabled, this " + labelPrefix + " boss slot shows predictive feedback before supported commits or a short post-selection warning for activation-only modules."));
 
         if (!supportsFeedback)
         {
@@ -418,10 +456,15 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (displayTriggerProperty == null || !displayTriggerProperty.boolValue)
             return;
 
-        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, useOverrideProperty, "Use Engagement Feedback Override", "Override the generic offensive engagement feedback settings for this " + labelPrefix + " slot."));
+        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, useOverrideProperty, "Use Candidate Warning Override", "Overrides both the owning mixed-pattern warning default and the enemy visual preset for this " + labelPrefix + " candidate only."));
 
         if (useOverrideProperty != null && useOverrideProperty.boolValue)
-            parent.Add(EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(overrideProperty));
+        {
+            parent.Add(new HelpBox("Precedence: this candidate override, then the owning mixed-pattern override, then the enemy visual preset. An empty candidate sprite inherits the first available sprite below it.", HelpBoxMessageType.Info));
+            parent.Add(EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(overrideProperty,
+                                                                                          EnemyBossPatternPresetsPanelSharedUtility.CreateTrackedPropertyChangeCallback(panel),
+                                                                                          EnemyOffensiveEngagementFeedbackEditorUsage.BossCandidate));
+        }
     }
 
     /// <summary>
@@ -438,6 +481,11 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (sourcePreset == null || bindingProperty == null)
             return false;
 
+        SerializedProperty bindingEnabledProperty = bindingProperty.FindPropertyRelative("isEnabled");
+
+        if (bindingEnabledProperty == null || !bindingEnabledProperty.boolValue)
+            return false;
+
         SerializedProperty moduleIdProperty = bindingProperty.FindPropertyRelative("moduleId");
         string moduleId = moduleIdProperty != null ? moduleIdProperty.stringValue : string.Empty;
 
@@ -449,7 +497,9 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (moduleDefinition == null)
             return false;
 
-        return EnemyOffensiveEngagementSupportUtility.SupportsTimingMode(section, moduleDefinition.ModuleKind);
+        return EnemyOffensiveEngagementSupportUtility.SupportsTimingMode(section,
+                                                                         moduleDefinition.ModuleKind,
+                                                                         EnemyOffensiveEngagementTimingContext.BossMixedPattern);
     }
     #endregion
 
@@ -467,7 +517,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (panel == null || interactionsProperty == null || sourcePreset == null)
             return;
 
-        EnemyBossPatternPresetsPanelSharedUtility.RecordSelectedPreset(panel, "Add Boss Interaction");
+        EnemyBossPatternPresetsPanelSharedUtility.RecordSelectedPreset(panel, "Add Mixed Pattern Candidate");
         SerializedObject presetSerializedObject = panel.PresetSerializedObject;
         presetSerializedObject.Update();
         int insertIndex = interactionsProperty.arraySize;
@@ -475,55 +525,14 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         SerializedProperty insertedInteraction = interactionsProperty.GetArrayElementAtIndex(insertIndex);
 
         if (insertedInteraction != null)
-            ConfigureInsertedInteraction(insertedInteraction, sourcePreset, insertIndex);
+            EnemyBossPatternPresetsPanelDefaultsUtility.ConfigureInsertedInteraction(insertedInteraction,
+                                                                                     sourcePreset,
+                                                                                     insertIndex);
 
         presetSerializedObject.ApplyModifiedProperties();
         EnemyBossPatternPresetsPanelSharedUtility.MarkDirtyAndRebuild(panel);
     }
 
-    /// <summary>
-    /// Configures serialized defaults for a newly inserted boss interaction.
-    /// </summary>
-    /// <param name="insertedInteraction">Serialized interaction created by the array insertion.</param>
-    /// <param name="sourcePreset">Source module catalog.</param>
-    /// <param name="insertIndex">Interaction index used for readable labels.</param>
-    private static void ConfigureInsertedInteraction(SerializedProperty insertedInteraction,
-                                                     EnemyModulesAndPatternsPreset sourcePreset,
-                                                     int insertIndex)
-    {
-        EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(insertedInteraction.FindPropertyRelative("enabled"), true);
-        EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(insertedInteraction.FindPropertyRelative("interactionType"), Convert.ToInt32(EnemyBossPatternInteractionType.Always));
-        EnemyBossPatternPresetsPanelModuleUtility.SetString(insertedInteraction.FindPropertyRelative("displayName"), "Always Interaction " + (insertIndex + 1));
-        ConfigureDefaultCoreCandidate(insertedInteraction.FindPropertyRelative("coreMovementExtraction"), sourcePreset);
-    }
-
-    /// <summary>
-    /// Adds a default Core Movement module candidate to a new pattern candidate when a module exists.
-    /// </summary>
-    /// <param name="coreExtractionProperty">Serialized core extraction root.</param>
-    /// <param name="sourcePreset">Source module catalog.</param>
-    private static void ConfigureDefaultCoreCandidate(SerializedProperty coreExtractionProperty, EnemyModulesAndPatternsPreset sourcePreset)
-    {
-        if (coreExtractionProperty == null)
-            return;
-
-        if (!EnemyBossPatternPresetsPanelModuleUtility.TryResolveFirstModuleId(sourcePreset, EnemyPatternModuleCatalogSection.CoreMovement, out string moduleId))
-            return;
-
-        SerializedProperty candidatesProperty = coreExtractionProperty.FindPropertyRelative("candidates");
-
-        if (candidatesProperty == null)
-            return;
-
-        candidatesProperty.arraySize = 0;
-        candidatesProperty.InsertArrayElementAtIndex(0);
-        SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(0);
-        SerializedProperty eligibilityProperty = candidateProperty.FindPropertyRelative("eligibility");
-        EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(eligibilityProperty.FindPropertyRelative("enabled"), true);
-        EnemyBossPatternPresetsPanelModuleUtility.SetString(eligibilityProperty.FindPropertyRelative("displayName"), "Default Core Movement");
-        EnemyBossPatternPresetsPanelModuleUtility.SetEnumIndex(candidateProperty.FindPropertyRelative("moduleMode"), Convert.ToInt32(EnemyBossPatternModuleMode.Module));
-        EnemyBossPatternPresetsPanelModuleUtility.ConfigureBinding(candidateProperty.FindPropertyRelative("binding"), moduleId);
-    }
     #endregion
 
     #region Formatting
@@ -540,7 +549,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         string displayName = displayNameProperty != null ? displayNameProperty.stringValue : string.Empty;
 
         if (string.IsNullOrWhiteSpace(displayName))
-            displayName = "Interaction " + (index + 1);
+            displayName = "Mixed Pattern " + (index + 1);
 
         return "#" + (index + 1).ToString("D2") + " " + FormatInteractionType(ResolveInteractionType(interactionTypeProperty)) + " - " + displayName;
     }

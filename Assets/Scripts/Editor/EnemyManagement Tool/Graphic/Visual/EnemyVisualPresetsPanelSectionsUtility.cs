@@ -133,11 +133,11 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.OffensiveEngagementFeedback,
                                "Offensive Engagement Feedback",
-                               BuildOffensiveEngagementFeedbackSubSection(panel));
+                               EnemyVisualPresetsPanelEngagementFeedbackSectionUtility.BuildOffensiveEngagementFeedbackSubSection(panel));
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.BossPatternChangeFeedback,
                                "Pattern Change Feedback",
-                               BuildBossPatternChangeFeedbackSubSection(panel));
+                               EnemyVisualPresetsPanelEngagementFeedbackSectionUtility.BuildBossPatternChangeFeedbackSubSection(panel));
         AddVisualSubSectionTab(panel,
                                EnemyVisualPresetsPanel.VisualSubSectionType.Prefabs,
                                "Prefabs & VFX",
@@ -370,38 +370,6 @@ internal static class EnemyVisualPresetsPanelSectionsUtility
         AddPropertyField(panel, container, damageFeedbackProperty, "flashMaximumBlend", "Flash Maximum Blend", "Maximum overlay strength reached immediately after a valid hit.");
         container.Add(EnemyVisualPresetsPanelElasticHitSectionUtility.Build(panel,
                                                                             panel.PresetSerializedObject.FindProperty("elasticHit")));
-        return container;
-    }
-
-    private static VisualElement BuildOffensiveEngagementFeedbackSubSection(EnemyVisualPresetsPanel panel)
-    {
-        SerializedProperty feedbackProperty = panel.PresetSerializedObject.FindProperty("offensiveEngagementFeedback");
-        VisualElement container = CreateSubSectionContainer("Offensive Engagement Feedback");
-        VisualElement feedbackEditor = EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(feedbackProperty, () =>
-        {
-            EnemyManagementDraftSession.MarkDirty();
-            panel.RefreshPresetList();
-        });
-        container.Add(feedbackEditor);
-        return container;
-    }
-
-    /// <summary>
-    /// Builds the boss pattern-change visual feedback subsection.
-    /// </summary>
-    /// <param name="panel">Owning visual preset panel.</param>
-    /// <returns>Subsection container with pattern-change feedback controls.</returns>
-    private static VisualElement BuildBossPatternChangeFeedbackSubSection(EnemyVisualPresetsPanel panel)
-    {
-        SerializedProperty feedbackProperty = panel.PresetSerializedObject.FindProperty("bossPatternChangeFeedback");
-        VisualElement container = CreateSubSectionContainer("Boss Pattern Change Feedback");
-        container.Add(new HelpBox("These settings are shown immediately after a boss pattern extraction changes the active pattern. Color and billboard lead-time fields are used as post-extraction display durations.", HelpBoxMessageType.Info));
-        VisualElement feedbackEditor = EnemyOffensiveEngagementFeedbackDrawerUtility.BuildSettingsEditor(feedbackProperty, () =>
-        {
-            EnemyManagementDraftSession.MarkDirty();
-            panel.RefreshPresetList();
-        });
-        container.Add(feedbackEditor);
         return container;
     }
 

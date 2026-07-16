@@ -240,21 +240,28 @@ public sealed class EnemyBossPatternInteractionDefinition
     #region Fields
 
     #region Serialized Fields
-    [Header("Interaction")]
-    [Tooltip("Enables this boss interaction during bake and runtime selection.")]
+    [Header("Mixed Pattern Candidate")]
+    [Tooltip("Enables this mixed-pattern candidate during bake and runtime selection.")]
     [SerializeField] private bool enabled = true;
 
     [Tooltip("Boss-only eligibility criterion that decides when this pattern candidate can be extracted.")]
     [SerializeField] private EnemyBossPatternInteractionType interactionType = EnemyBossPatternInteractionType.Always;
 
-    [Tooltip("Readable interaction name shown by the Boss Pattern Assemble section.")]
-    [SerializeField] private string displayName = "Always Interaction";
+    [Tooltip("Readable mixed-pattern candidate name shown by the Boss Pattern Assemble section.")]
+    [SerializeField] private string displayName = "Always Mixed Pattern";
 
-    [Tooltip("Minimum seconds the current boss interaction must remain active before another valid interaction can replace it.")]
+    [Tooltip("Minimum seconds the current mixed pattern must remain active before another valid candidate can replace it.")]
     [SerializeField] private float minimumActiveSeconds = 1f;
 
-    [Tooltip("Relative weight used when this eligible interaction is part of a pattern extraction roll.")]
+    [Tooltip("Relative weight used when this eligible mixed-pattern candidate is part of an extraction roll.")]
     [SerializeField] private float selectionWeight = 1f;
+
+    [Header("Behaviour Engagement Feedback")]
+    [Tooltip("When enabled, this mixed boss pattern supplies a boss-only default for behaviour engagement warnings. Overrides authored on individual module candidates still take priority.")]
+    [SerializeField] private bool useEngagementFeedbackOverride;
+
+    [Tooltip("Boss-only behaviour engagement warning settings inherited by active module candidates in this mixed pattern when they do not author their own override.")]
+    [SerializeField] private EnemyOffensiveEngagementFeedbackSettings engagementFeedbackOverride = new EnemyOffensiveEngagementFeedbackSettings();
 
     [Header("Missing Health")]
     [Tooltip("Minimum missing-health percentage, from 0 to 1, required by Missing Health interactions.")]
@@ -355,6 +362,22 @@ public sealed class EnemyBossPatternInteractionDefinition
         get
         {
             return selectionWeight;
+        }
+    }
+
+    public bool UseEngagementFeedbackOverride
+    {
+        get
+        {
+            return useEngagementFeedbackOverride;
+        }
+    }
+
+    public EnemyOffensiveEngagementFeedbackSettings EngagementFeedbackOverride
+    {
+        get
+        {
+            return engagementFeedbackOverride;
         }
     }
 
@@ -499,7 +522,11 @@ public sealed class EnemyBossPatternInteractionDefinition
         if (weaponExtraction == null)
             weaponExtraction = new EnemyBossPatternWeaponExtractionDefinition();
 
+        if (engagementFeedbackOverride == null)
+            engagementFeedbackOverride = new EnemyOffensiveEngagementFeedbackSettings();
+
         MigrateLegacySlotsIfNeeded();
+        engagementFeedbackOverride.Validate();
         coreMovementExtraction.Validate();
         shortRangeExtraction.Validate();
         weaponExtraction.Validate();
@@ -515,22 +542,22 @@ public sealed class EnemyBossPatternInteractionDefinition
         switch (type)
         {
             case EnemyBossPatternInteractionType.Always:
-                return "Always Interaction";
+                return "Always";
 
             case EnemyBossPatternInteractionType.ElapsedTime:
-                return "Elapsed Time Interaction";
+                return "Elapsed Time";
 
             case EnemyBossPatternInteractionType.TravelledDistance:
-                return "Travelled Distance Interaction";
+                return "Travelled Distance";
 
             case EnemyBossPatternInteractionType.PlayerDistance:
-                return "Player Distance Interaction";
+                return "Player Distance";
 
             case EnemyBossPatternInteractionType.RecentlyDamaged:
-                return "Recently Damaged Interaction";
+                return "Recently Damaged";
 
             default:
-                return "Missing Health Interaction";
+                return "Missing Health";
         }
     }
     #endregion

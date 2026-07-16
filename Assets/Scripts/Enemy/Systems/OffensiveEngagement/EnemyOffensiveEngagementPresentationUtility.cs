@@ -375,6 +375,9 @@ internal static class EnemyOffensiveEngagementPresentationUtility
             if (slotRuntime.SlotKind != slotKind)
                 continue;
 
+            if (slotRuntime.ActiveCandidateIndex < 0)
+                return false;
+
             float safeDurationSeconds = math.max(0f, durationSeconds);
 
             if (safeDurationSeconds <= 0f || slotRuntime.ActiveCandidateElapsedSeconds > safeDurationSeconds)

@@ -66,7 +66,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
                                                     EnemyPatternModuleBinding binding,
                                                     ref EnemyCompiledPatternBakeResult result)
     {
-        if (sharedPreset == null || binding == null)
+        if (sharedPreset == null || binding == null || !binding.IsEnabled)
             return false;
 
         EnemyPatternModuleDefinition moduleDefinition = sharedPreset.ResolveModuleDefinitionById(binding.ModuleId);
@@ -111,7 +111,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
                                                              float releaseDistanceBuffer,
                                                              ref EnemyPatternConfig patternConfig)
     {
-        if (sharedPreset == null || binding == null)
+        if (sharedPreset == null || binding == null || !binding.IsEnabled)
             return false;
 
         EnemyPatternModuleDefinition moduleDefinition = sharedPreset.ResolveModuleDefinitionById(binding.ModuleId);
@@ -193,7 +193,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
                                                        float recentlyDamagedWindowSeconds,
                                                        ref EnemyCompiledPatternBakeResult result)
     {
-        if (sharedPreset == null || binding == null)
+        if (sharedPreset == null || binding == null || !binding.IsEnabled)
             return false;
 
         EnemyPatternModuleDefinition moduleDefinition = sharedPreset.ResolveModuleDefinitionById(binding.ModuleId);

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -221,13 +220,13 @@ public sealed class EnemyBossPatternCoreMovementModuleCandidateDefinition
     [Tooltip("Core Movement module binding resolved from Core Movement definitions when Module Mode is Module.")]
     [SerializeField] private EnemyPatternModuleBinding binding = new EnemyPatternModuleBinding();
 
-    [Tooltip("When enabled, this Core Movement candidate emits offensive engagement feedback when it becomes active.")]
+    [Tooltip("When enabled, emits activation-only engagement feedback after this Core Movement candidate is selected. This boss warning does not predict the selected module's next behaviour commit.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
 
-    [Tooltip("When enabled, this Core Movement candidate overrides the generic offensive engagement feedback settings resolved from the visual preset.")]
+    [Tooltip("When enabled, this candidate uses its own engagement feedback settings with priority above the owning mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
 
-    [Tooltip("Optional offensive engagement feedback override applied only to this Core Movement candidate when the display trigger is enabled.")]
+    [Tooltip("Candidate-specific engagement warning settings used when both engagement toggles are enabled. Resolution order is candidate override, mixed-pattern override, then visual preset default.")]
     [SerializeField] private EnemyOffensiveEngagementFeedbackSettings engagementFeedbackOverride = new EnemyOffensiveEngagementFeedbackSettings();
     #endregion
 
@@ -360,7 +359,7 @@ public sealed class EnemyBossPatternShortRangeModuleCandidateDefinition
     [Tooltip("Whether this candidate clears Short-Range Interaction or applies a module assembly.")]
     [SerializeField] private EnemyBossPatternModuleMode moduleMode = EnemyBossPatternModuleMode.Module;
 
-    [Tooltip("Short-Range Interaction assembly used when Module Mode is Module.")]
+    [Tooltip("Short-Range Interaction assembly used when Module Mode is Module. ShortRangeDash keeps its predictive release warning; other supported boss modules warn after selection. Its nested override has priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private EnemyPatternShortRangeInteractionAssembly interaction = new EnemyPatternShortRangeInteractionAssembly();
     #endregion
 
@@ -465,7 +464,7 @@ public sealed class EnemyBossPatternWeaponModuleCandidateDefinition
     [Tooltip("Whether this candidate clears Weapon Interaction or applies a shooter module assembly.")]
     [SerializeField] private EnemyBossPatternModuleMode moduleMode = EnemyBossPatternModuleMode.Module;
 
-    [Tooltip("Weapon Interaction assembly used when Module Mode is Module.")]
+    [Tooltip("Weapon Interaction assembly used when Module Mode is Module. Shooter and Bombardier keep predictive shot warnings; activation-only boss modules warn after selection. Its nested override has priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private EnemyPatternWeaponInteractionAssembly interaction = new EnemyPatternWeaponInteractionAssembly();
     #endregion
 
@@ -549,249 +548,6 @@ public sealed class EnemyBossPatternWeaponModuleCandidateDefinition
             eligibility = new EnemyBossPatternModuleCandidateEligibilityDefinition();
 
         eligibility.ConfigureDisplayName(displayNameValue);
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
-/// Stores Core Movement extraction rules and candidates for one active boss pattern.
-/// </summary>
-[Serializable]
-public sealed class EnemyBossPatternCoreMovementExtractionDefinition
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Rules that decide when Core Movement extracts a new candidate while this pattern remains active.")]
-    [SerializeField] private EnemyBossPatternExtractionSettings extractionSettings = new EnemyBossPatternExtractionSettings();
-
-    [Tooltip("Core Movement candidates rolled internally by this pattern. Include a Null Module candidate to intentionally clear custom movement.")]
-    [SerializeField] private List<EnemyBossPatternCoreMovementModuleCandidateDefinition> candidates = new List<EnemyBossPatternCoreMovementModuleCandidateDefinition>();
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public EnemyBossPatternExtractionSettings ExtractionSettings
-    {
-        get
-        {
-            return extractionSettings;
-        }
-    }
-
-    public IReadOnlyList<EnemyBossPatternCoreMovementModuleCandidateDefinition> Candidates
-    {
-        get
-        {
-            return candidates;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Public Methods
-    /// <summary>
-    /// Keeps extraction settings and candidate references valid without changing authored thresholds.
-    /// </summary>
-    public void Validate()
-    {
-        if (extractionSettings == null)
-            extractionSettings = new EnemyBossPatternExtractionSettings();
-
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternCoreMovementModuleCandidateDefinition>();
-
-        for (int index = 0; index < candidates.Count; index++)
-        {
-            if (candidates[index] == null)
-                candidates[index] = new EnemyBossPatternCoreMovementModuleCandidateDefinition();
-
-            candidates[index].Validate();
-        }
-    }
-
-    /// <summary>
-    /// Adds one migrated Core Movement candidate only when this extraction list is still empty.
-    /// </summary>
-    /// <param name="sourceBinding">Legacy source binding to migrate.</param>
-    /// <param name="displayNameValue">Readable migrated candidate name.</param>
-    public void TryMigrateLegacyCandidate(EnemyPatternModuleBinding sourceBinding, string displayNameValue)
-    {
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternCoreMovementModuleCandidateDefinition>();
-
-        if (candidates.Count > 0)
-            return;
-
-        EnemyBossPatternCoreMovementModuleCandidateDefinition candidate = new EnemyBossPatternCoreMovementModuleCandidateDefinition();
-        candidate.ConfigureLegacyModule(sourceBinding, displayNameValue);
-        candidates.Add(candidate);
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
-/// Stores Short-Range Interaction extraction rules and candidates for one active boss pattern.
-/// </summary>
-[Serializable]
-public sealed class EnemyBossPatternShortRangeExtractionDefinition
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Rules that decide when Short-Range Interaction extracts a new candidate while this pattern remains active.")]
-    [SerializeField] private EnemyBossPatternExtractionSettings extractionSettings = new EnemyBossPatternExtractionSettings();
-
-    [Tooltip("Short-Range candidates rolled internally by this pattern. Include a Null Module candidate to disable the slot until the next extraction.")]
-    [SerializeField] private List<EnemyBossPatternShortRangeModuleCandidateDefinition> candidates = new List<EnemyBossPatternShortRangeModuleCandidateDefinition>();
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public EnemyBossPatternExtractionSettings ExtractionSettings
-    {
-        get
-        {
-            return extractionSettings;
-        }
-    }
-
-    public IReadOnlyList<EnemyBossPatternShortRangeModuleCandidateDefinition> Candidates
-    {
-        get
-        {
-            return candidates;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Public Methods
-    /// <summary>
-    /// Keeps extraction settings and candidate references valid without changing authored thresholds.
-    /// </summary>
-    public void Validate()
-    {
-        if (extractionSettings == null)
-            extractionSettings = new EnemyBossPatternExtractionSettings();
-
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternShortRangeModuleCandidateDefinition>();
-
-        for (int index = 0; index < candidates.Count; index++)
-        {
-            if (candidates[index] == null)
-                candidates[index] = new EnemyBossPatternShortRangeModuleCandidateDefinition();
-
-            candidates[index].Validate();
-        }
-    }
-
-    /// <summary>
-    /// Adds one migrated Short-Range candidate only when this extraction list is still empty.
-    /// </summary>
-    /// <param name="sourceInteraction">Legacy interaction to migrate.</param>
-    /// <param name="displayNameValue">Readable migrated candidate name.</param>
-    public void TryMigrateLegacyCandidate(EnemyPatternShortRangeInteractionAssembly sourceInteraction, string displayNameValue)
-    {
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternShortRangeModuleCandidateDefinition>();
-
-        if (candidates.Count > 0)
-            return;
-
-        EnemyBossPatternShortRangeModuleCandidateDefinition candidate = new EnemyBossPatternShortRangeModuleCandidateDefinition();
-        candidate.ConfigureLegacyModule(sourceInteraction, displayNameValue);
-        candidates.Add(candidate);
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
-/// Stores Weapon Interaction extraction rules and candidates for one active boss pattern.
-/// </summary>
-[Serializable]
-public sealed class EnemyBossPatternWeaponExtractionDefinition
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Rules that decide when Weapon Interaction extracts a new candidate while this pattern remains active.")]
-    [SerializeField] private EnemyBossPatternExtractionSettings extractionSettings = new EnemyBossPatternExtractionSettings();
-
-    [Tooltip("Weapon candidates rolled internally by this pattern. Include a Null Module candidate to stop shooting until the next extraction.")]
-    [SerializeField] private List<EnemyBossPatternWeaponModuleCandidateDefinition> candidates = new List<EnemyBossPatternWeaponModuleCandidateDefinition>();
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public EnemyBossPatternExtractionSettings ExtractionSettings
-    {
-        get
-        {
-            return extractionSettings;
-        }
-    }
-
-    public IReadOnlyList<EnemyBossPatternWeaponModuleCandidateDefinition> Candidates
-    {
-        get
-        {
-            return candidates;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Public Methods
-    /// <summary>
-    /// Keeps extraction settings and candidate references valid without changing authored thresholds.
-    /// </summary>
-    public void Validate()
-    {
-        if (extractionSettings == null)
-            extractionSettings = new EnemyBossPatternExtractionSettings();
-
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternWeaponModuleCandidateDefinition>();
-
-        for (int index = 0; index < candidates.Count; index++)
-        {
-            if (candidates[index] == null)
-                candidates[index] = new EnemyBossPatternWeaponModuleCandidateDefinition();
-
-            candidates[index].Validate();
-        }
-    }
-
-    /// <summary>
-    /// Adds one migrated Weapon candidate only when this extraction list is still empty.
-    /// </summary>
-    /// <param name="sourceInteraction">Legacy interaction to migrate.</param>
-    /// <param name="displayNameValue">Readable migrated candidate name.</param>
-    public void TryMigrateLegacyCandidate(EnemyPatternWeaponInteractionAssembly sourceInteraction, string displayNameValue)
-    {
-        if (candidates == null)
-            candidates = new List<EnemyBossPatternWeaponModuleCandidateDefinition>();
-
-        if (candidates.Count > 0)
-            return;
-
-        EnemyBossPatternWeaponModuleCandidateDefinition candidate = new EnemyBossPatternWeaponModuleCandidateDefinition();
-        candidate.ConfigureLegacyModule(sourceInteraction, displayNameValue);
-        candidates.Add(candidate);
     }
     #endregion
 

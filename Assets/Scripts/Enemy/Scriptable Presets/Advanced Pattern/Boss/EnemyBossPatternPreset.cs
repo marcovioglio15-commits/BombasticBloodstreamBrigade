@@ -15,7 +15,7 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     [Tooltip("Unique ID for this boss pattern preset.")]
     [SerializeField] private string presetId;
 
-    [Tooltip(" boss pattern preset name shown in Enemy Management Tool.")]
+    [Tooltip("Boss pattern preset name shown in Enemy Management Tool.")]
     [SerializeField] private string presetName = "New Boss Pattern Preset";
 
     [Tooltip("Short description of this boss pattern preset.")]
@@ -24,16 +24,16 @@ public sealed class EnemyBossPatternPreset : ScriptableObject
     [Tooltip("Optional semantic version string for this boss pattern preset.")]
     [SerializeField] private string version = "1.0.0";
 
-    [Header("Module & Patterns Presets")]
-    [Tooltip("Normal enemy Modules & Patterns preset used as the source module catalog for boss Pattern Assemble slots.")]
+    [Header("Source Module Catalog")]
+    [Tooltip("Normal-enemy Modules & Patterns preset used as the boss module definition catalog. Pattern Assemble reads Core Movement, Short-Range and Weapon definitions; Boss Drop Extraction reads Drop Items definitions. Assembled normal patterns and their engagement settings are not inherited.")]
     [SerializeField] private EnemyModulesAndPatternsPreset sourcePatternsPreset;
 
     [Header("Pattern Extraction")]
     [Tooltip("Rules that decide when the boss extracts a new eligible pattern candidate.")]
     [SerializeField] private EnemyBossPatternExtractionSettings extractionSettings = new EnemyBossPatternExtractionSettings();
 
-    [Header("Pattern Candidates")]
-    [Tooltip("Boss-specific pattern candidates. Runtime extraction rolls among eligible enabled candidates instead of always taking the first valid entry.")]
+    [Header("Mixed Pattern Candidates")]
+    [Tooltip("Boss-specific mixed-pattern candidates. Runtime extraction rolls among eligible enabled candidates instead of always taking the first valid entry.")]
     [SerializeField] private List<EnemyBossPatternInteractionDefinition> interactions = new List<EnemyBossPatternInteractionDefinition>();
 
     [Header("Boss Drop Extraction")]

@@ -15,7 +15,7 @@ MonoBehaviour:
   presetId: 9b765a38a71e4b62a6abad2298214bce
   presetName: Player Tuning Transfer Import
   sourceWorkbookProfile: 4
-  sourceWorkbookPath: Assets/Excell Data Exchange/Import/PlayerTuning_ImportTest.xlsx
+  sourceWorkbookPath: Assets/Excell Data Exchange/Export/PlayerTuning.xlsx
   conflictPolicy: 2
   missingRowPolicy: 0
   referenceResolutionMode: 1

@@ -220,7 +220,7 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
             return;
         }
 
-        warnings.Add(string.Format("Shared pattern '{0}' enables Display Behaviour Engagement Trigger on {1}, but module kind '{2}' does not currently expose a predictive offensive timing hook in that slot.",
+        warnings.Add(string.Format("Shared pattern '{0}' enables Behaviour Engagement Warning on {1}, but module kind '{2}' does not expose a normal-pattern predictive timing hook in that slot. Activation-only warnings require a boss mixed-pattern slot.",
                                    patternName,
                                    categoryLabel,
                                    definition.ModuleKind));

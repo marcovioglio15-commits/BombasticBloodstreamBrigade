@@ -36,6 +36,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
         AddExtractionWarnings(extractionSettingsProperty, parent);
         AddEmptyInteractionWarnings(interactionsProperty, parent);
         AddInternalExtractionWarnings(interactionsProperty, parent);
+        EnemyBossPatternPresetsPanelEngagementWarningUtility.AddWarnings(interactionsProperty, sourcePreset, parent);
         AddWeaponRuntimeProjectileWarnings(interactionsProperty, sourcePreset, parent);
     }
     #endregion
@@ -77,7 +78,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
             if (HasAnyEnabledOverride(interactionProperty))
                 continue;
 
-            parent.Add(new HelpBox("Boss Interaction " + (index + 1) + " is enabled but does not override Core, Short-Range or Weapon slots.", HelpBoxMessageType.Info));
+            parent.Add(new HelpBox("Mixed Pattern Candidate " + (index + 1) + " is enabled but does not override Core, Short-Range or Weapon slots.", HelpBoxMessageType.Info));
         }
     }
 
@@ -136,7 +137,7 @@ internal static class EnemyBossPatternPresetsPanelWarningUtility
         if (HasAnyExtractionTrigger(extractionSettingsProperty))
             return;
 
-        parent.Add(new HelpBox("Boss Interaction " + (interactionIndex + 1) + " " + slotLabel + " Extraction has candidates but no enabled reroll trigger. It can select an initial module, then it stays locked until the top-level pattern changes.", HelpBoxMessageType.Info));
+        parent.Add(new HelpBox("Mixed Pattern Candidate " + (interactionIndex + 1) + " " + slotLabel + " Extraction has candidates but no enabled reroll trigger. It can select an initial module, then it stays locked until the top-level pattern changes.", HelpBoxMessageType.Info));
     }
 
     /// <summary>

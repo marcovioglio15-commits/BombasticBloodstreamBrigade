@@ -205,7 +205,7 @@ MonoBehaviour:
       enabled: 1
       hideWhenMaximumUnavailable: 1
       smoothingSeconds: 0.08
-      sloshAffectsBubblesOnly: 1
+      sloshAffectsBubblesOnly: 0
       palette:
         outline: {r: 0.055, g: 0.04, b: 0.02, a: 1}
         body: {r: 0.36078432, g: 0.16078432, b: 0.1882353, a: 0.7529412}

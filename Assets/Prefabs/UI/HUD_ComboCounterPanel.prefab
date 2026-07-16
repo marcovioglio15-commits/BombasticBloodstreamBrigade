@@ -556,7 +556,7 @@ MonoBehaviour:
   isEnabled: 1
   rootObject: {fileID: 7477472897622985331}
   rankBadgeImage: {fileID: 1867693662127997706}
-  rankText: {fileID: 808367967294115293}
+  rankText: {fileID: 8936765380413075061}
   comboValueText: {fileID: 5061269415082876045}
   progressFillImage: {fileID: 2295955166052569416}
   progressBackgroundImage: {fileID: 9128347410279779769}
