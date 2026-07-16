@@ -38,6 +38,22 @@ MonoBehaviour:
     displayName: Base Pattern 0
     minimumActiveSeconds: 0
     selectionWeight: 1
+    useEngagementFeedbackOverride: 0
+    engagementFeedbackOverride:
+      enableColorBlend: 1
+      colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
+      colorBlendLeadTimeSeconds: 0.3
+      colorBlendFadeOutSeconds: 0.18
+      colorBlendMaximumBlend: 0.7
+      enableBillboard: 1
+      billboardSprite: {fileID: 0}
+      billboardColor: {r: 1, g: 1, b: 1, a: 1}
+      billboardWorldOffset: {x: 0, y: 1.85, z: 0}
+      billboardLeadTimeSeconds: 0.3
+      billboardBaseScale: 0.75
+      billboardPulseScaleMultiplier: 1.22
+      billboardPulseExpandDurationSeconds: 0.12
+      billboardPulseContractDurationSeconds: 0.14
     minimumMissingHealthPercent: 0
     maximumMissingHealthPercent: 0
     minimumElapsedSeconds: 0
@@ -348,8 +364,8 @@ MonoBehaviour:
                   collectDistancePerPlayerSpeed: 0.05
                   spawnAnimationMinDuration: 0.08
                   spawnAnimationMaxDuration: 0.16
-        displayBehaviourEngagementTrigger: 1
-        useEngagementFeedbackOverride: 1
+        displayBehaviourEngagementTrigger: 0
+        useEngagementFeedbackOverride: 0
         engagementFeedbackOverride:
           enableColorBlend: 1
           colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
@@ -357,11 +373,11 @@ MonoBehaviour:
           colorBlendFadeOutSeconds: 0.18
           colorBlendMaximumBlend: 0.7
           enableBillboard: 1
-          billboardSprite: {fileID: 21300000, guid: 3ed273190aacf1d4095d6236f10655bc, type: 3}
+          billboardSprite: {fileID: 21300000, guid: f9e7a09d0df9c5e41b57792606621d92, type: 3}
           billboardColor: {r: 1, g: 1, b: 1, a: 1}
-          billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+          billboardWorldOffset: {x: 0, y: 1.85, z: 0}
           billboardLeadTimeSeconds: 0.3
-          billboardBaseScale: 0.75
+          billboardBaseScale: 0.25
           billboardPulseScaleMultiplier: 1.22
           billboardPulseExpandDurationSeconds: 0.12
           billboardPulseContractDurationSeconds: 0.14
@@ -613,8 +629,8 @@ MonoBehaviour:
                   collectDistancePerPlayerSpeed: 0.05
                   spawnAnimationMinDuration: 0.08
                   spawnAnimationMaxDuration: 0.16
-        displayBehaviourEngagementTrigger: 1
-        useEngagementFeedbackOverride: 1
+        displayBehaviourEngagementTrigger: 0
+        useEngagementFeedbackOverride: 0
         engagementFeedbackOverride:
           enableColorBlend: 1
           colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
@@ -624,7 +640,7 @@ MonoBehaviour:
           enableBillboard: 1
           billboardSprite: {fileID: 21300000, guid: f8c397c483a89d94483673c54272ba2b, type: 3}
           billboardColor: {r: 1, g: 1, b: 1, a: 1}
-          billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+          billboardWorldOffset: {x: 0, y: 1.85, z: 0}
           billboardLeadTimeSeconds: 0.3
           billboardBaseScale: 0.75
           billboardPulseScaleMultiplier: 1.22
@@ -889,7 +905,7 @@ MonoBehaviour:
           enableBillboard: 1
           billboardSprite: {fileID: 0}
           billboardColor: {r: 1, g: 1, b: 1, a: 1}
-          billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+          billboardWorldOffset: {x: 0, y: 1.85, z: 0}
           billboardLeadTimeSeconds: 0.3
           billboardBaseScale: 0.75
           billboardPulseScaleMultiplier: 1.22
@@ -933,22 +949,22 @@ MonoBehaviour:
           activationRange: 6
           releaseDistanceBuffer: 1.5
           displayBehaviourEngagementTrigger: 1
-          useEngagementFeedbackOverride: 0
+          useEngagementFeedbackOverride: 1
           engagementFeedbackOverride:
-            enableColorBlend: 1
+            enableColorBlend: 0
             colorBlendColor: {r: 0, g: 0, b: 0, a: 0}
             colorBlendLeadTimeSeconds: 0
             colorBlendFadeOutSeconds: 0
             colorBlendMaximumBlend: 0
             enableBillboard: 1
-            billboardSprite: {fileID: 0}
-            billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
-            billboardLeadTimeSeconds: 0
-            billboardBaseScale: 0
-            billboardPulseScaleMultiplier: 0
-            billboardPulseExpandDurationSeconds: 0
-            billboardPulseContractDurationSeconds: 0
+            billboardSprite: {fileID: 21300000, guid: f9e7a09d0df9c5e41b57792606621d92, type: 3}
+            billboardColor: {r: 1, g: 1, b: 1, a: 1}
+            billboardWorldOffset: {x: 0, y: 3.5, z: 0}
+            billboardLeadTimeSeconds: 0.5
+            billboardBaseScale: 0.1
+            billboardPulseScaleMultiplier: 2
+            billboardPulseExpandDurationSeconds: 0.15
+            billboardPulseContractDurationSeconds: 0.35
           binding:
             moduleId: Module_Dash
             isEnabled: 1
@@ -1237,8 +1253,8 @@ MonoBehaviour:
           isEnabled: 1
           activationRange: 6
           releaseDistanceBuffer: 1.5
-          displayBehaviourEngagementTrigger: 1
-          useEngagementFeedbackOverride: 1
+          displayBehaviourEngagementTrigger: 0
+          useEngagementFeedbackOverride: 0
           engagementFeedbackOverride:
             enableColorBlend: 1
             colorBlendColor: {r: 0, g: 1, b: 0.9052942, a: 0.92156863}
@@ -1248,7 +1264,7 @@ MonoBehaviour:
             enableBillboard: 1
             billboardSprite: {fileID: 21300000, guid: 6590c898a53490d4e9d34c8f9b70bcec, type: 3}
             billboardColor: {r: 1, g: 1, b: 1, a: 1}
-            billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+            billboardWorldOffset: {x: 0, y: 1.85, z: 0}
             billboardLeadTimeSeconds: 0.3
             billboardBaseScale: 0.75
             billboardPulseScaleMultiplier: 1.22
@@ -1576,7 +1592,7 @@ MonoBehaviour:
             enableBillboard: 0
             billboardSprite: {fileID: 0}
             billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -1887,7 +1903,7 @@ MonoBehaviour:
             enableBillboard: 1
             billboardSprite: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
             billboardColor: {r: 1, g: 1, b: 1, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -2198,7 +2214,7 @@ MonoBehaviour:
             enableBillboard: 0
             billboardSprite: {fileID: 0}
             billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -2721,7 +2737,7 @@ MonoBehaviour:
         enableBillboard: 0
         billboardSprite: {fileID: 0}
         billboardColor: {r: 0, g: 0, b: 0, a: 0}
-        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardWorldOffset: {x: 0, y: 0, z: 0}
         billboardLeadTimeSeconds: 0
         billboardBaseScale: 0
         billboardPulseScaleMultiplier: 0
@@ -2980,7 +2996,7 @@ MonoBehaviour:
         enableBillboard: 0
         billboardSprite: {fileID: 0}
         billboardColor: {r: 0, g: 0, b: 0, a: 0}
-        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardWorldOffset: {x: 0, y: 0, z: 0}
         billboardLeadTimeSeconds: 0
         billboardBaseScale: 0
         billboardPulseScaleMultiplier: 0
@@ -3223,6 +3239,22 @@ MonoBehaviour:
     displayName: MH
     minimumActiveSeconds: 0
     selectionWeight: 5
+    useEngagementFeedbackOverride: 0
+    engagementFeedbackOverride:
+      enableColorBlend: 1
+      colorBlendColor: {r: 0.35, g: 1, b: 0.95, a: 1}
+      colorBlendLeadTimeSeconds: 0.3
+      colorBlendFadeOutSeconds: 0.18
+      colorBlendMaximumBlend: 0.7
+      enableBillboard: 1
+      billboardSprite: {fileID: 0}
+      billboardColor: {r: 1, g: 1, b: 1, a: 1}
+      billboardWorldOffset: {x: 0, y: 1.85, z: 0}
+      billboardLeadTimeSeconds: 0.3
+      billboardBaseScale: 0.75
+      billboardPulseScaleMultiplier: 1.22
+      billboardPulseExpandDurationSeconds: 0.12
+      billboardPulseContractDurationSeconds: 0.14
     minimumMissingHealthPercent: 0.8
     maximumMissingHealthPercent: 1
     minimumElapsedSeconds: 0
@@ -3508,7 +3540,7 @@ MonoBehaviour:
           enableBillboard: 1
           billboardSprite: {fileID: 0}
           billboardColor: {r: 1, g: 1, b: 1, a: 1}
-          billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+          billboardWorldOffset: {x: 0, y: 1.85, z: 0}
           billboardLeadTimeSeconds: 0.3
           billboardBaseScale: 0.75
           billboardPulseScaleMultiplier: 1.22
@@ -3562,7 +3594,7 @@ MonoBehaviour:
             enableBillboard: 0
             billboardSprite: {fileID: 0}
             billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -3890,7 +3922,7 @@ MonoBehaviour:
             enableBillboard: 0
             billboardSprite: {fileID: 0}
             billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -4201,7 +4233,7 @@ MonoBehaviour:
             enableBillboard: 0
             billboardSprite: {fileID: 0}
             billboardColor: {r: 0, g: 0, b: 0, a: 0}
-            billboardLocalOffset: {x: 0, y: 0, z: 0}
+            billboardWorldOffset: {x: 0, y: 0, z: 0}
             billboardLeadTimeSeconds: 0
             billboardBaseScale: 0
             billboardPulseScaleMultiplier: 0
@@ -4724,7 +4756,7 @@ MonoBehaviour:
         enableBillboard: 0
         billboardSprite: {fileID: 0}
         billboardColor: {r: 0, g: 0, b: 0, a: 0}
-        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardWorldOffset: {x: 0, y: 0, z: 0}
         billboardLeadTimeSeconds: 0
         billboardBaseScale: 0
         billboardPulseScaleMultiplier: 0
@@ -4983,7 +5015,7 @@ MonoBehaviour:
         enableBillboard: 0
         billboardSprite: {fileID: 0}
         billboardColor: {r: 0, g: 0, b: 0, a: 0}
-        billboardLocalOffset: {x: 0, y: 0, z: 0}
+        billboardWorldOffset: {x: 0, y: 0, z: 0}
         billboardLeadTimeSeconds: 0
         billboardBaseScale: 0
         billboardPulseScaleMultiplier: 0

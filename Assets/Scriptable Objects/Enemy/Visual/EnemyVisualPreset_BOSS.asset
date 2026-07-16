@@ -105,7 +105,7 @@ MonoBehaviour:
     enableBillboard: 1
     billboardSprite: {fileID: 21300000, guid: 6a0b1d07def993649a48cc9aca31ab30, type: 3}
     billboardColor: {r: 1, g: 1, b: 1, a: 1}
-    billboardLocalOffset: {x: 0, y: 3, z: 0}
+    billboardWorldOffset: {x: 0, y: 3, z: 0}
     billboardLeadTimeSeconds: 0.5
     billboardBaseScale: 0.08
     billboardPulseScaleMultiplier: 1.5
@@ -120,7 +120,7 @@ MonoBehaviour:
     enableBillboard: 1
     billboardSprite: {fileID: 21300000, guid: d991446632b496047ab28173c93bd55b, type: 3}
     billboardColor: {r: 1, g: 1, b: 1, a: 1}
-    billboardLocalOffset: {x: 0, y: 3, z: 0}
+    billboardWorldOffset: {x: 0, y: 3, z: 0}
     billboardLeadTimeSeconds: 0.5
     billboardBaseScale: 0.08
     billboardPulseScaleMultiplier: 1.5

@@ -4066,7 +4066,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -4361,7 +4361,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -5731,7 +5731,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -6026,7 +6026,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -7396,7 +7396,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -7691,7 +7691,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -9061,7 +9061,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -9374,7 +9374,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -10480,7 +10480,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -10775,7 +10775,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -12154,7 +12154,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -12449,7 +12449,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -13553,7 +13553,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -13848,7 +13848,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -15218,7 +15218,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -15513,7 +15513,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -16885,7 +16885,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -17180,7 +17180,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -18552,7 +18552,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
@@ -18847,7 +18847,7 @@ MonoBehaviour:
         enableBillboard: 1
         billboardSprite: {fileID: 0}
         billboardColor: {r: 1, g: 1, b: 1, a: 1}
-        billboardLocalOffset: {x: 0, y: 1.85, z: 0}
+        billboardWorldOffset: {x: 0, y: 1.85, z: 0}
         billboardLeadTimeSeconds: 0.3
         billboardBaseScale: 0.75
         billboardPulseScaleMultiplier: 1.22
