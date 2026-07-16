@@ -14,99 +14,68 @@ internal static class EnemyOffensiveEngagementPresentationUtility
 
     #region Public Methods
     /// <summary>
-    /// Resolves the strongest currently active offensive color-blend warning across every baked interaction config.
+    /// Resolves color-blend and billboard warning channels in one pass across every baked interaction config.
     /// </summary>
     /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
     /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
     /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
     /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
     /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
+    /// <param name="restrictToSource">Whether arbitration must ignore warnings from every other module source.</param>
+    /// <param name="protectedSource">Module source that owns presentation while interruption protection is active.</param>
     /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
     /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
-    /// <returns>The strongest active color-blend result, or an inactive result when no warning window is currently open.</returns>
-    public static EnemyOffensiveEngagementBlendResult ResolveBlendResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
-                                                                         DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
-                                                                         DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
-                                                                         bool hasBossSlotRuntimes,
-                                                                         DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
-                                                                         in EnemyPatternConfig patternConfig,
-                                                                         in EnemyPatternRuntimeState patternRuntimeState)
+    /// <param name="blendResult">Strongest active color-blend result, or an inactive result when no color warning window is open.</param>
+    /// <param name="billboardResult">Strongest active billboard result, or an inactive result when no billboard warning window is open.</param>
+    public static void ResolveResults(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
+                                      DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                      DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
+                                      bool hasBossSlotRuntimes,
+                                      DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
+                                      bool restrictToSource,
+                                      EnemyOffensiveEngagementTriggerSource protectedSource,
+                                      in EnemyPatternConfig patternConfig,
+                                      in EnemyPatternRuntimeState patternRuntimeState,
+                                      out EnemyOffensiveEngagementBlendResult blendResult,
+                                      out EnemyOffensiveEngagementBillboardResult billboardResult)
     {
-        EnemyOffensiveEngagementBlendResult bestResult = default(EnemyOffensiveEngagementBlendResult);
+        blendResult = default(EnemyOffensiveEngagementBlendResult);
+        billboardResult = default(EnemyOffensiveEngagementBillboardResult);
+        float bestBillboardPriority = -1f;
         int configCount = configs.Length;
 
         for (int configIndex = 0; configIndex < configCount; configIndex++)
         {
             EnemyOffensiveEngagementConfigElement config = configs[configIndex];
 
-            if (config.EnableColorBlend == 0)
-            {
+            if (restrictToSource && config.Source != protectedSource)
                 continue;
+
+            if (config.EnableColorBlend != 0 &&
+                TryEvaluateWindow(config.TimingMode,
+                                  config.Source,
+                                  config.ColorBlendLeadTimeSeconds,
+                                  shooterRuntime,
+                                  bombardierRuntime,
+                                  hasBossSlotRuntimes,
+                                  bossSlotRuntimes,
+                                  patternConfig,
+                                  patternRuntimeState,
+                                  out EnemyOffensiveEngagementWindow colorWindow))
+            {
+                float candidateBlend = math.saturate(colorWindow.NormalizedProgress) * math.saturate(config.ColorBlendMaximumBlend);
+
+                if (candidateBlend > blendResult.Blend)
+                {
+                    blendResult.IsActive = true;
+                    blendResult.Blend = candidateBlend;
+                    blendResult.Color = config.ColorBlendColor;
+                    blendResult.FadeOutSeconds = math.max(0f, config.ColorBlendFadeOutSeconds);
+                }
             }
 
-            if (!TryEvaluateWindow(config.TimingMode,
-                                   config.Source,
-                                   config.ColorBlendLeadTimeSeconds,
-                                   shooterRuntime,
-                                   bombardierRuntime,
-                                   hasBossSlotRuntimes,
-                                   bossSlotRuntimes,
-                                   patternConfig,
-                                   patternRuntimeState,
-                                   out EnemyOffensiveEngagementWindow window))
-            {
-                continue;
-            }
-
-            float candidateBlend = math.saturate(window.NormalizedProgress) * math.saturate(config.ColorBlendMaximumBlend);
-
-            if (candidateBlend <= bestResult.Blend)
-            {
-                continue;
-            }
-
-            bestResult.IsActive = true;
-            bestResult.Blend = candidateBlend;
-            bestResult.Color = config.ColorBlendColor;
-            bestResult.FadeOutSeconds = math.max(0f, config.ColorBlendFadeOutSeconds);
-        }
-
-        return bestResult;
-    }
-
-    /// <summary>
-    /// Resolves the billboard request with the strongest active engagement progress across every baked interaction config.
-    /// </summary>
-    /// <param name="configs">Baked offensive engagement configs for the current enemy.</param>
-    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
-    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
-    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
-    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
-    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
-    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
-    /// <returns>The strongest active billboard result, or an inactive result when no billboard window is currently open.</returns>
-    public static EnemyOffensiveEngagementBillboardResult ResolveBillboardResult(DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs,
-                                                                                 DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
-                                                                                 DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
-                                                                                 bool hasBossSlotRuntimes,
-                                                                                 DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
-                                                                                 in EnemyPatternConfig patternConfig,
-                                                                                 in EnemyPatternRuntimeState patternRuntimeState)
-    {
-        EnemyOffensiveEngagementBillboardResult bestResult = default(EnemyOffensiveEngagementBillboardResult);
-        float bestPriority = -1f;
-        int configCount = configs.Length;
-
-        for (int configIndex = 0; configIndex < configCount; configIndex++)
-        {
-            EnemyOffensiveEngagementConfigElement config = configs[configIndex];
-
-            if (config.EnableBillboard == 0)
-            {
-                continue;
-            }
-
-            if (!TryEvaluateWindow(config.TimingMode,
+            if (config.EnableBillboard == 0 ||
+                !TryEvaluateWindow(config.TimingMode,
                                    config.Source,
                                    config.BillboardLeadTimeSeconds,
                                    shooterRuntime,
@@ -115,29 +84,19 @@ internal static class EnemyOffensiveEngagementPresentationUtility
                                    bossSlotRuntimes,
                                    patternConfig,
                                    patternRuntimeState,
-                                   out EnemyOffensiveEngagementWindow window))
-            {
+                                   out EnemyOffensiveEngagementWindow billboardWindow) ||
+                billboardWindow.NormalizedProgress <= bestBillboardPriority)
                 continue;
-            }
 
-            float candidatePriority = window.NormalizedProgress;
-
-            if (candidatePriority <= bestPriority)
-            {
-                continue;
-            }
-
-            bestPriority = candidatePriority;
-            bestResult.IsActive = true;
-            bestResult.Source = config.Source;
-            bestResult.VisualSettingsKey = config.VisualSettingsKey;
-            bestResult.UseOverrideVisualSettings = config.UseOverrideVisualSettings != 0;
-            bestResult.Color = config.BillboardColor;
-            bestResult.Offset = config.BillboardOffset;
-            bestResult.UniformScale = ResolvePulseScale(config, window.ElapsedSeconds);
+            bestBillboardPriority = billboardWindow.NormalizedProgress;
+            billboardResult.IsActive = true;
+            billboardResult.Source = config.Source;
+            billboardResult.VisualSettingsKey = config.VisualSettingsKey;
+            billboardResult.UseOverrideVisualSettings = config.UseOverrideVisualSettings != 0;
+            billboardResult.Color = config.BillboardColor;
+            billboardResult.Offset = config.BillboardOffset;
+            billboardResult.UniformScale = ResolvePulseScale(config, billboardWindow.ElapsedSeconds);
         }
-
-        return bestResult;
     }
 
     /// <summary>
@@ -205,17 +164,25 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     /// <param name="currentBlend">Blend value applied during the previous frame.</param>
     /// <param name="currentFadeOutSeconds">Fade-out duration remembered from the previously dominant offensive warning.</param>
     /// <param name="targetResult">Strongest active offensive blend result for the current frame.</param>
+    /// <param name="forceActiveTarget">Whether an interruption-protected active result must immediately replace presentation inherited from another source.</param>
     /// <param name="deltaTime">Presentation delta time.</param>
     /// <param name="rememberedFadeOutSeconds">Updated fade-out duration that should be stored back into presentation state.</param>
     /// <returns>Displayed offensive engagement blend for the current frame.</returns>
     public static float ResolveDisplayedBlend(float currentBlend,
                                               float currentFadeOutSeconds,
                                               EnemyOffensiveEngagementBlendResult targetResult,
+                                              bool forceActiveTarget,
                                               float deltaTime,
                                               out float rememberedFadeOutSeconds)
     {
         float targetBlend = targetResult.IsActive ? targetResult.Blend : 0f;
         rememberedFadeOutSeconds = currentFadeOutSeconds;
+
+        if (forceActiveTarget && targetResult.IsActive)
+        {
+            rememberedFadeOutSeconds = math.max(0f, targetResult.FadeOutSeconds);
+            return targetBlend;
+        }
 
         if (targetBlend >= currentBlend)
         {
@@ -298,6 +265,51 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Checks whether at least one enabled visual channel of a single config is inside its warning window.
+    /// </summary>
+    /// <param name="config">Baked warning config to evaluate.</param>
+    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
+    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
+    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
+    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
+    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <returns>True when the config currently exposes an active color or billboard warning channel.</returns>
+    internal static bool IsConfigWarningActive(in EnemyOffensiveEngagementConfigElement config,
+                                               DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
+                                               DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
+                                               bool hasBossSlotRuntimes,
+                                               DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
+                                               in EnemyPatternConfig patternConfig,
+                                               in EnemyPatternRuntimeState patternRuntimeState)
+    {
+        if (config.EnableColorBlend != 0 &&
+            TryEvaluateWindow(config.TimingMode,
+                              config.Source,
+                              config.ColorBlendLeadTimeSeconds,
+                              shooterRuntime,
+                              bombardierRuntime,
+                              hasBossSlotRuntimes,
+                              bossSlotRuntimes,
+                              patternConfig,
+                              patternRuntimeState,
+                              out _))
+            return true;
+
+        return config.EnableBillboard != 0 &&
+               TryEvaluateWindow(config.TimingMode,
+                                 config.Source,
+                                 config.BillboardLeadTimeSeconds,
+                                 shooterRuntime,
+                                 bombardierRuntime,
+                                 hasBossSlotRuntimes,
+                                 bossSlotRuntimes,
+                                 patternConfig,
+                                 patternRuntimeState,
+                                 out _);
+    }
+
     /// <summary>
     /// Evaluates one predictive warning window for the requested timing mode and lead time.
     /// </summary>
@@ -598,38 +610,4 @@ internal static class EnemyOffensiveEngagementPresentationUtility
     #endregion
 
     #endregion
-}
-
-/// <summary>
-/// Stores one currently active predictive warning window resolved for a single offensive config.
-/// </summary>
-internal struct EnemyOffensiveEngagementWindow
-{
-    public float NormalizedProgress;
-    public float ElapsedSeconds;
-}
-
-/// <summary>
-/// Stores the strongest currently active offensive color-blend result.
-/// </summary>
-internal struct EnemyOffensiveEngagementBlendResult
-{
-    public bool IsActive;
-    public float Blend;
-    public float4 Color;
-    public float FadeOutSeconds;
-}
-
-/// <summary>
-/// Stores the strongest currently active offensive billboard result.
-/// </summary>
-internal struct EnemyOffensiveEngagementBillboardResult
-{
-    public bool IsActive;
-    public EnemyOffensiveEngagementTriggerSource Source;
-    public int VisualSettingsKey;
-    public bool UseOverrideVisualSettings;
-    public float4 Color;
-    public float3 Offset;
-    public float UniformScale;
 }

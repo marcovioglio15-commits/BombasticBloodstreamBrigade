@@ -25,6 +25,7 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         SerializedProperty activationRangeProperty = property.FindPropertyRelative("activationRange");
         SerializedProperty releaseDistanceBufferProperty = property.FindPropertyRelative("releaseDistanceBuffer");
         SerializedProperty displayBehaviourEngagementTriggerProperty = property.FindPropertyRelative("displayBehaviourEngagementTrigger");
+        SerializedProperty preventWarningInterruptionProperty = property.FindPropertyRelative("preventWarningInterruption");
         SerializedProperty useEngagementFeedbackOverrideProperty = property.FindPropertyRelative("useEngagementFeedbackOverride");
         SerializedProperty engagementFeedbackOverrideProperty = property.FindPropertyRelative("engagementFeedbackOverride");
         SerializedProperty bindingProperty = property.FindPropertyRelative("binding");
@@ -35,6 +36,7 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
             activationRangeProperty == null ||
             releaseDistanceBufferProperty == null ||
             displayBehaviourEngagementTriggerProperty == null ||
+            preventWarningInterruptionProperty == null ||
             useEngagementFeedbackOverrideProperty == null ||
             engagementFeedbackOverrideProperty == null ||
             bindingProperty == null)
@@ -68,6 +70,9 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         VisualElement feedbackOptionsContainer = new VisualElement();
         feedbackOptionsContainer.style.marginLeft = 12f;
         settingsContainer.Add(feedbackOptionsContainer);
+        EnemyAdvancedPatternDrawerUtility.AddField(feedbackOptionsContainer,
+                                                   preventWarningInterruptionProperty,
+                                                   "Prevent Warning Interruption");
         EnemyAdvancedPatternDrawerUtility.AddField(feedbackOptionsContainer,
                                                    useEngagementFeedbackOverrideProperty,
                                                    "Use Engagement Feedback Override");
@@ -169,12 +174,13 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
         bool isTriggerEnabled = isInteractionEnabled &&
                                 displayTriggerProperty != null &&
                                 displayTriggerProperty.boolValue;
-        bool isOverrideEnabled = isTriggerEnabled &&
+        bool supportsDisplayTrigger = EnemyOffensiveEngagementFeedbackDrawerUtility.SupportsDisplayTrigger(bindingProperty,
+                                                                                                             EnemyPatternModuleCatalogSection.ShortRangeInteraction);
+        bool hasEffectiveTrigger = isTriggerEnabled && supportsDisplayTrigger;
+        bool isOverrideEnabled = hasEffectiveTrigger &&
                                  useOverrideProperty != null &&
                                  useOverrideProperty.boolValue;
-        bool showUnsupportedModuleWarning = isTriggerEnabled &&
-                                            !EnemyOffensiveEngagementFeedbackDrawerUtility.SupportsDisplayTrigger(bindingProperty,
-                                                                                                                 EnemyPatternModuleCatalogSection.ShortRangeInteraction);
+        bool showUnsupportedModuleWarning = isTriggerEnabled && !supportsDisplayTrigger;
 
         if (settingsContainer != null)
         {
@@ -185,7 +191,7 @@ public sealed class EnemyPatternShortRangeInteractionAssemblyPropertyDrawer : Pr
 
         if (feedbackOptionsContainer != null)
         {
-            feedbackOptionsContainer.style.display = isTriggerEnabled
+            feedbackOptionsContainer.style.display = hasEffectiveTrigger
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
         }

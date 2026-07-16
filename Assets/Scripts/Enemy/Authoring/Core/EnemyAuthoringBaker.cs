@@ -317,7 +317,9 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
             AppliedColor = damageFlashColor,
             OffensiveEngagementColor = damageFlashColor,
             OffensiveEngagementBlend = 0f,
-            OffensiveEngagementFadeOutSeconds = 0f
+            OffensiveEngagementFadeOutSeconds = 0f,
+            HasProtectedEngagementSource = 0,
+            ProtectedEngagementSource = EnemyOffensiveEngagementTriggerSource.CoreMovement
         });
         AddComponent(entity, EnemyVisualFeedbackBakeUtility.BuildFaceFlipbookConfig(authoring.FaceFlipbookSettings));
         AddComponent(entity, CreateDefaultFaceFlipbookState());

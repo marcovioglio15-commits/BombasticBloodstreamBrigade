@@ -118,6 +118,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
                               sharedPreset,
                               globalSettings,
                               candidate.UseEngagementFeedbackOverride,
+                              candidate.PreventWarningInterruption,
                               candidate.EngagementFeedbackOverride,
                               EnemyPatternModuleCatalogSection.CoreMovement,
                               EnemyOffensiveEngagementTriggerSource.CoreMovement,
@@ -154,6 +155,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
                               sharedPreset,
                               globalSettings,
                               interaction.UseEngagementFeedbackOverride,
+                              interaction.PreventWarningInterruption,
                               interaction.EngagementFeedbackOverride,
                               EnemyPatternModuleCatalogSection.ShortRangeInteraction,
                               EnemyOffensiveEngagementTriggerSource.ShortRangeInteraction,
@@ -190,6 +192,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
                               sharedPreset,
                               globalSettings,
                               interaction.UseEngagementFeedbackOverride,
+                              interaction.PreventWarningInterruption,
                               interaction.EngagementFeedbackOverride,
                               EnemyPatternModuleCatalogSection.WeaponInteraction,
                               EnemyOffensiveEngagementTriggerSource.WeaponInteraction,
@@ -280,6 +283,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
     /// <param name="sharedPreset">Shared source preset used to resolve the selected module kind.</param>
     /// <param name="globalSettings">Generic visual feedback settings resolved from the visual preset.</param>
     /// <param name="useOverrideSettings">True when the interaction-specific override is enabled.</param>
+    /// <param name="preventWarningInterruption">True when this behaviour must retain presentation ownership for its active warning window.</param>
     /// <param name="overrideSettings">Optional interaction-specific override settings.</param>
     /// <param name="section">Source module catalog section.</param>
     /// <param name="source">Interaction source currently being compiled.</param>
@@ -290,6 +294,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
                                        EnemyModulesAndPatternsPreset sharedPreset,
                                        EnemyOffensiveEngagementFeedbackSettings globalSettings,
                                        bool useOverrideSettings,
+                                       bool preventWarningInterruption,
                                        EnemyOffensiveEngagementFeedbackSettings overrideSettings,
                                        EnemyPatternModuleCatalogSection section,
                                        EnemyOffensiveEngagementTriggerSource source,
@@ -316,7 +321,12 @@ internal static class EnemyOffensiveEngagementBakeUtility
         EnemyOffensiveEngagementFeedbackSettings settings = ResolveSettings(globalSettings,
                                                                            useOverrideSettings,
                                                                            overrideSettings);
-        return TryCreateConfig(source, timingMode, useOverrideSettings, settings, out config);
+        return TryCreateConfig(source,
+                               timingMode,
+                               useOverrideSettings,
+                               preventWarningInterruption,
+                               settings,
+                               out config);
     }
 
     /// <summary>
@@ -325,12 +335,14 @@ internal static class EnemyOffensiveEngagementBakeUtility
     /// <param name="source">Interaction source currently being compiled.</param>
     /// <param name="timingMode">Supported timing model used for a predictive commit or boss-owned activation window.</param>
     /// <param name="useOverrideVisualSettings">True when the interaction-specific override provided the baked settings.</param>
+    /// <param name="preventWarningInterruption">True when other module warnings cannot replace this config while its window remains active.</param>
     /// <param name="settings">Resolved authored settings block.</param>
     /// <param name="config">Output baked offensive engagement config.</param>
     /// <returns>True when the settings expose at least one visible feedback channel.</returns>
     private static bool TryCreateConfig(EnemyOffensiveEngagementTriggerSource source,
                                         EnemyOffensiveEngagementTimingMode timingMode,
                                         bool useOverrideVisualSettings,
+                                        bool preventWarningInterruption,
                                         EnemyOffensiveEngagementFeedbackSettings settings,
                                         out EnemyOffensiveEngagementConfigElement config)
     {
@@ -353,6 +365,7 @@ internal static class EnemyOffensiveEngagementBakeUtility
             TimingMode = timingMode,
             VisualSettingsKey = -1,
             UseOverrideVisualSettings = useOverrideVisualSettings ? (byte)1 : (byte)0,
+            PreventWarningInterruption = preventWarningInterruption ? (byte)1 : (byte)0,
             EnableColorBlend = settings.EnableColorBlend ? (byte)1 : (byte)0,
             ColorBlendColor = DamageFlashRuntimeUtility.ToLinearFloat4(ResolveFiniteColor(settings.ColorBlendColor,
                                                                                           DefaultSettings.ColorBlendColor)),

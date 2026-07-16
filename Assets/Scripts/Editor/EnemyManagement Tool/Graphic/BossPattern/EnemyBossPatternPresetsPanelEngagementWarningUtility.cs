@@ -23,13 +23,20 @@ internal static class EnemyBossPatternPresetsPanelEngagementWarningUtility
         if (interactionsProperty == null || sourcePreset == null || parent == null)
             return;
 
-        // Inspect only enabled mixed patterns that explicitly author a boss-only override.
+        // Inspect every enabled mixed pattern for ineffective protection flags before override-specific usage checks.
         for (int interactionIndex = 0; interactionIndex < interactionsProperty.arraySize; interactionIndex++)
         {
             SerializedProperty interactionProperty = interactionsProperty.GetArrayElementAtIndex(interactionIndex);
 
-            if (!ReadBoolean(interactionProperty, "enabled") ||
-                !ReadBoolean(interactionProperty, "useEngagementFeedbackOverride"))
+            if (!ReadBoolean(interactionProperty, "enabled"))
+                continue;
+
+            AddProtectionWarnings(interactionProperty,
+                                  interactionIndex,
+                                  sourcePreset,
+                                  parent);
+
+            if (!ReadBoolean(interactionProperty, "useEngagementFeedbackOverride"))
                 continue;
 
             int warningCandidateCount = 0;
@@ -66,6 +73,88 @@ internal static class EnemyBossPatternPresetsPanelEngagementWarningUtility
     #endregion
 
     #region Candidate Inspection
+    /// <summary>
+    /// Reports interruption-protection flags that cannot produce a supported runtime warning config.
+    /// </summary>
+    /// <param name="interactionProperty">Enabled mixed-pattern definition to inspect.</param>
+    /// <param name="interactionIndex">Serialized mixed-pattern index used in warning text.</param>
+    /// <param name="sourcePreset">Source module catalog used to resolve timing support.</param>
+    /// <param name="parent">Visual container receiving warning boxes.</param>
+    private static void AddProtectionWarnings(SerializedProperty interactionProperty,
+                                              int interactionIndex,
+                                              EnemyModulesAndPatternsPreset sourcePreset,
+                                              VisualElement parent)
+    {
+        AddProtectionWarnings(interactionProperty.FindPropertyRelative("coreMovementExtraction"),
+                              interactionIndex,
+                              sourcePreset,
+                              EnemyPatternModuleCatalogSection.CoreMovement,
+                              false,
+                              parent);
+        AddProtectionWarnings(interactionProperty.FindPropertyRelative("shortRangeExtraction"),
+                              interactionIndex,
+                              sourcePreset,
+                              EnemyPatternModuleCatalogSection.ShortRangeInteraction,
+                              true,
+                              parent);
+        AddProtectionWarnings(interactionProperty.FindPropertyRelative("weaponExtraction"),
+                              interactionIndex,
+                              sourcePreset,
+                              EnemyPatternModuleCatalogSection.WeaponInteraction,
+                              true,
+                              parent);
+    }
+
+    /// <summary>
+    /// Reports protected candidates in one extraction slot that cannot bake an active warning.
+    /// </summary>
+    /// <param name="extractionProperty">Serialized extraction slot containing module candidates.</param>
+    /// <param name="interactionIndex">Owning mixed-pattern index used in warning text.</param>
+    /// <param name="sourcePreset">Source module catalog used to resolve timing support.</param>
+    /// <param name="section">Catalog section that owns the candidates.</param>
+    /// <param name="usesNestedInteraction">Whether warning fields live under a nested interaction assembly.</param>
+    /// <param name="parent">Visual container receiving warning boxes.</param>
+    private static void AddProtectionWarnings(SerializedProperty extractionProperty,
+                                              int interactionIndex,
+                                              EnemyModulesAndPatternsPreset sourcePreset,
+                                              EnemyPatternModuleCatalogSection section,
+                                              bool usesNestedInteraction,
+                                              VisualElement parent)
+    {
+        SerializedProperty candidatesProperty = extractionProperty != null
+            ? extractionProperty.FindPropertyRelative("candidates")
+            : null;
+
+        if (candidatesProperty == null)
+            return;
+
+        // Preserve candidate ordering so each warning points to the same card the designer sees.
+        for (int candidateIndex = 0; candidateIndex < candidatesProperty.arraySize; candidateIndex++)
+        {
+            SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(candidateIndex);
+            SerializedProperty warningOwnerProperty = usesNestedInteraction && candidateProperty != null
+                ? candidateProperty.FindPropertyRelative("interaction")
+                : candidateProperty;
+
+            if (!ReadBoolean(warningOwnerProperty, "preventWarningInterruption") ||
+                IsSupportedWarningCandidate(candidateProperty,
+                                            sourcePreset,
+                                            section,
+                                            usesNestedInteraction,
+                                            out _))
+                continue;
+
+            parent.Add(new HelpBox("Mixed Pattern Candidate " +
+                                   (interactionIndex + 1) +
+                                   ", " +
+                                   ResolveSectionLabel(section) +
+                                   " Module Candidate " +
+                                   (candidateIndex + 1) +
+                                   " enables Prevent Warning Interruption, but it cannot bake a supported enabled Behaviour Engagement Warning, so the protection has no runtime effect.",
+                                   HelpBoxMessageType.Warning));
+        }
+    }
+
     /// <summary>
     /// Counts supported warning candidates and the subset that inherits its owning mixed-pattern override.
     /// </summary>
@@ -187,6 +276,26 @@ internal static class EnemyBossPatternPresetsPanelEngagementWarningUtility
             ? parent.FindPropertyRelative(relativeName)
             : null;
         return property != null ? property.enumValueIndex : -1;
+    }
+
+    /// <summary>
+    /// Converts a module catalog section into concise designer-facing warning text.
+    /// </summary>
+    /// <param name="section">Catalog section to format.</param>
+    /// <returns>Readable slot label.</returns>
+    private static string ResolveSectionLabel(EnemyPatternModuleCatalogSection section)
+    {
+        switch (section)
+        {
+            case EnemyPatternModuleCatalogSection.ShortRangeInteraction:
+                return "Short-Range";
+
+            case EnemyPatternModuleCatalogSection.WeaponInteraction:
+                return "Weapon";
+
+            default:
+                return "Core Movement";
+        }
     }
     #endregion
 

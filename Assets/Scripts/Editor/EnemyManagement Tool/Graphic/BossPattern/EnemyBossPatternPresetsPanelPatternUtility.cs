@@ -437,6 +437,7 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
                                                        string labelPrefix)
     {
         SerializedProperty displayTriggerProperty = slotProperty.FindPropertyRelative("displayBehaviourEngagementTrigger");
+        SerializedProperty preventInterruptionProperty = slotProperty.FindPropertyRelative("preventWarningInterruption");
         SerializedProperty useOverrideProperty = slotProperty.FindPropertyRelative("useEngagementFeedbackOverride");
         SerializedProperty overrideProperty = slotProperty.FindPropertyRelative("engagementFeedbackOverride");
         SerializedProperty bindingProperty = slotProperty.FindPropertyRelative("binding");
@@ -456,6 +457,10 @@ internal static class EnemyBossPatternPresetsPanelPatternUtility
         if (displayTriggerProperty == null || !displayTriggerProperty.boolValue)
             return;
 
+        parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel,
+                                                                                         preventInterruptionProperty,
+                                                                                         "Prevent Warning Interruption",
+                                                                                         "Keeps this candidate's active warning authoritative over warnings from other module slots until its own window closes. Simultaneous protected warnings use stable Core Movement, Short-Range, then Weapon order."));
         parent.Add(EnemyBossPatternPresetsPanelSharedUtility.CreateReactivePropertyField(panel, useOverrideProperty, "Use Candidate Warning Override", "Overrides both the owning mixed-pattern warning default and the enemy visual preset for this " + labelPrefix + " candidate only."));
 
         if (useOverrideProperty != null && useOverrideProperty.boolValue)

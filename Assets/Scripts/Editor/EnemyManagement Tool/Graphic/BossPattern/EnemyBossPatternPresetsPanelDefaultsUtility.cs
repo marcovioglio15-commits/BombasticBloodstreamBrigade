@@ -52,6 +52,7 @@ internal static class EnemyBossPatternPresetsPanelDefaultsUtility
             return;
 
         EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(warningOwnerProperty.FindPropertyRelative("displayBehaviourEngagementTrigger"), false);
+        EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(warningOwnerProperty.FindPropertyRelative("preventWarningInterruption"), false);
         EnemyBossPatternPresetsPanelModuleUtility.SetBoolean(warningOwnerProperty.FindPropertyRelative("useEngagementFeedbackOverride"), false);
         EnemyOffensiveEngagementFeedbackDrawerUtility.ApplyDefaultValues(warningOwnerProperty.FindPropertyRelative("engagementFeedbackOverride"));
     }

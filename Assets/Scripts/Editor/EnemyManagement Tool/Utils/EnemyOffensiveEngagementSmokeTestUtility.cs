@@ -1,4 +1,8 @@
 using System;
+using Unity.Core;
+using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,7 +21,7 @@ public static class EnemyOffensiveEngagementSmokeTestUtility
     public static void Run()
     {
         Validate();
-        Debug.Log("[EnemyOffensiveEngagementSmokeTestUtility] PASS - timing contexts and candidate/mixed/global visual precedence validated.");
+        Debug.Log("[EnemyOffensiveEngagementSmokeTestUtility] PASS - timing contexts, interruption ownership, warning priority and candidate/mixed/global visual precedence validated.");
     }
 
     /// <summary>
@@ -26,6 +30,7 @@ public static class EnemyOffensiveEngagementSmokeTestUtility
     public static void Validate()
     {
         ValidateTimingSupportMatrix();
+        ValidateWarningInterruptionProtection();
         ValidateBossPatternChangePriority();
         ValidateBossVisualSourcePrecedence();
     }
@@ -110,23 +115,188 @@ public static class EnemyOffensiveEngagementSmokeTestUtility
     /// </summary>
     private static void ValidateBossPatternChangePriority()
     {
-        if (EnemyDamageFlashPresentationSystem.ShouldUseBossPatternChangeBillboard(true, true))
+        if (EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBillboard(true, true))
             throw new InvalidOperationException("Boss pattern-change billboard masked an active behaviour engagement billboard.");
 
-        if (!EnemyDamageFlashPresentationSystem.ShouldUseBossPatternChangeBillboard(false, true))
+        if (!EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBillboard(false, true))
             throw new InvalidOperationException("Boss pattern-change billboard did not render when no behaviour engagement billboard was active.");
 
-        if (EnemyDamageFlashPresentationSystem.ShouldUseBossPatternChangeBlend(true, 1f, 0.5f))
+        if (EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBlend(true, 1f, 0.5f))
             throw new InvalidOperationException("Boss pattern-change blend masked an active behaviour engagement blend.");
 
-        if (!EnemyDamageFlashPresentationSystem.ShouldUseBossPatternChangeBlend(false, 1f, 0.5f))
+        if (!EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBlend(false, 1f, 0.5f))
             throw new InvalidOperationException("Boss pattern-change blend did not render when no behaviour engagement blend was active.");
 
-        if (EnemyDamageFlashPresentationSystem.IsBossPatternChangeChannelActive(true, 0.5f, true, 0.2f))
+        if (EnemyDamageFlashWarningPresentationUtility.IsBossPatternChangeChannelActive(true, 0.5f, true, 0.2f))
             throw new InvalidOperationException("Boss pattern-change channel exceeded its independent authored duration.");
 
-        if (!EnemyDamageFlashPresentationSystem.IsBossPatternChangeChannelActive(true, 0.5f, true, 1f))
+        if (!EnemyDamageFlashWarningPresentationUtility.IsBossPatternChangeChannelActive(true, 0.5f, true, 1f))
             throw new InvalidOperationException("Boss pattern-change channel ended before its independent authored duration.");
+    }
+    #endregion
+
+    #region Interruption Protection
+    /// <summary>
+    /// Runs the real presentation system against transient entities to verify protected ownership remains stable and transfers only after the owning warning closes.
+    /// </summary>
+    private static void ValidateWarningInterruptionProtection()
+    {
+        World world = new World("EnemyOffensiveEngagementInterruptionSmokeTest");
+        world.SetTime(new TimeData(1d / 60d, 1f / 60f));
+        EntityManager entityManager = world.EntityManager;
+        Entity enemyEntity = entityManager.CreateEntity(typeof(DamageFlashConfig),
+                                                         typeof(DamageFlashState),
+                                                         typeof(EnemyVisualFlashPresentationState),
+                                                         typeof(EnemyVisualConfig),
+                                                         typeof(EnemyVisualRuntimeState),
+                                                         typeof(EnemyPatternConfig),
+                                                         typeof(EnemyPatternRuntimeState),
+                                                         typeof(LocalTransform),
+                                                         typeof(EnemyActive));
+
+        try
+        {
+            entityManager.SetComponentData(enemyEntity, new EnemyVisualConfig
+            {
+                Mode = EnemyVisualMode.CompanionAnimator
+            });
+            entityManager.SetComponentData(enemyEntity, LocalTransform.Identity);
+            entityManager.AddBuffer<EnemyShooterRuntimeElement>(enemyEntity);
+            entityManager.AddBuffer<EnemyBombardierRuntimeElement>(enemyEntity);
+            entityManager.AddBuffer<EnemyBossPatternSlotRuntimeElement>(enemyEntity);
+            entityManager.AddBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity);
+            DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes = entityManager.GetBuffer<EnemyBossPatternSlotRuntimeElement>(enemyEntity);
+            DynamicBuffer<EnemyOffensiveEngagementConfigElement> configs = entityManager.GetBuffer<EnemyOffensiveEngagementConfigElement>(enemyEntity);
+            EnemyOffensiveEngagementConfigElement coreConfig = BuildProtectedActivationConfig(EnemyOffensiveEngagementTriggerSource.CoreMovement,
+                                                                                              new float4(1f, 0f, 0f, 1f),
+                                                                                              0.25f);
+            EnemyOffensiveEngagementConfigElement weaponConfig = BuildProtectedActivationConfig(EnemyOffensiveEngagementTriggerSource.WeaponInteraction,
+                                                                                                new float4(0f, 0f, 1f, 1f),
+                                                                                                0.9f);
+            entityManager.SetComponentData(enemyEntity, new EnemyVisualFlashPresentationState
+            {
+                AppliedBlend = weaponConfig.ColorBlendMaximumBlend,
+                AppliedColor = weaponConfig.ColorBlendColor,
+                OffensiveEngagementColor = weaponConfig.ColorBlendColor,
+                OffensiveEngagementBlend = weaponConfig.ColorBlendMaximumBlend,
+                OffensiveEngagementFadeOutSeconds = 10f,
+                ProtectedEngagementSource = EnemyOffensiveEngagementTriggerSource.WeaponInteraction
+            });
+            configs.Add(coreConfig);
+            configs.Add(weaponConfig);
+            bossSlotRuntimes.Add(BuildActiveBossSlot(EnemyBossPatternSlotKind.CoreMovement));
+            bossSlotRuntimes.Add(BuildActiveBossSlot(EnemyBossPatternSlotKind.WeaponInteraction));
+
+            SystemHandle presentationSystem = world.GetOrCreateSystem<EnemyDamageFlashPresentationSystem>();
+            presentationSystem.Update(world.Unmanaged);
+            RequireProtectedPresentation(entityManager,
+                                         enemyEntity,
+                                         EnemyOffensiveEngagementTriggerSource.CoreMovement,
+                                         coreConfig.ColorBlendColor,
+                                         "initial deterministic acquisition");
+
+            // Reorder the configs to prove an existing owner is retained while its own warning remains active.
+            configs.Clear();
+            configs.Add(weaponConfig);
+            configs.Add(coreConfig);
+            presentationSystem.Update(world.Unmanaged);
+            RequireProtectedPresentation(entityManager,
+                                         enemyEntity,
+                                         EnemyOffensiveEngagementTriggerSource.CoreMovement,
+                                         coreConfig.ColorBlendColor,
+                                         "stable ownership after config reordering");
+
+            // Close the Core Movement window and verify the simultaneously active protected Weapon warning takes ownership.
+            EnemyBossPatternSlotRuntimeElement coreRuntime = bossSlotRuntimes[0];
+            coreRuntime.ActiveCandidateIndex = -1;
+            bossSlotRuntimes[0] = coreRuntime;
+            presentationSystem.Update(world.Unmanaged);
+            RequireProtectedPresentation(entityManager,
+                                         enemyEntity,
+                                         EnemyOffensiveEngagementTriggerSource.WeaponInteraction,
+                                         weaponConfig.ColorBlendColor,
+                                         "ownership transfer after source completion");
+
+            // Disable protection on the remaining warning and verify stale ownership is released.
+            weaponConfig.PreventWarningInterruption = 0;
+            configs[0] = weaponConfig;
+            presentationSystem.Update(world.Unmanaged);
+
+            if (entityManager.GetComponentData<EnemyVisualFlashPresentationState>(enemyEntity).HasProtectedEngagementSource != 0)
+                throw new InvalidOperationException("Behaviour warning interruption ownership remained active after protection was disabled.");
+
+        }
+        finally
+        {
+            world.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Builds one active boss warning config with both visual channels protected from other module warnings.
+    /// </summary>
+    /// <param name="source">Boss module slot represented by the config.</param>
+    /// <param name="color">Distinct color used to verify that arbitration selected the protected source.</param>
+    /// <param name="maximumBlend">Distinct blend strength used to ensure a stronger competing warning cannot win.</param>
+    /// <returns>A complete transient module-activation warning config.</returns>
+    private static EnemyOffensiveEngagementConfigElement BuildProtectedActivationConfig(EnemyOffensiveEngagementTriggerSource source,
+                                                                                        float4 color,
+                                                                                        float maximumBlend)
+    {
+        return new EnemyOffensiveEngagementConfigElement
+        {
+            Source = source,
+            TimingMode = EnemyOffensiveEngagementTimingMode.ModuleActivation,
+            PreventWarningInterruption = 1,
+            EnableColorBlend = 1,
+            ColorBlendColor = color,
+            ColorBlendLeadTimeSeconds = 1f,
+            ColorBlendMaximumBlend = maximumBlend,
+            EnableBillboard = 1,
+            BillboardColor = color,
+            BillboardLeadTimeSeconds = 1f,
+            BillboardBaseScale = 1f
+        };
+    }
+
+    /// <summary>
+    /// Builds an active boss slot runtime inside the module-activation feedback window.
+    /// </summary>
+    /// <param name="slotKind">Boss module slot represented by the runtime element.</param>
+    /// <returns>An active transient slot runtime.</returns>
+    private static EnemyBossPatternSlotRuntimeElement BuildActiveBossSlot(EnemyBossPatternSlotKind slotKind)
+    {
+        return new EnemyBossPatternSlotRuntimeElement
+        {
+            SlotKind = slotKind,
+            ActivePatternIndex = 0,
+            ActiveCandidateIndex = 0,
+            ActiveCandidateElapsedSeconds = 0.1f
+        };
+    }
+
+    /// <summary>
+    /// Requires the presentation state to retain the expected protected owner and its filtered color result.
+    /// </summary>
+    /// <param name="entityManager">Entity manager containing the transient presentation state.</param>
+    /// <param name="enemyEntity">Transient enemy entity updated by the real presentation system.</param>
+    /// <param name="expectedSource">Protected source expected to own the frame.</param>
+    /// <param name="expectedColor">Color expected after filtering every competing warning source.</param>
+    /// <param name="caseLabel">Readable scenario label included in smoke-test failures.</param>
+    private static void RequireProtectedPresentation(EntityManager entityManager,
+                                                     Entity enemyEntity,
+                                                     EnemyOffensiveEngagementTriggerSource expectedSource,
+                                                     float4 expectedColor,
+                                                     string caseLabel)
+    {
+        EnemyVisualFlashPresentationState presentationState = entityManager.GetComponentData<EnemyVisualFlashPresentationState>(enemyEntity);
+
+        if (presentationState.HasProtectedEngagementSource == 0 ||
+            presentationState.ProtectedEngagementSource != expectedSource)
+            throw new InvalidOperationException("Behaviour warning interruption ownership failed for " + caseLabel + ".");
+
+        if (math.cmax(math.abs(presentationState.OffensiveEngagementColor - expectedColor)) > 0.0001f)
+            throw new InvalidOperationException("Protected behaviour warning color arbitration failed for " + caseLabel + ".");
     }
     #endregion
 
@@ -264,6 +434,7 @@ public static class EnemyOffensiveEngagementSmokeTestUtility
             RequireProperty(candidateProperty, "moduleMode").enumValueIndex = Convert.ToInt32(EnemyBossPatternModuleMode.Module);
             RequireProperty(RequireProperty(candidateProperty, "binding"), "isEnabled").boolValue = true;
             RequireProperty(candidateProperty, "displayBehaviourEngagementTrigger").boolValue = true;
+            RequireProperty(candidateProperty, "preventWarningInterruption").boolValue = candidateIndex == 0;
             bool useCandidateOverride = candidateIndex == 0 && firstCandidateSprite != null;
             RequireProperty(candidateProperty, "useEngagementFeedbackOverride").boolValue = useCandidateOverride;
 

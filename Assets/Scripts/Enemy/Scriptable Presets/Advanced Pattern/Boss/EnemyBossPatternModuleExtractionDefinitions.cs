@@ -223,6 +223,9 @@ public sealed class EnemyBossPatternCoreMovementModuleCandidateDefinition
     [Tooltip("When enabled, emits activation-only engagement feedback after this Core Movement candidate is selected. This boss warning does not predict the selected module's next behaviour commit.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
 
+    [Tooltip("Prevents this candidate's active warning from being replaced by Short-Range or Weapon warnings until its own warning window closes. Simultaneous protected warnings use stable slot order.")]
+    [SerializeField] private bool preventWarningInterruption;
+
     [Tooltip("When enabled, this candidate uses its own engagement feedback settings with priority above the owning mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
 
@@ -262,6 +265,14 @@ public sealed class EnemyBossPatternCoreMovementModuleCandidateDefinition
         get
         {
             return displayBehaviourEngagementTrigger;
+        }
+    }
+
+    public bool PreventWarningInterruption
+    {
+        get
+        {
+            return preventWarningInterruption;
         }
     }
 

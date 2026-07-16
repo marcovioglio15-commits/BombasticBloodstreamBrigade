@@ -15,52 +15,6 @@ public enum EnemyPatternModuleCatalogSection
 }
 
 /// <summary>
-/// Stores the core movement selection assembled inside one shared enemy pattern.
-/// </summary>
-[Serializable]
-public sealed class EnemyPatternCoreMovementAssembly
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Core movement module binding resolved from Core Movement definitions.")]
-    [SerializeField] private EnemyPatternModuleBinding binding = new EnemyPatternModuleBinding();
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public EnemyPatternModuleBinding Binding
-    {
-        get
-        {
-            return binding;
-        }
-    }
-    #endregion
-
-    #region Methods
-
-    #region Public Methods
-    /// <summary>
-    /// Ensures the core movement assembly always owns one binding instance and keeps it enabled.
-    /// </summary>
-    public void Validate()
-    {
-        if (binding == null)
-            binding = new EnemyPatternModuleBinding();
-
-        binding.Validate();
-
-        if (!binding.IsEnabled)
-            binding.Configure(binding.ModuleId, true);
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
 /// Stores the optional short-range interaction selection and shared activation settings used by one pattern.
 /// </summary>
 [Serializable]
@@ -85,6 +39,9 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
 
     [Tooltip("When enabled, this interaction emits engagement feedback. Shared normal patterns and boss mixed patterns preserve predictive timing when the selected module exposes a commit hook; activation-only boss modules show a short post-selection warning.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
+
+    [Tooltip("Prevents an active warning from this behaviour from being replaced by Core Movement, Short-Range or Weapon warnings until its own warning window closes. Simultaneous protected warnings use stable slot order.")]
+    [SerializeField] private bool preventWarningInterruption;
 
     [Tooltip("When enabled, this interaction uses its own engagement feedback settings. In shared normal patterns it overrides the visual preset default; in a boss mixed pattern it has candidate priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
@@ -128,6 +85,14 @@ public sealed class EnemyPatternShortRangeInteractionAssembly
         get
         {
             return displayBehaviourEngagementTrigger;
+        }
+    }
+
+    public bool PreventWarningInterruption
+    {
+        get
+        {
+            return preventWarningInterruption;
         }
     }
 
@@ -235,6 +200,9 @@ public sealed class EnemyPatternWeaponInteractionAssembly
     [Tooltip("When enabled, this interaction emits engagement feedback. Shared normal patterns and boss mixed patterns preserve predictive timing when the selected module exposes a commit hook; activation-only boss modules show a short post-selection warning.")]
     [SerializeField] private bool displayBehaviourEngagementTrigger;
 
+    [Tooltip("Prevents an active warning from this behaviour from being replaced by Core Movement, Short-Range or Weapon warnings until its own warning window closes. Simultaneous protected warnings use stable slot order.")]
+    [SerializeField] private bool preventWarningInterruption;
+
     [Tooltip("When enabled, this interaction uses its own engagement feedback settings. In shared normal patterns it overrides the visual preset default; in a boss mixed pattern it has candidate priority above the mixed-pattern override and visual preset default.")]
     [SerializeField] private bool useEngagementFeedbackOverride;
 
@@ -325,6 +293,14 @@ public sealed class EnemyPatternWeaponInteractionAssembly
         get
         {
             return displayBehaviourEngagementTrigger;
+        }
+    }
+
+    public bool PreventWarningInterruption
+    {
+        get
+        {
+            return preventWarningInterruption;
         }
     }
 

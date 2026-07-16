@@ -82,19 +82,36 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
             DamageFlashState runtimeState = damageFlashState.ValueRO;
             float damageBlend = DamageFlashRuntimeUtility.Advance(ref runtimeState, in damageFlashConfig.ValueRO, deltaTime);
             EnemyVisualFlashPresentationState currentPresentationState = visualFlashPresentationState.ValueRO;
-            EnemyOffensiveEngagementBlendResult offensiveBlendResult = EnemyOffensiveEngagementPresentationUtility.ResolveBlendResult(offensiveEngagementConfigs,
-                                                                                                                                     shooterRuntime,
-                                                                                                                                     bombardierRuntime,
-                                                                                                                                     hasBossSlotRuntimes,
-                                                                                                                                     bossSlotRuntimes,
-                                                                                                                                     in currentPatternConfig,
-                                                                                                                                     in currentPatternRuntimeState);
+            bool hasProtectedEngagementSource = EnemyOffensiveEngagementInterruptionUtility.TryResolveProtectedSource(offensiveEngagementConfigs,
+                                                                                                                     shooterRuntime,
+                                                                                                                     bombardierRuntime,
+                                                                                                                     hasBossSlotRuntimes,
+                                                                                                                     bossSlotRuntimes,
+                                                                                                                     in currentPatternConfig,
+                                                                                                                     in currentPatternRuntimeState,
+                                                                                                                     currentPresentationState.HasProtectedEngagementSource != 0,
+                                                                                                                     currentPresentationState.ProtectedEngagementSource,
+                                                                                                                     out EnemyOffensiveEngagementTriggerSource protectedEngagementSource);
+            EnemyOffensiveEngagementPresentationUtility.ResolveResults(offensiveEngagementConfigs,
+                                                                       shooterRuntime,
+                                                                       bombardierRuntime,
+                                                                       hasBossSlotRuntimes,
+                                                                       bossSlotRuntimes,
+                                                                       hasProtectedEngagementSource,
+                                                                       protectedEngagementSource,
+                                                                       in currentPatternConfig,
+                                                                       in currentPatternRuntimeState,
+                                                                       out EnemyOffensiveEngagementBlendResult offensiveBlendResult,
+                                                                       out EnemyOffensiveEngagementBillboardResult offensiveBillboardResult);
             float offensiveBlend = EnemyOffensiveEngagementPresentationUtility.ResolveDisplayedBlend(currentPresentationState.OffensiveEngagementBlend,
                                                                                                     currentPresentationState.OffensiveEngagementFadeOutSeconds,
                                                                                                     offensiveBlendResult,
+                                                                                                    hasProtectedEngagementSource,
                                                                                                     deltaTime,
                                                                                                     out float rememberedFadeOutSeconds);
-            float4 offensiveColor = ResolveOffensiveColor(currentPresentationState, offensiveBlendResult);
+            float4 offensiveColor = ResolveOffensiveColor(currentPresentationState,
+                                                          offensiveBlendResult,
+                                                          hasProtectedEngagementSource);
             EnemyBossPatternChangePresentationResult patternChangeResult = ResolvePatternChangePresentation(enemyEntity,
                                                                                                             patternChangeConfigLookup,
                                                                                                             patternChangeStateLookup,
@@ -107,12 +124,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                    enemyTransform.ValueRO.Position,
                                    cameraTransform,
                                    offensiveEngagementConfigs,
-                                   shooterRuntime,
-                                   bombardierRuntime,
-                                   hasBossSlotRuntimes,
-                                   bossSlotRuntimes,
-                                   in currentPatternConfig,
-                                   in currentPatternRuntimeState,
+                                   offensiveBillboardResult,
                                    patternChangeResult,
                                    stealerVisualStateLookup);
 
@@ -125,9 +137,9 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                 targetColor = offensiveColor;
             }
 
-            if (ShouldUseBossPatternChangeBlend(offensiveBlendResult.IsActive,
-                                                patternChangeResult.Blend,
-                                                targetBlend))
+            if (EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBlend(offensiveBlendResult.IsActive,
+                                                                                            patternChangeResult.Blend,
+                                                                                            targetBlend))
             {
                 targetBlend = patternChangeResult.Blend;
                 targetColor = patternChangeResult.Color;
@@ -138,7 +150,9 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                               targetColor,
                                               offensiveBlend,
                                               offensiveColor,
-                                              rememberedFadeOutSeconds))
+                                              rememberedFadeOutSeconds,
+                                              hasProtectedEngagementSource,
+                                              protectedEngagementSource))
             {
                 damageFlashState.ValueRW = runtimeState;
                 continue;
@@ -168,6 +182,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
             currentPresentationState.OffensiveEngagementColor = offensiveColor;
             currentPresentationState.OffensiveEngagementBlend = offensiveBlend;
             currentPresentationState.OffensiveEngagementFadeOutSeconds = rememberedFadeOutSeconds;
+            currentPresentationState.HasProtectedEngagementSource = hasProtectedEngagementSource ? (byte)1 : (byte)0;
+            currentPresentationState.ProtectedEngagementSource = hasProtectedEngagementSource
+                ? protectedEngagementSource
+                : EnemyOffensiveEngagementTriggerSource.CoreMovement;
             visualFlashPresentationState.ValueRW = currentPresentationState;
         }
 
@@ -193,51 +211,6 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     #endregion
 
     #region Helpers
-    /// <summary>
-    /// Resolves whether the generic boss pattern-change blend may render without masking an active behaviour engagement blend.
-    /// </summary>
-    /// <param name="engagementBlendActive">Whether a pattern-specific behaviour engagement color window is active.</param>
-    /// <param name="patternChangeBlend">Current generic boss pattern-change blend strength.</param>
-    /// <param name="currentBlend">Strongest damage or behaviour engagement blend already selected.</param>
-    /// <returns>True when the generic pattern-change blend is both unopposed and visually stronger.</returns>
-    public static bool ShouldUseBossPatternChangeBlend(bool engagementBlendActive,
-                                                       float patternChangeBlend,
-                                                       float currentBlend)
-    {
-        return !engagementBlendActive && patternChangeBlend > currentBlend;
-    }
-
-    /// <summary>
-    /// Resolves whether the generic boss pattern-change billboard may render without masking a pattern-specific behaviour warning.
-    /// </summary>
-    /// <param name="engagementBillboardActive">Whether a pattern-specific behaviour engagement billboard is active.</param>
-    /// <param name="patternChangeBillboardActive">Whether the generic boss pattern-change billboard window is active.</param>
-    /// <returns>True when only the generic pattern-change billboard should render.</returns>
-    public static bool ShouldUseBossPatternChangeBillboard(bool engagementBillboardActive,
-                                                           bool patternChangeBillboardActive)
-    {
-        return !engagementBillboardActive && patternChangeBillboardActive;
-    }
-
-    /// <summary>
-    /// Resolves one boss pattern-change channel against its own authored duration while the shared feedback lifetime remains open.
-    /// </summary>
-    /// <param name="feedbackWindowActive">Whether the shared pattern-change feedback lifetime was active at frame start.</param>
-    /// <param name="elapsedSeconds">Seconds elapsed since the pattern change.</param>
-    /// <param name="channelEnabled">Whether the evaluated visual channel is enabled.</param>
-    /// <param name="channelDurationSeconds">Independent display duration authored for the evaluated channel.</param>
-    /// <returns>True while this specific channel remains inside its own positive duration.</returns>
-    public static bool IsBossPatternChangeChannelActive(bool feedbackWindowActive,
-                                                        float elapsedSeconds,
-                                                        bool channelEnabled,
-                                                        float channelDurationSeconds)
-    {
-        return feedbackWindowActive &&
-               channelEnabled &&
-               channelDurationSeconds > 0f &&
-               elapsedSeconds <= channelDurationSeconds;
-    }
-
     /// <summary>
     /// Resolves the current main camera transform with a small retry interval so presentation systems do not repeatedly scan cameras every frame.
     /// </summary>
@@ -296,16 +269,19 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     /// </summary>
     /// <param name="currentPresentationState">Current stored presentation state.</param>
     /// <param name="offensiveBlendResult">Strongest active offensive blend result for the current frame.</param>
+    /// <param name="hasProtectedEngagementSource">Whether the active result must immediately replace presentation inherited from another module.</param>
     /// <returns>Offensive color that should be used for the current frame and stored back into runtime state.</returns>
     private static float4 ResolveOffensiveColor(EnemyVisualFlashPresentationState currentPresentationState,
-                                                EnemyOffensiveEngagementBlendResult offensiveBlendResult)
+                                                EnemyOffensiveEngagementBlendResult offensiveBlendResult,
+                                                bool hasProtectedEngagementSource)
     {
         if (!offensiveBlendResult.IsActive)
         {
             return currentPresentationState.OffensiveEngagementColor;
         }
 
-        if (offensiveBlendResult.Blend >= currentPresentationState.OffensiveEngagementBlend)
+        if (hasProtectedEngagementSource ||
+            offensiveBlendResult.Blend >= currentPresentationState.OffensiveEngagementBlend)
         {
             return offensiveBlendResult.Color;
         }
@@ -355,10 +331,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
 
         EnemyOffensiveEngagementBlendResult targetBlend = default(EnemyOffensiveEngagementBlendResult);
 
-        bool colorBlendWindowActive = IsBossPatternChangeChannelActive(windowWasActive,
-                                                                       feedbackState.ElapsedSeconds,
-                                                                       config.EnableColorBlend != 0,
-                                                                       config.ColorBlendDurationSeconds);
+        bool colorBlendWindowActive = EnemyDamageFlashWarningPresentationUtility.IsBossPatternChangeChannelActive(windowWasActive,
+                                                                                                                   feedbackState.ElapsedSeconds,
+                                                                                                                   config.EnableColorBlend != 0,
+                                                                                                                   config.ColorBlendDurationSeconds);
 
         if (colorBlendWindowActive)
         {
@@ -371,6 +347,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         feedbackState.DisplayedBlend = EnemyOffensiveEngagementPresentationUtility.ResolveDisplayedBlend(feedbackState.DisplayedBlend,
                                                                                                         feedbackState.FadeOutSeconds,
                                                                                                         targetBlend,
+                                                                                                        false,
                                                                                                         safeDeltaTime,
                                                                                                         out float rememberedFadeOutSeconds);
         feedbackState.FadeOutSeconds = rememberedFadeOutSeconds;
@@ -383,10 +360,10 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         stateLookup[enemyEntity] = feedbackState;
         result.Blend = feedbackState.DisplayedBlend;
         result.Color = feedbackState.DisplayedColor;
-        result.BillboardActive = IsBossPatternChangeChannelActive(windowWasActive,
-                                                                  feedbackState.ElapsedSeconds,
-                                                                  config.EnableBillboard != 0,
-                                                                  config.BillboardDurationSeconds);
+        result.BillboardActive = EnemyDamageFlashWarningPresentationUtility.IsBossPatternChangeChannelActive(windowWasActive,
+                                                                                                              feedbackState.ElapsedSeconds,
+                                                                                                              config.EnableBillboard != 0,
+                                                                                                              config.BillboardDurationSeconds);
         result.BillboardColor = config.BillboardColor;
         result.BillboardOffset = config.BillboardOffset;
         result.BillboardScale = EnemyOffensiveEngagementPresentationUtility.ResolvePulseScale(config.BillboardBaseScale,
@@ -406,12 +383,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     /// <param name="enemyPosition">Current enemy world position.</param>
     /// <param name="cameraTransform">Active camera transform used for billboarding.</param>
     /// <param name="offensiveEngagementConfigs">Baked offensive engagement configs for the current enemy.</param>
-    /// <param name="shooterRuntime">Current shooter runtime buffer used by weapon timing evaluation.</param>
-    /// <param name="bombardierRuntime">Current Bombardier runtime buffer used by weapon timing evaluation.</param>
-    /// <param name="hasBossSlotRuntimes">Whether boss slot runtime data is available for activation feedback.</param>
-    /// <param name="bossSlotRuntimes">Boss slot runtime buffer used by module activation timing.</param>
-    /// <param name="patternConfig">Current compiled pattern config used by short-range timing evaluation.</param>
-    /// <param name="patternRuntimeState">Current mutable pattern runtime state used by short-range timing evaluation.</param>
+    /// <param name="billboardResult">Behaviour engagement billboard request already filtered by interruption ownership.</param>
     /// <param name="patternChangeResult">Boss pattern-change billboard result resolved for the current frame.</param>
     /// <param name="stealerVisualStateLookup">Lookup used to resolve stolen power-up icon state.</param>
     private static void SyncOffensiveBillboard(EntityManager entityManager,
@@ -420,12 +392,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                                float3 enemyPosition,
                                                Transform cameraTransform,
                                                DynamicBuffer<EnemyOffensiveEngagementConfigElement> offensiveEngagementConfigs,
-                                               DynamicBuffer<EnemyShooterRuntimeElement> shooterRuntime,
-                                               DynamicBuffer<EnemyBombardierRuntimeElement> bombardierRuntime,
-                                               bool hasBossSlotRuntimes,
-                                               DynamicBuffer<EnemyBossPatternSlotRuntimeElement> bossSlotRuntimes,
-                                               in EnemyPatternConfig patternConfig,
-                                               in EnemyPatternRuntimeState patternRuntimeState,
+                                               EnemyOffensiveEngagementBillboardResult billboardResult,
                                                EnemyBossPatternChangePresentationResult patternChangeResult,
                                                ComponentLookup<EnemyPowerUpStealerVisualState> stealerVisualStateLookup)
     {
@@ -452,14 +419,6 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
             return;
         }
 
-        EnemyOffensiveEngagementBillboardResult billboardResult = EnemyOffensiveEngagementPresentationUtility.ResolveBillboardResult(offensiveEngagementConfigs,
-                                                                                                                                   shooterRuntime,
-                                                                                                                                   bombardierRuntime,
-                                                                                                                                   hasBossSlotRuntimes,
-                                                                                                                                   bossSlotRuntimes,
-                                                                                                                                   in patternConfig,
-                                                                                                                                   in patternRuntimeState);
-
         if (!billboardResult.IsActive && !patternChangeResult.BillboardActive)
         {
             billboardView.Hide();
@@ -467,8 +426,8 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         }
 
         Vector3 worldPosition = new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z);
-        bool usePatternChangeBillboard = ShouldUseBossPatternChangeBillboard(billboardResult.IsActive,
-                                                                            patternChangeResult.BillboardActive);
+        bool usePatternChangeBillboard = EnemyDamageFlashWarningPresentationUtility.ShouldUseBossPatternChangeBillboard(billboardResult.IsActive,
+                                                                                                                        patternChangeResult.BillboardActive);
         EnemyOffensiveEngagementTriggerSource source = usePatternChangeBillboard
             ? EnemyOffensiveEngagementTriggerSource.BossPatternChange
             : billboardResult.Source;
@@ -590,13 +549,17 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     /// <param name="offensiveBlend">Current offensive-only displayed blend.</param>
     /// <param name="offensiveColor">Current offensive-only remembered color.</param>
     /// <param name="rememberedFadeOutSeconds">Current remembered offensive fade-out duration.</param>
+    /// <param name="hasProtectedEngagementSource">Whether one behaviour source currently owns interruption protection.</param>
+    /// <param name="protectedEngagementSource">Behaviour source that owns interruption protection when active.</param>
     /// <returns>True when renderers already match the requested frame state.</returns>
     private static bool HasUnchangedPresentationState(EnemyVisualFlashPresentationState currentPresentationState,
                                                       float targetBlend,
                                                       float4 targetColor,
                                                       float offensiveBlend,
                                                       float4 offensiveColor,
-                                                      float rememberedFadeOutSeconds)
+                                                      float rememberedFadeOutSeconds,
+                                                      bool hasProtectedEngagementSource,
+                                                      EnemyOffensiveEngagementTriggerSource protectedEngagementSource)
     {
         if (math.abs(currentPresentationState.AppliedBlend - targetBlend) > BlendEpsilon)
         {
@@ -614,6 +577,17 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
         }
 
         if (!HasApproximatelyEqualColor(currentPresentationState.OffensiveEngagementColor, offensiveColor))
+        {
+            return false;
+        }
+
+        if ((currentPresentationState.HasProtectedEngagementSource != 0) != hasProtectedEngagementSource)
+        {
+            return false;
+        }
+
+        if (hasProtectedEngagementSource &&
+            currentPresentationState.ProtectedEngagementSource != protectedEngagementSource)
         {
             return false;
         }
@@ -662,27 +636,4 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
     #endregion
 
     #endregion
-}
-
-/// <summary>
-/// Stores resolved boss pattern-change presentation values for one frame.
-/// </summary>
-internal struct EnemyBossPatternChangePresentationResult
-{
-    public float Blend;
-    public float4 Color;
-    public bool BillboardActive;
-    public float4 BillboardColor;
-    public float3 BillboardOffset;
-    public float BillboardScale;
-}
-
-/// <summary>
-/// Stores resolved billboard style values for the enemy Power-Up Stealer icon.
-/// </summary>
-internal struct EnemyPowerUpStealerBillboardStyle
-{
-    public float4 Color;
-    public float3 Offset;
-    public float Scale;
 }

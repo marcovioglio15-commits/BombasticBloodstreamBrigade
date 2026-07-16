@@ -225,7 +225,9 @@ public static class EnemyPoolVisualUtility
             AppliedColor = new float4(1f, 1f, 1f, 1f),
             OffensiveEngagementColor = new float4(1f, 1f, 1f, 1f),
             OffensiveEngagementBlend = 0f,
-            OffensiveEngagementFadeOutSeconds = 0f
+            OffensiveEngagementFadeOutSeconds = 0f,
+            HasProtectedEngagementSource = 0,
+            ProtectedEngagementSource = EnemyOffensiveEngagementTriggerSource.CoreMovement
         };
     }
 

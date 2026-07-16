@@ -33,6 +33,7 @@ public struct EnemyOffensiveEngagementConfigElement : IBufferElementData
     public EnemyOffensiveEngagementTimingMode TimingMode;
     public int VisualSettingsKey;
     public byte UseOverrideVisualSettings;
+    public byte PreventWarningInterruption;
     public byte EnableColorBlend;
     public float4 ColorBlendColor;
     public float ColorBlendLeadTimeSeconds;
@@ -58,6 +59,8 @@ public struct EnemyVisualFlashPresentationState : IComponentData
     public float4 OffensiveEngagementColor;
     public float OffensiveEngagementBlend;
     public float OffensiveEngagementFadeOutSeconds;
+    public byte HasProtectedEngagementSource;
+    public EnemyOffensiveEngagementTriggerSource ProtectedEngagementSource;
 }
 
 /// <summary>

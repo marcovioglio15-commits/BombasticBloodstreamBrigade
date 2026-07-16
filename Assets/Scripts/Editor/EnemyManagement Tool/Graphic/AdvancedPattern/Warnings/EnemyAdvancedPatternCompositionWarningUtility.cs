@@ -116,6 +116,7 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
         AnalyzeOffensiveEngagementTrigger(patternName,
                                           pattern.ShortRangeInteraction != null && pattern.ShortRangeInteraction.IsEnabled,
                                           pattern.ShortRangeInteraction != null && pattern.ShortRangeInteraction.DisplayBehaviourEngagementTrigger,
+                                          pattern.ShortRangeInteraction != null && pattern.ShortRangeInteraction.PreventWarningInterruption,
                                           pattern.ShortRangeInteraction != null ? pattern.ShortRangeInteraction.Binding : null,
                                           EnemyPatternModuleCatalogSection.ShortRangeInteraction,
                                           preset,
@@ -131,6 +132,7 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
         AnalyzeOffensiveEngagementTrigger(patternName,
                                           pattern.WeaponInteraction != null && pattern.WeaponInteraction.IsEnabled,
                                           pattern.WeaponInteraction != null && pattern.WeaponInteraction.DisplayBehaviourEngagementTrigger,
+                                          pattern.WeaponInteraction != null && pattern.WeaponInteraction.PreventWarningInterruption,
                                           pattern.WeaponInteraction != null ? pattern.WeaponInteraction.Binding : null,
                                           EnemyPatternModuleCatalogSection.WeaponInteraction,
                                           preset,
@@ -189,6 +191,7 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
     /// <param name="patternName">Display name of the analyzed pattern.</param>
     /// <param name="categoryEnabled">Whether the owning category is enabled.</param>
     /// <param name="triggerEnabled">Whether the engagement trigger is enabled for that category.</param>
+    /// <param name="preventInterruption">Whether the category requests warning interruption protection.</param>
     /// <param name="binding">Optional category binding.</param>
     /// <param name="section">Expected catalog section for the category.</param>
     /// <param name="preset">Selected advanced-pattern preset.</param>
@@ -197,12 +200,20 @@ internal static class EnemyAdvancedPatternCompositionWarningUtility
     private static void AnalyzeOffensiveEngagementTrigger(string patternName,
                                                           bool categoryEnabled,
                                                           bool triggerEnabled,
+                                                          bool preventInterruption,
                                                           EnemyPatternModuleBinding binding,
                                                           EnemyPatternModuleCatalogSection section,
                                                           EnemyAdvancedPatternPreset preset,
                                                           HashSet<string> warnings,
                                                           string categoryLabel)
     {
+        if (preventInterruption && (!categoryEnabled || !triggerEnabled))
+        {
+            warnings.Add(string.Format("Shared pattern '{0}' enables Prevent Warning Interruption on {1}, but its Behaviour Engagement Warning is disabled, so the protection cannot affect runtime presentation.",
+                                       patternName,
+                                       categoryLabel));
+        }
+
         if (!categoryEnabled || !triggerEnabled || binding == null || !binding.IsEnabled || preset == null)
         {
             return;
