@@ -17,7 +17,7 @@ MonoBehaviour:
   m_Description: Blablabla
   m_Version: 1.0.4
   m_ControllerPreset: {fileID: 11400000, guid: 08b3595e324dc1d44aacba70676cde00, type: 2}
-  m_ProgressionPreset: {fileID: 11400000, guid: b07b7a543694b12449339cf2aa39e63b, type: 2}
+  m_ProgressionPreset: {fileID: 11400000, guid: 28011fec0de976b488e06fd6c9965d1f, type: 2}
   m_PowerUpsPreset: {fileID: 11400000, guid: 6d0f84c1e80d53a44999e8dedd17f116, type: 2}
   visualPreset: {fileID: 11400000, guid: 3d67950319294a109127fbf43e4bf9f6, type: 2}
   uiVisualPreset: {fileID: 11400000, guid: 7c8b06d4301332245a5cc48731c035aa, type: 2}

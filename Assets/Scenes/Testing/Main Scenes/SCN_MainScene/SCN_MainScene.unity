@@ -2810,7 +2810,7 @@ MonoBehaviour:
   deriveGameplayCullingMask: 1
   gameplayCullingMask:
     serializedVersion: 2
-    m_Bits: 4294965151
+    m_Bits: 4294960031
   additionalGameplayExcludedLayers:
     serializedVersion: 2
     m_Bits: 32
@@ -12536,7 +12536,7 @@ Camera:
   m_Depth: -0.99
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294965151
+    m_Bits: 4294960031
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

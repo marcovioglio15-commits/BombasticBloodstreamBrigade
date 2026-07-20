@@ -29,11 +29,11 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
-    /// Resolves whether the current transition phase must block gameplay simulation.
+    /// Resolves whether active scene replacement must block gameplay simulation.
     /// </summary>
     /// <param name="entityManager">EntityManager that owns the query.</param>
     /// <param name="transitionStateQuery">Query containing GameSceneTransitionState.</param>
-    /// <returns>True while scenes can still be loading or unloading before the post-readiness reveal window.</returns>
+    /// <returns>True until the transition fully releases scene-streaming and physics ownership.</returns>
     public static bool ShouldBlockGameplay(EntityManager entityManager, EntityQuery transitionStateQuery)
     {
         if (!TryGetTransitionState(entityManager, transitionStateQuery, out GameSceneTransitionState transitionState))
@@ -57,9 +57,9 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
-    /// Resolves whether the default-world transition phase must block gameplay simulation.
+    /// Resolves whether default-world scene replacement must block gameplay simulation.
     /// </summary>
-    /// <returns>True while scenes can still be loading or unloading before the post-readiness reveal window.</returns>
+    /// <returns>True until the transition fully releases scene-streaming and physics ownership.</returns>
     public static bool ShouldBlockDefaultWorldGameplay()
     {
         if (!TryGetDefaultTransitionState(out GameSceneTransitionState transitionState))
@@ -69,9 +69,9 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
-    /// Resolves whether the default-world player systems should remain frozen by the active scene transition.
+    /// Resolves whether default-world player simulation should remain frozen by active scene replacement.
     /// </summary>
-    /// <returns>True while scene content is not ready for visible player simulation.</returns>
+    /// <returns>True until the transition ends and the rebuilt physics world is safe for gameplay queries.</returns>
     public static bool ShouldBlockDefaultWorldPlayerGameplay()
     {
         if (!TryGetDefaultTransitionState(out GameSceneTransitionState transitionState))
@@ -149,37 +149,23 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
-    /// Resolves whether a transition state is still in a phase that can expose invalid scene data.
+    /// Resolves whether a transition state can expose scene-owned gameplay or physics data that is being replaced.
     /// </summary>
     /// <param name="transitionState">Current scene transition state.</param>
-    /// <returns>True when gameplay systems should remain frozen until post-readiness reveal phases.</returns>
+    /// <returns>True until the complete transition, including its reveal, has released all scene-streaming ownership.</returns>
     private static bool ShouldBlockGameplay(GameSceneTransitionState transitionState)
     {
-        if (transitionState.IsTransitioning == 0)
-            return false;
-
-        switch (transitionState.Phase)
-        {
-            case GameSceneTransitionPhase.HoldBlack:
-            case GameSceneTransitionPhase.FadeIn:
-                return false;
-
-            default:
-                return true;
-        }
+        return transitionState.IsTransitioning != 0;
     }
 
     /// <summary>
-    /// Resolves whether player simulation should stay locked for the current transition phase.
+    /// Resolves whether player simulation should stay locked while scene-owned physics data is being replaced.
     /// </summary>
     /// <param name="transitionState">Current scene transition state.</param>
-    /// <returns>True until the target scene has passed readiness and fade-in begins.</returns>
+    /// <returns>True until scene streaming and fade presentation both complete.</returns>
     private static bool ShouldBlockPlayerGameplay(GameSceneTransitionState transitionState)
     {
-        if (transitionState.IsTransitioning == 0)
-            return false;
-
-        return transitionState.Phase != GameSceneTransitionPhase.FadeIn;
+        return transitionState.IsTransitioning != 0;
     }
 
     /// <summary>

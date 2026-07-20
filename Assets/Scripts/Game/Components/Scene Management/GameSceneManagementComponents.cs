@@ -2,6 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
+#region Configuration And Definitions
 /// <summary>
 /// Stores singleton runtime settings for the Game Scene Manager.
 /// </summary>
@@ -77,13 +78,16 @@ public struct GameSceneTransitionElement : IBufferElementData
     public float PostLoadReadyExtraSeconds;
     public float FadeInSeconds;
 }
+#endregion
 
+#region Transition Runtime
 /// <summary>
 /// Stores scene transition requests submitted by UI, triggers or gameplay systems.
 /// </summary>
 public struct GameSceneTransitionRequest : IBufferElementData
 {
     public GameSceneTransitionRequestType RequestType;
+    public GameSceneTransitionPurpose Purpose;
     public FixedString64Bytes TargetSceneId;
     public FixedString64Bytes TransitionId;
 }
@@ -97,6 +101,7 @@ public struct GameSceneTransitionState : IComponentData
     public FixedString64Bytes SourceSceneId;
     public FixedString64Bytes TargetSceneId;
     public GameSceneTransitionPhase Phase;
+    public GameSceneTransitionPurpose Purpose;
     public byte Initialized;
     public byte IsTransitioning;
 }
@@ -129,7 +134,9 @@ public struct GameSceneLoadingProgressPresentationState : IComponentData
     public byte ShowPercentage;
     public byte ShowStatusText;
 }
+#endregion
 
+#region Transition Triggers
 /// <summary>
 /// Stores one baked scene transition trigger volume in world space.
 /// </summary>
@@ -154,3 +161,4 @@ public struct GameSceneTransitionTriggerRuntimeState : IComponentData
     public byte WasPlayerInside;
     public byte HasTriggered;
 }
+#endregion

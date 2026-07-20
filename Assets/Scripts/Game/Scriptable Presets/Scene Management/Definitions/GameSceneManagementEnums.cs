@@ -1,3 +1,4 @@
+#region Scene Enums
 /// <summary>
 /// Identifies the high-level purpose of a scene handled by the Game Scene Manager.
 /// </summary>
@@ -31,7 +32,9 @@ public enum GameSceneLoadBackend : byte
     BuildSettings = 0,
     Addressables = 1
 }
+#endregion
 
+#region Transition Enums
 /// <summary>
 /// Defines how a transition can be requested by gameplay, UI or authored trigger volumes.
 /// </summary>
@@ -56,6 +59,17 @@ public enum GameSceneTransitionRequestType : byte
 }
 
 /// <summary>
+/// Identifies whether a transition is a regular scene change or part of authoritative procedural room progression.
+/// </summary>
+public enum GameSceneTransitionPurpose : byte
+{
+    Standard = 0,
+    ProceduralInitialRoom = 1,
+    ProceduralRoomTraversal = 2,
+    ProceduralLevelBoundary = 3
+}
+
+/// <summary>
 /// Runtime phase used by the scene transition execution system.
 /// </summary>
 public enum GameSceneTransitionPhase : byte
@@ -68,3 +82,4 @@ public enum GameSceneTransitionPhase : byte
     HoldBlack = 5,
     FadeIn = 6
 }
+#endregion

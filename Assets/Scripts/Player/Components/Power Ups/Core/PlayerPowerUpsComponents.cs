@@ -3,6 +3,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
+#region Core State And Cheat Data
 public enum PlayerPowerUpCheatCommandType : byte
 {
     None = 0,
@@ -37,6 +38,7 @@ public struct PlayerPowerUpsState : IComponentData
     public int NextEquipOrder;
     public int PendingCheatPresetIndex;
     public uint LastObservedGlobalKillCount;
+    public uint LastObservedRoomClearCount;
     public float3 LastValidMovementDirection;
 }
 
@@ -72,7 +74,9 @@ public struct PlayerPowerUpCheatPresetPassiveElement : IBufferElementData
     public FixedString64Bytes PowerUpId;
     public PlayerPassiveToolConfig Tool;
 }
+#endregion
 
+#region Unlock Catalog And Scaling
 /// <summary>
 /// Runtime payload kind baked for one unlockable modular power-up catalog entry.
 /// </summary>
@@ -169,7 +173,9 @@ public struct PlayerPowerUpTierEntryScalingElement : IBufferElementData
     public float BaseSelectionWeight;
     public FixedString512Bytes ScalingFormula;
 }
+#endregion
 
+#region Milestone Selection
 /// <summary>
 /// Runtime milestone-selection state used to pause gameplay and expose power-up choices to HUD.
 /// </summary>
@@ -218,7 +224,9 @@ public struct PlayerMilestoneTimeScaleResumeState : IComponentData
     public float DurationSeconds;
     public float ElapsedUnscaledSeconds;
 }
+#endregion
 
+#region Aggregated Passive Tools
 /// <summary>
 /// Holds aggregated runtime multipliers from equipped passive tools.
 /// </summary>
@@ -263,7 +271,9 @@ public struct PlayerPassiveToolsStateElement : IBufferElementData
 {
     public PlayerPassiveToolsState Value;
 }
+#endregion
 
+#region Active Power-Up Runtime
 /// <summary>
 /// Holds runtime dash motion and invulnerability state.
 /// </summary>
@@ -341,7 +351,9 @@ public struct BombFuseState : IComponentData
 public struct BombExplodeRequest : IComponentData
 {
 }
+#endregion
 
+#region Passive Effect Runtime
 /// <summary>
 /// Holds runtime timers for passive explosion logic.
 /// </summary>
@@ -485,7 +497,9 @@ public struct ElementalTrailSegment : IComponentData
     public float StacksPerTick;
     public ElementalEffectConfig Effect;
 }
+#endregion
 
+#region VFX Requests
 /// <summary>
 /// Request to apply an explosion payload at a specific world position.
 /// </summary>
@@ -536,7 +550,9 @@ public struct PlayerPowerUpVfxSpawnRequest : IBufferElementData
     public byte FollowMuzzlePose;
     public byte FollowTargetRotation;
 }
+#endregion
 
+#region VFX Configuration
 /// <summary>
 /// Selects when the player level-up VFX should be spawned by progression runtime.
 /// </summary>
@@ -619,7 +635,9 @@ public struct PlayerPowerUpVfxCapConfig : IComponentData
     public int MaxActiveOneShotVfx;
     public byte RefreshAttachedLifetimeOnCapHit;
 }
+#endregion
 
+#region VFX Runtime
 /// <summary>
 /// Lifetime tracker for temporary spawned VFX entities.
 /// </summary>
@@ -671,3 +689,4 @@ public struct PlayerElementalTrailAttachedVfxPrefabReference : IComponentData
 {
     public UnityObjectRef<GameObject> Prefab;
 }
+#endregion

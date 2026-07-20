@@ -13,12 +13,16 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// </summary>
     /// <param name="powerUpsConfig">Current runtime power-up config used to seed slot values.</param>
     /// <param name="currentKillCount">Current global kill count tracked by power-up charge systems.</param>
+    /// <param name="currentRoomClearCount">Current procedural room-clear count tracked by power-up charge systems.</param>
     /// <returns>Initialized runtime state ready to add as PlayerPowerUpsState.</returns>
-    public static PlayerPowerUpsState CreateInitialState(in PlayerPowerUpsConfig powerUpsConfig, uint currentKillCount)
+    public static PlayerPowerUpsState CreateInitialState(in PlayerPowerUpsConfig powerUpsConfig,
+                                                         uint currentKillCount,
+                                                         uint currentRoomClearCount)
     {
         PlayerPowerUpsState powerUpsState = new PlayerPowerUpsState
         {
             LastObservedGlobalKillCount = currentKillCount,
+            LastObservedRoomClearCount = currentRoomClearCount,
             LastValidMovementDirection = float3.zero
         };
         ResetRuntimeState(ref powerUpsState, in powerUpsConfig);

@@ -107,6 +107,138 @@ MonoBehaviour:
     roomTags: 
     addressableKey: 
     sceneAsset: {fileID: 102900000, guid: da7ade6fe92d5ba4cba3257fa8bbb3b8, type: 3}
+  - sceneId: SCN_LGTEST_METRO_START
+    sceneName: SCN_LGTEST_METRO_START
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity
+    sceneGuid: 54c97702b5bc17f439c3b98c04743afb
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_START
+    sceneAsset: {fileID: 102900000, guid: 54c97702b5bc17f439c3b98c04743afb, type: 3}
+  - sceneId: SCN_LGTEST_METRO_NS
+    sceneName: SCN_LGTEST_METRO_NS
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
+    sceneGuid: 0b11934e90dbb314e87551aabe87ec57
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_NS
+    sceneAsset: {fileID: 102900000, guid: 0b11934e90dbb314e87551aabe87ec57, type: 3}
+  - sceneId: SCN_LGTEST_METRO_EW
+    sceneName: SCN_LGTEST_METRO_EW
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
+    sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_EW
+    sceneAsset: {fileID: 102900000, guid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7, type: 3}
+  - sceneId: SCN_LGTEST_METRO_CROSS
+    sceneName: SCN_LGTEST_METRO_CROSS
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
+    sceneGuid: 86787f958b7747a44892e18620a2fe75
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_CROSS
+    sceneAsset: {fileID: 102900000, guid: 86787f958b7747a44892e18620a2fe75, type: 3}
+  - sceneId: SCN_LGTEST_METRO_DOUBLE
+    sceneName: SCN_LGTEST_METRO_DOUBLE
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
+    sceneGuid: 433f03176860b0e409c1d762e15cd364
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_DOUBLE
+    sceneAsset: {fileID: 102900000, guid: 433f03176860b0e409c1d762e15cd364, type: 3}
+  - sceneId: SCN_LGTEST_METRO_BOSS
+    sceneName: SCN_LGTEST_METRO_BOSS
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
+    sceneGuid: 27d9e1327f828944794adba3410c0657
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MetroConcourse
+    addressableKey: SCN_LGTEST_METRO_BOSS
+    sceneAsset: {fileID: 102900000, guid: 27d9e1327f828944794adba3410c0657, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_START
+    sceneName: SCN_LGTEST_MAINT_START
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_START.unity
+    sceneGuid: d0f579d17b03b154287cfa15e7887024
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_START
+    sceneAsset: {fileID: 102900000, guid: d0f579d17b03b154287cfa15e7887024, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_CORNER_NE
+    sceneName: SCN_LGTEST_MAINT_CORNER_NE
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_NE.unity
+    sceneGuid: c56a428650e3345448e82cd5306813e9
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_CORNER_NE
+    sceneAsset: {fileID: 102900000, guid: c56a428650e3345448e82cd5306813e9, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_CORNER_SW
+    sceneName: SCN_LGTEST_MAINT_CORNER_SW
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_SW.unity
+    sceneGuid: f10e13dba6645024c946748fa4b1d1ac
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_CORNER_SW
+    sceneAsset: {fileID: 102900000, guid: f10e13dba6645024c946748fa4b1d1ac, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_TRIAD
+    sceneName: SCN_LGTEST_MAINT_TRIAD
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_TRIAD.unity
+    sceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_TRIAD
+    sceneAsset: {fileID: 102900000, guid: a3bb29a1d6ea86b46bb5e1b7c1c5a197, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_HUB
+    sceneName: SCN_LGTEST_MAINT_HUB
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_HUB.unity
+    sceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_HUB
+    sceneAsset: {fileID: 102900000, guid: 80bfeafb9e94c1f40bb4093fc4936c4b, type: 3}
+  - sceneId: SCN_LGTEST_MAINT_BOSS
+    sceneName: SCN_LGTEST_MAINT_BOSS
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
+    sceneGuid: 82bb006d89574a24488682f06c9e1332
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_LGTEST_MAINT_BOSS
+    sceneAsset: {fileID: 102900000, guid: 82bb006d89574a24488682f06c9e1332, type: 3}
   transitionDefinitions:
   - transitionId: TRN_MainMenu_To_Gameplay
     fromSceneId: SCN_MainMenu

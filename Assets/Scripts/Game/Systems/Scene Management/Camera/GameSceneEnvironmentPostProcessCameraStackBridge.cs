@@ -171,6 +171,7 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
 
         currentBaseCamera = resolvedBaseCamera;
         currentGameplayCamera = resolvedGameplayCamera;
+        GameProceduralTransitionCameraBridge.RefreshStackOrder();
     }
     #endregion
 
@@ -330,7 +331,7 @@ public sealed class GameSceneEnvironmentPostProcessCameraStackBridge : MonoBehav
         if (deriveGameplayCullingMask)
             return GameSceneCameraLayerUtility.BuildGameplayCullingMask(environmentCullingMask.value, additionalGameplayExcludedLayers.value);
 
-        return gameplayCullingMask.value;
+        return GameSceneCameraLayerUtility.ExcludeTransitionLayers(gameplayCullingMask.value);
     }
     #endregion
 

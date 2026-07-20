@@ -299,10 +299,16 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
         }
 
         uint currentKillCount = 0u;
+        uint currentRoomClearCount = 0u;
 
         if (SystemAPI.TryGetSingleton<GlobalEnemyKillCounter>(out GlobalEnemyKillCounter killCounter))
         {
             currentKillCount = killCounter.TotalKilled;
+        }
+
+        if (SystemAPI.TryGetSingleton<GameProceduralRoomClearCounter>(out GameProceduralRoomClearCounter roomClearCounter))
+        {
+            currentRoomClearCount = roomClearCounter.TotalCleared;
         }
 
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
@@ -314,7 +320,8 @@ public partial struct PlayerPowerUpsInitializeSystem : ISystem
             PlayerPowerUpsInitializeBootstrapUtility.AddMissingState(ref commandBuffer,
                                                                      in missingStateQuery,
                                                                      in powerUpsConfigLookup,
-                                                                     currentKillCount);
+                                                                     currentKillCount,
+                                                                     currentRoomClearCount);
         }
 
         if (missingFlags.HasMissingPassiveToolsState)

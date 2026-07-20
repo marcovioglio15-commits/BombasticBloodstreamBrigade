@@ -17,11 +17,13 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
     /// <param name="missingStateQuery">Query selecting entities without PlayerPowerUpsState.</param>
     /// <param name="powerUpsConfigLookup">Read-only lookup of external active loadout snapshot buffers.</param>
     /// <param name="currentKillCount">Current global kill count used as initial observer value.</param>
+    /// <param name="currentRoomClearCount">Current procedural room-clear count used as initial observer value.</param>
 
     public static void AddMissingState(ref EntityCommandBuffer commandBuffer,
                                        in EntityQuery missingStateQuery,
                                        in BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
-                                       uint currentKillCount)
+                                       uint currentKillCount,
+                                       uint currentRoomClearCount)
     {
         NativeArray<Entity> entities = missingStateQuery.ToEntityArray(Allocator.Temp);
 
@@ -31,7 +33,9 @@ internal static class PlayerPowerUpsInitializeBootstrapUtility
             PlayerPowerUpsConfigBufferUtility.Read(entities[index],
                                                    in powerUpsConfigLookup,
                                                    out config);
-            PlayerPowerUpsState initialState = PlayerPowerUpLoadoutRuntimeUtility.CreateInitialState(in config, currentKillCount);
+            PlayerPowerUpsState initialState = PlayerPowerUpLoadoutRuntimeUtility.CreateInitialState(in config,
+                                                                                                     currentKillCount,
+                                                                                                     currentRoomClearCount);
             commandBuffer.AddComponent(entities[index], initialState);
         }
 

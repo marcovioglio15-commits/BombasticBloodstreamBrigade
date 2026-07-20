@@ -27,11 +27,13 @@ internal static class GameSceneTransitionReadinessUtility
     /// <param name="hasTargetCompanionScene">True when a companion scene was loaded with the target.</param>
     /// <param name="targetCompanionScene">Companion scene definition.</param>
     /// <param name="persistentPlayerScenes">Direct DOTS player scenes required by the target.</param>
+    /// <param name="transitionPurpose">Purpose selecting first-load or persistent-runtime readiness policy.</param>
     /// <returns>True when Unity scene activation and DOTS streaming are complete.</returns>
     public static bool AreTransitionScenesReady(GameSceneDefinitionElement targetScene,
                                                 bool hasTargetCompanionScene,
                                                 GameSceneDefinitionElement targetCompanionScene,
-                                                List<GameSceneDefinitionElement> persistentPlayerScenes)
+                                                List<GameSceneDefinitionElement> persistentPlayerScenes,
+                                                GameSceneTransitionPurpose transitionPurpose)
     {
         if (!IsManagedUnitySceneReady(targetScene))
             return false;
@@ -39,7 +41,8 @@ internal static class GameSceneTransitionReadinessUtility
         if (hasTargetCompanionScene && !IsManagedUnitySceneReady(targetCompanionScene))
             return false;
 
-        if (GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene) && !IsGameplayRuntimeReady())
+        if (GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene) &&
+            !IsGameplayRuntimeReady(GameSceneTransitionPurposeUtility.RequiresFullGameplayWarmup(transitionPurpose)))
             return false;
 
         return ArePersistentPlayerScenesReady(persistentPlayerScenes);
@@ -140,8 +143,9 @@ internal static class GameSceneTransitionReadinessUtility
     /// <summary>
     /// Checks gameplay runtime surfaces that are created after scene load callbacks, before revealing gameplay.
     /// </summary>
-    /// <returns>True when input, camera and the single player entity are ready for the first visible frame.</returns>
-    private static bool IsGameplayRuntimeReady()
+    /// <param name="requireFullPoolWarmup">True only while the persistent gameplay runtime is being initialized for the first time.</param>
+    /// <returns>True when input, camera, the single player entity and any required first-load pools are ready.</returns>
+    private static bool IsGameplayRuntimeReady(bool requireFullPoolWarmup)
     {
         if (!PlayerInputRuntime.IsReady)
             return false;
@@ -167,6 +171,9 @@ internal static class GameSceneTransitionReadinessUtility
         {
             if (playerReadyQuery.CalculateEntityCount() != 1)
                 return false;
+
+            if (!requireFullPoolWarmup)
+                return true;
 
             return AreGameplayPoolsReady(entityManager);
         }

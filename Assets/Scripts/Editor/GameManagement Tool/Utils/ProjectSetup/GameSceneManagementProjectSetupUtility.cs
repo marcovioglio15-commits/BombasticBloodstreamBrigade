@@ -83,11 +83,14 @@ public static class GameSceneManagementProjectSetupUtility
     {
         EnsureSceneFolders();
         GameSceneTransitionLayerUtility.TryCreateLayer(GameSceneTriggerSettings.DefaultTransitionLayerName);
+        GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureProjectLayer();
+        GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureRendererFeatureLayers();
 
         GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
         GameHudManagerPreset hudPreset = EnsureHudManagerPreset();
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
-        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset);
+        GameProceduralLevelPreset proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsureDefaultPreset(scenePreset);
+        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset, proceduralLevelPreset);
         GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
         SynchronizeSceneManagerPreset(scenePreset);
@@ -175,10 +178,12 @@ public static class GameSceneManagementProjectSetupUtility
     /// <param name="settingsPreset">Settings Manager preset assigned as the master sub-preset.</param>
     /// <param name="hudPreset">HUD Manager preset assigned as the master sub-preset.</param>
     /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
+    /// <param name="proceduralLevelPreset">Procedural Level preset assigned as the master sub-preset.</param>
     /// <returns>Default Game Master preset asset.</returns>
     private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset,
                                                            GameSettingsManagerPreset settingsPreset,
-                                                           GameHudManagerPreset hudPreset)
+                                                           GameHudManagerPreset hudPreset,
+                                                           GameProceduralLevelPreset proceduralLevelPreset)
     {
         GameMasterPreset masterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
 
@@ -197,6 +202,7 @@ public static class GameSceneManagementProjectSetupUtility
         SetObjectReference(serializedMaster, "settingsManagerPreset", settingsPreset);
         SetObjectReference(serializedMaster, "hudManagerPreset", hudPreset);
         SetObjectReference(serializedMaster, "sceneManagerPreset", scenePreset);
+        SetObjectReference(serializedMaster, "proceduralLevelPreset", proceduralLevelPreset);
         serializedMaster.ApplyModifiedPropertiesWithoutUndo();
         masterPreset.ValidateValues();
         EditorUtility.SetDirty(masterPreset);
@@ -280,12 +286,14 @@ public static class GameSceneManagementProjectSetupUtility
         if (scenesProperty == null)
             return;
 
-        scenesProperty.arraySize = DefaultSceneDefinitions.Length;
-
         for (int index = 0; index < DefaultSceneDefinitions.Length; index++)
         {
-            SerializedProperty sceneProperty = scenesProperty.GetArrayElementAtIndex(index);
             GameSceneDefinitionSetup setup = DefaultSceneDefinitions[index];
+            SerializedProperty sceneProperty = FindOrAppendArrayElement(scenesProperty, "sceneId", setup.SceneId);
+
+            if (sceneProperty == null)
+                continue;
+
             SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(setup.ScenePath);
             SetString(sceneProperty, "sceneId", setup.SceneId);
             SetString(sceneProperty, "sceneName", setup.SceneName);
@@ -312,12 +320,14 @@ public static class GameSceneManagementProjectSetupUtility
         if (transitionsProperty == null)
             return;
 
-        transitionsProperty.arraySize = DefaultTransitionDefinitions.Length;
-
         for (int index = 0; index < DefaultTransitionDefinitions.Length; index++)
         {
-            SerializedProperty transitionProperty = transitionsProperty.GetArrayElementAtIndex(index);
             GameSceneTransitionDefinitionSetup setup = DefaultTransitionDefinitions[index];
+            SerializedProperty transitionProperty = FindOrAppendArrayElement(transitionsProperty, "transitionId", setup.TransitionId);
+
+            if (transitionProperty == null)
+                continue;
+
             SetString(transitionProperty, "transitionId", setup.TransitionId);
             SetString(transitionProperty, "fromSceneId", setup.FromSceneId);
             SetString(transitionProperty, "toSceneId", setup.ToSceneId);
@@ -618,6 +628,7 @@ public static class GameSceneManagementProjectSetupUtility
         SetObjectReference(serializedView, "canvasGroup", canvasGroup);
         SetObjectReference(serializedView, "fadeImage", fadeImage);
         serializedView.ApplyModifiedPropertiesWithoutUndo();
+        GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureBootstrapPresentation(scene, view, canvas);
         GameSceneManagementProjectSetupLoadingProgressUtility.EnsureLoadingProgressView(view.gameObject);
         EditorUtility.SetDirty(view);
     }

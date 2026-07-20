@@ -35,6 +35,10 @@ public sealed class GameMasterPreset : ScriptableObject
 
     [Tooltip("Scene manager preset used to configure scene loading, transitions, fade and scene trigger defaults.")]
     [SerializeField] private GameSceneManagerPreset sceneManagerPreset;
+
+    [Tooltip("Procedural Level preset used to configure ordered levels, reusable room tiles and deterministic graph generation.")]
+    [SerializeField]
+    private GameProceduralLevelPreset proceduralLevelPreset;
     #endregion
 
     #endregion
@@ -101,6 +105,14 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return sceneManagerPreset;
+        }
+    }
+
+    public GameProceduralLevelPreset ProceduralLevelPreset
+    {
+        get
+        {
+            return proceduralLevelPreset;
         }
     }
     #endregion

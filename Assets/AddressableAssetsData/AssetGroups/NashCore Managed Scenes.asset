@@ -21,14 +21,86 @@ MonoBehaviour:
     m_SerializedLabels:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0b11934e90dbb314e87551aabe87ec57
+    m_Address: SCN_LGTEST_METRO_NS
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 27d9e1327f828944794adba3410c0657
+    m_Address: SCN_LGTEST_METRO_BOSS
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 38e3563928683cd45a4636eecc880a51
     m_Address: SCN_MainMenu
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
+    m_Address: SCN_LGTEST_METRO_EW
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 433f03176860b0e409c1d762e15cd364
+    m_Address: SCN_LGTEST_METRO_DOUBLE
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54c97702b5bc17f439c3b98c04743afb
+    m_Address: SCN_LGTEST_METRO_START
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 80bfeafb9e94c1f40bb4093fc4936c4b
+    m_Address: SCN_LGTEST_MAINT_HUB
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82bb006d89574a24488682f06c9e1332
+    m_Address: SCN_LGTEST_MAINT_BOSS
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 86787f958b7747a44892e18620a2fe75
+    m_Address: SCN_LGTEST_METRO_CROSS
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 99c9720ab356a0642a771bea13969a05
     m_Address: SCN_MainScene
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3bb29a1d6ea86b46bb5e1b7c1c5a197
+    m_Address: SCN_LGTEST_MAINT_TRIAD
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c56a428650e3345448e82cd5306813e9
+    m_Address: SCN_LGTEST_MAINT_CORNER_NE
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d0f579d17b03b154287cfa15e7887024
+    m_Address: SCN_LGTEST_MAINT_START
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f10e13dba6645024c946748fa4b1d1ac
+    m_Address: SCN_LGTEST_MAINT_CORNER_SW
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene

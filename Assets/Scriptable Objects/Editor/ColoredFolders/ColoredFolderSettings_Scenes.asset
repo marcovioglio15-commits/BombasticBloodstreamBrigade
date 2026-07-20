@@ -29,6 +29,11 @@ MonoBehaviour:
   - Assets/Scenes/Testing/Main Scenes/UI
   - Assets/Scenes/Final/Bootstrap
   - Assets/Scenes/Testing/Main Scenes/Bootstrap
+  - Assets/Scenes/LevelGenerationSceneSetTest
+  - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse
+  - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes
+  - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels
+  - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes
   folderColors:
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
@@ -46,5 +51,10 @@ MonoBehaviour:
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
   - {r: 1, g: 0.53611743, b: 0, a: 0}
-  folderApplyModes: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  - {r: 1, g: 0.53611743, b: 0, a: 0}
+  folderApplyModes: 010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
   autoInheritColors: 1

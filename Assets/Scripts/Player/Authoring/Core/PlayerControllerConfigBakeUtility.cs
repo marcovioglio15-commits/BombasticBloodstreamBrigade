@@ -35,18 +35,21 @@ public static class PlayerControllerConfigBakeUtility
     }
 
     /// <summary>
-    /// Builds the world collision layer config resolved from the master preset.
-    /// Used during baking so runtime systems do not need to resolve layer names every frame.
+    /// Builds the world collision layer config from the master preset while retaining the default portal-blocker category.
+    /// Used during baking so runtime systems do not need to resolve or combine layer names every frame.
     /// </summary>
     /// <param name="masterPreset">Master preset that may override the default walls layer name.</param>
-    /// <returns>Runtime-safe world layers config with a resolved walls layer mask.</returns>
+    /// <returns>Runtime-safe world layers config containing the custom and default Walls categories when available.</returns>
     public static PlayerWorldLayersConfig BuildWorldLayersConfig(PlayerMasterPreset masterPreset)
     {
         string wallsLayerName = ResolveWallsLayerName(masterPreset);
         int wallsLayerMask = ResolveLayerMaskByName(wallsLayerName);
+        int defaultWallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
 
         if (wallsLayerMask == 0)
-            wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+            wallsLayerMask = defaultWallsLayerMask;
+        else
+            wallsLayerMask |= defaultWallsLayerMask;
 
         return new PlayerWorldLayersConfig
         {

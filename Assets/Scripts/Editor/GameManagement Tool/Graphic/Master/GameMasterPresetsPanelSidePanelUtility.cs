@@ -66,7 +66,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         GameManagementWindow.PanelType intendedActivePanel = panel.ActivePanel;
 
         panel.SuppressStateWrite = true;
-        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null, null, null);
+        AddTab(panel, GameManagementWindow.PanelType.GameMasterPresets, "Game Master Presets", panel.MainContentRoot, null, null, null, null, null);
 
         // Isolate per-panel failures: one panel that throws while constructing must not stop the
         // master tab from displaying.
@@ -81,6 +81,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
         if (intendedActivePanel == GameManagementWindow.PanelType.HudManager)
             TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.HudManager);
+
+        if (intendedActivePanel == GameManagementWindow.PanelType.ProceduralLevel)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.ProceduralLevel);
 
         if (!panel.SidePanels.ContainsKey(intendedActivePanel))
             intendedActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
@@ -141,6 +144,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             case GameManagementWindow.PanelType.HudManager:
                 OpenHudManagerPanel(panel, panelType);
                 break;
+            case GameManagementWindow.PanelType.ProceduralLevel:
+                OpenProceduralLevelPanel(panel, panelType);
+                break;
             default:
                 return;
         }
@@ -176,6 +182,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
             if (entry.HudPanel != null)
                 entry.HudPanel.RefreshFromSessionChange();
+
+            if (entry.ProceduralLevelPanel != null)
+                entry.ProceduralLevelPanel.RefreshFromSessionChange();
         }
     }
 
@@ -226,7 +235,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameAudioManagerPresetsPanel audioPanel = new GameAudioManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "Audio Manager", audioPanel.Root, panelType);
-        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel, null, null, null);
+        AddTab(panel, panelType, "Audio Manager", panelRoot, audioPanel, null, null, null, null);
     }
 
     /// <summary>
@@ -238,7 +247,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameSceneManagerPresetsPanel scenePanel = new GameSceneManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "Scene Manager", scenePanel.Root, panelType);
-        AddTab(panel, panelType, "Scene Manager", panelRoot, null, scenePanel, null, null);
+        AddTab(panel, panelType, "Scene Manager", panelRoot, null, scenePanel, null, null, null);
     }
 
     /// <summary>
@@ -250,7 +259,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameSettingsManagerPresetsPanel settingsPanel = new GameSettingsManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "Settings Manager", settingsPanel.Root, panelType);
-        AddTab(panel, panelType, "Settings Manager", panelRoot, null, null, settingsPanel, null);
+        AddTab(panel, panelType, "Settings Manager", panelRoot, null, null, settingsPanel, null, null);
     }
 
     /// <summary>
@@ -262,7 +271,19 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     {
         GameHudManagerPresetsPanel hudPanel = new GameHudManagerPresetsPanel();
         VisualElement panelRoot = BuildSidePanelRoot(panel, "HUD Manager", hudPanel.Root, panelType);
-        AddTab(panel, panelType, "HUD Manager", panelRoot, null, null, null, hudPanel);
+        AddTab(panel, panelType, "HUD Manager", panelRoot, null, null, null, hudPanel, null);
+    }
+
+    /// <summary>
+    /// Creates and registers the Procedural Level side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
+    private static void OpenProceduralLevelPanel(GameMasterPresetsPanel panel, GameManagementWindow.PanelType panelType)
+    {
+        GameProceduralLevelPresetsPanel proceduralLevelPanel = new GameProceduralLevelPresetsPanel(panel);
+        VisualElement panelRoot = BuildSidePanelRoot(panel, "Procedural Levels", proceduralLevelPanel.Root, panelType);
+        AddTab(panel, panelType, "Procedural Levels", panelRoot, null, null, null, null, proceduralLevelPanel);
     }
 
     /// <summary>
@@ -313,6 +334,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     /// <param name="scenePanel">Optional Scene Manager panel controller.</param>
     /// <param name="settingsPanel">Optional Settings Manager panel controller.</param>
     /// <param name="hudPanel">Optional HUD Manager panel controller.</param>
+    /// <param name="proceduralLevelPanel">Optional Procedural Level panel controller.</param>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
@@ -320,7 +342,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
                                GameAudioManagerPresetsPanel audioPanel,
                                GameSceneManagerPresetsPanel scenePanel,
                                GameSettingsManagerPresetsPanel settingsPanel,
-                               GameHudManagerPresetsPanel hudPanel)
+                               GameHudManagerPresetsPanel hudPanel,
+                               GameProceduralLevelPresetsPanel proceduralLevelPanel)
     {
         VisualElement tabContainer = new VisualElement();
         tabContainer.style.flexDirection = FlexDirection.Row;
@@ -342,7 +365,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             AudioPanel = audioPanel,
             ScenePanel = scenePanel,
             SettingsPanel = settingsPanel,
-            HudPanel = hudPanel
+            HudPanel = hudPanel,
+            ProceduralLevelPanel = proceduralLevelPanel
         };
     }
 

@@ -175,6 +175,50 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates, registers and assigns a new Procedural Level preset to the selected master preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    public static void CreateProceduralLevelPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameProceduralLevelPreset newPreset = GameProceduralLevelPresetLibraryUtility.CreatePresetAsset("GameProceduralLevelPreset");
+
+        if (newPreset == null)
+            return;
+
+        GameProceduralLevelPresetLibrary proceduralLibrary = GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create Procedural Level Preset");
+        Undo.RecordObject(proceduralLibrary, "Add Procedural Level Preset");
+        proceduralLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(proceduralLibrary);
+
+        // Seed a newly created procedural preset from the selected master's canonical scene catalog.
+        if (panel.SelectedPreset.SceneManagerPreset != null)
+        {
+            SerializedObject proceduralSerializedObject = new SerializedObject(newPreset);
+            SerializedProperty sceneCatalogProperty = proceduralSerializedObject.FindProperty("sceneCatalogPreset");
+            proceduralSerializedObject.Update();
+
+            if (sceneCatalogProperty != null)
+                sceneCatalogProperty.objectReferenceValue = panel.SelectedPreset.SceneManagerPreset;
+
+            proceduralSerializedObject.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(newPreset);
+        }
+
+        AssignSubPreset(panel, "proceduralLevelPreset", newPreset);
+        panel.OpenSidePanel(GameManagementWindow.PanelType.ProceduralLevel);
+
+        if (panel.SidePanels.TryGetValue(GameManagementWindow.PanelType.ProceduralLevel, out GameMasterPresetsPanel.SidePanelEntry sidePanelEntry) &&
+            sidePanelEntry.ProceduralLevelPanel != null)
+        {
+            sidePanelEntry.ProceduralLevelPanel.SelectPresetFromExternal(newPreset);
+        }
+    }
+
+    /// <summary>
     /// Assigns one sub-preset reference to the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel with serialized master preset.</param>
@@ -266,6 +310,15 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.SceneManager,
                             "Scene Manager",
                             panel.CreateSceneManagerPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Procedural Level Preset",
+                            "proceduralLevelPreset",
+                            typeof(GameProceduralLevelPreset),
+                            "Procedural Level preset used for ordered levels, reusable room tiles and deterministic graph generation.",
+                            GameManagementWindow.PanelType.ProceduralLevel,
+                            "Procedural Level",
+                            panel.CreateProceduralLevelPreset);
     }
 
     /// <summary>
@@ -387,6 +440,14 @@ internal static class GameMasterPresetsPanelSectionsUtility
         sceneButton.style.minWidth = 148f;
         sceneButton.style.marginTop = 4f;
         section.Add(sceneButton);
+
+        Button proceduralLevelButton = new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.ProceduralLevel));
+        proceduralLevelButton.text = "Open Procedural Levels";
+        proceduralLevelButton.tooltip = "Open the Procedural Level preset panel.";
+        proceduralLevelButton.style.flexShrink = 0f;
+        proceduralLevelButton.style.minWidth = 168f;
+        proceduralLevelButton.style.marginTop = 4f;
+        section.Add(proceduralLevelButton);
     }
     #endregion
 

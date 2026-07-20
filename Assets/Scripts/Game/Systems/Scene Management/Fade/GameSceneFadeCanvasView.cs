@@ -18,13 +18,16 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     #region Serialized Fields
     [Header("References")]
     [Tooltip("Canvas that renders the full-screen fade above all additive scene UI.")]
-    [SerializeField] private Canvas fadeCanvas;
+    [SerializeField]
+    private Canvas fadeCanvas;
 
     [Tooltip("CanvasGroup that receives fade alpha and blocks raycasts while the overlay is visible.")]
-    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField]
+    private CanvasGroup canvasGroup;
 
     [Tooltip("Image used as the full-screen fade surface.")]
-    [SerializeField] private Image fadeImage;
+    [SerializeField]
+    private Image fadeImage;
     #endregion
 
     #region Static
@@ -46,6 +49,8 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     /// <returns>True when a fade view received the state.</returns>
     public static bool TryApply(float alpha, bool visible, Color color)
     {
+        GameProceduralTransitionCameraBridge.SetFadePresentationVisible(visible || alpha > 0.001f);
+
         if (activeView == null)
             return false;
 
@@ -95,7 +100,10 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     private void OnDisable()
     {
         if (activeView == this)
+        {
             activeView = null;
+            GameProceduralTransitionCameraBridge.SetFadePresentationVisible(false);
+        }
     }
     #endregion
 
@@ -166,7 +174,15 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
         if (fadeCanvas == null)
             return;
 
-        fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        if (fadeCanvas.worldCamera != null)
+        {
+            fadeCanvas.renderMode = RenderMode.ScreenSpaceCamera;
+        }
+        else
+        {
+            fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        }
+
         fadeCanvas.overrideSorting = true;
         fadeCanvas.sortingOrder = MaxFadeSortingOrder;
     }

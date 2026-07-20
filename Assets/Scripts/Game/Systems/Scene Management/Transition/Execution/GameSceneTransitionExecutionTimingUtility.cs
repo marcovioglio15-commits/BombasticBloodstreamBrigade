@@ -57,6 +57,7 @@ internal static class GameSceneTransitionExecutionTimingUtility
     /// <param name="hasTargetCompanionScene">True when a companion scene was loaded with the target.</param>
     /// <param name="targetCompanionScene">Companion scene definition.</param>
     /// <param name="persistentPlayerLoadScenes">Persistent player scenes loaded for the target.</param>
+    /// <param name="transitionPurpose">Purpose selecting first-load or persistent-runtime readiness policy.</param>
     /// <param name="readinessWarmupFrames">Mutable warm-up frame counter.</param>
     /// <param name="readinessWarmupSeconds">Mutable warm-up duration counter.</param>
     /// <returns>True when the transition can reveal the target scene.</returns>
@@ -65,6 +66,7 @@ internal static class GameSceneTransitionExecutionTimingUtility
                                                   bool hasTargetCompanionScene,
                                                   GameSceneDefinitionElement targetCompanionScene,
                                                   List<GameSceneDefinitionElement> persistentPlayerLoadScenes,
+                                                  GameSceneTransitionPurpose transitionPurpose,
                                                   ref int readinessWarmupFrames,
                                                   ref float readinessWarmupSeconds)
     {
@@ -73,7 +75,14 @@ internal static class GameSceneTransitionExecutionTimingUtility
         if (!GameSceneTransitionReadinessUtility.AreTransitionScenesReady(targetScene,
                                                                          hasTargetCompanionScene,
                                                                          targetCompanionScene,
-                                                                         persistentPlayerLoadScenes))
+                                                                         persistentPlayerLoadScenes,
+                                                                         transitionPurpose))
+        {
+            ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
+            return false;
+        }
+
+        if (!GameProceduralRoomArrivalUtility.TryPreparePendingArrival(entityManager))
         {
             ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
             return false;

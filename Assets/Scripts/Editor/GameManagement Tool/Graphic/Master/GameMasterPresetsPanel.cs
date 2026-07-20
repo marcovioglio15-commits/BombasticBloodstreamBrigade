@@ -457,6 +457,14 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new Procedural Level preset and assigns it to the selected master preset.
+    /// </summary>
+    internal void CreateProceduralLevelPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateProceduralLevelPreset(this);
+    }
+
+    /// <summary>
     /// Opens or activates one side panel.
     /// </summary>
     /// <param name="panelType">Target panel type.</param>
@@ -562,6 +570,7 @@ public sealed class GameMasterPresetsPanel
         public GameSceneManagerPresetsPanel ScenePanel;
         public GameSettingsManagerPresetsPanel SettingsPanel;
         public GameHudManagerPresetsPanel HudPanel;
+        public GameProceduralLevelPresetsPanel ProceduralLevelPanel;
     }
     #endregion
 }

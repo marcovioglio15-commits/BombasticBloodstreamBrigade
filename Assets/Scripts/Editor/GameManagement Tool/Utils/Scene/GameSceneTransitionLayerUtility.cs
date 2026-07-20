@@ -65,9 +65,9 @@ public static class GameSceneTransitionLayerUtility
             if (!string.IsNullOrWhiteSpace(layerProperty.stringValue))
                 continue;
 
-            tagManager.Update();
             layerProperty.stringValue = layerName.Trim();
             tagManager.ApplyModifiedProperties();
+            EditorUtility.SetDirty(tagManager.targetObject);
             AssetDatabase.SaveAssets();
             return true;
         }

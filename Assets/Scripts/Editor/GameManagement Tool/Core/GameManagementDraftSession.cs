@@ -272,6 +272,8 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameHudManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameProceduralLevelPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameProceduralLevelPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
         AddSceneManagerPrefabPaths(uniquePaths);
 
@@ -317,6 +319,7 @@ public static class GameManagementDraftSession
         GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
+        GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
     }
 
     /// <summary>
@@ -454,7 +457,8 @@ public static class GameManagementDraftSession
                assetObject is GameAudioManagerPreset ||
                assetObject is GameSettingsManagerPreset ||
                assetObject is GameHudManagerPreset ||
-               assetObject is GameSceneManagerPreset;
+               assetObject is GameSceneManagerPreset ||
+               assetObject is GameProceduralLevelPreset;
     }
 
     /// <summary>
@@ -598,7 +602,12 @@ public static class GameManagementDraftSession
             return true;
 
         GameSceneManagerPresetLibrary sceneLibrary = GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
-        return LibraryContainsPath(sceneLibrary.Presets, assetPath);
+
+        if (LibraryContainsPath(sceneLibrary.Presets, assetPath))
+            return true;
+
+        GameProceduralLevelPresetLibrary proceduralLevelLibrary = GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
+        return LibraryContainsPath(proceduralLevelLibrary.Presets, assetPath);
     }
 
     /// <summary>

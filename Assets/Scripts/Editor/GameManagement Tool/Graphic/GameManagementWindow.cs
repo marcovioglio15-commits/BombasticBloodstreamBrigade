@@ -285,6 +285,11 @@ public sealed class GameManagementWindow : EditorWindow
     /// </summary>
     private void ApplyChanges()
     {
+        GameRoomMetadataRefreshReport report = GameRoomMetadataAutomaticRefreshUtility.RefreshAllStaleReferencedRooms();
+
+        if (!report.Succeeded)
+            Debug.LogWarning("[GameRoomMetadata] Apply completed with room caches still stale: " + string.Join(" | ", report.Errors));
+
         GameManagementDraftSession.Apply();
         RefreshPanelsAfterSessionChange();
     }
@@ -344,7 +349,8 @@ public sealed class GameManagementWindow : EditorWindow
         AudioManager = 1,
         SceneManager = 2,
         SettingsManager = 3,
-        HudManager = 4
+        HudManager = 4,
+        ProceduralLevel = 5
     }
     #endregion
 }

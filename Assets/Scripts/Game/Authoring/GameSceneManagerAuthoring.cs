@@ -52,6 +52,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             return createRuntimeSingletonWhenNotBaked;
         }
     }
+
     #endregion
 
     #region Methods
@@ -67,6 +68,15 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             return masterPreset.SceneManagerPreset;
 
         return sceneManagerPreset;
+    }
+
+    /// <summary>
+    /// Resolves the Procedural Level preset associated with the selected Game Master preset.
+    /// </summary>
+    /// <returns>Assigned Procedural Level preset, or null when procedural generation is not configured.</returns>
+    public GameProceduralLevelPreset ResolveProceduralLevelPreset()
+    {
+        return masterPreset != null ? masterPreset.ProceduralLevelPreset : null;
     }
     #endregion
 
@@ -122,10 +132,13 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
 
         resolvedPreset.EnsureInitialized();
         GameSceneManagerConfig config = GameSceneManagementBakeUtility.BuildConfig(resolvedPreset);
+
+        // Keep the shared Victory predicate on the base manager archetype for legacy and procedural rooms.
         Entity entity = entityManager.CreateEntity(typeof(GameSceneManagerConfig),
                                                    typeof(GameSceneTransitionState),
                                                    typeof(GameSceneFadePresentationState),
-                                                   typeof(GameSceneLoadingProgressPresentationState));
+                                                   typeof(GameSceneLoadingProgressPresentationState),
+                                                   typeof(GameRoomCombatCompletionState));
 
         // Add every buffer before retrieving DynamicBuffer handles, because AddBuffer is a structural change.
         entityManager.AddBuffer<GameSceneDefinitionElement>(entity);
@@ -139,6 +152,10 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         GameSceneManagementBakeUtility.PopulateSceneBuffer(resolvedPreset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(resolvedPreset, transitionBuffer);
         requestBuffer.Clear();
+        AddProceduralRuntimeData(entityManager,
+                                 entity,
+                                 ResolveProceduralLevelPreset(),
+                                 resolvedPreset);
         entityManager.SetComponentData(entity, new GameSceneTransitionState());
         entityManager.SetComponentData(entity, new GameSceneFadePresentationState
         {
@@ -148,6 +165,63 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         });
         entityManager.SetComponentData(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
         return true;
+    }
+
+    /// <summary>
+    /// Adds optional Procedural Level configuration and runtime buffers to the regular-scene fallback singleton.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the fallback singleton.</param>
+    /// <param name="entity">Scene manager singleton entity receiving procedural data.</param>
+    /// <param name="preset">Resolved Procedural Level preset, or null when the module is disabled.</param>
+    /// <param name="runtimeSceneCatalog">Effective Scene Manager preset used by runtime scene loading.</param>
+    private static void AddProceduralRuntimeData(EntityManager entityManager,
+                                                 Entity entity,
+                                                 GameProceduralLevelPreset preset,
+                                                 GameSceneManagerPreset runtimeSceneCatalog)
+    {
+        if (preset == null)
+            return;
+
+        preset.EnsureInitialized();
+
+        if (!GameProceduralLevelBakeUtility.TryValidateRuntimeConfiguration(preset,
+                                                                            runtimeSceneCatalog,
+                                                                            out string failureMessage))
+        {
+            Debug.LogError("[GameSceneManagerAuthoring] Procedural runtime bootstrap was disabled. " + failureMessage);
+            return;
+        }
+
+        entityManager.AddComponentData(entity, GameProceduralLevelBakeUtility.BuildConfig(preset));
+        entityManager.AddComponentData(entity, new GameProceduralLevelRuntimeState
+        {
+            CurrentLevelIndex = -1,
+            CurrentNodeIndex = -1,
+            PendingNodeIndex = -1,
+            Phase = GameProceduralLevelRuntimePhase.Uninitialized
+        });
+        entityManager.AddComponentData(entity, new GameProceduralRoomTransitionContext
+        {
+            SourceNodeIndex = -1,
+            TargetNodeIndex = -1
+        });
+        entityManager.AddComponentData(entity, new GameProceduralRoomClearCounter());
+        // Complete every structural change before retrieving buffer handles used for population.
+        entityManager.AddBuffer<GameProceduralLevelDefinitionElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomTileElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomMetadataElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomPortalDefinitionElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomNodeElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomEdgeElement>(entity);
+        entityManager.AddBuffer<GameProceduralRoomTraversalRequest>(entity);
+        entityManager.AddBuffer<GameProceduralLevelRunRequest>(entity);
+
+        DynamicBuffer<GameProceduralLevelDefinitionElement> levelBuffer = entityManager.GetBuffer<GameProceduralLevelDefinitionElement>(entity);
+        DynamicBuffer<GameProceduralRoomTileElement> tileBuffer = entityManager.GetBuffer<GameProceduralRoomTileElement>(entity);
+        DynamicBuffer<GameProceduralRoomMetadataElement> metadataBuffer = entityManager.GetBuffer<GameProceduralRoomMetadataElement>(entity);
+        DynamicBuffer<GameProceduralRoomPortalDefinitionElement> portalBuffer = entityManager.GetBuffer<GameProceduralRoomPortalDefinitionElement>(entity);
+        GameProceduralLevelBakeUtility.PopulateLevelBuffers(preset, levelBuffer, tileBuffer);
+        GameProceduralLevelBakeUtility.PopulateMetadataBuffers(preset, metadataBuffer, portalBuffer);
     }
     #endregion
 
@@ -188,12 +262,16 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
             Visible = 0
         });
         AddComponent(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
+
+        // Legacy and procedural rooms share the same allocation-free Victory predicate.
+        AddComponent(entity, new GameRoomCombatCompletionState());
         DynamicBuffer<GameSceneDefinitionElement> sceneBuffer = AddBuffer<GameSceneDefinitionElement>(entity);
         DynamicBuffer<GameSceneTransitionElement> transitionBuffer = AddBuffer<GameSceneTransitionElement>(entity);
         DynamicBuffer<GameSceneTransitionRequest> requestBuffer = AddBuffer<GameSceneTransitionRequest>(entity);
         GameSceneManagementBakeUtility.PopulateSceneBuffer(preset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(preset, transitionBuffer);
         requestBuffer.Clear();
+        BakeProceduralLevelData(authoring, entity, preset);
     }
     #endregion
 
@@ -210,10 +288,71 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
 
             if (authoring.MasterPreset.SceneManagerPreset != null)
                 DependsOn(authoring.MasterPreset.SceneManagerPreset);
+
+            if (authoring.MasterPreset.ProceduralLevelPreset != null)
+            {
+                DependsOn(authoring.MasterPreset.ProceduralLevelPreset);
+
+                if (authoring.MasterPreset.ProceduralLevelPreset.TransitionSettings != null &&
+                    authoring.MasterPreset.ProceduralLevelPreset.TransitionSettings.PlayerTransitionAnimation != null)
+                {
+                    DependsOn(authoring.MasterPreset.ProceduralLevelPreset.TransitionSettings.PlayerTransitionAnimation);
+                }
+            }
         }
 
         if (authoring.SceneManagerPreset != null)
             DependsOn(authoring.SceneManagerPreset);
+    }
+
+    /// <summary>
+    /// Bakes optional procedural level definitions and initializes mutable graph state on the scene manager entity.
+    /// </summary>
+    /// <param name="authoring">Scene manager authoring component used to resolve the procedural preset.</param>
+    /// <param name="entity">Scene manager singleton entity receiving procedural data.</param>
+    /// <param name="runtimeSceneCatalog">Effective Scene Manager preset baked into the singleton.</param>
+    private void BakeProceduralLevelData(GameSceneManagerAuthoring authoring,
+                                         Entity entity,
+                                         GameSceneManagerPreset runtimeSceneCatalog)
+    {
+        GameProceduralLevelPreset preset = authoring.ResolveProceduralLevelPreset();
+
+        if (preset == null)
+            return;
+
+        if (!GameProceduralLevelBakeUtility.TryValidateRuntimeConfiguration(preset,
+                                                                            runtimeSceneCatalog,
+                                                                            out string failureMessage))
+        {
+            Debug.LogError("[GameSceneManagerAuthoringBaker] Procedural configuration was not baked. " + failureMessage,
+                           authoring);
+            return;
+        }
+
+        AddComponent(entity, GameProceduralLevelBakeUtility.BuildConfig(preset));
+        AddComponent(entity, new GameProceduralLevelRuntimeState
+        {
+            CurrentLevelIndex = -1,
+            CurrentNodeIndex = -1,
+            PendingNodeIndex = -1,
+            Phase = GameProceduralLevelRuntimePhase.Uninitialized
+        });
+        AddComponent(entity, new GameProceduralRoomTransitionContext
+        {
+            SourceNodeIndex = -1,
+            TargetNodeIndex = -1
+        });
+        AddComponent(entity, new GameProceduralRoomClearCounter());
+        DynamicBuffer<GameProceduralLevelDefinitionElement> levelBuffer = AddBuffer<GameProceduralLevelDefinitionElement>(entity);
+        DynamicBuffer<GameProceduralRoomTileElement> tileBuffer = AddBuffer<GameProceduralRoomTileElement>(entity);
+        DynamicBuffer<GameProceduralRoomMetadataElement> metadataBuffer = AddBuffer<GameProceduralRoomMetadataElement>(entity);
+        DynamicBuffer<GameProceduralRoomPortalDefinitionElement> portalBuffer = AddBuffer<GameProceduralRoomPortalDefinitionElement>(entity);
+        AddBuffer<GameProceduralRoomNodeElement>(entity);
+        AddBuffer<GameProceduralRoomEdgeElement>(entity);
+        AddBuffer<GameProceduralRoomTraversalRequest>(entity);
+        AddBuffer<GameProceduralLevelRunRequest>(entity);
+        GameProceduralLevelBakeUtility.PopulateLevelBuffers(preset, levelBuffer, tileBuffer);
+        GameProceduralLevelBakeUtility.PopulateMetadataBuffers(preset, metadataBuffer, portalBuffer);
     }
     #endregion
 

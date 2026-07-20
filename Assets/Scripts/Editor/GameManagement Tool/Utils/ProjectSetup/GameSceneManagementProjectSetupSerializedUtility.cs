@@ -162,6 +162,43 @@ internal static class GameSceneManagementProjectSetupSerializedUtility
         if (property != null)
             property.objectReferenceValue = value;
     }
+
+    /// <summary>
+    /// Finds one serialized array element by stable string ID or appends a new element without removing existing entries.
+    /// </summary>
+    /// <param name="arrayProperty">Serialized array containing identifiable object entries.</param>
+    /// <param name="idPropertyName">Relative string property storing the stable entry ID.</param>
+    /// <param name="stableId">Stable ID to find or initialize.</param>
+    /// <returns>Existing or newly appended serialized array element, or null for invalid input.</returns>
+    public static SerializedProperty FindOrAppendArrayElement(SerializedProperty arrayProperty,
+                                                              string idPropertyName,
+                                                              string stableId)
+    {
+        if (arrayProperty == null || !arrayProperty.isArray)
+            return null;
+
+        // Preserve custom entries while locating the default definition by its exact stable ID.
+        for (int index = 0; index < arrayProperty.arraySize; index++)
+        {
+            SerializedProperty candidate = arrayProperty.GetArrayElementAtIndex(index);
+            SerializedProperty idProperty = candidate.FindPropertyRelative(idPropertyName);
+
+            if (idProperty == null)
+                continue;
+
+            if (!string.Equals(idProperty.stringValue, stableId, System.StringComparison.Ordinal))
+                continue;
+
+            return candidate;
+        }
+
+        // Append one fully overwritten default entry instead of truncating designer-authored definitions.
+        int appendedIndex = arrayProperty.arraySize;
+        arrayProperty.arraySize++;
+        SerializedProperty appendedElement = arrayProperty.GetArrayElementAtIndex(appendedIndex);
+        SetString(appendedElement, idPropertyName, stableId);
+        return appendedElement;
+    }
     #endregion
 
     #endregion

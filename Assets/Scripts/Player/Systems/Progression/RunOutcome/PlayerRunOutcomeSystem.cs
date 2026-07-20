@@ -18,7 +18,8 @@ using UnityEngine;
 public partial struct PlayerRunOutcomeSystem : ISystem
 {
     #region Fields
-    private EntityQuery activeBossMinionQuery;
+    private EntityQuery roomCombatCompletionQuery;
+    private EntityQuery proceduralManagerQuery;
     #endregion
 
     #region Methods
@@ -30,9 +31,11 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
-        activeBossMinionQuery = new EntityQueryBuilder(Allocator.Temp)
-            .WithAll<EnemyBossMinionOwner, EnemyActive>()
-            .WithNone<EnemyDespawnRequest>()
+        roomCombatCompletionQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<GameRoomCombatCompletionState>()
+            .Build(ref state);
+        proceduralManagerQuery = new EntityQueryBuilder(Allocator.Temp)
+            .WithAll<GameProceduralLevelRuntimeState, GameProceduralLevelDefinitionElement>()
             .Build(ref state);
 
         state.RequireForUpdate<PlayerControllerConfig>();
@@ -83,7 +86,10 @@ public partial struct PlayerRunOutcomeSystem : ISystem
             if (TryHandleHealthDefeat(ref runOutcomeState.ValueRW, playerHealth.ValueRO.Current, playbackDuration, audioRequests, canEnqueueAudioRequests))
                 continue;
 
-            TryHandleVictory(ref state, ref runOutcomeState.ValueRW, audioRequests, canEnqueueAudioRequests);
+            TryHandleVictory(entityManager,
+                             ref runOutcomeState.ValueRW,
+                             audioRequests,
+                             canEnqueueAudioRequests);
         }
     }
     #endregion
@@ -183,68 +189,26 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     /// <summary>
     /// Resolves the victory condition: every authored wave has to be completed and no boss-owned minion can still block
     /// completion. Victory does not use the dying playback - the player is still alive and the existing freeze/UI flow
-    /// applies immediately. Takes the system state by ref so the inner SystemAPI.Query enumeration can correctly update
-    /// its dependency handles, matching the source-generator contract.
+    /// applies immediately. The shared aggregate is updated before this system without temporary entity arrays.
     /// </summary>
-    /// <param name="state">Current ECS system state owning the spawner query handles.</param>
+    /// <param name="entityManager">Entity manager owning the shared completion and procedural state.</param>
     /// <param name="runOutcomeState">Mutable runtime state stored on the player entity.</param>
     /// <param name="audioRequests">Optional shared audio request buffer used to play the victory cue.</param>
     /// <param name="canEnqueueAudioRequests">True when the audio request buffer is available this frame.</param>
-    private void TryHandleVictory(ref SystemState state,
+    private void TryHandleVictory(EntityManager entityManager,
                                    ref PlayerRunOutcomeState runOutcomeState,
                                    DynamicBuffer<GameAudioEventRequest> audioRequests,
                                    bool canEnqueueAudioRequests)
     {
-        bool anySpawnerFound = false;
-        bool allSpawnersCompleted = true;
-        bool anyWaveFound = false;
-
-        foreach ((RefRO<EnemySpawner> _,
-                  RefRO<EnemySpawnerState> spawnerState,
-                  DynamicBuffer<EnemySpawnerWaveRuntimeElement> waveRuntimeBuffer)
-                 in SystemAPI.Query<RefRO<EnemySpawner>,
-                                    RefRO<EnemySpawnerState>,
-                                    DynamicBuffer<EnemySpawnerWaveRuntimeElement>>())
-        {
-            anySpawnerFound = true;
-
-            if (spawnerState.ValueRO.Initialized == 0)
-            {
-                allSpawnersCompleted = false;
-                break;
-            }
-
-            if (spawnerState.ValueRO.AliveCount > 0)
-            {
-                allSpawnersCompleted = false;
-                break;
-            }
-
-            if (waveRuntimeBuffer.Length <= 0)
-            {
-                allSpawnersCompleted = false;
-                break;
-            }
-
-            for (int waveIndex = 0; waveIndex < waveRuntimeBuffer.Length; waveIndex++)
-            {
-                anyWaveFound = true;
-
-                if (waveRuntimeBuffer[waveIndex].Completed != 0)
-                    continue;
-
-                allSpawnersCompleted = false;
-                break;
-            }
-
-            if (!allSpawnersCompleted)
-                break;
-        }
-
-        if (!anySpawnerFound || !anyWaveFound || !allSpawnersCompleted)
+        if (ShouldDeferVictoryToProceduralProgression(entityManager, proceduralManagerQuery))
             return;
 
-        if (HasCompletionBlockingBossMinions(activeBossMinionQuery))
+        if (roomCombatCompletionQuery.CalculateEntityCount() != 1)
+            return;
+
+        GameRoomCombatCompletionState completionState = entityManager.GetComponentData<GameRoomCombatCompletionState>(roomCombatCompletionQuery.GetSingletonEntity());
+
+        if (completionState.IsComplete == 0)
             return;
 
         FinalizeOutcome(ref runOutcomeState, PlayerRunOutcome.Victory);
@@ -299,29 +263,27 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     }
 
     /// <summary>
-    /// Resolves whether any active boss minion is configured to delay run completion after its boss dies.
+    /// Defers victory while an enabled procedural run has not completed its final Boss room.
     /// </summary>
-    /// <param name="activeBossMinionQuery">Query matching active boss-owned minions without despawn requests.</param>
-    /// <returns>True when at least one active minion blocks victory.</returns>
-    private static bool HasCompletionBlockingBossMinions(EntityQuery activeBossMinionQuery)
+    /// <param name="entityManager">Entity manager owning the optional procedural manager.</param>
+    /// <param name="proceduralManagerQuery">Query matching procedural runtime and ordered level definitions.</param>
+    /// <returns>True when procedural progression, rather than the current room, still owns run completion.</returns>
+    private static bool ShouldDeferVictoryToProceduralProgression(EntityManager entityManager,
+                                                                  EntityQuery proceduralManagerQuery)
     {
-        if (activeBossMinionQuery.IsEmptyIgnoreFilter)
+        if (proceduralManagerQuery.CalculateEntityCount() != 1)
             return false;
 
-        NativeArray<EnemyBossMinionOwner> minionOwners = activeBossMinionQuery.ToComponentDataArray<EnemyBossMinionOwner>(Allocator.Temp);
+        Entity managerEntity = proceduralManagerQuery.GetSingletonEntity();
+        DynamicBuffer<GameProceduralLevelDefinitionElement> levels = entityManager.GetBuffer<GameProceduralLevelDefinitionElement>(managerEntity, true);
 
-        try
+        for (int levelIndex = 0; levelIndex < levels.Length; levelIndex++)
         {
-            for (int index = 0; index < minionOwners.Length; index++)
-            {
-                if (minionOwners[index].BlocksRunCompletion != 0)
-                    return true;
-            }
-        }
-        finally
-        {
-            if (minionOwners.IsCreated)
-                minionOwners.Dispose();
+            if (levels[levelIndex].Enabled == 0)
+                continue;
+
+            GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
+            return runtimeState.Phase != GameProceduralLevelRuntimePhase.RunComplete;
         }
 
         return false;

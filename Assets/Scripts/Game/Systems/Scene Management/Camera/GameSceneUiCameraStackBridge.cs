@@ -105,6 +105,7 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
         GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, uiCamera);
 
         currentBaseCamera = baseCamera;
+        GameProceduralTransitionCameraBridge.RefreshStackOrder();
     }
 
     /// <summary>

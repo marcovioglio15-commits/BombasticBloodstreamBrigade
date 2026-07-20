@@ -1,0 +1,491 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6426140220407d4e8d2294d2b6f7a4f, type: 3}
+  m_Name: Level Generation Scene Set Test
+  m_EditorClassIdentifier: Assembly-CSharp::GameProceduralLevelPreset
+  presetId: 7866758b80d744ebb7d45dc4836050f9
+  presetName: Level Generation Scene Set Test
+  description: Two deterministic themed levels generated from SCN_MainScene for portal,
+    graph and scene-transition testing.
+  version: 1.0.0
+  sceneCatalogPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
+  generationSettings:
+    seedMode: 0
+    fixedSeed: 20260720
+    maximumNodeCount: 32
+    maximumDepth: 12
+    maximumGenerationAttempts: 5
+  transitionSettings:
+    keepPlayerVisible: 1
+    playerTransitionAnimation: {fileID: 0}
+    relocationNormalizedTime: 0.5
+    clearPlayerVelocity: 1
+  levels:
+  - technicalId: 2c6bcfcab36c6a5ca941350eda77c30e
+    levelId: LEVEL_LGTEST_01
+    displayName: Metro Concourse
+    enabled: 1
+    targetNodeCountRange: {x: 8, y: 11}
+    preferredBossDepthRange: {x: 4, y: 6}
+    ruleSettings:
+      roomDepthScore: 2
+      bossDepthScore: 4
+      fittingScore: 2
+    requireRoomClearBeforeExit: 1
+    useCenterArrival: 0
+    roomTiles:
+    - technicalId: 139d60ef1a4682ffb6644fa339a27c3b
+      tileId: TILE_LGTEST_METRO_START
+      sceneId: SCN_LGTEST_METRO_START
+      sceneGuid: 54c97702b5bc17f439c3b98c04743afb
+      role: 0
+      maximumCopies: 1
+      preferredDepthRange: {x: 0, y: 0}
+      baseSelectionWeight: 1
+    - technicalId: 0281afd42d8a97bd0d0d8469596bc90f
+      tileId: TILE_LGTEST_METRO_NS
+      sceneId: SCN_LGTEST_METRO_NS
+      sceneGuid: 0b11934e90dbb314e87551aabe87ec57
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: cf9139cd947bf7d5a54825a564482b6c
+      tileId: TILE_LGTEST_METRO_EW
+      sceneId: SCN_LGTEST_METRO_EW
+      sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: 39e6cbf0344823f58269bd8f17a7d599
+      tileId: TILE_LGTEST_METRO_CROSS
+      sceneId: SCN_LGTEST_METRO_CROSS
+      sceneGuid: 86787f958b7747a44892e18620a2fe75
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: 7f96bcb0b6f283a2a36c74a78a13540f
+      tileId: TILE_LGTEST_METRO_DOUBLE
+      sceneId: SCN_LGTEST_METRO_DOUBLE
+      sceneGuid: 433f03176860b0e409c1d762e15cd364
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: cb7a6330474e7c26af57cea7e901ecdb
+      tileId: TILE_LGTEST_METRO_BOSS
+      sceneId: SCN_LGTEST_METRO_BOSS
+      sceneGuid: 27d9e1327f828944794adba3410c0657
+      role: 2
+      maximumCopies: 1
+      preferredDepthRange: {x: 4, y: 6}
+      baseSelectionWeight: 1
+  - technicalId: 31581e1d4c6aa6904ebf598d76dca6b0
+    levelId: LEVEL_LGTEST_02
+    displayName: Maintenance Tunnels
+    enabled: 1
+    targetNodeCountRange: {x: 8, y: 11}
+    preferredBossDepthRange: {x: 4, y: 6}
+    ruleSettings:
+      roomDepthScore: 2
+      bossDepthScore: 4
+      fittingScore: 2
+    requireRoomClearBeforeExit: 1
+    useCenterArrival: 0
+    roomTiles:
+    - technicalId: 5e8d4a9ef0c60505a6bbc5c3edcbf417
+      tileId: TILE_LGTEST_MAINT_START
+      sceneId: SCN_LGTEST_MAINT_START
+      sceneGuid: d0f579d17b03b154287cfa15e7887024
+      role: 0
+      maximumCopies: 1
+      preferredDepthRange: {x: 0, y: 0}
+      baseSelectionWeight: 1
+    - technicalId: 88582e716d7493da0c46a8dcdd328340
+      tileId: TILE_LGTEST_MAINT_CORNER_NE
+      sceneId: SCN_LGTEST_MAINT_CORNER_NE
+      sceneGuid: c56a428650e3345448e82cd5306813e9
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: 7269f7532f4510329d8616f570315bcf
+      tileId: TILE_LGTEST_MAINT_CORNER_SW
+      sceneId: SCN_LGTEST_MAINT_CORNER_SW
+      sceneGuid: f10e13dba6645024c946748fa4b1d1ac
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: 2ffb225a3f3d9ffa1d195cd3ba7d0c89
+      tileId: TILE_LGTEST_MAINT_TRIAD
+      sceneId: SCN_LGTEST_MAINT_TRIAD
+      sceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: d2024b5e5eefea541eeb573023996934
+      tileId: TILE_LGTEST_MAINT_HUB
+      sceneId: SCN_LGTEST_MAINT_HUB
+      sceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
+      role: 1
+      maximumCopies: 3
+      preferredDepthRange: {x: 1, y: 5}
+      baseSelectionWeight: 1
+    - technicalId: 6a71c3480f9a4ad3049cd7437c471a19
+      tileId: TILE_LGTEST_MAINT_BOSS
+      sceneId: SCN_LGTEST_MAINT_BOSS
+      sceneGuid: 82bb006d89574a24488682f06c9e1332
+      role: 2
+      maximumCopies: 1
+      preferredDepthRange: {x: 4, y: 6}
+      baseSelectionWeight: 1
+  roomMetadata:
+  - sceneId: SCN_LGTEST_MAINT_BOSS
+    sceneGuid: 82bb006d89574a24488682f06c9e1332
+    dependencyHash: 3b39db65d4460a3dcafdc05e0403b81d
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_BOSS.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_BOSS_NORTH_01
+      side: 0
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_NORTH_02
+      side: 0
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_SOUTH_03
+      side: 1
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_SOUTH_04
+      side: 1
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_EAST_05
+      side: 2
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_EAST_06
+      side: 2
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_WEST_07
+      side: 3
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_BOSS_WEST_08
+      side: 3
+      capability: 0
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_MAINT_CORNER_NE
+    sceneGuid: c56a428650e3345448e82cd5306813e9
+    dependencyHash: 484f0b1d17fb1ab01095ff9db988fb6a
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_NE.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_NE.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_CORNER_NE_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_CORNER_NE_EAST_02
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_MAINT_CORNER_SW
+    sceneGuid: f10e13dba6645024c946748fa4b1d1ac
+    dependencyHash: fe1a3c1503b7db50800a1c44ab481932
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_SW.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_SW.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_CORNER_SW_SOUTH_01
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_CORNER_SW_WEST_02
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_MAINT_HUB
+    sceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
+    dependencyHash: 3572f97fa4a963de7b8ac5892dfd0331
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_HUB.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SUB_LGTEST_MAINT_HUB.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_HUB_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_NORTH_02
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_SOUTH_03
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_SOUTH_04
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_EAST_05
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_EAST_06
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_WEST_07
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_HUB_WEST_08
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_MAINT_START
+    sceneGuid: d0f579d17b03b154287cfa15e7887024
+    dependencyHash: 2ebfcbfc04d384702fa5a0f734765b1c
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_START.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_START.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_START_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_START_SOUTH_02
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_START_EAST_03
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_START_WEST_04
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_MAINT_TRIAD
+    sceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
+    dependencyHash: 378133635aec093db4288a78882e5da8
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_TRIAD.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_TRIAD.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_MAINT_TRIAD_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_TRIAD_EAST_02
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_MAINT_TRIAD_WEST_03
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_BOSS
+    sceneGuid: 27d9e1327f828944794adba3410c0657
+    dependencyHash: 9f76390e209cf08c1143d493f01e5c90
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_BOSS.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_BOSS_NORTH_01
+      side: 0
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_NORTH_02
+      side: 0
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_LEVEL_EXIT_09
+      side: 0
+      capability: 1
+      connectionPolicy: 2
+    - portalId: LGTEST_METRO_BOSS_SOUTH_03
+      side: 1
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_SOUTH_04
+      side: 1
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_EAST_05
+      side: 2
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_EAST_06
+      side: 2
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_WEST_07
+      side: 3
+      capability: 0
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_BOSS_WEST_08
+      side: 3
+      capability: 0
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_CROSS
+    sceneGuid: 86787f958b7747a44892e18620a2fe75
+    dependencyHash: 944b26893d033b6449567271e00acafd
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_CROSS.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_CROSS_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_CROSS_SOUTH_02
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_CROSS_EAST_03
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_CROSS_WEST_04
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_DOUBLE
+    sceneGuid: 433f03176860b0e409c1d762e15cd364
+    dependencyHash: b94f137fe951e3da618758b9454b82ff
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_DOUBLE.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_DOUBLE_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_DOUBLE_NORTH_02
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_DOUBLE_SOUTH_03
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_DOUBLE_SOUTH_04
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_DOUBLE_EAST_05
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_DOUBLE_WEST_06
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_EW
+    sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
+    dependencyHash: 067e96cdbf34d22891a23dd13393d9e8
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_EW.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_EW_EAST_01
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_EW_WEST_02
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_NS
+    sceneGuid: 0b11934e90dbb314e87551aabe87ec57
+    dependencyHash: 1e1a1fb7f18629bb747f71dbeba568b1
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_NS.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_NS_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_NS_SOUTH_02
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_LGTEST_METRO_START
+    sceneGuid: 54c97702b5bc17f439c3b98c04743afb
+    dependencyHash: 7abbb0edc7572cdd0ca864a4daa854dc
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_START.unity
+    centerAnchorCount: 1
+    portals:
+    - portalId: LGTEST_METRO_START_NORTH_01
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_START_SOUTH_02
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_START_EAST_03
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: LGTEST_METRO_START_WEST_04
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
