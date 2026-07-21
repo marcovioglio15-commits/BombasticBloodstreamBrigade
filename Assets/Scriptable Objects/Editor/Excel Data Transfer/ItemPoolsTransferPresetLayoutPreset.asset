@@ -1,0 +1,2189 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: ItemPoolsTransferPresetLayoutPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: dc9144ea1b3146109f03f971a32f567d
+  presetName: Item Pools Transfer Layout
+  objectsSheetName: Item Pools
+  defaultGridRows: 50
+  defaultGridColumns: 3
+  defaultCellWidth: 180
+  defaultCellHeight: 30
+  sheetDefinitions:
+  - sheetId: 1fc546e7aa154c299c967654f026d00c
+    sheetName: Objects
+    previewRowCount: 50
+    previewColumnCount: 3
+    previewCellWidth: 180
+    previewCellHeight: 30
+    freezeRowCount: 3
+    freezeColumnCount: 1
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 1
+      direction: 0
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Pool ID
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 1
+      columnIndex: 2
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Item ID
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 1
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Drop %
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 2
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[0].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[0].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 2
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 3
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[1].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[1].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000001000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 4
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[2].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[2].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000002000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 5
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[3].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[3].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000003000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 6
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[4].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[4].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000004000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 7
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[5].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[5].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000005000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 8
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[6].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[6].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000006000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 9
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[7].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[7].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000007000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 10
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[8].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[8].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000008000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 11
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[9].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[9].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000009000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 12
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[10].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[10].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000a000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 13
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[11].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[11].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000b000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 14
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[12].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[12].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000c000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 15
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[13].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[13].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000d000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 16
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[14].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[14].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000e000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 17
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[15].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[15].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 000000000f000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 18
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[16].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[16].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000010000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 19
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[17].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[17].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000011000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 20
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[18].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[18].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0000000012000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 3
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 5
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 7
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 8
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 9
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 10
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 11
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 12
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 13
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 14
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 15
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 16
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 17
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 18
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 19
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 20
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 22
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[0].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[0].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 23
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[1].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[1].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000001000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 24
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[2].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[2].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000002000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 25
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[3].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[3].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000003000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 26
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[4].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[4].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000004000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 27
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[5].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[5].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000005000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 28
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[6].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[6].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000006000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 29
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[7].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[7].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000007000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 30
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[8].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[8].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000008000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 31
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[9].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[9].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 0100000009000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 32
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[10].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[10].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 010000000a000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 33
+      columnIndex: 2
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[11].powerUpId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[11].powerUpId
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].powerUpId
+        expectedDataKind: 5
+        concreteListIndices: 010000000b000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 22
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 23
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 24
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 25
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 26
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 27
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 28
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 29
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 30
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 31
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 32
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 33
+      columnIndex: 1
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].tierId
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].tierId
+        pathTemplate: tierLevels.Array.data[].tierId
+        expectedDataKind: 5
+        concreteListIndices: 01000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 2
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[0].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[0].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 3
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[1].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[1].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000001000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 4
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[2].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[2].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000002000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 5
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[3].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[3].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000003000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 6
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[4].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[4].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000004000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 7
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[5].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[5].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000005000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 8
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[6].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[6].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000006000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 9
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[7].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[7].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000007000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 10
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[8].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[8].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000008000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 11
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[9].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[9].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000009000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 12
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[10].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[10].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000a000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 13
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[11].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[11].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000b000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 14
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[12].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[12].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000c000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 15
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[13].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[13].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000d000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 16
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[14].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[14].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000e000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 17
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[15].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[15].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 000000000f000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 18
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[16].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[16].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000010000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 19
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[17].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[17].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000011000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 20
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[0].entries.Array.data[18].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[0].entries.Array.data[18].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0000000012000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 22
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[0].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[0].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 23
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[1].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[1].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000001000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 24
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[2].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[2].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000002000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 25
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[3].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[3].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000003000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 26
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[4].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[4].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000004000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 27
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[5].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[5].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000005000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 28
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[6].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[6].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000006000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 29
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[7].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[7].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000007000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 30
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[8].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[8].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000008000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 31
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[9].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[9].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 0100000009000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 32
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[10].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[10].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 010000000a000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 33
+      columnIndex: 3
+      contentKind: 0
+      direction: 2
+      fieldBinding:
+        fieldId: Player:6d0f84c1e80d53a44999e8dedd17f116:PlayerPowerUpsPreset:tierLevels.Array.data[1].entries.Array.data[11].selectionWeight
+        domain: 1
+        ownerAssetGuid: 6d0f84c1e80d53a44999e8dedd17f116
+        ownerAssetTypeName: PlayerPowerUpsPreset
+        ownerAssetPath: Assets/Scriptable Objects/Player/Power-Ups/PlayerPowerUpsPreset.asset
+        serializedPath: tierLevels.Array.data[1].entries.Array.data[11].selectionWeight
+        pathTemplate: tierLevels.Array.data[].entries.Array.data[].selectionWeight
+        expectedDataKind: 2
+        concreteListIndices: 010000000b000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: 58e8e14c4186499da560445ba8a510bb
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 21
+      columnIndex: 3
+      contentKind: 1
+      direction: 0
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: =SOMMA(C2:C20)
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 34
+      columnIndex: 3
+      contentKind: 1
+      direction: 0
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: =SOMMA(C22:C33)
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 21
+      columnIndex: 2
+      contentKind: 1
+      direction: 0
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 'TOTAL:'
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 1fc546e7aa154c299c967654f026d00c
+      rowIndex: 34
+      columnIndex: 2
+      contentKind: 1
+      direction: 0
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 'TOTAL:'
+      brushId: a4cc044972444309a54b559160ad8db7
+      numberFormat: 
+      validateLiteralDuringImport: 0

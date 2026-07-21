@@ -202,13 +202,13 @@ MonoBehaviour:
       selectionWeight: 5
     - entryKind: 0
       powerUpId: Active_Shotgun
-      selectionWeight: 6
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: Active_DamageBoost
       selectionWeight: 5
     - entryKind: 1
       powerUpId: PassiveBouncingProjectiles
-      selectionWeight: 6
+      selectionWeight: 5
     - entryKind: 0
       powerUpId: ActiveGigaLaser
       selectionWeight: 5

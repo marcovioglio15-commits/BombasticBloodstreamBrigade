@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2001e592a311547ba193492c98b9b9, type: 3}
+  m_Name: ItemPoolsTransferPresetMasterPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataTransferMasterPreset
+  presetId: 07b5f94a2c894392b1de1453554548ed
+  presetName: Item Pools Transfer
+  description: 
+  version: 1.0.0
+  layoutPreset: {fileID: 11400000, guid: db45ea4a0010bd541994ff5cfd4cd250, type: 2}
+  brushPalettePreset: {fileID: 11400000, guid: ac2365597fae6f34395ecd7a3446efa3, type: 2}
+  importPreset: {fileID: 11400000, guid: f81b1605cc55e5540bf8375b9ec09477, type: 2}
+  exportPreset: {fileID: 11400000, guid: 06ce70b0c9fa80e48957cd91e600c3f2, type: 2}
