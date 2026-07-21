@@ -50,8 +50,17 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
         if (!hasRelevantCatalogChange)
             return;
 
-        pendingOwnerSceneReimport = true;
-        ownerSceneReimportRetryCount = 0;
+        bool requiresOwnerSceneReimport = ContainsOwnerSceneReimportChange(importedAssets, true) ||
+                                          ContainsOwnerSceneReimportChange(deletedAssets, false) ||
+                                          ContainsOwnerSceneReimportChange(movedAssets, true) ||
+                                          ContainsOwnerSceneReimportChange(movedFromAssetPaths, false);
+
+        if (requiresOwnerSceneReimport)
+        {
+            pendingOwnerSceneReimport = true;
+            ownerSceneReimportRetryCount = 0;
+        }
+
         QueueCatalogRefresh();
     }
     #endregion
@@ -161,7 +170,10 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
             return false;
 
         return exception.Message.IndexOf("Sharing violation", StringComparison.OrdinalIgnoreCase) >= 0 ||
-               exception.Message.IndexOf("being used by another process", StringComparison.OrdinalIgnoreCase) >= 0;
+               exception.Message.IndexOf("being used by another process", StringComparison.OrdinalIgnoreCase) >= 0 ||
+               exception.Message.IndexOf("Win32 IO returned 1224", StringComparison.OrdinalIgnoreCase) >= 0 ||
+               exception.Message.IndexOf("SceneDependencyCache", StringComparison.OrdinalIgnoreCase) >= 0 ||
+               exception.Message.IndexOf("sceneWithBuildSettings", StringComparison.OrdinalIgnoreCase) >= 0;
     }
     #endregion
 
@@ -180,6 +192,30 @@ public sealed class EnemySpawnerRuntimeCatalogAssetPostprocessor : AssetPostproc
         for (int assetIndex = 0; assetIndex < assetPaths.Length; assetIndex++)
         {
             if (IsCatalogRelevantAsset(assetPaths[assetIndex], canInspectAssetType))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks whether an asset batch changed data baked into closed owner scenes rather than a scene that Unity is already importing.
+    /// </summary>
+    /// <param name="assetPaths">Asset paths from one postprocessor batch category.</param>
+    /// <param name="canInspectAssetType">True when the asset still exists and its imported type can be queried.</param>
+    /// <returns>True when closed owner scenes require a separate Entities reimport pass.</returns>
+    private static bool ContainsOwnerSceneReimportChange(string[] assetPaths, bool canInspectAssetType)
+    {
+        if (assetPaths == null)
+            return false;
+
+        // A saved scene is already inside Unity's scene import lifecycle. Starting another forced SubScene import
+        // from that callback races the SceneDependencyCache writer and causes Win32 error 1224.
+        for (int assetIndex = 0; assetIndex < assetPaths.Length; assetIndex++)
+        {
+            string assetPath = assetPaths[assetIndex];
+
+            if (IsWavePresetAsset(assetPath, canInspectAssetType) || IsRuntimeSpawnerScriptAsset(assetPath))
                 return true;
         }
 

@@ -90,6 +90,7 @@ public struct GameSceneTransitionRequest : IBufferElementData
     public GameSceneTransitionPurpose Purpose;
     public FixedString64Bytes TargetSceneId;
     public FixedString64Bytes TransitionId;
+    public byte ReloadPersistentPlayer;
 }
 
 /// <summary>

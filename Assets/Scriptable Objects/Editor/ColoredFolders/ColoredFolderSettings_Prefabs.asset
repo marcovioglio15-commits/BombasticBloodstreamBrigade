@@ -32,6 +32,12 @@ MonoBehaviour:
   - Assets/Prefabs/Enemies/Projectiles
   - Assets/Prefabs/Enemies/Puddle
   - Assets/Prefabs/PowerUps/Orbital Projections
+  - Assets/Prefabs/Level Generation
+  - Assets/Prefabs/Level Generation/Doors
+  - Assets/Prefabs/Level Generation/Portals
+  - Assets/Prefabs/RoomAuthoring
+  - Assets/Prefabs/RoomAuthoring/Portals
+  - Assets/Prefabs/RoomAuthoring/Center
   folderColors:
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
@@ -52,5 +58,11 @@ MonoBehaviour:
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
   - {r: 0.19416952, g: 0, b: 1, a: 0}
-  folderApplyModes: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  - {r: 0.19416952, g: 0, b: 1, a: 0}
+  folderApplyModes: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
   autoInheritColors: 1

@@ -105,7 +105,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
 
             runRequests.RemoveAt(0);
             ResetRun(managerEntity);
-            TryGenerateFirstLevel(managerEntity, scenes, restartSeed);
+            TryGenerateFirstLevel(managerEntity, scenes, restartSeed, true);
             return;
         }
 
@@ -132,7 +132,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
         if (runRequests.Length > 0)
             runRequests.RemoveAt(0);
 
-        TryGenerateFirstLevel(managerEntity, scenes, runSeed);
+        TryGenerateFirstLevel(managerEntity, scenes, runSeed, false);
     }
     #endregion
 
@@ -143,9 +143,11 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
     /// <param name="managerEntity">Unique procedural manager entity.</param>
     /// <param name="scenes">Canonical Scene Manager catalog.</param>
     /// <param name="runSeed">Resolved authoritative run seed.</param>
+    /// <param name="reloadPersistentPlayer">True when a run restart must rebuild the persistent player runtime.</param>
     private void TryGenerateFirstLevel(Entity managerEntity,
                                        DynamicBuffer<GameSceneDefinitionElement> scenes,
-                                       uint runSeed)
+                                       uint runSeed,
+                                       bool reloadPersistentPlayer)
     {
         DynamicBuffer<GameProceduralLevelDefinitionElement> levels = EntityManager.GetBuffer<GameProceduralLevelDefinitionElement>(managerEntity, true);
         int levelIndex = FindNextEnabledLevel(levels, -1);
@@ -161,7 +163,8 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
                       levels[levelIndex],
                       levelIndex,
                       runSeed,
-                      GameProceduralRoomTransitionKind.InitialRoom);
+                      GameProceduralRoomTransitionKind.InitialRoom,
+                      reloadPersistentPlayer);
     }
 
     /// <summary>
@@ -189,7 +192,8 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
                       levels[levelIndex],
                       levelIndex,
                       runtimeState.RunSeed,
-                      GameProceduralRoomTransitionKind.LevelBoundary);
+                      GameProceduralRoomTransitionKind.LevelBoundary,
+                      false);
     }
 
     /// <summary>
@@ -201,12 +205,14 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
     /// <param name="levelIndex">Ordered level buffer index.</param>
     /// <param name="runSeed">Authoritative run seed shared across ordered levels.</param>
     /// <param name="transitionKind">Initial-run or level-boundary transition context.</param>
+    /// <param name="reloadPersistentPlayer">True when the generated first room starts a clean player runtime.</param>
     private void GenerateLevel(Entity managerEntity,
                                DynamicBuffer<GameSceneDefinitionElement> scenes,
                                GameProceduralLevelDefinitionElement level,
                                int levelIndex,
                                uint runSeed,
-                               GameProceduralRoomTransitionKind transitionKind)
+                               GameProceduralRoomTransitionKind transitionKind,
+                               bool reloadPersistentPlayer)
     {
         GameProceduralLevelConfig config = EntityManager.GetComponentData<GameProceduralLevelConfig>(managerEntity);
         DynamicBuffer<GameProceduralRoomTileElement> tiles = EntityManager.GetBuffer<GameProceduralRoomTileElement>(managerEntity, true);
@@ -254,7 +260,8 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
                                       levelIndex,
                                       result,
                                       startNode,
-                                      transitionKind);
+                                      transitionKind,
+                                      reloadPersistentPlayer);
     }
     #endregion
 
@@ -351,11 +358,13 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
     /// <param name="result">Successful shared solver result.</param>
     /// <param name="startNode">Generated Start node to load.</param>
     /// <param name="transitionKind">Initial-run or level-boundary transition context.</param>
+    /// <param name="reloadPersistentPlayer">True when Scene Management must recreate persistent player entities.</param>
     private void BeginGeneratedLevelTransition(Entity managerEntity,
                                                int levelIndex,
                                                GameProceduralLevelGenerationResult result,
                                                GameProceduralRoomNodeElement startNode,
-                                               GameProceduralRoomTransitionKind transitionKind)
+                                               GameProceduralRoomTransitionKind transitionKind,
+                                               bool reloadPersistentPlayer)
     {
         GameProceduralLevelRuntimeState runtimeState = EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
         runtimeState.FailureMessage = default;
@@ -387,7 +396,8 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
             Purpose = transitionKind == GameProceduralRoomTransitionKind.InitialRoom
                 ? GameSceneTransitionPurpose.ProceduralInitialRoom
                 : GameSceneTransitionPurpose.ProceduralLevelBoundary,
-            TargetSceneId = startNode.SceneId
+            TargetSceneId = startNode.SceneId,
+            ReloadPersistentPlayer = reloadPersistentPlayer ? (byte)1 : (byte)0
         });
     }
     #endregion
@@ -427,7 +437,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
             runRequests.RemoveAt(0);
 
         DynamicBuffer<GameSceneDefinitionElement> scenes = EntityManager.GetBuffer<GameSceneDefinitionElement>(managerEntity, true);
-        TryGenerateFirstLevel(managerEntity, scenes, runSeed);
+        TryGenerateFirstLevel(managerEntity, scenes, runSeed, false);
         return true;
     }
 

@@ -28,6 +28,11 @@ public static class GameProceduralLevelRunRequestSmokeTest
             {
                 SeedMode = GameProceduralLevelSeedMode.External
             });
+            entityManager.AddComponentData(managerEntity, new GameProceduralLevelRuntimeState
+            {
+                RunSeed = 109u,
+                Initialized = 1
+            });
             DynamicBuffer<GameProceduralLevelRunRequest> requests = entityManager.AddBuffer<GameProceduralLevelRunRequest>(managerEntity);
 
             Require(!GameProceduralLevelRunRequestUtility.TryStartRun(),
@@ -52,6 +57,15 @@ public static class GameProceduralLevelRunRequestSmokeTest
                     "External explicit restart request lost its restart semantics.");
 
             requests.Clear();
+            Require(GameProceduralLevelRunRequestUtility.TryRestartActiveRun(),
+                    "Active External run rejected reuse of its authoritative run seed.");
+            Require(requests.Length == 1 &&
+                    requests[0].RunSeed == 109u &&
+                    requests[0].HasExplicitSeed != 0 &&
+                    requests[0].Restart != 0,
+                    "Active External restart did not preserve its authoritative seed and restart semantics.");
+
+            requests.Clear();
             GameProceduralLevelConfig config = entityManager.GetComponentData<GameProceduralLevelConfig>(managerEntity);
             config.SeedMode = GameProceduralLevelSeedMode.Fixed;
             entityManager.SetComponentData(managerEntity, config);
@@ -59,6 +73,21 @@ public static class GameProceduralLevelRunRequestSmokeTest
                     "Fixed mode rejected its baked seed policy request.");
             Require(requests.Length == 1 && requests[0].HasExplicitSeed == 0,
                     "Fixed policy start request was not queued exactly once.");
+
+            requests.Clear();
+            Require(GameProceduralLevelRunRequestUtility.TryRestartActiveRun(),
+                    "Active Fixed run rejected its configured restart policy.");
+            Require(requests.Length == 1 &&
+                    requests[0].HasExplicitSeed == 0 &&
+                    requests[0].Restart != 0,
+                    "Active Fixed restart did not reapply the configured seed policy.");
+
+            requests.Clear();
+            GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
+            runtimeState.Initialized = 0;
+            entityManager.SetComponentData(managerEntity, runtimeState);
+            Require(!GameProceduralLevelRunRequestUtility.TryRestartActiveRun(),
+                    "Inactive procedural runtime incorrectly intercepted a legacy scene restart.");
 
             Debug.Log("[GameProceduralLevelRunRequestSmokeTest] All run-request seed policy checks passed.");
         }

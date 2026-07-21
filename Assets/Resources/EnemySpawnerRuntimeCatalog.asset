@@ -134,12 +134,12 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_CROSS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
+      defaultWavePresetGuid: 085e828ebb21b7045ae9e4b42612f20c
     - ownerSceneGuid: 9e9cbe8c0d82f484ca2d1014f6d1b065
       spawnerGuid: 0cdfe79276cddd82ec17566f158bab01
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_LGTEST_METRO_CROSS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
+      defaultEnabled: 0
       defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
   - sceneName: SCN_LGTEST_METRO_DOUBLE
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
@@ -150,12 +150,12 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_DOUBLE/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
+      defaultWavePresetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
     - ownerSceneGuid: b913c7cd5b4ce754b86503a1a1db2267
       spawnerGuid: e460db88e0548a84701d480fcc602cb8
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_LGTEST_METRO_DOUBLE/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
+      defaultEnabled: 0
       defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
   - sceneName: SCN_LGTEST_METRO_EW
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
@@ -166,12 +166,12 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_EW/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
+      defaultWavePresetGuid: d83ea893f3b670446a6b82587119e832
     - ownerSceneGuid: f322020fe50790b49917469e6a63e82e
       spawnerGuid: dfd27ae386b605934ed3105c09bfd8ff
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_LGTEST_METRO_EW/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
+      defaultEnabled: 0
       defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
   - sceneName: SCN_LGTEST_METRO_NS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
@@ -182,12 +182,12 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_NS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
+      defaultWavePresetGuid: 7fdb6c11e4b219c46a717e6356bc6e63
     - ownerSceneGuid: 4989da56774b24444a4e8df669174e42
       spawnerGuid: d65fbb5d4c1f226e445f003b91905f3e
       spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
       hierarchyPath: SUB_LGTEST_METRO_NS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
+      defaultEnabled: 0
       defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
   - sceneName: SCN_LGTEST_METRO_START
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity

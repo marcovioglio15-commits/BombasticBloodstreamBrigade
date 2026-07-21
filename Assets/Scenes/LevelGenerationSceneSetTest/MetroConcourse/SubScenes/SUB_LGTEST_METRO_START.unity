@@ -967,7 +967,7 @@ Transform:
   m_GameObject: {fileID: 577296227}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.46, y: 2.48, z: 0}
+  m_LocalPosition: {x: -7.14, y: 2.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -989,7 +989,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_START_WEST_04
   side: 3
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 577296230}
   arrivalAnchor: {fileID: 1899776522}
   inwardOffset: 0.75
@@ -1079,7 +1079,7 @@ GameObject:
   m_Component:
   - component: {fileID: 662013529}
   m_Layer: 0
-  m_Name: Procedural Room Authoring
+  m_Name: Room Authoring
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1343,7 +1343,7 @@ Transform:
   m_GameObject: {fileID: 1049629718}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.55, z: -18.21}
+  m_LocalPosition: {x: 0, y: 2.55, z: -17.72}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1365,7 +1365,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_START_SOUTH_02
   side: 1
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 1049629721}
   arrivalAnchor: {fileID: 1512510463}
   inwardOffset: 0.75
@@ -1562,7 +1562,7 @@ Transform:
   m_GameObject: {fileID: 1238922446}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.38, y: 2.62, z: 0}
+  m_LocalPosition: {x: 7.89, y: 2.62, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1584,7 +1584,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_START_EAST_03
   side: 2
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 1238922449}
   arrivalAnchor: {fileID: 1117027715}
   inwardOffset: 0.75
@@ -1638,7 +1638,7 @@ Transform:
   m_GameObject: {fileID: 1442670336}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.55, z: 12.740001}
+  m_LocalPosition: {x: 0, y: 2.55, z: 12.11}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1660,7 +1660,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_START_NORTH_01
   side: 0
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 1442670339}
   arrivalAnchor: {fileID: 1594431020}
   inwardOffset: 0.75

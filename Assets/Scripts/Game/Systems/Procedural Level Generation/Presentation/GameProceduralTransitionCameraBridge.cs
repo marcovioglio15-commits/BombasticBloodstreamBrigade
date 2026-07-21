@@ -42,7 +42,12 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     #region Runtime Fields
     private readonly Dictionary<Camera, int> originalCameraMasks = new Dictionary<Camera, int>();
     private Camera activeBaseCamera;
+    private CameraRenderSnapshot playerCameraSnapshot;
+    private Transform playerTrackingTransform;
+    private Vector3 playerTrackingStartPosition;
     private bool fadePresentationVisible;
+    private bool hasPlayerCameraSnapshot;
+    private bool hasPlayerTrackingStartPosition;
     private bool playerPresentationVisible;
     #endregion
 
@@ -105,12 +110,42 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
             return;
         }
 
+        if (visible && !activeBridge.playerPresentationVisible)
+        {
+            activeBridge.hasPlayerCameraSnapshot = false;
+            activeBridge.playerTrackingTransform = null;
+            activeBridge.hasPlayerTrackingStartPosition = false;
+        }
+
         activeBridge.playerPresentationVisible = visible;
 
         if (activeBridge.playerCamera != null)
             activeBridge.playerCamera.enabled = visible;
 
         activeBridge.RefreshCameraStack();
+
+        if (!visible)
+        {
+            activeBridge.hasPlayerCameraSnapshot = false;
+            activeBridge.playerTrackingTransform = null;
+            activeBridge.hasPlayerTrackingStartPosition = false;
+        }
+    }
+
+    /// <summary>
+    /// Captures the persistent player transform used to translate the camera snapshot by the exact room-arrival delta.
+    /// </summary>
+    /// <param name="playerTransform">Managed persistent player transform synchronized from the ECS LocalTransform.</param>
+    public static void SetPlayerTrackingTransform(Transform playerTransform)
+    {
+        if (activeBridge == null || !activeBridge.playerPresentationVisible)
+            return;
+
+        activeBridge.playerTrackingTransform = playerTransform;
+        activeBridge.hasPlayerTrackingStartPosition = playerTransform != null;
+
+        if (playerTransform != null)
+            activeBridge.playerTrackingStartPosition = playerTransform.position;
     }
 
     /// <summary>
@@ -166,7 +201,10 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (!playerPresentationVisible || playerCamera == null || activeBaseCamera == null)
             return;
 
-        SynchronizePlayerCamera(activeBaseCamera, playerCamera);
+        if (hasPlayerCameraSnapshot)
+            playerCameraSnapshot.Apply(playerCamera, ResolvePlayerTrackingOffset());
+        else
+            SynchronizePlayerCamera(activeBaseCamera, playerCamera);
     }
     #endregion
 
@@ -276,7 +314,20 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
             return;
 
         ExcludePlayerLayerFromCameraStack(activeBaseCamera, baseCameraData);
-        SynchronizePlayerCamera(activeBaseCamera, playerCamera);
+
+        // Capture the source gameplay view once. The same pose keeps the persistent player stable while the
+        // base stack temporarily moves through bootstrap fallback and the newly loaded room camera.
+        if (!hasPlayerCameraSnapshot && !GameSceneBootstrapCameraView.IsFallbackCamera(activeBaseCamera))
+        {
+            playerCameraSnapshot = CameraRenderSnapshot.Capture(activeBaseCamera);
+            hasPlayerCameraSnapshot = true;
+        }
+
+        if (hasPlayerCameraSnapshot)
+            playerCameraSnapshot.Apply(playerCamera, ResolvePlayerTrackingOffset());
+        else
+            SynchronizePlayerCamera(activeBaseCamera, playerCamera);
+
         GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, playerCamera);
     }
 
@@ -334,6 +385,18 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         }
 
         originalCameraMasks.Clear();
+    }
+
+    /// <summary>
+    /// Resolves the world-space relocation delta required to preserve the player's source-screen position.
+    /// </summary>
+    /// <returns>Player displacement since transition start, or zero before managed transform tracking is available.</returns>
+    private Vector3 ResolvePlayerTrackingOffset()
+    {
+        if (!hasPlayerTrackingStartPosition || playerTrackingTransform == null)
+            return Vector3.zero;
+
+        return playerTrackingTransform.position - playerTrackingStartPosition;
     }
 
     /// <summary>
@@ -408,5 +471,65 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     }
     #endregion
 
+    #endregion
+
+    #region Types
+    /// <summary>
+    /// Stores the source gameplay view used by the isolated player overlay throughout one room transition.
+    /// </summary>
+    private struct CameraRenderSnapshot
+    {
+        #region Fields
+        private Vector3 position;
+        private Quaternion rotation;
+        private Rect rect;
+        private bool orthographic;
+        private float orthographicSize;
+        private float fieldOfView;
+        private float nearClipPlane;
+        private float farClipPlane;
+        #endregion
+
+        #region Methods
+        /// <summary>
+        /// Captures the pose and projection that frame the player when an intra-level transition starts.
+        /// </summary>
+        /// <param name="source">Source gameplay base camera.</param>
+        /// <returns>Standalone snapshot safe to retain after the source scene unloads.</returns>
+        public static CameraRenderSnapshot Capture(Camera source)
+        {
+            return new CameraRenderSnapshot
+            {
+                position = source.transform.position,
+                rotation = source.transform.rotation,
+                rect = source.rect,
+                orthographic = source.orthographic,
+                orthographicSize = source.orthographicSize,
+                fieldOfView = source.fieldOfView,
+                nearClipPlane = source.nearClipPlane,
+                farClipPlane = source.farClipPlane
+            };
+        }
+
+        /// <summary>
+        /// Applies the captured source view plus player relocation delta without changing the active room camera.
+        /// </summary>
+        /// <param name="destination">Persistent overlay camera rendering isolated player renderers.</param>
+        /// <param name="positionOffset">World-space player displacement used to preserve its source-screen placement.</param>
+        public void Apply(Camera destination, Vector3 positionOffset)
+        {
+            if (destination == null)
+                return;
+
+            destination.transform.SetPositionAndRotation(position + positionOffset, rotation);
+            destination.rect = rect;
+            destination.orthographic = orthographic;
+            destination.orthographicSize = orthographicSize;
+            destination.fieldOfView = fieldOfView;
+            destination.nearClipPlane = nearClipPlane;
+            destination.farClipPlane = farClipPlane;
+        }
+        #endregion
+    }
     #endregion
 }

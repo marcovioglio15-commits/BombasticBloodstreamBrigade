@@ -11,7 +11,7 @@ using UnityEngine;
 public static class GameSceneManagementPlayModeSceneGuard
 {
     #region Constants
-    private const string EnabledPreferenceKey = "NashCore.GameSceneManagement.ForceBootstrapPlayMode.V2";
+    private const string EnabledPreferenceKey = "NashCore.GameSceneManagement.ForceBootstrapPlayMode.V3";
     private const string PendingRestoreKey = "NashCore.GameSceneManagement.PlayModeRestorePending";
     private const string SerializedSetupKey = "NashCore.GameSceneManagement.SerializedPlayModeSceneSetup";
     private const string MenuPath = "Tools/Game/Scene Manager/Force Bootstrap Play Mode";
@@ -84,11 +84,26 @@ public static class GameSceneManagementPlayModeSceneGuard
     /// </summary>
     private static void PrepareBootstrapPlayMode()
     {
+        if (ConsumeBypassRequest())
+            return;
+
         if (!IsEnabled())
             return;
 
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
         {
+            EditorApplication.isPlaying = false;
+            return;
+        }
+
+        // A scene save queues metadata work, but Play Mode can begin before that delayed callback runs.
+        // Complete and persist the generated room snapshot now so runtime bootstrap never reads a stale asset.
+        GameRoomMetadataRefreshReport metadataReport = GameRoomMetadataAutomaticRefreshUtility.RefreshAllStaleReferencedRooms();
+
+        if (!metadataReport.Succeeded)
+        {
+            Debug.LogError("[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural room metadata could not be refreshed: " +
+                           string.Join(" | ", metadataReport.Errors));
             EditorApplication.isPlaying = false;
             return;
         }
@@ -234,8 +249,20 @@ public static class GameSceneManagementPlayModeSceneGuard
     /// <returns>True when Play Mode should open SCN_Bootstrap automatically.</returns>
     private static bool IsEnabled()
     {
-        return EditorPrefs.GetBool(EnabledPreferenceKey, true) &&
-               !SessionState.GetBool(BypassSessionKey, false);
+        return EditorPrefs.GetBool(EnabledPreferenceKey, true);
+    }
+
+    /// <summary>
+    /// Consumes the one-shot bypass requested by automated Play Mode tests without disabling future designer sessions.
+    /// </summary>
+    /// <returns>True when the current Play Mode entry alone should keep its existing scene setup.</returns>
+    private static bool ConsumeBypassRequest()
+    {
+        if (!SessionState.GetBool(BypassSessionKey, false))
+            return false;
+
+        SessionState.SetBool(BypassSessionKey, false);
+        return true;
     }
 
     /// <summary>

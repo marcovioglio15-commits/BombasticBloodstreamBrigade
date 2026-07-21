@@ -152,6 +152,14 @@ public static class EnemySpawnerRuntimeCatalogOwnerSceneImportUtility
                                            collectedSubSceneGuids,
                                            subScenes,
                                            scenesOpenedForScan);
+
+            // The Entities utility requires live SubScene components. Reimport before closing the temporary
+            // parent scenes so Unity never receives component references invalidated by scene teardown.
+            if (subScenes.Count > 0)
+            {
+                DefaultWorldInitialization.DefaultLazyEditModeInitialize();
+                SubSceneInspectorUtility.ForceReimport(subScenes.ToArray());
+            }
         }
         finally
         {
@@ -159,12 +167,6 @@ public static class EnemySpawnerRuntimeCatalogOwnerSceneImportUtility
             for (int sceneIndex = 0; sceneIndex < scenesOpenedForScan.Count; sceneIndex++)
                 EditorSceneManager.CloseScene(scenesOpenedForScan[sceneIndex], true);
         }
-
-        if (subScenes.Count <= 0)
-            return;
-
-        DefaultWorldInitialization.DefaultLazyEditModeInitialize();
-        SubSceneInspectorUtility.ForceReimport(subScenes.ToArray());
     }
 
     /// <summary>

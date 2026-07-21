@@ -8,8 +8,13 @@ using UnityEngine;
 /// </summary>
 public static class GameRoomMetadataAutomaticRefreshUtility
 {
+    #region Constants
+    private const double RefreshDebounceSeconds = 0.5d;
+    #endregion
+
     #region Fields
     private static bool refreshScheduled;
+    private static double refreshNotBeforeTime;
     #endregion
 
     #region Methods
@@ -54,8 +59,16 @@ public static class GameRoomMetadataAutomaticRefreshUtility
             string presetPath = AssetDatabase.GUIDToAssetPath(presetGuids[presetIndex]);
             GameProceduralLevelPreset preset = AssetDatabase.LoadAssetAtPath<GameProceduralLevelPreset>(presetPath);
 
-            if (preset != null)
-                aggregateReport.Merge(RefreshStaleReferencedRooms(preset));
+            if (preset == null)
+                continue;
+
+            GameRoomMetadataRefreshReport presetReport = RefreshStaleReferencedRooms(preset);
+            aggregateReport.Merge(presetReport);
+
+            // Generated metadata must reach disk immediately: DOTS import workers and Play Mode bootstrap do not
+            // reliably consume an unsaved ScriptableObject representation owned by the editor process.
+            if (presetReport.RefreshedRoomCount > 0)
+                AssetDatabase.SaveAssetIfDirty(preset);
         }
 
         MarkDraftDirtyWhenChanged(aggregateReport);
@@ -67,11 +80,17 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     /// </summary>
     public static void ScheduleRefresh()
     {
-        if (refreshScheduled || Application.isBatchMode)
+        if (Application.isBatchMode)
+            return;
+
+        refreshNotBeforeTime = EditorApplication.timeSinceStartup + RefreshDebounceSeconds;
+
+        if (refreshScheduled)
             return;
 
         refreshScheduled = true;
-        EditorApplication.delayCall += ExecuteScheduledRefresh;
+        EditorApplication.update -= ExecuteScheduledRefresh;
+        EditorApplication.update += ExecuteScheduledRefresh;
     }
 
     /// <summary>
@@ -154,13 +173,17 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     /// </summary>
     private static void ExecuteScheduledRefresh()
     {
-        refreshScheduled = false;
+        if (!refreshScheduled || EditorApplication.timeSinceStartup < refreshNotBeforeTime)
+            return;
 
         if (EditorApplication.isCompiling || EditorApplication.isUpdating || EditorApplication.isPlayingOrWillChangePlaymode)
         {
-            ScheduleRefresh();
+            refreshNotBeforeTime = EditorApplication.timeSinceStartup + RefreshDebounceSeconds;
             return;
         }
+
+        refreshScheduled = false;
+        EditorApplication.update -= ExecuteScheduledRefresh;
 
         GameRoomMetadataRefreshReport report = RefreshAllStaleReferencedRooms();
 

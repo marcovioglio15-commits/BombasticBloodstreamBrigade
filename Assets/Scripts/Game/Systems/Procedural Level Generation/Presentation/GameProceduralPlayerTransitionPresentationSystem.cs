@@ -54,7 +54,7 @@ public partial class GameProceduralPlayerTransitionPresentationSystem : SystemBa
     /// </summary>
     protected override void OnDestroy()
     {
-        GameProceduralPlayerTransitionPresentationUtility.End();
+        GameProceduralPlayerTransitionPresentationUtility.EndImmediately();
     }
     #endregion
 

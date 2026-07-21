@@ -14,6 +14,10 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 {
     #region Fields
 
+    #region Static Fields
+    private static Camera activeFallbackCamera;
+    #endregion
+
     #region Serialized Fields
     [Header("References")]
     [Tooltip("Fallback camera used only while the bootstrap scene is the only loaded scene with a renderable camera.")]
@@ -40,6 +44,18 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 
     #region Methods
 
+    #region Public Methods
+    /// <summary>
+    /// Checks whether a camera is the active bootstrap-only render fallback rather than a gameplay follow camera.
+    /// </summary>
+    /// <param name="candidateCamera">Camera candidate resolved by a runtime camera consumer.</param>
+    /// <returns>True when the candidate is owned by the active bootstrap fallback view.</returns>
+    public static bool IsFallbackCamera(Camera candidateCamera)
+    {
+        return candidateCamera != null && candidateCamera == activeFallbackCamera;
+    }
+    #endregion
+
     #region Unity Methods
     /// <summary>
     /// Registers scene callbacks and immediately applies the fallback camera policy.
@@ -47,6 +63,7 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
     private void OnEnable()
     {
         ResolveReferences();
+        activeFallbackCamera = bootstrapCamera;
         ConfigureFallbackCamera();
         SceneManager.activeSceneChanged += HandleActiveSceneChanged;
         SceneManager.sceneLoaded += HandleSceneLoaded;
@@ -62,6 +79,9 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
         SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
         SceneManager.sceneLoaded -= HandleSceneLoaded;
         SceneManager.sceneUnloaded -= HandleSceneUnloaded;
+
+        if (activeFallbackCamera == bootstrapCamera)
+            activeFallbackCamera = null;
     }
     #endregion
 
@@ -115,6 +135,10 @@ public sealed class GameSceneBootstrapCameraView : MonoBehaviour
 #if NASHCORE_FMOD || UNITY_EDITOR
         RefreshFmodListenerState(externalCamera);
 #endif
+
+        // Scene callbacks have no guaranteed listener order. Rebuild transition overlays only after this
+        // fallback state is final so the persistent player always has a base camera between room scenes.
+        GameProceduralTransitionCameraBridge.RefreshStackOrder();
     }
 
     /// <summary>

@@ -29,6 +29,18 @@ public static class GameSceneTransitionGameplayRuntimeCleanupSmokeTest
             DynamicBuffer<LinkedEntityGroup> linkedEntities = entityManager.AddBuffer<LinkedEntityGroup>(projectileRoot);
             linkedEntities.Add(new LinkedEntityGroup { Value = projectileRoot });
             linkedEntities.Add(new LinkedEntityGroup { Value = projectileChild });
+            Entity shooterEntity = entityManager.CreateEntity(typeof(ProjectilePoolState));
+            entityManager.SetComponentData(shooterEntity, new ProjectilePoolState
+            {
+                InitialCapacity = 2,
+                ExpandBatch = 1,
+                Initialized = 1
+            });
+            DynamicBuffer<ProjectilePoolElement> projectilePool = entityManager.AddBuffer<ProjectilePoolElement>(shooterEntity);
+            projectilePool.Add(new ProjectilePoolElement { ProjectileEntity = projectileRoot });
+            projectilePool.Add(new ProjectilePoolElement { ProjectileEntity = standaloneProjectile });
+            DynamicBuffer<ShootRequest> shootRequests = entityManager.AddBuffer<ShootRequest>(shooterEntity);
+            shootRequests.Add(default);
 
             // Exercise the complete runtime cleanup path used before gameplay scene transitions.
             GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
@@ -39,7 +51,14 @@ public static class GameSceneTransitionGameplayRuntimeCleanupSmokeTest
                 entityManager.Exists(standaloneProjectile))
                 throw new Exception("Scene-transition cleanup did not destroy transient linked and standalone projectiles.");
 
-            Debug.Log("[GameSceneTransitionGameplayRuntimeCleanupSmokeTest] All linked cleanup checks passed.");
+            ProjectilePoolState poolState = entityManager.GetComponentData<ProjectilePoolState>(shooterEntity);
+            DynamicBuffer<ProjectilePoolElement> refreshedProjectilePool = entityManager.GetBuffer<ProjectilePoolElement>(shooterEntity);
+            DynamicBuffer<ShootRequest> refreshedShootRequests = entityManager.GetBuffer<ShootRequest>(shooterEntity);
+
+            if (refreshedProjectilePool.Length != 0 || refreshedShootRequests.Length != 0 || poolState.Initialized != 0)
+                throw new Exception("Scene-transition cleanup left stale projectile pool references on a surviving shooter.");
+
+            Debug.Log("[GameSceneTransitionGameplayRuntimeCleanupSmokeTest] Linked cleanup and surviving pool reset checks passed.");
         }
         finally
         {

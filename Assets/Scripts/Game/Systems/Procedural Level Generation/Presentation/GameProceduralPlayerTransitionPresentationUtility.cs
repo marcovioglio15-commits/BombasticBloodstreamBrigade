@@ -14,6 +14,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     private static PlayableGraph animationGraph;
     private static AnimationClipPlayable animationPlayable;
     private static bool active;
+    private static bool endRequested;
     private static bool hasAnimation;
     private static bool loggedMissingAnimator;
     private static float animationDuration;
@@ -30,9 +31,13 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     public static void Begin(EntityManager entityManager, GameProceduralLevelConfig config)
     {
         if (active)
+        {
+            endRequested = false;
             return;
+        }
 
         active = true;
+        endRequested = false;
         GameProceduralTransitionCameraBridge.SetPlayerPresentationVisible(true);
 
         if (!TryResolvePlayerAnimator(entityManager, out Animator animator))
@@ -47,6 +52,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         }
 
         MoveRenderersToTransitionLayer(animator);
+        GameProceduralTransitionCameraBridge.SetPlayerTrackingTransform(animator.transform);
 
         if (config.HasPlayerTransitionAnimation == 0)
             return;
@@ -58,13 +64,28 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     }
 
     /// <summary>
-    /// Restores renderer layers, stops temporary clip playback and disables the player-only overlay.
+    /// Schedules renderer and overlay restoration after one presentation frame, allowing the target gameplay camera
+    /// to render a stable handoff frame before it resumes ownership of the persistent player.
     /// </summary>
     public static void End()
     {
         if (!active && originalRendererLayers.Count == 0 && !animationGraph.IsValid())
             return;
 
+        if (!endRequested)
+        {
+            endRequested = true;
+            return;
+        }
+
+        EndImmediately();
+    }
+
+    /// <summary>
+    /// Restores renderer layers, temporary animation and overlay ownership immediately during world or bridge teardown.
+    /// </summary>
+    public static void EndImmediately()
+    {
         if (animationGraph.IsValid())
             animationGraph.Destroy();
 
@@ -73,6 +94,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         animationDuration = 0f;
         hasAnimation = false;
         active = false;
+        endRequested = false;
         GameProceduralTransitionCameraBridge.SetPlayerPresentationVisible(false);
     }
 

@@ -16,6 +16,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
     {
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
+        ResetProjectilePoolsAfterCleanup(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyExperienceDrop>(entityManager);
@@ -38,6 +39,55 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Clears stale projectile entity references and marks surviving shooter pools for deterministic reinitialization.
+    /// This is required for persistent player shooters after procedural room cleanup destroys their pooled instances.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning surviving shooter state and buffers.</param>
+    private static void ResetProjectilePoolsAfterCleanup(EntityManager entityManager)
+    {
+        EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadWrite<ProjectilePoolState>(),
+                ComponentType.ReadWrite<ProjectilePoolElement>()
+            },
+            Options = EntityQueryOptions.IncludeDisabledEntities
+        });
+        NativeArray<Entity> shooterEntities = default;
+
+        try
+        {
+            shooterEntities = query.ToEntityArray(Allocator.Temp);
+
+            // Reset buffers only after projectile destruction has completed, avoiding invalid aliases across structural changes.
+            for (int shooterIndex = 0; shooterIndex < shooterEntities.Length; shooterIndex++)
+            {
+                Entity shooterEntity = shooterEntities[shooterIndex];
+
+                if (!entityManager.Exists(shooterEntity))
+                    continue;
+
+                entityManager.GetBuffer<ProjectilePoolElement>(shooterEntity).Clear();
+
+                if (entityManager.HasBuffer<ShootRequest>(shooterEntity))
+                    entityManager.GetBuffer<ShootRequest>(shooterEntity).Clear();
+
+                ProjectilePoolState poolState = entityManager.GetComponentData<ProjectilePoolState>(shooterEntity);
+                poolState.Initialized = 0;
+                entityManager.SetComponentData(shooterEntity, poolState);
+            }
+        }
+        finally
+        {
+            if (shooterEntities.IsCreated)
+                shooterEntities.Dispose();
+
+            query.Dispose();
+        }
+    }
+
     /// <summary>
     /// Destroys every entity with a runtime marker component, excluding prefab entities.
     /// </summary>

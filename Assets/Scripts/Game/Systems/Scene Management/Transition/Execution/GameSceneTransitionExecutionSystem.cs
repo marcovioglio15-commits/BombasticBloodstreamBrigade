@@ -165,6 +165,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             return false;
 
         bool isRestart = request.RequestType == GameSceneTransitionRequestType.RestartActiveScene;
+        bool reloadPersistentPlayer = isRestart || request.ReloadPersistentPlayer != 0;
 
         if (!isRestart &&
             transitionState.ActiveSceneId.Equals(resolvedTarget.SceneId) &&
@@ -183,11 +184,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         reloadActiveScene = isRestart || sourceSceneId.Equals(targetSceneId);
         activePurpose = request.Purpose;
         unloadSourceBeforeLoad = reloadActiveScene || GameSceneTransitionPurposeUtility.IsProcedural(activePurpose);
-        reloadTargetCompanion = isRestart;
+        reloadTargetCompanion = reloadPersistentPlayer;
         ResetOperationProgress();
         GameScenePersistentPlayerSceneUtility.CollectOperations(scenes,
                                                                 targetScene,
-                                                                isRestart && GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene),
+                                                                reloadPersistentPlayer && GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene),
                                                                 persistentPlayerPreLoadUnloadScenes,
                                                                 persistentPlayerLoadScenes,
                                                                 persistentPlayerPostLoadUnloadScenes);

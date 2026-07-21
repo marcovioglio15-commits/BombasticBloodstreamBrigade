@@ -589,10 +589,13 @@ public sealed class GameplayMenuController : MonoBehaviour
 
     #region Scene Flow
     /// <summary>
-    /// Requests an ECS Scene Manager restart for the active gameplay scene.
+    /// Restarts the active procedural run when available, otherwise requests a legacy active-scene restart.
     /// </summary>
     private void ReloadActiveScene()
     {
+        if (GameProceduralLevelRunRequestUtility.TryRestartActiveRun())
+            return;
+
         if (GameSceneTransitionRequestUtility.EnqueueRestartActiveScene())
             return;
 

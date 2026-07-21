@@ -152,6 +152,9 @@ internal static class PlayerRuntimeCameraUtility
         if (!camera.isActiveAndEnabled)
             return false;
 
+        if (GameSceneBootstrapCameraView.IsFallbackCamera(camera))
+            return false;
+
         UniversalAdditionalCameraData cameraData = camera.GetComponent<UniversalAdditionalCameraData>();
 
         if (cameraData == null)
