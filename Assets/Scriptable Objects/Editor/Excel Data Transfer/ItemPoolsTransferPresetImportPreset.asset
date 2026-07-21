@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1428006f80f34c64d9a913aa423375c3, type: 3}
+  m_Name: ItemPoolsTransferPresetImportPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataImportPreset
+  presetId: c816367d8dfb4e969a39e3201fd1da59
+  presetName: Item Pools Transfer Import
+  sourceWorkbookProfile: 4
+  sourceWorkbookPath: Logs/Excel Data Transfer Test Workbooks/ItemPools.xlsx
+  conflictPolicy: 2
+  missingRowPolicy: 0
+  referenceResolutionMode: 1
+  formulaImportPolicy: 0
+  blockPotentiallyStaleFormulaCaches: 1
+  requirePreviewBeforeApply: 1
+  blockAmbiguousReferences: 1
+  scalingRuleImportPolicy: 0
+  includePlayerData: 1
+  includeEnemyData: 0
+  includeGameData: 0
+  includeWaveData: 0
+  includeConcreteListElements: 1
