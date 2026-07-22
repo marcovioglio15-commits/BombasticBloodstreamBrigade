@@ -146,7 +146,9 @@ public static class GameProceduralLevelSolver
                                                                   tile.PreferredDepthRange,
                                                                   tile.BaseSelectionWeight,
                                                                   metadata.CenterAnchorCount,
-                                                                  portalInputs));
+                                                                  portalInputs,
+                                                                  tile.UseExactDepthConstraint,
+                                                                  tile.ExactDepth));
         }
 
         GameProceduralLevelGenerationSettings generationSettings = preset.GenerationSettings;
@@ -258,11 +260,16 @@ public static class GameProceduralLevelSolver
                 string.IsNullOrWhiteSpace(tile.TechnicalId) ||
                 string.IsNullOrWhiteSpace(tile.SceneId) ||
                 tile.MaximumCopies <= 0 ||
+                tile.PreferredDepthRange.x < 0 ||
+                tile.PreferredDepthRange.y < tile.PreferredDepthRange.x ||
+                tile.UseExactDepthConstraint && (tile.ExactDepth < 0 || tile.ExactDepth > input.MaximumDepth) ||
+                tile.Role == GameProceduralRoomRole.Start && tile.UseExactDepthConstraint && tile.ExactDepth != 0 ||
+                tile.Role != GameProceduralRoomRole.Start && tile.UseExactDepthConstraint && tile.ExactDepth < 1 ||
                 tile.BaseSelectionWeight <= 0f ||
                 float.IsNaN(tile.BaseSelectionWeight) ||
                 float.IsInfinity(tile.BaseSelectionWeight))
             {
-                diagnostic = "Every solver tile requires identity, scene, positive copy budget and a finite positive base weight.";
+                diagnostic = "Every solver tile requires identity, scene, valid preferred or exact depth data, positive copy budget and a finite positive base weight.";
                 return false;
             }
 

@@ -44,6 +44,8 @@ internal static class GameProceduralLevelTileValidationUtility
                        context,
                        "Preferred Depth Range must be ordered and non-negative.");
 
+        ValidateExactDepth(preset, tile, context, report);
+
         if (float.IsNaN(tile.BaseSelectionWeight) ||
             float.IsInfinity(tile.BaseSelectionWeight) ||
             tile.BaseSelectionWeight <= 0f)
@@ -115,6 +117,57 @@ internal static class GameProceduralLevelTileValidationUtility
     #endregion
 
     #region Tile Methods
+    /// <summary>
+    /// Validates the optional hard depth constraint without rewriting the authored depth or preferred scoring range.
+    /// </summary>
+    /// <param name="preset">Owning preset supplying the global technical depth limit.</param>
+    /// <param name="tile">Tile whose exact placement constraint is inspected.</param>
+    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="report">Destination validation report.</param>
+    private static void ValidateExactDepth(GameProceduralLevelPreset preset,
+                                           GameProceduralRoomTileDefinition tile,
+                                           string context,
+                                           GameProceduralLevelValidationReport report)
+    {
+        if (!tile.UseExactDepthConstraint)
+            return;
+
+        if (tile.ExactDepth < 0)
+        {
+            report.Add(GameProceduralLevelValidationCode.InvalidExactDepth,
+                       GameProceduralLevelValidationSeverity.Error,
+                       context,
+                       "Exact Depth must be non-negative when the hard constraint is enabled.");
+            return;
+        }
+
+        GameProceduralLevelGenerationSettings generationSettings = preset != null ? preset.GenerationSettings : null;
+
+        if (generationSettings != null && tile.ExactDepth > generationSettings.MaximumDepth)
+            report.Add(GameProceduralLevelValidationCode.ExactDepthExceedsLimit,
+                       GameProceduralLevelValidationSeverity.Error,
+                       context,
+                       "Exact Depth exceeds the global Maximum Depth and can never produce a node.");
+
+        if (tile.Role == GameProceduralRoomRole.Start && tile.ExactDepth != 0)
+            report.Add(GameProceduralLevelValidationCode.StartExactDepthMismatch,
+                       GameProceduralLevelValidationSeverity.Error,
+                       context,
+                       "The Start tile is structurally fixed at depth zero, so its Exact Depth must also be zero.");
+
+        if (tile.Role != GameProceduralRoomRole.Start && tile.ExactDepth < 1)
+            report.Add(GameProceduralLevelValidationCode.NonStartExactDepthMismatch,
+                       GameProceduralLevelValidationSeverity.Error,
+                       context,
+                       "Regular and Boss tiles cannot occupy the Start node at depth zero, so their Exact Depth must be at least one.");
+
+        if (tile.ExactDepth < tile.PreferredDepthRange.x || tile.ExactDepth > tile.PreferredDepthRange.y)
+            report.Add(GameProceduralLevelValidationCode.ExactDepthOutsidePreferredRange,
+                       GameProceduralLevelValidationSeverity.Warning,
+                       context,
+                       "Exact Depth lies outside Preferred Depth Range. The hard constraint wins, so the preferred range is ignored while enabled.");
+    }
+
     /// <summary>
     /// Validates tile IDs stored in fixed runtime buffers and uniqueness within the level.
     /// </summary>

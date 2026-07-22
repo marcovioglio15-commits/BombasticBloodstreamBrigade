@@ -39,10 +39,14 @@ public static class GameProceduralLevelBakeSmokeTest
             ValidateLevelRanges(levels, tiles);
             ValidateMetadataRanges(metadata, portals);
             ValidateTileMetadataIndices(tiles);
+            ValidateTileDepthConstraints(tiles);
 
             GameProceduralLevelConfig config = GameProceduralLevelBakeUtility.BuildConfig(preset);
             Require(config.PresetId.ToString() == "PRESET_BAKE_SMOKE",
                     "The baked global config did not preserve the preset ID.");
+            Require(config.HideLoadingProgressDuringRoomTransitions != 0,
+                    "The baked global config did not preserve room-transition loading suppression.");
+            ValidateTransactionalStreamingConfig(config);
             ValidateFixedStringBakeGuards(preset,
                                           levels,
                                           tiles,
@@ -72,6 +76,18 @@ public static class GameProceduralLevelBakeSmokeTest
         SerializedObject serializedPreset = new SerializedObject(preset);
         serializedPreset.Update();
         SetString(serializedPreset, "presetId", "PRESET_BAKE_SMOKE");
+        SerializedProperty transitionSettings = RequireProperty(serializedPreset, "transitionSettings");
+        SetEnum(transitionSettings,
+                "roomStreamingMode",
+                (int)GameProceduralRoomStreamingMode.TransactionalDualSlot);
+        SetEnum(transitionSettings,
+                "adjacentPreloadPolicy",
+                (int)GameProceduralAdjacentPreloadPolicy.AllOutgoingUpToBudget);
+        SetInteger(transitionSettings, "maximumStagedRooms", 3);
+        SetBoolean(transitionSettings, "requireReadyBeforePortalCommit", true);
+        SetInteger(transitionSettings, "retiredRoomBudget", 1);
+        SetFloat(transitionSettings, "retirementWorkBudgetMilliseconds", 1.5f);
+        SetBoolean(transitionSettings, "hideLoadingProgressDuringRoomTransitions", true);
 
         SerializedProperty levels = RequireProperty(serializedPreset, "levels");
         levels.arraySize = 2;
@@ -135,6 +151,8 @@ public static class GameProceduralLevelBakeSmokeTest
         SetEnum(tile, "role", (int)role);
         SetInteger(tile, "maximumCopies", 2);
         SetVector2Int(tile, "preferredDepthRange", new Vector2Int(0, 4));
+        SetBoolean(tile, "useExactDepthConstraint", role != GameProceduralRoomRole.Start);
+        SetInteger(tile, "exactDepth", role == GameProceduralRoomRole.Regular ? 2 : 3);
         SetFloat(tile, "baseSelectionWeight", 1f);
     }
 
@@ -261,6 +279,40 @@ public static class GameProceduralLevelBakeSmokeTest
                 "Tiles sharing SCN_ROOM_A did not share metadata index zero.");
         Require(tiles[2].MetadataIndex == 1,
                 "SCN_ROOM_B did not resolve metadata index one.");
+    }
+
+    /// <summary>
+    /// Verifies optional hard depth constraints survive flattening without changing unconstrained Start authoring.
+    /// </summary>
+    /// <param name="tiles">Baked flattened room tile buffer.</param>
+    private static void ValidateTileDepthConstraints(DynamicBuffer<GameProceduralRoomTileElement> tiles)
+    {
+        Require(tiles[0].UseExactDepthConstraint == 0,
+                "The unconstrained Start tile gained a hard depth constraint during baking.");
+        Require(tiles[1].UseExactDepthConstraint != 0 && tiles[1].ExactDepth == 2,
+                "The Regular tile did not preserve its authored Exact Depth.");
+        Require(tiles[2].UseExactDepthConstraint != 0 && tiles[2].ExactDepth == 3,
+                "The Boss tile did not preserve its authored Exact Depth.");
+    }
+
+    /// <summary>
+    /// Verifies the complete transactional preload and deferred-retirement policy survives the authoring-to-ECS bake path.
+    /// </summary>
+    /// <param name="config">Baked procedural runtime configuration.</param>
+    private static void ValidateTransactionalStreamingConfig(GameProceduralLevelConfig config)
+    {
+        Require(config.RoomStreamingMode == GameProceduralRoomStreamingMode.TransactionalDualSlot,
+                "The baked config did not preserve transactional dual-slot streaming.");
+        Require(config.AdjacentPreloadPolicy == GameProceduralAdjacentPreloadPolicy.AllOutgoingUpToBudget,
+                "The baked config did not preserve the outgoing-room preload policy.");
+        Require(config.MaximumStagedRooms == 3,
+                "The baked config did not preserve the staged-room budget.");
+        Require(config.RequireReadyBeforePortalCommit != 0,
+                "The baked config did not preserve the portal readiness gate.");
+        Require(config.RetiredRoomBudget == 1,
+                "The baked config did not preserve the retired-room budget.");
+        Require(Mathf.Approximately(config.RetirementWorkBudgetMilliseconds, 1.5f),
+                "The baked config did not preserve the retirement work budget.");
     }
 
     /// <summary>

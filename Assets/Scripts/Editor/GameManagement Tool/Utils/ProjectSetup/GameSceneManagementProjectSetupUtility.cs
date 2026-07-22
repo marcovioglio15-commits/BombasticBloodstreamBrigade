@@ -34,7 +34,6 @@ public static class GameSceneManagementProjectSetupUtility
     private const string FadeCanvasObjectName = "Canvas_SceneTransitionFade";
     private const string FadeSurfaceObjectName = "FadeSurface";
     private const int FadeSortingOrder = 32767;
-    private const float BootstrapFallbackCameraDepth = -1000f;
 
     private static readonly GameSceneDefinitionSetup[] DefaultSceneDefinitions =
     {
@@ -89,17 +88,35 @@ public static class GameSceneManagementProjectSetupUtility
         GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
         GameHudManagerPreset hudPreset = EnsureHudManagerPreset();
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
-        GameProceduralLevelPreset proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsureDefaultPreset(scenePreset);
+        GameMasterPreset existingMasterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
+        GameProceduralLevelPreset proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsurePreset(existingMasterPreset != null
+                                                                                                                ? existingMasterPreset.ProceduralLevelPreset
+                                                                                                                : null,
+                                                                                                            scenePreset);
         GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset, proceduralLevelPreset);
+        EnsureBootstrapScene(masterPreset, scenePreset);
         GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
+        scenePreset = EnsureSceneManagerPreset();
+        GameScenePersistentGameplayCameraSetupUtility.Apply(scenePreset, false);
+        scenePreset = EnsureSceneManagerPreset();
+        masterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
+        proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsurePreset(masterPreset != null
+                                                                                       ? masterPreset.ProceduralLevelPreset
+                                                                                       : null,
+                                                                                   scenePreset);
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        GameRoomMetadataRefreshReport metadataRefreshReport = GameRoomMetadataScannerUtility.RefreshReferencedRooms(proceduralLevelPreset);
+
+        if (!metadataRefreshReport.Succeeded)
+            throw new InvalidOperationException("Persistent camera migration could not refresh room metadata: " +
+                                                string.Join("; ", metadataRefreshReport.Errors));
+
         SynchronizeSceneManagerPreset(scenePreset);
         ApplyDefaultBuildSettings();
         SynchronizeSceneManagerPreset(scenePreset);
         GameSceneAddressablesEditorUtility.EnsureSceneEntries(scenePreset);
         AssetDatabase.SaveAssets();
-        EnsureBootstrapScene(masterPreset, scenePreset);
-
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
@@ -453,38 +470,12 @@ public static class GameSceneManagementProjectSetupUtility
     }
 
     /// <summary>
-    /// Ensures the bootstrap scene has one camera for standalone play-mode visibility.
+    /// Ensures the bootstrap scene has one persistent gameplay camera owner or a migration-ready placeholder.
     /// </summary>
     /// <param name="scene">Bootstrap scene being configured.</param>
     private static void EnsureBootstrapCamera(Scene scene)
     {
-        Camera camera = FindFirstComponentInScene<Camera>(scene);
-
-        if (camera == null)
-        {
-            GameObject cameraObject = new GameObject("Bootstrap Fallback Camera", typeof(Camera), typeof(AudioListener));
-            cameraObject.transform.position = new Vector3(0f, 1f, -10f);
-            SceneManager.MoveGameObjectToScene(cameraObject, scene);
-            camera = cameraObject.GetComponent<Camera>();
-        }
-
-        AudioListener audioListener = EnsureComponent<AudioListener>(camera.gameObject);
-        GameSceneBootstrapCameraView bootstrapCameraView = EnsureComponent<GameSceneBootstrapCameraView>(camera.gameObject);
-
-        camera.gameObject.name = "Bootstrap Fallback Camera";
-        camera.gameObject.tag = "Untagged";
-        camera.depth = BootstrapFallbackCameraDepth;
-
-        SerializedObject serializedView = new SerializedObject(bootstrapCameraView);
-        serializedView.Update();
-        SetObjectReference(serializedView, "bootstrapCamera", camera);
-        SetObjectReference(serializedView, "bootstrapAudioListener", audioListener);
-        SetBool(serializedView, "disableWhenManagedCameraExists", true);
-        SetFloat(serializedView, "fallbackCameraDepth", BootstrapFallbackCameraDepth);
-        serializedView.ApplyModifiedPropertiesWithoutUndo();
-        EditorUtility.SetDirty(camera);
-        EditorUtility.SetDirty(audioListener);
-        EditorUtility.SetDirty(bootstrapCameraView);
+        GameScenePersistentGameplayCameraSetupUtility.EnsureBootstrapPlaceholder(scene);
     }
 
     /// <summary>

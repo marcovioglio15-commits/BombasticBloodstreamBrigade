@@ -60,11 +60,10 @@ public partial struct EnemyGroundIndicatorSyncSystem : ISystem
         PhysicsWorldSingleton physicsWorldSingleton = default;
         bool hasPhysicsWorld = SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out physicsWorldSingleton);
 
-        // Skip ground projection while a scene transition is active so the indicators never cast against a
-        // physics world whose collider blob assets are being released by the unloading gameplay subscene.
-        bool sceneTransitionActive = SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
-                                     transitionState.IsTransitioning != 0;
-        bool canProjectOntoGround = hasPhysicsWorld && !sceneTransitionActive;
+        // Scene replacement protects released collider blobs, while transactional room traversal retains continuous
+        // projection against the live dual-slot physics world.
+        bool canProjectOntoGround = hasPhysicsWorld &&
+                                    !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
         // Exclude the Walls layer so indicators project onto the floor only, never onto adjacent wall colliders.
         uint groundProbeMask = GroundShadowProjectionUtility.ResolveGroundProbeMask((uint)WorldWallCollisionUtility.ResolveWallsLayerMask());
         ResolveMainCameraTransform(elapsedTime);

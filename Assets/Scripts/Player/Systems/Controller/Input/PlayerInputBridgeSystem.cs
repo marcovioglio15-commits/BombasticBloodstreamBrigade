@@ -9,11 +9,29 @@ using UnityEngine.InputSystem;
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 public partial struct PlayerInputBridgeSystem : ISystem
 {
+    #region Constants
+    private const float pointerRearmDistanceSquared = 4f;
+    #endregion
+
+    #region Fields
+    private bool suppressPointerUntilMoved;
+    private bool suppressPowerUpPrimaryUntilReleased;
+    private bool suppressPowerUpSecondaryUntilReleased;
+    private bool suppressShootUntilReleased;
+    private bool suppressSwapUntilReleased;
+    private bool transitionHadMotionLock;
+    private bool wasLiveTransitionMotion;
+    private bool wasSceneTransitioning;
+    private float2 pointerRearmPosition;
+    #endregion
+
     #if UNITY_EDITOR
     #region Editor Debug
     private static bool loggedInput;
     #endregion
     #endif
+
+    #region Methods
 
     #region Lifecycle
     /// <summary>
@@ -24,6 +42,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     {
         state.RequireForUpdate<PlayerInputState>();
     }
+    #endregion
     
     #region Update
     /// <summary>
@@ -47,11 +66,18 @@ public partial struct PlayerInputBridgeSystem : ISystem
         bool moveUsesAnalogSource = false;
         bool lookUsesAnalogSource = false;
         bool isInputReady = PlayerInputRuntime.IsReady;
-        bool isGameplayPaused = PlayerGameplayPauseUtility.IsHardGameplayPauseActive();
+        GameSceneTransitionRuntimeGuardUtility.ResolveDefaultWorldPlayerPolicy(out bool isSceneTransitioning,
+                                                                               out bool transitionBlocksGameplay,
+                                                                               out bool allowsLiveTransitionMotion,
+                                                                               out bool requiresStableMotionRelease);
+        bool isGameplayPaused = PlayerGameplayPauseUtility.IsTimeScaleHardPaused() || transitionBlocksGameplay;
+        bool suppressLoadFrameMotion = requiresStableMotionRelease && !wasLiveTransitionMotion;
         bool useMousePointerLook = PlayerInputRuntime.ShouldUseMousePointerLook();
         ComponentLookup<PlayerRunOutcomeState> runOutcomeLookup = SystemAPI.GetComponentLookup<PlayerRunOutcomeState>(true);
 
-        if (isInputReady && !isGameplayPaused)
+        // Sample only the current control state. Ready procedural FadeIn and spatially aligned traversal consume live
+        // movement and look without retaining deltas, while the transition gate discards all discrete actions.
+        if (isInputReady && (!isGameplayPaused || isSceneTransitioning))
         {
             if (moveAction != null)
             {
@@ -94,6 +120,14 @@ public partial struct PlayerInputBridgeSystem : ISystem
             }
         }
 
+        bool pointerLookBlocked = ApplyTransitionRearmGate(isSceneTransitioning,
+                                                           allowsLiveTransitionMotion,
+                                                           useMousePointerLook,
+                                                           ref shoot,
+                                                           ref powerUpPrimary,
+                                                           ref powerUpSecondary,
+                                                           ref swapPowerUpSlots);
+
         bool assignedLocalInput = false;
 
         // Single local input source by design: only the first matching player receives live input.
@@ -110,14 +144,14 @@ public partial struct PlayerInputBridgeSystem : ISystem
             {
                 if (isFinalized)
                 {
-                    ResetInputState(ref inputState.ValueRW);
+                    ResetInputState(ref inputState.ValueRW, false);
                     assignedLocalInput = true;
                     continue;
                 }
 
-                if (isGameplayPaused)
+                if (isGameplayPaused && (!allowsLiveTransitionMotion || suppressLoadFrameMotion))
                 {
-                    ResetInputState(ref inputState.ValueRW);
+                    ResetInputState(ref inputState.ValueRW, isSceneTransitioning || pointerLookBlocked);
                     assignedLocalInput = true;
                     continue;
                 }
@@ -127,6 +161,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                                 look,
                                 moveUsesAnalogSource,
                                 lookUsesAnalogSource,
+                                pointerLookBlocked,
                                 shoot,
                                 powerUpPrimary,
                                 powerUpSecondary,
@@ -135,7 +170,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                 continue;
             }
 
-            ResetInputState(ref inputState.ValueRW);
+            ResetInputState(ref inputState.ValueRW, false);
         }
 
         #if UNITY_EDITOR
@@ -149,18 +184,157 @@ public partial struct PlayerInputBridgeSystem : ISystem
     }
     #endregion
 
-    #region Helpers
+    #region Transition Gate
+    /// <summary>
+    /// Discards discrete gameplay actions throughout scene transitions and requires held buttons to release before
+    /// rearming. Continuous move and controller-look vectors resume from their current sample without buffered deltas.
+    /// </summary>
+    /// <param name="isSceneTransitioning">True while scene management owns the gameplay gate.</param>
+    /// <param name="allowsLiveTransitionMotion">True when a stable target can consume current movement and look samples.</param>
+    /// <param name="useMousePointerLook">True when the current input context resolves look from the mouse pointer.</param>
+    /// <param name="shoot">Mutable sampled shooting state.</param>
+    /// <param name="powerUpPrimary">Mutable sampled primary power-up state.</param>
+    /// <param name="powerUpSecondary">Mutable sampled secondary power-up state.</param>
+    /// <param name="swapPowerUpSlots">Mutable sampled slot-swap state.</param>
+    /// <returns>True while mouse-pointer look must preserve the arrival-facing direction.</returns>
+    private bool ApplyTransitionRearmGate(bool isSceneTransitioning,
+                                          bool allowsLiveTransitionMotion,
+                                          bool useMousePointerLook,
+                                          ref float shoot,
+                                          ref float powerUpPrimary,
+                                          ref float powerUpSecondary,
+                                          ref float swapPowerUpSlots)
+    {
+        if (isSceneTransitioning)
+        {
+            wasSceneTransitioning = true;
+
+            if (allowsLiveTransitionMotion)
+            {
+                if (transitionHadMotionLock && !wasLiveTransitionMotion && useMousePointerLook)
+                {
+                    suppressPointerUntilMoved = true;
+                    pointerRearmPosition = ResolvePointerPosition();
+                }
+
+                // Consume motion directly every frame, while discrete actions remain blocked and can only rearm after release.
+                suppressShootUntilReleased |= shoot > 0f;
+                suppressPowerUpPrimaryUntilReleased |= powerUpPrimary > 0f;
+                suppressPowerUpSecondaryUntilReleased |= powerUpSecondary > 0f;
+                suppressSwapUntilReleased |= swapPowerUpSlots > 0f;
+                shoot = 0f;
+                powerUpPrimary = 0f;
+                powerUpSecondary = 0f;
+                swapPowerUpSlots = 0f;
+                wasLiveTransitionMotion = true;
+                return UpdatePointerRearmGate(useMousePointerLook);
+            }
+
+            transitionHadMotionLock = true;
+            wasLiveTransitionMotion = false;
+            suppressPointerUntilMoved = useMousePointerLook;
+            return useMousePointerLook;
+        }
+
+        // Arm only edge-triggered actions from the controls physically held on the first released frame. Continuous
+        // vectors use the current sample immediately and therefore cannot release historical input as a burst.
+        if (wasSceneTransitioning)
+        {
+            suppressShootUntilReleased = shoot > 0f;
+            suppressPowerUpPrimaryUntilReleased = powerUpPrimary > 0f;
+            suppressPowerUpSecondaryUntilReleased = powerUpSecondary > 0f;
+            suppressSwapUntilReleased = swapPowerUpSlots > 0f;
+
+            if (transitionHadMotionLock && !wasLiveTransitionMotion && useMousePointerLook)
+            {
+                suppressPointerUntilMoved = true;
+                pointerRearmPosition = ResolvePointerPosition();
+            }
+
+            transitionHadMotionLock = false;
+            wasLiveTransitionMotion = false;
+            wasSceneTransitioning = false;
+        }
+
+        FilterButtonUntilReleased(ref suppressShootUntilReleased, ref shoot);
+        FilterButtonUntilReleased(ref suppressPowerUpPrimaryUntilReleased, ref powerUpPrimary);
+        FilterButtonUntilReleased(ref suppressPowerUpSecondaryUntilReleased, ref powerUpSecondary);
+        FilterButtonUntilReleased(ref suppressSwapUntilReleased, ref swapPowerUpSlots);
+
+        return UpdatePointerRearmGate(useMousePointerLook);
+    }
+
+    /// <summary>
+    /// Keeps absolute pointer look neutral until the mouse moves after the destructive transition lock. Unlike stick
+    /// vectors, an absolute pointer position would otherwise reinterpret movement performed while no target existed.
+    /// </summary>
+    /// <param name="useMousePointerLook">True when mouse screen position owns facing.</param>
+    /// <returns>True while pointer-facing must remain on the authored arrival direction.</returns>
+    private bool UpdatePointerRearmGate(bool useMousePointerLook)
+    {
+        if (!useMousePointerLook)
+        {
+            suppressPointerUntilMoved = false;
+            return false;
+        }
+
+        if (!suppressPointerUntilMoved)
+            return false;
+
+        if (math.lengthsq(ResolvePointerPosition() - pointerRearmPosition) < pointerRearmDistanceSquared)
+            return true;
+
+        suppressPointerUntilMoved = false;
+        return false;
+    }
+
+    /// <summary>
+    /// Holds one sampled button at zero until the physical action is released.
+    /// </summary>
+    /// <param name="suppressed">Mutable release-to-rearm latch for the button channel.</param>
+    /// <param name="value">Mutable sampled button value.</param>
+    private static void FilterButtonUntilReleased(ref bool suppressed, ref float value)
+    {
+        if (!suppressed)
+            return;
+
+        if (value <= 0f)
+        {
+            suppressed = false;
+            return;
+        }
+
+        value = 0f;
+    }
+
+    /// <summary>
+    /// Reads the current mouse position for post-transition pointer rearming without retaining event history.
+    /// </summary>
+    /// <returns>Current mouse position, or zero when no mouse is connected.</returns>
+    private static float2 ResolvePointerPosition()
+    {
+        if (Mouse.current == null)
+            return float2.zero;
+
+        Vector2 position = Mouse.current.position.ReadValue();
+        return new float2(position.x, position.y);
+    }
+    #endregion
+
+    #region State Writes
     /// <summary>
     /// Clears all input channels and their source metadata for players that should not consume local input this frame.
     /// </summary>
     /// <param name="inputState">Mutable ECS input state stored on one player entity.</param>
-    private static void ResetInputState(ref PlayerInputState inputState)
+    /// <param name="pointerLookBlocked">True when mouse-pointer facing must remain locked after the reset.</param>
+    private static void ResetInputState(ref PlayerInputState inputState, bool pointerLookBlocked)
     {
         WriteInputState(ref inputState,
                         float2.zero,
                         float2.zero,
                         false,
                         false,
+                        pointerLookBlocked,
                         0f,
                         0f,
                         0f,
@@ -175,6 +349,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     /// <param name="look">Resolved controller look vector for this frame.</param>
     /// <param name="moveUsesAnalogSource">True when movement came from an analog stick-like source.</param>
     /// <param name="lookUsesAnalogSource">True when look came from an analog stick-like source.</param>
+    /// <param name="pointerLookBlocked">True while mouse-pointer look awaits a fresh post-transition movement.</param>
     /// <param name="shoot">Resolved shooting trigger value.</param>
     /// <param name="powerUpPrimary">Resolved primary active-tool trigger value.</param>
     /// <param name="powerUpSecondary">Resolved secondary active-tool trigger value.</param>
@@ -184,6 +359,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                                         float2 look,
                                         bool moveUsesAnalogSource,
                                         bool lookUsesAnalogSource,
+                                        bool pointerLookBlocked,
                                         float shoot,
                                         float powerUpPrimary,
                                         float powerUpSecondary,
@@ -193,12 +369,14 @@ public partial struct PlayerInputBridgeSystem : ISystem
         inputState.Look = look;
         inputState.MoveUsesAnalogSource = moveUsesAnalogSource ? (byte)1 : (byte)0;
         inputState.LookUsesAnalogSource = lookUsesAnalogSource ? (byte)1 : (byte)0;
+        inputState.PointerLookBlocked = pointerLookBlocked ? (byte)1 : (byte)0;
         inputState.Shoot = shoot;
         inputState.PowerUpPrimary = powerUpPrimary;
         inputState.PowerUpSecondary = powerUpSecondary;
         inputState.SwapPowerUpSlots = swapPowerUpSlots;
     }
     #endregion
+
     #endregion
 
 }

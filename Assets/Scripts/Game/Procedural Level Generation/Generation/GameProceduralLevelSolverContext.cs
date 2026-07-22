@@ -147,8 +147,25 @@ internal sealed class GameProceduralLevelSolverContext
         int finalNodeCount = nodes.Count + 1;
         bool nodeCountAccepted = finalNodeCount >= input.TargetNodeCountRange.x &&
                                  finalNodeCount <= input.TargetNodeCountRange.y;
-        bool mustClose = finalNodeCount == input.TargetNodeCountRange.y || bossDepth >= input.MaximumDepth;
+        bool exactBossDepthReached = bossTile.UseExactDepthConstraint && bossDepth == bossTile.ExactDepth;
+        bool mustClose = finalNodeCount == input.TargetNodeCountRange.y ||
+                         bossDepth >= input.MaximumDepth ||
+                         exactBossDepthReached;
         bool reachedSoftTargets = finalNodeCount >= targetNodeCount && bossDepth >= targetBossDepth;
+
+        if (bossTile.UseExactDepthConstraint && bossDepth > bossTile.ExactDepth)
+        {
+            SetFailure(GameProceduralLevelGenerationFailureCode.NoBossRoomCandidate,
+                       "The frontier advanced beyond the Boss tile's exact depth constraint.");
+            return false;
+        }
+
+        if (exactBossDepthReached && !nodeCountAccepted)
+        {
+            SetFailure(GameProceduralLevelGenerationFailureCode.NodeBudgetExceeded,
+                       "The Boss exact depth was reached before the authored target node count could be satisfied.");
+            return false;
+        }
 
         // Prefer the authored soft targets, while technical limits can force an earlier valid convergence attempt.
         if (nodeCountAccepted && (reachedSoftTargets || mustClose))
@@ -289,7 +306,7 @@ internal sealed class GameProceduralLevelSolverContext
     /// <returns>True when every branch can converge through unique Boss entrances when fitting is active.</returns>
     private bool TryAttachBoss(List<int> frontier, int bossDepth)
     {
-        if (!CanUseTile(bossTile))
+        if (!CanUseTileAtDepth(bossTile, bossDepth))
         {
             SetFailure(GameProceduralLevelGenerationFailureCode.NoBossRoomCandidate,
                        "The Boss tile copy budget is exhausted.");
@@ -587,12 +604,16 @@ internal sealed class GameProceduralLevelSolverContext
 
     #region Helper Methods
     /// <summary>
-    /// Checks whether another logical node may use one tile without exceeding its maximum copies.
+    /// Checks whether another logical node may use one tile at the requested depth without exceeding its maximum copies.
     /// </summary>
     /// <param name="tile">Reusable tile to inspect.</param>
-    /// <returns>True when copy capacity remains.</returns>
-    private bool CanUseTile(GameProceduralRoomTileSolverInput tile)
+    /// <param name="depth">Candidate graph depth.</param>
+    /// <returns>True when the hard depth constraint matches and copy capacity remains.</returns>
+    private bool CanUseTileAtDepth(GameProceduralRoomTileSolverInput tile, int depth)
     {
+        if (tile.UseExactDepthConstraint && tile.ExactDepth != depth)
+            return false;
+
         return !copyCounts.TryGetValue(tile.TechnicalId, out int count) || count < tile.MaximumCopies;
     }
 

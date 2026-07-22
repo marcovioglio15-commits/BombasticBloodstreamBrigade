@@ -11,17 +11,40 @@ using UnityEngine;
 public partial struct PlayerCameraFollowSystem : ISystem
 {
     #region Fields
+
+    #region Static Fields
+    private static int traversalOverrideCameraInstanceId;
+    private static int traversalOverrideFrame = -1;
+    #endregion
+
+    #region Runtime Fields
     private bool hasAutoOffset;
     private float3 autoOffset;
     private bool hasChildOffset;
     private float3 childLocalOffset;
+    private bool hasTraversalCameraOffset;
+    private float3 traversalCameraOffset;
+    private bool wasProceduralRoomTraversal;
+    private int traversalCameraInstanceId;
     private CameraBehavior lastBehavior;
     private int lastCameraInstanceId;
+    private int canonicalAutoOffsetCameraInstanceId;
+    private int canonicalChildOffsetCameraInstanceId;
     private float3 followVelocity;
+    private float3 canonicalAutoOffset;
+    private float3 canonicalChildLocalOffset;
+    private Entity lastPlayerEntity;
     private EntityQuery runOutcomeQuery;
+    private bool hasCanonicalAutoOffset;
+    private bool hasCanonicalChildOffset;
+    private bool hasTrackedPlayer;
     #endregion
 
-    #region Lifecycle
+    #endregion
+
+    #region Methods
+
+    #region Lifecycle Methods
     /// <summary>
     /// Configures the system to require updates 
     /// for entities that have the PlayerControllerConfig component, which contains
@@ -93,6 +116,8 @@ public partial struct PlayerCameraFollowSystem : ISystem
             if (localToWorldLookup.HasComponent(entity))
                 playerPosition = localToWorldLookup[entity].Position;
 
+            bool playerChanged = !hasTrackedPlayer || entity != lastPlayerEntity;
+
             // Evolve the damage shake once for the player before behavior branching so the room-fixed camera
             // (driven by PlayerCameraRoomAnchorSystem) reads the same offset without recomputing trauma.
             PlayerCameraShakeState shakeState = default;
@@ -143,19 +168,10 @@ public partial struct PlayerCameraFollowSystem : ISystem
                 PlayerCameraShakeRuntimeUtility.ApplyFovToCamera(camera, in shakeState);
             }
 
-            if (cameraConfig.Behavior == CameraBehavior.RoomFixed)
-                continue;
-
             bool behaviorChanged = cameraConfig.Behavior != lastBehavior;
-            bool preserveFollowContinuity = cameraChanged &&
-                                            !behaviorChanged &&
-                                            isProceduralRoomTraversal &&
-                                            CanPreserveFollowContinuity(cameraConfig.Behavior);
 
-            // A normal camera or behavior replacement starts a fresh authored offset. Room traversal instead
-            // retains the source follow relationship because target room camera transforms are layout metadata,
-            // not a new player-relative framing request.
-            if (behaviorChanged || cameraChanged && !preserveFollowContinuity)
+            // Camera or behavior replacement starts a fresh authored offset and discards stale spring state.
+            if (behaviorChanged || cameraChanged || playerChanged)
             {
                 ResetCachedOffsets();
                 lastBehavior = cameraConfig.Behavior;
@@ -165,6 +181,31 @@ public partial struct PlayerCameraFollowSystem : ISystem
             {
                 followVelocity = float3.zero;
                 lastCameraInstanceId = cameraInstanceId;
+            }
+
+            // A new run receives a deterministic baseline from the persistent rig. Never recapture the previous
+            // run's final camera-to-player relation as the next run's automatic offset.
+            if (playerChanged)
+            {
+                ResetForNewPlayer(camera,
+                                  entity,
+                                  playerPosition,
+                                  localTransform.ValueRO.Rotation,
+                                  in cameraConfig,
+                                  in shakeState);
+            }
+
+            if (cameraConfig.Behavior == CameraBehavior.RoomFixed)
+                continue;
+
+            // Preserve the exact source framing throughout traversal and its release frame. The player-only overlay
+            // applies the same relocation delta, so neither camera smoothing nor room coordinates expose the commit.
+            if (TryApplyTraversalFraming(camera,
+                                         playerPosition,
+                                         in shakeState,
+                                         isProceduralRoomTraversal))
+            {
+                break;
             }
 
             float3 offset = cameraConfig.FollowOffset;
@@ -210,16 +251,12 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     break;
                 default:
                     float3 newPosition = targetPosition;
-
-                    if (!preserveFollowContinuity)
-                    {
-                        float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
-                        newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource,
-                                                                               targetPosition,
-                                                                               cameraConfig.Values,
-                                                                               ref followVelocity,
-                                                                               deltaTime);
-                    }
+                    float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+                    newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource,
+                                                                           targetPosition,
+                                                                           cameraConfig.Values,
+                                                                           ref followVelocity,
+                                                                           deltaTime);
 
                     PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
                     break;
@@ -227,6 +264,147 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
             break;
         }
+    }
+    #endregion
+
+    #region Traversal Continuity Methods
+    /// <summary>
+    /// Checks whether the follow system already wrote authoritative traversal framing for the supplied camera this frame.
+    /// The room-anchor system uses this ownership marker to avoid a second competing camera transform write.
+    /// </summary>
+    /// <param name="camera">Gameplay camera whose transform ownership is being queried.</param>
+    /// <returns>True when traversal continuity owns this camera for the current rendered frame.</returns>
+    internal static bool OwnsTraversalFraming(Camera camera)
+    {
+        return camera != null &&
+               traversalOverrideFrame == Time.frameCount &&
+               traversalOverrideCameraInstanceId == camera.GetInstanceID();
+    }
+
+    /// <summary>
+    /// Captures the unshaken source camera-to-player offset once, reapplies it while room coordinates change under
+    /// black, and retains it for the first released frame so no spring step becomes visible at fade completion.
+    /// </summary>
+    /// <param name="camera">Persistent gameplay camera receiving the continuity pose.</param>
+    /// <param name="playerPosition">Current world-space position of the persistent ECS player.</param>
+    /// <param name="shakeState">Current feedback state layered above the preserved base framing.</param>
+    /// <param name="isProceduralRoomTraversal">True while the transactional room traversal remains active.</param>
+    /// <returns>True when this method wrote the authoritative camera transform for the current frame.</returns>
+    private bool TryApplyTraversalFraming(Camera camera,
+                                          float3 playerPosition,
+                                          in PlayerCameraShakeState shakeState,
+                                          bool isProceduralRoomTraversal)
+    {
+        if (!isProceduralRoomTraversal && !wasProceduralRoomTraversal)
+            return false;
+
+        int cameraInstanceId = camera.GetInstanceID();
+
+        // Capture the real source view instead of the configured target offset, which may differ while the spring settles.
+        if (!hasTraversalCameraOffset || traversalCameraInstanceId != cameraInstanceId)
+        {
+            traversalCameraOffset = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position,
+                                                                                           in shakeState) -
+                                    playerPosition;
+            traversalCameraInstanceId = cameraInstanceId;
+            hasTraversalCameraOffset = true;
+            followVelocity = float3.zero;
+        }
+
+        PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
+                                                      playerPosition + traversalCameraOffset,
+                                                      in shakeState,
+                                                      false,
+                                                      quaternion.identity);
+        traversalOverrideCameraInstanceId = cameraInstanceId;
+        traversalOverrideFrame = Time.frameCount;
+        wasProceduralRoomTraversal = isProceduralRoomTraversal;
+
+        // The release frame remains exact; normal follow smoothing resumes from this pose on the following frame.
+        if (!isProceduralRoomTraversal)
+        {
+            hasTraversalCameraOffset = false;
+            traversalCameraInstanceId = 0;
+        }
+
+        return true;
+    }
+    #endregion
+
+    #region Cache Methods
+
+    /// <summary>
+    /// Rebinds the persistent camera to a newly created player without inheriting the previous run's spring,
+    /// traversal offset or final world position. Automatic behaviors retain the first valid offset captured for
+    /// the same persistent camera instance and reuse it on later runs.
+    /// </summary>
+    /// <param name="camera">Persistent gameplay camera being rebound.</param>
+    /// <param name="playerEntity">New authoritative player entity.</param>
+    /// <param name="playerPosition">Current player world position after start-room arrival.</param>
+    /// <param name="playerRotation">Current authored player rotation.</param>
+    /// <param name="cameraConfig">Resolved runtime camera behavior and fixed offset.</param>
+    /// <param name="shakeState">New player's feedback state used to avoid baking shake into the baseline.</param>
+    private void ResetForNewPlayer(Camera camera,
+                                   Entity playerEntity,
+                                   float3 playerPosition,
+                                   quaternion playerRotation,
+                                   in PlayerRuntimeCameraConfig cameraConfig,
+                                   in PlayerCameraShakeState shakeState)
+    {
+        float3 currentBasePosition = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position,
+                                                                                            in shakeState);
+        float3 resolvedPosition = currentBasePosition;
+
+        // Resolve and cache one stable baseline for each automatic behavior on this persistent camera instance.
+        switch (cameraConfig.Behavior)
+        {
+            case CameraBehavior.FollowWithAutoOffset:
+                if (!hasCanonicalAutoOffset || canonicalAutoOffsetCameraInstanceId != camera.GetInstanceID())
+                {
+                    canonicalAutoOffset = currentBasePosition - playerPosition;
+                    canonicalAutoOffsetCameraInstanceId = camera.GetInstanceID();
+                    hasCanonicalAutoOffset = true;
+                }
+
+                autoOffset = canonicalAutoOffset;
+                hasAutoOffset = true;
+                resolvedPosition = playerPosition + autoOffset;
+                break;
+
+            case CameraBehavior.ChildOfPlayer:
+                if (!hasCanonicalChildOffset || canonicalChildOffsetCameraInstanceId != camera.GetInstanceID())
+                {
+                    canonicalChildLocalOffset = math.rotate(math.inverse(playerRotation),
+                                                            currentBasePosition - playerPosition);
+                    canonicalChildOffsetCameraInstanceId = camera.GetInstanceID();
+                    hasCanonicalChildOffset = true;
+                }
+
+                childLocalOffset = canonicalChildLocalOffset;
+                hasChildOffset = true;
+                resolvedPosition = playerPosition + math.rotate(playerRotation, childLocalOffset);
+                break;
+
+            case CameraBehavior.FollowWithOffset:
+                resolvedPosition = playerPosition + cameraConfig.FollowOffset;
+                break;
+        }
+
+        if (cameraConfig.Behavior != CameraBehavior.RoomFixed)
+        {
+            PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
+                                                          resolvedPosition,
+                                                          in shakeState,
+                                                          cameraConfig.Behavior == CameraBehavior.ChildOfPlayer,
+                                                          playerRotation);
+        }
+
+        lastPlayerEntity = playerEntity;
+        hasTrackedPlayer = true;
+        hasTraversalCameraOffset = false;
+        wasProceduralRoomTraversal = false;
+        traversalCameraInstanceId = 0;
+        followVelocity = float3.zero;
     }
 
     /// <summary>
@@ -239,28 +417,8 @@ public partial struct PlayerCameraFollowSystem : ISystem
         hasChildOffset = false;
         followVelocity = float3.zero;
     }
-
-    /// <summary>
-    /// Resolves whether the current follow behavior owns enough stable state to transfer framing to a new room camera.
-    /// </summary>
-    /// <param name="behavior">Active designer-selected camera follow behavior.</param>
-    /// <returns>True when camera replacement can preserve or deterministically reconstruct its player-relative offset.</returns>
-    private bool CanPreserveFollowContinuity(CameraBehavior behavior)
-    {
-        switch (behavior)
-        {
-            case CameraBehavior.FollowWithAutoOffset:
-                return hasAutoOffset;
-            case CameraBehavior.ChildOfPlayer:
-                return hasChildOffset;
-            case CameraBehavior.FollowWithOffset:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     #endregion
 
+    #endregion
 
 }

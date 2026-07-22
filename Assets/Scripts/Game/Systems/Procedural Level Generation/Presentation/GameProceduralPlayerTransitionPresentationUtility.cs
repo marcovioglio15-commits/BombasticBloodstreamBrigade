@@ -13,10 +13,12 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     private static readonly Dictionary<GameObject, int> originalRendererLayers = new Dictionary<GameObject, int>();
     private static PlayableGraph animationGraph;
     private static AnimationClipPlayable animationPlayable;
+    private static Animator transitionAnimator;
     private static bool active;
     private static bool endRequested;
     private static bool hasAnimation;
     private static bool loggedMissingAnimator;
+    private static bool originalApplyRootMotion;
     private static float animationDuration;
     #endregion
 
@@ -89,8 +91,12 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         if (animationGraph.IsValid())
             animationGraph.Destroy();
 
+        if (transitionAnimator != null)
+            transitionAnimator.applyRootMotion = originalApplyRootMotion;
+
         GameSceneCameraLayerUtility.RestoreRendererObjectLayers(originalRendererLayers);
         animationPlayable = default;
+        transitionAnimator = null;
         animationDuration = 0f;
         hasAnimation = false;
         active = false;
@@ -160,12 +166,15 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     }
 
     /// <summary>
-    /// Creates an unscaled one-shot Playables graph that can drive an arbitrary designer-selected animation clip directly.
+    /// Creates an unscaled one-shot Playables graph for a validated in-place clip while explicitly disabling root motion.
     /// </summary>
     /// <param name="animator">Animator receiving direct clip output.</param>
     /// <param name="clip">Designer-selected transition clip.</param>
     private static void StartAnimation(Animator animator, AnimationClip clip)
     {
+        transitionAnimator = animator;
+        originalApplyRootMotion = animator.applyRootMotion;
+        animator.applyRootMotion = false;
         animationGraph = PlayableGraph.Create("GameProceduralPlayerTransition");
         animationGraph.SetTimeUpdateMode(DirectorUpdateMode.UnscaledGameTime);
         AnimationPlayableOutput output = AnimationPlayableOutput.Create(animationGraph,

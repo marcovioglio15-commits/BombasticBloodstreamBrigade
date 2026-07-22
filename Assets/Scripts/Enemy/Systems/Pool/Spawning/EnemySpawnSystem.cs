@@ -55,11 +55,18 @@ public partial struct EnemySpawnSystem : ISystem
         NativeArray<Entity> spawnerEntities = spawnerQuery.ToEntityArray(state.WorldUpdateAllocator);
 
         for (int spawnerIndex = 0; spawnerIndex < spawnerEntities.Length; spawnerIndex++)
+        {
+            Entity spawnerEntity = spawnerEntities[spawnerIndex];
+
+            if (!GameProceduralRoomInstanceQueryUtility.IsEntityInActiveRoom(entityManager, spawnerEntity))
+                continue;
+
             ProcessSpawner(entityManager,
-                           spawnerEntities[spawnerIndex],
+                           spawnerEntity,
                            elapsedTime,
                            ref remainingReservationBudget,
                            ref remainingActivationBudget);
+        }
     }
     #endregion
 

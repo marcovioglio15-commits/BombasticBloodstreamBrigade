@@ -66,7 +66,7 @@ internal static class GameProceduralLevelSolverSearchUtility
         {
             GameProceduralRoomTileSolverInput tile = regularTiles[index];
 
-            if (!CanUseTile(tile, copyCounts))
+            if (!CanUseTileAtDepth(tile, copyCounts, nextDepth))
                 continue;
 
             if (input.UseCenterArrival)
@@ -119,6 +119,14 @@ internal static class GameProceduralLevelSolverSearchUtility
     public static int SelectTargetBossDepth(GameProceduralLevelSolverInput input,
                                             ref GameProceduralLevelSolverRandom random)
     {
+        for (int tileIndex = 0; tileIndex < input.RoomTiles.Count; tileIndex++)
+        {
+            GameProceduralRoomTileSolverInput tile = input.RoomTiles[tileIndex];
+
+            if (tile.Role == GameProceduralRoomRole.Boss && tile.UseExactDepthConstraint)
+                return tile.ExactDepth;
+        }
+
         List<float> weights = new List<float>(input.MaximumDepth);
 
         for (int depth = 1; depth <= input.MaximumDepth; depth++)
@@ -357,14 +365,19 @@ internal static class GameProceduralLevelSolverSearchUtility
     }
 
     /// <summary>
-    /// Checks whether another logical node may use one tile without exceeding its maximum copies.
+    /// Checks whether another logical node may use one tile at the requested depth without exceeding its maximum copies.
     /// </summary>
     /// <param name="tile">Reusable tile to inspect.</param>
     /// <param name="copyCounts">Current copy counts keyed by tile technical ID.</param>
-    /// <returns>True when copy capacity remains.</returns>
-    private static bool CanUseTile(GameProceduralRoomTileSolverInput tile,
-                                   Dictionary<string, int> copyCounts)
+    /// <param name="depth">Absolute graph depth requested for the candidate node.</param>
+    /// <returns>True when the hard depth constraint matches and copy capacity remains.</returns>
+    private static bool CanUseTileAtDepth(GameProceduralRoomTileSolverInput tile,
+                                          Dictionary<string, int> copyCounts,
+                                          int depth)
     {
+        if (tile.UseExactDepthConstraint && tile.ExactDepth != depth)
+            return false;
+
         return !copyCounts.TryGetValue(tile.TechnicalId, out int count) || count < tile.MaximumCopies;
     }
 

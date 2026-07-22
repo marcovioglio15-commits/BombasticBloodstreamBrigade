@@ -23,6 +23,9 @@ public partial class GameProceduralRoomTraversalSystem : SystemBase
     {
         managerQuery = GetEntityQuery(typeof(GameSceneTransitionState),
                                       typeof(GameSceneTransitionRequest),
+                                      typeof(GameSceneManagerConfig),
+                                      typeof(GameSceneDefinitionElement),
+                                      typeof(GameProceduralLevelConfig),
                                       typeof(GameProceduralLevelRuntimeState),
                                       typeof(GameProceduralRoomNodeElement),
                                       typeof(GameProceduralRoomEdgeElement),
@@ -88,6 +91,37 @@ public partial class GameProceduralRoomTraversalSystem : SystemBase
             return;
 
         GameProceduralRoomNodeElement targetNode = nodes[edge.TargetNodeIndex];
+        GameProceduralLevelConfig config = EntityManager.GetComponentData<GameProceduralLevelConfig>(managerEntity);
+
+        ulong generationKey = GameProceduralRoomStreamingSystem.BuildGenerationKey(runtimeState);
+
+        if (config.RoomStreamingMode == GameProceduralRoomStreamingMode.TransactionalDualSlot &&
+            config.RequireReadyBeforePortalCommit != 0 &&
+            !GameProceduralRoomStreamingRuntimeUtility.IsNodeReady(generationKey, targetNode.NodeIndex))
+        {
+            if (GameProceduralRoomStreamingRuntimeUtility.PrioritizeCandidate(generationKey,
+                                                                              targetNode.NodeIndex,
+                                                                              config.MaximumStagedRooms))
+            {
+                DynamicBuffer<GameSceneDefinitionElement> scenes = EntityManager.GetBuffer<GameSceneDefinitionElement>(managerEntity, true);
+                GameSceneManagerConfig sceneConfig = EntityManager.GetComponentData<GameSceneManagerConfig>(managerEntity);
+
+                if (GameProceduralRoomStreamingSystem.TryResolveScene(scenes,
+                                                                      targetNode.SceneId,
+                                                                      out GameSceneDefinitionElement targetScene))
+                {
+                    GameProceduralRoomStreamingRuntimeUtility.EnsureNodeLoading(generationKey,
+                                                                                targetNode.NodeIndex,
+                                                                                targetScene,
+                                                                                sceneConfig.LoadBackend,
+                                                                                true);
+                }
+            }
+
+            traversalRequests.Insert(0, request);
+            return;
+        }
+
         runtimeState.PendingNodeIndex = targetNode.NodeIndex;
         runtimeState.CurrentRoomCleared = 0;
         runtimeState.Phase = GameProceduralLevelRuntimePhase.Traversing;

@@ -198,6 +198,13 @@ internal static class GameSceneTransitionSceneOperationUtility
         if (unloadComplete)
             return false;
 
+        if (GameProceduralRoomStreamingRuntimeUtility.TryTickExternalUnload(sceneDefinition.SceneId,
+                                                                            out bool transactionalUnloadComplete))
+        {
+            unloadComplete = transactionalUnloadComplete;
+            return !transactionalUnloadComplete;
+        }
+
         if (!activeOperation.IsRunning)
         {
             if (!TryStartUnload(sceneDefinition, hasBootstrapScene, bootstrapScene, targetScene, config, ref activeOperation))

@@ -205,6 +205,49 @@ internal static class GameProceduralLevelPresetsPanelSectionsUtility
         if (settingsProperty == null)
             return;
 
+        SerializedProperty streamingModeProperty = settingsProperty.FindPropertyRelative("roomStreamingMode");
+        SerializedProperty preloadPolicyProperty = settingsProperty.FindPropertyRelative("adjacentPreloadPolicy");
+        PropertyField preloadPolicyField = null;
+        PropertyField maximumStagedRoomsField = null;
+        PropertyField requireReadyField = null;
+        PropertyField retiredRoomBudgetField = null;
+        PropertyField retirementWorkBudgetField = null;
+        PropertyField clearPlayerVelocityField = null;
+        System.Action refreshStreamingVisibility = () => RefreshStreamingVisibility(streamingModeProperty,
+                                                                                     preloadPolicyProperty,
+                                                                                     preloadPolicyField,
+                                                                                     maximumStagedRoomsField,
+                                                                                     requireReadyField,
+                                                                                     retiredRoomBudgetField,
+                                                                                     retirementWorkBudgetField,
+                                                                                     clearPlayerVelocityField);
+        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                    streamingModeProperty,
+                                                                    "Room Streaming Mode",
+                                                                    "Authored Single Slot guarantees one resident room, preserves every scene surface at its authored coordinates and places the player at the graph-selected entrance behind black. Dual Slot optionally preloads spatially isolated rooms; Serial Scene Replacement is the compatibility path.",
+                                                                    refreshStreamingVisibility);
+        preloadPolicyField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                           preloadPolicyProperty,
+                                                                                           "Adjacent Preload Policy",
+                                                                                           "Selects whether all outgoing rooms up to budget, only the first outgoing room, or no adjacent rooms are staged.",
+                                                                                           refreshStreamingVisibility);
+        maximumStagedRoomsField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                                settingsProperty.FindPropertyRelative("maximumStagedRooms"),
+                                                                                                "Maximum Staged Rooms",
+                                                                                                "Bounds fully loaded inactive room instances retained for immediate portal commits. One is recommended because staged DOTS rooms still participate in world updates.");
+        requireReadyField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                         settingsProperty.FindPropertyRelative("requireReadyBeforePortalCommit"),
+                                                                                         "Require Ready Before Portal Commit",
+                                                                                         "Keeps a portal closed until its exact target managed scene and DOTS SubScenes are staged.");
+        retiredRoomBudgetField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                              settingsProperty.FindPropertyRelative("retiredRoomBudget"),
+                                                                                              "Retired Room Budget",
+                                                                                              "Keeps this many previous room instances resident after the opaque transaction. Zero defers unloading until the protected post-transition delay without retaining extra room simulation.");
+        retirementWorkBudgetField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                                  settingsProperty.FindPropertyRelative("retirementWorkBudgetMilliseconds"),
+                                                                                                  "Retirement Work Budget (ms)",
+                                                                                                  "Limits main-thread bookkeeping used to start deferred retirement after fade-in.");
+
         SerializedProperty keepPlayerVisibleProperty = settingsProperty.FindPropertyRelative("keepPlayerVisible");
         SerializedProperty animationProperty = settingsProperty.FindPropertyRelative("playerTransitionAnimation");
         PropertyField animationField = null;
@@ -218,25 +261,70 @@ internal static class GameProceduralLevelPresetsPanelSectionsUtility
                                                                     "Keep Player Visible",
                                                                     "Keeps the persistent player presentation above the black environment pass only during room-to-room transitions.",
                                                                     refreshTransitionVisibility);
+        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                    settingsProperty.FindPropertyRelative("hideLoadingProgressDuringRoomTransitions"),
+                                                                    "Hide Room Loading Progress",
+                                                                    "Hides percentage, progress ring and loading status text only for room-to-room traversal. Initial loads and run restarts keep the complete loading presentation.");
         animationField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
                                                                                       animationProperty,
                                                                                       "Player Transition Animation",
-                                                                                      "Optional one-shot animation played while the persistent player remains visible during an intra-level transition.",
+                                                                                      "Optional in-place, root-curve-free one-shot animation played while the persistent player remains visible during an intra-level transition.",
                                                                                       refreshTransitionVisibility);
         relocationField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
                                                                                        settingsProperty.FindPropertyRelative("relocationNormalizedTime"),
-                                                                                       "Relocation Normalized Time",
-                                                                                       "Normalized clip time at which the ready destination arrival pose is applied.");
+                                                                                       "Room Commit Normalized Time",
+                                                                                       "Normalized clip time at which the authored destination is committed and the player is placed at the graph-selected entrance behind black.");
 
-        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
-                                                                    settingsProperty.FindPropertyRelative("clearPlayerVelocity"),
-                                                                    "Clear Player Velocity",
-                                                                    "Clears persistent player linear and angular velocity when an arrival pose is committed.");
+        clearPlayerVelocityField = GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
+                                                                                                 settingsProperty.FindPropertyRelative("clearPlayerVelocity"),
+                                                                                                 "Clear Player Velocity",
+                                                                                                 "Clears player motion when Authored Single Slot or Serial Scene Replacement relocates the player. Spatial Dual Slot preserves live movement and look.");
+        refreshStreamingVisibility();
         refreshTransitionVisibility();
     }
     #endregion
 
     #region Conditional Visibility Methods
+    /// <summary>
+    /// Shows dual-slot preload controls or serial motion-reset controls only while the selected mode consumes them.
+    /// </summary>
+    /// <param name="streamingModeProperty">Serialized room streaming mode.</param>
+    /// <param name="preloadPolicyProperty">Serialized adjacent preload policy.</param>
+    /// <param name="preloadPolicyField">Preload policy field controlled by dual-slot mode.</param>
+    /// <param name="maximumStagedRoomsField">Staged-room budget field controlled by active preloading.</param>
+    /// <param name="requireReadyField">Portal readiness policy field controlled by dual-slot mode.</param>
+    /// <param name="retiredRoomBudgetField">Retained-room budget field controlled by dual-slot mode.</param>
+    /// <param name="retirementWorkBudgetField">Deferred work budget field controlled by dual-slot mode.</param>
+    /// <param name="clearPlayerVelocityField">Compatibility motion-reset field shown only for serial replacement.</param>
+    private static void RefreshStreamingVisibility(SerializedProperty streamingModeProperty,
+                                                   SerializedProperty preloadPolicyProperty,
+                                                   VisualElement preloadPolicyField,
+                                                   VisualElement maximumStagedRoomsField,
+                                                   VisualElement requireReadyField,
+                                                   VisualElement retiredRoomBudgetField,
+                                                   VisualElement retirementWorkBudgetField,
+                                                   VisualElement clearPlayerVelocityField)
+    {
+        if (streamingModeProperty == null || preloadPolicyProperty == null || preloadPolicyField == null ||
+            maximumStagedRoomsField == null || requireReadyField == null || retiredRoomBudgetField == null ||
+            retirementWorkBudgetField == null || clearPlayerVelocityField == null)
+        {
+            return;
+        }
+
+        streamingModeProperty.serializedObject.UpdateIfRequiredOrScript();
+        bool dualSlot = streamingModeProperty.enumValueIndex == (int)GameProceduralRoomStreamingMode.TransactionalDualSlot;
+        bool relocatesPlayer = streamingModeProperty.enumValueIndex != (int)GameProceduralRoomStreamingMode.TransactionalDualSlot;
+        bool preloading = dualSlot &&
+                          preloadPolicyProperty.enumValueIndex != (int)GameProceduralAdjacentPreloadPolicy.Disabled;
+        preloadPolicyField.style.display = dualSlot ? DisplayStyle.Flex : DisplayStyle.None;
+        maximumStagedRoomsField.style.display = preloading ? DisplayStyle.Flex : DisplayStyle.None;
+        requireReadyField.style.display = dualSlot ? DisplayStyle.Flex : DisplayStyle.None;
+        retiredRoomBudgetField.style.display = dualSlot ? DisplayStyle.Flex : DisplayStyle.None;
+        retirementWorkBudgetField.style.display = dualSlot ? DisplayStyle.Flex : DisplayStyle.None;
+        clearPlayerVelocityField.style.display = relocatesPlayer ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
     /// <summary>
     /// Shows the fixed seed only while the authored seed policy consumes it.
     /// </summary>

@@ -29,8 +29,24 @@ internal static class GameProceduralLevelProjectSetupUtility
         if (preset == null)
             throw new InvalidOperationException("Unable to create the default GameProceduralLevelPreset asset.");
 
+        return EnsurePreset(preset, sceneCatalogPreset);
+    }
+
+    /// <summary>
+    /// Initializes and registers an authored Procedural Level preset while preserving its designer-authored content.
+    /// </summary>
+    /// <param name="preset">Authored preset already selected by the Game Master configuration.</param>
+    /// <param name="sceneCatalogPreset">Canonical Scene Manager preset assigned only when the authored link is missing.</param>
+    /// <returns>The initialized authored preset, or a newly created default when no preset was supplied.</returns>
+    public static GameProceduralLevelPreset EnsurePreset(GameProceduralLevelPreset preset,
+                                                         GameSceneManagerPreset sceneCatalogPreset)
+    {
+        if (preset == null)
+            return EnsureDefaultPreset(sceneCatalogPreset);
+
         preset.EnsureInitialized();
         AssignMissingSceneCatalog(preset, sceneCatalogPreset);
+        GameProceduralRoomTransactionalSetupUtility.EnsureExplicitSubSceneOwnership(preset);
 
         GameProceduralLevelPresetLibrary library = GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
         library.AddPreset(preset);

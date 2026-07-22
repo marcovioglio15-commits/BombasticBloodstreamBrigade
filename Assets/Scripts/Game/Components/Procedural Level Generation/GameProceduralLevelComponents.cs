@@ -42,7 +42,14 @@ public struct GameProceduralLevelConfig : IComponentData
     public int MaximumNodeCount;
     public int MaximumDepth;
     public int MaximumGenerationAttempts;
+    public GameProceduralRoomStreamingMode RoomStreamingMode;
+    public GameProceduralAdjacentPreloadPolicy AdjacentPreloadPolicy;
+    public int MaximumStagedRooms;
+    public byte RequireReadyBeforePortalCommit;
+    public int RetiredRoomBudget;
+    public float RetirementWorkBudgetMilliseconds;
     public byte KeepPlayerVisible;
+    public byte HideLoadingProgressDuringRoomTransitions;
     public byte HasPlayerTransitionAnimation;
     public UnityObjectRef<AnimationClip> PlayerTransitionAnimation;
     public float RelocationNormalizedTime;
@@ -90,6 +97,8 @@ public struct GameProceduralRoomTileElement : IBufferElementData
     public int MaximumCopies;
     public int PreferredDepthMinimum;
     public int PreferredDepthMaximum;
+    public byte UseExactDepthConstraint;
+    public int ExactDepth;
     public float BaseSelectionWeight;
 }
 
@@ -131,6 +140,7 @@ public struct GameProceduralLevelRuntimeState : IComponentData
     public FixedString128Bytes FailureMessage;
     public uint RunSeed;
     public uint LevelSeed;
+    public uint GenerationVersion;
     public int CurrentLevelIndex;
     public int CurrentNodeIndex;
     public int PendingNodeIndex;

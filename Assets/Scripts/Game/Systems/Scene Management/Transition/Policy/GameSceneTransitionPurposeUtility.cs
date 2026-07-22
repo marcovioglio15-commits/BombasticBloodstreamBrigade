@@ -1,7 +1,9 @@
+using Unity.Entities;
+
 /// <summary>
 /// Centralizes transition behavior that is specific to authoritative procedural room progression.
 /// </summary>
-internal static class GameSceneTransitionPurposeUtility
+public static class GameSceneTransitionPurposeUtility
 {
     #region Methods
 
@@ -54,6 +56,27 @@ internal static class GameSceneTransitionPurposeUtility
     }
 
     /// <summary>
+    /// Resolves whether detailed loading presentation is disabled for an ordinary procedural room traversal.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the accepted scene transition.</param>
+    /// <param name="managerEntity">Scene manager entity that may contain baked procedural presentation settings.</param>
+    /// <param name="purpose">Accepted transition purpose.</param>
+    /// <returns>True only for room traversal when the Procedural Level preset enables fade-only loading presentation.</returns>
+    public static bool ShouldHideDetailedLoadingProgress(EntityManager entityManager,
+                                                         Entity managerEntity,
+                                                         GameSceneTransitionPurpose purpose)
+    {
+        if (purpose != GameSceneTransitionPurpose.ProceduralRoomTraversal)
+            return false;
+
+        if (!entityManager.Exists(managerEntity) || !entityManager.HasComponent<GameProceduralLevelConfig>(managerEntity))
+            return false;
+
+        GameProceduralLevelConfig proceduralConfig = entityManager.GetComponentData<GameProceduralLevelConfig>(managerEntity);
+        return proceduralConfig.HideLoadingProgressDuringRoomTransitions != 0;
+    }
+
+    /// <summary>
     /// Resolves whether the main source scene must be removed before the next procedural room can load.
     /// </summary>
     /// <param name="unloadSourceBeforeLoad">True when the active transition uses pre-load source removal.</param>
@@ -86,7 +109,10 @@ internal static class GameSceneTransitionPurposeUtility
                                                              GameSceneDefinitionElement sourceCompanionScene,
                                                              GameSceneDefinitionElement targetCompanionScene)
     {
-        if (!unloadSourceBeforeLoad || !hasSourceCompanionScene)
+        if (!hasSourceCompanionScene)
+            return false;
+
+        if (!unloadSourceBeforeLoad && !reloadTargetCompanion)
             return false;
 
         if (!reloadTargetCompanion &&

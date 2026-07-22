@@ -193,6 +193,30 @@ internal static class GameProceduralLevelGraphPreviewUtility
                 return new Color(0.38f, 0.58f, 0.88f, 1f);
         }
     }
+
+    /// <summary>
+    /// Returns a deterministic node color that remains distinct from sibling nodes in the same depth column.
+    /// </summary>
+    /// <param name="depthOrdinal">Stable row ordinal inside one depth column.</param>
+    /// <param name="depthNodeCount">Total number of sibling nodes sharing the depth.</param>
+    /// <param name="role">Structural node role used to preserve clear Start and Boss semantics.</param>
+    /// <returns>Opaque node and outgoing-edge color.</returns>
+    public static Color ResolveNodeColor(int depthOrdinal,
+                                         int depthNodeCount,
+                                         GameProceduralRoomRole role)
+    {
+        if (depthNodeCount <= 1)
+            return ResolveRoleColor(role);
+
+        float hue = Mathf.Repeat(0.56f + depthOrdinal * 0.6180339f, 1f);
+        float saturation = EditorGUIUtility.isProSkin ? 0.58f : 0.68f;
+        float value = EditorGUIUtility.isProSkin ? 0.88f : 0.78f;
+        Color siblingColor = Color.HSVToRGB(hue, saturation, value);
+        Color roleColor = ResolveRoleColor(role);
+        return Color.Lerp(siblingColor,
+                          roleColor,
+                          role == GameProceduralRoomRole.Regular ? 0.12f : 0.34f);
+    }
     #endregion
 
     #region Private Methods

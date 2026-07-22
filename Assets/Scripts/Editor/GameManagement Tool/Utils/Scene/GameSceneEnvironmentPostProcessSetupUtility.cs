@@ -313,7 +313,7 @@ public static class GameSceneEnvironmentPostProcessSetupUtility
         Camera baseCamera = FindGameplayBaseCamera(scene);
 
         if (baseCamera == null)
-            throw new InvalidOperationException("Gameplay base camera was not found in " + scene.path + ".");
+            return;
 
         Camera gameplayCamera = EnsureGameplayOverlayCamera(baseCamera);
         UniversalAdditionalCameraData baseCameraData = EnsureComponent<UniversalAdditionalCameraData>(baseCamera.gameObject);

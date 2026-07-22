@@ -49,12 +49,10 @@ public partial struct PlayerGroundShadowPresentationSystem : ISystem
         PhysicsWorldSingleton physicsWorldSingleton = default;
         bool hasPhysicsWorld = SystemAPI.TryGetSingleton<PhysicsWorldSingleton>(out physicsWorldSingleton);
 
-        // Ground projection must not query physics while a scene transition is active: on a "Play Again"
-        // restart the persistent player outlives the unloaded gameplay subscene, so casting against the
-        // physics world in that window dereferences wall collider blob assets that were already released.
-        bool sceneTransitionActive = SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
-                                     transitionState.IsTransitioning != 0;
-        bool canProjectOntoGround = hasPhysicsWorld && !sceneTransitionActive;
+        // Suppress projection only while scene replacement can expose released collider blobs. Spatially aligned
+        // player presentation remains visible and resumes projection as soon as target physics is ready.
+        bool canProjectOntoGround = hasPhysicsWorld &&
+                                    !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
         bool synchronizedAnyPlayer = false;
 
         foreach ((RefRO<PlayerGroundShadowConfig> groundShadowConfig,

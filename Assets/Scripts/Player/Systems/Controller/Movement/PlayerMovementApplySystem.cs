@@ -37,19 +37,22 @@ public partial struct PlayerMovementApplySystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        if (PlayerGameplayPauseUtility.IsPlayerMotionHardPauseActive())
             return;
 
         float deltaTime = SystemAPI.Time.DeltaTime;
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         ComponentLookup<PlayerDashState> dashLookup = SystemAPI.GetComponentLookup<PlayerDashState>(false);
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+        bool canQueryScenePhysics = !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
 
         if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
             worldLayersConfig.WallsLayerMask != 0)
             wallsLayerMask = worldLayersConfig.WallsLayerMask;
 
-        bool wallsEnabled = wallsLayerMask != 0;
+        // Single-slot traversal keeps transform integration live while scene collider blobs are replaced. Wall
+        // clearance resumes only after the target physics-readiness barrier has exported a safe world.
+        bool wallsEnabled = wallsLayerMask != 0 && canQueryScenePhysics;
 
         foreach ((RefRW<LocalTransform> localTransform,
                   RefRW<PlayerMovementState> movementState,

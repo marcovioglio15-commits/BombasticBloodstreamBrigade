@@ -18,6 +18,7 @@ public static class GameProceduralLevelSolverSmokeTest
         ValidatePortalArrivalGraph();
         ValidateCenterArrivalSkipsFitting();
         ValidateEntranceCapacityFailure();
+        ValidateExactDepthConstraint();
         ValidateArrivalAndLevelExitGuards();
         ValidateValidatorContracts();
         Debug.Log("[GameProceduralLevelSolverSmokeTest] Deterministic solver checks passed.");
@@ -107,6 +108,35 @@ public static class GameProceduralLevelSolverSmokeTest
     }
 
     /// <summary>
+    /// Verifies a hard tile depth accepts the exact layer and excludes the tile from every other candidate layer.
+    /// </summary>
+    private static void ValidateExactDepthConstraint()
+    {
+        GameProceduralLevelGenerationResult validResult = GameProceduralLevelSolver.Generate(
+            CreatePortalInput(true, false, false, null, 1, 2f, 1, 2),
+            173u);
+        Require(validResult.Success,
+                "Exact regular and Boss depth constraints rejected their valid layers: " + validResult.Diagnostic);
+
+        for (int nodeIndex = 0; nodeIndex < validResult.Nodes.Count; nodeIndex++)
+        {
+            GameProceduralLevelGraphNode node = validResult.Nodes[nodeIndex];
+
+            if (node.Role == GameProceduralRoomRole.Regular)
+                Require(node.Depth == 1, "A Regular tile spawned outside its exact depth.");
+
+            if (node.Role == GameProceduralRoomRole.Boss)
+                Require(node.Depth == 2, "The Boss tile spawned outside its exact depth.");
+        }
+
+        GameProceduralLevelGenerationResult excludedResult = GameProceduralLevelSolver.Generate(
+            CreatePortalInput(true, false, false, null, 1, 2f, 2, 2),
+            173u);
+        Require(!excludedResult.Success,
+                "A Regular tile constrained to depth two incorrectly spawned in the required depth-one layer.");
+    }
+
+    /// <summary>
     /// Verifies the pure runtime guard always requires the Start center anchor and conditionally requires a usable Boss LevelExit.
     /// </summary>
     private static void ValidateArrivalAndLevelExitGuards()
@@ -171,13 +201,17 @@ public static class GameProceduralLevelSolverSmokeTest
     /// <param name="levelExitCapability">Optional capability for the Boss LevelExit fixture; null omits the portal.</param>
     /// <param name="startCenterAnchorCount">Center-anchor count exposed by the Start room metadata.</param>
     /// <param name="fittingScore">Fitting score supplied to the immutable solver request.</param>
+    /// <param name="regularExactDepth">Exact Regular depth, or -1 to keep soft preferred-range placement.</param>
+    /// <param name="bossExactDepth">Exact Boss depth, or -1 to keep soft preferred-range placement.</param>
     /// <returns>Immutable pure managed solver request.</returns>
     private static GameProceduralLevelSolverInput CreatePortalInput(bool includeSecondBossEntrance,
                                                                     bool useCenterArrival,
                                                                     bool requiresLevelExit,
                                                                     GameRoomPortalCapability? levelExitCapability,
                                                                     int startCenterAnchorCount,
-                                                                    float fittingScore = 2f)
+                                                                    float fittingScore = 2f,
+                                                                    int regularExactDepth = -1,
+                                                                    int bossExactDepth = -1)
     {
         List<GameProceduralRoomPortalSolverInput> startPortals = new List<GameProceduralRoomPortalSolverInput>
         {
@@ -246,7 +280,9 @@ public static class GameProceduralLevelSolverSmokeTest
                                                    new Vector2Int(1, 1),
                                                    1f,
                                                    1,
-                                                   regularPortals),
+                                                   regularPortals,
+                                                   regularExactDepth >= 0,
+                                                   regularExactDepth),
             new GameProceduralRoomTileSolverInput("TILE_BOSS_TECH",
                                                    "BOSS_TILE",
                                                    "SCN_BOSS",
@@ -255,7 +291,9 @@ public static class GameProceduralLevelSolverSmokeTest
                                                    new Vector2Int(2, 2),
                                                    1f,
                                                    1,
-                                                   bossPortals)
+                                                   bossPortals,
+                                                   bossExactDepth >= 0,
+                                                   bossExactDepth)
         };
         return new GameProceduralLevelSolverInput("LEVEL_TECH",
                                                   "LEVEL_TEST",

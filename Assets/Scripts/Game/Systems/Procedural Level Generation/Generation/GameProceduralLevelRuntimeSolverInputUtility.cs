@@ -136,7 +136,9 @@ internal static class GameProceduralLevelRuntimeSolverInputUtility
                                                           new Vector2Int(tile.PreferredDepthMinimum, tile.PreferredDepthMaximum),
                                                           tile.BaseSelectionWeight,
                                                           roomMetadata.CenterAnchorCount,
-                                                          portalInputs);
+                                                          portalInputs,
+                                                          tile.UseExactDepthConstraint != 0,
+                                                          tile.ExactDepth);
         return true;
     }
     #endregion

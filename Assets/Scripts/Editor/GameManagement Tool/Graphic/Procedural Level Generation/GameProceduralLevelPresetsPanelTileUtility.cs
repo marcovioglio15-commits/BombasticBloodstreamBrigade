@@ -117,10 +117,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
                                                                     tileProperty.FindPropertyRelative("maximumCopies"),
                                                                     "Maximum Copies",
                                                                     "Maximum logical graph nodes that may reference this room scene in the current level.");
-        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(card,
-                                                                    tileProperty.FindPropertyRelative("preferredDepthRange"),
-                                                                    "Preferred Depth Range",
-                                                                    "Inclusive depth range ranked by the level's Room Depth Score without changing hard structural constraints.");
+        GameProceduralLevelPresetsPanelTileDepthUtility.AddDepthFields(card, tileProperty);
         GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(card,
                                                                     tileProperty.FindPropertyRelative("baseSelectionWeight"),
                                                                     "Base Selection Weight",
@@ -559,6 +556,8 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
         SetString(tileProperty, "sceneGuid", string.Empty);
         SetInteger(tileProperty, "role", (int)GameProceduralRoomRole.Regular);
         SetInteger(tileProperty, "maximumCopies", 1);
+        SetBool(tileProperty, "useExactDepthConstraint", false);
+        SetInteger(tileProperty, "exactDepth", 1);
         SetVector2Int(tileProperty, "preferredDepthRange", new Vector2Int(1, 8));
         SetFloat(tileProperty, "baseSelectionWeight", 1f);
     }
@@ -594,6 +593,20 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
             property.enumValueIndex = value;
         else
             property.intValue = value;
+    }
+
+    /// <summary>
+    /// Sets a relative serialized boolean when the field exists.
+    /// </summary>
+    /// <param name="parent">Serialized parent object.</param>
+    /// <param name="propertyName">Relative boolean field name.</param>
+    /// <param name="value">Boolean value to assign.</param>
+    private static void SetBool(SerializedProperty parent, string propertyName, bool value)
+    {
+        SerializedProperty property = parent != null ? parent.FindPropertyRelative(propertyName) : null;
+
+        if (property != null)
+            property.boolValue = value;
     }
 
     /// <summary>

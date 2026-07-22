@@ -1,10 +1,11 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Scenes;
 using Unity.Transforms;
 
 /// <summary>
-/// Resolves one pending room arrival, relocates the persistent player and binds physical exits to generated graph edges.
+/// Resolves one pending room arrival, preserves or initializes the persistent player pose and binds generated exits.
 /// </summary>
 internal static class GameProceduralRoomArrivalUtility
 {
@@ -58,13 +59,7 @@ internal static class GameProceduralRoomArrivalUtility
             return false;
         }
 
-        if (!TryResolveArrivalPose(entityManager, context, out float3 arrivalPosition, out quaternion arrivalRotation))
-            return false;
-
-        if (!TryRelocatePlayer(entityManager,
-                               config,
-                               arrivalPosition,
-                               arrivalRotation))
+        if (!TryPreparePlayerPose(entityManager, config, context))
         {
             return false;
         }
@@ -109,20 +104,25 @@ internal static class GameProceduralRoomArrivalUtility
     {
         position = float3.zero;
         rotation = quaternion.identity;
-        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomCenterAnchor>());
+        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomCenterAnchor>(),
+                                                            ComponentType.ReadOnly<SceneTag>());
+        NativeList<Entity> anchors = new NativeList<Entity>(Allocator.Temp);
 
         try
         {
-            if (query.CalculateEntityCount() != 1)
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(query, ref anchors);
+
+            if (anchors.Length != 1)
                 return false;
 
-            GameRoomCenterAnchor anchor = query.GetSingleton<GameRoomCenterAnchor>();
+            GameRoomCenterAnchor anchor = entityManager.GetComponentData<GameRoomCenterAnchor>(anchors[0]);
             position = anchor.Position;
             rotation = anchor.Rotation;
             return true;
         }
         finally
         {
+            anchors.Dispose();
             query.Dispose();
         }
     }
@@ -146,21 +146,24 @@ internal static class GameProceduralRoomArrivalUtility
         if (portalId.Length <= 0)
             return false;
 
-        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortal>());
-        NativeArray<GameRoomPortal> portals = default;
+        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortal>(),
+                                                            ComponentType.ReadOnly<SceneTag>());
+        NativeList<Entity> portalEntities = new NativeList<Entity>(Allocator.Temp);
 
         try
         {
-            portals = query.ToComponentDataArray<GameRoomPortal>(Allocator.Temp);
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(query, ref portalEntities);
             int matchCount = 0;
 
-            for (int portalIndex = 0; portalIndex < portals.Length; portalIndex++)
+            for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
             {
-                if (!portals[portalIndex].PortalId.Equals(portalId))
+                GameRoomPortal portal = entityManager.GetComponentData<GameRoomPortal>(portalEntities[portalIndex]);
+
+                if (!portal.PortalId.Equals(portalId))
                     continue;
 
-                position = portals[portalIndex].ArrivalPosition;
-                rotation = portals[portalIndex].ArrivalRotation;
+                position = portal.ArrivalPosition;
+                rotation = portal.ArrivalRotation;
                 matchCount++;
             }
 
@@ -168,9 +171,7 @@ internal static class GameProceduralRoomArrivalUtility
         }
         finally
         {
-            if (portals.IsCreated)
-                portals.Dispose();
-
+            portalEntities.Dispose();
             query.Dispose();
         }
     }
@@ -178,34 +179,52 @@ internal static class GameProceduralRoomArrivalUtility
 
     #region Player
     /// <summary>
-    /// Relocates the unique persistent player and optionally clears movement and held input state.
+    /// Preserves the exact player pose only for optional aligned dual-slot traversal, or applies the authored arrival
+    /// pose for single-slot traversal and run boundaries while the environment is fully black.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the persistent player.</param>
     /// <param name="config">Baked transition settings.</param>
-    /// <param name="position">Target world position.</param>
-    /// <param name="rotation">Target world rotation.</param>
-    /// <returns>True when exactly one player was available and relocated.</returns>
-    private static bool TryRelocatePlayer(EntityManager entityManager,
-                                          GameProceduralLevelConfig config,
-                                          float3 position,
-                                          quaternion rotation)
+    /// <param name="context">Pending transition context selecting continuous traversal or authored run-boundary placement.</param>
+    /// <returns>True when a unique player was available and its required pose policy completed.</returns>
+    private static bool TryPreparePlayerPose(EntityManager entityManager,
+                                             GameProceduralLevelConfig config,
+                                             GameProceduralRoomTransitionContext context)
     {
         EntityQuery playerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
                                                                   ComponentType.ReadWrite<LocalTransform>());
 
         try
         {
-            if (playerQuery.CalculateEntityCount() != 1)
+            int playerCount = playerQuery.CalculateEntityCount();
+
+            if (playerCount != 1)
                 return false;
 
             Entity playerEntity = playerQuery.GetSingletonEntity();
-            LocalTransform transform = entityManager.GetComponentData<LocalTransform>(playerEntity);
-            transform.Position = position;
-            transform.Rotation = rotation;
-            entityManager.SetComponentData(playerEntity, transform);
-            ApplyArrivalFacing(entityManager, playerEntity, rotation);
 
-            if (config.ClearPlayerVelocity != 0)
+            bool preservesContinuousMotion = context.Kind == GameProceduralRoomTransitionKind.IntraLevel &&
+                                             GameProceduralRoomTransitionTransactionUtility.IsSpatiallyAlignedStreaming(config.RoomStreamingMode);
+
+            // Optional spatial dual-slot streaming moves the target around the persistent player. Authored single-slot
+            // and serial replacement instead place the player on the exact graph-selected entrance behind black.
+            if (!preservesContinuousMotion)
+            {
+                if (!TryResolveArrivalPose(entityManager,
+                                           context,
+                                           out float3 arrivalPosition,
+                                           out quaternion arrivalRotation))
+                {
+                    return false;
+                }
+
+                LocalTransform transform = entityManager.GetComponentData<LocalTransform>(playerEntity);
+                transform.Position = arrivalPosition;
+                transform.Rotation = arrivalRotation;
+                entityManager.SetComponentData(playerEntity, transform);
+                ApplyArrivalFacing(entityManager, playerEntity, arrivalRotation);
+            }
+
+            if (config.ClearPlayerVelocity != 0 && !preservesContinuousMotion)
                 ClearPlayerMotion(entityManager, playerEntity);
 
             return true;
@@ -239,6 +258,11 @@ internal static class GameProceduralRoomArrivalUtility
         lookState.DesiredDirection = forward;
         lookState.CurrentDirection = forward;
         lookState.AngularSpeed = 0f;
+        lookState.PrevLookMask = 0;
+        lookState.CurrLookMask = 0;
+        lookState.LookPressTimes = float4.zero;
+        lookState.ReleaseHoldMask = 0;
+        lookState.ReleaseHoldUntilTime = 0f;
         entityManager.SetComponentData(playerEntity, lookState);
     }
 
@@ -256,7 +280,9 @@ internal static class GameProceduralRoomArrivalUtility
             movementState.Velocity = float3.zero;
             movementState.PrevMoveMask = 0;
             movementState.CurrMoveMask = 0;
+            movementState.MovePressTimes = float4.zero;
             movementState.ReleaseHoldMask = 0;
+            movementState.ReleaseHoldUntilTime = 0f;
             entityManager.SetComponentData(playerEntity, movementState);
         }
 
@@ -271,6 +297,7 @@ internal static class GameProceduralRoomArrivalUtility
             inputState.SwapPowerUpSlots = 0f;
             inputState.MoveUsesAnalogSource = 0;
             inputState.LookUsesAnalogSource = 0;
+            inputState.PointerLookBlocked = 1;
             entityManager.SetComponentData(playerEntity, inputState);
         }
     }
@@ -288,12 +315,13 @@ internal static class GameProceduralRoomArrivalUtility
                                              GameProceduralRoomTransitionContext context)
     {
         EntityQuery portalQuery = entityManager.CreateEntityQuery(typeof(GameRoomPortal),
-                                                                  typeof(GameRoomPortalRuntimeState));
-        NativeArray<Entity> portalEntities = default;
+                                                                  typeof(GameRoomPortalRuntimeState),
+                                                                  typeof(SceneTag));
+        NativeList<Entity> portalEntities = new NativeList<Entity>(Allocator.Temp);
 
         try
         {
-            portalEntities = portalQuery.ToEntityArray(Allocator.Temp);
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(portalQuery, ref portalEntities);
             DynamicBuffer<GameProceduralRoomEdgeElement> edges = entityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity, true);
             DynamicBuffer<GameProceduralRoomNodeElement> nodes = entityManager.GetBuffer<GameProceduralRoomNodeElement>(managerEntity, true);
             bool activeNodeIsBoss = context.TargetNodeIndex >= 0 &&
@@ -332,9 +360,7 @@ internal static class GameProceduralRoomArrivalUtility
         }
         finally
         {
-            if (portalEntities.IsCreated)
-                portalEntities.Dispose();
-
+            portalEntities.Dispose();
             portalQuery.Dispose();
         }
     }

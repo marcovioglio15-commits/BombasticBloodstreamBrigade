@@ -398,9 +398,10 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
             Vector3 start = new Vector3(sourceRect.xMax, sourceRect.center.y, 0f);
             Vector3 end = new Vector3(targetRect.xMin, targetRect.center.y, 0f);
             float tangentLength = Math.Max(36f, (end.x - start.x) * 0.42f);
-            Color color = edge.UsesCenterArrival
-                ? new Color(0.35f, 0.8f, 1f, 0.88f)
-                : new Color(0.72f, 0.78f, 0.92f, 0.9f);
+            Color color = GameProceduralLevelGraphPreviewUtility.ResolveNodeColor(sourceLayout.DepthOrdinal,
+                                                                                 sourceLayout.DepthNodeCount,
+                                                                                 sourceLayout.Node.Role);
+            color.a = edge.UsesCenterArrival ? 0.78f : 0.92f;
             Handles.DrawBezier(start,
                                end,
                                start + Vector3.right * tangentLength,
@@ -408,6 +409,7 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
                                color,
                                null,
                                Math.Max(1.25f, 2f * zoom));
+            DrawEdgeArrowHead(end, color);
             string label = edge.UsesCenterArrival
                 ? "CENTER"
                 : edge.SourceSide + " → " + edge.TargetSide;
@@ -453,7 +455,9 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
                 continue;
 
             Color previousBackground = GUI.backgroundColor;
-            GUI.backgroundColor = GameProceduralLevelGraphPreviewUtility.ResolveRoleColor(layout.Node.Role);
+            GUI.backgroundColor = GameProceduralLevelGraphPreviewUtility.ResolveNodeColor(layout.DepthOrdinal,
+                                                                                          layout.DepthNodeCount,
+                                                                                          layout.Node.Role);
             string label = layout.Node.Role + "  •  Node " + layout.Node.NodeId + "\n" +
                            layout.Node.TileId + "  #" + layout.Node.CopyOrdinal + "\n" +
                            layout.Node.SceneId;
@@ -467,6 +471,20 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
 
             GUI.backgroundColor = previousBackground;
         }
+    }
+
+    /// <summary>
+    /// Draws a compact right-facing arrow head using the same source-node color as its connection curve.
+    /// </summary>
+    /// <param name="end">Canvas-space target point at the target node boundary.</param>
+    /// <param name="color">Source-node color shared by the complete edge.</param>
+    private void DrawEdgeArrowHead(Vector3 end, Color color)
+    {
+        float size = Mathf.Clamp(7f * zoom, 3.5f, 10f);
+        Handles.color = color;
+        Handles.DrawAAConvexPolygon(end,
+                                    end + new Vector3(-size, -size * 0.65f, 0f),
+                                    end + new Vector3(-size, size * 0.65f, 0f));
     }
 
     /// <summary>

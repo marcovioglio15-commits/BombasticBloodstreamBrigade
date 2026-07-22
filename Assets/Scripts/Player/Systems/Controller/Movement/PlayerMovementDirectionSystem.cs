@@ -51,7 +51,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
     /// <param name="state"></param>
     public void OnUpdate(ref SystemState state)
     {
-        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        if (PlayerGameplayPauseUtility.IsPlayerMotionHardPauseActive())
         {
             foreach (RefRW<PlayerMovementState> movementState in SystemAPI.Query<RefRW<PlayerMovementState>>())
                 movementState.ValueRW.DesiredDirection = float3.zero;

@@ -94,6 +94,8 @@ public sealed class GameProceduralRoomTileSolverInput
     private readonly float baseSelectionWeight;
     private readonly int centerAnchorCount;
     private readonly GameProceduralRoomPortalSolverInput[] portals;
+    private readonly bool useExactDepthConstraint;
+    private readonly int exactDepth;
     #endregion
 
     #endregion
@@ -170,6 +172,22 @@ public sealed class GameProceduralRoomTileSolverInput
             return portals;
         }
     }
+
+    public bool UseExactDepthConstraint
+    {
+        get
+        {
+            return useExactDepthConstraint;
+        }
+    }
+
+    public int ExactDepth
+    {
+        get
+        {
+            return exactDepth;
+        }
+    }
     #endregion
 
     #region Methods
@@ -187,6 +205,8 @@ public sealed class GameProceduralRoomTileSolverInput
     /// <param name="baseSelectionWeight">Positive base candidate weight.</param>
     /// <param name="centerAnchorCount">Number of cached center anchors.</param>
     /// <param name="portals">Flattened individual portal signatures.</param>
+    /// <param name="useExactDepthConstraint">Whether this tile is valid at one hard graph depth only.</param>
+    /// <param name="exactDepth">Required graph depth when the hard constraint is enabled.</param>
     public GameProceduralRoomTileSolverInput(string technicalId,
                                              string tileId,
                                              string sceneId,
@@ -195,7 +215,9 @@ public sealed class GameProceduralRoomTileSolverInput
                                              Vector2Int preferredDepthRange,
                                              float baseSelectionWeight,
                                              int centerAnchorCount,
-                                             IList<GameProceduralRoomPortalSolverInput> portals)
+                                             IList<GameProceduralRoomPortalSolverInput> portals,
+                                             bool useExactDepthConstraint = false,
+                                             int exactDepth = 0)
     {
         this.technicalId = technicalId ?? string.Empty;
         this.tileId = tileId ?? string.Empty;
@@ -206,6 +228,8 @@ public sealed class GameProceduralRoomTileSolverInput
         this.baseSelectionWeight = baseSelectionWeight;
         this.centerAnchorCount = centerAnchorCount;
         this.portals = CopyPortals(portals);
+        this.useExactDepthConstraint = useExactDepthConstraint;
+        this.exactDepth = exactDepth;
     }
     #endregion
 

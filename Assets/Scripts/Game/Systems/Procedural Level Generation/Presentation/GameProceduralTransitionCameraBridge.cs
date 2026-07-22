@@ -92,7 +92,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (activeBridge.fadeCamera != null)
             activeBridge.fadeCamera.enabled = visible;
 
-        activeBridge.RefreshCameraStack();
+        activeBridge.ApplyCachedPresentationState();
     }
 
     /// <summary>
@@ -122,7 +122,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (activeBridge.playerCamera != null)
             activeBridge.playerCamera.enabled = visible;
 
-        activeBridge.RefreshCameraStack();
+        activeBridge.ApplyCachedPresentationState();
 
         if (!visible)
         {
@@ -216,6 +216,12 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     /// <param name="nextScene">New active scene.</param>
     private void HandleActiveSceneChanged(Scene previousScene, Scene nextScene)
     {
+        if (GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(previousScene) ||
+            GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(nextScene))
+        {
+            return;
+        }
+
         RefreshCameraStack();
     }
 
@@ -226,6 +232,9 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     /// <param name="loadMode">Load mode used by Scene Management.</param>
     private void HandleSceneLoaded(Scene loadedScene, LoadSceneMode loadMode)
     {
+        if (GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(loadedScene))
+            return;
+
         RefreshCameraStack();
     }
 
@@ -235,6 +244,9 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     /// <param name="unloadedScene">Scene removed from the loaded set.</param>
     private void HandleSceneUnloaded(Scene unloadedScene)
     {
+        if (GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(unloadedScene))
+            return;
+
         RefreshCameraStack();
     }
     #endregion
@@ -307,17 +319,45 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (playerCamera != null)
             GameSceneUrpCameraStackUtility.RemoveOverlayCameraFromLoadedBaseStacks(playerCamera);
 
-        if (fadePresentationVisible && fadeCamera != null)
+        if (fadeCamera != null)
             GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, fadeCamera);
 
-        if (!playerPresentationVisible || playerCamera == null)
+        if (playerCamera != null)
+            GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, playerCamera);
+
+        ApplyCachedPresentationState();
+    }
+
+    /// <summary>
+    /// Updates transition-only masks and framing against the already wired persistent base-camera stack.
+    /// </summary>
+    private void ApplyCachedPresentationState()
+    {
+        if (activeBaseCamera == null)
+        {
+            RefreshCameraStack();
+            return;
+        }
+
+        UniversalAdditionalCameraData baseCameraData = activeBaseCamera.GetComponent<UniversalAdditionalCameraData>();
+
+        if (baseCameraData == null || baseCameraData.renderType != CameraRenderType.Base)
+            return;
+
+        if (!playerPresentationVisible)
+        {
+            RestoreCameraMasks();
+            return;
+        }
+
+        if (playerCamera == null)
             return;
 
         ExcludePlayerLayerFromCameraStack(activeBaseCamera, baseCameraData);
 
-        // Capture the source gameplay view once. The same pose keeps the persistent player stable while the
-        // base stack temporarily moves through bootstrap fallback and the newly loaded room camera.
-        if (!hasPlayerCameraSnapshot && !GameSceneBootstrapCameraView.IsFallbackCamera(activeBaseCamera))
+        // Capture the persistent gameplay view once so the isolated player overlay preserves identical framing
+        // while the same bootstrap-owned camera follows the relocated player behind the black environment fade.
+        if (!hasPlayerCameraSnapshot)
         {
             playerCameraSnapshot = CameraRenderSnapshot.Capture(activeBaseCamera);
             hasPlayerCameraSnapshot = true;
@@ -328,7 +368,6 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         else
             SynchronizePlayerCamera(activeBaseCamera, playerCamera);
 
-        GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, playerCamera);
     }
 
     /// <summary>

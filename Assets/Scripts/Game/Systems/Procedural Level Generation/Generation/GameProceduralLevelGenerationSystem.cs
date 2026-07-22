@@ -370,6 +370,9 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
         runtimeState.FailureMessage = default;
         runtimeState.RunSeed = result.RunSeed;
         runtimeState.LevelSeed = result.LevelSeed;
+        runtimeState.GenerationVersion = runtimeState.GenerationVersion == uint.MaxValue
+            ? 1u
+            : runtimeState.GenerationVersion + 1u;
         runtimeState.CurrentLevelIndex = levelIndex;
         runtimeState.CurrentNodeIndex = -1;
         runtimeState.PendingNodeIndex = startNode.NodeIndex;
@@ -630,6 +633,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
     /// <param name="managerEntity">Unique procedural manager entity.</param>
     private void ResetRun(Entity managerEntity)
     {
+        uint generationVersion = EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity).GenerationVersion;
         EntityManager.GetBuffer<GameProceduralRoomNodeElement>(managerEntity).Clear();
         EntityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity).Clear();
         EntityManager.GetBuffer<GameProceduralRoomTraversalRequest>(managerEntity).Clear();
@@ -637,6 +641,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
         RemoveProceduralSceneRequests(EntityManager.GetBuffer<GameSceneTransitionRequest>(managerEntity));
         EntityManager.SetComponentData(managerEntity, new GameProceduralLevelRuntimeState
         {
+            GenerationVersion = generationVersion,
             CurrentLevelIndex = -1,
             CurrentNodeIndex = -1,
             PendingNodeIndex = -1,

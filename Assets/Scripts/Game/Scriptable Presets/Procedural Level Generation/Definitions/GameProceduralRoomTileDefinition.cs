@@ -38,6 +38,14 @@ public sealed class GameProceduralRoomTileDefinition
     [SerializeField]
     private Vector2Int preferredDepthRange = new Vector2Int(1, 8);
 
+    [Tooltip("Restricts every generated occurrence of this tile to one exact graph depth instead of using the preferred depth range for placement scoring.")]
+    [SerializeField]
+    private bool useExactDepthConstraint;
+
+    [Tooltip("Required graph depth for this tile when Exact Depth Constraint is enabled; the tile is excluded from every other depth.")]
+    [SerializeField]
+    private int exactDepth = 1;
+
     [Tooltip("Base weighted-selection value applied before level rule scores rank valid candidates.")]
     [SerializeField]
     private float baseSelectionWeight = 1f;
@@ -99,6 +107,22 @@ public sealed class GameProceduralRoomTileDefinition
         get
         {
             return preferredDepthRange;
+        }
+    }
+
+    public bool UseExactDepthConstraint
+    {
+        get
+        {
+            return useExactDepthConstraint;
+        }
+    }
+
+    public int ExactDepth
+    {
+        get
+        {
+            return exactDepth;
         }
     }
 

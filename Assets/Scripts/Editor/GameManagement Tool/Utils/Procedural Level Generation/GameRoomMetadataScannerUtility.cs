@@ -422,7 +422,11 @@ public static class GameRoomMetadataScannerUtility
 
             for (int subSceneIndex = 0; subSceneIndex < subScenes.Length; subSceneIndex++)
             {
-                string subScenePath = ResolveSubSceneAssetPath(subScenes[subSceneIndex]);
+                SubScene subScene = subScenes[subSceneIndex];
+                string subScenePath = ResolveSubSceneAssetPath(subScene);
+
+                if (subScene != null && subScene.AutoLoadScene)
+                    warnings.Add("SubScene component '" + BuildHierarchyPath(subScene.transform) + "' in '" + scene.path + "' must disable Auto Load Scene for duplicate-capable transactional room streaming.");
 
                 if (string.IsNullOrWhiteSpace(subScenePath))
                 {

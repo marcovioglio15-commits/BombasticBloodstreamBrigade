@@ -65,7 +65,18 @@ public static class GameProceduralLevelBakeUtility
             MaximumNodeCount = generationSettings != null ? generationSettings.MaximumNodeCount : 128,
             MaximumDepth = generationSettings != null ? generationSettings.MaximumDepth : 64,
             MaximumGenerationAttempts = generationSettings != null ? generationSettings.MaximumGenerationAttempts : 128,
+            RoomStreamingMode = transitionSettings != null
+                ? transitionSettings.RoomStreamingMode
+                : GameProceduralRoomStreamingMode.AuthoredSingleSlot,
+            AdjacentPreloadPolicy = transitionSettings != null
+                ? transitionSettings.AdjacentPreloadPolicy
+                : GameProceduralAdjacentPreloadPolicy.Disabled,
+            MaximumStagedRooms = transitionSettings != null ? transitionSettings.MaximumStagedRooms : 0,
+            RequireReadyBeforePortalCommit = transitionSettings == null || transitionSettings.RequireReadyBeforePortalCommit ? (byte)1 : (byte)0,
+            RetiredRoomBudget = transitionSettings != null ? transitionSettings.RetiredRoomBudget : 0,
+            RetirementWorkBudgetMilliseconds = transitionSettings != null ? transitionSettings.RetirementWorkBudgetMilliseconds : 1.5f,
             KeepPlayerVisible = transitionSettings != null && transitionSettings.KeepPlayerVisible ? (byte)1 : (byte)0,
+            HideLoadingProgressDuringRoomTransitions = transitionSettings != null && transitionSettings.HideLoadingProgressDuringRoomTransitions ? (byte)1 : (byte)0,
             HasPlayerTransitionAnimation = transitionSettings != null && transitionSettings.PlayerTransitionAnimation != null ? (byte)1 : (byte)0,
             PlayerTransitionAnimation = transitionSettings != null ? transitionSettings.PlayerTransitionAnimation : null,
             RelocationNormalizedTime = transitionSettings != null ? transitionSettings.RelocationNormalizedTime : 0.5f,
@@ -215,6 +226,8 @@ public static class GameProceduralLevelBakeUtility
                 MaximumCopies = tile.MaximumCopies,
                 PreferredDepthMinimum = tile.PreferredDepthRange.x,
                 PreferredDepthMaximum = tile.PreferredDepthRange.y,
+                UseExactDepthConstraint = tile.UseExactDepthConstraint ? (byte)1 : (byte)0,
+                ExactDepth = tile.ExactDepth,
                 BaseSelectionWeight = tile.BaseSelectionWeight
             });
         }

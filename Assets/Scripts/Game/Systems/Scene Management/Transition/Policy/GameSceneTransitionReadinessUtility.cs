@@ -42,7 +42,8 @@ internal static class GameSceneTransitionReadinessUtility
             return false;
 
         if (GameScenePersistentPlayerSceneUtility.IsGameplayLikeScene(targetScene) &&
-            !IsGameplayRuntimeReady(GameSceneTransitionPurposeUtility.RequiresFullGameplayWarmup(transitionPurpose)))
+            !IsGameplayRuntimeReady(GameSceneTransitionPurposeUtility.RequiresFullGameplayWarmup(transitionPurpose),
+                                    transitionPurpose == GameSceneTransitionPurpose.ProceduralRoomTraversal))
             return false;
 
         return ArePersistentPlayerScenesReady(persistentPlayerScenes);
@@ -144,8 +145,10 @@ internal static class GameSceneTransitionReadinessUtility
     /// Checks gameplay runtime surfaces that are created after scene load callbacks, before revealing gameplay.
     /// </summary>
     /// <param name="requireFullPoolWarmup">True only while the persistent gameplay runtime is being initialized for the first time.</param>
+    /// <param name="requireActiveEnemyPoolWarmup">True when the newly committed room must finish its enemy pool prewarm before reveal.</param>
     /// <returns>True when input, camera, the single player entity and any required first-load pools are ready.</returns>
-    private static bool IsGameplayRuntimeReady(bool requireFullPoolWarmup)
+    private static bool IsGameplayRuntimeReady(bool requireFullPoolWarmup,
+                                               bool requireActiveEnemyPoolWarmup)
     {
         if (!PlayerInputRuntime.IsReady)
             return false;
@@ -172,10 +175,13 @@ internal static class GameSceneTransitionReadinessUtility
             if (playerReadyQuery.CalculateEntityCount() != 1)
                 return false;
 
-            if (!requireFullPoolWarmup)
-                return true;
+            if (requireFullPoolWarmup)
+                return AreGameplayPoolsReady(entityManager);
 
-            return AreGameplayPoolsReady(entityManager);
+            if (requireActiveEnemyPoolWarmup)
+                return AreEnemyPoolsReady(entityManager);
+
+            return true;
         }
         finally
         {
@@ -336,6 +342,12 @@ internal static class GameSceneTransitionReadinessUtility
             for (int spawnerIndex = 0; spawnerIndex < spawnerEntities.Length; spawnerIndex++)
             {
                 Entity spawnerEntity = spawnerEntities[spawnerIndex];
+
+                // Transactional retirement keeps previous room sections resident outside the critical path. Their
+                // dormant spawners must never block the newly committed room's full restart warm-up contract.
+                if (!GameProceduralRoomInstanceQueryUtility.IsEntityInActiveRoom(entityManager, spawnerEntity))
+                    continue;
+
                 EnemySpawnerState spawnerState = entityManager.GetComponentData<EnemySpawnerState>(spawnerEntity);
 
                 if (spawnerState.Initialized == 0)
@@ -532,7 +544,16 @@ internal static class GameSceneTransitionReadinessUtility
 
         try
         {
-            return sourceQuery.CalculateEntityCount() > 0;
+            using NativeArray<Entity> sourceEntities = sourceQuery.ToEntityArray(Allocator.Temp);
+
+            // Only active-room sources participate in readiness while retired exact instances remain resident.
+            for (int sourceIndex = 0; sourceIndex < sourceEntities.Length; sourceIndex++)
+            {
+                if (GameProceduralRoomInstanceQueryUtility.IsEntityInActiveRoom(entityManager, sourceEntities[sourceIndex]))
+                    return true;
+            }
+
+            return false;
         }
         finally
         {

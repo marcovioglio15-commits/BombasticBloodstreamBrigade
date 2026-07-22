@@ -42,10 +42,15 @@ public partial struct GameRoomCombatCompletionSystem : ISystem
 
         // Spawner count is small and stable; direct generated iteration avoids NativeArray materialization.
         foreach ((RefRO<EnemySpawnerState> spawnerState,
-                  DynamicBuffer<EnemySpawnerWaveRuntimeElement> waves)
+                  DynamicBuffer<EnemySpawnerWaveRuntimeElement> waves,
+                  Entity spawnerEntity)
                  in SystemAPI.Query<RefRO<EnemySpawnerState>, DynamicBuffer<EnemySpawnerWaveRuntimeElement>>()
-                             .WithAll<EnemySpawner>())
+                             .WithAll<EnemySpawner>()
+                             .WithEntityAccess())
         {
+            if (!GameProceduralRoomInstanceQueryUtility.IsEntityInActiveRoom(state.EntityManager, spawnerEntity))
+                continue;
+
             if (!GameRoomCombatCompletionUtility.IsSpawnerComplete(spawnerState.ValueRO,
                                                                    waves,
                                                                    out bool spawnerHasWaves))

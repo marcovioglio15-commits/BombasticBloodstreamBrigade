@@ -28,6 +28,23 @@ internal static class PlayerGameplayPauseUtility
     }
 
     /// <summary>
+    /// Resolves whether player position and facing must freeze while a destination is unsafe. Motion resumes for a
+    /// ready procedural FadeIn and remains live throughout optional spatial dual-slot traversal.
+    /// </summary>
+    /// <returns>True for time-scale pauses and destructive scene-replacement phases.</returns>
+    public static bool IsPlayerMotionHardPauseActive()
+    {
+        if (IsTimeScaleHardPaused())
+            return true;
+
+        GameSceneTransitionRuntimeGuardUtility.ResolveDefaultWorldPlayerPolicy(out bool _,
+                                                                               out bool shouldBlockGameplay,
+                                                                               out bool allowsLiveMotion,
+                                                                               out bool _);
+        return shouldBlockGameplay && !allowsLiveMotion;
+    }
+
+    /// <summary>
     /// Resolves whether Unity's scaled time is paused, without treating scene transitions as a pause by itself.
     /// </summary>
     /// <returns>True when Time.timeScale is effectively zero.</returns>

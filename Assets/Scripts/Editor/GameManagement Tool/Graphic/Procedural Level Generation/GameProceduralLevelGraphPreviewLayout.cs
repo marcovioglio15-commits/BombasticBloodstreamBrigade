@@ -12,6 +12,8 @@ internal readonly struct GameProceduralLevelGraphPreviewNodeLayout
     #region Readonly Fields
     private readonly GameProceduralLevelGraphNode node;
     private readonly Rect rect;
+    private readonly int depthOrdinal;
+    private readonly int depthNodeCount;
     #endregion
 
     #endregion
@@ -32,6 +34,22 @@ internal readonly struct GameProceduralLevelGraphPreviewNodeLayout
             return rect;
         }
     }
+
+    public int DepthOrdinal
+    {
+        get
+        {
+            return depthOrdinal;
+        }
+    }
+
+    public int DepthNodeCount
+    {
+        get
+        {
+            return depthNodeCount;
+        }
+    }
     #endregion
 
     #region Methods
@@ -42,10 +60,17 @@ internal readonly struct GameProceduralLevelGraphPreviewNodeLayout
     /// </summary>
     /// <param name="node">Generated graph node.</param>
     /// <param name="rect">World-space preview rectangle.</param>
-    public GameProceduralLevelGraphPreviewNodeLayout(GameProceduralLevelGraphNode node, Rect rect)
+    /// <param name="depthOrdinal">Stable row ordinal inside the node's depth column.</param>
+    /// <param name="depthNodeCount">Total nodes sharing the same graph depth.</param>
+    public GameProceduralLevelGraphPreviewNodeLayout(GameProceduralLevelGraphNode node,
+                                                     Rect rect,
+                                                     int depthOrdinal,
+                                                     int depthNodeCount)
     {
         this.node = node;
         this.rect = rect;
+        this.depthOrdinal = depthOrdinal;
+        this.depthNodeCount = depthNodeCount;
     }
     #endregion
 
@@ -149,7 +174,10 @@ internal sealed class GameProceduralLevelGraphPreviewLayout
                                      startY + row * (NodeHeight + RowSpacing),
                                      NodeWidth,
                                      NodeHeight);
-                layouts[node.NodeId] = new GameProceduralLevelGraphPreviewNodeLayout(node, rect);
+                layouts[node.NodeId] = new GameProceduralLevelGraphPreviewNodeLayout(node,
+                                                                                     rect,
+                                                                                     row,
+                                                                                     depthNodes.Count);
             }
         }
 

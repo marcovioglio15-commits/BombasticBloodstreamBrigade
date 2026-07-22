@@ -389,8 +389,42 @@ public static class GameProceduralLevelValidator
             return;
         }
 
+        if (settings.RoomStreamingMode == GameProceduralRoomStreamingMode.TransactionalDualSlot &&
+            settings.AdjacentPreloadPolicy != GameProceduralAdjacentPreloadPolicy.Disabled &&
+            settings.MaximumStagedRooms < 1)
+        {
+            report.Add(GameProceduralLevelValidationCode.InvalidMaximumStagedRooms,
+                       GameProceduralLevelValidationSeverity.Error,
+                       "Transition Settings",
+                       "Maximum Staged Rooms must be at least one while adjacent transactional preloading is enabled.");
+        }
+
+        if (settings.RoomStreamingMode == GameProceduralRoomStreamingMode.TransactionalDualSlot &&
+            settings.RetiredRoomBudget < 0)
+            report.Add(GameProceduralLevelValidationCode.InvalidRetiredRoomBudget,
+                       GameProceduralLevelValidationSeverity.Error,
+                       "Transition Settings",
+                       "Retired Room Budget cannot be negative.");
+
+        if (settings.RoomStreamingMode == GameProceduralRoomStreamingMode.TransactionalDualSlot &&
+            (float.IsNaN(settings.RetirementWorkBudgetMilliseconds) ||
+             float.IsInfinity(settings.RetirementWorkBudgetMilliseconds) ||
+             settings.RetirementWorkBudgetMilliseconds <= 0f))
+        {
+            report.Add(GameProceduralLevelValidationCode.InvalidRetirementWorkBudget,
+                       GameProceduralLevelValidationSeverity.Error,
+                       "Transition Settings",
+                       "Retirement Work Budget must be finite and greater than zero milliseconds.");
+        }
+
         if (!settings.KeepPlayerVisible || settings.PlayerTransitionAnimation == null)
             return;
+
+        if (settings.PlayerTransitionAnimation.hasRootCurves)
+            report.Add(GameProceduralLevelValidationCode.TransitionAnimationContainsRootCurves,
+                       GameProceduralLevelValidationSeverity.Error,
+                       "Transition Settings",
+                       "Player Transition Animation must be in-place and contain no root transform curves, otherwise it can change player presentation position or rotation during traversal.");
 
         float relocationTime = settings.RelocationNormalizedTime;
 
@@ -405,7 +439,7 @@ public static class GameProceduralLevelValidator
         report.Add(GameProceduralLevelValidationCode.InvalidRelocationNormalizedTime,
                    GameProceduralLevelValidationSeverity.Error,
                    "Transition Settings",
-                   "Relocation Normalized Time must be finite and remain inside the inclusive 0..1 range.");
+                   "Room Commit Normalized Time must be finite and remain inside the inclusive 0..1 range.");
     }
     #endregion
 

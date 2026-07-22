@@ -72,9 +72,14 @@ public partial struct GameProceduralRoomPortalDetectionSystem : ISystem
         bool levelRequiresClear = levels[runtimeState.CurrentLevelIndex].RequireRoomClearBeforeExit != 0;
 
         foreach ((RefRO<GameRoomPortal> portal,
-                  RefRW<GameRoomPortalRuntimeState> portalState)
-                 in SystemAPI.Query<RefRO<GameRoomPortal>, RefRW<GameRoomPortalRuntimeState>>())
+                  RefRW<GameRoomPortalRuntimeState> portalState,
+                  Entity portalEntity)
+                 in SystemAPI.Query<RefRO<GameRoomPortal>, RefRW<GameRoomPortalRuntimeState>>()
+                             .WithEntityAccess())
         {
+            if (!GameProceduralRoomInstanceQueryUtility.IsEntityInActiveRoom(state.EntityManager, portalEntity))
+                continue;
+
             bool playerInside = ContainsPoint(portal.ValueRO, playerPosition);
 
             if (!playerInside)

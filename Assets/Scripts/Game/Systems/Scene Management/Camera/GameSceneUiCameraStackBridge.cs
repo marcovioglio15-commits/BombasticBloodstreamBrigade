@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -10,6 +11,10 @@ using UnityEngine.SceneManagement;
 public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 {
     #region Fields
+
+    #region Static Fields
+    private static readonly HashSet<GameSceneUiCameraStackBridge> activeBridges = new HashSet<GameSceneUiCameraStackBridge>();
+    #endregion
 
     #region Serialized Fields
     [Header("Camera Stack")]
@@ -31,6 +36,20 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
     #region Methods
 
+    #region Public Methods
+    /// <summary>
+    /// Rebinds every loaded UI overlay after persistent base-camera ownership changes during scene replacement.
+    /// </summary>
+    internal static void RefreshLoadedCameraStacks()
+    {
+        foreach (GameSceneUiCameraStackBridge bridge in activeBridges)
+        {
+            if (bridge != null && bridge.isActiveAndEnabled)
+                bridge.ApplyCameraStack();
+        }
+    }
+    #endregion
+
     #region Unity Methods
     /// <summary>
     /// Registers scene-change callbacks and applies the camera stack once the additive UI scene is enabled.
@@ -40,8 +59,10 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
         if (uiCamera == null)
             uiCamera = GetComponent<Camera>();
 
+        activeBridges.Add(this);
         SceneManager.activeSceneChanged += HandleActiveSceneChanged;
         SceneManager.sceneLoaded += HandleSceneLoaded;
+        SceneManager.sceneUnloaded += HandleSceneUnloaded;
         ApplyCameraStack();
     }
 
@@ -52,6 +73,8 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     {
         SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
         SceneManager.sceneLoaded -= HandleSceneLoaded;
+        SceneManager.sceneUnloaded -= HandleSceneUnloaded;
+        activeBridges.Remove(this);
 
         if (removeFromStackOnDisable)
             RemoveCameraStack();
@@ -66,6 +89,12 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     /// <param name="nextScene">Scene that became active.</param>
     private void HandleActiveSceneChanged(Scene previousScene, Scene nextScene)
     {
+        if (GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(previousScene) ||
+            GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(nextScene))
+        {
+            return;
+        }
+
         ApplyCameraStack();
     }
 
@@ -75,6 +104,18 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
     /// <param name="loadedScene">Scene loaded by Unity.</param>
     /// <param name="loadMode">Mode used for the scene load.</param>
     private void HandleSceneLoaded(Scene loadedScene, LoadSceneMode loadMode)
+    {
+        if (GameProceduralRoomStreamingRuntimeUtility.IsOwnedManagedScene(loadedScene))
+            return;
+
+        ApplyCameraStack();
+    }
+
+    /// <summary>
+    /// Rebinds the overlay when unloading a menu or previous owner exposes the persistent gameplay base camera.
+    /// </summary>
+    /// <param name="unloadedScene">Scene whose base camera may have owned this overlay.</param>
+    private void HandleSceneUnloaded(Scene unloadedScene)
     {
         ApplyCameraStack();
     }
@@ -99,6 +140,9 @@ public sealed class GameSceneUiCameraStackBridge : MonoBehaviour
 
         if (baseCameraData == null || uiCameraData == null)
             return;
+
+        if (currentBaseCamera != null && currentBaseCamera != baseCamera)
+            GameSceneUrpCameraStackUtility.RemoveOverlayCameraFromLoadedBaseStacks(uiCamera);
 
         uiCameraData.renderType = CameraRenderType.Overlay;
         uiCameraData.renderPostProcessing = false;

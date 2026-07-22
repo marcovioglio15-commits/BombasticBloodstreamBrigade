@@ -34,11 +34,11 @@ public partial struct PlayerLookDirectionSystem : ISystem
     {
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
         bool useMousePointerLook = PlayerInputRuntime.ShouldUseMousePointerLook();
-        bool isGameplayPaused = PlayerGameplayPauseUtility.IsHardGameplayPauseActive();
+        bool isPlayerMotionPaused = PlayerGameplayPauseUtility.IsPlayerMotionHardPauseActive();
         Camera camera = null;
         float2 mouseScreenPosition = float2.zero;
 
-        if (useMousePointerLook && !isGameplayPaused)
+        if (useMousePointerLook && !isPlayerMotionPaused)
         {
             Mouse mouse = Mouse.current;
 
@@ -79,7 +79,7 @@ public partial struct PlayerLookDirectionSystem : ISystem
                 continue;
             }
 
-            if (isGameplayPaused)
+            if (isPlayerMotionPaused)
             {
                 lookState.ValueRW.DesiredDirection = PlayerControllerMath.NormalizePlanar(fallbackDirection, playerForward);
                 continue;
@@ -88,7 +88,7 @@ public partial struct PlayerLookDirectionSystem : ISystem
             if (math.lengthsq(fallbackDirection) < 1e-6f)
                 fallbackDirection = playerForward;
 
-            if (useMousePointerLook)
+            if (useMousePointerLook && inputState.ValueRO.PointerLookBlocked == 0)
             {
                 if (TryResolveMousePointerDirection(camera,
                                                     mouseScreenPosition,

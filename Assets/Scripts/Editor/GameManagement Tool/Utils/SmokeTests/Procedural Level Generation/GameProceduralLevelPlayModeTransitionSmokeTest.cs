@@ -2,7 +2,6 @@
 using System;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Transforms;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -21,11 +20,10 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     private const string PhaseKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.Phase";
     private const string StepTicksKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.StepTicks";
     private const string SourceNodeKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.SourceNode";
-    private const string SourceCameraOffsetXKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.SourceCameraOffsetX";
-    private const string SourceCameraOffsetYKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.SourceCameraOffsetY";
-    private const string SourceCameraOffsetZKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.SourceCameraOffsetZ";
     private const string RestartPlayerIndexKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.RestartPlayerIndex";
     private const string RestartPlayerVersionKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.RestartPlayerVersion";
+    private const string TargetPortalIdKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.TargetPortalId";
+    private const string TargetPortalSideKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.TargetPortalSide";
     private const string MainMenuSceneId = "SCN_MainMenu";
     private const string FallbackGameplaySceneId = "SCN_MainScene";
     private const string WaitingForMainMenuPhase = "WaitingForMainMenu";
@@ -34,9 +32,10 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     private const string WaitingForRestartStartPhase = "WaitingForRestartStart";
     private const string WaitingForRestartCompletionPhase = "WaitingForRestartCompletion";
     private const string CompletedPhase = "Completed";
-    private const double StepTimeoutSeconds = 75d;
-    private const float CameraOffsetTolerance = 0.25f;
-    private const float ViewportTolerance = 0.05f;
+    private const string initialRoomControlCycle = "Initial room control release";
+    private const string roomTraversalControlCycle = "Room traversal control release";
+    private const string restartControlCycle = "Restart control release";
+    private const double StepTimeoutSeconds = 180d;
     #endregion
 
     #region Constructors
@@ -58,16 +57,25 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
 
     #region Public Methods
     /// <summary>
-    /// Opens bootstrap and starts the time-bounded Play Mode transition regression test.
+    /// Refreshes generated room metadata, opens bootstrap and starts the time-bounded Play Mode transition regression test.
     /// </summary>
     public static void Run()
     {
+        GameRoomMetadataRefreshReport metadataReport = GameRoomMetadataAutomaticRefreshUtility.RefreshAllStaleReferencedRooms();
+
+        if (!metadataReport.Succeeded)
+            throw new InvalidOperationException("Procedural room metadata refresh failed before Play Mode: " +
+                                                string.Join(" | ", metadataReport.Errors));
+
+        AssetDatabase.SaveAssets();
         SessionState.SetBool(ActiveKey, true);
         SessionState.SetBool(EnteredPlayKey, false);
         SessionState.SetString(FailureKey, string.Empty);
         SessionState.SetString(PhaseKey, WaitingForMainMenuPhase);
         SessionState.SetString(StepTicksKey, DateTime.UtcNow.Ticks.ToString());
         SessionState.SetInt(SourceNodeKey, -1);
+        GameProceduralCameraContinuitySmokeUtility.Reset();
+        GameProceduralPlayerControlReleaseSmokeUtility.Reset();
         SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, true);
         EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.BootstrapScenePath, OpenSceneMode.Single);
         EditorApplication.isPlaying = true;
@@ -213,20 +221,63 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         GameSceneTransitionState transitionState = entityManager.GetComponentData<GameSceneTransitionState>(managerEntity);
         GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
 
-        if (transitionState.IsTransitioning != 0 ||
-            runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
+        if (transitionState.IsTransitioning != 0)
+        {
+            if (!GameProceduralPlayerControlReleaseSmokeUtility.Tick(entityManager,
+                                                                      transitionState,
+                                                                      initialRoomControlCycle,
+                                                                      out string releaseFailure))
+            {
+                SessionState.SetString(FailureKey, releaseFailure);
+            }
+
+            return;
+        }
+
+        if (runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
             runtimeState.CurrentNodeIndex < 0)
         {
             return;
         }
 
-        if (!TryCaptureCameraOffset(entityManager, out Vector3 sourceCameraOffset, out string cameraFailure))
+        if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
+                                                                        initialRoomControlCycle,
+                                                                        out bool releaseReady,
+                                                                        out string releaseCompletionFailure))
+        {
+            SessionState.SetString(FailureKey, releaseCompletionFailure);
+            return;
+        }
+
+        if (!releaseReady)
+            return;
+
+        if (!GameProceduralCameraContinuitySmokeUtility.CaptureAndStore(entityManager, out string cameraFailure))
         {
             SessionState.SetString(FailureKey, cameraFailure);
             return;
         }
 
-        StoreSourceCameraOffset(sourceCameraOffset);
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateGameplayUi(out string uiFailure))
+        {
+            SessionState.SetString(FailureKey, uiFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateSingleManagedRoom(entityManager,
+                                                                                  managerEntity,
+                                                                                  out string roomFailure))
+        {
+            SessionState.SetString(FailureKey, roomFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateAuthoredRoomPlacement(entityManager,
+                                                                                       out string placementFailure))
+        {
+            SessionState.SetString(FailureKey, placementFailure);
+            return;
+        }
 
         DynamicBuffer<GameProceduralRoomEdgeElement> edges = entityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity, true);
 
@@ -245,6 +296,8 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
                 AssignedEdgeIndex = edge.EdgeIndex
             });
             SessionState.SetInt(SourceNodeKey, runtimeState.CurrentNodeIndex);
+            SessionState.SetString(TargetPortalIdKey, edge.TargetPortalId.ToString());
+            SessionState.SetInt(TargetPortalSideKey, (int)edge.TargetSide);
             SessionState.SetString(PhaseKey, WaitingForTraversalPhase);
             ResetStepTimeout();
             return;
@@ -263,26 +316,103 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         GameSceneTransitionState transitionState = entityManager.GetComponentData<GameSceneTransitionState>(managerEntity);
         GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
 
-        if (transitionState.IsTransitioning != 0 ||
-            runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
+        if (transitionState.IsTransitioning != 0)
+        {
+            if (transitionState.Purpose != GameSceneTransitionPurpose.ProceduralRoomTraversal)
+            {
+                SessionState.SetString(FailureKey,
+                                       "Room traversal started with unexpected transition purpose " + transitionState.Purpose + ".");
+                return;
+            }
+
+            if (Time.timeScale <= 0.0001f)
+                SessionState.SetString(FailureKey, "Transactional room traversal paused global Unity time scale.");
+
+            if (!GameProceduralPlayerControlReleaseSmokeUtility.Tick(entityManager,
+                                                                      transitionState,
+                                                                      roomTraversalControlCycle,
+                                                                      out string releaseFailure))
+            {
+                SessionState.SetString(FailureKey, releaseFailure);
+            }
+
+            return;
+        }
+
+        if (runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
             runtimeState.CurrentNodeIndex == SessionState.GetInt(SourceNodeKey, -1))
         {
             return;
         }
 
-        if (!ValidateCameraContinuity(entityManager, out string cameraFailure))
+        if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
+                                                                        roomTraversalControlCycle,
+                                                                        out bool releaseReady,
+                                                                        out string releaseCompletionFailure))
+        {
+            SessionState.SetString(FailureKey, releaseCompletionFailure);
+            return;
+        }
+
+        if (!releaseReady)
+            return;
+
+        if (!GameProceduralCameraContinuitySmokeUtility.Validate(entityManager, out string cameraFailure))
         {
             SessionState.SetString(FailureKey, cameraFailure);
             return;
         }
 
-        if (!ValidatePlayerProjectilePoolReady(entityManager, out string poolFailure))
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateGameplayUi(out string uiFailure))
+        {
+            SessionState.SetString(FailureKey, uiFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateSingleManagedRoom(entityManager,
+                                                                                  managerEntity,
+                                                                                  out string roomFailure))
+        {
+            SessionState.SetString(FailureKey, roomFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateAuthoredRoomPlacement(entityManager,
+                                                                                       out string placementFailure))
+        {
+            SessionState.SetString(FailureKey, placementFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateTargetPortalAlignment(
+                entityManager,
+                SessionState.GetString(TargetPortalIdKey, string.Empty),
+                (GameRoomPortalSide)SessionState.GetInt(TargetPortalSideKey, -1),
+                out string portalFailure))
+        {
+            SessionState.SetString(FailureKey, portalFailure);
+            return;
+        }
+
+        if (!GameProceduralRuntimeReadinessSmokeUtility.TryValidateEnemySpawnersReady(entityManager,
+                                                                                      out bool enemySpawnersReady,
+                                                                                      out string enemyFailure))
+        {
+            SessionState.SetString(FailureKey, enemyFailure);
+            return;
+        }
+
+        if (!enemySpawnersReady)
+            return;
+
+        if (!GameProceduralRuntimeReadinessSmokeUtility.ValidatePlayerProjectilePoolReady(entityManager,
+                                                                                           out string poolFailure))
         {
             SessionState.SetString(FailureKey, poolFailure);
             return;
         }
 
-        if (!TryResolvePlayerEntity(entityManager, out Entity playerEntity))
+        if (!GameProceduralRuntimeReadinessSmokeUtility.TryResolvePlayerEntity(entityManager, out Entity playerEntity))
         {
             SessionState.SetString(FailureKey, "The persistent player was unavailable before procedural restart validation.");
             return;
@@ -318,6 +448,15 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         if (transitionState.IsTransitioning == 0)
             return;
 
+        if (!GameProceduralPlayerControlReleaseSmokeUtility.Tick(entityManager,
+                                                                  transitionState,
+                                                                  restartControlCycle,
+                                                                  out string releaseFailure))
+        {
+            SessionState.SetString(FailureKey, releaseFailure);
+            return;
+        }
+
         if (transitionState.Purpose != GameSceneTransitionPurpose.ProceduralInitialRoom)
         {
             SessionState.SetString(FailureKey,
@@ -339,14 +478,38 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         GameSceneTransitionState transitionState = entityManager.GetComponentData<GameSceneTransitionState>(managerEntity);
         GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
 
-        if (transitionState.IsTransitioning != 0 ||
-            runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
+        if (transitionState.IsTransitioning != 0)
+        {
+            if (!GameProceduralPlayerControlReleaseSmokeUtility.Tick(entityManager,
+                                                                      transitionState,
+                                                                      restartControlCycle,
+                                                                      out string releaseFailure))
+            {
+                SessionState.SetString(FailureKey, releaseFailure);
+            }
+
+            return;
+        }
+
+        if (runtimeState.Phase != GameProceduralLevelRuntimePhase.Active ||
             runtimeState.CurrentNodeIndex < 0)
         {
             return;
         }
 
-        if (!TryResolvePlayerEntity(entityManager, out Entity playerEntity))
+        if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
+                                                                        restartControlCycle,
+                                                                        out bool releaseReady,
+                                                                        out string releaseCompletionFailure))
+        {
+            SessionState.SetString(FailureKey, releaseCompletionFailure);
+            return;
+        }
+
+        if (!releaseReady)
+            return;
+
+        if (!GameProceduralRuntimeReadinessSmokeUtility.TryResolvePlayerEntity(entityManager, out Entity playerEntity))
         {
             SessionState.SetString(FailureKey, "Play Again completed without one persistent player entity.");
             return;
@@ -369,9 +532,22 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
             return;
         }
 
-        if (!ValidatePlayerProjectilePoolReady(entityManager, out string poolFailure))
+        if (!GameProceduralRuntimeReadinessSmokeUtility.ValidatePlayerProjectilePoolReady(entityManager,
+                                                                                           out string poolFailure))
         {
             SessionState.SetString(FailureKey, poolFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.ValidateGameplayUi(out string uiFailure))
+        {
+            SessionState.SetString(FailureKey, uiFailure);
+            return;
+        }
+
+        if (!GameProceduralCameraContinuitySmokeUtility.Validate(entityManager, out string restartCameraFailure))
+        {
+            SessionState.SetString(FailureKey, "Play Again camera reset failed: " + restartCameraFailure);
             return;
         }
 
@@ -417,86 +593,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     }
 
     /// <summary>
-    /// Resolves the unique persistent player used by restart and projectile-pool assertions.
-    /// </summary>
-    /// <param name="entityManager">Default-world entity manager.</param>
-    /// <param name="playerEntity">Resolved persistent player entity.</param>
-    /// <returns>True when exactly one player exists.</returns>
-    private static bool TryResolvePlayerEntity(EntityManager entityManager, out Entity playerEntity)
-    {
-        playerEntity = Entity.Null;
-        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
-                                                            ComponentType.ReadOnly<PlayerRunOutcomeState>());
-
-        try
-        {
-            if (query.CalculateEntityCount() != 1)
-                return false;
-
-            playerEntity = query.GetSingletonEntity();
-            return true;
-        }
-        finally
-        {
-            query.Dispose();
-        }
-    }
-
-    /// <summary>
-    /// Verifies cleanup rebuilt the surviving player's projectile pool with valid parked entities.
-    /// </summary>
-    /// <param name="entityManager">Default-world entity manager containing player shooting runtime.</param>
-    /// <param name="failure">Diagnostic message when pool initialization or entity ownership is stale.</param>
-    /// <returns>True when the player pool is initialized and contains only valid projectile entities.</returns>
-    private static bool ValidatePlayerProjectilePoolReady(EntityManager entityManager, out string failure)
-    {
-        failure = string.Empty;
-        EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
-                                                            ComponentType.ReadOnly<ShooterProjectilePrefab>(),
-                                                            ComponentType.ReadOnly<ProjectilePoolState>(),
-                                                            ComponentType.ReadOnly<ProjectilePoolElement>());
-
-        try
-        {
-            if (query.CalculateEntityCount() != 1)
-            {
-                failure = "Projectile-pool validation requires exactly one persistent player shooter.";
-                return false;
-            }
-
-            Entity playerEntity = query.GetSingletonEntity();
-            ProjectilePoolState poolState = entityManager.GetComponentData<ProjectilePoolState>(playerEntity);
-            DynamicBuffer<ProjectilePoolElement> projectilePool = entityManager.GetBuffer<ProjectilePoolElement>(playerEntity, true);
-
-            if (poolState.Initialized == 0 || projectilePool.Length < Mathf.Max(0, poolState.InitialCapacity))
-            {
-                failure = "The persistent player projectile pool was not rebuilt after room cleanup.";
-                return false;
-            }
-
-            // Every pool reference must resolve to a live, inactive projectile before gameplay is revealed.
-            for (int projectileIndex = 0; projectileIndex < projectilePool.Length; projectileIndex++)
-            {
-                Entity projectileEntity = projectilePool[projectileIndex].ProjectileEntity;
-
-                if (!entityManager.Exists(projectileEntity) ||
-                    !entityManager.HasComponent<ProjectileActive>(projectileEntity) ||
-                    entityManager.IsComponentEnabled<ProjectileActive>(projectileEntity))
-                {
-                    failure = "The persistent player projectile pool contains a missing or active entity after transition cleanup.";
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        finally
-        {
-            query.Dispose();
-        }
-    }
-
-    /// <summary>
     /// Checks whether the fallback gameplay scene ever became loaded during direct procedural startup.
     /// </summary>
     /// <returns>True when SCN_MainScene is currently loaded.</returns>
@@ -504,98 +600,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     {
         Scene scene = SceneManager.GetSceneByName(FallbackGameplaySceneId);
         return scene.IsValid() && scene.isLoaded;
-    }
-
-    /// <summary>
-    /// Captures the active gameplay camera offset relative to the unique persistent player ECS transform.
-    /// </summary>
-    /// <param name="entityManager">Default-world entity manager containing the player transform.</param>
-    /// <param name="cameraOffset">Resolved player-relative gameplay camera offset.</param>
-    /// <param name="failure">Diagnostic message when a unique player or gameplay camera cannot be resolved.</param>
-    /// <returns>True when both the camera and player position were available.</returns>
-    private static bool TryCaptureCameraOffset(EntityManager entityManager,
-                                               out Vector3 cameraOffset,
-                                               out string failure)
-    {
-        cameraOffset = Vector3.zero;
-        failure = string.Empty;
-        Camera gameplayCamera = Camera.main;
-
-        if (gameplayCamera == null || GameSceneBootstrapCameraView.IsFallbackCamera(gameplayCamera))
-        {
-            failure = "No active gameplay MainCamera was available for camera-continuity validation.";
-            return false;
-        }
-
-        EntityQuery playerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
-                                                                  ComponentType.ReadOnly<LocalToWorld>());
-
-        try
-        {
-            if (playerQuery.CalculateEntityCount() != 1)
-            {
-                failure = "Camera-continuity validation requires exactly one persistent player LocalToWorld.";
-                return false;
-            }
-
-            LocalToWorld playerTransform = entityManager.GetComponentData<LocalToWorld>(playerQuery.GetSingletonEntity());
-            cameraOffset = gameplayCamera.transform.position - (Vector3)playerTransform.Position;
-            return true;
-        }
-        finally
-        {
-            playerQuery.Dispose();
-        }
-    }
-
-    /// <summary>
-    /// Persists the source room's player-relative camera offset across the asynchronous traversal.
-    /// </summary>
-    /// <param name="cameraOffset">Source gameplay camera offset captured before traversal.</param>
-    private static void StoreSourceCameraOffset(Vector3 cameraOffset)
-    {
-        SessionState.SetFloat(SourceCameraOffsetXKey, cameraOffset.x);
-        SessionState.SetFloat(SourceCameraOffsetYKey, cameraOffset.y);
-        SessionState.SetFloat(SourceCameraOffsetZKey, cameraOffset.z);
-    }
-
-    /// <summary>
-    /// Verifies that a room camera replacement preserves player framing and leaves the player inside the target viewport.
-    /// </summary>
-    /// <param name="entityManager">Default-world entity manager containing the relocated player transform.</param>
-    /// <param name="failure">Diagnostic message describing an offset or viewport regression.</param>
-    /// <returns>True when the target room camera retained the source player-relative framing.</returns>
-    private static bool ValidateCameraContinuity(EntityManager entityManager, out string failure)
-    {
-        if (!TryCaptureCameraOffset(entityManager, out Vector3 targetCameraOffset, out failure))
-            return false;
-
-        Vector3 sourceCameraOffset = new Vector3(SessionState.GetFloat(SourceCameraOffsetXKey, 0f),
-                                                 SessionState.GetFloat(SourceCameraOffsetYKey, 0f),
-                                                 SessionState.GetFloat(SourceCameraOffsetZKey, 0f));
-        float offsetDelta = Vector3.Distance(sourceCameraOffset, targetCameraOffset);
-
-        if (offsetDelta > CameraOffsetTolerance)
-        {
-            failure = "Room camera replacement changed the player-relative offset by " +
-                      offsetDelta.ToString("0.###") + " units.";
-            return false;
-        }
-
-        Camera gameplayCamera = Camera.main;
-        Vector3 playerPosition = gameplayCamera.transform.position - targetCameraOffset;
-        Vector3 viewportPosition = gameplayCamera.WorldToViewportPoint(playerPosition);
-        bool playerIsVisible = viewportPosition.z > 0f &&
-                               viewportPosition.x >= -ViewportTolerance &&
-                               viewportPosition.x <= 1f + ViewportTolerance &&
-                               viewportPosition.y >= -ViewportTolerance &&
-                               viewportPosition.y <= 1f + ViewportTolerance;
-
-        if (playerIsVisible)
-            return true;
-
-        failure = "The relocated player is outside the target room camera viewport at " + viewportPosition + ".";
-        return false;
     }
 
     /// <summary>
@@ -713,7 +717,10 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         SessionState.SetInt(SourceNodeKey, -1);
         SessionState.SetInt(RestartPlayerIndexKey, -1);
         SessionState.SetInt(RestartPlayerVersionKey, -1);
+        SessionState.SetString(TargetPortalIdKey, string.Empty);
+        SessionState.SetInt(TargetPortalSideKey, -1);
         SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, false);
+        GameProceduralPlayerControlReleaseSmokeUtility.Reset();
 
         if (passed)
             Debug.Log("[GameProceduralLevelPlayModeTransitionSmokeTest] Direct Start-room load, streamed traversal and Play Again restart passed.");

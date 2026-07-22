@@ -58,6 +58,9 @@ internal static class GameProceduralLevelGraphInvariantUtility
             copyCounts.TryGetValue(node.TileTechnicalId, out int copies);
             copyCounts[node.TileTechnicalId] = copies + 1;
 
+            if (!ValidateExactTileDepth(input, node, out diagnostic))
+                return false;
+
             switch (node.Role)
             {
                 case GameProceduralRoomRole.Start:
@@ -183,6 +186,37 @@ internal static class GameProceduralLevelGraphInvariantUtility
     #endregion
 
     #region Validation Methods
+    /// <summary>
+    /// Verifies a generated node respects the hard depth constraint declared by its reusable tile.
+    /// </summary>
+    /// <param name="input">Input containing immutable tile placement constraints.</param>
+    /// <param name="node">Generated node being inspected.</param>
+    /// <param name="diagnostic">Failure text when the tile or exact depth does not match.</param>
+    /// <returns>True when the node belongs to a known tile and satisfies its optional exact depth.</returns>
+    private static bool ValidateExactTileDepth(GameProceduralLevelSolverInput input,
+                                               GameProceduralLevelGraphNode node,
+                                               out string diagnostic)
+    {
+        diagnostic = string.Empty;
+
+        for (int tileIndex = 0; tileIndex < input.RoomTiles.Count; tileIndex++)
+        {
+            GameProceduralRoomTileSolverInput tile = input.RoomTiles[tileIndex];
+
+            if (!string.Equals(tile.TechnicalId, node.TileTechnicalId, StringComparison.Ordinal))
+                continue;
+
+            if (!tile.UseExactDepthConstraint || tile.ExactDepth == node.Depth)
+                return true;
+
+            diagnostic = "A generated tile occurrence violates its exact depth constraint.";
+            return false;
+        }
+
+        diagnostic = "A generated node references an unknown reusable tile.";
+        return false;
+    }
+
     /// <summary>
     /// Verifies generated occurrences do not exceed their reusable tile copy budgets.
     /// </summary>

@@ -17,12 +17,19 @@ internal static class GameSceneTransitionTimeScaleUtility
     /// Starts a transition-owned time-scale lock when configured.
     /// </summary>
     /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="purpose">Transition purpose selecting pause-free room traversal.</param>
     /// <param name="timeScaleChanged">True when a previous lock is active.</param>
     /// <param name="previousTimeScale">Previous time-scale value captured before locking.</param>
-    public static void Begin(GameSceneManagerConfig config, ref bool timeScaleChanged, ref float previousTimeScale)
+    public static void Begin(GameSceneManagerConfig config,
+                             GameSceneTransitionPurpose purpose,
+                             ref bool timeScaleChanged,
+                             ref float previousTimeScale)
     {
-        if (config.SetTimeScaleDuringTransition == 0 && config.LockGameplayInput == 0)
+        if (purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal ||
+            config.SetTimeScaleDuringTransition == 0)
+        {
             return;
+        }
 
         if (timeScaleChanged)
             return;

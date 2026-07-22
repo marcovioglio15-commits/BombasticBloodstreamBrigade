@@ -60,6 +60,11 @@ internal static class GameSceneTransitionExecutionTimingUtility
     /// <param name="transitionPurpose">Purpose selecting first-load or persistent-runtime readiness policy.</param>
     /// <param name="readinessWarmupFrames">Mutable warm-up frame counter.</param>
     /// <param name="readinessWarmupSeconds">Mutable warm-up duration counter.</param>
+    /// <param name="physicsStepStateQuery">Cached query containing the exported physics step version.</param>
+    /// <param name="timeScaleChanged">Mutable flag tracking a transition-owned time-scale lock.</param>
+    /// <param name="previousTimeScale">Time scale restored for hidden fixed-step warm-up.</param>
+    /// <param name="physicsReadinessRequested">Mutable flag tracking the post-load physics target.</param>
+    /// <param name="requiredPhysicsStepVersion">Mutable physics step version required before reveal.</param>
     /// <returns>True when the transition can reveal the target scene.</returns>
     public static bool TryCompleteReadinessWarmup(EntityManager entityManager,
                                                   GameSceneDefinitionElement targetScene,
@@ -68,7 +73,12 @@ internal static class GameSceneTransitionExecutionTimingUtility
                                                   List<GameSceneDefinitionElement> persistentPlayerLoadScenes,
                                                   GameSceneTransitionPurpose transitionPurpose,
                                                   ref int readinessWarmupFrames,
-                                                  ref float readinessWarmupSeconds)
+                                                  ref float readinessWarmupSeconds,
+                                                  EntityQuery physicsStepStateQuery,
+                                                  ref bool timeScaleChanged,
+                                                  float previousTimeScale,
+                                                  ref bool physicsReadinessRequested,
+                                                  ref ulong requiredPhysicsStepVersion)
     {
         entityManager.CompleteDependencyBeforeRO<LocalToWorld>();
 
@@ -78,11 +88,29 @@ internal static class GameSceneTransitionExecutionTimingUtility
                                                                          persistentPlayerLoadScenes,
                                                                          transitionPurpose))
         {
-            ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
+            ResetReadiness(ref readinessWarmupFrames,
+                           ref readinessWarmupSeconds,
+                           ref physicsReadinessRequested,
+                           ref requiredPhysicsStepVersion);
             return false;
         }
 
         if (!GameProceduralRoomArrivalUtility.TryPreparePendingArrival(entityManager))
+        {
+            ResetReadiness(ref readinessWarmupFrames,
+                           ref readinessWarmupSeconds,
+                           ref physicsReadinessRequested,
+                           ref requiredPhysicsStepVersion);
+            return false;
+        }
+
+        // Release only the transition-owned time lock while the authoritative transition guard still neutralizes
+        // player input and gameplay. This lets DOTS rebuild scene-owned collider blobs safely behind black.
+        GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
+
+        if (!GameSceneTransitionPhysicsReadinessUtility.TryComplete(physicsStepStateQuery,
+                                                                    ref physicsReadinessRequested,
+                                                                    ref requiredPhysicsStepVersion))
         {
             ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
             return false;
@@ -106,6 +134,22 @@ internal static class GameSceneTransitionExecutionTimingUtility
     {
         readinessWarmupFrames = 0;
         readinessWarmupSeconds = 0f;
+    }
+
+    /// <summary>
+    /// Clears visual warm-up and fixed-step readiness when loaded scene readiness regresses or a transition resets.
+    /// </summary>
+    /// <param name="readinessWarmupFrames">Mutable warm-up frame counter.</param>
+    /// <param name="readinessWarmupSeconds">Mutable warm-up duration counter.</param>
+    /// <param name="physicsReadinessRequested">Mutable flag tracking the post-load physics target.</param>
+    /// <param name="requiredPhysicsStepVersion">Mutable physics step version required before reveal.</param>
+    public static void ResetReadiness(ref int readinessWarmupFrames,
+                                      ref float readinessWarmupSeconds,
+                                      ref bool physicsReadinessRequested,
+                                      ref ulong requiredPhysicsStepVersion)
+    {
+        ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
+        GameSceneTransitionPhysicsReadinessUtility.Reset(ref physicsReadinessRequested, ref requiredPhysicsStepVersion);
     }
     #endregion
 
