@@ -78,7 +78,82 @@ internal readonly struct GameProceduralLevelGraphPreviewNodeLayout
 }
 
 /// <summary>
-/// Arranges generated nodes into stable depth columns without mutating or reordering solver output.
+/// Stores deterministic source and target anchor slots for one rendered graph edge.
+/// </summary>
+internal readonly struct GameProceduralLevelGraphPreviewEdgeLayout
+{
+    #region Fields
+
+    #region Readonly Fields
+    private readonly int sourceOrdinal;
+    private readonly int sourceCount;
+    private readonly int targetOrdinal;
+    private readonly int targetCount;
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public int SourceOrdinal
+    {
+        get
+        {
+            return sourceOrdinal;
+        }
+    }
+
+    public int SourceCount
+    {
+        get
+        {
+            return sourceCount;
+        }
+    }
+
+    public int TargetOrdinal
+    {
+        get
+        {
+            return targetOrdinal;
+        }
+    }
+
+    public int TargetCount
+    {
+        get
+        {
+            return targetCount;
+        }
+    }
+    #endregion
+
+    #region Methods
+
+    #region Constructors
+    /// <summary>
+    /// Creates immutable side-anchor assignments that keep converging edges visually independent.
+    /// </summary>
+    /// <param name="sourceOrdinal">Stable outgoing slot ordinal on the source node.</param>
+    /// <param name="sourceCount">Total outgoing edges sharing the source node side.</param>
+    /// <param name="targetOrdinal">Stable incoming slot ordinal on the target node.</param>
+    /// <param name="targetCount">Total incoming edges sharing the target node side.</param>
+    public GameProceduralLevelGraphPreviewEdgeLayout(int sourceOrdinal,
+                                                     int sourceCount,
+                                                     int targetOrdinal,
+                                                     int targetCount)
+    {
+        this.sourceOrdinal = sourceOrdinal;
+        this.sourceCount = sourceCount;
+        this.targetOrdinal = targetOrdinal;
+        this.targetCount = targetCount;
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Arranges generated nodes and non-overlapping edge anchors without mutating or reordering solver output.
 /// </summary>
 internal sealed class GameProceduralLevelGraphPreviewLayout
 {
@@ -94,6 +169,7 @@ internal sealed class GameProceduralLevelGraphPreviewLayout
 
     #region Readonly Fields
     private readonly GameProceduralLevelGraphPreviewNodeLayout[] nodes;
+    private readonly GameProceduralLevelGraphPreviewEdgeLayout[] edges;
     private readonly Rect graphBounds;
     #endregion
 
@@ -129,6 +205,7 @@ internal sealed class GameProceduralLevelGraphPreviewLayout
     {
         if (result == null || !result.Success || result.Nodes.Count == 0)
             return new GameProceduralLevelGraphPreviewLayout(Array.Empty<GameProceduralLevelGraphPreviewNodeLayout>(),
+                                                             Array.Empty<GameProceduralLevelGraphPreviewEdgeLayout>(),
                                                              new Rect(0f, 0f, 1f, 1f));
 
         int maximumDepth = 0;
@@ -186,7 +263,9 @@ internal sealed class GameProceduralLevelGraphPreviewLayout
                                0f,
                                graphWidth + OuterPadding * 2f,
                                graphHeight + OuterPadding * 2f);
-        return new GameProceduralLevelGraphPreviewLayout(layouts, bounds);
+        return new GameProceduralLevelGraphPreviewLayout(layouts,
+                                                         BuildEdgeLayouts(result.Edges, layouts),
+                                                         bounds);
     }
 
     /// <summary>
@@ -206,18 +285,185 @@ internal sealed class GameProceduralLevelGraphPreviewLayout
         layout = nodes[nodeId];
         return true;
     }
+
+    /// <summary>
+    /// Resolves precomputed side-anchor ordinals by the edge's stable generation-list index.
+    /// </summary>
+    /// <param name="edgeIndex">Zero-based edge index in the generation result.</param>
+    /// <param name="layout">Matching source and target anchor layout when present.</param>
+    /// <returns>True when the edge index lies inside the layout.</returns>
+    public bool TryGetEdge(int edgeIndex, out GameProceduralLevelGraphPreviewEdgeLayout layout)
+    {
+        if (edgeIndex < 0 || edgeIndex >= edges.Length)
+        {
+            layout = default;
+            return false;
+        }
+
+        layout = edges[edgeIndex];
+        return true;
+    }
+    #endregion
+
+    #region Edge Layout Methods
+    /// <summary>
+    /// Builds stable outgoing and incoming side slots so individual edge colors cannot overwrite each other.
+    /// </summary>
+    /// <param name="graphEdges">Generated edges in stable solver order.</param>
+    /// <param name="nodeLayouts">Node rectangles indexed by stable node ID.</param>
+    /// <returns>Edge layouts indexed identically to the generated edge collection.</returns>
+    private static GameProceduralLevelGraphPreviewEdgeLayout[] BuildEdgeLayouts(
+        IReadOnlyList<GameProceduralLevelGraphEdge> graphEdges,
+        GameProceduralLevelGraphPreviewNodeLayout[] nodeLayouts)
+    {
+        int[] sourceOrdinals = new int[graphEdges.Count];
+        int[] sourceCounts = new int[graphEdges.Count];
+        int[] targetOrdinals = new int[graphEdges.Count];
+        int[] targetCounts = new int[graphEdges.Count];
+        PopulateEdgeAnchorSlots(graphEdges,
+                                nodeLayouts,
+                                true,
+                                sourceOrdinals,
+                                sourceCounts);
+        PopulateEdgeAnchorSlots(graphEdges,
+                                nodeLayouts,
+                                false,
+                                targetOrdinals,
+                                targetCounts);
+        GameProceduralLevelGraphPreviewEdgeLayout[] layouts =
+            new GameProceduralLevelGraphPreviewEdgeLayout[graphEdges.Count];
+
+        // Combine the independently ordered source and target slots by stable edge index.
+        for (int edgeIndex = 0; edgeIndex < layouts.Length; edgeIndex++)
+            layouts[edgeIndex] = new GameProceduralLevelGraphPreviewEdgeLayout(sourceOrdinals[edgeIndex],
+                                                                               sourceCounts[edgeIndex],
+                                                                               targetOrdinals[edgeIndex],
+                                                                               targetCounts[edgeIndex]);
+
+        return layouts;
+    }
+
+    /// <summary>
+    /// Assigns side slots ordered by the opposite node's vertical placement to reduce edge crossings.
+    /// </summary>
+    /// <param name="graphEdges">Generated edges in stable solver order.</param>
+    /// <param name="nodeLayouts">Node rectangles indexed by stable node ID.</param>
+    /// <param name="groupBySource">True to build outgoing slots; false to build incoming slots.</param>
+    /// <param name="ordinals">Destination array receiving each edge's side ordinal.</param>
+    /// <param name="counts">Destination array receiving each edge's shared-side edge count.</param>
+    private static void PopulateEdgeAnchorSlots(IReadOnlyList<GameProceduralLevelGraphEdge> graphEdges,
+                                                GameProceduralLevelGraphPreviewNodeLayout[] nodeLayouts,
+                                                bool groupBySource,
+                                                int[] ordinals,
+                                                int[] counts)
+    {
+        Dictionary<int, List<int>> edgeIndicesByNode = new Dictionary<int, List<int>>();
+
+        // Group stable edge indices by the side-owning node.
+        for (int edgeIndex = 0; edgeIndex < graphEdges.Count; edgeIndex++)
+        {
+            GameProceduralLevelGraphEdge edge = graphEdges[edgeIndex];
+            int nodeId = groupBySource ? edge.SourceNodeId : edge.TargetNodeId;
+
+            if (!edgeIndicesByNode.TryGetValue(nodeId, out List<int> edgeIndices))
+            {
+                edgeIndices = new List<int>();
+                edgeIndicesByNode.Add(nodeId, edgeIndices);
+            }
+
+            edgeIndices.Add(edgeIndex);
+        }
+
+        // Match vertical slots to opposite-node order for deterministic, minimally crossed curves.
+        foreach (KeyValuePair<int, List<int>> entry in edgeIndicesByNode)
+        {
+            List<int> edgeIndices = entry.Value;
+            SortEdgeIndices(graphEdges, nodeLayouts, groupBySource, edgeIndices);
+
+            for (int ordinal = 0; ordinal < edgeIndices.Count; ordinal++)
+            {
+                int edgeIndex = edgeIndices[ordinal];
+                ordinals[edgeIndex] = ordinal;
+                counts[edgeIndex] = edgeIndices.Count;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sorts one usually small node-edge group in place without allocating comparison delegates.
+    /// </summary>
+    /// <param name="graphEdges">Generated edges in stable solver order.</param>
+    /// <param name="nodeLayouts">Node rectangles indexed by stable node ID.</param>
+    /// <param name="groupBySource">True when target nodes drive ordering; false when source nodes drive it.</param>
+    /// <param name="edgeIndices">Mutable edge-index group to order.</param>
+    private static void SortEdgeIndices(IReadOnlyList<GameProceduralLevelGraphEdge> graphEdges,
+                                        GameProceduralLevelGraphPreviewNodeLayout[] nodeLayouts,
+                                        bool groupBySource,
+                                        List<int> edgeIndices)
+    {
+        // Insertion sort avoids delegate allocations for the low edge degrees used by room graphs.
+        for (int index = 1; index < edgeIndices.Count; index++)
+        {
+            int edgeIndex = edgeIndices[index];
+            int insertionIndex = index;
+
+            while (insertionIndex > 0 &&
+                   CompareOppositeNodes(graphEdges,
+                                        nodeLayouts,
+                                        groupBySource,
+                                        edgeIndices[insertionIndex - 1],
+                                        edgeIndex) > 0)
+            {
+                edgeIndices[insertionIndex] = edgeIndices[insertionIndex - 1];
+                insertionIndex--;
+            }
+
+            edgeIndices[insertionIndex] = edgeIndex;
+        }
+    }
+
+    /// <summary>
+    /// Compares two edges by opposite-node height, node ID and edge index for fully stable slot ordering.
+    /// </summary>
+    /// <param name="graphEdges">Generated edges in stable solver order.</param>
+    /// <param name="nodeLayouts">Node rectangles indexed by stable node ID.</param>
+    /// <param name="groupBySource">True when the target is the opposite node; false when the source is opposite.</param>
+    /// <param name="leftIndex">First edge index.</param>
+    /// <param name="rightIndex">Second edge index.</param>
+    /// <returns>Negative, zero or positive according to stable visual ordering.</returns>
+    private static int CompareOppositeNodes(IReadOnlyList<GameProceduralLevelGraphEdge> graphEdges,
+                                            GameProceduralLevelGraphPreviewNodeLayout[] nodeLayouts,
+                                            bool groupBySource,
+                                            int leftIndex,
+                                            int rightIndex)
+    {
+        GameProceduralLevelGraphEdge leftEdge = graphEdges[leftIndex];
+        GameProceduralLevelGraphEdge rightEdge = graphEdges[rightIndex];
+        int leftNodeId = groupBySource ? leftEdge.TargetNodeId : leftEdge.SourceNodeId;
+        int rightNodeId = groupBySource ? rightEdge.TargetNodeId : rightEdge.SourceNodeId;
+        int heightComparison = nodeLayouts[leftNodeId].Rect.center.y.CompareTo(nodeLayouts[rightNodeId].Rect.center.y);
+
+        if (heightComparison != 0)
+            return heightComparison;
+
+        int nodeComparison = leftNodeId.CompareTo(rightNodeId);
+        return nodeComparison != 0 ? nodeComparison : leftIndex.CompareTo(rightIndex);
+    }
     #endregion
 
     #region Constructors
     /// <summary>
-    /// Creates one immutable preview layout from precomputed node rectangles and bounds.
+    /// Creates one immutable preview layout from precomputed node rectangles, edge slots and bounds.
     /// </summary>
     /// <param name="nodes">Node layout array indexed by Node ID.</param>
+    /// <param name="edges">Edge layout array indexed by generation-list position.</param>
     /// <param name="graphBounds">Complete world-coordinate graph bounds.</param>
     private GameProceduralLevelGraphPreviewLayout(GameProceduralLevelGraphPreviewNodeLayout[] nodes,
+                                                  GameProceduralLevelGraphPreviewEdgeLayout[] edges,
                                                   Rect graphBounds)
     {
         this.nodes = nodes;
+        this.edges = edges;
         this.graphBounds = graphBounds;
     }
     #endregion

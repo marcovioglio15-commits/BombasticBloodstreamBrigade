@@ -40,6 +40,7 @@ public static class GameProceduralLevelBakeSmokeTest
             ValidateMetadataRanges(metadata, portals);
             ValidateTileMetadataIndices(tiles);
             ValidateTileDepthConstraints(tiles);
+            GameProceduralLevelGraphPreviewSmokeUtility.Validate();
 
             GameProceduralLevelConfig config = GameProceduralLevelBakeUtility.BuildConfig(preset);
             Require(config.PresetId.ToString() == "PRESET_BAKE_SMOKE",

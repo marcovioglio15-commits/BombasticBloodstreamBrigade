@@ -95,14 +95,15 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
                                                   100000f,
                                                   GUILayout.ExpandWidth(true),
                                                   GUILayout.ExpandHeight(true));
-        DrawCanvas(lastCanvasRect);
 
-        if (fitRequested && generationResult != null && generationResult.Success)
-        {
-            FitGraph(lastCanvasRect);
+        if (fitRequested &&
+            Event.current.type == EventType.Repaint &&
+            generationResult != null &&
+            generationResult.Success &&
+            TryFitGraph(lastCanvasRect))
             fitRequested = false;
-            Repaint();
-        }
+
+        DrawCanvas(lastCanvasRect);
     }
     #endregion
 
@@ -390,13 +391,24 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
             GameProceduralLevelGraphEdge edge = generationResult.Edges[index];
 
             if (!graphLayout.TryGetNode(edge.SourceNodeId, out GameProceduralLevelGraphPreviewNodeLayout sourceLayout) ||
-                !graphLayout.TryGetNode(edge.TargetNodeId, out GameProceduralLevelGraphPreviewNodeLayout targetLayout))
+                !graphLayout.TryGetNode(edge.TargetNodeId, out GameProceduralLevelGraphPreviewNodeLayout targetLayout) ||
+                !graphLayout.TryGetEdge(index, out GameProceduralLevelGraphPreviewEdgeLayout edgeLayout))
                 continue;
 
-            Rect sourceRect = TransformRect(sourceLayout.Rect);
-            Rect targetRect = TransformRect(targetLayout.Rect);
-            Vector3 start = new Vector3(sourceRect.xMax, sourceRect.center.y, 0f);
-            Vector3 end = new Vector3(targetRect.xMin, targetRect.center.y, 0f);
+            Rect sourceRect = GameProceduralLevelGraphPreviewViewportUtility.TransformRect(sourceLayout.Rect,
+                                                                                           panOffset,
+                                                                                           zoom);
+            Rect targetRect = GameProceduralLevelGraphPreviewViewportUtility.TransformRect(targetLayout.Rect,
+                                                                                           panOffset,
+                                                                                           zoom);
+            Vector3 start = GameProceduralLevelGraphPreviewViewportUtility.ResolveConnectionPoint(sourceRect,
+                                                                                                   true,
+                                                                                                   edgeLayout.SourceOrdinal,
+                                                                                                   edgeLayout.SourceCount);
+            Vector3 end = GameProceduralLevelGraphPreviewViewportUtility.ResolveConnectionPoint(targetRect,
+                                                                                                 false,
+                                                                                                 edgeLayout.TargetOrdinal,
+                                                                                                 edgeLayout.TargetCount);
             float tangentLength = Math.Max(36f, (end.x - start.x) * 0.42f);
             Color color = GameProceduralLevelGraphPreviewUtility.ResolveNodeColor(sourceLayout.DepthOrdinal,
                                                                                  sourceLayout.DepthNodeCount,
@@ -409,12 +421,23 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
                                color,
                                null,
                                Math.Max(1.25f, 2f * zoom));
-            DrawEdgeArrowHead(end, color);
+
+            // Complete the curve with a source-colored arrowhead at its independent target slot.
+            float arrowSize = Mathf.Clamp(7f * zoom, 3.5f, 10f);
+            Handles.color = color;
+            Handles.DrawAAConvexPolygon(end,
+                                        end + new Vector3(-arrowSize, -arrowSize * 0.65f, 0f),
+                                        end + new Vector3(-arrowSize, arrowSize * 0.65f, 0f));
             string label = edge.UsesCenterArrival
                 ? "CENTER"
                 : edge.SourceSide + " → " + edge.TargetSide;
             Vector2 midpoint = Vector2.Lerp(start, end, 0.5f);
+            Color previousContentColor = GUI.contentColor;
+            Color labelColor = color;
+            labelColor.a = 1f;
+            GUI.contentColor = labelColor;
             GUI.Label(new Rect(midpoint.x - 58f, midpoint.y - 10f, 116f, 20f), label, edgeLabelStyle);
+            GUI.contentColor = previousContentColor;
         }
 
         Handles.EndGUI();
@@ -434,7 +457,9 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
             if (!drawnDepths.Add(layout.Node.Depth))
                 continue;
 
-            Rect nodeRect = TransformRect(layout.Rect);
+            Rect nodeRect = GameProceduralLevelGraphPreviewViewportUtility.TransformRect(layout.Rect,
+                                                                                         panOffset,
+                                                                                         zoom);
             GUI.Label(new Rect(nodeRect.x, Math.Max(4f, nodeRect.y - 34f), nodeRect.width, 24f),
                       "DEPTH " + layout.Node.Depth,
                       depthStyle);
@@ -449,7 +474,9 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
         for (int index = 0; index < graphLayout.Nodes.Count; index++)
         {
             GameProceduralLevelGraphPreviewNodeLayout layout = graphLayout.Nodes[index];
-            Rect rect = TransformRect(layout.Rect);
+            Rect rect = GameProceduralLevelGraphPreviewViewportUtility.TransformRect(layout.Rect,
+                                                                                     panOffset,
+                                                                                     zoom);
 
             if (rect.width < 32f || rect.height < 18f)
                 continue;
@@ -471,20 +498,6 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
 
             GUI.backgroundColor = previousBackground;
         }
-    }
-
-    /// <summary>
-    /// Draws a compact right-facing arrow head using the same source-node color as its connection curve.
-    /// </summary>
-    /// <param name="end">Canvas-space target point at the target node boundary.</param>
-    /// <param name="color">Source-node color shared by the complete edge.</param>
-    private void DrawEdgeArrowHead(Vector3 end, Color color)
-    {
-        float size = Mathf.Clamp(7f * zoom, 3.5f, 10f);
-        Handles.color = color;
-        Handles.DrawAAConvexPolygon(end,
-                                    end + new Vector3(-size, -size * 0.65f, 0f),
-                                    end + new Vector3(-size, size * 0.65f, 0f));
     }
 
     /// <summary>
@@ -624,22 +637,24 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
     }
 
     /// <summary>
-    /// Fits complete graph bounds inside the canvas while reserving room for the node inspector.
+    /// Fits complete graph bounds inside a finalized canvas while reserving only a visible inspector.
     /// </summary>
     /// <param name="canvasRect">Current canvas rectangle.</param>
-    private void FitGraph(Rect canvasRect)
+    /// <returns>True when finalized viewport dimensions allowed the fit to be applied.</returns>
+    private bool TryFitGraph(Rect canvasRect)
     {
         if (graphLayout == null || graphLayout.Nodes.Count == 0)
-            return;
+            return false;
 
-        Rect bounds = graphLayout.GraphBounds;
-        float availableWidth = Math.Max(100f, canvasRect.width - InspectorWidth - CanvasPadding * 2f);
-        float availableHeight = Math.Max(100f, canvasRect.height - CanvasPadding * 2f);
-        zoom = Mathf.Clamp(Math.Min(availableWidth / bounds.width, availableHeight / bounds.height),
-                           MinimumZoom,
-                           MaximumZoom);
-        panOffset = new Vector2(CanvasPadding + (availableWidth - bounds.width * zoom) * 0.5f - bounds.x * zoom,
-                                CanvasPadding + (availableHeight - bounds.height * zoom) * 0.5f - bounds.y * zoom);
+        float reservedRightWidth = selectedNodeId >= 0 ? InspectorWidth + 12f : 0f;
+        return GameProceduralLevelGraphPreviewViewportUtility.TryResolveFit(graphLayout.GraphBounds,
+                                                                            canvasRect.size,
+                                                                            reservedRightWidth,
+                                                                            CanvasPadding,
+                                                                            MinimumZoom,
+                                                                            MaximumZoom,
+                                                                            out zoom,
+                                                                            out panOffset);
     }
     #endregion
 
@@ -679,19 +694,6 @@ public sealed class GameProceduralLevelGraphPreviewWindow : EditorWindow
             richText = false
         };
     }
-    #endregion
-
-    #region Helper Methods
-    /// <summary>
-    /// Transforms one graph world rectangle into the current clipped canvas coordinate system.
-    /// </summary>
-    /// <param name="worldRect">Graph world rectangle.</param>
-    /// <returns>Zoomed and panned canvas rectangle.</returns>
-    private Rect TransformRect(Rect worldRect)
-    {
-        return new Rect(panOffset + worldRect.position * zoom, worldRect.size * zoom);
-    }
-
     #endregion
 
     #endregion
