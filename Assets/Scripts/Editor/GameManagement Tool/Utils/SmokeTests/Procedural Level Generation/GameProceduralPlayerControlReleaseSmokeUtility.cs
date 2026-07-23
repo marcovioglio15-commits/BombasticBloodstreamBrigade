@@ -29,13 +29,17 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     private static LocalTransform baselineTransform;
     private static PlayerMovementState baselineMovementState;
     private static PlayerLookState baselineLookState;
+    private static float3 baselineCameraPosition;
     private static float3 previousPosition;
     private static quaternion previousRotation;
     private static float maximumFadeInFrameDisplacement;
     private static float maximumFadeInFrameRotation;
+    private static int baselineVisualInstanceId;
     private static bool hasBaseline;
+    private static bool hasBaselineCamera;
     private static bool hasMovementState;
     private static bool hasLookState;
+    private static bool hasVisualContinuityBaseline;
     private static bool sawFadeIn;
     private static bool sawLiveInput;
     private static bool sawLiveLook;
@@ -80,6 +84,12 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
 
         if (!TryResolvePlayer(entityManager, out Entity playerEntity))
             return true;
+
+        if (transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal &&
+            !ValidatePlayerVisualContinuity(playerEntity, cycle, out failure))
+        {
+            return false;
+        }
 
         PlayerInputState inputState = entityManager.GetComponentData<PlayerInputState>(playerEntity);
 
@@ -253,6 +263,13 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
         previousRotation = transform.Rotation;
         hasMovementState = entityManager.HasComponent<PlayerMovementState>(playerEntity);
         hasLookState = entityManager.HasComponent<PlayerLookState>(playerEntity);
+        Camera camera = Camera.main;
+
+        if (camera != null && GameSceneBootstrapCameraView.IsPersistentGameplayCamera(camera))
+        {
+            baselineCameraPosition = camera.transform.position;
+            hasBaselineCamera = true;
+        }
 
         if (hasMovementState)
             baselineMovementState = entityManager.GetComponentData<PlayerMovementState>(playerEntity);
@@ -264,13 +281,25 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     }
 
     /// <summary>
-    /// Restores the test-only displacement and clears the sampled ECS input before normal regression checks resume.
+    /// Restores the test-only displacement, preserves the current camera-to-player relation and clears sampled ECS
+    /// input before normal regression checks resume.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the player state.</param>
     /// <param name="playerEntity">Unique player modified by the probe.</param>
     private static void RestoreBaseline(EntityManager entityManager, Entity playerEntity)
     {
         entityManager.SetComponentData(playerEntity, baselineTransform);
+
+        // Restore the exact pre-probe camera pose so follow lag created by synthetic motion cannot contaminate the
+        // later traversal and new-run camera assertions.
+        Camera camera = Camera.main;
+
+        if (hasBaselineCamera &&
+            camera != null &&
+            GameSceneBootstrapCameraView.IsPersistentGameplayCamera(camera))
+        {
+            camera.transform.position = baselineCameraPosition;
+        }
 
         if (hasMovementState)
             entityManager.SetComponentData(playerEntity, baselineMovementState);
@@ -283,6 +312,7 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
         inputState.Look = float2.zero;
         inputState.MoveUsesAnalogSource = 0;
         inputState.LookUsesAnalogSource = 0;
+        inputState.SuppressMotionIntegration = 0;
         inputState.Shoot = 0f;
         inputState.PowerUpPrimary = 0f;
         inputState.PowerUpSecondary = 0f;
@@ -299,18 +329,68 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
         baselineTransform = default;
         baselineMovementState = default;
         baselineLookState = default;
+        baselineCameraPosition = float3.zero;
         previousPosition = float3.zero;
         previousRotation = quaternion.identity;
         maximumFadeInFrameDisplacement = 0f;
         maximumFadeInFrameRotation = 0f;
+        baselineVisualInstanceId = 0;
         hasBaseline = false;
+        hasBaselineCamera = false;
         hasMovementState = false;
         hasLookState = false;
+        hasVisualContinuityBaseline = false;
         sawFadeIn = false;
         sawLiveInput = false;
         sawLiveLook = false;
         sawMotionDuringFadeIn = false;
         awaitingRestoredPresentationFrame = false;
+    }
+    #endregion
+
+    #region Presentation
+    /// <summary>
+    /// Verifies that room replacement retains the same active managed player visual instead of destroying and
+    /// reconstructing it with the outgoing Unity scene.
+    /// </summary>
+    /// <param name="playerEntity">Persistent player whose runtime visual must survive traversal.</param>
+    /// <param name="cycle">Stable diagnostic name for the sampled transition.</param>
+    /// <param name="failure">Diagnostic message when visual ownership or identity is discontinuous.</param>
+    /// <returns>True while the persistent player visual remains valid.</returns>
+    private static bool ValidatePlayerVisualContinuity(Entity playerEntity,
+                                                       string cycle,
+                                                       out string failure)
+    {
+        failure = string.Empty;
+
+        if (!PlayerManagedVisualAnimatorBridgeSystem.TryGetRuntimeBridgeRoot(playerEntity,
+                                                                             out Transform visualRoot) ||
+            visualRoot == null)
+        {
+            failure = cycle + " lost the managed player visual during room replacement.";
+            return false;
+        }
+
+        if (!visualRoot.gameObject.activeInHierarchy)
+        {
+            failure = cycle + " temporarily deactivated the managed player visual.";
+            return false;
+        }
+
+        int currentInstanceId = visualRoot.gameObject.GetInstanceID();
+
+        if (!hasVisualContinuityBaseline)
+        {
+            baselineVisualInstanceId = currentInstanceId;
+            hasVisualContinuityBaseline = true;
+            return true;
+        }
+
+        if (baselineVisualInstanceId == currentInstanceId)
+            return true;
+
+        failure = cycle + " reconstructed the managed player visual during room replacement.";
+        return false;
     }
     #endregion
 

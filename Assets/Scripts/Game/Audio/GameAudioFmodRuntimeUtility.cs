@@ -99,6 +99,36 @@ public static class GameAudioFmodRuntimeUtility
     }
 
     /// <summary>
+    /// Loads and resolves the configured background-music resources without starting playback. Scene-transition
+    /// readiness calls this while the target is still covered so FMOD bank I/O cannot stall the first visible frame.
+    /// </summary>
+    /// <param name="eventPath">FMOD music event path that will be started during the target reveal.</param>
+    /// <param name="bankName">FMOD bank containing the configured music event.</param>
+    /// <param name="logMissingEventPath">True when preparation failures should emit development diagnostics.</param>
+    /// <returns>True when the bank and event description are ready, or when FMOD is not compiled into this build.</returns>
+    public static bool PrepareBackgroundMusic(string eventPath,
+                                              string bankName,
+                                              bool logMissingEventPath)
+    {
+        if (string.IsNullOrWhiteSpace(eventPath))
+        {
+            LogMissingMusicPath(logMissingEventPath);
+            return true;
+        }
+
+#if NASHCORE_FMOD || UNITY_EDITOR
+        if (!EnsureBackgroundMusicBankLoaded(bankName, logMissingEventPath))
+            return false;
+
+        return TryResolveBackgroundMusicEvent(eventPath,
+                                              logMissingEventPath,
+                                              out EventDescription _);
+#else
+        return true;
+#endif
+    }
+
+    /// <summary>
     /// Starts, updates or stops the managed background music event instance.
     /// </summary>
     /// <param name="eventPath">FMOD music event path.</param>

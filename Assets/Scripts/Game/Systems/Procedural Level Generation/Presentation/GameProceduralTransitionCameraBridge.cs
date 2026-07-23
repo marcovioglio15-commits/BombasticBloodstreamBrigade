@@ -43,10 +43,11 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     private readonly Dictionary<Camera, int> originalCameraMasks = new Dictionary<Camera, int>();
     private Camera activeBaseCamera;
     private CameraRenderSnapshot playerCameraSnapshot;
-    private Transform playerTrackingTransform;
+    private Vector3 playerTrackingPosition;
     private Vector3 playerTrackingStartPosition;
     private bool fadePresentationVisible;
     private bool hasPlayerCameraSnapshot;
+    private bool hasPlayerTrackingPosition;
     private bool hasPlayerTrackingStartPosition;
     private bool playerPresentationVisible;
     #endregion
@@ -113,7 +114,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (visible && !activeBridge.playerPresentationVisible)
         {
             activeBridge.hasPlayerCameraSnapshot = false;
-            activeBridge.playerTrackingTransform = null;
+            activeBridge.hasPlayerTrackingPosition = false;
             activeBridge.hasPlayerTrackingStartPosition = false;
         }
 
@@ -127,25 +128,34 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (!visible)
         {
             activeBridge.hasPlayerCameraSnapshot = false;
-            activeBridge.playerTrackingTransform = null;
+            activeBridge.hasPlayerTrackingPosition = false;
             activeBridge.hasPlayerTrackingStartPosition = false;
         }
     }
 
     /// <summary>
-    /// Captures the persistent player transform used to translate the camera snapshot by the exact room-arrival delta.
+    /// Synchronizes the authoritative player render anchor and immediately applies its relocation delta to the overlay.
     /// </summary>
-    /// <param name="playerTransform">Managed persistent player transform synchronized from the ECS LocalTransform.</param>
-    public static void SetPlayerTrackingTransform(Transform playerTransform)
+    /// <param name="playerPosition">World-space player render anchor resolved from the current ECS pose.</param>
+    public static void SetPlayerTrackingPosition(Vector3 playerPosition)
     {
         if (activeBridge == null || !activeBridge.playerPresentationVisible)
             return;
 
-        activeBridge.playerTrackingTransform = playerTransform;
-        activeBridge.hasPlayerTrackingStartPosition = playerTransform != null;
+        activeBridge.playerTrackingPosition = playerPosition;
+        activeBridge.hasPlayerTrackingPosition = true;
 
-        if (playerTransform != null)
-            activeBridge.playerTrackingStartPosition = playerTransform.position;
+        if (!activeBridge.hasPlayerTrackingStartPosition)
+        {
+            activeBridge.playerTrackingStartPosition = playerPosition;
+            activeBridge.hasPlayerTrackingStartPosition = true;
+        }
+
+        // PresentationSystemGroup may run after MonoBehaviour LateUpdate. Applying here keeps camera and visual
+        // relocation in the same render submission instead of exposing one frame with mismatched world positions.
+        if (activeBridge.hasPlayerCameraSnapshot && activeBridge.playerCamera != null)
+            activeBridge.playerCameraSnapshot.Apply(activeBridge.playerCamera,
+                                                    activeBridge.ResolvePlayerTrackingOffset());
     }
 
     /// <summary>
@@ -432,10 +442,10 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     /// <returns>Player displacement since transition start, or zero before managed transform tracking is available.</returns>
     private Vector3 ResolvePlayerTrackingOffset()
     {
-        if (!hasPlayerTrackingStartPosition || playerTrackingTransform == null)
+        if (!hasPlayerTrackingStartPosition || !hasPlayerTrackingPosition)
             return Vector3.zero;
 
-        return playerTrackingTransform.position - playerTrackingStartPosition;
+        return playerTrackingPosition - playerTrackingStartPosition;
     }
 
     /// <summary>

@@ -306,6 +306,7 @@ internal struct GameSceneTransitionPhysicsStepState : IComponentData
 {
     #region Fields
     public ulong CompletedStepVersion;
+    public byte NavigationWarmupAllowed;
     #endregion
 }
 
@@ -391,6 +392,26 @@ internal static class GameSceneTransitionPhysicsReadinessUtility
         }
 
         return completedStepVersion >= requiredStepVersion;
+    }
+
+    /// <summary>
+    /// Enables or disables transition-time navigation access to the exported physics world after validating singleton ownership.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the world-local physics readiness singleton.</param>
+    /// <param name="physicsStepStateQuery">Cached writable query containing the readiness singleton.</param>
+    /// <param name="allowed">True only after target physics has completed a fresh fixed step.</param>
+    public static void SetNavigationWarmupAllowed(EntityManager entityManager,
+                                                  EntityQuery physicsStepStateQuery,
+                                                  bool allowed)
+    {
+        if (physicsStepStateQuery.CalculateEntityCount() != 1)
+            return;
+
+        Entity stateEntity = physicsStepStateQuery.GetSingletonEntity();
+        GameSceneTransitionPhysicsStepState stepState =
+            entityManager.GetComponentData<GameSceneTransitionPhysicsStepState>(stateEntity);
+        stepState.NavigationWarmupAllowed = allowed ? (byte)1 : (byte)0;
+        entityManager.SetComponentData(stateEntity, stepState);
     }
 
     /// <summary>

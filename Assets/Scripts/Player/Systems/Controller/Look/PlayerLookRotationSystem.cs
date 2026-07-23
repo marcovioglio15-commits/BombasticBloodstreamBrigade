@@ -67,6 +67,12 @@ public partial struct PlayerLookRotationSystem : ISystem
                                                           RefRO<PlayerRuntimeLookConfig>>()
                                                    .WithEntityAccess())
         {
+            if (inputStateLookup.HasComponent(playerEntity) &&
+                inputStateLookup[playerEntity].SuppressMotionIntegration != 0)
+            {
+                continue;
+            }
+
             PlayerRuntimeLookConfig lookConfig = runtimeLookConfig.ValueRO;
             PlayerLookState lookStateData = lookState.ValueRO;
             LocalTransform localTransformData = localTransform.ValueRO;

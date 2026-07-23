@@ -28,13 +28,19 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Keeps lifecycle cleanup active for the persistent game world even while no player entity is loaded.
+    /// </summary>
+    /// <param name="state">System state used to bind updates to the persistent scene manager.</param>
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<PlayerControllerConfig>();
-        state.RequireForUpdate<PlayerVisualRuntimeBridgeConfig>();
-        state.RequireForUpdate<LocalTransform>();
+        state.RequireForUpdate<GameSceneManagerConfig>();
     }
 
+    /// <summary>
+    /// Releases every persistent managed visual when the owning ECS world is disposed.
+    /// </summary>
+    /// <param name="state">System state owning the player presentation world.</param>
     public void OnDestroy(ref SystemState state)
     {
         if (managedInstances.Count > 0)
@@ -62,6 +68,10 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
 #endif
     }
 
+    /// <summary>
+    /// Synchronizes live player visuals and removes persistent instances immediately after their ECS owner disappears.
+    /// </summary>
+    /// <param name="state">System state providing the player presentation entity manager.</param>
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();
@@ -414,6 +424,12 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         return entityManager.GetComponentObject<Animator>(playerEntity);
     }
 
+    /// <summary>
+    /// Resolves or creates the persistent managed visual owned by one authoritative player entity.
+    /// </summary>
+    /// <param name="playerEntity">Player entity retaining visual ownership across room scenes.</param>
+    /// <param name="runtimeVisualPrefab">Configured managed player visual prefab.</param>
+    /// <returns>Reusable persistent visual instance, or null when configuration is incomplete.</returns>
     private static ManagedPlayerVisualInstance GetOrCreateManagedInstance(Entity playerEntity, GameObject runtimeVisualPrefab)
     {
         ManagedPlayerVisualInstance managedInstance;
@@ -466,6 +482,11 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         }
 
         instanceObject.name = string.Format("{0}_RuntimeVisual", runtimeVisualPrefab.name);
+
+        // The authoritative player entity survives room replacement, so its managed visual must not inherit the
+        // currently active room scene's lifetime. Entity-owner cleanup still destroys it at run or world teardown.
+        if (Application.isPlaying)
+            Object.DontDestroyOnLoad(instanceObject);
 
         managedInstance = new ManagedPlayerVisualInstance
         {

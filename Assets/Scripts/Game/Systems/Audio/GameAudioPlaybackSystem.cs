@@ -145,9 +145,16 @@ public partial struct GameAudioPlaybackSystem : ISystem
         if (sceneConfig.MainMenuSceneId.Length <= 0)
             return false;
 
-        if (transitionState.IsTransitioning != 0 &&
-            transitionState.TargetSceneId.Equals(sceneConfig.MainMenuSceneId))
-            return true;
+        if (transitionState.IsTransitioning != 0)
+        {
+            if (transitionState.TargetSceneId.Equals(sceneConfig.MainMenuSceneId))
+                return true;
+
+            // The gameplay bank was prepared under cover. Start music at the first fully ready FadeIn frame so its
+            // startup precedes queued spawn feedback and never lands on the visible transition-completion frame.
+            if (transitionState.Phase == GameSceneTransitionPhase.FadeIn)
+                return false;
+        }
 
         return transitionState.ActiveSceneId.Equals(sceneConfig.MainMenuSceneId);
     }

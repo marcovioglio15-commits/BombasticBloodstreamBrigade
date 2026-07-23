@@ -4,6 +4,7 @@ using Unity.Entities;
 /// Activates player-only rendering and optional animation for intra-level transitions while leaving first and boundary loads fully black.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateAfter(typeof(PlayerManagedVisualAnimatorBridgeSystem))]
 public partial class GameProceduralPlayerTransitionPresentationSystem : SystemBase
 {
     #region Fields

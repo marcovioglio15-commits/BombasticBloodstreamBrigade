@@ -38,8 +38,14 @@ public partial struct PlayerDashMovementSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         foreach ((RefRW<PlayerDashState> dashState,
-                  RefRW<PlayerMovementState> movementState) in SystemAPI.Query<RefRW<PlayerDashState>, RefRW<PlayerMovementState>>())
+                  RefRW<PlayerMovementState> movementState,
+                  RefRO<PlayerInputState> inputState) in SystemAPI.Query<RefRW<PlayerDashState>,
+                                                                  RefRW<PlayerMovementState>,
+                                                                  RefRO<PlayerInputState>>())
         {
+            if (inputState.ValueRO.SuppressMotionIntegration != 0)
+                continue;
+
             UpdateInvulnerability(ref dashState.ValueRW, deltaTime);
 
             if (dashState.ValueRO.IsDashing == 0)

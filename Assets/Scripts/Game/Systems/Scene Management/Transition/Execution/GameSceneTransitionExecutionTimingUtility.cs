@@ -12,6 +12,7 @@ internal static class GameSceneTransitionExecutionTimingUtility
     private const int MinimumReadyWarmupFrames = 3;
     private const float MinimumReadyWarmupSeconds = 0.05f;
     private const float MaximumFadeStepSeconds = 1f / 30f;
+    private const float MaximumStableFrameSeconds = MaximumFadeStepSeconds;
     #endregion
 
     #region Methods
@@ -45,6 +46,17 @@ internal static class GameSceneTransitionExecutionTimingUtility
     public static float ResolveFadeStepDeltaTime(float unscaledDeltaTime)
     {
         return Mathf.Min(Mathf.Max(0f, unscaledDeltaTime), MaximumFadeStepSeconds);
+    }
+
+    /// <summary>
+    /// Checks whether one frame is short enough to expose responsive gameplay motion after scene-loading work.
+    /// </summary>
+    /// <param name="unscaledDeltaTime">Raw Unity unscaled frame duration.</param>
+    /// <returns>True when the frame can safely contribute to readiness or player motion.</returns>
+    public static bool IsStableFrame(float unscaledDeltaTime)
+    {
+        return unscaledDeltaTime >= 0f &&
+               unscaledDeltaTime <= MaximumStableFrameSeconds;
     }
     #endregion
 
@@ -88,6 +100,9 @@ internal static class GameSceneTransitionExecutionTimingUtility
                                                                          persistentPlayerLoadScenes,
                                                                          transitionPurpose))
         {
+            GameSceneTransitionPhysicsReadinessUtility.SetNavigationWarmupAllowed(entityManager,
+                                                                                   physicsStepStateQuery,
+                                                                                   false);
             ResetReadiness(ref readinessWarmupFrames,
                            ref readinessWarmupSeconds,
                            ref physicsReadinessRequested,
@@ -97,6 +112,9 @@ internal static class GameSceneTransitionExecutionTimingUtility
 
         if (!GameProceduralRoomArrivalUtility.TryPreparePendingArrival(entityManager))
         {
+            GameSceneTransitionPhysicsReadinessUtility.SetNavigationWarmupAllowed(entityManager,
+                                                                                   physicsStepStateQuery,
+                                                                                   false);
             ResetReadiness(ref readinessWarmupFrames,
                            ref readinessWarmupSeconds,
                            ref physicsReadinessRequested,
@@ -112,12 +130,37 @@ internal static class GameSceneTransitionExecutionTimingUtility
                                                                     ref physicsReadinessRequested,
                                                                     ref requiredPhysicsStepVersion))
         {
+            GameSceneTransitionPhysicsReadinessUtility.SetNavigationWarmupAllowed(entityManager,
+                                                                                   physicsStepStateQuery,
+                                                                                   false);
+            ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
+            return false;
+        }
+
+        GameSceneTransitionPhysicsReadinessUtility.SetNavigationWarmupAllowed(entityManager,
+                                                                               physicsStepStateQuery,
+                                                                               true);
+
+        if ((GameSceneTransitionPurposeUtility.RequiresFullGameplayWarmup(transitionPurpose) ||
+             transitionPurpose == GameSceneTransitionPurpose.ProceduralRoomTraversal) &&
+            !GameSceneTransitionGameplayWarmupUtility.IsEnemyNavigationReady(entityManager))
+        {
+            ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
+            return false;
+        }
+
+        float warmupDeltaTime = Time.unscaledDeltaTime;
+
+        // A long frame usually reports work completed after the preceding readiness check. Restart the hidden
+        // observation window so that synchronous load cost cannot qualify the target for immediate reveal.
+        if (!IsStableFrame(warmupDeltaTime))
+        {
             ResetReadinessWarmup(ref readinessWarmupFrames, ref readinessWarmupSeconds);
             return false;
         }
 
         readinessWarmupFrames++;
-        readinessWarmupSeconds += Mathf.Max(0f, Time.unscaledDeltaTime);
+        readinessWarmupSeconds += warmupDeltaTime;
 
         if (readinessWarmupFrames < MinimumReadyWarmupFrames)
             return false;

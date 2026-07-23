@@ -16,9 +16,9 @@ TagManager:
   - 
   - SceneTransition
   - Enemy
-  - 
+  - SceneTransitionFade
   - Environment
-  - 
+  - PlayerTransition
   - 
   - 
   - 

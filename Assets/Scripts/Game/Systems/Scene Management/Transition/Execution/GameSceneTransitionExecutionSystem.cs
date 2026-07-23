@@ -44,26 +44,22 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                       typeof(GameSceneDefinitionElement),
                                       typeof(GameSceneTransitionElement),
                                       typeof(GameSceneTransitionRequest));
-        physicsStepStateQuery = GetEntityQuery(ComponentType.ReadOnly<GameSceneTransitionPhysicsStepState>());
+        physicsStepStateQuery = GetEntityQuery(ComponentType.ReadWrite<GameSceneTransitionPhysicsStepState>());
     }
-
     /// <summary>Restores time scale if the system is destroyed during a transition.</summary>
     protected override void OnDestroy()
     {
         GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
     }
-
     /// <summary>Starts pending transitions or advances the active asynchronous scene operation.</summary>
     protected override void OnUpdate()
     {
         int managerCount = managerQuery.CalculateEntityCount();
-
         if (managerCount != 1)
         {
             loggedManagerCountWarning = GameSceneTransitionExecutionUtility.LogManagerCountWarning(managerCount, loggedManagerCountWarning);
             return;
         }
-
         loggedManagerCountWarning = false;
         Entity managerEntity = managerQuery.GetSingletonEntity();
         GameSceneManagerConfig config = EntityManager.GetComponentData<GameSceneManagerConfig>(managerEntity);
@@ -73,7 +69,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         DynamicBuffer<GameSceneDefinitionElement> scenes = EntityManager.GetBuffer<GameSceneDefinitionElement>(managerEntity);
         DynamicBuffer<GameSceneTransitionElement> transitions = EntityManager.GetBuffer<GameSceneTransitionElement>(managerEntity);
         DynamicBuffer<GameSceneTransitionRequest> requests = EntityManager.GetBuffer<GameSceneTransitionRequest>(managerEntity);
-
         if (transitionState.IsTransitioning != 0)
         {
             TickActiveTransition(managerEntity, config, ref transitionState, ref fadeState, ref loadingProgressState);
@@ -82,27 +77,32 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             EntityManager.SetComponentData(managerEntity, loadingProgressState);
             return;
         }
-
         if (transitionState.Initialized == 0)
             GameSceneTransitionExecutionUtility.InitializeStateFromLoadedScene(config, scenes, ref transitionState);
-
-        if (TryStartInitialTransition(managerEntity, config, scenes, transitions, ref transitionState, ref fadeState, ref loadingProgressState))
+        if (GameSceneTransitionExecutionUtility.TryCreateInitialRequest(config,
+                                                                        transitionState,
+                                                                        out GameSceneTransitionRequest initialRequest) &&
+            TryStartTransition(managerEntity,
+                               config,
+                               scenes,
+                               transitions,
+                               initialRequest,
+                               ref transitionState,
+                               ref fadeState,
+                               ref loadingProgressState))
         {
             EntityManager.SetComponentData(managerEntity, transitionState);
             EntityManager.SetComponentData(managerEntity, fadeState);
             EntityManager.SetComponentData(managerEntity, loadingProgressState);
             return;
         }
-
         if (requests.Length <= 0)
         {
             EntityManager.SetComponentData(managerEntity, transitionState);
             return;
         }
-
         GameSceneTransitionRequest request = requests[0];
         requests.RemoveAt(0);
-
         if (TryStartTransition(managerEntity, config, scenes, transitions, request, ref transitionState, ref fadeState, ref loadingProgressState))
         {
             EntityManager.SetComponentData(managerEntity, transitionState);
@@ -113,44 +113,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     #endregion
 
     #region Start
-    /// <summary>Starts the configured initial scene transition after bootstrap when required.</summary>
-    /// <param name="managerEntity">Scene manager entity supplying purpose-specific presentation policy.</param>
-    /// <param name="config">Runtime scene manager configuration.</param>
-    /// <param name="scenes">Canonical scene definitions used to resolve the initial target.</param>
-    /// <param name="transitions">Authored transition definitions used to resolve optional overrides.</param>
-    /// <param name="transitionState">Mutable scene transition state.</param>
-    /// <param name="fadeState">Mutable fade presentation state.</param>
-    /// <param name="loadingProgressState">Mutable loading-progress presentation state.</param>
-    /// <returns>True when the initial transition started.</returns>
-    private bool TryStartInitialTransition(Entity managerEntity,
-                                           GameSceneManagerConfig config,
-                                           DynamicBuffer<GameSceneDefinitionElement> scenes,
-                                           DynamicBuffer<GameSceneTransitionElement> transitions,
-                                           ref GameSceneTransitionState transitionState,
-                                           ref GameSceneFadePresentationState fadeState,
-                                           ref GameSceneLoadingProgressPresentationState loadingProgressState)
-    {
-        if (config.AutoLoadInitialScene == 0)
-            return false;
-
-        if (config.InitialSceneId.Length <= 0)
-            return false;
-
-        if (transitionState.ActiveSceneId.Equals(config.InitialSceneId))
-            return false;
-
-        if (!GameSceneTransitionExecutionUtility.ShouldRunInitialTransition(config, transitionState))
-            return false;
-
-        GameSceneTransitionRequest request = new GameSceneTransitionRequest
-        {
-            RequestType = GameSceneTransitionRequestType.LoadScene,
-            TargetSceneId = config.InitialSceneId,
-            TransitionId = default
-        };
-        return TryStartTransition(managerEntity, config, scenes, transitions, request, ref transitionState, ref fadeState, ref loadingProgressState);
-    }
-
     /// <summary>Resolves and starts one transition request.</summary>
     /// <param name="managerEntity">Scene manager entity supplying purpose-specific presentation policy.</param>
     /// <param name="config">Runtime scene manager configuration.</param>
@@ -172,15 +134,12 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     {
         if (!GameSceneTransitionExecutionUtility.TryResolveTargetScene(config, scenes, transitions, request, transitionState, out GameSceneDefinitionElement resolvedTarget, out GameSceneTransitionElement transition))
             return false;
-
         bool isRestart = request.RequestType == GameSceneTransitionRequestType.RestartActiveScene;
         bool reloadPersistentPlayer = isRestart || request.ReloadPersistentPlayer != 0;
-
         if (!isRestart &&
             transitionState.ActiveSceneId.Equals(resolvedTarget.SceneId) &&
             !GameSceneTransitionPurposeUtility.AllowsSameSceneReload(request.Purpose))
             return false;
-
         bool startBehindBlack = GameSceneTransitionExecutionUtility.ShouldStartBehindBlack(config, request, transitionState);
         sourceSceneId = transitionState.ActiveSceneId;
         targetSceneId = resolvedTarget.SceneId;
@@ -238,19 +197,15 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         transitionState.TargetSceneId = targetSceneId;
         transitionState.Purpose = activePurpose;
         transitionState.IsTransitioning = 1;
-
         if (startBehindBlack)
         {
             GameSceneTransitionExecutionUtility.SetFade(ref fadeState, 1f, true, config);
             AdvanceAfterFadeOut(ref transitionState, ref fadeState, ref loadingProgressState, config);
             return true;
         }
-
         BeginPhase(GameSceneTransitionPhase.FadeOut, ref transitionState, ref fadeState, ref loadingProgressState, config);
-
         if (fadeOutSeconds <= 0f)
             AdvanceAfterFadeOut(ref transitionState, ref fadeState, ref loadingProgressState, config);
-
         return true;
     }
     #endregion
@@ -269,7 +224,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                       ref GameSceneLoadingProgressPresentationState loadingProgressState)
     {
         float deltaTime = GameSceneTransitionExecutionTimingUtility.ResolveFadeStepDeltaTime(UnityEngine.Time.unscaledDeltaTime);
-
         switch (activePhase)
         {
             case GameSceneTransitionPhase.FadeOut:
@@ -279,7 +233,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                     ref fadeState,
                                                                     config))
                     AdvanceAfterFadeOut(ref transitionState, ref fadeState, ref loadingProgressState, config);
-
                 break;
             case GameSceneTransitionPhase.PreUnload:
                 TickPreUnload(ref transitionState, ref fadeState, ref loadingProgressState, config);
@@ -298,12 +251,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                        ref loadingProgressState,
                                                                        config))
                     break;
-
                 BeginPhase(GameSceneTransitionPhase.FadeIn, ref transitionState, ref fadeState, ref loadingProgressState, config);
-
                 if (fadeInSeconds <= 0f)
                     CompleteTransition(Entity.Null, config, ref transitionState, ref fadeState, ref loadingProgressState);
-
                 break;
             case GameSceneTransitionPhase.FadeIn:
                 if (GameSceneTransitionFadePhaseUtility.TickFadeIn(ref phaseTimer,
@@ -311,13 +261,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                    deltaTime,
                                                                    ref fadeState))
                     CompleteTransition(managerEntity, config, ref transitionState, ref fadeState, ref loadingProgressState);
-
                 break;
             default:
                 CompleteTransition(managerEntity, config, ref transitionState, ref fadeState, ref loadingProgressState);
                 break;
         }
-
         if (suppressLoadingProgress)
             GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
     }
@@ -338,8 +286,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                             hasSourceScene,
                                                                                                             sourceScene,
                                                                                                             targetScene,
-                                                                                                            ShouldForceProceduralRuntimeCleanup());
-
+                                                                                                            GameSceneTransitionExecutionUtility.ShouldForceProceduralRuntimeCleanup(activePurpose,
+                                                                                                                                                                                         transactionalRoomStreaming,
+                                                                                                                                                                                         singleSlotRoomStreaming));
         if (GameSceneTransitionPurposeUtility.ShouldUnloadSourceBeforeLoad(unloadSourceBeforeLoad,
                                                                           hasSourceScene,
                                                                           sourceScene) &&
@@ -403,7 +352,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                             hasSourceScene,
                                                                                                             sourceScene,
                                                                                                             targetScene,
-                                                                                                            ShouldForceProceduralRuntimeCleanup());
+                                                                                                            GameSceneTransitionExecutionUtility.ShouldForceProceduralRuntimeCleanup(activePurpose,
+                                                                                                                                                                                        transactionalRoomStreaming,
+                                                                                                                                                                                        singleSlotRoomStreaming));
 
         if (GameScenePersistentPlayerSceneUtility.TickLoadSteps(persistentPlayerLoadScenes, ref persistentPlayerLoadIndex))
         {
@@ -484,6 +435,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         }
 
         if (transactionalRoomStreaming &&
+            !singleSlotRoomStreaming &&
             activePurpose == GameSceneTransitionPurpose.ProceduralRoomTraversal)
         {
             if (!GameProceduralRoomArrivalUtility.TryPreparePendingArrival(EntityManager))
@@ -518,24 +470,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         }
 
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, ref loadingProgressState, config);
-    }
-    #endregion
-
-    #region Cleanup Policy
-    /// <summary>
-    /// Forces transient room-runtime cleanup for initial loads, compatibility replacement and single-slot traversal.
-    /// Dual-slot traversal alone retains both room-owned runtime surfaces until its deferred retirement path completes.
-    /// </summary>
-    /// <returns>True when the active procedural transition crosses a runtime lifetime boundary.</returns>
-    private bool ShouldForceProceduralRuntimeCleanup()
-    {
-        if (!GameSceneTransitionPurposeUtility.IsProcedural(activePurpose))
-            return false;
-
-        if (!transactionalRoomStreaming || singleSlotRoomStreaming)
-            return true;
-
-        return activePurpose == GameSceneTransitionPurpose.ProceduralInitialRoom;
     }
     #endregion
 
@@ -631,6 +565,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         persistentPlayerPostLoadUnloadIndex = 0;
         preLoadRuntimeCleanupComplete = false;
         transactionalSourceOwned = false;
+        GameSceneTransitionPhysicsReadinessUtility.SetNavigationWarmupAllowed(EntityManager,
+                                                                               physicsStepStateQuery,
+                                                                               false);
         GameSceneTransitionExecutionTimingUtility.ResetReadiness(ref readinessWarmupFrames,
                                                                  ref readinessWarmupSeconds,
                                                                  ref physicsReadinessRequested,
@@ -647,16 +584,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                      ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                      GameSceneManagerConfig config)
     {
-        bool unloadReloadedCompanion = reloadTargetCompanion && hasSourceCompanionScene;
-
-        if ((unloadSourceBeforeLoad && (hasSourceScene || hasSourceCompanionScene)) ||
-            unloadReloadedCompanion)
-        {
-            BeginPhase(GameSceneTransitionPhase.PreUnload, ref transitionState, ref fadeState, ref loadingProgressState, config);
-            return;
-        }
-
-        BeginPhase(GameSceneTransitionPhase.Loading, ref transitionState, ref fadeState, ref loadingProgressState, config);
+        GameSceneTransitionPhase nextPhase = GameSceneTransitionExecutionUtility.ResolvePhaseAfterFadeOut(unloadSourceBeforeLoad,
+                                                                                                           hasSourceScene,
+                                                                                                           hasSourceCompanionScene,
+                                                                                                           reloadTargetCompanion);
+        BeginPhase(nextPhase, ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
 
     /// <summary>Starts the hold-black phase when configured, otherwise starts fade-in.</summary>
@@ -669,15 +601,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                    ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                    GameSceneManagerConfig config)
     {
-        if (postLoadReadyExtraSeconds > 0f)
-        {
-            BeginPhase(GameSceneTransitionPhase.HoldBlack, ref transitionState, ref fadeState, ref loadingProgressState, config);
-            return;
-        }
+        GameSceneTransitionPhase revealPhase =
+            GameSceneTransitionExecutionUtility.ResolveReadyRevealPhase(postLoadReadyExtraSeconds);
+        BeginPhase(revealPhase, ref transitionState, ref fadeState, ref loadingProgressState, config);
 
-        BeginPhase(GameSceneTransitionPhase.FadeIn, ref transitionState, ref fadeState, ref loadingProgressState, config);
-
-        if (fadeInSeconds <= 0f)
+        if (revealPhase == GameSceneTransitionPhase.FadeIn && fadeInSeconds <= 0f)
             CompleteTransition(Entity.Null, config, ref transitionState, ref fadeState, ref loadingProgressState);
     }
 
@@ -688,18 +616,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     private void ApplyLoadingProgressForPhase(GameSceneTransitionPhase phase,
                                               ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                               GameSceneManagerConfig config)
-    {
-        if (suppressLoadingProgress)
-        {
-            GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
-            return;
-        }
-
-        GameSceneTransitionExecutionProgressUtility.ApplyForPhase(phase,
-                                                                  ref loadingProgressState,
-                                                                  config,
-                                                                  BuildLoadingProgressSnapshot());
-    }
+        => GameSceneTransitionExecutionProgressUtility.ApplyForPhase(phase,
+                                                                     ref loadingProgressState,
+                                                                     config,
+                                                                     suppressLoadingProgress,
+                                                                     BuildLoadingProgressSnapshot());
 
     /// <summary>Applies aggregate loading progress for the current operation step.</summary>
     /// <param name="loadingProgressState">Mutable loading-progress presentation state.</param>
@@ -710,35 +631,26 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                              GameSceneManagerConfig config,
                                              GameSceneLoadingProgressOperationKind operationKind,
                                              GameSceneDefinitionElement sceneDefinition)
-    {
-        if (suppressLoadingProgress)
-        {
-            GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
-            return;
-        }
-
-        GameSceneTransitionExecutionProgressUtility.ApplyCurrent(ref loadingProgressState,
-                                                                 config,
-                                                                 operationKind,
-                                                                 sceneDefinition,
-                                                                 BuildLoadingProgressSnapshot());
-    }
+        => GameSceneTransitionExecutionProgressUtility.ApplyCurrent(ref loadingProgressState,
+                                                                    config,
+                                                                    operationKind,
+                                                                    sceneDefinition,
+                                                                    suppressLoadingProgress,
+                                                                    BuildLoadingProgressSnapshot());
 
     /// <summary>Builds an immutable snapshot of the counters used by loading-progress calculations.</summary>
     /// <returns>Current transition progress snapshot.</returns>
     private GameSceneTransitionProgressSnapshot BuildLoadingProgressSnapshot()
-    {
-        return new GameSceneTransitionProgressSnapshot(reloadActiveScene, hasSourceScene,
-                                                       sourceScene, hasSourceCompanionScene,
-                                                       sourceCompanionScene, targetScene,
-                                                       hasTargetCompanionScene, targetSceneLoaded,
-                                                       targetCompanionSceneLoaded, sourceSceneUnloadComplete,
-                                                       sourceCompanionSceneUnloadComplete, persistentPlayerPreLoadUnloadScenes,
-                                                       persistentPlayerLoadScenes, persistentPlayerPostLoadUnloadScenes,
-                                                       persistentPlayerPreLoadUnloadIndex, persistentPlayerLoadIndex,
-                                                       persistentPlayerPostLoadUnloadIndex, loadingProgressTotalSteps,
-                                                       activeOperation);
-    }
+        => new GameSceneTransitionProgressSnapshot(reloadActiveScene, hasSourceScene,
+                                                   sourceScene, hasSourceCompanionScene,
+                                                   sourceCompanionScene, targetScene,
+                                                   hasTargetCompanionScene, targetSceneLoaded,
+                                                   targetCompanionSceneLoaded, sourceSceneUnloadComplete,
+                                                   sourceCompanionSceneUnloadComplete, persistentPlayerPreLoadUnloadScenes,
+                                                   persistentPlayerLoadScenes, persistentPlayerPostLoadUnloadScenes,
+                                                   persistentPlayerPreLoadUnloadIndex, persistentPlayerLoadIndex,
+                                                   persistentPlayerPostLoadUnloadIndex, loadingProgressTotalSteps,
+                                                   activeOperation);
 
     /// <summary>Updates managed and ECS phase fields and resets the phase timer.</summary>
     /// <param name="phase">New transition phase.</param>
@@ -776,13 +688,11 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                     ref GameSceneTransitionState transitionState,
                                     ref GameSceneFadePresentationState fadeState,
                                     ref GameSceneLoadingProgressPresentationState loadingProgressState)
-    {
-        GameSceneTransitionExecutionCompletionUtility.Complete(EntityManager, managerEntity,
-                                                               ref activeOperation, ref activePhase, ref activePurpose,
-                                                               ref suppressLoadingProgress, targetSceneId, ref transitionState,
-                                                               ref fadeState, ref loadingProgressState, config,
-                                                               ref timeScaleChanged, previousTimeScale);
-    }
+        => GameSceneTransitionExecutionCompletionUtility.Complete(EntityManager, managerEntity,
+                                                                  ref activeOperation, ref activePhase, ref activePurpose,
+                                                                  ref suppressLoadingProgress, targetSceneId, ref transitionState,
+                                                                  ref fadeState, ref loadingProgressState, config,
+                                                                  ref timeScaleChanged, previousTimeScale);
 
     #endregion
 

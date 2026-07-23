@@ -145,6 +145,36 @@ internal static class GameSceneTransitionExecutionUtility
     }
 
     /// <summary>
+    /// Builds the configured initial load request when bootstrap state still requires automatic startup.
+    /// </summary>
+    /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="transitionState">Current initialized scene state.</param>
+    /// <param name="request">Initial load request when automatic startup remains eligible.</param>
+    /// <returns>True when the executor should submit the returned request.</returns>
+    public static bool TryCreateInitialRequest(GameSceneManagerConfig config,
+                                               GameSceneTransitionState transitionState,
+                                               out GameSceneTransitionRequest request)
+    {
+        request = default;
+
+        if (config.AutoLoadInitialScene == 0 ||
+            config.InitialSceneId.Length <= 0 ||
+            transitionState.ActiveSceneId.Equals(config.InitialSceneId) ||
+            !ShouldRunInitialTransition(config, transitionState))
+        {
+            return false;
+        }
+
+        request = new GameSceneTransitionRequest
+        {
+            RequestType = GameSceneTransitionRequestType.LoadScene,
+            TargetSceneId = config.InitialSceneId,
+            TransitionId = default
+        };
+        return true;
+    }
+
+    /// <summary>
     /// Resolves whether a startup transition should begin already black to cover initial scene loading.
     /// </summary>
     /// <param name="config">Scene manager runtime config.</param>
@@ -202,6 +232,26 @@ internal static class GameSceneTransitionExecutionUtility
             GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
 
         return true;
+    }
+
+    /// <summary>
+    /// Resolves whether procedural isolation requires transient gameplay cleanup across the current room boundary.
+    /// </summary>
+    /// <param name="purpose">Active transition purpose.</param>
+    /// <param name="transactionalRoomStreaming">True when room streaming retains transactional ownership.</param>
+    /// <param name="singleSlotRoomStreaming">True when the transactional policy replaces one authored slot.</param>
+    /// <returns>True when cleanup must run even though both scenes are gameplay-like.</returns>
+    public static bool ShouldForceProceduralRuntimeCleanup(GameSceneTransitionPurpose purpose,
+                                                           bool transactionalRoomStreaming,
+                                                           bool singleSlotRoomStreaming)
+    {
+        if (!GameSceneTransitionPurposeUtility.IsProcedural(purpose))
+            return false;
+
+        if (!transactionalRoomStreaming || singleSlotRoomStreaming)
+            return true;
+
+        return purpose == GameSceneTransitionPurpose.ProceduralInitialRoom;
     }
     #endregion
 
@@ -281,6 +331,37 @@ internal static class GameSceneTransitionExecutionUtility
     #endregion
 
     #region Fade
+    /// <summary>
+    /// Resolves the destructive phase that follows fade-out from the current unload policy.
+    /// </summary>
+    /// <param name="unloadSourceBeforeLoad">True when source content must retire before target loading.</param>
+    /// <param name="hasSourceScene">True when a source scene can be unloaded.</param>
+    /// <param name="hasSourceCompanionScene">True when a source companion can be unloaded.</param>
+    /// <param name="reloadTargetCompanion">True when the target companion must be replaced.</param>
+    /// <returns>PreUnload when any pre-load retirement is required; otherwise Loading.</returns>
+    public static GameSceneTransitionPhase ResolvePhaseAfterFadeOut(bool unloadSourceBeforeLoad,
+                                                                    bool hasSourceScene,
+                                                                    bool hasSourceCompanionScene,
+                                                                    bool reloadTargetCompanion)
+    {
+        bool unloadReloadedCompanion = reloadTargetCompanion && hasSourceCompanionScene;
+        return unloadSourceBeforeLoad && (hasSourceScene || hasSourceCompanionScene) || unloadReloadedCompanion
+            ? GameSceneTransitionPhase.PreUnload
+            : GameSceneTransitionPhase.Loading;
+    }
+
+    /// <summary>
+    /// Resolves whether a ready target enters its authored black hold or begins reveal immediately.
+    /// </summary>
+    /// <param name="postLoadReadyExtraSeconds">Configured extra opaque hold duration.</param>
+    /// <returns>HoldBlack for positive duration; otherwise FadeIn.</returns>
+    public static GameSceneTransitionPhase ResolveReadyRevealPhase(float postLoadReadyExtraSeconds)
+    {
+        return postLoadReadyExtraSeconds > 0f
+            ? GameSceneTransitionPhase.HoldBlack
+            : GameSceneTransitionPhase.FadeIn;
+    }
+
     /// <summary>
     /// Writes fade state values with the configured fade color.
     /// </summary>

@@ -68,6 +68,9 @@ public partial struct PlayerLookDirectionSystem : ISystem
                                     RefRO<PlayerRuntimeLookConfig>,
                                     RefRO<LocalTransform>>())
         {
+            if (inputState.ValueRO.SuppressMotionIntegration != 0)
+                continue;
+
             // Retrieve the look configuration from the controller config
             PlayerRuntimeLookConfig lookConfig = runtimeLookConfig.ValueRO;
             float3 playerForward = PlayerControllerMath.NormalizePlanar(math.forward(localTransform.ValueRO.Rotation), new float3(0f, 0f, 1f));

@@ -15,22 +15,45 @@ internal static class GameSceneTransitionExecutionProgressUtility
     /// <param name="phase">Transition phase being entered.</param>
     /// <param name="loadingProgressState">Mutable loading-progress presentation component.</param>
     /// <param name="config">Scene manager runtime config.</param>
+    /// <param name="suppressLoadingProgress">True when this transition exposes only the fade overlay.</param>
     /// <param name="snapshot">Immutable snapshot of the executor progress counters.</param>
     public static void ApplyForPhase(GameSceneTransitionPhase phase,
                                      ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                      GameSceneManagerConfig config,
+                                     bool suppressLoadingProgress,
                                      GameSceneTransitionProgressSnapshot snapshot)
     {
+        if (suppressLoadingProgress)
+        {
+            GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
+            return;
+        }
+
         switch (phase)
         {
             case GameSceneTransitionPhase.PreUnload:
-                ApplyCurrent(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, snapshot.SourceScene, snapshot);
+                ApplyCurrent(ref loadingProgressState,
+                             config,
+                             GameSceneLoadingProgressOperationKind.Unloading,
+                             snapshot.SourceScene,
+                             false,
+                             snapshot);
                 break;
             case GameSceneTransitionPhase.Loading:
-                ApplyCurrent(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Loading, snapshot.TargetScene, snapshot);
+                ApplyCurrent(ref loadingProgressState,
+                             config,
+                             GameSceneLoadingProgressOperationKind.Loading,
+                             snapshot.TargetScene,
+                             false,
+                             snapshot);
                 break;
             case GameSceneTransitionPhase.PostUnload:
-                ApplyCurrent(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, snapshot.SourceScene, snapshot);
+                ApplyCurrent(ref loadingProgressState,
+                             config,
+                             GameSceneLoadingProgressOperationKind.Unloading,
+                             snapshot.SourceScene,
+                             false,
+                             snapshot);
                 break;
             case GameSceneTransitionPhase.HoldBlack:
                 GameSceneLoadingProgressRuntimeUtility.ApplyReady(ref loadingProgressState, config);
@@ -48,13 +71,21 @@ internal static class GameSceneTransitionExecutionProgressUtility
     /// <param name="config">Scene manager runtime config.</param>
     /// <param name="operationKind">Current operation kind used for status text.</param>
     /// <param name="sceneDefinition">Scene definition currently being processed.</param>
+    /// <param name="suppressLoadingProgress">True when this transition exposes only the fade overlay.</param>
     /// <param name="snapshot">Immutable snapshot of the executor progress counters.</param>
     public static void ApplyCurrent(ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                     GameSceneManagerConfig config,
                                     GameSceneLoadingProgressOperationKind operationKind,
                                     GameSceneDefinitionElement sceneDefinition,
+                                    bool suppressLoadingProgress,
                                     GameSceneTransitionProgressSnapshot snapshot)
     {
+        if (suppressLoadingProgress)
+        {
+            GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
+            return;
+        }
+
         int completedSteps = ResolveCompletedSteps(snapshot);
         float progress = GameSceneLoadingProgressRuntimeUtility.ResolveAggregateProgress(completedSteps,
                                                                                         snapshot.LoadingProgressTotalSteps,

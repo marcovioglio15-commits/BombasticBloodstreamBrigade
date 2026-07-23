@@ -175,11 +175,18 @@ internal static class GameSceneTransitionReadinessUtility
             if (playerReadyQuery.CalculateEntityCount() != 1)
                 return false;
 
-            if (requireFullPoolWarmup)
-                return AreGameplayPoolsReady(entityManager);
+            if (!GameSceneTransitionGameplayWarmupUtility.IsAudioReady(entityManager))
+                return false;
 
-            if (requireActiveEnemyPoolWarmup)
-                return AreEnemyPoolsReady(entityManager);
+            bool poolsReady = true;
+
+            if (requireFullPoolWarmup)
+                poolsReady = AreGameplayPoolsReady(entityManager);
+            else if (requireActiveEnemyPoolWarmup)
+                poolsReady = AreEnemyPoolsReady(entityManager);
+
+            if (!poolsReady)
+                return false;
 
             return true;
         }

@@ -180,8 +180,8 @@ MonoBehaviour:
       role: 2
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
-      useExactDepthConstraint: 0
-      exactDepth: 1
+      useExactDepthConstraint: 1
+      exactDepth: 6
       baseSelectionWeight: 1
   roomMetadata:
   - sceneId: SCN_LGTEST_MAINT_BOSS

@@ -11,6 +11,7 @@ public struct PlayerInputState : IComponentData
     public byte MoveUsesAnalogSource; // Non-zero when the current movement vector came from an analog stick-like control.
     public byte LookUsesAnalogSource; // Non-zero when the current look vector came from an analog stick-like control.
     public byte PointerLookBlocked; // Non-zero until mouse-pointer look receives a fresh post-transition movement.
+    public byte SuppressMotionIntegration; // Non-zero when a transition hitch must not advance player position or facing.
     public float Shoot; // Shooting trigger value (0 = idle, 1 = pressed).
     public float PowerUpPrimary; // Primary active-tool trigger value.
     public float PowerUpSecondary; // Secondary active-tool trigger value.

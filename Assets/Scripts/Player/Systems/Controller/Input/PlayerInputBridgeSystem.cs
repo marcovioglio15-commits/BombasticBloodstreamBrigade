@@ -11,6 +11,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
 {
     #region Constants
     private const float pointerRearmDistanceSquared = 4f;
+    private const int transitionReleaseDeltaGuardFrameCount = 2;
     #endregion
 
     #region Fields
@@ -22,6 +23,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     private bool transitionHadMotionLock;
     private bool wasLiveTransitionMotion;
     private bool wasSceneTransitioning;
+    private int transitionReleaseDeltaGuardFrames;
     private float2 pointerRearmPosition;
     #endregion
 
@@ -127,6 +129,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                                                            ref powerUpPrimary,
                                                            ref powerUpSecondary,
                                                            ref swapPowerUpSlots);
+        bool suppressStalledMotion = ShouldSuppressStalledMotion(isSceneTransitioning);
 
         bool assignedLocalInput = false;
 
@@ -144,14 +147,17 @@ public partial struct PlayerInputBridgeSystem : ISystem
             {
                 if (isFinalized)
                 {
-                    ResetInputState(ref inputState.ValueRW, false);
+                    ResetInputState(ref inputState.ValueRW, false, false);
                     assignedLocalInput = true;
                     continue;
                 }
 
-                if (isGameplayPaused && (!allowsLiveTransitionMotion || suppressLoadFrameMotion))
+                if ((isGameplayPaused && (!allowsLiveTransitionMotion || suppressLoadFrameMotion)) ||
+                    suppressStalledMotion)
                 {
-                    ResetInputState(ref inputState.ValueRW, isSceneTransitioning || pointerLookBlocked);
+                    ResetInputState(ref inputState.ValueRW,
+                                    isSceneTransitioning || pointerLookBlocked,
+                                    suppressStalledMotion);
                     assignedLocalInput = true;
                     continue;
                 }
@@ -162,6 +168,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                                 moveUsesAnalogSource,
                                 lookUsesAnalogSource,
                                 pointerLookBlocked,
+                                false,
                                 shoot,
                                 powerUpPrimary,
                                 powerUpSecondary,
@@ -170,7 +177,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                 continue;
             }
 
-            ResetInputState(ref inputState.ValueRW, false);
+            ResetInputState(ref inputState.ValueRW, false, false);
         }
 
         #if UNITY_EDITOR
@@ -254,6 +261,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
             transitionHadMotionLock = false;
             wasLiveTransitionMotion = false;
             wasSceneTransitioning = false;
+            transitionReleaseDeltaGuardFrames = transitionReleaseDeltaGuardFrameCount;
         }
 
         FilterButtonUntilReleased(ref suppressShootUntilReleased, ref shoot);
@@ -262,6 +270,28 @@ public partial struct PlayerInputBridgeSystem : ISystem
         FilterButtonUntilReleased(ref suppressSwapUntilReleased, ref swapPowerUpSlots);
 
         return UpdatePointerRearmGate(useMousePointerLook);
+    }
+
+    /// <summary>
+    /// Discards continuous motion on an abnormally long transition or release frame. Unity reports work performed
+    /// late in one frame through the following frame's delta, so the release guard prevents held input from
+    /// integrating hidden stall duration as a visible position or rotation jump.
+    /// </summary>
+    /// <param name="isSceneTransitioning">True while the authoritative transition still owns player input.</param>
+    /// <returns>True only for a guarded release frame whose unscaled delta exceeds the stability threshold.</returns>
+    private bool ShouldSuppressStalledMotion(bool isSceneTransitioning)
+    {
+        if (isSceneTransitioning)
+        {
+            transitionReleaseDeltaGuardFrames = 0;
+            return !GameSceneTransitionExecutionTimingUtility.IsStableFrame(Time.unscaledDeltaTime);
+        }
+
+        if (transitionReleaseDeltaGuardFrames <= 0)
+            return false;
+
+        transitionReleaseDeltaGuardFrames--;
+        return !GameSceneTransitionExecutionTimingUtility.IsStableFrame(Time.unscaledDeltaTime);
     }
 
     /// <summary>
@@ -327,7 +357,10 @@ public partial struct PlayerInputBridgeSystem : ISystem
     /// </summary>
     /// <param name="inputState">Mutable ECS input state stored on one player entity.</param>
     /// <param name="pointerLookBlocked">True when mouse-pointer facing must remain locked after the reset.</param>
-    private static void ResetInputState(ref PlayerInputState inputState, bool pointerLookBlocked)
+    /// <param name="suppressMotionIntegration">True when position and facing must not consume this frame's delta.</param>
+    private static void ResetInputState(ref PlayerInputState inputState,
+                                        bool pointerLookBlocked,
+                                        bool suppressMotionIntegration)
     {
         WriteInputState(ref inputState,
                         float2.zero,
@@ -335,6 +368,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                         false,
                         false,
                         pointerLookBlocked,
+                        suppressMotionIntegration,
                         0f,
                         0f,
                         0f,
@@ -350,6 +384,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     /// <param name="moveUsesAnalogSource">True when movement came from an analog stick-like source.</param>
     /// <param name="lookUsesAnalogSource">True when look came from an analog stick-like source.</param>
     /// <param name="pointerLookBlocked">True while mouse-pointer look awaits a fresh post-transition movement.</param>
+    /// <param name="suppressMotionIntegration">True when transition stability requires a zero-motion simulation step.</param>
     /// <param name="shoot">Resolved shooting trigger value.</param>
     /// <param name="powerUpPrimary">Resolved primary active-tool trigger value.</param>
     /// <param name="powerUpSecondary">Resolved secondary active-tool trigger value.</param>
@@ -360,6 +395,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
                                         bool moveUsesAnalogSource,
                                         bool lookUsesAnalogSource,
                                         bool pointerLookBlocked,
+                                        bool suppressMotionIntegration,
                                         float shoot,
                                         float powerUpPrimary,
                                         float powerUpSecondary,
@@ -370,6 +406,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
         inputState.MoveUsesAnalogSource = moveUsesAnalogSource ? (byte)1 : (byte)0;
         inputState.LookUsesAnalogSource = lookUsesAnalogSource ? (byte)1 : (byte)0;
         inputState.PointerLookBlocked = pointerLookBlocked ? (byte)1 : (byte)0;
+        inputState.SuppressMotionIntegration = suppressMotionIntegration ? (byte)1 : (byte)0;
         inputState.Shoot = shoot;
         inputState.PowerUpPrimary = powerUpPrimary;
         inputState.PowerUpSecondary = powerUpSecondary;

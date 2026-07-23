@@ -74,6 +74,9 @@ public partial struct PlayerMovementDirectionSystem : ISystem
         {
             PlayerRuntimeMovementConfig movementConfig = runtimeMovementConfig.ValueRO;
 
+            if (inputState.ValueRO.SuppressMotionIntegration != 0)
+                continue;
+
             float2 moveInput = inputState.ValueRO.Move;
             bool usesAnalogMoveSource = inputState.ValueRO.MoveUsesAnalogSource != 0;
             float deadZone = movementConfig.Values.InputDeadZone;

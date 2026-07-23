@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -11,14 +13,17 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
 {
     #region Fields
     private static readonly Dictionary<GameObject, int> originalRendererLayers = new Dictionary<GameObject, int>();
+    private static Entity trackedPlayerEntity;
     private static PlayableGraph animationGraph;
     private static AnimationClipPlayable animationPlayable;
+    private static Animator isolatedAnimator;
     private static Animator transitionAnimator;
     private static bool active;
     private static bool endRequested;
     private static bool hasAnimation;
     private static bool loggedMissingAnimator;
     private static bool originalApplyRootMotion;
+    private static bool rendererIsolationReady;
     private static float animationDuration;
     #endregion
 
@@ -32,17 +37,27 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     /// <param name="config">Baked procedural transition presentation settings.</param>
     public static void Begin(EntityManager entityManager, GameProceduralLevelConfig config)
     {
-        if (active)
+        if (!active)
         {
-            endRequested = false;
+            active = true;
+            GameProceduralTransitionCameraBridge.SetPlayerPresentationVisible(true);
+        }
+
+        endRequested = false;
+
+        if (!TryResolvePlayerPresentation(entityManager,
+                                          out Animator animator,
+                                          out Vector3 trackingPosition))
+        {
             return;
         }
 
-        active = true;
-        endRequested = false;
-        GameProceduralTransitionCameraBridge.SetPlayerPresentationVisible(true);
+        GameProceduralTransitionCameraBridge.SetPlayerTrackingPosition(trackingPosition);
 
-        if (!TryResolvePlayerAnimator(entityManager, out Animator animator))
+        if (rendererIsolationReady && isolatedAnimator == animator)
+            return;
+
+        if (animator == null)
         {
             if (!loggedMissingAnimator)
             {
@@ -53,8 +68,11 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
             return;
         }
 
-        MoveRenderersToTransitionLayer(animator);
-        GameProceduralTransitionCameraBridge.SetPlayerTrackingTransform(animator.transform);
+        if (!TryMoveRenderersToTransitionLayer(animator))
+            return;
+
+        isolatedAnimator = animator;
+        rendererIsolationReady = true;
 
         if (config.HasPlayerTransitionAnimation == 0)
             return;
@@ -95,10 +113,13 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
             transitionAnimator.applyRootMotion = originalApplyRootMotion;
 
         GameSceneCameraLayerUtility.RestoreRendererObjectLayers(originalRendererLayers);
+        trackedPlayerEntity = Entity.Null;
         animationPlayable = default;
+        isolatedAnimator = null;
         transitionAnimator = null;
         animationDuration = 0f;
         hasAnimation = false;
+        rendererIsolationReady = false;
         active = false;
         endRequested = false;
         GameProceduralTransitionCameraBridge.SetPlayerPresentationVisible(false);
@@ -121,24 +142,70 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
 
     #region Private Methods
     /// <summary>
-    /// Resolves the unique persistent player Animator managed component without scanning scene objects.
+    /// Resolves the unique persistent player's authoritative render anchor and optional managed Animator without
+    /// scanning scene objects. The anchor includes the baked runtime-visual offset so rotation changes remain atomic.
     /// </summary>
     /// <param name="entityManager">Entity manager owning player ECS and managed companion data.</param>
-    /// <param name="animator">Resolved managed Animator.</param>
-    /// <returns>True when exactly one valid player Animator is available.</returns>
-    private static bool TryResolvePlayerAnimator(EntityManager entityManager, out Animator animator)
+    /// <param name="animator">Resolved managed Animator when its visual bridge is ready.</param>
+    /// <param name="trackingPosition">World-space render anchor derived from authoritative ECS data.</param>
+    /// <returns>True when exactly one player pose is available.</returns>
+    private static bool TryResolvePlayerPresentation(EntityManager entityManager,
+                                                     out Animator animator,
+                                                     out Vector3 trackingPosition)
     {
         animator = null;
+        trackingPosition = Vector3.zero;
+        if (!TryResolvePlayerEntity(entityManager, out Entity playerEntity))
+            return false;
+
+        LocalTransform playerTransform = entityManager.GetComponentData<LocalTransform>(playerEntity);
+        float3 renderPosition = playerTransform.Position;
+
+        if (entityManager.HasComponent<PlayerVisualRuntimeBridgeConfig>(playerEntity))
+        {
+            PlayerVisualRuntimeBridgeConfig visualConfig = entityManager.GetComponentData<PlayerVisualRuntimeBridgeConfig>(playerEntity);
+            renderPosition += math.rotate(playerTransform.Rotation, visualConfig.PositionOffset);
+        }
+
+        trackingPosition = new Vector3(renderPosition.x, renderPosition.y, renderPosition.z);
+
+        if (entityManager.HasComponent<Animator>(playerEntity))
+            animator = entityManager.GetComponentObject<Animator>(playerEntity);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Reuses the persistent player identity during one transition and allocates a query only when it must be resolved.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the persistent player.</param>
+    /// <param name="playerEntity">Resolved player with controller and transform state.</param>
+    /// <returns>True when exactly one valid player is available.</returns>
+    private static bool TryResolvePlayerEntity(EntityManager entityManager, out Entity playerEntity)
+    {
+        playerEntity = trackedPlayerEntity;
+
+        if (playerEntity != Entity.Null &&
+            entityManager.Exists(playerEntity) &&
+            entityManager.HasComponent<PlayerControllerConfig>(playerEntity) &&
+            entityManager.HasComponent<LocalTransform>(playerEntity))
+            return true;
+
         EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
-                                                            ComponentType.ReadOnly<Animator>());
+                                                            ComponentType.ReadOnly<LocalTransform>());
 
         try
         {
             if (query.CalculateEntityCount() != 1)
+            {
+                trackedPlayerEntity = Entity.Null;
+                playerEntity = Entity.Null;
                 return false;
+            }
 
-            animator = entityManager.GetComponentObject<Animator>(query.GetSingletonEntity());
-            return animator != null;
+            playerEntity = query.GetSingletonEntity();
+            trackedPlayerEntity = playerEntity;
+            return true;
         }
         finally
         {
@@ -150,19 +217,21 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     /// Temporarily routes every renderer in the managed player hierarchy to the player-only transition camera.
     /// </summary>
     /// <param name="animator">Persistent player Animator hierarchy root.</param>
-    private static void MoveRenderersToTransitionLayer(Animator animator)
+    /// <returns>True when at least one renderer remains isolated for transition presentation.</returns>
+    private static bool TryMoveRenderersToTransitionLayer(Animator animator)
     {
         int playerLayerIndex = GameProceduralTransitionCameraBridge.PlayerLayerIndex;
 
         if (playerLayerIndex < 0)
         {
             Debug.LogWarning("[GameProceduralLevel] The PlayerTransition layer is missing. Re-run Game Scene Management project setup.");
-            return;
+            return false;
         }
 
-        GameSceneCameraLayerUtility.MoveRendererObjectsToLayer(animator,
-                                                              playerLayerIndex,
-                                                              originalRendererLayers);
+        return GameSceneCameraLayerUtility.MoveRendererObjectsToLayer(animator,
+                                                                     playerLayerIndex,
+                                                                     originalRendererLayers) > 0 ||
+               originalRendererLayers.Count > 0;
     }
 
     /// <summary>

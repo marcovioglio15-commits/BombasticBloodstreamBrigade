@@ -57,11 +57,16 @@ public partial struct PlayerMovementApplySystem : ISystem
         foreach ((RefRW<LocalTransform> localTransform,
                   RefRW<PlayerMovementState> movementState,
                   RefRO<PlayerRuntimeMovementConfig> runtimeMovementConfig,
+                  RefRO<PlayerInputState> inputState,
                   Entity entity) in SystemAPI.Query<RefRW<LocalTransform>,
                                                     RefRW<PlayerMovementState>,
-                                                    RefRO<PlayerRuntimeMovementConfig>>()
+                                                    RefRO<PlayerRuntimeMovementConfig>,
+                                                    RefRO<PlayerInputState>>()
                                                 .WithEntityAccess())
         {
+            if (inputState.ValueRO.SuppressMotionIntegration != 0)
+                continue;
+
             float wallCollisionSkinWidth = math.max(0f, runtimeMovementConfig.ValueRO.Values.WallCollisionSkinWidth);
             float3 currentPosition = localTransform.ValueRO.Position;
             float3 resolvedPosition = currentPosition;

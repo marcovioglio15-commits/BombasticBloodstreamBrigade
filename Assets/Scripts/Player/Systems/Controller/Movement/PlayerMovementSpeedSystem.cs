@@ -60,8 +60,16 @@ public partial struct PlayerMovementSpeedSystem : ISystem
         foreach ((RefRW<PlayerMovementState> movementState,
                   RefRO<PlayerMovementModifiers> modifiers,
                   RefRO<PlayerRuntimeMovementConfig> runtimeMovementConfig,
-                  Entity playerEntity) in SystemAPI.Query<RefRW<PlayerMovementState>, RefRO<PlayerMovementModifiers>, RefRO<PlayerRuntimeMovementConfig>>().WithEntityAccess())
+                  RefRO<PlayerInputState> inputState,
+                  Entity playerEntity) in SystemAPI.Query<RefRW<PlayerMovementState>,
+                                                          RefRO<PlayerMovementModifiers>,
+                                                          RefRO<PlayerRuntimeMovementConfig>,
+                                                          RefRO<PlayerInputState>>()
+                                                   .WithEntityAccess())
         {
+            if (inputState.ValueRO.SuppressMotionIntegration != 0)
+                continue;
+
             PlayerRuntimeMovementConfig movementConfig = runtimeMovementConfig.ValueRO;
             float3 desiredDirection = movementState.ValueRO.DesiredDirection;
             bool hasInput = math.lengthsq(desiredDirection) > 1e-6f;

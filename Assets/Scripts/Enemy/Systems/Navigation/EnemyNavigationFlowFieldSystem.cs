@@ -7,10 +7,10 @@ using Unity.Collections;
 /// <summary>
 /// Builds and refreshes one shared static navigation flow field used by enemy pursuit around wall obstacles.
 /// </summary>
-[UpdateInGroup(typeof(EnemySystemGroup))]
-[UpdateAfter(typeof(EnemySpawnSystem))]
-[UpdateBefore(typeof(EnemySteeringSystem))]
-[UpdateBefore(typeof(EnemyPatternMovementSystem))]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateAfter(typeof(GameSceneManagementSystemGroup))]
+[UpdateAfter(typeof(EnemyPoolInitializeSystem))]
+[UpdateBefore(typeof(EnemySystemGroup))]
 public partial struct EnemyNavigationFlowFieldSystem : ISystem
 {
     #region Fields
@@ -67,6 +67,13 @@ public partial struct EnemyNavigationFlowFieldSystem : ISystem
     {
         if (!state.EntityManager.Exists(navigationEntity))
             return;
+
+        if (GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning() &&
+            (!SystemAPI.TryGetSingleton(out GameSceneTransitionPhysicsStepState physicsStepState) ||
+             physicsStepState.NavigationWarmupAllowed == 0))
+        {
+            return;
+        }
 
         if (!SystemAPI.TryGetSingletonEntity<PlayerControllerConfig>(out Entity playerEntity))
             return;

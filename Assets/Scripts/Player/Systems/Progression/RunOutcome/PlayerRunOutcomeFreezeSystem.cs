@@ -184,6 +184,7 @@ public partial struct PlayerRunOutcomeFreezeSystem : ISystem
         inputState.MoveUsesAnalogSource = 0;
         inputState.LookUsesAnalogSource = 0;
         inputState.PointerLookBlocked = 0;
+        inputState.SuppressMotionIntegration = 0;
         inputState.Shoot = 0f;
         inputState.PowerUpPrimary = 0f;
         inputState.PowerUpSecondary = 0f;
