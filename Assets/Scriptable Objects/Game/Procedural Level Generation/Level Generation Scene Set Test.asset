@@ -20,7 +20,7 @@ MonoBehaviour:
   sceneCatalogPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
   generationSettings:
     seedMode: 0
-    fixedSeed: 20260720
+    fixedSeed: 1
     maximumNodeCount: 32
     maximumDepth: 12
     maximumGenerationAttempts: 5
@@ -591,7 +591,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_01
     sceneGuid: 5a34e40218bcc094382de3b9fedebc81
-    dependencyHash: 2b21aae8593c950ce345a9187ce1885a
+    dependencyHash: cb976970ba918cf794efdaa4e2b1284a
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_01.unity
@@ -616,6 +616,4 @@ MonoBehaviour:
       side: 3
       capability: 2
       connectionPolicy: 1
-    authoringWarnings:
-    - SubScene component 'SUB_METRO_01' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_01.unity'
-      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+    authoringWarnings: []
