@@ -234,9 +234,9 @@ MonoBehaviour:
       order: 0
       useOverridePayload: 0
       overridePayload:
-        targetStatName: 
+        targetStatName: Damage
         resource: 0
-        formula: 
+        formula: '[Damage] = [this] + 0.15'
         flatNumericValue: 0
         flatBooleanValue: 0
         flatTokenValue: 
@@ -648,7 +648,7 @@ MonoBehaviour:
     exitDuration: 0.3
     scrollDistance: 0.35
     font: {fileID: 0}
-  portalMarqueeSettings:
+  portalLogSettings:
     worldOffset: {x: 0, y: 1.75, z: 0}
     fontSize: 3.2
     cellSpacing: 2
