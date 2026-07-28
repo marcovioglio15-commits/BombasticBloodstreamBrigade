@@ -11,7 +11,7 @@ public sealed class GameRoomRewardPresentationCellView : MonoBehaviour
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("RectTransform moved by the owning player log or portal Log.")]
+    [Tooltip("RectTransform moved by the owning player log or portal log.")]
     [SerializeField]
     private RectTransform cellTransform;
 

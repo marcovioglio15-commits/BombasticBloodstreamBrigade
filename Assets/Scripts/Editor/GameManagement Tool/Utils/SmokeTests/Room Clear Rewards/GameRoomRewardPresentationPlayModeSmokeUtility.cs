@@ -12,7 +12,7 @@ internal static class GameRoomRewardPresentationPlayModeSmokeUtility
 
     #region Public Methods
     /// <summary>
-    /// Waits for room completion, then verifies one player log delivery and one visible outgoing portal Log.
+    /// Waits for room completion, then verifies one player log delivery and one visible outgoing portal log.
     /// </summary>
     /// <param name="entityManager">Default-world entity manager owning procedural and player runtime data.</param>
     /// <param name="managerEntity">Unique procedural manager singleton.</param>
@@ -105,12 +105,12 @@ internal static class GameRoomRewardPresentationPlayModeSmokeUtility
 
     #region Portal Validation
     /// <summary>
-    /// Finds a graph-assigned outgoing portal and verifies that its matching managed-scene Log is visible.
+    /// Finds a graph-assigned outgoing portal and verifies that its matching managed-scene log is visible.
     /// </summary>
     /// <param name="entityManager">Entity manager owning generated graph and physical portals.</param>
     /// <param name="managerEntity">Procedural manager owning the graph buffers.</param>
     /// <param name="currentNodeIndex">Active graph node whose outgoing portal should be presented.</param>
-    /// <param name="ready">True when one matching Log contains visible destination rewards.</param>
+    /// <param name="ready">True when one matching log contains visible destination rewards.</param>
     /// <param name="failure">Structural graph or portal failure.</param>
     /// <returns>True when the view exists or may still rebuild; false for invalid runtime assignments.</returns>
     private static bool TryValidatePortalLog(EntityManager entityManager,

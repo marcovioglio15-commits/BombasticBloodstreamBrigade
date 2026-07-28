@@ -79,7 +79,7 @@ internal static class GameRoomRewardCompositionEditorUtility
             return;
 
         root.Add(new HelpBox(
-            "Mappings are shared by the player log and portal Log. Sync keeps exactly the stat and resource targets currently used by modules.",
+            "Mappings are shared by the player log and portal log. Sync keeps exactly the stat and resource targets currently used by modules.",
             HelpBoxMessageType.Info));
         Button syncButton = new Button(() => SyncMappings(root, serializedPreset, mappings));
         syncButton.text = "Sync Used Targets";
@@ -341,7 +341,7 @@ internal static class GameRoomRewardCompositionEditorUtility
             "PresentationMapping",
             BuildMappingKey(mapping),
             BuildMappingTitle(mapping),
-            "Expand this named target mapping to edit shared player-log and portal-Log presentation.");
+            "Expand this named target mapping to edit shared player-log and portal-log presentation.");
         VisualElement card = CreateCard();
         Label targetLabel = new Label(BuildMappingTargetLabel(mapping));
         targetLabel.style.unityFontStyleAndWeight = FontStyle.Bold;

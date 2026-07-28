@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Scans room root scenes and recursively referenced SubScenes without changing the 's open-scene setup.
+/// Scans room root scenes and recursively referenced SubScenes without changing the designer's open-scene setup.
 /// </summary>
 public static class GameRoomMetadataScannerUtility
 {
@@ -89,7 +89,7 @@ public static class GameRoomMetadataScannerUtility
         if (preset == null || preset.Levels == null)
             return sceneIds;
 
-        // Include disabled levels so their metadata is ready before s enable them.
+        // Include disabled levels so their metadata is ready before designers enable them.
         for (int levelIndex = 0; levelIndex < preset.Levels.Count; levelIndex++)
             AppendReferencedSceneIds(preset.Levels[levelIndex], sceneIds, uniqueSceneIds);
 
@@ -448,7 +448,7 @@ public static class GameRoomMetadataScannerUtility
             snapshot.AuthoringWarnings.Add(context + " uses a non-trigger BoxCollider; ECS can evaluate it, but the collider may physically obstruct traversal.");
 
         if (portal.ArrivalAnchor == null)
-            snapshot.AuthoringWarnings.Add(context + " has no arrival anchor; bake fallback uses the portal transform but -facing validation remains unresolved.");
+            snapshot.AuthoringWarnings.Add(context + " has no arrival anchor; bake fallback uses the portal transform but designer-facing validation remains unresolved.");
 
         if (portal.InwardOffset < 0f)
             snapshot.AuthoringWarnings.Add(context + " has a negative inward offset and may place the player back inside the entry volume.");

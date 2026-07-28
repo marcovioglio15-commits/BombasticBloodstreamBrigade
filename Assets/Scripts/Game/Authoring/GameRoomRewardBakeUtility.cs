@@ -56,7 +56,7 @@ public static class GameRoomRewardBakeUtility
     }
 
     /// <summary>
-    /// Builds immutable player-log and portal-Log settings from one reward preset.
+    /// Builds immutable player-log and portal-log settings from one reward preset.
     /// </summary>
     /// <param name="preset">Source Room Clear Rewards preset.</param>
     /// <returns>Baked global reward configuration.</returns>

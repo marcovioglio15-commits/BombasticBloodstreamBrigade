@@ -16,16 +16,16 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("World-space canvas containing the fixed portal Log cells.")]
+    [Tooltip("World-space canvas containing the fixed portal log cells.")]
     [SerializeField]
     private Canvas worldCanvas;
 
-    [Tooltip("Fixed reusable Log cells. Runtime code never creates additional UI objects.")]
+    [Tooltip("Fixed reusable log cells. Runtime code never creates additional UI objects.")]
     [SerializeField]
     private GameRoomRewardPresentationCellView[] cells =
         Array.Empty<GameRoomRewardPresentationCellView>();
 
-    [Tooltip("Keeps the portal Log facing the active gameplay camera.")]
+    [Tooltip("Keeps the portal log facing the active gameplay camera.")]
     [SerializeField]
     private bool faceCamera = true;
     #endregion
@@ -50,7 +50,7 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
 
     #region Properties
     /// <summary>
-    /// Gets whether this Log currently owns rebuilt content on an enabled world-space canvas.
+    /// Gets whether this log currently owns rebuilt content on an enabled world-space canvas.
     /// </summary>
     public bool HasVisibleContent =>
         signature != int.MinValue &&
@@ -71,7 +71,7 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     /// Assigns the fixed world-space canvas and reusable cell pool during editor setup.
     /// </summary>
     /// <param name="resolvedCanvas">Preauthored world-space canvas.</param>
-    /// <param name="resolvedCells">Preauthored reusable Log cells.</param>
+    /// <param name="resolvedCells">Preauthored reusable log cells.</param>
     public void ConfigureAuthoring(Canvas resolvedCanvas,
                                    GameRoomRewardPresentationCellView[] resolvedCells)
     {
@@ -95,7 +95,7 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     /// </summary>
     /// <param name="candidateSignature">Generation and edge-derived signature owned by this content.</param>
     /// <param name="sourceItems">All formatted destination reward descriptors.</param>
-    /// <param name="portalCenter">World-space portal center used as the Log anchor.</param>
+    /// <param name="portalCenter">World-space portal center used as the log anchor.</param>
     /// <param name="config">Baked portal presentation settings.</param>
     public void Rebuild(int candidateSignature,
                         IReadOnlyList<GameRoomRewardPresentationItem> sourceItems,
@@ -256,7 +256,7 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     }
 
     /// <summary>
-    /// Rotates the Log toward the active camera using a cached transform.
+    /// Rotates the log toward the active camera using a cached transform.
     /// </summary>
     private void FaceCamera()
     {

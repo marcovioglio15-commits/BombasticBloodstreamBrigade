@@ -30,16 +30,19 @@ public static class GameRoomRewardRuntimeSmokeTest
             EntityManager entityManager = world.EntityManager;
             Entity managerEntity = CreateManager(entityManager);
             Entity playerEntity = CreatePlayer(entityManager);
+            ValidateFormulaPortalPreview(entityManager,
+                                         managerEntity,
+                                         playerEntity);
             GameRoomRewardGrantSystem system =
                 world.GetOrCreateSystemManaged<GameRoomRewardGrantSystem>();
             GrantRoomClear(entityManager, managerEntity);
             system.Update();
-            ValidateInitialGrant(entityManager, playerEntity);
+            ValidateInitialGrant(entityManager, managerEntity, playerEntity);
 
             // Replay the exact transaction and verify the player checkpoint prevents duplicate application.
             GrantRoomClear(entityManager, managerEntity);
             system.Update();
-            ValidateInitialGrant(entityManager, playerEntity);
+            ValidateInitialGrant(entityManager, managerEntity, playerEntity);
 
             EnterRoom(entityManager, managerEntity, 2u, true);
             system.Update();
@@ -84,6 +87,7 @@ public static class GameRoomRewardRuntimeSmokeTest
         entityManager.AddBuffer<GameRoomRewardDefinitionElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardTileBindingElement>(managerEntity);
+        entityManager.AddBuffer<GameRoomRewardPresentationElement>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
         DynamicBuffer<GameRoomRewardModuleElement> modules =
@@ -220,6 +224,59 @@ public static class GameRoomRewardRuntimeSmokeTest
     }
     #endregion
 
+    #region Presentation Validation
+    /// <summary>
+    /// Proves a portal preview evaluates a formula against current player stats and exposes its numeric result.
+    /// </summary>
+    /// <param name="entityManager">Fixture entity manager owning reward and player data.</param>
+    /// <param name="managerEntity">Fixture reward manager containing the formula module.</param>
+    /// <param name="playerEntity">Fixture player supplying current formula variables and resource values.</param>
+    private static void ValidateFormulaPortalPreview(EntityManager entityManager,
+                                                     Entity managerEntity,
+                                                     Entity playerEntity)
+    {
+        DynamicBuffer<GameRoomRewardModuleElement> modules =
+            entityManager.GetBuffer<GameRoomRewardModuleElement>(managerEntity);
+        DynamicBuffer<GameRoomRewardPresentationElement> mappings =
+            entityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity);
+        DynamicBuffer<PlayerScalableStatElement> scalableStats =
+            entityManager.GetBuffer<PlayerScalableStatElement>(playerEntity);
+        PlayerHealth health =
+            entityManager.GetComponentData<PlayerHealth>(playerEntity);
+        PlayerExperience experience =
+            entityManager.GetComponentData<PlayerExperience>(playerEntity);
+        PlayerPowerUpsState powerUpsState =
+            entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+        GameRoomRewardModuleElement formulaModule = modules[3];
+        bool evaluated =
+            PlayerRoomRewardValueUtility.TryEvaluateFormulaPreview(
+                in formulaModule,
+                scalableStats,
+                in health,
+                in experience,
+                in powerUpsState,
+                out PlayerFormulaValue formulaBaseValue,
+                out PlayerFormulaValue formulaResult);
+        GameRoomRewardPresentationItem item =
+            GameRoomRewardPresentationFormatter.FormatPortalModule(
+                in formulaModule,
+                1,
+                mappings,
+                in formulaBaseValue,
+                in formulaResult,
+                evaluated);
+
+        Require(evaluated,
+                "Portal preview did not evaluate the formula through the shared runtime path.");
+        Require(string.Equals(item.Text,
+                              "Experience +5 (next 2 rooms)",
+                              StringComparison.Ordinal),
+                "Portal preview did not expose the resolved formula result.");
+        Require(item.Text.IndexOf("formula", StringComparison.OrdinalIgnoreCase) < 0,
+                "Portal preview still exposed the generic Formula placeholder.");
+    }
+    #endregion
+
     #region Transactions
     /// <summary>
     /// Emits the same authoritative clear transaction used to validate replay protection.
@@ -270,8 +327,10 @@ public static class GameRoomRewardRuntimeSmokeTest
     /// Validates permanent values, post-clamp presentation and future-room schedules after first grant.
     /// </summary>
     /// <param name="entityManager">Fixture entity manager.</param>
+    /// <param name="managerEntity">Reward manager providing presentation mappings.</param>
     /// <param name="playerEntity">Player receiving the reward.</param>
     private static void ValidateInitialGrant(EntityManager entityManager,
+                                             Entity managerEntity,
                                              Entity playerEntity)
     {
         PlayerHealth health = entityManager.GetComponentData<PlayerHealth>(playerEntity);
@@ -283,6 +342,10 @@ public static class GameRoomRewardRuntimeSmokeTest
             entityManager.GetBuffer<PlayerRoomRewardTemporaryResourceElement>(playerEntity);
         DynamicBuffer<PlayerRoomRewardPresentationEvent> events =
             entityManager.GetBuffer<PlayerRoomRewardPresentationEvent>(playerEntity);
+        DynamicBuffer<GameRoomRewardPresentationElement> mappings =
+            entityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity);
+
+        // Validate authoritative values and temporary schedule lifetimes.
         RequireApproximately(stats[0].Value, 15f, "Permanent stat delta was not applied exactly once.");
         RequireApproximately(health.Current, 100f, "Health reward did not clamp to maximum health.");
         Require(modifiers.Length == 1 && resources.Length == 1,
@@ -297,6 +360,17 @@ public static class GameRoomRewardRuntimeSmokeTest
                              "The health presentation entry does not contain the actual post-clamp delta.");
         Require(events[2].StartsNextRoom != 0 && events[3].StartsNextRoom != 0,
                 "Temporary acquisition entries do not identify their next-room activation.");
+
+        // Verify the player log receives the post-order formula projection instead of a generic label.
+        PlayerRoomRewardPresentationEvent formulaEvent = events[3];
+        GameRoomRewardPresentationItem formulaSchedule =
+            GameRoomRewardPresentationFormatter.FormatPlayerEvent(in formulaEvent, mappings);
+        Require(string.Equals(formulaSchedule.Text,
+                              "Experience +7.5 (next 2 rooms)",
+                              StringComparison.Ordinal),
+                "The player log did not expose the resolved scheduled formula result.");
+        Require(formulaSchedule.Text.IndexOf("formula", StringComparison.OrdinalIgnoreCase) < 0,
+                "The player log still exposed the generic Formula placeholder.");
     }
 
     /// <summary>

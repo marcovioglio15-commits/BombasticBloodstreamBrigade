@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Rebuilds preauthored portal Logs when graph edge assignments expose a rewarded destination room.
+/// Rebuilds preauthored portal logs when graph edge assignments expose a rewarded destination room.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial class GameRoomPortalRewardPresentationSystem : SystemBase
@@ -14,6 +14,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     private readonly List<GameRoomRewardPresentationItem> formattedItems =
         new List<GameRoomRewardPresentationItem>(16);
     private EntityQuery managerQuery;
+    private EntityQuery playerQuery;
     private EntityQuery portalQuery;
     private uint lastAnchorRevision;
     private uint lastGenerationVersion;
@@ -38,6 +39,10 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                       typeof(GameProceduralLevelRuntimeState),
                                       typeof(GameProceduralRoomNodeElement),
                                       typeof(GameProceduralRoomEdgeElement));
+        playerQuery = GetEntityQuery(typeof(PlayerHealth),
+                                     typeof(PlayerExperience),
+                                     typeof(PlayerPowerUpsState),
+                                     typeof(PlayerScalableStatElement));
         portalQuery = GetEntityQuery(typeof(GameRoomPortal),
                                      typeof(GameRoomPortalRuntimeState));
         portalQuery.SetChangedVersionFilter(typeof(GameRoomPortalRuntimeState));
@@ -48,10 +53,12 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     /// </summary>
     protected override void OnUpdate()
     {
-        if (managerQuery.CalculateEntityCount() != 1)
+        if (managerQuery.CalculateEntityCount() != 1 ||
+            playerQuery.CalculateEntityCount() != 1)
             return;
 
         Entity managerEntity = managerQuery.GetSingletonEntity();
+        Entity playerEntity = playerQuery.GetSingletonEntity();
         GameRoomRewardConfig config =
             EntityManager.GetComponentData<GameRoomRewardConfig>(managerEntity);
         GameProceduralLevelRuntimeState runtimeState =
@@ -107,6 +114,14 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
             EntityManager.GetBuffer<GameRoomRewardModuleElement>(managerEntity, true);
         DynamicBuffer<GameRoomRewardPresentationElement> mappings =
             EntityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity, true);
+        DynamicBuffer<PlayerScalableStatElement> scalableStats =
+            EntityManager.GetBuffer<PlayerScalableStatElement>(playerEntity, true);
+        PlayerHealth health =
+            EntityManager.GetComponentData<PlayerHealth>(playerEntity);
+        PlayerExperience experience =
+            EntityManager.GetComponentData<PlayerExperience>(playerEntity);
+        PlayerPowerUpsState powerUpsState =
+            EntityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
 
         // Each changed portal resolves its assigned edge once and rebuilds only when its signature differs.
         for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
@@ -154,7 +169,11 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                   rewards,
                                   moduleBindings,
                                   modules,
-                                  mappings);
+                                  mappings,
+                                  scalableStats,
+                                  in health,
+                                  in experience,
+                                  in powerUpsState);
 
             if (formattedItems.Count == 0)
             {
@@ -217,13 +236,21 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     /// <param name="moduleBindings">All reward-to-module bindings.</param>
     /// <param name="modules">All flattened atomic modules.</param>
     /// <param name="mappings">All shared presentation mappings.</param>
+    /// <param name="scalableStats">Current authoritative player stats exposed to formula variables.</param>
+    /// <param name="health">Current player health used by resource formulas.</param>
+    /// <param name="experience">Current player experience used by resource formulas.</param>
+    /// <param name="powerUpsState">Current player active power-up energy used by resource formulas.</param>
     private void BuildDestinationItems(
         int tileIndex,
         DynamicBuffer<GameRoomRewardTileBindingElement> tileBindings,
         DynamicBuffer<GameRoomRewardDefinitionElement> rewards,
         DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindings,
         DynamicBuffer<GameRoomRewardModuleElement> modules,
-        DynamicBuffer<GameRoomRewardPresentationElement> mappings)
+        DynamicBuffer<GameRoomRewardPresentationElement> mappings,
+        DynamicBuffer<PlayerScalableStatElement> scalableStats,
+        in PlayerHealth health,
+        in PlayerExperience experience,
+        in PlayerPowerUpsState powerUpsState)
     {
         formattedItems.Clear();
         IReadOnlyList<int> orderedTileBindings =
@@ -257,10 +284,22 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                                 tileBinding.Quantity *
                                                 moduleBinding.Quantity);
                 GameRoomRewardModuleElement module = modules[moduleBinding.ModuleIndex];
+                bool hasFormulaResult =
+                    PlayerRoomRewardValueUtility.TryEvaluateFormulaPreview(
+                        in module,
+                        scalableStats,
+                        in health,
+                        in experience,
+                        in powerUpsState,
+                        out PlayerFormulaValue formulaBaseValue,
+                        out PlayerFormulaValue formulaResult);
                 formattedItems.Add(
                     GameRoomRewardPresentationFormatter.FormatPortalModule(in module,
                                                                            combinedQuantity,
-                                                                           mappings));
+                                                                           mappings,
+                                                                           in formulaBaseValue,
+                                                                           in formulaResult,
+                                                                           hasFormulaResult));
             }
         }
     }

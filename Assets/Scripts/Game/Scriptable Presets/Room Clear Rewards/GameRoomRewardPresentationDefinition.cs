@@ -192,7 +192,7 @@ public sealed class GameRoomRewardPlayerLogSettings
 }
 
 /// <summary>
-/// Configures the fixed-capacity horizontal reward Log displayed by destination portals.
+/// Configures the fixed-capacity horizontal reward log displayed by destination portals.
 /// </summary>
 [Serializable]
 public sealed class GameRoomRewardPortalLogSettings
@@ -200,11 +200,11 @@ public sealed class GameRoomRewardPortalLogSettings
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("World-space offset applied to the preauthored portal reward Log.")]
+    [Tooltip("World-space offset applied to the preauthored portal reward log.")]
     [SerializeField]
     private Vector3 worldOffset = new Vector3(0f, 1.75f, 0f);
 
-    [Tooltip("Text size applied to every preauthored portal Log cell.")]
+    [Tooltip("Text size applied to every preauthored portal log cell.")]
     [SerializeField]
     private float fontSize = 3.2f;
 
@@ -212,7 +212,7 @@ public sealed class GameRoomRewardPortalLogSettings
     [SerializeField]
     private float cellSpacing = 2f;
 
-    [Tooltip("Maximum number of preauthored Log cells visible at the same time.")]
+    [Tooltip("Maximum number of preauthored log cells visible at the same time.")]
     [SerializeField]
     private int visibleCells = 1;
 
@@ -220,15 +220,15 @@ public sealed class GameRoomRewardPortalLogSettings
     [SerializeField]
     private float scrollSpeed = 0.75f;
 
-    [Tooltip("Pause in seconds before a rebuilt portal Log starts scrolling.")]
+    [Tooltip("Pause in seconds before a rebuilt portal log starts scrolling.")]
     [SerializeField]
     private float initialPause = 0.5f;
 
-    [Tooltip("Pause in seconds applied after the Log completes one full loop.")]
+    [Tooltip("Pause in seconds applied after the log completes one full loop.")]
     [SerializeField]
     private float loopPause = 0.35f;
 
-    [Tooltip("Optional font override used by every preauthored portal Log cell.")]
+    [Tooltip("Optional font override used by every preauthored portal log cell.")]
     [SerializeField]
     private TMP_FontAsset font;
     #endregion

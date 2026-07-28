@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &150056951
+--- !u!1001 &111939184
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -129,15 +129,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 30.33
+      value: 0.9531451
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.21
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.66
+      value: -15.51
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -169,96 +169,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1097113701923057890, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: portalId
-      value: LGTEST_METRO_EW_WEST_02
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.98
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -14.37
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.2
+      value: LGTEST_METRO_NS_SOUTH_02
       objectReference: {fileID: 0}
     - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_Name
-      value: PF_RoomRewardPortalAnchor (1)
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
---- !u!1001 &363357781
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 16
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 3.21
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 12.09
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1097113701923057890, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: portalId
-      value: LGTEST_METRO_NS_NORTH_01
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.98
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -14.37
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_Name
-      value: PF_RoomRewardPortalAnchor (2)
+      value: Portal Reward - LGTEST_METRO_NS_SOUTH_02
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -326,60 +241,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f58f86ff522315f4cb6079ea21495d10, type: 3}
---- !u!1 &797989121
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 797989123}
-  - component: {fileID: 797989122}
-  m_Layer: 0
-  m_Name: SUB_METRO_01
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &797989122
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797989121}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45a335734b1572644a6a5d09d87adc65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Scenes::Unity.Scenes.SubScene
-  _SceneAsset: {fileID: 102900000, guid: 71a89c8d3835e6c419e0f79016c3670f, type: 3}
-  _HierarchyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  AutoLoadScene: 1
-  _SceneGUID:
-    Value:
-      x: 3637086743
-      y: 1282298755
-      z: 159321745
-      w: 4034280545
---- !u!4 &797989123
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 797989121}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1433948460
+--- !u!1001 &464449708
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -389,15 +251,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 15.4
+      value: -13.59
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.21
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -17.48
+      value: -0.89
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -429,30 +291,71 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1097113701923057890, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: portalId
-      value: LGTEST_METRO_NS_SOUTH_02
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.98
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -14.37
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.2
+      value: LGTEST_METRO_EW_WEST_02
       objectReference: {fileID: 0}
     - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_Name
-      value: PF_RoomRewardPortalAnchor (3)
+      value: Portal Reward - LGTEST_METRO_EW_WEST_02
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
---- !u!1001 &1713506759
+--- !u!1 &797989121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 797989123}
+  - component: {fileID: 797989122}
+  m_Layer: 0
+  m_Name: SUB_METRO_01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &797989122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797989121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45a335734b1572644a6a5d09d87adc65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Scenes::Unity.Scenes.SubScene
+  _SceneAsset: {fileID: 102900000, guid: 71a89c8d3835e6c419e0f79016c3670f, type: 3}
+  _HierarchyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  AutoLoadScene: 0
+  _SceneGUID:
+    Value:
+      x: 3637086743
+      y: 1282298755
+      z: 159321745
+      w: 4034280545
+--- !u!4 &797989123
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 797989121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1024940710
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -462,15 +365,76 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.52
+      value: 2.09
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.21
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.66
+      value: 15.622
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097113701923057890, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: portalId
+      value: LGTEST_METRO_NS_NORTH_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_Name
+      value: Portal Reward - LGTEST_METRO_NS_NORTH_01
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+--- !u!1001 &1498303670
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 17.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.97
       objectReference: {fileID: 0}
     - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -504,21 +468,9 @@ PrefabInstance:
       propertyPath: portalId
       value: LGTEST_METRO_EW_EAST_01
       objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.98
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -14.37
-      objectReference: {fileID: 0}
-    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.2
-      objectReference: {fileID: 0}
     - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
       propertyPath: m_Name
-      value: PF_RoomRewardPortalAnchor
+      value: Portal Reward - LGTEST_METRO_EW_EAST_01
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -586,10 +538,10 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1713506759}
-  - {fileID: 150056951}
-  - {fileID: 363357781}
-  - {fileID: 1433948460}
   - {fileID: 2000978071}
   - {fileID: 427694152}
   - {fileID: 797989123}
+  - {fileID: 1498303670}
+  - {fileID: 1024940710}
+  - {fileID: 464449708}
+  - {fileID: 111939184}

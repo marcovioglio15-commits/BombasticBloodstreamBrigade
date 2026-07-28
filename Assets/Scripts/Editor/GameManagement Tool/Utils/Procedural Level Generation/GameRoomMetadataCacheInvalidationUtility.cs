@@ -28,6 +28,27 @@ public static class GameRoomMetadataCacheInvalidationUtility
     }
 
     /// <summary>
+    /// Marks snapshots stale only when an imported scene changed the stored aggregate dependency hash.
+    /// Unity may report unchanged scenes as imported while lazily resolving their dependency artifacts, so
+    /// path membership alone cannot distinguish a source edit from a cache-only reimport.
+    /// </summary>
+    /// <param name="importedAssetPaths">Imported project-relative scene paths.</param>
+    public static void MarkStaleForImportedAssetPaths(IReadOnlyCollection<string> importedAssetPaths)
+    {
+        if (importedAssetPaths == null || importedAssetPaths.Count == 0)
+            return;
+
+        HashSet<string> normalizedPaths = BuildNormalizedPathSet(importedAssetPaths);
+
+        if (normalizedPaths.Count == 0)
+            return;
+
+        VisitPresets((metadataProperty) =>
+            MetadataReferencesAnyPath(metadataProperty, normalizedPaths) &&
+            HasDependencyHashMismatch(metadataProperty));
+    }
+
+    /// <summary>
     /// Marks every room snapshot stale after authoring schema scripts change.
     /// </summary>
     public static void MarkAllStale()
@@ -109,6 +130,40 @@ public static class GameRoomMetadataCacheInvalidationUtility
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Compares one serialized snapshot with the current aggregate dependency hash of its source scenes.
+    /// </summary>
+    /// <param name="metadataProperty">Serialized metadata entry whose dependency state should be checked.</param>
+    /// <returns>True when required data is missing or the current aggregate hash differs from the stored hash.</returns>
+    private static bool HasDependencyHashMismatch(SerializedProperty metadataProperty)
+    {
+        SerializedProperty dependencyHashProperty =
+            metadataProperty.FindPropertyRelative("dependencyHash");
+        SerializedProperty sourceScenePathsProperty =
+            metadataProperty.FindPropertyRelative("sourceScenePaths");
+
+        if (dependencyHashProperty == null ||
+            string.IsNullOrWhiteSpace(dependencyHashProperty.stringValue) ||
+            sourceScenePathsProperty == null ||
+            !sourceScenePathsProperty.isArray ||
+            sourceScenePathsProperty.arraySize == 0)
+        {
+            return true;
+        }
+
+        List<string> sourceScenePaths = new List<string>(sourceScenePathsProperty.arraySize);
+
+        // Rebuild the exact source-path set used by the scanner without opening or modifying scenes.
+        for (int pathIndex = 0; pathIndex < sourceScenePathsProperty.arraySize; pathIndex++)
+            sourceScenePaths.Add(sourceScenePathsProperty.GetArrayElementAtIndex(pathIndex).stringValue);
+
+        string currentHash =
+            GameRoomMetadataDependencyUtility.ComputeCombinedDependencyHash(sourceScenePaths);
+        return !string.Equals(dependencyHashProperty.stringValue,
+                              currentHash,
+                              StringComparison.Ordinal);
     }
 
     /// <summary>

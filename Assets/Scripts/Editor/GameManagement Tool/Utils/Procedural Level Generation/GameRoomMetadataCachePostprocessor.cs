@@ -34,14 +34,17 @@ public sealed class GameRoomMetadataCachePostprocessor : AssetPostprocessor
             return;
         }
 
-        List<string> changedScenePaths = new List<string>();
-        AppendScenePaths(importedAssets, changedScenePaths);
-        AppendScenePaths(deletedAssets, changedScenePaths);
-        AppendScenePaths(movedAssets, changedScenePaths);
-        AppendScenePaths(movedFromAssetPaths, changedScenePaths);
-        GameRoomMetadataCacheInvalidationUtility.MarkStaleForAssetPaths(changedScenePaths);
+        List<string> importedScenePaths = new List<string>();
+        AppendScenePaths(importedAssets, importedScenePaths);
+        AppendScenePaths(movedAssets, importedScenePaths);
+        GameRoomMetadataCacheInvalidationUtility.MarkStaleForImportedAssetPaths(importedScenePaths);
 
-        if (changedScenePaths.Count > 0)
+        List<string> removedScenePaths = new List<string>();
+        AppendScenePaths(deletedAssets, removedScenePaths);
+        AppendScenePaths(movedFromAssetPaths, removedScenePaths);
+        GameRoomMetadataCacheInvalidationUtility.MarkStaleForAssetPaths(removedScenePaths);
+
+        if (importedScenePaths.Count > 0 || removedScenePaths.Count > 0)
             GameRoomMetadataAutomaticRefreshUtility.ScheduleRefresh();
     }
     #endregion

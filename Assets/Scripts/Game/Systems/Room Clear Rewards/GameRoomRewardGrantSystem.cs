@@ -324,9 +324,13 @@ public partial class GameRoomRewardGrantSystem : SystemBase
         if (module.Duration == GameRoomRewardDuration.Temporary)
         {
             ScheduleTemporary(in module,
+                              scalableStats,
                               temporaryModifiers,
                               temporaryResources,
                               presentationEvents,
+                              in health,
+                              in experience,
+                              in powerUpsState,
                               currentVisitOrdinal,
                               grantSequence);
             return;
@@ -376,15 +380,23 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// Schedules a temporary modifier or stipend starting on the next distinct room visit.
     /// </summary>
     /// <param name="module">Temporary atomic module.</param>
+    /// <param name="scalableStats">Current authoritative stats used to project formula presentation values.</param>
     /// <param name="modifiers">Temporary stat modifier buffer.</param>
     /// <param name="resources">Temporary resource stipend buffer.</param>
     /// <param name="presentationEvents">Player presentation event queue.</param>
+    /// <param name="health">Current player health used by resource formula projections.</param>
+    /// <param name="experience">Current player experience used by resource formula projections.</param>
+    /// <param name="powerUpsState">Current player energy state used by resource formula projections.</param>
     /// <param name="currentVisitOrdinal">Current distinct room visit ordinal.</param>
     /// <param name="grantSequence">Monotonic room-clear sequence.</param>
     private static void ScheduleTemporary(in GameRoomRewardModuleElement module,
+                                          DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                           DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> modifiers,
                                           DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> resources,
                                           DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
+                                          in PlayerHealth health,
+                                          in PlayerExperience experience,
+                                          in PlayerPowerUpsState powerUpsState,
                                           uint currentVisitOrdinal,
                                           uint grantSequence)
     {
@@ -430,16 +442,27 @@ public partial class GameRoomRewardGrantSystem : SystemBase
             });
         }
 
+        // Capture an acquisition-time projection for the preauthored player log.
+        PlayerRoomRewardValueUtility.ResolveScheduledPresentationValue(
+            in module,
+            scalableStats,
+            in health,
+            in experience,
+            in powerUpsState,
+            out GameRoomRewardValueSource presentationValueSource,
+            out float numericDelta,
+            out byte booleanValue,
+            out FixedString64Bytes tokenValue);
         presentationEvents.Add(new PlayerRoomRewardPresentationEvent
         {
             TargetStatName = module.TargetStatName,
-            TokenValue = module.FlatTokenValue,
+            TokenValue = tokenValue,
             TargetDomain = module.TargetDomain,
             Resource = module.Resource,
-            ValueSource = module.ValueSource,
+            ValueSource = presentationValueSource,
             StatType = module.TargetStatType,
-            NumericDelta = module.FlatNumericValue,
-            BooleanValue = module.FlatBooleanValue,
+            NumericDelta = numericDelta,
+            BooleanValue = booleanValue,
             IsTemporary = 1,
             StartsNextRoom = 1,
             DurationRooms = module.DurationRooms,
@@ -447,6 +470,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
             Sequence = grantSequence
         });
     }
+
     #endregion
 
     #region Presentation

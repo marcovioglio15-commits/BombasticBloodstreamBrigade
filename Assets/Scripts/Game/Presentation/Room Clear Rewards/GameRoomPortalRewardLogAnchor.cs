@@ -5,7 +5,7 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Registers one preauthored managed-scene portal Log against its stable ECS portal identity.
+/// Registers one preauthored managed-scene portal log against its stable ECS portal identity.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
@@ -21,9 +21,9 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     [SerializeField]
     private string portalId;
 
-    [Tooltip("Preauthored world-space Log controlled by the ECS presentation bridge for this portal.")]
+    [Tooltip("Preauthored world-space log controlled by the ECS presentation bridge for this portal.")]
     [SerializeField]
-    private GameRoomPortalRewardLogView LogView;
+    private GameRoomPortalRewardLogView logView;
     #endregion
 
     #region Runtime Fields
@@ -45,20 +45,20 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// Assigns the stable portal identity and fixed view during the explicit managed-scene setup workflow.
     /// </summary>
     /// <param name="resolvedPortalId">Stable identifier copied from the matching ECS portal authoring.</param>
-    /// <param name="resolvedLogView">Preauthored world-space Log owned by this anchor.</param>
+    /// <param name="resolvedLogView">Preauthored world-space log owned by this anchor.</param>
     public void ConfigureAuthoring(string resolvedPortalId,
                                    GameRoomPortalRewardLogView resolvedLogView)
     {
         portalId = resolvedPortalId;
-        LogView = resolvedLogView;
+        logView = resolvedLogView;
     }
 
     /// <summary>
-    /// Resolves the closest loaded managed-scene Log matching one ECS portal identity and world position.
+    /// Resolves the closest loaded managed-scene log matching one ECS portal identity and world position.
     /// </summary>
     /// <param name="resolvedPortalId">Stable ECS portal identifier.</param>
     /// <param name="portalCenter">Current portal center after room-instance placement.</param>
-    /// <param name="view">Closest valid preauthored Log when resolution succeeds.</param>
+    /// <param name="view">Closest valid preauthored log when resolution succeeds.</param>
     /// <returns>True when one loaded anchor matches both identity and placed world position.</returns>
     public static bool TryResolve(FixedString64Bytes resolvedPortalId,
                                   float3 portalCenter,
@@ -85,7 +85,7 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
             }
 
             if (!anchor.isActiveAndEnabled ||
-                anchor.LogView == null ||
+                anchor.logView == null ||
                 !string.Equals(anchor.portalId,
                                resolvedPortalIdString,
                                StringComparison.Ordinal))
@@ -101,7 +101,7 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
                 continue;
 
             nearestDistanceSquared = distanceSquared;
-            view = anchor.LogView;
+            view = anchor.logView;
         }
 
         if (nearestDistanceSquared <= MaximumPositionErrorSquared)
@@ -112,7 +112,7 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     }
 
     /// <summary>
-    /// Hides every registered Log before a new procedural graph assignment is presented.
+    /// Hides every registered log before a new procedural graph assignment is presented.
     /// </summary>
     public static void HideAll()
     {
@@ -121,8 +121,8 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         {
             GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
 
-            if (anchor != null && anchor.LogView != null)
-                anchor.LogView.Hide();
+            if (anchor != null && anchor.logView != null)
+                anchor.logView.Hide();
         }
     }
     #endregion
@@ -139,8 +139,8 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
             IncrementRevision();
         }
 
-        if (LogView != null)
-            LogView.Hide();
+        if (logView != null)
+            logView.Hide();
     }
 
     /// <summary>
@@ -151,8 +151,8 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         if (registeredAnchors.Remove(this))
             IncrementRevision();
 
-        if (LogView != null)
-            LogView.Hide();
+        if (logView != null)
+            logView.Hide();
     }
     #endregion
 

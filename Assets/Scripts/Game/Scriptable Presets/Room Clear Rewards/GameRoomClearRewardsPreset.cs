@@ -16,7 +16,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     [SerializeField]
     private string presetId;
 
-    [Tooltip("-facing preset name displayed in Game Management Tool.")]
+    [Tooltip("Designer-facing preset name displayed in Game Management Tool.")]
     [SerializeField]
     private string presetName = "New Room Clear Rewards Preset";
 
@@ -54,7 +54,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     private GameRoomRewardPlayerLogSettings playerLogSettings = new GameRoomRewardPlayerLogSettings();
 
     [Header("Portal Log")]
-    [Tooltip("Layout, capacity and timing applied to preauthored destination portal reward Logs.")]
+    [Tooltip("Layout, capacity and timing applied to preauthored destination portal reward logs.")]
     [SerializeField]
     private GameRoomRewardPortalLogSettings portalLogSettings = new GameRoomRewardPortalLogSettings();
     #endregion

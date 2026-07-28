@@ -13,7 +13,7 @@ public static class GameRoomRewardPresentationValidationUtility
 
     #region Public Methods
     /// <summary>
-    /// Validates player-log and portal-Log settings without correcting authored values.
+    /// Validates player-log and portal-log settings without correcting authored values.
     /// </summary>
     /// <param name="preset">Room reward preset containing presentation settings.</param>
     /// <param name="failureMessage">First actionable presentation validation failure.</param>
@@ -188,10 +188,10 @@ public static class GameRoomRewardPresentationValidationUtility
 
     #region Portal Log
     /// <summary>
-    /// Validates bounded cell capacity, layout and timing for preauthored portal Logs.
+    /// Validates bounded cell capacity, layout and timing for preauthored portal logs.
     /// </summary>
     /// <param name="settings">Portal Log settings to inspect.</param>
-    /// <param name="failureMessage">First actionable portal-Log failure.</param>
+    /// <param name="failureMessage">First actionable portal-log failure.</param>
     /// <returns>True when all values are finite and supported by the fixed cell pool.</returns>
     private static bool TryValidatePortalLog(
         GameRoomRewardPortalLogSettings settings,

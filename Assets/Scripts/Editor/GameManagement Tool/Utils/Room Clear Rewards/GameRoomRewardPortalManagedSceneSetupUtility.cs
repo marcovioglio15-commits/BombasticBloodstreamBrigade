@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Installs fixed portal reward Logs in managed room scenes while keeping SubScene artifacts unmanaged.
+/// Installs fixed portal reward logs in managed room scenes while keeping SubScene artifacts unmanaged.
 /// </summary>
 internal static class GameRoomRewardPortalManagedSceneSetupUtility
 {
@@ -22,7 +22,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// <summary>
     /// Rebuilds managed portal presentation anchors for every room referenced by a procedural level preset.
     /// </summary>
-    /// <param name="portalAnchorPrefab">Shared anchor and fixed-capacity Log prefab installed for each portal.</param>
+    /// <param name="portalAnchorPrefab">Shared anchor and fixed-capacity log prefab installed for each portal.</param>
     public static void Configure(GameObject portalAnchorPrefab)
     {
         if (portalAnchorPrefab == null)
@@ -94,7 +94,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// Replaces setup-owned presentation anchors in one managed room scene from its referenced SubScene portals.
     /// </summary>
     /// <param name="roomScenePath">Project-relative managed room scene path.</param>
-    /// <param name="portalAnchorPrefab">Shared anchor and Log prefab installed for each portal.</param>
+    /// <param name="portalAnchorPrefab">Shared anchor and log prefab installed for each portal.</param>
     private static void ConfigureRoomScene(string roomScenePath,
                                            GameObject portalAnchorPrefab)
     {
@@ -149,7 +149,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// </summary>
     /// <param name="roomScene">Managed room scene receiving the presentation hierarchy.</param>
     /// <param name="sources">Portal identities and authored world centers collected from referenced SubScenes.</param>
-    /// <param name="portalAnchorPrefab">Shared anchor and Log prefab installed for every portal.</param>
+    /// <param name="portalAnchorPrefab">Shared anchor and log prefab installed for every portal.</param>
     private static void CreatePresentationAnchors(
         Scene roomScene,
         IReadOnlyList<PortalPresentationSource> sources,
@@ -174,7 +174,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
 
             if (view == null)
                 throw new InvalidOperationException(
-                    "The shared portal anchor prefab has no Log view.");
+                    "The shared portal anchor prefab has no log view.");
 
             anchorObject.GetComponent<GameRoomPortalRewardLogAnchor>()
                 .ConfigureAuthoring(source.PortalId, view);

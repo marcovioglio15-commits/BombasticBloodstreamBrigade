@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Marks room metadata stale when a  saves a scene and queues a safe deferred refresh.
+/// Marks room metadata stale when a designer saves a scene and queues a safe deferred refresh.
 /// </summary>
 [InitializeOnLoad]
 public static class GameRoomMetadataSceneSaveWatcher

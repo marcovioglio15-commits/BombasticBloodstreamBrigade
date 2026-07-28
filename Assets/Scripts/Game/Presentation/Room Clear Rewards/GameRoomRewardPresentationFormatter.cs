@@ -8,7 +8,7 @@ using UnityEngine;
 public static class GameRoomRewardPresentationFormatter
 {
     #region Constants
-    private const string FormulaSummary = "formula";
+    private const string unavailableValueSummary = "value unavailable";
     #endregion
 
     #region Methods
@@ -43,16 +43,22 @@ public static class GameRoomRewardPresentationFormatter
     }
 
     /// <summary>
-    /// Formats one destination module preview without exposing its full unified formula.
+    /// Formats one destination module preview from authored flat data or a non-mutating formula result.
     /// </summary>
     /// <param name="module">Flattened atomic reward module.</param>
     /// <param name="quantity">Combined module and room-reward quantity represented by this entry.</param>
     /// <param name="mappings">Baked target presentation mappings.</param>
-    /// <returns>Immutable descriptor consumed by a portal Log.</returns>
+    /// <param name="formulaBaseValue">Current typed target value used as [this] by a formula module.</param>
+    /// <param name="formulaResult">Typed formula result resolved from the current authoritative player snapshot.</param>
+    /// <param name="hasFormulaResult">True when a formula module was evaluated successfully.</param>
+    /// <returns>Immutable descriptor consumed by a portal log.</returns>
     public static GameRoomRewardPresentationItem FormatPortalModule(
         in GameRoomRewardModuleElement module,
         int quantity,
-        DynamicBuffer<GameRoomRewardPresentationElement> mappings)
+        DynamicBuffer<GameRoomRewardPresentationElement> mappings,
+        in PlayerFormulaValue formulaBaseValue,
+        in PlayerFormulaValue formulaResult,
+        bool hasFormulaResult)
     {
         GameRoomRewardPresentationElement mapping =
             ResolveMapping(module.PresentationMappingIndex, mappings, out bool hasMapping);
@@ -62,7 +68,10 @@ public static class GameRoomRewardPresentationFormatter
         string label = hasMapping && !mapping.DisplayLabel.IsEmpty
             ? mapping.DisplayLabel.ToString()
             : fallbackLabel;
-        string valueSummary = ResolveModulePreviewValue(in module);
+        string valueSummary = ResolveModulePreviewValue(in module,
+                                                        in formulaBaseValue,
+                                                        in formulaResult,
+                                                        hasFormulaResult);
         string durationSummary = module.Duration == GameRoomRewardDuration.Temporary
             ? string.Format(CultureInfo.InvariantCulture,
                             " (next {0} room{1})",
@@ -110,7 +119,7 @@ public static class GameRoomRewardPresentationFormatter
     }
 
     /// <summary>
-    /// Formats a future-room schedule without exposing its complete formula expression.
+    /// Formats a future-room schedule from its resolved acquisition-time projection.
     /// </summary>
     /// <param name="rewardEvent">Scheduled temporary reward event.</param>
     /// <returns>Short configured-value summary.</returns>
@@ -118,7 +127,7 @@ public static class GameRoomRewardPresentationFormatter
         in PlayerRoomRewardPresentationEvent rewardEvent)
     {
         if (rewardEvent.ValueSource == GameRoomRewardValueSource.Formula)
-            return FormulaSummary;
+            return unavailableValueSummary;
 
         if (rewardEvent.TargetDomain == GameRoomRewardTargetDomain.Resource)
             return FormatSignedNumber(rewardEvent.NumericDelta, false);
@@ -140,14 +149,24 @@ public static class GameRoomRewardPresentationFormatter
     }
 
     /// <summary>
-    /// Formats a flattened module for a destination preview.
+    /// Formats a flattened module from its authored flat payload or resolved formula preview.
     /// </summary>
     /// <param name="module">Module whose authored value is summarized.</param>
-    /// <returns>Formula placeholder or typed flat value.</returns>
-    private static string ResolveModulePreviewValue(in GameRoomRewardModuleElement module)
+    /// <param name="formulaBaseValue">Current typed value supplied to the formula as [this].</param>
+    /// <param name="formulaResult">Typed formula result resolved against the current player snapshot.</param>
+    /// <param name="hasFormulaResult">True when formula evaluation succeeded.</param>
+    /// <returns>Resolved formula result or typed flat value.</returns>
+    private static string ResolveModulePreviewValue(
+        in GameRoomRewardModuleElement module,
+        in PlayerFormulaValue formulaBaseValue,
+        in PlayerFormulaValue formulaResult,
+        bool hasFormulaResult)
     {
         if (module.ValueSource == GameRoomRewardValueSource.Formula)
-            return FormulaSummary;
+            return ResolveFormulaPreviewValue(in module,
+                                              in formulaBaseValue,
+                                              in formulaResult,
+                                              hasFormulaResult);
 
         if (module.TargetDomain == GameRoomRewardTargetDomain.Resource)
             return FormatSignedNumber(module.FlatNumericValue, false);
@@ -166,6 +185,76 @@ public static class GameRoomRewardPresentationFormatter
             default:
                 return FormatSignedNumber(module.FlatNumericValue, false);
         }
+    }
+
+    /// <summary>
+    /// Formats a typed formula result using the same delta semantics shown after an authoritative player grant.
+    /// </summary>
+    /// <param name="module">Formula module defining target domain and stat type.</param>
+    /// <param name="formulaBaseValue">Current typed target value supplied to the formula as [this].</param>
+    /// <param name="formulaResult">Typed formula output resolved by the shared runtime evaluator.</param>
+    /// <param name="hasFormulaResult">True when the evaluator produced a target-compatible result.</param>
+    /// <returns>Short resolved value summary or an actionable unavailable fallback.</returns>
+    private static string ResolveFormulaPreviewValue(
+        in GameRoomRewardModuleElement module,
+        in PlayerFormulaValue formulaBaseValue,
+        in PlayerFormulaValue formulaResult,
+        bool hasFormulaResult)
+    {
+        if (!hasFormulaResult || !formulaResult.IsValid)
+            return unavailableValueSummary;
+
+        if (module.TargetDomain == GameRoomRewardTargetDomain.Resource)
+        {
+            return formulaResult.Type == PlayerFormulaValueType.Number
+                ? FormatSignedNumber(formulaResult.NumberValue, false)
+                : unavailableValueSummary;
+        }
+
+        switch (module.TargetStatType)
+        {
+            case PlayerScalableStatType.Boolean:
+                return formulaResult.Type == PlayerFormulaValueType.Boolean
+                    ? (formulaResult.BooleanValue ? "enabled" : "disabled")
+                    : unavailableValueSummary;
+            case PlayerScalableStatType.Token:
+                return formulaResult.Type == PlayerFormulaValueType.Token &&
+                       !string.IsNullOrWhiteSpace(formulaResult.TokenValue)
+                    ? formulaResult.TokenValue
+                    : unavailableValueSummary;
+            case PlayerScalableStatType.Integer:
+            case PlayerScalableStatType.Unsigned:
+                return FormatFormulaNumericDelta(in formulaBaseValue,
+                                                 in formulaResult,
+                                                 true);
+            default:
+                return FormatFormulaNumericDelta(in formulaBaseValue,
+                                                 in formulaResult,
+                                                 false);
+        }
+    }
+
+    /// <summary>
+    /// Converts an absolute numeric stat formula result into the signed delta used by reward presentation.
+    /// </summary>
+    /// <param name="formulaBaseValue">Current numeric stat value supplied to the formula.</param>
+    /// <param name="formulaResult">Absolute numeric stat value returned by the formula.</param>
+    /// <param name="integral">True when decimal digits must be suppressed for the target stat type.</param>
+    /// <returns>Signed numeric delta or the unavailable fallback when either value is not numeric.</returns>
+    private static string FormatFormulaNumericDelta(
+        in PlayerFormulaValue formulaBaseValue,
+        in PlayerFormulaValue formulaResult,
+        bool integral)
+    {
+        if (formulaBaseValue.Type != PlayerFormulaValueType.Number ||
+            formulaResult.Type != PlayerFormulaValueType.Number)
+        {
+            return unavailableValueSummary;
+        }
+
+        return FormatSignedNumber(formulaResult.NumberValue -
+                                  formulaBaseValue.NumberValue,
+                                  integral);
     }
 
     /// <summary>
