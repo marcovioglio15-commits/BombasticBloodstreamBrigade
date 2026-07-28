@@ -369,7 +369,7 @@ public partial struct PlayerDeathAnimationSystem : ISystem
             return;
 
         // Visual bridge hide can happen even when no VFX is authored, as long as the preset asks for it. Treat it as a
-        // sibling one-shot so designers can hide the player rig at the spawn-time threshold regardless of VFX presence.
+        // sibling one-shot so s can hide the player rig at the spawn-time threshold regardless of VFX presence.
         // Same frame also hides every player-attached VFX (Charge Shot, Level-Up, Health/Shield Increase, Muzzle Flash
         // follow-pose, Elemental Trail attached, Laser Beam managed visual), player-owned orbital projection hierarchy,
         // and aiming pointer so the despawn effect plays against a clean stage instead of a halo around the invisible

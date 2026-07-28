@@ -207,7 +207,7 @@ public static class GameProceduralLevelFoundationSmokeTest
     /// </summary>
     /// <param name="level">Serialized level definition to configure.</param>
     /// <param name="technicalId">Stable fixture technical ID.</param>
-    /// <param name="levelId">Designer-facing fixture level ID.</param>
+    /// <param name="levelId">-facing fixture level ID.</param>
     /// <param name="displayName">Display name whose UTF-8 capacity is validated.</param>
     /// <param name="includeTiles">Whether this level owns the Start and Boss fixture tiles.</param>
     private static void ConfigureValidationLevel(SerializedProperty level,
@@ -245,7 +245,7 @@ public static class GameProceduralLevelFoundationSmokeTest
     /// </summary>
     /// <param name="tile">Serialized room tile to configure.</param>
     /// <param name="technicalId">Stable fixture technical ID.</param>
-    /// <param name="tileId">Designer-facing fixture tile ID.</param>
+    /// <param name="tileId">-facing fixture tile ID.</param>
     /// <param name="sceneId">Metadata scene ID referenced by the tile.</param>
     /// <param name="role">Structural role assigned to the tile.</param>
     private static void ConfigureValidationTile(SerializedProperty tile,

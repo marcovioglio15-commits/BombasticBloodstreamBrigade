@@ -40,6 +40,8 @@ public partial struct PlayerRuntimePortraitHudVisualScalingSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimePortraitHudVisualScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePortraitHudVisualScalingElement>(true);
         BufferLookup<PlayerBasePortraitHudAnimationElement> baseAnimationLookup = SystemAPI.GetBufferLookup<PlayerBasePortraitHudAnimationElement>(true);
         BufferLookup<PlayerPortraitHudAnimationElement> animationLookup = SystemAPI.GetBufferLookup<PlayerPortraitHudAnimationElement>(false);
@@ -80,8 +82,10 @@ public partial struct PlayerRuntimePortraitHudVisualScalingSystem : ISystem
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
             CopyBaseAnimations(baseAnimationLookup[configEntity], animationLookup[configEntity]);
             PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,

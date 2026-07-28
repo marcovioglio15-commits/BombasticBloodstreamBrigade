@@ -44,15 +44,25 @@ public partial struct PlayerMovementApplySystem : ISystem
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         ComponentLookup<PlayerDashState> dashLookup = SystemAPI.GetComponentLookup<PlayerDashState>(false);
         int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+        int portalBarrierLayerMask = WorldPortalBarrierCollisionUtility.ResolvePortalBarrierLayerMask();
         bool canQueryScenePhysics = !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
 
-        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
-            worldLayersConfig.WallsLayerMask != 0)
-            wallsLayerMask = worldLayersConfig.WallsLayerMask;
+        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig))
+        {
+            if (worldLayersConfig.WallsLayerMask != 0)
+                wallsLayerMask = worldLayersConfig.WallsLayerMask;
+
+            if (worldLayersConfig.PortalBarrierLayerMask != 0)
+                portalBarrierLayerMask = worldLayersConfig.PortalBarrierLayerMask;
+        }
+
+        CollisionFilter playerMovementFilter =
+            WorldPortalBarrierCollisionUtility.BuildPlayerMovementFilter(wallsLayerMask,
+                                                                          portalBarrierLayerMask);
 
         // Single-slot traversal keeps transform integration live while scene collider blobs are replaced. Wall
         // clearance resumes only after the target physics-readiness barrier has exported a safe world.
-        bool wallsEnabled = wallsLayerMask != 0 && canQueryScenePhysics;
+        bool worldCollisionEnabled = playerMovementFilter.CollidesWith != 0u && canQueryScenePhysics;
 
         foreach ((RefRW<LocalTransform> localTransform,
                   RefRW<PlayerMovementState> movementState,
@@ -74,7 +84,7 @@ public partial struct PlayerMovementApplySystem : ISystem
             float3 displacement = resolvedVelocity * deltaTime;
             bool hasDisplacement = math.lengthsq(displacement) >= 1e-8f;
 
-            if (wallsEnabled)
+            if (worldCollisionEnabled)
             {
                 if (hasDisplacement)
                 {
@@ -82,7 +92,7 @@ public partial struct PlayerMovementApplySystem : ISystem
                                                                                            currentPosition,
                                                                                            displacement,
                                                                                            PlayerCollisionRadius,
-                                                                                           wallsLayerMask,
+                                                                                           playerMovementFilter,
                                                                                            wallCollisionSkinWidth,
                                                                                            out float3 allowedDisplacement,
                                                                                            out float3 hitNormal);
@@ -108,7 +118,7 @@ public partial struct PlayerMovementApplySystem : ISystem
                     bool hasCorrection = WorldWallCollisionUtility.TryResolveMinimumClearance(physicsWorldSingleton,
                                                                                               resolvedPosition,
                                                                                               minimumClearanceDistance,
-                                                                                              wallsLayerMask,
+                                                                                              playerMovementFilter,
                                                                                               out float3 correctionDisplacement,
                                                                                               out float3 correctionNormal);
 

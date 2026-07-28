@@ -27,6 +27,7 @@ public partial struct PlayerJetpackVfxSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
         state.RequireForUpdate<PlayerJetpackVfxConfig>();
         state.RequireForUpdate<PlayerJetpackVfxRuntimeState>();
         state.RequireForUpdate<PlayerMovementState>();
@@ -39,25 +40,32 @@ public partial struct PlayerJetpackVfxSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
+        ComponentLookup<PlayerMovementState> movementStateLookup = SystemAPI.GetComponentLookup<PlayerMovementState>(true);
+        ComponentLookup<LocalTransform> playerTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
 
-        foreach ((RefRO<PlayerJetpackVfxConfig> jetpackVfxConfig,
-                  RefRW<PlayerJetpackVfxRuntimeState> jetpackVfxState,
-                  RefRO<PlayerMovementState> movementState,
-                  RefRO<LocalTransform> playerTransform)
-                 in SystemAPI.Query<RefRO<PlayerJetpackVfxConfig>,
-                                    RefRW<PlayerJetpackVfxRuntimeState>,
-                                    RefRO<PlayerMovementState>,
-                                    RefRO<LocalTransform>>())
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  RefRO<PlayerJetpackVfxConfig> jetpackVfxConfig,
+                  RefRW<PlayerJetpackVfxRuntimeState> jetpackVfxState)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
+                                    RefRO<PlayerJetpackVfxConfig>,
+                                    RefRW<PlayerJetpackVfxRuntimeState>>())
         {
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!movementStateLookup.TryGetComponent(playerEntity, out PlayerMovementState movementState) ||
+                !playerTransformLookup.TryGetComponent(playerEntity, out LocalTransform playerTransform))
+            {
+                continue;
+            }
+
             PlayerJetpackVfxConfig config = jetpackVfxConfig.ValueRO;
             PlayerJetpackVfxRuntimeState runtimeState = jetpackVfxState.ValueRO;
-            LocalTransform transform = playerTransform.ValueRO;
             bool stateChanged = false;
             bool usesMovement = UsesMovement(config.ActivationMode);
             bool usesRotation = UsesRotation(config.ActivationMode);
             float movementSpeedThreshold = math.max(0f, config.MovementSpeedThreshold);
             float movementSpeedSquared = usesMovement || config.ScaleWithMovementSpeed != 0
-                ? math.lengthsq(movementState.ValueRO.Velocity)
+                ? math.lengthsq(movementState.Velocity)
                 : 0f;
             bool isMoving = usesMovement &&
                             movementSpeedSquared >
@@ -66,7 +74,7 @@ public partial struct PlayerJetpackVfxSystem : ISystem
 
             if (usesRotation)
             {
-                isRotating = ResolveIsRotating(transform.Rotation,
+                isRotating = ResolveIsRotating(playerTransform.Rotation,
                                                deltaTime,
                                                math.max(0f, config.RotationSpeedThresholdDegrees),
                                                ref runtimeState);
@@ -105,11 +113,11 @@ public partial struct PlayerJetpackVfxSystem : ISystem
 
     #region Scale
     /// <summary>
-    /// Resolves a multiplier centered on the designer-authored scale at a configured percentage of the custom maximum-size speed.
+    /// Resolves a multiplier centered on the -authored scale at a configured percentage of the custom maximum-size speed.
     /// </summary>
     /// <param name="config">Runtime Jetpack VFX behavior settings.</param>
     /// <param name="movementSpeedSquared">Squared current player movement speed.</param>
-    /// <returns>Positive scale multiplier that can shrink below or grow above the designer-authored scale.</returns>
+    /// <returns>Positive scale multiplier that can shrink below or grow above the -authored scale.</returns>
     private static float ResolveDesiredScaleMultiplier(in PlayerJetpackVfxConfig config,
                                                        float movementSpeedSquared)
     {

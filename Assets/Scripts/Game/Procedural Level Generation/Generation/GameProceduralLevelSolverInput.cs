@@ -197,7 +197,7 @@ public sealed class GameProceduralRoomTileSolverInput
     /// Creates one pure solver tile from editor objects or flattened runtime configuration buffers.
     /// </summary>
     /// <param name="technicalId">Stable reusable tile technical ID.</param>
-    /// <param name="tileId">Designer-facing tile ID.</param>
+    /// <param name="tileId">-facing tile ID.</param>
     /// <param name="sceneId">Canonical room scene ID.</param>
     /// <param name="role">Structural tile role.</param>
     /// <param name="maximumCopies">Maximum logical nodes using this tile.</param>
@@ -394,7 +394,7 @@ public sealed class GameProceduralLevelSolverInput
     /// Creates one immutable pure managed request shared by editor preview and authoritative runtime generation.
     /// </summary>
     /// <param name="levelTechnicalId">Immutable level identity used for seed derivation.</param>
-    /// <param name="levelId">Designer-facing level identity used by diagnostics.</param>
+    /// <param name="levelId">-facing level identity used by diagnostics.</param>
     /// <param name="targetNodeCountRange">Inclusive acceptable total node range.</param>
     /// <param name="preferredBossDepthRange">Inclusive preferred terminal depth range.</param>
     /// <param name="roomDepthScore">Non-negative room depth rule weight.</param>

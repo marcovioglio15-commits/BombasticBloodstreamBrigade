@@ -4,14 +4,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
-/// Points from the player entity to its dedicated health-bar visual configuration entity.
-/// </summary>
-public struct PlayerHealthBarVisualReference : IComponentData
-{
-    public Entity ConfigEntity;
-}
-
-/// <summary>
 /// Points from the dedicated health-bar visual configuration entity back to its authoritative player.
 /// </summary>
 public struct PlayerHealthBarVisualOwner : IComponentData

@@ -27,7 +27,7 @@ public sealed class ExcelDataTransferMasterPreset : ScriptableObject
     [Tooltip("Layout preset controlling sheet names, grid dimensions and painted cell mappings.")]
     [SerializeField] private ExcelDataWorkbookLayoutPreset layoutPreset;
 
-    [Tooltip("Brush palette preset used by the layout designer and field picker filters.")]
+    [Tooltip("Brush palette preset used by the layout  and field picker filters.")]
     [SerializeField] private ExcelDataBrushPalettePreset brushPalettePreset;
 
     [Tooltip("Import sub-preset controlling source workbook, conflict policies and import field selection.")]

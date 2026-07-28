@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Scans room root scenes and recursively referenced SubScenes without changing the designer's open-scene setup.
+/// Scans room root scenes and recursively referenced SubScenes without changing the 's open-scene setup.
 /// </summary>
 public static class GameRoomMetadataScannerUtility
 {
@@ -89,7 +89,7 @@ public static class GameRoomMetadataScannerUtility
         if (preset == null || preset.Levels == null)
             return sceneIds;
 
-        // Include disabled levels so their metadata is ready before designers enable them.
+        // Include disabled levels so their metadata is ready before s enable them.
         for (int levelIndex = 0; levelIndex < preset.Levels.Count; levelIndex++)
             AppendReferencedSceneIds(preset.Levels[levelIndex], sceneIds, uniqueSceneIds);
 
@@ -327,8 +327,10 @@ public static class GameRoomMetadataScannerUtility
         {
             GameRoomPortalAuthoring[] portals = roots[rootIndex].GetComponentsInChildren<GameRoomPortalAuthoring>(true);
             GameRoomCenterAnchorAuthoring[] centerAnchors = roots[rootIndex].GetComponentsInChildren<GameRoomCenterAnchorAuthoring>(true);
+            EnemySpawnerAuthoring[] spawners = roots[rootIndex].GetComponentsInChildren<EnemySpawnerAuthoring>(true);
             snapshot.CenterAnchorCount += centerAnchors.Length;
-            foundRootAuthoring |= isManagedRootScene && (portals.Length > 0 || centerAnchors.Length > 0);
+            foundRootAuthoring |= isManagedRootScene &&
+                                  (portals.Length > 0 || centerAnchors.Length > 0 || spawners.Length > 0);
 
             for (int portalIndex = 0; portalIndex < portals.Length; portalIndex++)
                 AppendPortal(portals[portalIndex], scene.path, snapshot, portalIds);
@@ -340,13 +342,74 @@ public static class GameRoomMetadataScannerUtility
                 if (anchor != null && !anchor.gameObject.activeInHierarchy)
                     snapshot.AuthoringWarnings.Add("Center anchor '" + BuildHierarchyPath(anchor.transform) + "' in '" + scene.path + "' is inactive and may not bake as an available arrival pose.");
             }
+
+            for (int spawnerIndex = 0; spawnerIndex < spawners.Length; spawnerIndex++)
+                AppendSpawner(spawners[spawnerIndex], scene.path, isManagedRootScene, snapshot);
         }
 
         if (!foundRootAuthoring)
             return;
 
         snapshot.CacheStale = true;
-        snapshot.AuthoringWarnings.Add("Portal and center-anchor authoring found in the managed root scene cannot produce runtime ECS entities. Move these components into a referenced SubScene, save it and refresh room metadata.");
+        snapshot.AuthoringWarnings.Add("Portal, center-anchor or enemy-spawner authoring found in the managed root scene cannot produce runtime ECS entities. Move these components into a referenced SubScene, save it and refresh room metadata.");
+    }
+
+    /// <summary>
+    /// Counts one active bakeable enemy spawner and records why it cannot make a room reward-eligible.
+    /// </summary>
+    /// <param name="spawner">Enemy spawner authoring component to inspect.</param>
+    /// <param name="scenePath">Scene or SubScene owning the component.</param>
+    /// <param name="isManagedRootScene">True when the component cannot bake as a room runtime entity.</param>
+    /// <param name="snapshot">Mutable room metadata snapshot.</param>
+    private static void AppendSpawner(EnemySpawnerAuthoring spawner,
+                                      string scenePath,
+                                      bool isManagedRootScene,
+                                      GameRoomMetadataScanSnapshot snapshot)
+    {
+        if (spawner == null)
+            return;
+
+        string context = "Enemy spawner '" + BuildHierarchyPath(spawner.transform) + "' in '" + scenePath + "'";
+        bool active = spawner.enabled &&
+                      spawner.gameObject.activeInHierarchy &&
+                      spawner.RuntimeEnabledByDefault;
+
+        if (!active)
+            return;
+
+        if (isManagedRootScene)
+        {
+            snapshot.AuthoringWarnings.Add(context + " is active but cannot contribute to Room Clear Reward eligibility because it is outside a bakeable SubScene.");
+            return;
+        }
+
+        snapshot.ActiveSpawnerCount++;
+        bool hasNonemptyWave = false;
+
+        if (spawner.Waves != null)
+        {
+            for (int waveIndex = 0; waveIndex < spawner.Waves.Count; waveIndex++)
+            {
+                EnemySpawnWaveAuthoring wave = spawner.Waves[waveIndex];
+
+                if (wave == null ||
+                    EnemySpawnerWaveBakeUtility.CountWaveEnemies(wave) <= 0)
+                {
+                    continue;
+                }
+
+                hasNonemptyWave = true;
+                break;
+            }
+        }
+
+        if (hasNonemptyWave)
+        {
+            snapshot.ActiveSpawnerWithWavesCount++;
+            return;
+        }
+
+        snapshot.AuthoringWarnings.Add(context + " is active but has no wave containing at least one enemy, so its room cannot receive Room Clear Rewards.");
     }
 
     /// <summary>
@@ -385,7 +448,7 @@ public static class GameRoomMetadataScannerUtility
             snapshot.AuthoringWarnings.Add(context + " uses a non-trigger BoxCollider; ECS can evaluate it, but the collider may physically obstruct traversal.");
 
         if (portal.ArrivalAnchor == null)
-            snapshot.AuthoringWarnings.Add(context + " has no arrival anchor; bake fallback uses the portal transform but designer-facing validation remains unresolved.");
+            snapshot.AuthoringWarnings.Add(context + " has no arrival anchor; bake fallback uses the portal transform but -facing validation remains unresolved.");
 
         if (portal.InwardOffset < 0f)
             snapshot.AuthoringWarnings.Add(context + " has a negative inward offset and may place the player back inside the entry volume.");

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -14,7 +15,7 @@ public sealed class GameProceduralRoomTileDefinition
     [SerializeField]
     private string technicalId;
 
-    [Tooltip("Designer-facing identifier displayed in the level tile list and graph preview.")]
+    [Tooltip("-facing identifier displayed in the level tile list and graph preview.")]
     [SerializeField]
     private string tileId = "ROOM_TILE";
 
@@ -49,6 +50,10 @@ public sealed class GameProceduralRoomTileDefinition
     [Tooltip("Base weighted-selection value applied before level rule scores rank valid candidates.")]
     [SerializeField]
     private float baseSelectionWeight = 1f;
+
+    [Tooltip("Ordered Room Clear Reward references granted after every wave and remaining enemy in this tile have been cleared.")]
+    [SerializeField]
+    private List<GameRoomRewardTileAssignment> roomRewards = new List<GameRoomRewardTileAssignment>();
     #endregion
 
     #endregion
@@ -133,6 +138,14 @@ public sealed class GameProceduralRoomTileDefinition
             return baseSelectionWeight;
         }
     }
+
+    public IReadOnlyList<GameRoomRewardTileAssignment> RoomRewards
+    {
+        get
+        {
+            return roomRewards;
+        }
+    }
     #endregion
 
     #region Methods
@@ -145,6 +158,9 @@ public sealed class GameProceduralRoomTileDefinition
     {
         if (string.IsNullOrWhiteSpace(technicalId))
             technicalId = Guid.NewGuid().ToString("N");
+
+        if (roomRewards == null)
+            roomRewards = new List<GameRoomRewardTileAssignment>();
     }
 
     /// <summary>

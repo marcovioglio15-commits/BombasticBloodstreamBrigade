@@ -13,6 +13,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
     /// </summary>
     /// <param name="entity">Player entity being refreshed.</param>
     /// <param name="scalableStatsLookup">Runtime scalable-stat buffer lookup.</param>
+    /// <param name="temporaryModifiersLookup">Room-scoped scalable-stat modifier lookup.</param>
+    /// <param name="temporaryStateLookup">Versioned room-visit state lookup.</param>
     /// <param name="controllerScalingLookup">Controller scaling metadata lookup.</param>
     /// <param name="baseMovementLookup">Immutable movement baseline lookup.</param>
     /// <param name="runtimeMovementLookup">Mutable runtime movement config lookup.</param>
@@ -51,6 +53,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
     /// <returns>True when runtime-scaled data was rebuilt; otherwise false.</returns>
     public static bool TryApplyForEntity(Entity entity,
                                          BufferLookup<PlayerScalableStatElement> scalableStatsLookup,
+                                         BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup,
+                                         ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup,
                                          BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup,
                                          ComponentLookup<PlayerBaseMovementConfig> baseMovementLookup,
                                          ComponentLookup<PlayerRuntimeMovementConfig> runtimeMovementLookup,
@@ -95,6 +99,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
                                          bool forceApply)
     {
         if (!scalableStatsLookup.HasBuffer(entity) ||
+            !temporaryModifiersLookup.HasBuffer(entity) ||
+            !temporaryStateLookup.HasComponent(entity) ||
             !controllerScalingLookup.HasBuffer(entity) ||
             !baseMovementLookup.HasComponent(entity) ||
             !runtimeMovementLookup.HasComponent(entity) ||
@@ -141,6 +147,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
         }
 
         DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
+        DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers = temporaryModifiersLookup[entity];
+        PlayerRoomRewardTemporaryState temporaryState = temporaryStateLookup[entity];
         DynamicBuffer<PlayerRuntimeControllerScalingElement> controllerScaling = controllerScalingLookup[entity];
         PlayerBaseMovementConfig baseMovement = baseMovementLookup[entity];
         PlayerRuntimeMovementConfig runtimeMovement = runtimeMovementLookup[entity];
@@ -187,6 +195,8 @@ internal static class PlayerRuntimeScalingRefreshUtility
         PlayerExperienceCollection playerExperienceCollection = experienceCollectionLookup[entity];
         PlayerRuntimeScalingState runtimeScalingState = runtimeScalingStateLookup[entity];
         bool rebuilt = PlayerRuntimeScalingApplyUtility.TryApply(scalableStats,
+                                                                 temporaryModifiers,
+                                                                 in temporaryState,
                                                                  controllerScaling,
                                                                  in baseMovement,
                                                                  ref runtimeMovement,

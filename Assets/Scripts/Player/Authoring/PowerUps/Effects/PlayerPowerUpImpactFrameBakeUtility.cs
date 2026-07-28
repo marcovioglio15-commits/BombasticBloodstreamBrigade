@@ -10,7 +10,7 @@ internal static class PlayerPowerUpImpactFrameBakeUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the runtime Impact Frame config from an authored payload without mutating designer values.
+    /// Builds the runtime Impact Frame config from an authored payload without mutating  values.
     /// </summary>
     /// <param name="impactFrameData">Authored module payload selected for the binding.</param>
     /// <param name="impactFrameConfig">Runtime config consumed by activation and presentation systems.</param>

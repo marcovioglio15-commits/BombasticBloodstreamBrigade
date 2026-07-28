@@ -28,7 +28,7 @@ public partial struct PlayerConditionalWeaponSwitchSystem : ISystem
 
     /// <summary>
     /// Re-evaluates the conditional weapon switch table when the scalable stats hash changes. Empty tables
-    /// short-circuit on the config entry count so designer presets without conditional entries cost nothing.
+    /// short-circuit on the config entry count so  presets without conditional entries cost nothing.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)

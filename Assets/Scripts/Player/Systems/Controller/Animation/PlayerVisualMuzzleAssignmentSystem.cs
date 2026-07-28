@@ -1,20 +1,15 @@
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
-/// Resolves one PlayerVisualMuzzleAnchor from the current managed Animator hierarchy and keeps it attached to the player entity.
-/// This bridge works for both companion animators and runtime-spawned visual prefabs.
-/// None.
+/// Resolves one managed muzzle anchor per player and stores it on the presentation-only visual companion entity.
+/// This keeps managed structural changes away from the authoritative player archetype.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(PlayerManagedVisualAnimatorBridgeSystem))]
 public partial struct PlayerVisualMuzzleAssignmentSystem : ISystem
 {
-    #region Fields
-    private static readonly List<PendingMuzzleAssignment> pendingAssignments = new List<PendingMuzzleAssignment>(2);
-    #endregion
-
     #region Methods
 
     #region Lifecycle
@@ -26,20 +21,11 @@ public partial struct PlayerVisualMuzzleAssignmentSystem : ISystem
     {
         state.RequireForUpdate<PlayerControllerConfig>();
         state.RequireForUpdate<PlayerAnimatedMuzzleWorldPose>();
-        pendingAssignments.Clear();
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
     }
 
     /// <summary>
-    /// Clears cached pending assignments when the system is destroyed.
-    /// </summary>
-    /// <param name="state">Current ECS system state.</param>
-    public void OnDestroy(ref SystemState state)
-    {
-        pendingAssignments.Clear();
-    }
-
-    /// <summary>
-    /// Resolves the current muzzle anchor from the player's managed visual hierarchy and assigns it as a managed component object.
+    /// Resolves the current muzzle anchor from each player visual hierarchy and synchronizes it to the linked companion entity.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
@@ -47,105 +33,82 @@ public partial struct PlayerVisualMuzzleAssignmentSystem : ISystem
         state.CompleteDependency();
 
         EntityManager entityManager = state.EntityManager;
-        pendingAssignments.Clear();
 
-        foreach ((RefRO<PlayerControllerConfig> _,
-                  Entity entity)
-                 in SystemAPI.Query<RefRO<PlayerControllerConfig>>()
-                             .WithEntityAccess())
+        // Defer managed-component changes until the SystemAPI query has released its iteration guard.
+        using (EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp))
         {
-            PlayerVisualMuzzleAnchor resolvedAnchor = ResolveVisualMuzzleAnchor(entityManager, entity);
-            bool hasCurrentAnchor = entityManager.HasComponent<PlayerVisualMuzzleAnchor>(entity);
-
-            if (!hasCurrentAnchor && resolvedAnchor == null)
-                continue;
-
-            if (hasCurrentAnchor)
+            foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                      Entity visualRuntimeEntity)
+                     in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>>()
+                                 .WithEntityAccess())
             {
-                PlayerVisualMuzzleAnchor currentAnchor = entityManager.GetComponentObject<PlayerVisualMuzzleAnchor>(entity);
+                Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
 
-                if (ReferenceEquals(currentAnchor, resolvedAnchor))
+                if (!entityManager.Exists(playerEntity) ||
+                    !entityManager.HasComponent<PlayerControllerConfig>(playerEntity))
                     continue;
+
+                QueueCompanionAnchorSynchronization(entityManager,
+                                                     commandBuffer,
+                                                     visualRuntimeEntity,
+                                                     ResolveVisualMuzzleAnchor(entityManager,
+                                                                               visualRuntimeEntity));
             }
 
-            QueueAssignment(entity, resolvedAnchor);
+            commandBuffer.Playback(entityManager);
         }
-
-        ApplyQueuedAssignments(entityManager);
     }
     #endregion
 
     #region Helpers
     /// <summary>
-    /// Enqueues one pending muzzle-anchor assignment or removal to be applied after query iteration finishes.
+    /// Queues one resolved managed anchor update for playback after the active ECS query completes.
     /// </summary>
-    /// <param name="entity">Player entity receiving the assignment.</param>
-    /// <param name="resolvedAnchor">Resolved managed muzzle anchor, or null to remove the current assignment.</param>
-    private static void QueueAssignment(Entity entity, PlayerVisualMuzzleAnchor resolvedAnchor)
+    /// <param name="entityManager">Entity manager used to inspect the companion's current managed anchor.</param>
+    /// <param name="commandBuffer">Temporary command buffer receiving deferred managed-component changes.</param>
+    /// <param name="visualRuntimeEntity">Presentation-only companion that owns the managed anchor.</param>
+    /// <param name="resolvedAnchor">Current anchor resolved from the player visual hierarchy.</param>
+    private static void QueueCompanionAnchorSynchronization(EntityManager entityManager,
+                                                            EntityCommandBuffer commandBuffer,
+                                                            Entity visualRuntimeEntity,
+                                                            PlayerVisualMuzzleAnchor resolvedAnchor)
     {
-        for (int assignmentIndex = 0; assignmentIndex < pendingAssignments.Count; assignmentIndex++)
+        bool hasAssignedAnchor = entityManager.HasComponent<PlayerVisualMuzzleAnchor>(visualRuntimeEntity);
+
+        if (resolvedAnchor == null)
         {
-            PendingMuzzleAssignment existingAssignment = pendingAssignments[assignmentIndex];
+            if (hasAssignedAnchor)
+                commandBuffer.RemoveComponent<PlayerVisualMuzzleAnchor>(visualRuntimeEntity);
 
-            if (existingAssignment.PlayerEntity != entity)
-                continue;
-
-            existingAssignment.MuzzleAnchor = resolvedAnchor;
-            pendingAssignments[assignmentIndex] = existingAssignment;
             return;
         }
 
-        pendingAssignments.Add(new PendingMuzzleAssignment
+        if (!hasAssignedAnchor)
         {
-            PlayerEntity = entity,
-            MuzzleAnchor = resolvedAnchor
-        });
-    }
-
-    /// <summary>
-    /// Applies all queued muzzle-anchor structural changes once entity iteration has completed.
-    /// </summary>
-    /// <param name="entityManager">EntityManager used to mutate managed component assignments safely.</param>
-    private static void ApplyQueuedAssignments(EntityManager entityManager)
-    {
-        for (int assignmentIndex = 0; assignmentIndex < pendingAssignments.Count; assignmentIndex++)
-        {
-            PendingMuzzleAssignment assignment = pendingAssignments[assignmentIndex];
-
-            if (!entityManager.Exists(assignment.PlayerEntity))
-                continue;
-
-            if (entityManager.HasComponent<PlayerVisualMuzzleAnchor>(assignment.PlayerEntity))
-            {
-                PlayerVisualMuzzleAnchor currentAnchor = entityManager.GetComponentObject<PlayerVisualMuzzleAnchor>(assignment.PlayerEntity);
-
-                if (ReferenceEquals(currentAnchor, assignment.MuzzleAnchor))
-                    continue;
-
-                entityManager.RemoveComponent<PlayerVisualMuzzleAnchor>(assignment.PlayerEntity);
-            }
-
-            if (assignment.MuzzleAnchor == null)
-                continue;
-
-            entityManager.AddComponentObject(assignment.PlayerEntity, assignment.MuzzleAnchor);
+            commandBuffer.AddComponent(visualRuntimeEntity, resolvedAnchor);
+            return;
         }
 
-        pendingAssignments.Clear();
+        PlayerVisualMuzzleAnchor assignedAnchor =
+            entityManager.GetComponentObject<PlayerVisualMuzzleAnchor>(visualRuntimeEntity);
+
+        if (!ReferenceEquals(assignedAnchor, resolvedAnchor))
+            commandBuffer.AddComponent(visualRuntimeEntity, resolvedAnchor);
     }
 
     /// <summary>
-    /// Resolves the muzzle anchor component that belongs to the current Animator hierarchy of one player entity.
+    /// Resolves the muzzle anchor component that belongs to the current presentation companion Animator hierarchy.
     /// </summary>
     /// <param name="entityManager">EntityManager used to read the managed Animator component.</param>
-    /// <param name="entity">Player entity whose visual hierarchy should be inspected.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion whose visual hierarchy should be inspected.</param>
     /// <returns>Resolved muzzle anchor component, or null when none is available.</returns>
-    private static PlayerVisualMuzzleAnchor ResolveVisualMuzzleAnchor(EntityManager entityManager, Entity entity)
+    private static PlayerVisualMuzzleAnchor ResolveVisualMuzzleAnchor(EntityManager entityManager,
+                                                                     Entity visualRuntimeEntity)
     {
-        if (!entityManager.HasComponent<Animator>(entity))
+        if (!entityManager.HasComponent<Animator>(visualRuntimeEntity))
             return null;
 
-        Animator animatorComponent = entityManager.GetComponentObject<Animator>(entity);
+        Animator animatorComponent = entityManager.GetComponentObject<Animator>(visualRuntimeEntity);
 
         if (animatorComponent == null)
             return null;
@@ -157,14 +120,6 @@ public partial struct PlayerVisualMuzzleAssignmentSystem : ISystem
 
         return animatorComponent.GetComponentInChildren<PlayerVisualMuzzleAnchor>(true);
     }
-
-    #region Nested Types
-    private struct PendingMuzzleAssignment
-    {
-        public Entity PlayerEntity;
-        public PlayerVisualMuzzleAnchor MuzzleAnchor;
-    }
-    #endregion
     #endregion
 
     #endregion

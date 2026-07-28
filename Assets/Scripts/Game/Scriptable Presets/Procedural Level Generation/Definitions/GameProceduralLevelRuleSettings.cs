@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Stores designer-authored weights used to rank structurally valid procedural graph candidates.
+/// Stores -authored weights used to rank structurally valid procedural graph candidates.
 /// </summary>
 [Serializable]
 public sealed class GameProceduralLevelRuleSettings

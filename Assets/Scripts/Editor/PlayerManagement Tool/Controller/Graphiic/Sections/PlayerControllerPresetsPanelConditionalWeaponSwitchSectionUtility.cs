@@ -5,7 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds the Conditional Weapon Switches dropdown shown directly below the shooting Values block. Designers
+/// Builds the Conditional Weapon Switches dropdown shown directly below the shooting Values block. s
 /// can append, remove and reorder entries; each entry binds a defined Weapon Id, a priority, an override flag
 /// and a list of stat-driven inclusive range conditions. The serialized fields use the standard scalable field
 /// factory so Add Scaling formulas are honored end-to-end alongside the rest of the shooting tool.
@@ -103,7 +103,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
 
     /// <summary>
     /// Builds one entry foldout with its weapon-id, priority and override controls plus the nested conditions
-    /// section. Reuses the existing scalable Weapon Id selector so designers benefit from the same Add Scaling
+    /// section. Reuses the existing scalable Weapon Id selector so s benefit from the same Add Scaling
     /// machinery as the Switch Weapon power-up module.
     /// </summary>
     /// <param name="entriesProperty">Parent entries array.</param>
@@ -210,7 +210,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
     }
 
     /// <summary>
-    /// Builds the conditions container nested inside one entry. Mirrors the entry list pattern so designers can
+    /// Builds the conditions container nested inside one entry. Mirrors the entry list pattern so s can
     /// append, remove and reorder conditions; each condition exposes a stat dropdown, an inclusive range and a
     /// requirement selector.
     /// </summary>
@@ -559,7 +559,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
 
     #region Diagnostics
     /// <summary>
-    /// Resolves the visible foldout header for one entry so designers can spot the bound weapon id at a glance.
+    /// Resolves the visible foldout header for one entry so s can spot the bound weapon id at a glance.
     /// </summary>
     /// <param name="entryProperty">Serialized entry property.</param>
     /// <param name="entryIndex">Authored entry index.</param>
@@ -659,7 +659,7 @@ internal static class PlayerControllerPresetsPanelConditionalWeaponSwitchSection
             if (warningBuilder.Length > 0)
                 warningBuilder.AppendLine();
 
-            warningBuilder.Append("Minimum is greater than Maximum. The runtime tolerates inverted bounds but designers usually mean the natural order.");
+            warningBuilder.Append("Minimum is greater than Maximum. The runtime tolerates inverted bounds but s usually mean the natural order.");
         }
 
         if (warningBuilder.Length <= 0)

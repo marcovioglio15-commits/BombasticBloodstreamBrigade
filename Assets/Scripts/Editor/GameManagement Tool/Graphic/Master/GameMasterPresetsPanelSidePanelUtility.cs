@@ -85,6 +85,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         if (intendedActivePanel == GameManagementWindow.PanelType.ProceduralLevel)
             TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.ProceduralLevel);
 
+        if (intendedActivePanel == GameManagementWindow.PanelType.RoomClearRewards)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.RoomClearRewards);
+
         if (!panel.SidePanels.ContainsKey(intendedActivePanel))
             intendedActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
 
@@ -147,6 +150,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             case GameManagementWindow.PanelType.ProceduralLevel:
                 OpenProceduralLevelPanel(panel, panelType);
                 break;
+            case GameManagementWindow.PanelType.RoomClearRewards:
+                OpenRoomClearRewardsPanel(panel, panelType);
+                break;
             default:
                 return;
         }
@@ -185,6 +191,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
             if (entry.ProceduralLevelPanel != null)
                 entry.ProceduralLevelPanel.RefreshFromSessionChange();
+
+            if (entry.RoomClearRewardsPanel != null)
+                entry.RoomClearRewardsPanel.RefreshFromSessionChange();
         }
     }
 
@@ -287,6 +296,31 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     }
 
     /// <summary>
+    /// Creates and registers the Room Clear Rewards side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
+    private static void OpenRoomClearRewardsPanel(GameMasterPresetsPanel panel,
+                                                  GameManagementWindow.PanelType panelType)
+    {
+        GameRoomClearRewardsPresetsPanel rewardsPanel = new GameRoomClearRewardsPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel,
+                                                     "Room Clear Rewards",
+                                                     rewardsPanel.Root,
+                                                     panelType);
+        AddTab(panel,
+               panelType,
+               "Room Clear Rewards",
+               panelRoot,
+               null,
+               null,
+               null,
+               null,
+               null,
+               rewardsPanel);
+    }
+
+    /// <summary>
     /// Creates the side-panel root with a title and close button.
     /// </summary>
     /// <param name="panel">Owning panel used by the close callback.</param>
@@ -335,6 +369,7 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     /// <param name="settingsPanel">Optional Settings Manager panel controller.</param>
     /// <param name="hudPanel">Optional HUD Manager panel controller.</param>
     /// <param name="proceduralLevelPanel">Optional Procedural Level panel controller.</param>
+    /// <param name="roomClearRewardsPanel">Optional Room Clear Rewards panel controller.</param>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
@@ -343,7 +378,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
                                GameSceneManagerPresetsPanel scenePanel,
                                GameSettingsManagerPresetsPanel settingsPanel,
                                GameHudManagerPresetsPanel hudPanel,
-                               GameProceduralLevelPresetsPanel proceduralLevelPanel)
+                               GameProceduralLevelPresetsPanel proceduralLevelPanel,
+                               GameRoomClearRewardsPresetsPanel roomClearRewardsPanel = null)
     {
         VisualElement tabContainer = new VisualElement();
         tabContainer.style.flexDirection = FlexDirection.Row;
@@ -366,7 +402,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             ScenePanel = scenePanel,
             SettingsPanel = settingsPanel,
             HudPanel = hudPanel,
-            ProceduralLevelPanel = proceduralLevelPanel
+            ProceduralLevelPanel = proceduralLevelPanel,
+            RoomClearRewardsPanel = roomClearRewardsPanel
         };
     }
 

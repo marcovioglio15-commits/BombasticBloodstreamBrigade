@@ -192,7 +192,7 @@ internal static class GameSceneManagementProjectSetupSerializedUtility
             return candidate;
         }
 
-        // Append one fully overwritten default entry instead of truncating designer-authored definitions.
+        // Append one fully overwritten default entry instead of truncating -authored definitions.
         int appendedIndex = arrayProperty.arraySize;
         arrayProperty.arraySize++;
         SerializedProperty appendedElement = arrayProperty.GetArrayElementAtIndex(appendedIndex);

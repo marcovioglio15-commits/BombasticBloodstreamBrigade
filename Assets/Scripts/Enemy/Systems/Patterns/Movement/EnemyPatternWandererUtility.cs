@@ -459,7 +459,7 @@ public static class EnemyPatternWandererUtility
     }
 
     /// <summary>
-    /// Picks the best Wanderer destination by prioritizing collision-safe trajectories and then designer biases.
+    /// Picks the best Wanderer destination by prioritizing collision-safe trajectories and then  biases.
     /// </summary>
     /// <param name="enemyEntity">Current enemy entity.</param>
     /// <param name="selfPriorityTier">Current enemy general priority tier.</param>

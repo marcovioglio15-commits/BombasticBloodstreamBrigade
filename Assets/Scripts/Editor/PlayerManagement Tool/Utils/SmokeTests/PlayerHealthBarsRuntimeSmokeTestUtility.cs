@@ -53,9 +53,9 @@ internal static class PlayerHealthBarsRuntimeSmokeTestUtility
             {
                 Current = 25f
             });
-            entityManager.AddComponentData(playerEntity, new PlayerHealthBarVisualReference
+            entityManager.AddComponentData(playerEntity, new PlayerPresentationRuntimeReferences
             {
-                ConfigEntity = configEntity
+                HealthBarVisualEntity = configEntity
             });
             entityManager.AddComponentData(configEntity, PlayerHealthBarVisualBakeUtility.BuildConfig((PlayerVisualPreset)null));
             entityManager.AddComponentData(configEntity, new PlayerHealthBarVisualScalingState

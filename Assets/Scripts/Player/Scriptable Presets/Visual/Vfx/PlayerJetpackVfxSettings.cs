@@ -22,7 +22,7 @@ public sealed class PlayerJetpackVfxSettings
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Prefab-relative path or unique GameObject name resolving the designer-authored Jetpack VFX inside the Visual Player hierarchy.")]
+    [Tooltip("Prefab-relative path or unique GameObject name resolving the -authored Jetpack VFX inside the Visual Player hierarchy.")]
     [SerializeField] private string runtimeReference = string.Empty;
 
     [Tooltip("Controls whether the Jetpack VFX is always visible or only visible while the player moves, rotates, or performs either activity.")]
@@ -34,13 +34,13 @@ public sealed class PlayerJetpackVfxSettings
     [Tooltip("Minimum player angular speed in degrees per second required by rotation-based activation modes.")]
     [SerializeField] private float rotationSpeedThresholdDegrees = 1f;
 
-    [Tooltip("When enabled, shrinks or grows the Jetpack VFX local scale around its designer-authored scale according to current player movement speed.")]
+    [Tooltip("When enabled, shrinks or grows the Jetpack VFX local scale around its -authored scale according to current player movement speed.")]
     [SerializeField] private bool scaleWithMovementSpeed;
 
     [Tooltip("Player movement speed in world units per second at which the Jetpack VFX reaches its maximum configured size.")]
     [SerializeField] private float speedForMaximumScale = 10f;
 
-    [Tooltip("Percentage of Speed For Maximum Scale at which the Jetpack VFX uses its designer-authored local scale.")]
+    [Tooltip("Percentage of Speed For Maximum Scale at which the Jetpack VFX uses its -authored local scale.")]
     [SerializeField] private float normalScaleSpeedPercent = 50f;
 
     [Tooltip("Total Jetpack VFX scale variation across the full zero-to-Speed For Maximum Scale range. The authored scale is preserved at Normal Scale Speed Percent.")]

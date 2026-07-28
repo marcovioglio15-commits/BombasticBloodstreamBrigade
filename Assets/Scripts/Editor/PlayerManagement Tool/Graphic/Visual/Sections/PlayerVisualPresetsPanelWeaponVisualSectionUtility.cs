@@ -35,7 +35,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
     /// <summary>
     /// Builds the Weapon Visuals subsection for one selected Player Visual Preset. Populates the container and
     /// wires every refresh path so picker values, warnings, and Add Scaling controls stay synchronized as the
-    /// designer edits the runtime visual bridge prefab, the mountable weapons array, or the default attachment.
+    ///  edits the runtime visual bridge prefab, the mountable weapons array, or the default attachment.
     /// </summary>
     /// <param name="panel">Owning visual preset panel providing serialized preset context.</param>
     /// <param name="container">Destination subsection container.</param>
@@ -142,7 +142,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
 
     /// <summary>
     /// Rebuilds the mountable weapons UI from the serialized array. Removes stale controls and creates one
-    /// row per entry plus an "Add Weapon" button so designers can extend the array without leaving the panel.
+    /// row per entry plus an "Add Weapon" button so s can extend the array without leaving the panel.
     /// </summary>
     /// <param name="panel">Owning visual preset panel.</param>
     /// <param name="container">Mountable weapons container rebuilt in place.</param>
@@ -280,7 +280,7 @@ internal static class PlayerVisualPresetsPanelWeaponVisualSectionUtility
     }
 
     /// <summary>
-    /// Builds the per-entry AnimationClip picker so designers can author the shoot clip alongside the runtime
+    /// Builds the per-entry AnimationClip picker so s can author the shoot clip alongside the runtime
     /// reference. Marks the panel dirty on each change so the draft session captures the edit.
     /// </summary>
     /// <param name="panel">Owning visual preset panel used to mark draft changes.</param>

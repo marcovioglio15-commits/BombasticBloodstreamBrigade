@@ -15,7 +15,7 @@ public sealed class GameProceduralLevelDefinition
     [SerializeField]
     private string technicalId;
 
-    [Tooltip("Designer-authored stable level identifier used by runtime progression and diagnostics.")]
+    [Tooltip("-authored stable level identifier used by runtime progression and diagnostics.")]
     [SerializeField]
     private string levelId = "LEVEL_01";
 
@@ -35,7 +35,7 @@ public sealed class GameProceduralLevelDefinition
     [SerializeField]
     private Vector2Int preferredBossDepthRange = new Vector2Int(5, 8);
 
-    [Tooltip("Designer-authored weights used to rank valid room and Boss placement candidates.")]
+    [Tooltip("-authored weights used to rank valid room and Boss placement candidates.")]
     [SerializeField]
     private GameProceduralLevelRuleSettings ruleSettings = new GameProceduralLevelRuleSettings();
 
@@ -144,7 +144,7 @@ public sealed class GameProceduralLevelDefinition
     /// </summary>
     public void EnsureInitialized()
     {
-        // Initialize required identity and reference data without sanitizing designer values.
+        // Initialize required identity and reference data without sanitizing  values.
         if (string.IsNullOrWhiteSpace(technicalId))
             technicalId = Guid.NewGuid().ToString("N");
 
@@ -176,7 +176,7 @@ public sealed class GameProceduralLevelDefinition
         if (roomTiles == null)
             return;
 
-        // Detach all duplicated tile identities while preserving designer-facing IDs and authored settings.
+        // Detach all duplicated tile identities while preserving -facing IDs and authored settings.
         for (int index = 0; index < roomTiles.Count; index++)
         {
             GameProceduralRoomTileDefinition roomTile = roomTiles[index];

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Defines one brush shown in the layout designer palette.
+/// Defines one brush shown in the layout  palette.
 /// </summary>
 [Serializable]
 public sealed class ExcelDataBrushDefinition

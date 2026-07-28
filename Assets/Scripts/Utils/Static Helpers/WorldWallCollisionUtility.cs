@@ -229,10 +229,36 @@ public static class WorldWallCollisionUtility
                                                   out float3 correctionDisplacement,
                                                   out float3 hitNormal)
     {
+        CollisionFilter wallCollisionFilter = BuildWallsCollisionFilter(wallsLayerMask);
+        return TryResolveMinimumClearance(physicsWorldSingleton,
+                                          position,
+                                          minimumClearanceDistance,
+                                          in wallCollisionFilter,
+                                          out correctionDisplacement,
+                                          out hitNormal);
+    }
+
+    /// <summary>
+    /// Resolves minimum clearance using a caller-supplied collision identity and category mask.
+    /// </summary>
+    /// <param name="physicsWorldSingleton">Current physics world.</param>
+    /// <param name="position">World-space point representing the moving object.</param>
+    /// <param name="minimumClearanceDistance">Required distance from matching colliders.</param>
+    /// <param name="collisionFilter">Collision filter used for the distance query.</param>
+    /// <param name="correctionDisplacement">Resolved depenetration displacement.</param>
+    /// <param name="hitNormal">Resolved closest surface normal.</param>
+    /// <returns>True when a correction is required.</returns>
+    public static bool TryResolveMinimumClearance(in PhysicsWorldSingleton physicsWorldSingleton,
+                                                  float3 position,
+                                                  float minimumClearanceDistance,
+                                                  in CollisionFilter collisionFilter,
+                                                  out float3 correctionDisplacement,
+                                                  out float3 hitNormal)
+    {
         correctionDisplacement = float3.zero;
         hitNormal = float3.zero;
 
-        if (wallsLayerMask == 0)
+        if (collisionFilter.CollidesWith == 0u)
             return false;
 
         float clampedMinimumClearance = math.max(0f, minimumClearanceDistance);
@@ -244,10 +270,10 @@ public static class WorldWallCollisionUtility
         {
             Position = position,
             MaxDistance = clampedMinimumClearance,
-            Filter = BuildWallsCollisionFilter(wallsLayerMask)
+            Filter = collisionFilter
         };
 
-        if (physicsWorldSingleton.CalculateDistance(distanceInput, out DistanceHit distanceHit) == false)
+        if (!physicsWorldSingleton.CalculateDistance(distanceInput, out DistanceHit distanceHit))
             return false;
 
         float requiredCorrectionDistance = clampedMinimumClearance - distanceHit.Distance;

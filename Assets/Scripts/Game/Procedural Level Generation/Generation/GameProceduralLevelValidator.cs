@@ -149,7 +149,7 @@ public static class GameProceduralLevelValidator
     }
 
     /// <summary>
-    /// Validates a designer-facing label against the exact UTF-8 payload available to FixedString128Bytes.
+    /// Validates a -facing label against the exact UTF-8 payload available to FixedString128Bytes.
     /// </summary>
     /// <param name="value">Display label stored in the flattened runtime level buffer.</param>
     /// <param name="context">Field context included in diagnostics.</param>
@@ -445,11 +445,11 @@ public static class GameProceduralLevelValidator
 
     #region Level Methods
     /// <summary>
-    /// Validates stable and designer-facing level IDs, including preset-wide uniqueness.
+    /// Validates stable and -facing level IDs, including preset-wide uniqueness.
     /// </summary>
     /// <param name="level">Level whose IDs are inspected.</param>
     /// <param name="technicalIds">Technical IDs already encountered in the preset.</param>
-    /// <param name="levelIds">Designer-facing IDs already encountered in the preset.</param>
+    /// <param name="levelIds">-facing IDs already encountered in the preset.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateLevelIdentity(GameProceduralLevelDefinition level,
                                               HashSet<string> technicalIds,
@@ -556,7 +556,7 @@ public static class GameProceduralLevelValidator
     /// </summary>
     /// <param name="level">Level containing the ranges.</param>
     /// <param name="settings">Global solver limits.</param>
-    /// <param name="context">Designer-facing level context.</param>
+    /// <param name="context">-facing level context.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateLevelRanges(GameProceduralLevelDefinition level,
                                             GameProceduralLevelGenerationSettings settings,
@@ -616,7 +616,7 @@ public static class GameProceduralLevelValidator
     /// <param name="missingCode">Missing-value diagnostic code.</param>
     /// <param name="duplicateCode">Duplicate-value diagnostic code.</param>
     /// <param name="context">Owning level context.</param>
-    /// <param name="label">Designer-facing field label.</param>
+    /// <param name="label">-facing field label.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateRequiredUniqueId(string value,
                                                  HashSet<string> encountered,

@@ -40,7 +40,11 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup =
+            SystemAPI.GetComponentLookup<PlayerRuntimeScalingState>(true);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeWeaponVisualScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeWeaponVisualScalingElement>(true);
         BufferLookup<PlayerBaseAdditionalWeaponVisualElement> baseAdditionalWeaponsLookup = SystemAPI.GetBufferLookup<PlayerBaseAdditionalWeaponVisualElement>(true);
         BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup = SystemAPI.GetBufferLookup<PlayerAdditionalWeaponVisualElement>(false);
@@ -49,46 +53,56 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
         BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboRankElement>(true);
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
 
-        foreach ((RefRO<PlayerRuntimeScalingState> runtimeScalingState,
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
                   RefRW<PlayerWeaponVisualScalingState> weaponScalingState,
                   RefRO<PlayerBaseWeaponVisualConfig> baseConfig,
                   RefRW<PlayerVisualRuntimeBridgeConfig> runtimeConfig,
-                  Entity entity)
-                 in SystemAPI.Query<RefRO<PlayerRuntimeScalingState>,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
                                     RefRW<PlayerWeaponVisualScalingState>,
                                     RefRO<PlayerBaseWeaponVisualConfig>,
                                     RefRW<PlayerVisualRuntimeBridgeConfig>>()
                              .WithAll<PlayerRuntimeWeaponVisualScalingElement>()
                              .WithEntityAccess())
         {
-            if (runtimeScalingState.ValueRO.Initialized == 0)
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!runtimeScalingStateLookup.TryGetComponent(playerEntity,
+                                                           out PlayerRuntimeScalingState runtimeScalingState) ||
+                runtimeScalingState.Initialized == 0)
+            {
                 continue;
+            }
 
             if (weaponScalingState.ValueRO.Initialized != 0 &&
-                weaponScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.ValueRO.LastScalableStatsHash)
+                weaponScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.LastScalableStatsHash)
             {
                 continue;
             }
 
             ApplyBaseConfig(in baseConfig.ValueRO, ref runtimeConfig.ValueRW);
-            RebuildAdditionalWeaponsBuffer(entity, in baseAdditionalWeaponsLookup, ref additionalWeaponsLookup);
-            PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+            RebuildAdditionalWeaponsBuffer(visualRuntimeEntity,
+                                           in baseAdditionalWeaponsLookup,
+                                           ref additionalWeaponsLookup);
+            PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,
                                                            EffectiveScalableStats,
                                                            VariableContext);
 
-            if (scalingLookup.HasBuffer(entity))
-                ApplyScaling(scalingLookup[entity],
+            if (scalingLookup.HasBuffer(visualRuntimeEntity))
+                ApplyScaling(scalingLookup[visualRuntimeEntity],
                               ref runtimeConfig.ValueRW,
                               ref additionalWeaponsLookup,
-                              entity);
+                              visualRuntimeEntity);
 
             weaponScalingState.ValueRW.Initialized = 1;
-            weaponScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.ValueRO.LastScalableStatsHash;
+            weaponScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.LastScalableStatsHash;
         }
     }
     #endregion
@@ -101,11 +115,11 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     /// <param name="scalingBuffer">Runtime weapon visual scaling metadata.</param>
     /// <param name="runtimeConfig">Mutable runtime visual bridge configuration.</param>
     /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
-    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion owning the additional-weapons buffer.</param>
     private static void ApplyScaling(DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> scalingBuffer,
                                      ref PlayerVisualRuntimeBridgeConfig runtimeConfig,
                                      ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
-                                     Entity entity)
+                                     Entity visualRuntimeEntity)
     {
         for (int scalingIndex = 0; scalingIndex < scalingBuffer.Length; scalingIndex++)
         {
@@ -126,7 +140,7 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
                               resolvedToken,
                               ref runtimeConfig,
                               ref additionalWeaponsLookup,
-                              entity);
+                              visualRuntimeEntity);
         }
     }
 
@@ -139,13 +153,13 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     /// <param name="resolvedToken">Formula-resolved token text.</param>
     /// <param name="runtimeConfig">Mutable runtime visual bridge configuration.</param>
     /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
-    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion owning the additional-weapons buffer.</param>
     private static void ApplyTokenToField(PlayerRuntimeWeaponVisualFieldId fieldId,
                                            int targetEntryIndex,
                                            string resolvedToken,
                                            ref PlayerVisualRuntimeBridgeConfig runtimeConfig,
                                            ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
-                                           Entity entity)
+                                           Entity visualRuntimeEntity)
     {
         string normalizedToken = string.IsNullOrWhiteSpace(resolvedToken) ? string.Empty : resolvedToken.Trim();
 
@@ -165,7 +179,7 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
                                               targetEntryIndex,
                                               normalizedToken,
                                               ref additionalWeaponsLookup,
-                                              entity);
+                                              visualRuntimeEntity);
                 return;
         }
     }
@@ -178,17 +192,17 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     /// <param name="targetEntryIndex">Bake-resolved target array index.</param>
     /// <param name="normalizedToken">Trimmed token result ready for capacity checks.</param>
     /// <param name="additionalWeaponsLookup">Mutable lookup used to write per-entry token results.</param>
-    /// <param name="entity">Player entity owning the additional-weapons buffer.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion owning the additional-weapons buffer.</param>
     private static void ApplyTokenToAdditionalWeapon(PlayerRuntimeWeaponVisualFieldId fieldId,
                                                       int targetEntryIndex,
                                                       string normalizedToken,
                                                       ref BufferLookup<PlayerAdditionalWeaponVisualElement> additionalWeaponsLookup,
-                                                      Entity entity)
+                                                      Entity visualRuntimeEntity)
     {
-        if (!additionalWeaponsLookup.HasBuffer(entity))
+        if (!additionalWeaponsLookup.HasBuffer(visualRuntimeEntity))
             return;
 
-        DynamicBuffer<PlayerAdditionalWeaponVisualElement> buffer = additionalWeaponsLookup[entity];
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> buffer = additionalWeaponsLookup[visualRuntimeEntity];
 
         if (targetEntryIndex < 0 || targetEntryIndex >= buffer.Length)
             return;
@@ -226,18 +240,21 @@ public partial struct PlayerRuntimeWeaponVisualScalingSystem : ISystem
     /// Rebuilds the runtime additional-weapons buffer from the immutable baseline buffer. Called once per scaling
     /// hash change so the next rule pass writes into deterministic per-entry slots.
     /// </summary>
-    /// <param name="entity">Player entity owning both buffers.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion owning both buffers.</param>
     /// <param name="baseLookup">Read-only baseline buffer lookup.</param>
     /// <param name="runtimeLookup">Mutable runtime buffer lookup rebuilt in place.</param>
-    private static void RebuildAdditionalWeaponsBuffer(Entity entity,
+    private static void RebuildAdditionalWeaponsBuffer(Entity visualRuntimeEntity,
                                                        in BufferLookup<PlayerBaseAdditionalWeaponVisualElement> baseLookup,
                                                        ref BufferLookup<PlayerAdditionalWeaponVisualElement> runtimeLookup)
     {
-        if (!baseLookup.HasBuffer(entity) || !runtimeLookup.HasBuffer(entity))
+        if (!baseLookup.HasBuffer(visualRuntimeEntity) ||
+            !runtimeLookup.HasBuffer(visualRuntimeEntity))
+        {
             return;
+        }
 
-        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseBuffer = baseLookup[entity];
-        DynamicBuffer<PlayerAdditionalWeaponVisualElement> runtimeBuffer = runtimeLookup[entity];
+        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseBuffer = baseLookup[visualRuntimeEntity];
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> runtimeBuffer = runtimeLookup[visualRuntimeEntity];
         runtimeBuffer.Clear();
 
         for (int entryIndex = 0; entryIndex < baseBuffer.Length; entryIndex++)

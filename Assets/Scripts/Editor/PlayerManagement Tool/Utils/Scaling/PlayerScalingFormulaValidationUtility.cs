@@ -25,7 +25,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// <summary>
     /// Validates one formula using parser rules and optional variable whitelist.
     /// </summary>
-    /// <param name="formula">Formula text entered by designers.</param>
+    /// <param name="formula">Formula text entered by s.</param>
     /// <param name="allowedVariables">Optional variable whitelist (case-insensitive). Null skips unknown-variable checks.</param>
     /// <param name="warningMessage">Validation warning text when formula is invalid.</param>
     /// <returns>True when formula is valid, otherwise false.</returns>
@@ -46,7 +46,7 @@ public static class PlayerScalingFormulaValidationUtility
     /// <summary>
     /// Validates one formula using parser rules, variable types, and the expected result type for the current field.
     /// </summary>
-    /// <param name="formula">Formula text entered by designers.</param>
+    /// <param name="formula">Formula text entered by s.</param>
     /// <param name="allowedVariables">Optional variable whitelist (case-insensitive). Null skips unknown-variable checks.</param>
     /// <param name="variableTypes">Known typed variables available in the current authoring scope.</param>
     /// <param name="thisType">Type bound to the reserved [this] token.</param>

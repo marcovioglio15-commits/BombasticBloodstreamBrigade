@@ -179,7 +179,7 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
 
     /// <summary>
     /// Mirror of <see cref="ResolveDamageMotorSpeeds"/> for the fire shake channel. The two channels carry independent
-    /// rumble settings, so a designer can drive only one motor for fire while damage uses both, or balance the two
+    /// rumble settings, so a  can drive only one motor for fire while damage uses both, or balance the two
     /// shakes without coupling their amplitudes.
     /// </summary>
     /// <param name="shake">Resolved runtime fire shake config carrying the rumble enable flag and motor amplitudes.</param>

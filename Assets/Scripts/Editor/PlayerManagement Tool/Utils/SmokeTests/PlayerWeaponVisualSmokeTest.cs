@@ -258,7 +258,7 @@ public static class PlayerWeaponVisualSmokeTest
             string plasmaReferenceStatKey = PlayerScalingStatKeyUtility.BuildStatKey(plasmaEntry.FindPropertyRelative("runtimeReference"));
 
             if (!plasmaIdStatKey.Contains("data[0|weaponId:Plasma]", StringComparison.Ordinal))
-                throw new Exception("Weapon visual Add Scaling stat key does not use the designer Weapon Id as stable token.");
+                throw new Exception("Weapon visual Add Scaling stat key does not use the  Weapon Id as stable token.");
 
             SerializedProperty scalingRulesProperty = serializedPreset.FindProperty("scalingRules");
             scalingRulesProperty.arraySize = 2;

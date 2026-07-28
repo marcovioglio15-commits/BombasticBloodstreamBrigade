@@ -53,7 +53,9 @@ public static class PlayerControllerConfigBakeUtility
 
         return new PlayerWorldLayersConfig
         {
-            WallsLayerMask = wallsLayerMask
+            WallsLayerMask = wallsLayerMask,
+            PortalBarrierLayerMask =
+                WorldPortalBarrierCollisionUtility.ResolvePortalBarrierLayerMask()
         };
     }
 

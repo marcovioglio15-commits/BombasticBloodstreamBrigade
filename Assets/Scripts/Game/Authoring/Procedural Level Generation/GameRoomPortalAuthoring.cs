@@ -47,7 +47,7 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
     private GameRoomPortalConnectionPolicy connectionPolicy;
 
     [Header("Traversal Volume")]
-    [Tooltip("Box collider defining both the ECS traversal volume and the closed-portal barrier dimensions. Keep it configured as a trigger for authoring isolation.")]
+    [Tooltip("Disabled trigger-shaped BoxCollider used only as authoring geometry for manual ECS player detection and the independent player-query blocker.")]
     [SerializeField]
     private BoxCollider portalVolume;
 
@@ -170,12 +170,21 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
         else if (Encoding.UTF8.GetByteCount(portalId) > MaximumFixedString64Utf8Bytes)
             AppendBakeFailure(failures, "the Portal ID exceeds the 61-byte ECS capacity");
 
+        if (WorldPortalBarrierCollisionUtility.ResolvePortalBarrierLayerMask() == 0)
+            AppendBakeFailure(failures, "the project is missing the dedicated PortalBarrier layer");
+
         // Both logical traversal geometry and the independent blocker require one finite positive world-space box.
         if (portalVolume == null)
             AppendBakeFailure(failures, "the assigned BoxCollider volume is missing");
         else
         {
             Vector3 scaledSize = Vector3.Scale(portalVolume.size, Abs(portalVolume.transform.lossyScale));
+
+            if (!portalVolume.isTrigger)
+                AppendBakeFailure(failures, "the assigned BoxCollider must be a trigger because ECS performs player-only logical detection");
+
+            if (portalVolume.enabled)
+                AppendBakeFailure(failures, "the authored BoxCollider must be disabled so only manual ECS player detection and the dedicated player-query blocker are baked");
 
             if (!IsFinitePositive(scaledSize))
                 AppendBakeFailure(failures, "the BoxCollider volume has a non-finite or non-positive effective world size");
@@ -188,7 +197,7 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
 
     #region Unity Methods
     /// <summary>
-    /// Initializes stable identity and local references when the component is first added by a designer.
+    /// Initializes stable identity and local references when the component is first added by a .
     /// </summary>
     private void Reset()
     {
@@ -197,7 +206,10 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
         arrivalAnchor = transform;
 
         if (portalVolume != null)
+        {
             portalVolume.isTrigger = true;
+            portalVolume.enabled = false;
+        }
     }
 
     #endregion
@@ -480,6 +492,7 @@ public sealed class GameRoomPortalAuthoringBaker : Baker<GameRoomPortalAuthoring
         {
             AssignedEdgeIndex = -1
         });
+
         BakePhysicalBlocker(authoring,
                             scaledSize,
                             worldCenter,
@@ -489,7 +502,7 @@ public sealed class GameRoomPortalAuthoringBaker : Baker<GameRoomPortalAuthoring
 
     #region Physics
     /// <summary>
-    /// Bakes one independent static Walls collider that remains closed until graph assignment opens this portal.
+    /// Bakes one independent player-query-only collider that remains closed until graph assignment opens this portal.
     /// </summary>
     /// <param name="authoring">Source portal authoring component.</param>
     /// <param name="scaledSize">World-scaled blocker dimensions.</param>
@@ -500,10 +513,16 @@ public sealed class GameRoomPortalAuthoringBaker : Baker<GameRoomPortalAuthoring
                                      Vector3 worldCenter,
                                      Quaternion worldRotation)
     {
-        int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+        int portalBarrierLayerMask =
+            WorldPortalBarrierCollisionUtility.ResolvePortalBarrierLayerMask();
 
-        if (wallsLayerMask == 0)
-            Debug.LogWarning("[GameRoomPortalAuthoringBaker] Portal '" + authoring.name + "' uses the universal fail-closed collision filter because the default Walls layer is missing.", authoring);
+        if (portalBarrierLayerMask == 0)
+        {
+            Debug.LogError("[GameRoomPortalAuthoringBaker] Portal '" + authoring.name +
+                           "' did not bake a physical blocker because the dedicated PortalBarrier layer is missing.",
+                           authoring);
+            return;
+        }
 
         BoxGeometry geometry = new BoxGeometry
         {
@@ -512,7 +531,8 @@ public sealed class GameRoomPortalAuthoringBaker : Baker<GameRoomPortalAuthoring
             Size = new float3(scaledSize.x, scaledSize.y, scaledSize.z),
             BevelRadius = 0f
         };
-        CollisionFilter filter = GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(wallsLayerMask);
+        CollisionFilter filter =
+            GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(portalBarrierLayerMask);
         BlobAssetReference<Unity.Physics.Collider> blockingCollider = PhysicsBoxCollider.Create(geometry, filter);
         AddBlobAsset(ref blockingCollider, out Unity.Entities.Hash128 _);
         Entity blockerEntity = CreateAdditionalEntity(TransformUsageFlags.None,

@@ -128,7 +128,7 @@ internal static class EnemyBossPatternPresetsPanelEngagementWarningUtility
         if (candidatesProperty == null)
             return;
 
-        // Preserve candidate ordering so each warning points to the same card the designer sees.
+        // Preserve candidate ordering so each warning points to the same card the  sees.
         for (int candidateIndex = 0; candidateIndex < candidatesProperty.arraySize; candidateIndex++)
         {
             SerializedProperty candidateProperty = candidatesProperty.GetArrayElementAtIndex(candidateIndex);
@@ -279,7 +279,7 @@ internal static class EnemyBossPatternPresetsPanelEngagementWarningUtility
     }
 
     /// <summary>
-    /// Converts a module catalog section into concise designer-facing warning text.
+    /// Converts a module catalog section into concise -facing warning text.
     /// </summary>
     /// <param name="section">Catalog section to format.</param>
     /// <returns>Readable slot label.</returns>

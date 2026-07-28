@@ -43,7 +43,9 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
                                       typeof(GameProceduralRoomTraversalRequest),
                                       typeof(GameProceduralRoomTransitionContext),
                                       typeof(GameProceduralRoomClearCounter),
-                                      typeof(GameProceduralLevelRunRequest));
+                                      typeof(GameProceduralLevelRunRequest),
+                                      typeof(GameProceduralRoomClearedEvent),
+                                      typeof(GameProceduralRoomEnteredEvent));
     }
 
     /// <summary>
@@ -638,6 +640,8 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
         EntityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity).Clear();
         EntityManager.GetBuffer<GameProceduralRoomTraversalRequest>(managerEntity).Clear();
         EntityManager.GetBuffer<GameProceduralLevelRunRequest>(managerEntity).Clear();
+        EntityManager.GetBuffer<GameProceduralRoomClearedEvent>(managerEntity).Clear();
+        EntityManager.GetBuffer<GameProceduralRoomEnteredEvent>(managerEntity).Clear();
         RemoveProceduralSceneRequests(EntityManager.GetBuffer<GameSceneTransitionRequest>(managerEntity));
         EntityManager.SetComponentData(managerEntity, new GameProceduralLevelRuntimeState
         {
@@ -653,6 +657,7 @@ public partial class GameProceduralLevelGenerationSystem : SystemBase
             TargetNodeIndex = -1
         });
         EntityManager.SetComponentData(managerEntity, new GameProceduralRoomClearCounter());
+        GameRoomRewardRunResetUtility.ResetPlayers(EntityManager);
     }
 
     /// <summary>

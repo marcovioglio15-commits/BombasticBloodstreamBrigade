@@ -147,11 +147,13 @@ internal sealed class GameProceduralLevelSolverContext
         int finalNodeCount = nodes.Count + 1;
         bool nodeCountAccepted = finalNodeCount >= input.TargetNodeCountRange.x &&
                                  finalNodeCount <= input.TargetNodeCountRange.y;
+        bool bossDepthAccepted = !bossTile.UseExactDepthConstraint || bossDepth == bossTile.ExactDepth;
         bool exactBossDepthReached = bossTile.UseExactDepthConstraint && bossDepth == bossTile.ExactDepth;
         bool mustClose = finalNodeCount == input.TargetNodeCountRange.y ||
                          bossDepth >= input.MaximumDepth ||
                          exactBossDepthReached;
         bool reachedSoftTargets = finalNodeCount >= targetNodeCount && bossDepth >= targetBossDepth;
+        bool preferredBossAttempted = false;
 
         if (bossTile.UseExactDepthConstraint && bossDepth > bossTile.ExactDepth)
         {
@@ -168,8 +170,9 @@ internal sealed class GameProceduralLevelSolverContext
         }
 
         // Prefer the authored soft targets, while technical limits can force an earlier valid convergence attempt.
-        if (nodeCountAccepted && (reachedSoftTargets || mustClose))
+        if (nodeCountAccepted && bossDepthAccepted && (reachedSoftTargets || mustClose))
         {
+            preferredBossAttempted = true;
             GameProceduralLevelSolverSnapshot bossSnapshot = CaptureSnapshot();
 
             if (TryAttachBoss(frontier, bossDepth))
@@ -197,26 +200,22 @@ internal sealed class GameProceduralLevelSolverContext
 
         GameProceduralLevelSolverSnapshot layerSnapshot = CaptureSnapshot();
 
-        if (!TryCreatePendingExits(frontier, out List<GameProceduralLevelPendingExit> pendingExits))
-        {
-            Rollback(layerSnapshot);
-            return false;
-        }
-
-        List<int> nextLayer = new List<int>();
-        Dictionary<int, HashSet<int>> targetNodesBySource = new Dictionary<int, HashSet<int>>();
-
-        for (int index = 0; index < frontier.Count; index++)
-            targetNodesBySource.Add(frontier[index], new HashSet<int>());
-
-        if (TryAssignPendingExit(pendingExits,
-                                 0,
-                                 nextLayer,
-                                 targetNodesBySource,
-                                 bossDepth))
+        if (TryPlanNextLayer(frontier, bossDepth))
             return true;
 
         Rollback(layerSnapshot);
+
+        // A preferred range is a score, not a seed-dependent hard constraint: close at the latest valid fallback.
+        if (nodeCountAccepted && bossDepthAccepted && !preferredBossAttempted)
+        {
+            GameProceduralLevelSolverSnapshot bossSnapshot = CaptureSnapshot();
+
+            if (TryAttachBoss(frontier, bossDepth))
+                return true;
+
+            Rollback(bossSnapshot);
+        }
+
         return false;
     }
 
@@ -313,20 +312,9 @@ internal sealed class GameProceduralLevelSolverContext
             return false;
         }
 
-        List<GameProceduralLevelPendingExit> bossExits = new List<GameProceduralLevelPendingExit>(frontier.Count);
-
-        // A single Boss target requires exactly one active outgoing portal from each source node.
-        for (int index = 0; index < frontier.Count; index++)
-        {
-            if (!TrySelectBossExit(frontier[index], out GameProceduralRoomPortalSolverInput sourcePortal))
-                return false;
-
-            bossExits.Add(new GameProceduralLevelPendingExit(frontier[index], sourcePortal));
-        }
-
         int bossNodeId = AddNode(bossTile, bossDepth);
 
-        if (TryAssignBossEntrance(bossExits, 0, bossNodeId))
+        if (TryAssignBossSource(frontier, 0, bossNodeId))
             return true;
 
         SetFailure(GameProceduralLevelGenerationFailureCode.NoBossRoomCandidate,
@@ -335,82 +323,103 @@ internal sealed class GameProceduralLevelSolverContext
     }
 
     /// <summary>
-    /// Selects the only required exit or one optional exit that can converge a source node into the Boss.
+    /// Backtracks every legal source exit and Boss entrance pair until all frontier branches converge.
     /// </summary>
-    /// <param name="sourceNodeId">Frontier source node.</param>
-    /// <param name="sourcePortal">Selected physical source portal.</param>
-    /// <returns>True when the source can emit exactly one Boss edge.</returns>
-    private bool TrySelectBossExit(int sourceNodeId, out GameProceduralRoomPortalSolverInput sourcePortal)
+    /// <param name="frontier">Current deepest Regular or Start nodes.</param>
+    /// <param name="sourceIndex">Frontier source currently being assigned.</param>
+    /// <param name="bossNodeId">Terminal Boss node ID.</param>
+    /// <returns>True when every source owns one compatible converging Boss edge.</returns>
+    private bool TryAssignBossSource(List<int> frontier, int sourceIndex, int bossNodeId)
     {
-        GameProceduralLevelSolverNodeState sourceState = nodeStates[sourceNodeId];
+        if (!ConsumeSearchStep())
+            return false;
+
+        if (sourceIndex >= frontier.Count)
+            return true;
+
+        int sourceNodeId = frontier[sourceIndex];
         List<GameProceduralRoomPortalSolverInput> required = new List<GameProceduralRoomPortalSolverInput>();
         List<GameProceduralRoomPortalSolverInput> optional = new List<GameProceduralRoomPortalSolverInput>();
-        CollectAvailableExits(sourceState, required, optional);
+        GameProceduralLevelSolverSearchUtility.CollectAvailableExits(nodeStates[sourceNodeId],
+                                                                    required,
+                                                                    optional);
 
         if (required.Count > 1)
         {
-            sourcePortal = default;
             SetFailure(GameProceduralLevelGenerationFailureCode.RequiredExitUnresolved,
                        "A frontier room owns multiple Required exits, so its edges cannot target one distinct Boss node.");
             return false;
         }
 
-        if (required.Count == 1)
-        {
-            sourcePortal = required[0];
-            return true;
-        }
+        List<GameProceduralRoomPortalSolverInput> candidates = required.Count == 1
+            ? required
+            : optional;
 
-        if (optional.Count == 0)
+        if (candidates.Count == 0)
         {
-            sourcePortal = default;
             SetFailure(GameProceduralLevelGenerationFailureCode.RequiredExitUnresolved,
                        "A frontier room has no available exit that can reach the Boss.");
             return false;
         }
 
-        sourcePortal = optional[random.NextInt(optional.Count)];
-        return true;
+        GameProceduralLevelSolverSearchUtility.Shuffle(candidates, ref random);
+
+        // Explore every legal source portal so random ordering never hides a compatible Boss route.
+        for (int index = 0; index < candidates.Count; index++)
+        {
+            if (TryAssignBossPortal(frontier,
+                                    sourceIndex,
+                                    bossNodeId,
+                                    new GameProceduralLevelPendingExit(sourceNodeId, candidates[index])))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
-    /// Recursively assigns distinct compatible Boss entrances, or empty targets in center-arrival mode.
+    /// Assigns one source portal to a compatible unused Boss entrance and continues convergence.
     /// </summary>
-    /// <param name="bossExits">One converging exit for each frontier source.</param>
-    /// <param name="exitIndex">Current Boss edge index.</param>
+    /// <param name="frontier">Current deepest Regular or Start nodes.</param>
+    /// <param name="sourceIndex">Frontier source currently being assigned.</param>
     /// <param name="bossNodeId">Terminal Boss node ID.</param>
-    /// <returns>True when all Boss edges have valid arrival assignments.</returns>
-    private bool TryAssignBossEntrance(List<GameProceduralLevelPendingExit> bossExits,
-                                       int exitIndex,
-                                       int bossNodeId)
+    /// <param name="pendingExit">Selected physical exit on the current source.</param>
+    /// <returns>True when this edge and all remaining frontier edges can reach the Boss.</returns>
+    private bool TryAssignBossPortal(List<int> frontier,
+                                     int sourceIndex,
+                                     int bossNodeId,
+                                     GameProceduralLevelPendingExit pendingExit)
     {
-        if (exitIndex >= bossExits.Count)
-            return true;
-
-        GameProceduralLevelPendingExit pendingExit = bossExits[exitIndex];
-
         if (input.UseCenterArrival)
         {
+            GameProceduralLevelSolverSnapshot snapshot = CaptureSnapshot();
             AddEdge(pendingExit,
                     bossNodeId,
                     new GameProceduralLevelTargetCandidate(bossNodeId, null, default, false, 1f));
-            return TryAssignBossEntrance(bossExits, exitIndex + 1, bossNodeId);
+
+            if (TryAssignBossSource(frontier, sourceIndex + 1, bossNodeId))
+                return true;
+
+            Rollback(snapshot);
+            return false;
         }
 
-        List<GameProceduralRoomPortalSolverInput> entrances = GameProceduralLevelSolverSearchUtility.GetCompatibleEntrances(nodeStates[bossNodeId],
-                                                                                                                             pendingExit.Portal.Side);
+        List<GameProceduralRoomPortalSolverInput> entrances =
+            GameProceduralLevelSolverSearchUtility.GetCompatibleEntrances(nodeStates[bossNodeId],
+                                                                           pendingExit.Portal.Side);
         GameProceduralLevelSolverSearchUtility.Shuffle(entrances, ref random);
 
+        // Reserve each compatible entrance independently and release it when the remaining frontier fails.
         for (int index = 0; index < entrances.Count; index++)
         {
             GameProceduralLevelSolverSnapshot snapshot = CaptureSnapshot();
             GameProceduralRoomPortalSolverInput entrance = entrances[index];
             nodeStates[bossNodeId].UsedIncomingPortalIds.Add(entrance.PortalId);
             AddEdge(pendingExit,
-                    bossNodeId,
-                    new GameProceduralLevelTargetCandidate(bossNodeId, null, entrance, true, 1f));
+                     bossNodeId,
+                     new GameProceduralLevelTargetCandidate(bossNodeId, null, entrance, true, 1f));
 
-            if (TryAssignBossEntrance(bossExits, exitIndex + 1, bossNodeId))
+            if (TryAssignBossSource(frontier, sourceIndex + 1, bossNodeId))
                 return true;
 
             Rollback(snapshot);
@@ -422,93 +431,48 @@ internal sealed class GameProceduralLevelSolverContext
 
     #region Exit Planning Methods
     /// <summary>
-    /// Selects all Required exits and a bounded deterministic subset of Optional exits for one new layer.
+    /// Enumerates legal Required and Optional exit plans before assigning a new graph layer.
     /// </summary>
     /// <param name="frontier">Current source nodes.</param>
-    /// <param name="pendingExits">Combined individual exits requiring target assignments.</param>
-    /// <returns>True when every source can emit at least one forward edge.</returns>
-    private bool TryCreatePendingExits(List<int> frontier,
-                                       out List<GameProceduralLevelPendingExit> pendingExits)
+    /// <param name="nextDepth">Depth assigned to every target node.</param>
+    /// <returns>True when one complete exit plan reaches a terminal Boss.</returns>
+    private bool TryPlanNextLayer(List<int> frontier, int nextDepth)
     {
-        pendingExits = new List<GameProceduralLevelPendingExit>();
         int remainingNodeCapacity = Math.Min(input.TargetNodeCountRange.y, input.MaximumNodeCount) - nodes.Count - 1;
-
-        for (int sourceIndex = 0; sourceIndex < frontier.Count; sourceIndex++)
-        {
-            int sourceNodeId = frontier[sourceIndex];
-            List<GameProceduralRoomPortalSolverInput> required = new List<GameProceduralRoomPortalSolverInput>();
-            List<GameProceduralRoomPortalSolverInput> optional = new List<GameProceduralRoomPortalSolverInput>();
-            CollectAvailableExits(nodeStates[sourceNodeId], required, optional);
-
-            if (required.Count > remainingNodeCapacity)
-            {
-                SetFailure(GameProceduralLevelGenerationFailureCode.NodeBudgetExceeded,
-                           "One room owns more Required exits than the remaining distinct-target node capacity.");
-                return false;
-            }
-
-            int minimumOptionalCount = required.Count == 0 ? 1 : 0;
-
-            if (optional.Count < minimumOptionalCount)
-            {
-                SetFailure(GameProceduralLevelGenerationFailureCode.RequiredExitUnresolved,
-                           "Every non-Boss room must expose at least one available Required or Optional exit.");
-                return false;
-            }
-
-            GameProceduralLevelSolverSearchUtility.Shuffle(optional, ref random);
-            int maximumOptionalCount = Math.Min(optional.Count,
-                                                Math.Max(minimumOptionalCount,
-                                                         remainingNodeCapacity - required.Count));
-            int optionalCount = minimumOptionalCount;
-
-            if (maximumOptionalCount > minimumOptionalCount)
-                optionalCount += random.NextInt(maximumOptionalCount - minimumOptionalCount + 1);
-
-            for (int index = 0; index < required.Count; index++)
-                pendingExits.Add(new GameProceduralLevelPendingExit(sourceNodeId, required[index]));
-
-            for (int index = 0; index < optionalCount; index++)
-                pendingExits.Add(new GameProceduralLevelPendingExit(sourceNodeId, optional[index]));
-        }
-
-        GameProceduralLevelSolverSearchUtility.Shuffle(pendingExits, ref random);
-        return pendingExits.Count > 0;
+        return GameProceduralLevelSolverExitPlanUtility.TryPlan(
+            frontier,
+            nodeStates,
+            remainingNodeCapacity,
+            ref random,
+            ConsumeSearchStep,
+            SetFailure,
+            pendingExits => TryAssignPlannedLayer(frontier, pendingExits, nextDepth));
     }
 
     /// <summary>
-    /// Collects individual exit-capable portals while excluding the node's already assigned incoming entrances.
+    /// Assigns one complete Required and Optional exit plan to a fresh next layer.
     /// </summary>
-    /// <param name="nodeState">Source node working state.</param>
-    /// <param name="required">Destination list for Required exits.</param>
-    /// <param name="optional">Destination list for Optional exits.</param>
-    private static void CollectAvailableExits(GameProceduralLevelSolverNodeState nodeState,
-                                              List<GameProceduralRoomPortalSolverInput> required,
-                                              List<GameProceduralRoomPortalSolverInput> optional)
+    /// <param name="frontier">Current source nodes.</param>
+    /// <param name="pendingExits">Complete physical source-exit plan.</param>
+    /// <param name="nextDepth">Depth assigned to the next layer.</param>
+    /// <returns>True when all planned exits can be assigned and the descendant graph reaches the Boss.</returns>
+    private bool TryAssignPlannedLayer(List<int> frontier,
+                                       List<GameProceduralLevelPendingExit> pendingExits,
+                                       int nextDepth)
     {
-        for (int index = 0; index < nodeState.Tile.Portals.Count; index++)
-        {
-            GameProceduralRoomPortalSolverInput portal = nodeState.Tile.Portals[index];
+        List<int> nextLayer = new List<int>();
+        Dictionary<int, HashSet<int>> targetNodesBySource =
+            new Dictionary<int, HashSet<int>>();
 
-            // An incoming Both portal is permanently reserved and can never become a source exit on this node.
-            if (nodeState.UsedIncomingPortalIds.Contains(portal.PortalId))
-                continue;
+        for (int index = 0; index < frontier.Count; index++)
+            targetNodesBySource.Add(frontier[index], new HashSet<int>());
 
-            if (portal.Capability == GameRoomPortalCapability.Entrance ||
-                portal.ConnectionPolicy == GameRoomPortalConnectionPolicy.LevelExit)
-                continue;
-
-            switch (portal.ConnectionPolicy)
-            {
-                case GameRoomPortalConnectionPolicy.Required:
-                    required.Add(portal);
-                    break;
-
-                case GameRoomPortalConnectionPolicy.Optional:
-                    optional.Add(portal);
-                    break;
-            }
-        }
+        return pendingExits.Count > 0 &&
+               TryAssignPendingExit(pendingExits,
+                                    0,
+                                    nextLayer,
+                                    targetNodesBySource,
+                                    nextDepth);
     }
     #endregion
 
@@ -640,6 +604,9 @@ internal sealed class GameProceduralLevelSolverContext
     /// <param name="message">Actionable failure description.</param>
     private void SetFailure(GameProceduralLevelGenerationFailureCode code, string message)
     {
+        if (failureCode == GameProceduralLevelGenerationFailureCode.SearchBudgetExceeded)
+            return;
+
         failureCode = code;
         diagnostic = message;
     }

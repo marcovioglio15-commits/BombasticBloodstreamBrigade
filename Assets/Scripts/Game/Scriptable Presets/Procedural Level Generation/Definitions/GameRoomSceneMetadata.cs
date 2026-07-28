@@ -35,11 +35,19 @@ public sealed class GameRoomSceneMetadata
     [SerializeField]
     private int centerAnchorCount;
 
+    [Tooltip("Number of enabled enemy spawners discovered in bakeable SubScenes during the last metadata scan.")]
+    [SerializeField]
+    private int activeSpawnerCount;
+
+    [Tooltip("Number of enabled bakeable enemy spawners containing at least one wave with one or more enemies.")]
+    [SerializeField]
+    private int activeSpawnerWithWavesCount;
+
     [Tooltip("Individual portal signatures discovered in the room authoring SubScene.")]
     [SerializeField]
     private List<GameRoomPortalMetadata> portals = new List<GameRoomPortalMetadata>();
 
-    [Tooltip("Non-mutating authoring warnings captured during the last metadata scan for display in designer tooling.")]
+    [Tooltip("Non-mutating authoring warnings captured during the last metadata scan for display in  tooling.")]
     [SerializeField]
     private List<string> authoringWarnings = new List<string>();
     #endregion
@@ -92,6 +100,30 @@ public sealed class GameRoomSceneMetadata
         get
         {
             return centerAnchorCount;
+        }
+    }
+
+    public int ActiveSpawnerCount
+    {
+        get
+        {
+            return activeSpawnerCount;
+        }
+    }
+
+    public int ActiveSpawnerWithWavesCount
+    {
+        get
+        {
+            return activeSpawnerWithWavesCount;
+        }
+    }
+
+    public bool IsRoomClearRewardEligible
+    {
+        get
+        {
+            return !cacheStale && activeSpawnerWithWavesCount > 0;
         }
     }
 

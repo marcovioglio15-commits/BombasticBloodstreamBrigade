@@ -15,7 +15,7 @@ public enum PlayerScalableStatType : byte
 }
 
 /// <summary>
-/// Stores one scalable stat entry editable by designers in progression presets.
+/// Stores one scalable stat entry editable by s in progression presets.
 /// </summary>
 [Serializable]
 public sealed class PlayerScalableStatDefinition

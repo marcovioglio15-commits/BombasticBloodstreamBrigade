@@ -274,6 +274,8 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameSceneManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameProceduralLevelPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameProceduralLevelPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameRoomClearRewardsPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameRoomClearRewardsPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
         AddSceneManagerPrefabPaths(uniquePaths);
 
@@ -320,6 +322,7 @@ public static class GameManagementDraftSession
         GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
+        GameRoomClearRewardsPresetLibraryUtility.GetOrCreateLibrary();
     }
 
     /// <summary>
@@ -458,7 +461,8 @@ public static class GameManagementDraftSession
                assetObject is GameSettingsManagerPreset ||
                assetObject is GameHudManagerPreset ||
                assetObject is GameSceneManagerPreset ||
-               assetObject is GameProceduralLevelPreset;
+               assetObject is GameProceduralLevelPreset ||
+               assetObject is GameRoomClearRewardsPreset;
     }
 
     /// <summary>
@@ -607,7 +611,13 @@ public static class GameManagementDraftSession
             return true;
 
         GameProceduralLevelPresetLibrary proceduralLevelLibrary = GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();
-        return LibraryContainsPath(proceduralLevelLibrary.Presets, assetPath);
+
+        if (LibraryContainsPath(proceduralLevelLibrary.Presets, assetPath))
+            return true;
+
+        GameRoomClearRewardsPresetLibrary rewardsLibrary =
+            GameRoomClearRewardsPresetLibraryUtility.GetOrCreateLibrary();
+        return LibraryContainsPath(rewardsLibrary.Presets, assetPath);
     }
 
     /// <summary>

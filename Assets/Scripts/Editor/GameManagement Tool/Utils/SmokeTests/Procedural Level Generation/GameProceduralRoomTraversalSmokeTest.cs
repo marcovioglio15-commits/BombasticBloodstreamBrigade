@@ -7,7 +7,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 /// <summary>
-/// Verifies oriented portal containment, one-shot entry latching, clear gating and entrance-only blocking.
+/// Verifies floor-projected oriented portal containment, Optional exit latching, clear gating and entrance blocking.
 /// </summary>
 public static class GameProceduralRoomTraversalSmokeTest
 {
@@ -57,7 +57,7 @@ public static class GameProceduralRoomTraversalSmokeTest
                                        managerEntity,
                                        playerEntity,
                                        portalEntity);
-            Debug.Log("[GameProceduralRoomTraversalSmokeTest] All OBB and traversal-policy checks passed.");
+            Debug.Log("[GameProceduralRoomTraversalSmokeTest] Floor-projected OBB, Optional exit and traversal-policy checks passed.");
         }
         finally
         {
@@ -275,8 +275,8 @@ public static class GameProceduralRoomTraversalSmokeTest
             PortalId = new FixedString64Bytes("ROTATED_EAST_EXIT"),
             Side = GameRoomPortalSide.East,
             Capability = GameRoomPortalCapability.Exit,
-            Policy = GameRoomPortalConnectionPolicy.Required,
-            Center = new float3(5f, 0f, 3f),
+            Policy = GameRoomPortalConnectionPolicy.Optional,
+            Center = new float3(5f, 2.5f, 3f),
             HalfExtents = new float3(2f, 1f, 0.25f),
             Rotation = quaternion.RotateY(math.radians(90f)),
             RequireRoomClear = 0
@@ -316,7 +316,11 @@ public static class GameProceduralRoomTraversalSmokeTest
     /// <returns>World-space inside position.</returns>
     private static float3 GetInsidePosition(GameRoomPortal portal)
     {
-        return portal.Center + math.mul(portal.Rotation, new float3(1.5f, 0f, 0.1f));
+        float3 position =
+            portal.Center +
+            math.mul(portal.Rotation, new float3(1.5f, 0f, 0.1f));
+        position.y = 0f;
+        return position;
     }
 
     /// <summary>
@@ -326,7 +330,11 @@ public static class GameProceduralRoomTraversalSmokeTest
     /// <returns>World-space outside position.</returns>
     private static float3 GetOutsidePosition(GameRoomPortal portal)
     {
-        return portal.Center + math.mul(portal.Rotation, new float3(2.5f, 0f, 0f));
+        float3 position =
+            portal.Center +
+            math.mul(portal.Rotation, new float3(2.5f, 0f, 0f));
+        position.y = 0f;
+        return position;
     }
 
     /// <summary>

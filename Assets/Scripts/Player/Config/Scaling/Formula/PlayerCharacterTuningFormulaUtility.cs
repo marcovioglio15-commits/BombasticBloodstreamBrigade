@@ -11,7 +11,7 @@ public static class PlayerCharacterTuningFormulaUtility
     /// <summary>
     /// Splits one Character Tuning assignment into its target scalable stat and right-hand expression.
     /// </summary>
-    /// <param name="formula">Raw assignment string entered by designers.</param>
+    /// <param name="formula">Raw assignment string entered by s.</param>
     /// <param name="targetStatName">Parsed left-hand scalable stat name.</param>
     /// <param name="expression">Parsed right-hand mathematical expression.</param>
     /// <param name="errorMessage">Failure reason when parsing fails.</param>

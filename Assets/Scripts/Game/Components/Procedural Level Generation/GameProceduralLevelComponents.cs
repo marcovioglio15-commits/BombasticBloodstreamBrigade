@@ -149,6 +149,7 @@ public struct GameProceduralLevelRuntimeState : IComponentData
     public byte Initialized;
     public byte GraphGenerated;
     public byte CurrentRoomCleared;
+    public uint VisitOrdinal;
 }
 
 /// <summary>
@@ -235,6 +236,35 @@ public struct GameProceduralRoomClearCounter : IComponentData
 {
     public uint TotalCleared;
     public uint Version;
+}
+
+/// <summary>
+/// Emits one authoritative event after a room-clear transaction has committed.
+/// </summary>
+[InternalBufferCapacity(1)]
+public struct GameProceduralRoomClearedEvent : IBufferElementData
+{
+    public uint RunSeed;
+    public uint GenerationVersion;
+    public uint ClearVersion;
+    public int LevelIndex;
+    public int NodeIndex;
+    public int TileIndex;
+}
+
+/// <summary>
+/// Emits one authoritative event after a procedural room transition has committed.
+/// </summary>
+[InternalBufferCapacity(1)]
+public struct GameProceduralRoomEnteredEvent : IBufferElementData
+{
+    public uint RunSeed;
+    public uint GenerationVersion;
+    public uint VisitOrdinal;
+    public int LevelIndex;
+    public int NodeIndex;
+    public int TileIndex;
+    public byte FirstVisit;
 }
 
 /// <summary>

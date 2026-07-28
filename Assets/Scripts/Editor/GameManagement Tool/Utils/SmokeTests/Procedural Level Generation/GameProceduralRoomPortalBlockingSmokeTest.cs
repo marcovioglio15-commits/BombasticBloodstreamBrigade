@@ -15,7 +15,8 @@ using PhysicsBoxCollider = Unity.Physics.BoxCollider;
 public static class GameProceduralRoomPortalBlockingSmokeTest
 {
     #region Constants
-    private const int WallsLayerMask = 1 << 6;
+    private const int WallsLayerMask = 1 << 5;
+    private const int PortalBarrierLayerMask = 1 << 6;
     #endregion
 
     #region Methods
@@ -26,7 +27,8 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
     /// </summary>
     public static void Run()
     {
-        CollisionFilter blockerFilter = GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(WallsLayerMask);
+        CollisionFilter blockerFilter =
+            GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(PortalBarrierLayerMask);
         BlobAssetReference<Unity.Physics.Collider> blockerCollider = PhysicsBoxCollider.Create(new BoxGeometry
         {
             Center = float3.zero,
@@ -100,25 +102,32 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
 
     #region Validation Methods
     /// <summary>
-    /// Verifies the baked category collides with existing player Walls queries and no unrelated category.
+    /// Verifies the baked category matches only the reserved player movement query identity.
     /// </summary>
     /// <param name="blockerFilter">Production blocker collision filter.</param>
     private static void ValidateFilter(CollisionFilter blockerFilter)
     {
-        CollisionFilter playerWallsQuery = WorldWallCollisionUtility.BuildWallsCollisionFilter(WallsLayerMask);
-        CollisionFilter playerOverrideQuery = WorldWallCollisionUtility.BuildWallsCollisionFilter(WallsLayerMask | (1 << 7));
-        CollisionFilter unrelatedQuery = WorldWallCollisionUtility.BuildWallsCollisionFilter(1 << 7);
+        CollisionFilter playerMovementQuery =
+            WorldPortalBarrierCollisionUtility.BuildPlayerMovementFilter(WallsLayerMask,
+                                                                          PortalBarrierLayerMask);
+        CollisionFilter wallsOnlyQuery =
+            WorldWallCollisionUtility.BuildWallsCollisionFilter(WallsLayerMask);
+        CollisionFilter unrelatedQuery =
+            WorldWallCollisionUtility.BuildWallsCollisionFilter(1 << 7);
         CollisionFilter fallbackFilter = GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(0);
-        Require(blockerFilter.BelongsTo == (uint)WallsLayerMask,
-                "The blocker does not belong exclusively to the configured Walls category.");
-        Require(CollisionFilter.IsCollisionEnabled(blockerFilter, playerWallsQuery),
-                "The blocker filter is invisible to the player's existing Walls query.");
-        Require(CollisionFilter.IsCollisionEnabled(blockerFilter, playerOverrideQuery),
-                "The blocker filter is invisible after Player Walls override and default masks are combined.");
+        Require(blockerFilter.BelongsTo == (uint)PortalBarrierLayerMask,
+                "The blocker does not belong exclusively to the PortalBarrier category.");
+        Require(blockerFilter.CollidesWith ==
+                WorldPortalBarrierCollisionUtility.PlayerMovementQueryCategory,
+                "The blocker accepts categories other than the reserved player movement identity.");
+        Require(CollisionFilter.IsCollisionEnabled(blockerFilter, playerMovementQuery),
+                "The blocker filter is invisible to the player movement query.");
+        Require(!CollisionFilter.IsCollisionEnabled(blockerFilter, wallsOnlyQuery),
+                "The blocker leaks into a generic Walls query used by projectiles, drops or enemies.");
         Require(!CollisionFilter.IsCollisionEnabled(blockerFilter, unrelatedQuery),
                 "The blocker filter leaks into a non-Walls query category.");
-        Require(fallbackFilter.BelongsTo == uint.MaxValue && fallbackFilter.CollidesWith == uint.MaxValue,
-                "A missing Walls layer did not produce a universal fail-closed collision filter.");
+        Require(fallbackFilter.BelongsTo == 0u && fallbackFilter.CollidesWith == 0u,
+                "A missing PortalBarrier layer produced a collider that could affect unrelated entities.");
     }
 
     /// <summary>
@@ -146,7 +155,9 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
             {
                 Start = new float3(-2f, 0f, 0f),
                 End = new float3(2f, 0f, 0f),
-                Filter = WorldWallCollisionUtility.BuildWallsCollisionFilter(WallsLayerMask)
+                Filter =
+                    WorldPortalBarrierCollisionUtility.BuildPlayerMovementFilter(WallsLayerMask,
+                                                                                 PortalBarrierLayerMask)
             };
             Require(physicsWorld.CastRay(input),
                     "The rotated portal blocker did not participate in the Unity Physics static broadphase.");

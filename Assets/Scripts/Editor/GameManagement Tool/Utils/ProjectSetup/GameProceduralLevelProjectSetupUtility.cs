@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Creates and links the default Procedural Level preset without replacing designer-authored levels or tuning.
+/// Creates and links the default Procedural Level preset without replacing -authored levels or tuning.
 /// </summary>
 internal static class GameProceduralLevelProjectSetupUtility
 {
@@ -33,7 +33,7 @@ internal static class GameProceduralLevelProjectSetupUtility
     }
 
     /// <summary>
-    /// Initializes and registers an authored Procedural Level preset while preserving its designer-authored content.
+    /// Initializes and registers an authored Procedural Level preset while preserving its -authored content.
     /// </summary>
     /// <param name="preset">Authored preset already selected by the Game Master configuration.</param>
     /// <param name="sceneCatalogPreset">Canonical Scene Manager preset assigned only when the authored link is missing.</param>

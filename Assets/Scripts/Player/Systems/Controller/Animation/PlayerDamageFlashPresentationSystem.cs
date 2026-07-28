@@ -56,16 +56,13 @@ public partial struct PlayerDamageFlashPresentationSystem : ISystem
                 continue;
             }
 
-            if (entityManager.HasComponent<Animator>(playerEntity))
+            if (PlayerPresentationRuntimeUtility.TryResolveAnimator(entityManager,
+                                                                    playerEntity,
+                                                                    out Animator animator))
             {
-                Animator animator = entityManager.GetComponentObject<Animator>(playerEntity);
-
-                if (animator != null)
-                {
-                    ManagedDamageFlashRendererUtility.ApplyToAnimator(animator,
-                                                                     DamageFlashRuntimeUtility.ToManagedColor(damageFlashConfig.ValueRO.FlashColor),
-                                                                     targetBlend);
-                }
+                ManagedDamageFlashRendererUtility.ApplyToAnimator(animator,
+                                                                 DamageFlashRuntimeUtility.ToManagedColor(damageFlashConfig.ValueRO.FlashColor),
+                                                                 targetBlend);
             }
 
             runtimeState.AppliedBlend = targetBlend;

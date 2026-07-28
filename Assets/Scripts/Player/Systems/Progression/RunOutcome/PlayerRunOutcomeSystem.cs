@@ -8,7 +8,7 @@ using UnityEngine;
 /// Defeat goes through a transient "dying" phase first so the lethal hit can play its full feedback envelope (camera
 /// shake, flash, vignette, rumble and the optional death animation authored on the Player Visual Preset) before the
 /// end-of-run UI appears. The dying window length comes from <see cref="PlayerDeathAnimationConfig.PlaybackDurationSeconds"/>
-/// (authored on the Player Visual Preset Death Animation sub-section) so designers can scale it via the standard
+/// (authored on the Player Visual Preset Death Animation sub-section) so s can scale it via the standard
 /// Add Scaling pipeline. Victory remains
 /// instantaneous because it does not need the player to receive a final hit; setting <see cref="PlayerRunOutcomeState.IsFinalized"/>
 /// straight away keeps the existing freeze/UI flow unchanged for the victory path.
@@ -108,7 +108,7 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     {
         runOutcomeState.DyingElapsedSeconds += math.max(0f, deltaTime);
 
-        // A zero-or-negative window collapses to one frame so designers can opt out of the dying playback entirely.
+        // A zero-or-negative window collapses to one frame so s can opt out of the dying playback entirely.
         if (runOutcomeState.DyingElapsedSeconds < math.max(0f, defeatFeedbackPlaybackSeconds))
             return;
 
@@ -218,7 +218,7 @@ public partial struct PlayerRunOutcomeSystem : ISystem
     }
 
     /// <summary>
-    /// Starts the defeat playback window or finalizes immediately when the configured window is zero so designers can
+    /// Starts the defeat playback window or finalizes immediately when the configured window is zero so s can
     /// preserve the old behaviour by setting Defeat Feedback Playback to 0. Plays the death cue exactly once at the
     /// moment defeat is detected, while the lethal hit's feedbacks are still alive on the camera.
     /// </summary>

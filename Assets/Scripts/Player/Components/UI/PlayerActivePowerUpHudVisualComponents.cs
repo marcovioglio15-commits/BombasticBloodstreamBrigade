@@ -3,14 +3,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
-/// Points from the player entity to its dedicated active power-up HUD visual configuration entity.
-/// </summary>
-public struct PlayerActivePowerUpHudVisualReference : IComponentData
-{
-    public Entity ConfigEntity;
-}
-
-/// <summary>
 /// Points from the active power-up HUD visual configuration entity back to its authoritative player.
 /// </summary>
 public struct PlayerActivePowerUpHudVisualOwner : IComponentData

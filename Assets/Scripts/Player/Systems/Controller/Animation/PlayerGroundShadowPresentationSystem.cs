@@ -17,7 +17,7 @@ public partial struct PlayerGroundShadowPresentationSystem : ISystem
     #endregion
 
     #region Fields
-    private EntityQuery playerQuery;
+    private EntityQuery visualRuntimeQuery;
     private static EnemyGroundIndicatorView runtimeView;
     private static Mesh runtimeMesh;
     private static UnityEngine.Material runtimeMaterial;
@@ -33,11 +33,11 @@ public partial struct PlayerGroundShadowPresentationSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
-        playerQuery = SystemAPI.QueryBuilder()
-            .WithAll<PlayerControllerConfig, PlayerGroundShadowConfig, PlayerWorldLayersConfig, PlayerHealth, LocalTransform>()
+        visualRuntimeQuery = SystemAPI.QueryBuilder()
+            .WithAll<PlayerVisualRuntimeDataOwner, PlayerGroundShadowConfig>()
             .Build();
 
-        state.RequireForUpdate(playerQuery);
+        state.RequireForUpdate(visualRuntimeQuery);
     }
 
     /// <summary>
@@ -54,21 +54,30 @@ public partial struct PlayerGroundShadowPresentationSystem : ISystem
         bool canProjectOntoGround = hasPhysicsWorld &&
                                     !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
         bool synchronizedAnyPlayer = false;
+        ComponentLookup<PlayerControllerConfig> controllerConfigLookup = SystemAPI.GetComponentLookup<PlayerControllerConfig>(true);
+        ComponentLookup<PlayerWorldLayersConfig> worldLayersLookup = SystemAPI.GetComponentLookup<PlayerWorldLayersConfig>(true);
+        ComponentLookup<PlayerHealth> healthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(true);
+        ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
 
-        foreach ((RefRO<PlayerGroundShadowConfig> groundShadowConfig,
-                  RefRO<PlayerWorldLayersConfig> worldLayersConfig,
-                  RefRO<PlayerHealth> playerHealth,
-                  RefRO<LocalTransform> playerTransform)
-                 in SystemAPI.Query<RefRO<PlayerGroundShadowConfig>,
-                                    RefRO<PlayerWorldLayersConfig>,
-                                    RefRO<PlayerHealth>,
-                                    RefRO<LocalTransform>>()
-                             .WithAll<PlayerControllerConfig>())
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  RefRO<PlayerGroundShadowConfig> groundShadowConfig)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
+                                    RefRO<PlayerGroundShadowConfig>>())
         {
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!controllerConfigLookup.HasComponent(playerEntity) ||
+                !worldLayersLookup.TryGetComponent(playerEntity, out PlayerWorldLayersConfig worldLayersConfig) ||
+                !healthLookup.TryGetComponent(playerEntity, out PlayerHealth playerHealth) ||
+                !transformLookup.TryGetComponent(playerEntity, out LocalTransform playerTransform))
+            {
+                continue;
+            }
+
             SyncPlayerShadow(in groundShadowConfig.ValueRO,
-                             in worldLayersConfig.ValueRO,
-                             in playerHealth.ValueRO,
-                             in playerTransform.ValueRO,
+                             in worldLayersConfig,
+                             in playerHealth,
+                             in playerTransform,
                              canProjectOntoGround,
                              in physicsWorldSingleton,
                              SystemAPI.Time.DeltaTime);
@@ -141,9 +150,10 @@ public partial struct PlayerGroundShadowPresentationSystem : ISystem
                                                    playerRotationFloat.value.z,
                                                    playerRotationFloat.value.w);
 
-        // Probe everything except the Walls layer so the shadow never projects onto vertical wall colliders
-        // next to the player, the cause of the edge-on flicker near map borders and while moving.
-        uint groundProbeMask = GroundShadowProjectionUtility.ResolveGroundProbeMask((uint)worldLayers.WallsLayerMask);
+        // Exclude walls and the player-only portal barriers so the shadow cannot project onto vertical blockers.
+        uint excludedGroundProbeMask = (uint)(worldLayers.WallsLayerMask |
+                                              worldLayers.PortalBarrierLayerMask);
+        uint groundProbeMask = GroundShadowProjectionUtility.ResolveGroundProbeMask(excludedGroundProbeMask);
         GroundShadowProjectionUtility.ResolvePose(playerPosition,
                                                   playerRotation,
                                                   playerTransform.Scale,

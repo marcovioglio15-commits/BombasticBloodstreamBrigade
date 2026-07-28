@@ -102,7 +102,7 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     }
 
     /// <summary>
-    /// Draws the shared paint-brush controls inside the wave selected by the designer.
+    /// Draws the shared paint-brush controls inside the wave selected by the .
     /// </summary>
     /// <param name="brushMasterPreset">Enemy master preset assigned while painting.</param>
     /// <param name="brushEnemyCount">Enemy count assigned while painting.</param>

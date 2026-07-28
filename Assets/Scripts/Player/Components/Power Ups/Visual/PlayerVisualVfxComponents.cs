@@ -102,7 +102,7 @@ public struct PlayerProjectileDeathVfxScalingState : IComponentData
 }
 
 /// <summary>
-/// Runtime settings controlling a designer-authored Jetpack VFX inside the Visual Player hierarchy.
+/// Runtime settings controlling a -authored Jetpack VFX inside the Visual Player hierarchy.
 /// </summary>
 public struct PlayerJetpackVfxConfig : IComponentData
 {

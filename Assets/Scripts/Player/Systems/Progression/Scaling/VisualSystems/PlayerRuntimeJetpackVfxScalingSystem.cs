@@ -30,6 +30,7 @@ public partial struct PlayerRuntimeJetpackVfxScalingSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerRuntimeScalingState>();
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
         state.RequireForUpdate<PlayerJetpackVfxScalingState>();
         state.RequireForUpdate<PlayerBaseJetpackVfxConfig>();
         state.RequireForUpdate<PlayerJetpackVfxConfig>();
@@ -42,44 +43,52 @@ public partial struct PlayerRuntimeJetpackVfxScalingSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup = SystemAPI.GetComponentLookup<PlayerRuntimeScalingState>(true);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeJetpackVfxScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeJetpackVfxScalingElement>(true);
         ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
         ComponentLookup<PlayerComboCounterState> comboStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(true);
         BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboRankElement>(true);
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
 
-        foreach ((RefRO<PlayerRuntimeScalingState> runtimeScalingState,
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
                   RefRW<PlayerJetpackVfxScalingState> vfxScalingState,
                   RefRO<PlayerBaseJetpackVfxConfig> baseConfig,
                   RefRW<PlayerJetpackVfxConfig> runtimeConfig,
-                  Entity entity)
-                 in SystemAPI.Query<RefRO<PlayerRuntimeScalingState>,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
                                     RefRW<PlayerJetpackVfxScalingState>,
                                     RefRO<PlayerBaseJetpackVfxConfig>,
                                     RefRW<PlayerJetpackVfxConfig>>()
                              .WithAll<PlayerRuntimeJetpackVfxScalingElement>()
                              .WithEntityAccess())
         {
-            if (runtimeScalingState.ValueRO.Initialized == 0)
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!runtimeScalingStateLookup.TryGetComponent(playerEntity, out PlayerRuntimeScalingState runtimeScalingState) ||
+                runtimeScalingState.Initialized == 0)
                 continue;
 
             if (vfxScalingState.ValueRO.Initialized != 0 &&
-                vfxScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.ValueRO.LastScalableStatsHash)
+                vfxScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.LastScalableStatsHash)
                 continue;
 
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
-            PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+            PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,
                                                            EffectiveScalableStats,
                                                            VariableContext);
-            ApplyScaling(scalingLookup[entity], ref runtimeConfig.ValueRW);
+            ApplyScaling(scalingLookup[visualRuntimeEntity], ref runtimeConfig.ValueRW);
             vfxScalingState.ValueRW.Initialized = 1;
-            vfxScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.ValueRO.LastScalableStatsHash;
+            vfxScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.LastScalableStatsHash;
         }
     }
     #endregion

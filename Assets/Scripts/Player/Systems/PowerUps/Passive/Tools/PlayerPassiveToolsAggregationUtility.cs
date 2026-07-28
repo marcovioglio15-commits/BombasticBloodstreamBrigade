@@ -473,7 +473,7 @@ public static class PlayerPassiveToolsAggregationUtility
     /// Folds the resolved conditional weapon switch state into the aggregated passive snapshot. Power-up
     /// switches keep priority by default, mirroring the documented contract: an authored conditional entry can
     /// only beat the equipped Switch Weapon power-up when its Override Power Up Switch flag is enabled.
-    /// Conditional matches are always honored when no power-up switch is currently active so designers can use
+    /// Conditional matches are always honored when no power-up switch is currently active so s can use
     /// the conditional pipeline as a stat-driven default without flipping the override toggle on every entry.
     /// </summary>
     /// <param name="conditionalState">Resolved conditional weapon switch state produced by the dedicated system.</param>

@@ -126,7 +126,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     }
 
     /// <summary>
-    /// Resolves whether optional clip playback has reached the designer-selected relocation point.
+    /// Resolves whether optional clip playback has reached the -selected relocation point.
     /// </summary>
     /// <param name="normalizedTime">Normalized clip time at which hidden room relocation may proceed.</param>
     /// <returns>True when no clip is active or its playback reached the requested normalized time.</returns>
@@ -161,16 +161,21 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         LocalTransform playerTransform = entityManager.GetComponentData<LocalTransform>(playerEntity);
         float3 renderPosition = playerTransform.Position;
 
-        if (entityManager.HasComponent<PlayerVisualRuntimeBridgeConfig>(playerEntity))
+        if (PlayerPresentationRuntimeUtility.TryResolveVisualRuntimeEntity(entityManager,
+                                                                           playerEntity,
+                                                                           out Entity visualRuntimeEntity) &&
+            entityManager.HasComponent<PlayerVisualRuntimeBridgeConfig>(visualRuntimeEntity))
         {
-            PlayerVisualRuntimeBridgeConfig visualConfig = entityManager.GetComponentData<PlayerVisualRuntimeBridgeConfig>(playerEntity);
+            PlayerVisualRuntimeBridgeConfig visualConfig =
+                entityManager.GetComponentData<PlayerVisualRuntimeBridgeConfig>(visualRuntimeEntity);
             renderPosition += math.rotate(playerTransform.Rotation, visualConfig.PositionOffset);
         }
 
         trackingPosition = new Vector3(renderPosition.x, renderPosition.y, renderPosition.z);
 
-        if (entityManager.HasComponent<Animator>(playerEntity))
-            animator = entityManager.GetComponentObject<Animator>(playerEntity);
+        PlayerPresentationRuntimeUtility.TryResolveAnimator(entityManager,
+                                                            playerEntity,
+                                                            out animator);
 
         return true;
     }
@@ -238,7 +243,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     /// Creates an unscaled one-shot Playables graph for a validated in-place clip while explicitly disabling root motion.
     /// </summary>
     /// <param name="animator">Animator receiving direct clip output.</param>
-    /// <param name="clip">Designer-selected transition clip.</param>
+    /// <param name="clip">-selected transition clip.</param>
     private static void StartAnimation(Animator animator, AnimationClip clip)
     {
         transitionAnimator = animator;

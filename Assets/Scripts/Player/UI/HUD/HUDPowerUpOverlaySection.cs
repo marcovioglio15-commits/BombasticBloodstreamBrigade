@@ -238,10 +238,12 @@ internal sealed class HUDPowerUpOverlaySection
     {
         configEntity = Entity.Null;
 
-        if (!entityManager.HasComponent<PlayerActivePowerUpHudVisualReference>(playerEntity))
+        if (!entityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity))
             return false;
 
-        configEntity = entityManager.GetComponentData<PlayerActivePowerUpHudVisualReference>(playerEntity).ConfigEntity;
+        configEntity = entityManager
+            .GetComponentData<PlayerPresentationRuntimeReferences>(playerEntity)
+            .ActivePowerUpHudVisualEntity;
         return configEntity != Entity.Null &&
                entityManager.Exists(configEntity) &&
                entityManager.HasComponent<PlayerActivePowerUpHudVisualConfig>(configEntity);

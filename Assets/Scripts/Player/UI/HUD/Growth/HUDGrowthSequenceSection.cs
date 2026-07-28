@@ -115,7 +115,7 @@ public sealed class HUDGrowthSequenceSection : MonoBehaviour
     public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!runtimeEntityManager.Exists(playerEntity) ||
-            !runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualReference>(playerEntity) ||
+            !runtimeEntityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerProgressionConfig>(playerEntity) ||
             !runtimeEntityManager.HasComponent<PlayerLevel>(playerEntity))
         {
@@ -126,8 +126,9 @@ public sealed class HUDGrowthSequenceSection : MonoBehaviour
             return;
         }
 
-        PlayerGrowthSequenceHudVisualReference visualReference = runtimeEntityManager.GetComponentData<PlayerGrowthSequenceHudVisualReference>(playerEntity);
-        Entity configEntity = visualReference.ConfigEntity;
+        PlayerPresentationRuntimeReferences visualReferences =
+            runtimeEntityManager.GetComponentData<PlayerPresentationRuntimeReferences>(playerEntity);
+        Entity configEntity = visualReferences.GrowthSequenceHudVisualEntity;
 
         if (!runtimeEntityManager.Exists(configEntity) ||
             !runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualConfig>(configEntity) ||
@@ -644,10 +645,10 @@ public sealed class HUDGrowthSequenceSection : MonoBehaviour
         if (!runtimeEntityManager.Exists(playerEntity))
             return;
 
-        if (!runtimeEntityManager.HasComponent<PlayerGrowthSequenceHudVisualReference>(playerEntity))
+        if (!runtimeEntityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity))
         {
             LogDiagnosticOnce(ref loggedMissingPlayerReference,
-                              "[HUDGrowthSequenceSection] Player entity is missing PlayerGrowthSequenceHudVisualReference. The active player bake does not include the new Growth Sequence HUD config yet; reimport/rebake the player prefab or owner scene.");
+                              "[HUDGrowthSequenceSection] Player entity is missing PlayerPresentationRuntimeReferences. The active player bake does not include the Growth Sequence HUD companion yet; reimport/rebake the player prefab or owner scene.");
             return;
         }
 

@@ -23,7 +23,8 @@ public partial class GameProceduralRoomTransitionCommitSystem : SystemBase
         managerQuery = GetEntityQuery(typeof(GameSceneTransitionState),
                                       typeof(GameProceduralLevelRuntimeState),
                                       typeof(GameProceduralRoomTransitionContext),
-                                      typeof(GameProceduralRoomNodeElement));
+                                      typeof(GameProceduralRoomNodeElement),
+                                      typeof(GameProceduralRoomEnteredEvent));
     }
 
     /// <summary>
@@ -54,15 +55,32 @@ public partial class GameProceduralRoomTransitionCommitSystem : SystemBase
         if (!GameProceduralRoomArrivalUtility.TryPreparePendingArrival(EntityManager, managerEntity))
             return;
 
+        byte firstVisit = targetNode.Visited == 0 ? (byte)1 : (byte)0;
         targetNode.Visited = 1;
         nodes[context.TargetNodeIndex] = targetNode;
         GameProceduralLevelRuntimeState runtimeState = EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
+
+        if (firstVisit != 0)
+            runtimeState.VisitOrdinal++;
+
         runtimeState.CurrentNodeIndex = context.TargetNodeIndex;
         runtimeState.PendingNodeIndex = -1;
         runtimeState.CurrentDepth = targetNode.Depth;
         runtimeState.CurrentRoomCleared = targetNode.Cleared;
         runtimeState.Phase = GameProceduralLevelRuntimePhase.Active;
         EntityManager.SetComponentData(managerEntity, runtimeState);
+        DynamicBuffer<GameProceduralRoomEnteredEvent> enteredEvents = EntityManager.GetBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
+        enteredEvents.Clear();
+        enteredEvents.Add(new GameProceduralRoomEnteredEvent
+        {
+            RunSeed = runtimeState.RunSeed,
+            GenerationVersion = runtimeState.GenerationVersion,
+            VisitOrdinal = runtimeState.VisitOrdinal,
+            LevelIndex = runtimeState.CurrentLevelIndex,
+            NodeIndex = targetNode.NodeIndex,
+            TileIndex = targetNode.TileIndex,
+            FirstVisit = firstVisit
+        });
         context.Kind = GameProceduralRoomTransitionKind.None;
         context.CommitPending = 0;
         context.RelocationPending = 0;

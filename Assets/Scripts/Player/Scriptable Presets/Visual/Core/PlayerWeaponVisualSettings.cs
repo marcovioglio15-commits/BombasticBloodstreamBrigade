@@ -176,7 +176,7 @@ public sealed class PlayerWeaponVisualSettings
 
     /// <summary>
     /// Resolves the mountable entry stored for the supplied weapon ID, or null when the ID is empty or unknown.
-    /// Comparison is ordinal and trims authored whitespace so designers can format the field freely.
+    /// Comparison is ordinal and trims authored whitespace so s can format the field freely.
     /// </summary>
     /// <param name="weaponId">defined weapon ID to look up.</param>
     /// <returns>Authored entry matching the ID, or null when not present.</returns>
@@ -347,7 +347,7 @@ public sealed class PlayerWeaponVisualSettings
 
     /// <summary>
     /// Validates the Default Additional Weapon Id against the authored entries. Reports unknown IDs and a
-    /// missing shoot animation clip on the matching entry so designers can fix incoherent setups.
+    /// missing shoot animation clip on the matching entry so s can fix incoherent setups.
     /// </summary>
     /// <param name="ownerAssetName">Visual preset asset name included in warnings.</param>
     private void ValidateDefaultAdditionalWeapon(string ownerAssetName)
@@ -385,7 +385,7 @@ public sealed class PlayerWeaponVisualSettings
 
     /// <summary>
     /// Builds a stable label used by validation and editor warnings for one entry. Falls back to a numeric
-    /// label when the weapon ID is empty so error messages remain readable while designers are authoring.
+    /// label when the weapon ID is empty so error messages remain readable while s are authoring.
     /// </summary>
     /// <param name="weaponId">Weapon ID authored on the entry.</param>
     /// <param name="entryIndex">Authored array index of the entry.</param>

@@ -14,6 +14,8 @@ internal static class PlayerRuntimeScalingFormulaContextUtility
     /// </summary>
     /// <param name="entity">Player entity owning the current scalable-stat state.</param>
     /// <param name="scalableStatsLookup">Read-only base scalable-stat lookup.</param>
+    /// <param name="temporaryModifiersLookup">Read-only room-scoped stat modifier lookup.</param>
+    /// <param name="temporaryStateLookup">Read-only room-visit state lookup.</param>
     /// <param name="comboConfigLookup">Read-only runtime combo config lookup.</param>
     /// <param name="comboStateLookup">Read-only combo state lookup.</param>
     /// <param name="comboRanksLookup">Read-only runtime combo-rank lookup.</param>
@@ -22,6 +24,8 @@ internal static class PlayerRuntimeScalingFormulaContextUtility
     /// <param name="variableContext">Reusable typed formula context rebuilt in place.</param>
     public static void Fill(Entity entity,
                             in BufferLookup<PlayerScalableStatElement> scalableStatsLookup,
+                            in BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup,
+                            in ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup,
                             in ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup,
                             in ComponentLookup<PlayerComboCounterState> comboStateLookup,
                             in BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup,
@@ -37,6 +41,14 @@ internal static class PlayerRuntimeScalingFormulaContextUtility
 
         DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
         PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats, effectiveScalableStats);
+
+        if (temporaryModifiersLookup.HasBuffer(entity) && temporaryStateLookup.HasComponent(entity))
+        {
+            PlayerRoomRewardTemporaryState temporaryState = temporaryStateLookup[entity];
+            PlayerRoomRewardTemporaryModifierUtility.ApplyActiveModifiers(temporaryModifiersLookup[entity],
+                                                                          temporaryState.LastVisitOrdinal,
+                                                                          effectiveScalableStats);
+        }
 
         if (comboConfigLookup.HasComponent(entity) &&
             comboStateLookup.HasComponent(entity) &&

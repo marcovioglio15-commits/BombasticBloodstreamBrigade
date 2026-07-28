@@ -236,7 +236,7 @@ internal static class PlayerVisualPresetsPanelDeathAnimationSectionUtility
 
     /// <summary>
     /// Refreshes the warning HelpBoxes for the death animation section. Warnings are emitted instead of snapping per
-    /// project rule 20: the validator only clamps hard floors so designers see the issues without losing data.
+    /// project rule 20: the validator only clamps hard floors so s see the issues without losing data.
     /// </summary>
     /// <param name="warningsContainer">Container that receives the HelpBoxes.</param>
     /// <param name="properties">Resolved property bundle for the death animation block.</param>

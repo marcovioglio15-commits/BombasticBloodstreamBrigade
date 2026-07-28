@@ -5,7 +5,7 @@ using UnityEngine;
 #region Camera Settings
 /// <summary>
 /// Owns the camera follow behavior, smoothing values and the two trauma-based shake channels (damage on hit, fire on shot).
-/// Both shake channels expose the same multi-axis, zoom and single-impulse extension so designers can mix sharp tactile
+/// Both shake channels expose the same multi-axis, zoom and single-impulse extension so s can mix sharp tactile
 /// feedback with the existing noise model from one consistent authoring surface.
 /// </summary>
 [Serializable]
@@ -423,7 +423,7 @@ public sealed class CameraDamageShakeSettings
 /// <summary>
 /// Fire-driven trauma camera shake. Mirror of <see cref="CameraDamageShakeSettings"/> minus the damage-scaling block:
 /// trauma is added once per primary-shot spawn and split-children are suppressed at the producer so secondary fragments
-/// never retrigger this kick. The same multi-axis/zoom/single-impulse extensions are exposed so designers can author
+/// never retrigger this kick. The same multi-axis/zoom/single-impulse extensions are exposed so s can author
 /// fire feedback that complements the damage shake without coupling their amplitudes.
 /// </summary>
 [Serializable]

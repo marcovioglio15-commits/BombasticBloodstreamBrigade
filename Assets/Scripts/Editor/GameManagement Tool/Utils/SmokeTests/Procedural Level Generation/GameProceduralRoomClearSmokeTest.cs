@@ -183,6 +183,7 @@ public static class GameProceduralRoomClearSmokeTest
             OrderIndex = 0,
             Enabled = 1
         });
+        entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
         return managerEntity;
     }
 

@@ -1,5 +1,5 @@
 /// <summary>
-/// Validates active procedural level rule scores without mutating designer-authored values.
+/// Validates active procedural level rule scores without mutating -authored values.
 /// </summary>
 public static class GameProceduralLevelRuleValidationUtility
 {
@@ -10,7 +10,7 @@ public static class GameProceduralLevelRuleValidationUtility
     /// Validates finite non-negative scores and skips fitting entirely for center-arrival levels.
     /// </summary>
     /// <param name="level">Level containing the rule scores.</param>
-    /// <param name="context">Designer-facing level context.</param>
+    /// <param name="context">-facing level context.</param>
     /// <param name="report">Destination validation report.</param>
     public static void Validate(GameProceduralLevelDefinition level,
                                 string context,
@@ -51,11 +51,11 @@ public static class GameProceduralLevelRuleValidationUtility
 
     #region Validation Methods
     /// <summary>
-    /// Adds one blocking diagnostic when an active designer-authored score is negative or non-finite.
+    /// Adds one blocking diagnostic when an active -authored score is negative or non-finite.
     /// </summary>
     /// <param name="value">Score value to inspect.</param>
     /// <param name="code">Stable score-specific validation code.</param>
-    /// <param name="label">Designer-facing score label.</param>
+    /// <param name="label">-facing score label.</param>
     /// <param name="context">Owning level context.</param>
     /// <param name="report">Destination validation report.</param>
     private static void ValidateScore(float value,

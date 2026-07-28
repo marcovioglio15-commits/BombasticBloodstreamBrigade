@@ -96,7 +96,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
 
     #region Level Mutation Methods
     /// <summary>
-    /// Appends a clean level definition with a unique designer ID and stable technical identity.
+    /// Appends a clean level definition with a unique  ID and stable technical identity.
     /// </summary>
     /// <param name="panel">Panel whose selected preset receives the level.</param>
     private static void AddLevel(GameProceduralLevelPresetsPanel panel)
@@ -331,7 +331,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
         GameProceduralLevelPresetsPanelFieldUtility.AddDelayedText(identitySection,
                                                                   levelProperty.FindPropertyRelative("levelId"),
                                                                   "Level ID",
-                                                                  "Designer-authored stable runtime progression and diagnostics identifier.",
+                                                                  "-authored stable runtime progression and diagnostics identifier.",
                                                                   false,
                                                                   panel.BuildActiveSection);
         GameProceduralLevelPresetsPanelFieldUtility.AddDelayedText(identitySection,
@@ -400,7 +400,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
     /// </summary>
     /// <param name="parent">Action row receiving the button.</param>
     /// <param name="text">Visible button text.</param>
-    /// <param name="tooltip">Designer-facing action explanation.</param>
+    /// <param name="tooltip">-facing action explanation.</param>
     /// <param name="width">Fixed readable width.</param>
     /// <param name="action">Action invoked by the button.</param>
     private static void AddActionButton(VisualElement parent, string text, string tooltip, float width, Action action)
@@ -485,7 +485,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
     }
 
     /// <summary>
-    /// Produces a unique designer-facing Level ID without mutating existing definitions.
+    /// Produces a unique -facing Level ID without mutating existing definitions.
     /// </summary>
     /// <param name="preset">Preset whose Level IDs must remain unique.</param>
     /// <param name="requestedId">Preferred base ID.</param>
@@ -506,7 +506,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
     }
 
     /// <summary>
-    /// Checks whether the preset already contains one exact designer-facing Level ID.
+    /// Checks whether the preset already contains one exact -facing Level ID.
     /// </summary>
     /// <param name="preset">Preset inspected for duplicates.</param>
     /// <param name="levelId">Exact ordinal Level ID candidate.</param>
@@ -534,7 +534,7 @@ internal static class GameProceduralLevelPresetsPanelLevelUtility
     /// </summary>
     /// <param name="levelProperty">Serialized new level element.</param>
     /// <param name="technicalId">Fresh immutable technical identity.</param>
-    /// <param name="levelId">Unique designer-facing Level ID.</param>
+    /// <param name="levelId">Unique -facing Level ID.</param>
     /// <param name="displayName">Initial chip and preview label.</param>
     private static void ResetLevel(SerializedProperty levelProperty, string technicalId, string levelId, string displayName)
     {

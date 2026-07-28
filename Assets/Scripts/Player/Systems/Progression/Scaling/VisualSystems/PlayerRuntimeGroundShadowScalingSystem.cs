@@ -24,6 +24,7 @@ public partial struct PlayerRuntimeGroundShadowScalingSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerRuntimeScalingState>();
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
         state.RequireForUpdate<PlayerGroundShadowScalingState>();
         state.RequireForUpdate<PlayerBaseGroundShadowConfig>();
         state.RequireForUpdate<PlayerGroundShadowConfig>();
@@ -36,47 +37,55 @@ public partial struct PlayerRuntimeGroundShadowScalingSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup = SystemAPI.GetComponentLookup<PlayerRuntimeScalingState>(true);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeGroundShadowScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeGroundShadowScalingElement>(true);
         ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
         ComponentLookup<PlayerComboCounterState> comboStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(true);
         BufferLookup<PlayerRuntimeComboRankElement> comboRanksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboRankElement>(true);
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
 
-        foreach ((RefRO<PlayerRuntimeScalingState> runtimeScalingState,
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
                   RefRW<PlayerGroundShadowScalingState> groundShadowScalingState,
                   RefRO<PlayerBaseGroundShadowConfig> baseConfig,
                   RefRW<PlayerGroundShadowConfig> runtimeConfig,
-                  Entity entity)
-                 in SystemAPI.Query<RefRO<PlayerRuntimeScalingState>,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
                                     RefRW<PlayerGroundShadowScalingState>,
                                     RefRO<PlayerBaseGroundShadowConfig>,
                                     RefRW<PlayerGroundShadowConfig>>()
                              .WithAll<PlayerRuntimeGroundShadowScalingElement>()
                              .WithEntityAccess())
         {
-            if (runtimeScalingState.ValueRO.Initialized == 0)
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!runtimeScalingStateLookup.TryGetComponent(playerEntity, out PlayerRuntimeScalingState runtimeScalingState) ||
+                runtimeScalingState.Initialized == 0)
                 continue;
 
             if (groundShadowScalingState.ValueRO.Initialized != 0 &&
-                groundShadowScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.ValueRO.LastScalableStatsHash)
+                groundShadowScalingState.ValueRO.LastScalableStatsHash == runtimeScalingState.LastScalableStatsHash)
             {
                 continue;
             }
 
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
-            PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+            PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,
                                                            EffectiveScalableStats,
                                                            VariableContext);
-            ApplyScaling(scalingLookup[entity], ref runtimeConfig.ValueRW);
+            ApplyScaling(scalingLookup[visualRuntimeEntity], ref runtimeConfig.ValueRW);
             Sanitize(ref runtimeConfig.ValueRW);
             groundShadowScalingState.ValueRW.Initialized = 1;
-            groundShadowScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.ValueRO.LastScalableStatsHash;
+            groundShadowScalingState.ValueRW.LastScalableStatsHash = runtimeScalingState.LastScalableStatsHash;
         }
     }
     #endregion

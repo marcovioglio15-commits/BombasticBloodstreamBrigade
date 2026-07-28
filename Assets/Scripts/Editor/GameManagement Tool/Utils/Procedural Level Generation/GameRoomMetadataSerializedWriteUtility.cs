@@ -37,6 +37,8 @@ internal static class GameRoomMetadataSerializedWriteUtility
         SetString(metadataProperty, "dependencyHash", snapshot.DependencyHash);
         SetBoolean(metadataProperty, "cacheStale", snapshot.CacheStale);
         SetInteger(metadataProperty, "centerAnchorCount", snapshot.CenterAnchorCount);
+        SetInteger(metadataProperty, "activeSpawnerCount", snapshot.ActiveSpawnerCount);
+        SetInteger(metadataProperty, "activeSpawnerWithWavesCount", snapshot.ActiveSpawnerWithWavesCount);
         WriteStringArray(metadataProperty.FindPropertyRelative("sourceScenePaths"), snapshot.SourceScenePaths);
         WriteStringArray(metadataProperty.FindPropertyRelative("authoringWarnings"), snapshot.AuthoringWarnings);
         WritePortalArray(metadataProperty.FindPropertyRelative("portals"), snapshot);

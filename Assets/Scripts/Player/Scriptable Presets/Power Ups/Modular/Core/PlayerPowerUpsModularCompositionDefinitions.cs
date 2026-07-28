@@ -37,7 +37,7 @@ public sealed class PowerUpSwitchWeaponModuleData
     #region Setup
     /// <summary>
     /// Assigns the Weapon Id targeted by this Switch Weapon module. Used by the defaults utility to pre-populate
-    /// a freshly created payload before designer edits.
+    /// a freshly created payload before  edits.
     /// </summary>
     /// <param name="weaponIdValue">defined Weapon Id to assign.</param>
     public void Configure(string weaponIdValue)

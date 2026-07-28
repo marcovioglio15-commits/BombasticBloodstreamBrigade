@@ -6,4 +6,5 @@ using Unity.Entities;
 public struct PlayerWorldLayersConfig : IComponentData
 {
     public int WallsLayerMask;
+    public int PortalBarrierLayerMask;
 }

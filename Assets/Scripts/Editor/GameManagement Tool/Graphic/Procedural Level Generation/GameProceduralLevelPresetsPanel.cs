@@ -176,6 +176,16 @@ public sealed class GameProceduralLevelPresetsPanel
                 : null;
         }
     }
+
+    internal GameRoomClearRewardsPreset RoomClearRewardsPreset
+    {
+        get
+        {
+            return masterPanel != null && masterPanel.SelectedPreset != null
+                ? masterPanel.SelectedPreset.RoomClearRewardsPreset
+                : null;
+        }
+    }
     #endregion
 
     #region Constructors

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds intelligent Player Management Tool controls for a designer-authored Visual Player Jetpack VFX.
+/// Builds intelligent Player Management Tool controls for a -authored Visual Player Jetpack VFX.
 /// </summary>
 internal static class PlayerVisualPresetsPanelJetpackVfxSectionUtility
 {
@@ -22,7 +22,7 @@ internal static class PlayerVisualPresetsPanelJetpackVfxSectionUtility
         Foldout foldout = ManagementToolFoldoutStateUtility.CreateFoldout("Player Jetpack VFX",
                                                                           "NashCore.PlayerManagement.Visual.VFX.PlayerJetpack",
                                                                           true);
-        foldout.tooltip = "Controls a Jetpack VFX GameObject already positioned by designers inside the Visual Player hierarchy.";
+        foldout.tooltip = "Controls a Jetpack VFX GameObject already positioned by s inside the Visual Player hierarchy.";
 
         if (panel == null || panel.PresetSerializedObject == null)
             return foldout;
@@ -80,7 +80,7 @@ internal static class PlayerVisualPresetsPanelJetpackVfxSectionUtility
                          scaleWithMovementSpeedProperty,
                          scalingRulesProperty,
                          "Scale With Movement Speed",
-                         "When enabled, shrinks or grows the Jetpack VFX around its designer-authored local scale according to current player movement speed.",
+                         "When enabled, shrinks or grows the Jetpack VFX around its -authored local scale according to current player movement speed.",
                          false);
         AddScalableField(movementScaleContainer,
                          speedForMaximumScaleProperty,
@@ -92,7 +92,7 @@ internal static class PlayerVisualPresetsPanelJetpackVfxSectionUtility
                          normalScaleSpeedPercentProperty,
                          scalingRulesProperty,
                          "Normal Scale Speed Percent",
-                         "Percentage of Speed For Maximum Scale at which the Jetpack VFX uses its designer-authored local scale.",
+                         "Percentage of Speed For Maximum Scale at which the Jetpack VFX uses its -authored local scale.",
                          false);
         AddScalableField(movementScaleContainer,
                          scaleVariationPercentProperty,
@@ -258,7 +258,7 @@ internal static class PlayerVisualPresetsPanelJetpackVfxSectionUtility
         }
 
         if (runtimePrefab == null)
-            warnings.Add(new HelpBox("Assign a Runtime Visual Bridge Prefab to validate the designer-authored Jetpack VFX reference.", HelpBoxMessageType.Info));
+            warnings.Add(new HelpBox("Assign a Runtime Visual Bridge Prefab to validate the -authored Jetpack VFX reference.", HelpBoxMessageType.Info));
 
         string normalizedReference = runtimeReference.Trim();
 

@@ -17,19 +17,19 @@ public sealed class ExcelDataWorkbookSheetDefinition
     [Tooltip("Visible Excel worksheet name before invalid-character sanitization by the workbook adapter.")]
     [SerializeField] private string sheetName = "Objects";
 
-    [Tooltip("Rows displayed by the layout designer preview; export uses the maximum authored cell coordinate.")]
+    [Tooltip("Rows displayed by the layout  preview; export uses the maximum authored cell coordinate.")]
     [Min(1)]
     [SerializeField] private int previewRowCount = 32;
 
-    [Tooltip("Columns displayed by the layout designer preview; export uses the maximum authored cell coordinate.")]
+    [Tooltip("Columns displayed by the layout  preview; export uses the maximum authored cell coordinate.")]
     [Min(1)]
     [SerializeField] private int previewColumnCount = 16;
 
-    [Tooltip("Visible cell width in pixels used only by the Unity layout designer preview.")]
+    [Tooltip("Visible cell width in pixels used only by the Unity layout  preview.")]
     [Min(24)]
     [SerializeField] private int previewCellWidth = 112;
 
-    [Tooltip("Visible cell height in pixels used only by the Unity layout designer preview.")]
+    [Tooltip("Visible cell height in pixels used only by the Unity layout  preview.")]
     [Min(18)]
     [SerializeField] private int previewCellHeight = 28;
 

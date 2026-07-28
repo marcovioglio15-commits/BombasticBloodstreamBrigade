@@ -417,6 +417,13 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
         // Create entity and build configuration blob
         Entity entity = GetEntity(TransformUsageFlags.Dynamic);
+        Entity visualRuntimeDataEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                                false,
+                                                                "Player Visual Runtime Data");
+        AddComponent(visualRuntimeDataEntity, new PlayerVisualRuntimeDataOwner
+        {
+            PlayerEntity = entity
+        });
 #if UNITY_EDITOR
         TryAddScalingDebugBuffers(entity,
                                   scaledPresetScope);
@@ -537,6 +544,14 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             GraceTimeSeconds = math.max(0f, controllerPreset.HealthStatistics.GraceTimeSeconds)
         });
         AddComponent(entity, new PlayerRuntimeScalingState());
+        AddComponent(entity, new PlayerRoomRewardGrantState
+        {
+            LastNodeIndex = -1
+        });
+        AddComponent(entity, new PlayerRoomRewardTemporaryState());
+        AddBuffer<PlayerRoomRewardTemporaryModifierElement>(entity);
+        AddBuffer<PlayerRoomRewardTemporaryResourceElement>(entity);
+        AddBuffer<PlayerRoomRewardPresentationEvent>(entity);
         DynamicBuffer<PlayerRuntimeControllerScalingElement> controllerScalingBuffer = AddBuffer<PlayerRuntimeControllerScalingElement>(entity);
 #if UNITY_EDITOR
         PlayerRuntimeScalingControllerBakeUtility.PopulateControllerScalingMetadata(sourceControllerPreset, controllerScalingBuffer);
@@ -552,10 +567,12 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 
         if (animationBindingsPreset != null)
         {
-            AddComponent(entity, PlayerControllerConfigBakeUtility.BuildAnimatorParameterConfig(animationBindingsPreset));
-            AddComponent(entity, PlayerControllerConfigBakeUtility.BuildUpperBodyAnimationClipConfig(animationBindingsPreset,
-                                                                                                       visualPreset));
-            AddComponent(entity, new PlayerAnimatorRuntimeState
+            AddComponent(visualRuntimeDataEntity,
+                         PlayerControllerConfigBakeUtility.BuildAnimatorParameterConfig(animationBindingsPreset));
+            AddComponent(visualRuntimeDataEntity,
+                         PlayerControllerConfigBakeUtility.BuildUpperBodyAnimationClipConfig(animationBindingsPreset,
+                                                                                             visualPreset));
+            AddComponent(visualRuntimeDataEntity, new PlayerAnimatorRuntimeState
             {
                 PreviousShooting = 0,
                 PreviousPrimaryCharging = 0,
@@ -573,7 +590,9 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                 LastMoveX = 0f,
                 LastMoveY = 1f
             });
-            TryAddAnimatorAssetFallbackComponents(entity, resolvedAnimatorComponent, animationBindingsPreset);
+            TryAddAnimatorAssetFallbackComponents(visualRuntimeDataEntity,
+                                                  resolvedAnimatorComponent,
+                                                  animationBindingsPreset);
         }
 
         PlayerVisualRuntimeBridgeConfig visualRuntimeBridgeConfig = new PlayerVisualRuntimeBridgeConfig
@@ -586,38 +605,42 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             SpawnWhenAnimatorMissing = authoring.SpawnRuntimeVisualBridgeWhenAnimatorMissing ? (byte)1 : (byte)0
         };
         PlayerWeaponVisualBakeUtility.ApplyRuntimeConfig(visualPreset, ref visualRuntimeBridgeConfig);
-        AddComponent(entity, visualRuntimeBridgeConfig);
-        AddComponent(entity, PlayerWeaponVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
-        AddComponent(entity, new PlayerWeaponVisualScalingState());
+        AddComponent(visualRuntimeDataEntity, visualRuntimeBridgeConfig);
+        AddComponent(visualRuntimeDataEntity, PlayerWeaponVisualBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(visualRuntimeDataEntity, new PlayerWeaponVisualScalingState());
 
         // Runtime + baseline mountable-weapons buffers. Runtime entries are mutated by Add Scaling rebuilds when
         // the unified scalable-stat hash changes; the baseline is the cloned source-of-truth for that rebuild.
-        DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponsBuffer = AddBuffer<PlayerAdditionalWeaponVisualElement>(entity);
+        DynamicBuffer<PlayerAdditionalWeaponVisualElement> additionalWeaponsBuffer =
+            AddBuffer<PlayerAdditionalWeaponVisualElement>(visualRuntimeDataEntity);
         PlayerWeaponVisualBakeUtility.PopulateAdditionalWeaponsBuffer(visualPreset, additionalWeaponsBuffer);
-        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseAdditionalWeaponsBuffer = AddBuffer<PlayerBaseAdditionalWeaponVisualElement>(entity);
+        DynamicBuffer<PlayerBaseAdditionalWeaponVisualElement> baseAdditionalWeaponsBuffer =
+            AddBuffer<PlayerBaseAdditionalWeaponVisualElement>(visualRuntimeDataEntity);
         PlayerWeaponVisualBakeUtility.PopulateBaseAdditionalWeaponsBuffer(sourceVisualPreset, baseAdditionalWeaponsBuffer);
 
-        DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> weaponVisualScalingBuffer = AddBuffer<PlayerRuntimeWeaponVisualScalingElement>(entity);
+        DynamicBuffer<PlayerRuntimeWeaponVisualScalingElement> weaponVisualScalingBuffer =
+            AddBuffer<PlayerRuntimeWeaponVisualScalingElement>(visualRuntimeDataEntity);
 #if UNITY_EDITOR
         PlayerWeaponVisualBakeUtility.PopulateScalingMetadata(sourceVisualPreset, weaponVisualScalingBuffer);
 #endif
+
         if (visualPreset != null)
         {
-            AddComponent(entity, PlayerVisualVfxBakeUtility.BuildJetpackVfxConfig(visualPreset));
-            AddComponent(entity, PlayerVisualVfxBakeUtility.BuildBaseJetpackVfxConfig(sourceVisualPreset));
-            AddComponent(entity, new PlayerJetpackVfxScalingState());
-            AddComponent(entity, new PlayerJetpackVfxRuntimeState());
-            DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> jetpackVfxScalingBuffer = AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(entity);
+            AddComponent(visualRuntimeDataEntity, PlayerVisualVfxBakeUtility.BuildJetpackVfxConfig(visualPreset));
+            AddComponent(visualRuntimeDataEntity, PlayerVisualVfxBakeUtility.BuildBaseJetpackVfxConfig(sourceVisualPreset));
+            AddComponent(visualRuntimeDataEntity, new PlayerJetpackVfxScalingState());
+            AddComponent(visualRuntimeDataEntity, new PlayerJetpackVfxRuntimeState());
+            DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> jetpackVfxScalingBuffer = AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(visualRuntimeDataEntity);
 #if UNITY_EDITOR
             PlayerRuntimeScalingVisualBakeUtility.PopulateJetpackVfxScalingMetadata(sourceVisualPreset,
                                                                                     jetpackVfxScalingBuffer);
 #endif
         }
 
-        AddComponent(entity, PlayerGroundShadowBakeUtility.BuildConfig(visualPreset));
-        AddComponent(entity, PlayerGroundShadowBakeUtility.BuildBaseConfig(sourceVisualPreset));
-        AddComponent(entity, new PlayerGroundShadowScalingState());
-        DynamicBuffer<PlayerRuntimeGroundShadowScalingElement> groundShadowScalingBuffer = AddBuffer<PlayerRuntimeGroundShadowScalingElement>(entity);
+        AddComponent(visualRuntimeDataEntity, PlayerGroundShadowBakeUtility.BuildConfig(visualPreset));
+        AddComponent(visualRuntimeDataEntity, PlayerGroundShadowBakeUtility.BuildBaseConfig(sourceVisualPreset));
+        AddComponent(visualRuntimeDataEntity, new PlayerGroundShadowScalingState());
+        DynamicBuffer<PlayerRuntimeGroundShadowScalingElement> groundShadowScalingBuffer = AddBuffer<PlayerRuntimeGroundShadowScalingElement>(visualRuntimeDataEntity);
 #if UNITY_EDITOR
         PlayerRuntimeScalingVisualBakeUtility.PopulateGroundShadowScalingMetadata(sourceVisualPreset,
                                                                                   groundShadowScalingBuffer);
@@ -628,10 +651,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         Entity healthBarVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
                                                               false,
                                                               "Player Health Bar Visual Configuration");
-        AddComponent(entity, new PlayerHealthBarVisualReference
-        {
-            ConfigEntity = healthBarVisualEntity
-        });
         AddComponent(healthBarVisualEntity, new PlayerHealthBarVisualOwner
         {
             PlayerEntity = entity
@@ -648,10 +667,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         Entity activePowerUpHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
                                                                      false,
                                                                      "Player Active Power-Up HUD Visual Configuration");
-        AddComponent(entity, new PlayerActivePowerUpHudVisualReference
-        {
-            ConfigEntity = activePowerUpHudVisualEntity
-        });
         AddComponent(activePowerUpHudVisualEntity, new PlayerActivePowerUpHudVisualOwner
         {
             PlayerEntity = entity
@@ -668,10 +683,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         Entity portraitHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
                                                                 false,
                                                                 "Player Portrait HUD Visual Configuration");
-        AddComponent(entity, new PlayerPortraitHudVisualReference
-        {
-            ConfigEntity = portraitHudVisualEntity
-        });
         AddComponent(portraitHudVisualEntity, new PlayerPortraitHudVisualOwner
         {
             PlayerEntity = entity
@@ -696,10 +707,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         Entity growthSequenceHudVisualEntity = CreateAdditionalEntity(TransformUsageFlags.None,
                                                                       false,
                                                                       "Player Growth Sequence HUD Visual Configuration");
-        AddComponent(entity, new PlayerGrowthSequenceHudVisualReference
-        {
-            ConfigEntity = growthSequenceHudVisualEntity
-        });
         AddComponent(growthSequenceHudVisualEntity, new PlayerGrowthSequenceHudVisualOwner
         {
             PlayerEntity = entity
@@ -720,6 +727,14 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
         PlayerRuntimeScalingVisualBakeUtility.PopulateGrowthSequenceHudVisualScalingMetadata(sourceUiVisualPresetData,
                                                                                             growthSequenceHudScalingBuffer);
 #endif
+        AddComponent(entity, new PlayerPresentationRuntimeReferences
+        {
+            VisualRuntimeEntity = visualRuntimeDataEntity,
+            HealthBarVisualEntity = healthBarVisualEntity,
+            ActivePowerUpHudVisualEntity = activePowerUpHudVisualEntity,
+            PortraitHudVisualEntity = portraitHudVisualEntity,
+            GrowthSequenceHudVisualEntity = growthSequenceHudVisualEntity
+        });
 
         // Conditional weapon switches authored in the controller preset are baked into a dedicated ECS table.
         // The dedicated system evaluates the table against the player's scalable stats and writes the winning
@@ -749,7 +764,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
 #if UNITY_EDITOR
         PlayerConditionalWeaponSwitchBakeUtility.PopulateScalingMetadata(sourceControllerPreset, conditionalScalingBuffer);
 #endif
-        AddComponent(entity, new OutlineVisualConfig
+        AddComponent(visualRuntimeDataEntity, new OutlineVisualConfig
         {
             Enabled = authoring.EnableOutline ? (byte)1 : (byte)0,
             Thickness = math.max(0f, authoring.OutlineThickness),

@@ -262,7 +262,7 @@ public static class PlayerVisualVfxBakeUtility
     }
 
     /// <summary>
-    /// Builds runtime visibility and movement-speed scale settings for the designer-authored Jetpack VFX inside the Visual Player.
+    /// Builds runtime visibility and movement-speed scale settings for the -authored Jetpack VFX inside the Visual Player.
     /// </summary>
     /// <param name="visualPreset">Resolved visual preset, already scaled when Add Scaling is enabled.</param>
     /// <returns>Runtime config containing a safe prefab-relative visual reference, activity thresholds, and scale controls.</returns>
@@ -404,7 +404,7 @@ public static class PlayerVisualVfxBakeUtility
     }
 
     /// <summary>
-    /// Builds a safe fixed-string selector for the designer-authored Jetpack VFX object.
+    /// Builds a safe fixed-string selector for the -authored Jetpack VFX object.
     /// </summary>
     /// <param name="runtimeReference">Authored prefab-relative path or unique object name.</param>
     /// <returns>Trimmed selector, or an empty value when the authored reference exceeds runtime capacity.</returns>

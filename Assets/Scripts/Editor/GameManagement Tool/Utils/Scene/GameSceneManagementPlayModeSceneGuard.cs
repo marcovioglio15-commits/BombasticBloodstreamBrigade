@@ -117,7 +117,7 @@ public static class GameSceneManagementPlayModeSceneGuard
         SceneSetup[] currentSetup = EditorSceneManager.GetSceneManagerSetup();
         StoreSceneSetup(currentSetup);
 
-        if (!OpenBootstrapScene())
+        if (!OpenBootstrapScene() || !ValidateBootstrapRuntimeConfiguration())
         {
             RestorePreviousSceneSetup();
             EditorApplication.isPlaying = false;
@@ -167,6 +167,62 @@ public static class GameSceneManagementPlayModeSceneGuard
 
         EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Single);
         return true;
+    }
+
+    /// <summary>
+    /// Blocks Play Mode when the bootstrap's procedural graph or room reward configuration cannot bake safely.
+    /// </summary>
+    /// <returns>True when the active bootstrap authoring configuration passes bake-equivalent validation.</returns>
+    private static bool ValidateBootstrapRuntimeConfiguration()
+    {
+        GameSceneManagerAuthoring[] authorings =
+            UnityEngine.Object.FindObjectsByType<GameSceneManagerAuthoring>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+
+        if (authorings.Length != 1)
+        {
+            Debug.LogError(
+                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because the bootstrap scene must contain exactly one GameSceneManagerAuthoring component.");
+            return false;
+        }
+
+        GameSceneManagerAuthoring authoring = authorings[0];
+        GameProceduralLevelPreset proceduralPreset = authoring.ResolveProceduralLevelPreset();
+
+        if (proceduralPreset == null)
+            return true;
+
+        GameSceneManagerPreset scenePreset = authoring.ResolveSceneManagerPreset();
+
+        if (!GameProceduralLevelBakeUtility.TryValidateRuntimeConfiguration(
+                proceduralPreset,
+                scenePreset,
+                out string proceduralFailure))
+        {
+            Debug.LogError(
+                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural generation is invalid. " +
+                proceduralFailure,
+                authoring);
+            return false;
+        }
+
+        GameRoomClearRewardsPreset rewardPreset = authoring.ResolveRoomClearRewardsPreset();
+
+        if (rewardPreset == null)
+            return true;
+
+        if (GameRoomRewardBakeUtility.TryValidateRuntimeConfiguration(
+                rewardPreset,
+                proceduralPreset,
+                out string rewardFailure))
+            return true;
+
+        Debug.LogError(
+            "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because Room Clear Rewards are invalid. " +
+            rewardFailure,
+            authoring);
+        return false;
     }
     #endregion
 
@@ -253,7 +309,7 @@ public static class GameSceneManagementPlayModeSceneGuard
     }
 
     /// <summary>
-    /// Consumes the one-shot bypass requested by automated Play Mode tests without disabling future designer sessions.
+    /// Consumes the one-shot bypass requested by automated Play Mode tests without disabling future  sessions.
     /// </summary>
     /// <returns>True when the current Play Mode entry alone should keep its existing scene setup.</returns>
     private static bool ConsumeBypassRequest()

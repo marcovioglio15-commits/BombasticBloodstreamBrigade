@@ -77,9 +77,13 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     {
         SerializedProperty tileProperty = tilesProperty.GetArrayElementAtIndex(tileIndex);
         SerializedProperty tileIdProperty = tileProperty.FindPropertyRelative("tileId");
+        SerializedProperty technicalIdProperty = tileProperty.FindPropertyRelative("technicalId");
         string tileLabel = tileIdProperty != null && !string.IsNullOrWhiteSpace(tileIdProperty.stringValue)
             ? tileIdProperty.stringValue
             : "Room Tile " + (tileIndex + 1);
+        string tileIdentity = technicalIdProperty != null && !string.IsNullOrWhiteSpace(technicalIdProperty.stringValue)
+            ? technicalIdProperty.stringValue
+            : tileProperty.propertyPath;
 
         VisualElement card = new VisualElement();
         card.style.marginBottom = 8f;
@@ -96,33 +100,36 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
         card.style.borderTopColor = new Color(0.35f, 0.35f, 0.35f);
         card.style.borderBottomColor = new Color(0.35f, 0.35f, 0.35f);
 
-        Label heading = new Label((tileIndex + 1) + ". " + tileLabel);
-        heading.tooltip = "Room tile card ordered within the selected level's candidate set.";
-        heading.style.unityFontStyleAndWeight = FontStyle.Bold;
-        card.Add(heading);
-        card.Add(BuildTileActionRow(panel, levelProperty, tileIndex, tilesProperty.arraySize));
+        Foldout tileFoldout = GameRoomRewardEditorElementUtility.CreateFoldout(
+            "ProceduralRoomTile",
+            tileIdentity,
+            (tileIndex + 1) + ". " + tileLabel,
+            "Collapsible room tile settings ordered within the selected level's candidate set.");
+        card.Add(tileFoldout);
+        tileFoldout.Add(BuildTileActionRow(panel, levelProperty, tileIndex, tilesProperty.arraySize));
 
-        GameProceduralLevelPresetsPanelFieldUtility.AddDelayedText(card,
+        GameProceduralLevelPresetsPanelFieldUtility.AddDelayedText(tileFoldout,
                                                                   tileIdProperty,
                                                                   "Tile ID",
-                                                                  "Designer-facing identifier shown in validation diagnostics and graph preview nodes.",
+                                                                  "-facing identifier shown in validation diagnostics and graph preview nodes.",
                                                                   false,
                                                                   panel.BuildActiveSection);
-        AddSceneSelector(panel, card, tileProperty);
-        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(card,
+        AddSceneSelector(panel, tileFoldout, tileProperty);
+        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(tileFoldout,
                                                                     tileProperty.FindPropertyRelative("role"),
                                                                     "Room Role",
                                                                     "Structural role used to enforce one Start room and one terminal Boss room per generated level.");
-        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(card,
+        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(tileFoldout,
                                                                     tileProperty.FindPropertyRelative("maximumCopies"),
                                                                     "Maximum Copies",
                                                                     "Maximum logical graph nodes that may reference this room scene in the current level.");
-        GameProceduralLevelPresetsPanelTileDepthUtility.AddDepthFields(card, tileProperty);
-        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(card,
+        GameProceduralLevelPresetsPanelTileDepthUtility.AddDepthFields(tileFoldout, tileProperty);
+        GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(tileFoldout,
                                                                     tileProperty.FindPropertyRelative("baseSelectionWeight"),
                                                                     "Base Selection Weight",
                                                                     "Base candidate weight applied before enabled level rule scores are evaluated.");
-        AddMetadataRecap(panel, card, tileProperty.FindPropertyRelative("sceneId"), levelProperty.FindPropertyRelative("useCenterArrival"));
+        AddMetadataRecap(panel, tileFoldout, tileProperty.FindPropertyRelative("sceneId"), levelProperty.FindPropertyRelative("useCenterArrival"));
+        GameProceduralLevelRoomRewardAssignmentEditorUtility.Build(panel, tileFoldout, tileProperty);
         return card;
     }
 
@@ -164,7 +171,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     /// Creates one compact tile action button.
     /// </summary>
     /// <param name="text">Visible button text.</param>
-    /// <param name="tooltip">Designer-facing action explanation.</param>
+    /// <param name="tooltip">-facing action explanation.</param>
     /// <param name="action">Action invoked when clicked.</param>
     /// <returns>Configured action button.</returns>
     private static Button CreateActionButton(string text, string tooltip, Action action)
@@ -395,7 +402,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     }
 
     /// <summary>
-    /// Duplicates one room tile and regenerates its immutable technical and designer-facing IDs.
+    /// Duplicates one room tile and regenerates its immutable technical and -facing IDs.
     /// </summary>
     /// <param name="panel">Panel whose preset receives the duplicate.</param>
     /// <param name="levelProperty">Serialized selected level.</param>
@@ -427,7 +434,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     }
 
     /// <summary>
-    /// Removes one room tile after designer confirmation.
+    /// Removes one room tile after  confirmation.
     /// </summary>
     /// <param name="panel">Panel whose preset loses the tile.</param>
     /// <param name="levelProperty">Serialized selected level.</param>
@@ -500,7 +507,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     }
 
     /// <summary>
-    /// Produces a unique designer-facing tile ID within the selected level.
+    /// Produces a unique -facing tile ID within the selected level.
     /// </summary>
     /// <param name="level">Level whose tile IDs must remain unique.</param>
     /// <param name="requestedId">Preferred base tile ID.</param>
@@ -547,7 +554,7 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
     /// </summary>
     /// <param name="tileProperty">Serialized new tile element.</param>
     /// <param name="technicalId">Fresh immutable tile technical identity.</param>
-    /// <param name="tileId">Unique designer-facing tile ID.</param>
+    /// <param name="tileId">Unique -facing tile ID.</param>
     private static void ResetTile(SerializedProperty tileProperty, string technicalId, string tileId)
     {
         SetString(tileProperty, "technicalId", technicalId);
@@ -560,6 +567,10 @@ internal static class GameProceduralLevelPresetsPanelTileUtility
         SetInteger(tileProperty, "exactDepth", 1);
         SetVector2Int(tileProperty, "preferredDepthRange", new Vector2Int(1, 8));
         SetFloat(tileProperty, "baseSelectionWeight", 1f);
+        SerializedProperty roomRewards = tileProperty.FindPropertyRelative("roomRewards");
+
+        if (roomRewards != null && roomRewards.isArray)
+            roomRewards.arraySize = 0;
     }
 
     /// <summary>

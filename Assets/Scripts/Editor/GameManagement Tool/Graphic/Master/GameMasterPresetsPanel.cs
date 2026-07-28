@@ -465,6 +465,14 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new Room Clear Rewards preset and assigns it to the selected Game Master preset.
+    /// </summary>
+    internal void CreateRoomClearRewardsPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateRoomClearRewardsPreset(this);
+    }
+
+    /// <summary>
     /// Opens or activates one side panel.
     /// </summary>
     /// <param name="panelType">Target panel type.</param>
@@ -571,6 +579,7 @@ public sealed class GameMasterPresetsPanel
         public GameSettingsManagerPresetsPanel SettingsPanel;
         public GameHudManagerPresetsPanel HudPanel;
         public GameProceduralLevelPresetsPanel ProceduralLevelPanel;
+        public GameRoomClearRewardsPresetsPanel RoomClearRewardsPanel;
     }
     #endregion
 }

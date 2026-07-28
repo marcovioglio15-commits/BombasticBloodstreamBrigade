@@ -415,10 +415,12 @@ public sealed class PlayerHealthBarsHudView : MonoBehaviour
     {
         configEntity = Entity.Null;
 
-        if (!entityManager.HasComponent<PlayerHealthBarVisualReference>(playerEntity))
+        if (!entityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity))
             return false;
 
-        configEntity = entityManager.GetComponentData<PlayerHealthBarVisualReference>(playerEntity).ConfigEntity;
+        configEntity = entityManager
+            .GetComponentData<PlayerPresentationRuntimeReferences>(playerEntity)
+            .HealthBarVisualEntity;
         return configEntity != Entity.Null &&
                entityManager.Exists(configEntity) &&
                entityManager.HasComponent<PlayerHealthBarVisualConfig>(configEntity);

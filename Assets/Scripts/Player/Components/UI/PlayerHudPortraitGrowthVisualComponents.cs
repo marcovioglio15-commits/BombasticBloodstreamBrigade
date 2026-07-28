@@ -5,14 +5,6 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Points from the player entity to its dedicated HUD portrait configuration entity.
-/// </summary>
-public struct PlayerPortraitHudVisualReference : IComponentData
-{
-    public Entity ConfigEntity;
-}
-
-/// <summary>
 /// Points from the HUD portrait configuration entity back to the authoritative player entity.
 /// </summary>
 public struct PlayerPortraitHudVisualOwner : IComponentData
@@ -110,14 +102,6 @@ public struct PlayerRuntimePortraitHudVisualScalingElement : IBufferElementData
     public byte IsInteger;
     public FixedString64Bytes BaseTokenValue;
     public FixedString512Bytes Formula;
-}
-
-/// <summary>
-/// Points from the player entity to its dedicated HUD growth-sequence configuration entity.
-/// </summary>
-public struct PlayerGrowthSequenceHudVisualReference : IComponentData
-{
-    public Entity ConfigEntity;
 }
 
 /// <summary>

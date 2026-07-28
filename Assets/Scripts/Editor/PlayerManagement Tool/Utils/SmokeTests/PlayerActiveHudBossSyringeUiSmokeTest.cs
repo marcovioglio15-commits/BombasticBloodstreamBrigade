@@ -301,7 +301,7 @@ public static class PlayerActiveHudBossSyringeUiSmokeTest
 
     #region Scene Slot References
     /// <summary>
-    /// Validates that scene active slots keep self-contained references without enforcing designer-authored placement.
+    /// Validates that scene active slots keep self-contained references without enforcing -authored placement.
     /// </summary>
     /// <param name="overlayObject">Serialized active power-up overlay section containing slot view references.</param>
     private static void ValidateSceneSlotReferences(SerializedObject overlayObject)

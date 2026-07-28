@@ -350,7 +350,8 @@ public sealed class GameManagementWindow : EditorWindow
         SceneManager = 2,
         SettingsManager = 3,
         HudManager = 4,
-        ProceduralLevel = 5
+        ProceduralLevel = 5,
+        RoomClearRewards = 6
     }
     #endregion
 }

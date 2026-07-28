@@ -11,7 +11,7 @@ public static class GameRoomMetadataCacheValidationUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds designer-facing warnings without initializing, sanitizing or rewriting any preset value.
+    /// Builds -facing warnings without initializing, sanitizing or rewriting any preset value.
     /// </summary>
     /// <param name="preset">Procedural preset to validate.</param>
     /// <returns>Ordered warning list suitable for a tool HelpBox or build validation output.</returns>

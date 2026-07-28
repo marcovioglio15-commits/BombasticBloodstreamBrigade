@@ -17,7 +17,7 @@ internal static class GameProceduralLevelPresetsPanelFieldUtility
     /// <param name="parent">Visual container receiving the field.</param>
     /// <param name="property">Serialized property edited by the field.</param>
     /// <param name="label">Readable field label.</param>
-    /// <param name="tooltip">Designer-facing explanation of the setting.</param>
+    /// <param name="tooltip">-facing explanation of the setting.</param>
     /// <param name="onChanged">Optional callback used to rebuild conditional UI.</param>
     /// <returns>Created property field, or null when arguments are invalid.</returns>
     public static PropertyField AddBoundProperty(VisualElement parent,
@@ -40,7 +40,7 @@ internal static class GameProceduralLevelPresetsPanelFieldUtility
         });
         field.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
-            // Binding can emit a synthetic change while the field is attaching; it is not a designer edit.
+            // Binding can emit a synthetic change while the field is attaching; it is not a  edit.
             if (!acceptsCommittedChanges)
             {
                 evt.StopPropagation();
@@ -67,7 +67,7 @@ internal static class GameProceduralLevelPresetsPanelFieldUtility
     /// <param name="parent">Visual container receiving the text field.</param>
     /// <param name="property">Serialized string property edited by the field.</param>
     /// <param name="label">Readable field label.</param>
-    /// <param name="tooltip">Designer-facing explanation of the text.</param>
+    /// <param name="tooltip">-facing explanation of the text.</param>
     /// <param name="multiline">True when the field should accept multiple lines.</param>
     /// <param name="onChanged">Optional callback invoked after the serialized change.</param>
     /// <returns>Created delayed text field, or null when arguments are invalid.</returns>

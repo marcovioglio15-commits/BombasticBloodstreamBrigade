@@ -78,6 +78,15 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     {
         return masterPreset != null ? masterPreset.ProceduralLevelPreset : null;
     }
+
+    /// <summary>
+    /// Resolves the Room Clear Rewards preset associated with the selected Game Master preset.
+    /// </summary>
+    /// <returns>Assigned Room Clear Rewards preset, or null when room rewards are disabled.</returns>
+    public GameRoomClearRewardsPreset ResolveRoomClearRewardsPreset()
+    {
+        return masterPreset != null ? masterPreset.RoomClearRewardsPreset : null;
+    }
     #endregion
 
     #region Unity Methods
@@ -155,6 +164,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         AddProceduralRuntimeData(entityManager,
                                  entity,
                                  ResolveProceduralLevelPreset(),
+                                 ResolveRoomClearRewardsPreset(),
                                  resolvedPreset);
         entityManager.SetComponentData(entity, new GameSceneTransitionState());
         entityManager.SetComponentData(entity, new GameSceneFadePresentationState
@@ -173,10 +183,12 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     /// <param name="entityManager">Entity manager owning the fallback singleton.</param>
     /// <param name="entity">Scene manager singleton entity receiving procedural data.</param>
     /// <param name="preset">Resolved Procedural Level preset, or null when the module is disabled.</param>
+    /// <param name="rewardPreset">Resolved Room Clear Rewards preset, or null when room rewards are disabled.</param>
     /// <param name="runtimeSceneCatalog">Effective Scene Manager preset used by runtime scene loading.</param>
     private static void AddProceduralRuntimeData(EntityManager entityManager,
                                                  Entity entity,
                                                  GameProceduralLevelPreset preset,
+                                                 GameRoomClearRewardsPreset rewardPreset,
                                                  GameSceneManagerPreset runtimeSceneCatalog)
     {
         if (preset == null)
@@ -215,6 +227,27 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         entityManager.AddBuffer<GameProceduralRoomEdgeElement>(entity);
         entityManager.AddBuffer<GameProceduralRoomTraversalRequest>(entity);
         entityManager.AddBuffer<GameProceduralLevelRunRequest>(entity);
+        entityManager.AddBuffer<GameProceduralRoomClearedEvent>(entity);
+        entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(entity);
+        string rewardFailureMessage = string.Empty;
+
+        if (rewardPreset != null &&
+            GameRoomRewardBakeUtility.TryValidateRuntimeConfiguration(rewardPreset,
+                                                                      preset,
+                                                                      out rewardFailureMessage))
+        {
+            entityManager.AddComponentData(entity, GameRoomRewardBakeUtility.BuildConfig(rewardPreset));
+            entityManager.AddBuffer<GameRoomRewardModuleElement>(entity);
+            entityManager.AddBuffer<GameRoomRewardDefinitionElement>(entity);
+            entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(entity);
+            entityManager.AddBuffer<GameRoomRewardTileBindingElement>(entity);
+            entityManager.AddBuffer<GameRoomRewardPresentationElement>(entity);
+        }
+        else if (rewardPreset != null)
+        {
+            Debug.LogError("[GameSceneManagerAuthoring] Room reward runtime bootstrap was disabled. " +
+                           rewardFailureMessage);
+        }
 
         DynamicBuffer<GameProceduralLevelDefinitionElement> levelBuffer = entityManager.GetBuffer<GameProceduralLevelDefinitionElement>(entity);
         DynamicBuffer<GameProceduralRoomTileElement> tileBuffer = entityManager.GetBuffer<GameProceduralRoomTileElement>(entity);
@@ -222,6 +255,18 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         DynamicBuffer<GameProceduralRoomPortalDefinitionElement> portalBuffer = entityManager.GetBuffer<GameProceduralRoomPortalDefinitionElement>(entity);
         GameProceduralLevelBakeUtility.PopulateLevelBuffers(preset, levelBuffer, tileBuffer);
         GameProceduralLevelBakeUtility.PopulateMetadataBuffers(preset, metadataBuffer, portalBuffer);
+
+        if (rewardPreset != null && entityManager.HasComponent<GameRoomRewardConfig>(entity))
+        {
+            GameRoomRewardBakeUtility.PopulateBuffers(
+                rewardPreset,
+                preset,
+                entityManager.GetBuffer<GameRoomRewardModuleElement>(entity),
+                entityManager.GetBuffer<GameRoomRewardDefinitionElement>(entity),
+                entityManager.GetBuffer<GameRoomRewardModuleBindingElement>(entity),
+                entityManager.GetBuffer<GameRoomRewardTileBindingElement>(entity),
+                entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity));
+        }
     }
     #endregion
 
@@ -299,6 +344,35 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
                     DependsOn(authoring.MasterPreset.ProceduralLevelPreset.TransitionSettings.PlayerTransitionAnimation);
                 }
             }
+
+            if (authoring.MasterPreset.RoomClearRewardsPreset != null)
+            {
+                GameRoomClearRewardsPreset rewardPreset = authoring.MasterPreset.RoomClearRewardsPreset;
+                DependsOn(rewardPreset);
+
+                if (rewardPreset.PlayerContextPreset != null)
+                    DependsOn(rewardPreset.PlayerContextPreset);
+
+                if (rewardPreset.PlayerContextPreset != null &&
+                    rewardPreset.PlayerContextPreset.ProgressionPreset != null)
+                {
+                    DependsOn(rewardPreset.PlayerContextPreset.ProgressionPreset);
+                }
+
+                if (rewardPreset.PlayerLogSettings != null && rewardPreset.PlayerLogSettings.Font != null)
+                    DependsOn(rewardPreset.PlayerLogSettings.Font);
+
+                if (rewardPreset.PortalLogSettings != null && rewardPreset.PortalLogSettings.Font != null)
+                    DependsOn(rewardPreset.PortalLogSettings.Font);
+
+                for (int mappingIndex = 0; mappingIndex < rewardPreset.PresentationMappings.Count; mappingIndex++)
+                {
+                    GameRoomRewardPresentationDefinition mapping = rewardPreset.PresentationMappings[mappingIndex];
+
+                    if (mapping != null && mapping.Sprite != null)
+                        DependsOn(mapping.Sprite);
+                }
+            }
         }
 
         if (authoring.SceneManagerPreset != null)
@@ -351,8 +425,51 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         AddBuffer<GameProceduralRoomEdgeElement>(entity);
         AddBuffer<GameProceduralRoomTraversalRequest>(entity);
         AddBuffer<GameProceduralLevelRunRequest>(entity);
+        AddBuffer<GameProceduralRoomClearedEvent>(entity);
+        AddBuffer<GameProceduralRoomEnteredEvent>(entity);
         GameProceduralLevelBakeUtility.PopulateLevelBuffers(preset, levelBuffer, tileBuffer);
         GameProceduralLevelBakeUtility.PopulateMetadataBuffers(preset, metadataBuffer, portalBuffer);
+        BakeRoomRewardData(authoring, entity, preset);
+    }
+
+    /// <summary>
+    /// Bakes optional room reward definitions and tile bindings onto the procedural manager singleton.
+    /// </summary>
+    /// <param name="authoring">Scene manager authoring component used to resolve the reward preset.</param>
+    /// <param name="entity">Procedural manager entity receiving flattened reward configuration.</param>
+    /// <param name="proceduralPreset">Procedural preset containing tile assignments.</param>
+    private void BakeRoomRewardData(GameSceneManagerAuthoring authoring,
+                                    Entity entity,
+                                    GameProceduralLevelPreset proceduralPreset)
+    {
+        GameRoomClearRewardsPreset rewardPreset = authoring.ResolveRoomClearRewardsPreset();
+
+        if (rewardPreset == null)
+            return;
+
+        if (!GameRoomRewardBakeUtility.TryValidateRuntimeConfiguration(rewardPreset,
+                                                                       proceduralPreset,
+                                                                       out string failureMessage))
+        {
+            Debug.LogError("[GameSceneManagerAuthoringBaker] Room reward configuration was not baked. " +
+                           failureMessage,
+                           authoring);
+            return;
+        }
+
+        AddComponent(entity, GameRoomRewardBakeUtility.BuildConfig(rewardPreset));
+        DynamicBuffer<GameRoomRewardModuleElement> moduleBuffer = AddBuffer<GameRoomRewardModuleElement>(entity);
+        DynamicBuffer<GameRoomRewardDefinitionElement> rewardBuffer = AddBuffer<GameRoomRewardDefinitionElement>(entity);
+        DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindingBuffer = AddBuffer<GameRoomRewardModuleBindingElement>(entity);
+        DynamicBuffer<GameRoomRewardTileBindingElement> tileBindingBuffer = AddBuffer<GameRoomRewardTileBindingElement>(entity);
+        DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer = AddBuffer<GameRoomRewardPresentationElement>(entity);
+        GameRoomRewardBakeUtility.PopulateBuffers(rewardPreset,
+                                                  proceduralPreset,
+                                                  moduleBuffer,
+                                                  rewardBuffer,
+                                                  moduleBindingBuffer,
+                                                  tileBindingBuffer,
+                                                  presentationBuffer);
     }
     #endregion
 

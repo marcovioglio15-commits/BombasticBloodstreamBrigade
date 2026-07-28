@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 
 /// <summary>
 /// Builds enum-like editor selectors for defined Weapon Id string fields. The serialized value remains
-/// a scalable token, while designers select authored options without typing IDs manually.
+/// a scalable token, while s select authored options without typing IDs manually.
 /// </summary>
 internal static class PlayerWeaponIdSelectorUtility
 {
@@ -25,7 +25,7 @@ internal static class PlayerWeaponIdSelectorUtility
     /// </summary>
     /// <param name="weaponIdProperty">Serialized Weapon Id token property.</param>
     /// <param name="scalingRulesProperty">Serialized Add Scaling rules array.</param>
-    /// <param name="label">Popup label shown to designers.</param>
+    /// <param name="label">Popup label shown to s.</param>
     /// <param name="tooltip">Explanatory popup and scalable-field tooltip.</param>
     /// <param name="emptyLabel">Display label mapped to an empty serialized Weapon Id.</param>
     /// <param name="optionsProvider">Callback rebuilding the currently available defined IDs.</param>
@@ -185,7 +185,7 @@ internal static class PlayerWeaponIdSelectorUtility
     /// </summary>
     /// <param name="popupContainer">Container rebuilt in place.</param>
     /// <param name="weaponIdProperty">Serialized Weapon Id token property.</param>
-    /// <param name="label">Popup label shown to designers.</param>
+    /// <param name="label">Popup label shown to s.</param>
     /// <param name="tooltip">Explanatory popup tooltip.</param>
     /// <param name="emptyLabel">Display label mapped to an empty serialized ID.</param>
     /// <param name="optionsProvider">Callback rebuilding available IDs.</param>

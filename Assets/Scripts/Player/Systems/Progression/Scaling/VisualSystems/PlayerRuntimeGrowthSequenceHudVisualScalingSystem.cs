@@ -40,6 +40,8 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeGrowthSequenceHudVisualScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeGrowthSequenceHudVisualScalingElement>(true);
         BufferLookup<PlayerBaseGrowthSequenceHudStepVisualElement> baseStepLookup = SystemAPI.GetBufferLookup<PlayerBaseGrowthSequenceHudStepVisualElement>(true);
         BufferLookup<PlayerGrowthSequenceHudStepVisualElement> stepLookup = SystemAPI.GetBufferLookup<PlayerGrowthSequenceHudStepVisualElement>(false);
@@ -80,8 +82,10 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
             CopyBaseSteps(baseStepLookup[configEntity], stepLookup[configEntity]);
             PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,

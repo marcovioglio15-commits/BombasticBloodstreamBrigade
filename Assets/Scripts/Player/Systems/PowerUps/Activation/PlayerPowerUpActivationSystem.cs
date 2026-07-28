@@ -124,6 +124,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup =
+            SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup =
+            SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProgressionScalingElement>(true);
         BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeDeathAnimationScalingElement>(true);
         BufferLookup<PlayerBaseGamePhaseElement> baseGamePhasesLookup = SystemAPI.GetBufferLookup<PlayerBaseGamePhaseElement>(true);
@@ -309,6 +313,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             {
                 RefreshRuntimeScaledState(entity,
                                           scalableStatsLookup,
+                                          temporaryModifiersLookup,
+                                          temporaryStateLookup,
                                           controllerScalingLookup,
                                           baseMovementLookup,
                                           runtimeMovementLookup,
@@ -438,6 +444,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             {
                 RefreshRuntimeScaledState(entity,
                                           scalableStatsLookup,
+                                          temporaryModifiersLookup,
+                                          temporaryStateLookup,
                                           controllerScalingLookup,
                                           baseMovementLookup,
                                           runtimeMovementLookup,
@@ -565,6 +573,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             {
                 RefreshRuntimeScaledState(entity,
                                           scalableStatsLookup,
+                                          temporaryModifiersLookup,
+                                          temporaryStateLookup,
                                           controllerScalingLookup,
                                           baseMovementLookup,
                                           runtimeMovementLookup,
@@ -711,6 +721,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     /// </summary>
     /// <param name="entity">Player entity being refreshed.</param>
     /// <param name="scalableStatsLookup">Runtime scalable-stat buffer lookup.</param>
+    /// <param name="temporaryModifiersLookup">Room-scoped scalable-stat modifier lookup.</param>
+    /// <param name="temporaryStateLookup">Versioned room-visit state lookup.</param>
     /// <param name="controllerScalingLookup">Controller scaling metadata lookup.</param>
     /// <param name="baseMovementLookup">Immutable movement baseline lookup.</param>
     /// <param name="runtimeMovementLookup">Mutable runtime movement config lookup.</param>
@@ -751,6 +763,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     /// <param name="playerExperienceCollection">Cached experience-collection component refreshed from runtime state.</param>
     private static void RefreshRuntimeScaledState(Entity entity,
                                                   BufferLookup<PlayerScalableStatElement> scalableStatsLookup,
+                                                  BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup,
+                                                  ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup,
                                                   BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup,
                                                   ComponentLookup<PlayerBaseMovementConfig> baseMovementLookup,
                                                   ComponentLookup<PlayerRuntimeMovementConfig> runtimeMovementLookup,
@@ -803,6 +817,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     {
         PlayerRuntimeScalingRefreshUtility.TryApplyForEntity(entity,
                                                              scalableStatsLookup,
+                                                             temporaryModifiersLookup,
+                                                             temporaryStateLookup,
                                                              controllerScalingLookup,
                                                              baseMovementLookup,
                                                              runtimeMovementLookup,

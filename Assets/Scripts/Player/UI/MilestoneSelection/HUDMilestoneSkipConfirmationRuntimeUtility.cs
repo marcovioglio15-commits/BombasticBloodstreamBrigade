@@ -150,6 +150,17 @@ internal static class HUDMilestoneSkipConfirmationRuntimeUtility
         DynamicBuffer<PlayerScalableStatElement> scalableStats = entityManager.GetBuffer<PlayerScalableStatElement>(playerEntity);
         PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats, EffectiveScalableStats);
 
+        if (entityManager.HasBuffer<PlayerRoomRewardTemporaryModifierElement>(playerEntity) &&
+            entityManager.HasComponent<PlayerRoomRewardTemporaryState>(playerEntity))
+        {
+            PlayerRoomRewardTemporaryState temporaryState =
+                entityManager.GetComponentData<PlayerRoomRewardTemporaryState>(playerEntity);
+            PlayerRoomRewardTemporaryModifierUtility.ApplyActiveModifiers(
+                entityManager.GetBuffer<PlayerRoomRewardTemporaryModifierElement>(playerEntity),
+                temporaryState.LastVisitOrdinal,
+                EffectiveScalableStats);
+        }
+
         if (entityManager.HasComponent<PlayerRuntimeComboCounterConfig>(playerEntity) &&
             entityManager.HasComponent<PlayerComboCounterState>(playerEntity) &&
             entityManager.HasBuffer<PlayerRuntimeComboRankElement>(playerEntity) &&

@@ -154,7 +154,9 @@ public partial struct GameProceduralRoomPortalDetectionSystem : ISystem
     }
 
     /// <summary>
-    /// Tests one world-space point against a baked oriented portal box without using trigger callbacks.
+    /// Tests one player-root position against a portal's oriented floor footprint without using trigger callbacks.
+    /// Vertical overlap is owned by the physical player blocker because player roots remain at floor height while
+    /// authored door volumes are centered around the character body.
     /// </summary>
     /// <param name="portal">Rotation-aware portal volume.</param>
     /// <param name="point">World-space player position.</param>
@@ -163,7 +165,8 @@ public partial struct GameProceduralRoomPortalDetectionSystem : ISystem
     {
         float3 localPoint = math.mul(math.inverse(portal.Rotation), point - portal.Center);
         float3 absolutePoint = math.abs(localPoint);
-        return math.all(absolutePoint <= portal.HalfExtents);
+        return absolutePoint.x <= portal.HalfExtents.x &&
+               absolutePoint.z <= portal.HalfExtents.z;
     }
     #endregion
 

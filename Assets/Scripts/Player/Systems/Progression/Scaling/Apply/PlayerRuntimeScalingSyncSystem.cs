@@ -36,6 +36,8 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
         runtimeScalingQuery = new EntityQueryBuilder(Allocator.Temp)
                                  .WithAll<PlayerRuntimeScalingState>()
                                  .WithAll<PlayerScalableStatElement>()
+                                 .WithAll<PlayerRoomRewardTemporaryModifierElement>()
+                                 .WithAll<PlayerRoomRewardTemporaryState>()
                                  .WithAll<PlayerRuntimeControllerScalingElement>()
                                  .WithAll<PlayerBaseMovementConfig>()
                                  .WithAll<PlayerRuntimeMovementConfig>()
@@ -87,6 +89,10 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup =
+            SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup =
+            SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeControllerScalingElement>(true);
         ComponentLookup<PlayerBaseMovementConfig> baseMovementLookup = SystemAPI.GetComponentLookup<PlayerBaseMovementConfig>(true);
         ComponentLookup<PlayerRuntimeMovementConfig> runtimeMovementLookup = SystemAPI.GetComponentLookup<PlayerRuntimeMovementConfig>(false);
@@ -134,6 +140,8 @@ public partial struct PlayerRuntimeScalingSyncSystem : ISystem
         {
             PlayerRuntimeScalingRefreshUtility.TryApplyForEntity(entities[entityIndex],
                                                                  scalableStatsLookup,
+                                                                 temporaryModifiersLookup,
+                                                                 temporaryStateLookup,
                                                                  controllerScalingLookup,
                                                                  baseMovementLookup,
                                                                  runtimeMovementLookup,

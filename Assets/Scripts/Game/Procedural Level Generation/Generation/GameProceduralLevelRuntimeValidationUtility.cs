@@ -39,6 +39,9 @@ public static class GameProceduralLevelRuntimeValidationUtility
                        "The Procedural Level catalog must reference the exact Scene Manager preset resolved by the active Game Master.");
         }
 
+        if (report.IsValid)
+            GameProceduralLevelSolvabilityUtility.AppendDiagnostics(preset, report);
+
         return report;
     }
     #endregion

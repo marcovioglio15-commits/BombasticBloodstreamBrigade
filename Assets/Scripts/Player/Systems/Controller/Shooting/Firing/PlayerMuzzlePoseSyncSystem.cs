@@ -22,6 +22,7 @@ public partial struct PlayerMuzzlePoseSyncSystem : ISystem
     {
         state.RequireForUpdate<PlayerControllerConfig>();
         state.RequireForUpdate<PlayerAnimatedMuzzleWorldPose>();
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
     }
 
     /// <summary>
@@ -31,28 +32,44 @@ public partial struct PlayerMuzzlePoseSyncSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         state.CompleteDependency();
-
         EntityManager entityManager = state.EntityManager;
+        ComponentLookup<PlayerAnimatedMuzzleWorldPose> muzzleWorldPoseLookup =
+            SystemAPI.GetComponentLookup<PlayerAnimatedMuzzleWorldPose>(false);
+        ComponentLookup<LocalTransform> localTransformLookup =
+            SystemAPI.GetComponentLookup<LocalTransform>(true);
 
-        foreach ((RefRW<PlayerAnimatedMuzzleWorldPose> muzzleWorldPose,
-                  RefRO<LocalTransform> localTransform,
-                  Entity entity)
-                 in SystemAPI.Query<RefRW<PlayerAnimatedMuzzleWorldPose>,
-                                    RefRO<LocalTransform>>()
-                             .WithAll<PlayerControllerConfig>()
+        // Synchronize the presentation companion back to the authoritative shooting pose.
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>>()
                              .WithEntityAccess())
         {
-            if (!entityManager.HasComponent<PlayerVisualMuzzleAnchor>(entity))
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!entityManager.Exists(playerEntity) ||
+                !entityManager.HasComponent<PlayerControllerConfig>(playerEntity) ||
+                !muzzleWorldPoseLookup.HasComponent(playerEntity) ||
+                !localTransformLookup.HasComponent(playerEntity))
             {
-                ClearPose(ref muzzleWorldPose.ValueRW, in localTransform.ValueRO);
                 continue;
             }
 
-            PlayerVisualMuzzleAnchor muzzleAnchor = entityManager.GetComponentObject<PlayerVisualMuzzleAnchor>(entity);
+            PlayerAnimatedMuzzleWorldPose muzzleWorldPose = muzzleWorldPoseLookup[playerEntity];
+            LocalTransform localTransform = localTransformLookup[playerEntity];
+
+            if (!entityManager.HasComponent<PlayerVisualMuzzleAnchor>(visualRuntimeEntity))
+            {
+                ClearPose(ref muzzleWorldPose, in localTransform);
+                muzzleWorldPoseLookup[playerEntity] = muzzleWorldPose;
+                continue;
+            }
+
+            PlayerVisualMuzzleAnchor muzzleAnchor = entityManager.GetComponentObject<PlayerVisualMuzzleAnchor>(visualRuntimeEntity);
 
             if (muzzleAnchor == null)
             {
-                ClearPose(ref muzzleWorldPose.ValueRW, in localTransform.ValueRO);
+                ClearPose(ref muzzleWorldPose, in localTransform);
+                muzzleWorldPoseLookup[playerEntity] = muzzleWorldPose;
                 continue;
             }
 
@@ -60,23 +77,25 @@ public partial struct PlayerMuzzlePoseSyncSystem : ISystem
 
             if (muzzleTransform == null)
             {
-                ClearPose(ref muzzleWorldPose.ValueRW, in localTransform.ValueRO);
+                ClearPose(ref muzzleWorldPose, in localTransform);
+                muzzleWorldPoseLookup[playerEntity] = muzzleWorldPose;
                 continue;
             }
 
-            float3 playerPosition = localTransform.ValueRO.Position;
-            quaternion playerRotation = localTransform.ValueRO.Rotation;
+            float3 playerPosition = localTransform.Position;
+            quaternion playerRotation = localTransform.Rotation;
             quaternion inversePlayerRotation = math.inverse(playerRotation);
             float3 muzzlePosition = muzzleTransform.position;
             quaternion muzzleRotation = muzzleTransform.rotation;
             float3 muzzleRelativePosition = muzzlePosition - playerPosition;
 
-            muzzleWorldPose.ValueRW.Position = muzzlePosition;
-            muzzleWorldPose.ValueRW.Rotation = muzzleRotation;
-            muzzleWorldPose.ValueRW.LocalPosition = math.rotate(inversePlayerRotation, muzzleRelativePosition);
-            muzzleWorldPose.ValueRW.ForwardShotOffset = muzzleAnchor.ForwardShotOffset;
-            muzzleWorldPose.ValueRW.MinimumPlanarDistanceFromPlayer = muzzleAnchor.MinimumPlanarDistanceFromPlayer;
-            muzzleWorldPose.ValueRW.IsValid = 1;
+            muzzleWorldPose.Position = muzzlePosition;
+            muzzleWorldPose.Rotation = muzzleRotation;
+            muzzleWorldPose.LocalPosition = math.rotate(inversePlayerRotation, muzzleRelativePosition);
+            muzzleWorldPose.ForwardShotOffset = muzzleAnchor.ForwardShotOffset;
+            muzzleWorldPose.MinimumPlanarDistanceFromPlayer = muzzleAnchor.MinimumPlanarDistanceFromPlayer;
+            muzzleWorldPose.IsValid = 1;
+            muzzleWorldPoseLookup[playerEntity] = muzzleWorldPose;
         }
     }
     #endregion

@@ -108,7 +108,7 @@ public static class GameProceduralLevelBakeSmokeTest
     /// </summary>
     /// <param name="level">Serialized level definition.</param>
     /// <param name="technicalId">Stable level technical ID.</param>
-    /// <param name="levelId">Designer-facing level ID.</param>
+    /// <param name="levelId">-facing level ID.</param>
     /// <param name="levelIndex">Ordered fixture level index.</param>
     private static void ConfigureLevel(SerializedProperty level,
                                        string technicalId,
@@ -136,7 +136,7 @@ public static class GameProceduralLevelBakeSmokeTest
     /// </summary>
     /// <param name="tile">Serialized tile definition.</param>
     /// <param name="technicalId">Stable tile technical ID.</param>
-    /// <param name="tileId">Designer-facing tile ID.</param>
+    /// <param name="tileId">-facing tile ID.</param>
     /// <param name="sceneId">Canonical scene ID.</param>
     /// <param name="role">Structural tile role.</param>
     private static void ConfigureTile(SerializedProperty tile,

@@ -4,7 +4,7 @@ using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
-/// Resolves, toggles, and scales the designer-authored Jetpack VFX object inside the active Visual Player hierarchy.
+/// Resolves, toggles, and scales the -authored Jetpack VFX object inside the active Visual Player hierarchy.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(PlayerManagedVisualAnimatorBridgeSystem))]
@@ -28,6 +28,7 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
+        state.RequireForUpdate<PlayerVisualRuntimeDataOwner>();
         state.RequireForUpdate<PlayerJetpackVfxConfig>();
         state.RequireForUpdate<PlayerJetpackVfxRuntimeState>();
     }
@@ -61,13 +62,18 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         CleanupInvalidOwners(entityManager);
 
-        foreach ((RefRO<PlayerJetpackVfxConfig> config,
-                  RefRO<PlayerJetpackVfxRuntimeState> runtimeState,
-                  Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerJetpackVfxConfig>,
-                                    RefRO<PlayerJetpackVfxRuntimeState>>()
-                             .WithEntityAccess())
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  RefRO<PlayerJetpackVfxConfig> config,
+                  RefRO<PlayerJetpackVfxRuntimeState> runtimeState)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
+                                    RefRO<PlayerJetpackVfxConfig>,
+                                    RefRO<PlayerJetpackVfxRuntimeState>>())
         {
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!entityManager.Exists(playerEntity))
+                continue;
+
             if (config.ValueRO.RuntimeReference.Length <= 0)
             {
                 HideAndRemoveBinding(playerEntity);
@@ -110,13 +116,12 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
 
         visualRoot = null;
 
-        if (!entityManager.HasComponent<Animator>(playerEntity))
+        if (!PlayerPresentationRuntimeUtility.TryResolveAnimator(entityManager,
+                                                                 playerEntity,
+                                                                 out Animator animator))
+        {
             return false;
-
-        Animator animator = entityManager.GetComponentObject<Animator>(playerEntity);
-
-        if (animator == null)
-            return false;
+        }
 
         PlayerWeaponVisualSet weaponVisualSet = animator.GetComponentInParent<PlayerWeaponVisualSet>(true);
         visualRoot = weaponVisualSet != null ? weaponVisualSet.transform : animator.transform;
@@ -165,7 +170,7 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
     /// <summary>
     /// Applies one active state only when the resolved Jetpack VFX object requires a change.
     /// </summary>
-    /// <param name="targetObject">Optional designer-authored Jetpack VFX object.</param>
+    /// <param name="targetObject">Optional -authored Jetpack VFX object.</param>
     /// <param name="visible">Desired active state.</param>
     private static void SetVisible(GameObject targetObject, bool visible)
     {
@@ -174,7 +179,7 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
     }
 
     /// <summary>
-    /// Applies a bounded multiplier over the cached designer-authored local scale only when it changes.
+    /// Applies a bounded multiplier over the cached -authored local scale only when it changes.
     /// </summary>
     /// <param name="binding">Resolved Jetpack VFX binding.</param>
     /// <param name="desiredScaleMultiplier">Desired multiplier published by ECS gameplay state.</param>
@@ -197,7 +202,7 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
     }
 
     /// <summary>
-    /// Restores the designer-authored local scale before a cached binding is discarded.
+    /// Restores the -authored local scale before a cached binding is discarded.
     /// </summary>
     /// <param name="binding">Optional cached Jetpack VFX binding.</param>
     private static void RestoreAuthoredScale(PlayerJetpackVfxVisualBinding binding)
@@ -251,7 +256,7 @@ public partial struct PlayerJetpackVfxPresentationSystem : ISystem
 
     #region Nested Types
     /// <summary>
-    /// Caches one resolved designer-authored Jetpack VFX and its authored local scale while leaving position and rotation untouched.
+    /// Caches one resolved -authored Jetpack VFX and its authored local scale while leaving position and rotation untouched.
     /// </summary>
     private sealed class PlayerJetpackVfxVisualBinding
     {

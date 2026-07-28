@@ -80,15 +80,25 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         CleanupInvalidOwnerInstances(entityManager);
         pendingAnimatorAssignments.Clear();
         pendingRenderVisibilityAssignments.Clear();
+        ComponentLookup<LocalTransform> playerTransformLookup =
+            SystemAPI.GetComponentLookup<LocalTransform>(true);
 
-        foreach ((RefRO<PlayerVisualRuntimeBridgeConfig> visualBridgeConfig,
-                  RefRO<LocalTransform> playerTransform,
-                  Entity playerEntity)
-                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeBridgeConfig>,
-                                    RefRO<LocalTransform>>()
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  RefRO<PlayerVisualRuntimeBridgeConfig> visualBridgeConfig,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
+                                    RefRO<PlayerVisualRuntimeBridgeConfig>>()
                              .WithEntityAccess())
         {
-            Animator animatorComponent = ResolveAnimatorComponent(entityManager, playerEntity);
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
+
+            if (!playerTransformLookup.TryGetComponent(playerEntity,
+                                                       out LocalTransform playerTransform))
+            {
+                continue;
+            }
+
+            Animator animatorComponent = ResolveAnimatorComponent(entityManager, visualRuntimeEntity);
             bool runtimeBridgeEnabled = visualBridgeConfig.ValueRO.SpawnWhenAnimatorMissing != 0;
             ManagedPlayerVisualInstance runtimeInstance;
             bool hasRuntimeInstance = managedInstances.TryGetValue(playerEntity, out runtimeInstance);
@@ -112,7 +122,9 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
 
                 if (managedInstance != null && managedInstance.AnimatorComponent != null)
                 {
-                    QueueAnimatorAssignment(entityManager, playerEntity, managedInstance.AnimatorComponent);
+                    QueueAnimatorAssignment(entityManager,
+                                            visualRuntimeEntity,
+                                            managedInstance.AnimatorComponent);
                 }
 
                 runtimeInstance = managedInstance;
@@ -138,7 +150,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
             if (hasRuntimeInstance)
             {
                 SyncManagedInstanceTransform(runtimeInstance,
-                                             playerTransform.ValueRO,
+                                             playerTransform,
                                              visualBridgeConfig.ValueRO);
             }
 
@@ -213,16 +225,25 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         return true;
     }
 
-    private static void QueueAnimatorAssignment(EntityManager entityManager, Entity playerEntity, Animator targetAnimatorComponent)
+    /// <summary>
+    /// Queues one managed Animator replacement so structural changes occur after the presentation query completes.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect the current managed component.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion that receives the Animator.</param>
+    /// <param name="targetAnimatorComponent">Managed Animator resolved from the active visual hierarchy.</param>
+    private static void QueueAnimatorAssignment(EntityManager entityManager,
+                                                Entity visualRuntimeEntity,
+                                                Animator targetAnimatorComponent)
     {
         if (targetAnimatorComponent == null)
         {
             return;
         }
 
-        if (entityManager.HasComponent<Animator>(playerEntity))
+        if (entityManager.HasComponent<Animator>(visualRuntimeEntity))
         {
-            Animator currentAnimatorComponent = entityManager.GetComponentObject<Animator>(playerEntity);
+            Animator currentAnimatorComponent =
+                entityManager.GetComponentObject<Animator>(visualRuntimeEntity);
 
             if (currentAnimatorComponent == targetAnimatorComponent)
             {
@@ -234,7 +255,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         {
             PendingAnimatorAssignment existingAssignment = pendingAnimatorAssignments[assignmentIndex];
 
-            if (existingAssignment.PlayerEntity != playerEntity)
+            if (existingAssignment.VisualRuntimeEntity != visualRuntimeEntity)
             {
                 continue;
             }
@@ -246,11 +267,15 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
 
         pendingAnimatorAssignments.Add(new PendingAnimatorAssignment
         {
-            PlayerEntity = playerEntity,
+            VisualRuntimeEntity = visualRuntimeEntity,
             AnimatorComponent = targetAnimatorComponent
         });
     }
 
+    /// <summary>
+    /// Applies queued managed Animator replacements to presentation companions after entity iteration.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used for the deferred structural changes.</param>
     private static void ApplyQueuedAnimatorAssignments(EntityManager entityManager)
     {
         if (pendingAnimatorAssignments.Count <= 0)
@@ -262,7 +287,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         {
             PendingAnimatorAssignment assignment = pendingAnimatorAssignments[assignmentIndex];
 
-            if (!entityManager.Exists(assignment.PlayerEntity))
+            if (!entityManager.Exists(assignment.VisualRuntimeEntity))
             {
                 continue;
             }
@@ -272,19 +297,21 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
                 continue;
             }
 
-            if (entityManager.HasComponent<Animator>(assignment.PlayerEntity))
+            if (entityManager.HasComponent<Animator>(assignment.VisualRuntimeEntity))
             {
-                Animator currentAnimatorComponent = entityManager.GetComponentObject<Animator>(assignment.PlayerEntity);
+                Animator currentAnimatorComponent =
+                    entityManager.GetComponentObject<Animator>(assignment.VisualRuntimeEntity);
 
                 if (currentAnimatorComponent == assignment.AnimatorComponent)
                 {
                     continue;
                 }
 
-                entityManager.RemoveComponent<Animator>(assignment.PlayerEntity);
+                entityManager.RemoveComponent<Animator>(assignment.VisualRuntimeEntity);
             }
 
-            entityManager.AddComponentObject(assignment.PlayerEntity, assignment.AnimatorComponent);
+            entityManager.AddComponentObject(assignment.VisualRuntimeEntity,
+                                             assignment.AnimatorComponent);
         }
 
         pendingAnimatorAssignments.Clear();
@@ -414,14 +441,21 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
         }
     }
 
-    private static Animator ResolveAnimatorComponent(EntityManager entityManager, Entity playerEntity)
+    /// <summary>
+    /// Resolves the managed Animator currently attached to one presentation companion.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used to inspect managed components.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion expected to own the Animator.</param>
+    /// <returns>Current managed Animator, or null when the bridge has not assigned one yet.</returns>
+    private static Animator ResolveAnimatorComponent(EntityManager entityManager,
+                                                     Entity visualRuntimeEntity)
     {
-        if (!entityManager.HasComponent<Animator>(playerEntity))
+        if (!entityManager.HasComponent<Animator>(visualRuntimeEntity))
         {
             return null;
         }
 
-        return entityManager.GetComponentObject<Animator>(playerEntity);
+        return entityManager.GetComponentObject<Animator>(visualRuntimeEntity);
     }
 
     /// <summary>
@@ -608,7 +642,7 @@ public partial struct PlayerManagedVisualAnimatorBridgeSystem : ISystem
 
     private struct PendingAnimatorAssignment
     {
-        public Entity PlayerEntity;
+        public Entity VisualRuntimeEntity;
         public Animator AnimatorComponent;
     }
 

@@ -408,7 +408,7 @@ public sealed class HUDMilestoneSelectionSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates the LevelUpTitle text with the current player level while preserving the cached designer template.
+    /// Updates the LevelUpTitle text with the current player level while preserving the cached  template.
     /// </summary>
     /// <param name="currentPlayerLevel">Current player level used to replace the supported token.</param>
     private void UpdateHeaderText(int currentPlayerLevel)

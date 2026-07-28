@@ -86,6 +86,8 @@ internal static class GameProceduralSceneTransitionPurposeSmokeFixtureUtility
         entityManager.AddBuffer<GameProceduralRoomMetadataElement>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomPortalDefinitionElement>(managerEntity);
         entityManager.AddBuffer<GameProceduralLevelRunRequest>(managerEntity);
+        entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
+        entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
     }
 
     /// <summary>
@@ -232,6 +234,8 @@ internal static class GameProceduralSceneTransitionPurposeSmokeFixtureUtility
         entityManager.AddBuffer<GameProceduralRoomEdgeElement>(managerEntity);
         entityManager.AddBuffer<GameProceduralLevelRunRequest>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomTraversalRequest>(managerEntity);
+        entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
+        entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
         return managerEntity;
     }
 

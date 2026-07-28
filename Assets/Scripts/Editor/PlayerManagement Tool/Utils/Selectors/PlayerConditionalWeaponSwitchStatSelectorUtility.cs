@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Builds the popup selector used by conditional weapon switch conditions to pick a scalable stat declared in
 /// the Level-Up & Progression preset. The serialized value is kept as a plain stat name string so the runtime
-/// evaluator can match it without reflection. Stat-type metadata is exposed in the popup label so designers can
+/// evaluator can match it without reflection. Stat-type metadata is exposed in the popup label so s can
 /// avoid wiring numeric ranges against Token-typed stats by mistake.
 /// </summary>
 internal static class PlayerConditionalWeaponSwitchStatSelectorUtility
@@ -238,7 +238,7 @@ internal static class PlayerConditionalWeaponSwitchStatSelectorUtility
     }
 
     /// <summary>
-    /// Formats one option label as &quot;statName (Type)&quot; so designers can immediately tell which authored
+    /// Formats one option label as &quot;statName (Type)&quot; so s can immediately tell which authored
     /// stats expose a numeric or boolean projection compatible with the inclusive range condition.
     /// </summary>
     /// <param name="option">Option being formatted.</param>

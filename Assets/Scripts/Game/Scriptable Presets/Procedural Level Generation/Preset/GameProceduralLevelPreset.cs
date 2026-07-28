@@ -176,7 +176,7 @@ public sealed class GameProceduralLevelPreset : ScriptableObject
         if (levels == null)
             return;
 
-        // Detach all duplicated editor identities while preserving designer-facing IDs and scene metadata.
+        // Detach all duplicated editor identities while preserving -facing IDs and scene metadata.
         for (int index = 0; index < levels.Count; index++)
         {
             GameProceduralLevelDefinition level = levels[index];
@@ -189,7 +189,7 @@ public sealed class GameProceduralLevelPreset : ScriptableObject
     }
 
     /// <summary>
-    /// Finds one level by its stable designer-authored level ID.
+    /// Finds one level by its stable -authored level ID.
     /// </summary>
     /// <param name="levelId">Level ID to find.</param>
     /// <param name="level">Matching level definition when available.</param>

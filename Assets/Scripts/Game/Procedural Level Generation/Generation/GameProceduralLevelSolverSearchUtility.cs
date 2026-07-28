@@ -86,6 +86,41 @@ internal static class GameProceduralLevelSolverSearchUtility
     }
 
     /// <summary>
+    /// Collects exit-capable portals while excluding already reserved incoming entrances and level exits.
+    /// </summary>
+    /// <param name="nodeState">Source node working state.</param>
+    /// <param name="required">Destination list receiving every available Required exit.</param>
+    /// <param name="optional">Destination list receiving every available Optional exit.</param>
+    public static void CollectAvailableExits(GameProceduralLevelSolverNodeState nodeState,
+                                             List<GameProceduralRoomPortalSolverInput> required,
+                                             List<GameProceduralRoomPortalSolverInput> optional)
+    {
+        for (int index = 0; index < nodeState.Tile.Portals.Count; index++)
+        {
+            GameProceduralRoomPortalSolverInput portal = nodeState.Tile.Portals[index];
+
+            // An incoming Both portal remains reserved and cannot become an outgoing edge on this node.
+            if (nodeState.UsedIncomingPortalIds.Contains(portal.PortalId))
+                continue;
+
+            if (portal.Capability == GameRoomPortalCapability.Entrance ||
+                portal.ConnectionPolicy == GameRoomPortalConnectionPolicy.LevelExit)
+                continue;
+
+            switch (portal.ConnectionPolicy)
+            {
+                case GameRoomPortalConnectionPolicy.Required:
+                    required.Add(portal);
+                    break;
+
+                case GameRoomPortalConnectionPolicy.Optional:
+                    optional.Add(portal);
+                    break;
+            }
+        }
+    }
+
+    /// <summary>
     /// Returns every compatible unused target entrance on an existing logical node.
     /// </summary>
     /// <param name="targetState">Target node working state.</param>

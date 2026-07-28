@@ -101,7 +101,7 @@ internal static class PowerUpModuleSwitchWeaponPayloadDrawerUtility
     /// Displays one warning message in the reusable payload HelpBox.
     /// </summary>
     /// <param name="warningBox">Warning box updated in place.</param>
-    /// <param name="message">Warning text shown to designers.</param>
+    /// <param name="message">Warning text shown to s.</param>
     private static void ShowWarning(HelpBox warningBox, string message)
     {
         warningBox.text = message;

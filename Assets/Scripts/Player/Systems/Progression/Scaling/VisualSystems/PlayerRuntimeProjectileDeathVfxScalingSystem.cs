@@ -42,6 +42,8 @@ public partial struct PlayerRuntimeProjectileDeathVfxScalingSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeProjectileDeathVfxScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProjectileDeathVfxScalingElement>(true);
         ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
         ComponentLookup<PlayerComboCounterState> comboStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(true);
@@ -69,8 +71,10 @@ public partial struct PlayerRuntimeProjectileDeathVfxScalingSystem : ISystem
 
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
             PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,

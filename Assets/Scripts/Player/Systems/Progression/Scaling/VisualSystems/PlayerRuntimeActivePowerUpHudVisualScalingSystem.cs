@@ -40,6 +40,8 @@ public partial struct PlayerRuntimeActivePowerUpHudVisualScalingSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeActivePowerUpHudVisualScalingElement> scalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeActivePowerUpHudVisualScalingElement>(true);
         ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup = SystemAPI.GetComponentLookup<PlayerRuntimeScalingState>(true);
         ComponentLookup<PlayerRuntimeComboCounterConfig> comboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
@@ -77,8 +79,10 @@ public partial struct PlayerRuntimeActivePowerUpHudVisualScalingSystem : ISystem
 
             runtimeConfig.ValueRW = baseConfig.ValueRO.Config;
             PlayerRuntimeScalingFormulaContextUtility.Fill(playerEntity,
-                                                           in scalableStatsLookup,
-                                                           in comboConfigLookup,
+                                                            in scalableStatsLookup,
+                                                            in temporaryModifiersLookup,
+                                                            in temporaryStateLookup,
+                                                            in comboConfigLookup,
                                                            in comboStateLookup,
                                                            in comboRanksLookup,
                                                            in characterTuningLookup,

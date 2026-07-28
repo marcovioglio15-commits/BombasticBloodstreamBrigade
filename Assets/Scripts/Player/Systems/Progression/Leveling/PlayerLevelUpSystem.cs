@@ -129,6 +129,10 @@ public partial struct PlayerLevelUpSystem : ISystem
         ComponentLookup<PlayerMilestonePowerUpSelectionState> milestoneSelectionStateLookup = SystemAPI.GetComponentLookup<PlayerMilestonePowerUpSelectionState>(false);
         BufferLookup<PlayerMilestonePowerUpSelectionOfferElement> milestoneSelectionOffersLookup = SystemAPI.GetBufferLookup<PlayerMilestonePowerUpSelectionOfferElement>(false);
         BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(false);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup =
+            SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup =
+            SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
         BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeControllerScalingElement>(true);
         BufferLookup<PlayerRuntimeDeathAnimationScalingElement> deathAnimationScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeDeathAnimationScalingElement>(true);
         BufferLookup<PlayerRuntimeProgressionScalingElement> progressionScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeProgressionScalingElement>(true);
@@ -176,6 +180,8 @@ public partial struct PlayerLevelUpSystem : ISystem
 
             bool runtimeScalingRefreshed = PlayerRuntimeScalingRefreshUtility.TryApplyForEntity(entity,
                                                                                                  scalableStatsLookup,
+                                                                                                 temporaryModifiersLookup,
+                                                                                                 temporaryStateLookup,
                                                                                                  controllerScalingLookup,
                                                                                                  baseMovementLookup,
                                                                                                  runtimeMovementLookup,
@@ -320,8 +326,10 @@ public partial struct PlayerLevelUpSystem : ISystem
                 }
 
                 runtimeScalingRefreshed = PlayerRuntimeScalingRefreshUtility.TryApplyForEntity(entity,
-                                                                                               scalableStatsLookup,
-                                                                                               controllerScalingLookup,
+                                                                                                 scalableStatsLookup,
+                                                                                                 temporaryModifiersLookup,
+                                                                                                 temporaryStateLookup,
+                                                                                                 controllerScalingLookup,
                                                                                                baseMovementLookup,
                                                                                                runtimeMovementLookup,
                                                                                                baseLookLookup,

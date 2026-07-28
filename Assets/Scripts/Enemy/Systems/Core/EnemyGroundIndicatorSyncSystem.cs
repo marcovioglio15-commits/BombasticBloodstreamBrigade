@@ -65,7 +65,10 @@ public partial struct EnemyGroundIndicatorSyncSystem : ISystem
         bool canProjectOntoGround = hasPhysicsWorld &&
                                     !GameSceneTransitionRuntimeGuardUtility.ShouldBlockDefaultWorldPhysicsQueries();
         // Exclude the Walls layer so indicators project onto the floor only, never onto adjacent wall colliders.
-        uint groundProbeMask = GroundShadowProjectionUtility.ResolveGroundProbeMask((uint)WorldWallCollisionUtility.ResolveWallsLayerMask());
+        int excludedGroundProbeLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask() |
+                                           WorldPortalBarrierCollisionUtility.ResolvePortalBarrierLayerMask();
+        uint groundProbeMask =
+            GroundShadowProjectionUtility.ResolveGroundProbeMask((uint)excludedGroundProbeLayerMask);
         ResolveMainCameraTransform(elapsedTime);
         Transform cameraTransform = cachedMainCameraTransform;
         SyncGroundIndicatorViews(ref state,

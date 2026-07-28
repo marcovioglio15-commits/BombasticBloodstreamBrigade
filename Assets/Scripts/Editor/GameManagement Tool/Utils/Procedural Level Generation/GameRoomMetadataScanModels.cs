@@ -112,6 +112,8 @@ internal sealed class GameRoomMetadataScanSnapshot
     internal string SceneGuid;
     internal string DependencyHash;
     internal int CenterAnchorCount;
+    internal int ActiveSpawnerCount;
+    internal int ActiveSpawnerWithWavesCount;
     internal bool CacheStale;
     #endregion
 }

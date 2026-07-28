@@ -65,13 +65,15 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
         int processedAnimatorEntities = 0;
 
-        foreach ((RefRW<PlayerAnimatorParameterConfig> parameterConfig,
+        foreach ((RefRO<PlayerVisualRuntimeDataOwner> visualRuntimeOwner,
+                  RefRW<PlayerAnimatorParameterConfig> parameterConfig,
                   RefRO<PlayerUpperBodyAnimationClipConfig> upperBodyAnimationClipConfig,
                   RefRO<PlayerVisualRuntimeBridgeConfig> visualBridgeConfig,
                   RefRO<OutlineVisualConfig> outlineConfig,
                   RefRW<PlayerAnimatorRuntimeState> animatorRuntimeState,
-                  Entity entity)
-                 in SystemAPI.Query<RefRW<PlayerAnimatorParameterConfig>,
+                  Entity visualRuntimeEntity)
+                 in SystemAPI.Query<RefRO<PlayerVisualRuntimeDataOwner>,
+                                    RefRW<PlayerAnimatorParameterConfig>,
                                     RefRO<PlayerUpperBodyAnimationClipConfig>,
                                     RefRO<PlayerVisualRuntimeBridgeConfig>,
                                     RefRO<OutlineVisualConfig>,
@@ -79,19 +81,20 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                              .WithEntityAccess())
         {
             processedAnimatorEntities++;
+            Entity playerEntity = visualRuntimeOwner.ValueRO.PlayerEntity;
 
-            if (!entityManager.HasComponent<Animator>(entity))
+            if (!entityManager.HasComponent<Animator>(visualRuntimeEntity))
             {
                 if (loggedMissingAnimatorComponentWarning == 0)
                 {
-                    Debug.LogWarning("[PlayerAnimatorSyncSystem] Animator component missing on player entity. Verify RuntimeVisualBridgePrefab configuration for runtime visual spawn.");
+                    Debug.LogWarning("[PlayerAnimatorSyncSystem] Animator component missing on the presentation companion. Verify RuntimeVisualBridgePrefab configuration for runtime visual spawn.");
                     loggedMissingAnimatorComponentWarning = 1;
                 }
 
                 continue;
             }
 
-            Animator animator = entityManager.GetComponentObject<Animator>(entity);
+            Animator animator = entityManager.GetComponentObject<Animator>(visualRuntimeEntity);
 
             if (animator == null)
             {
@@ -104,12 +107,12 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                 continue;
             }
 
-            bool hasMovementState = movementLookup.HasComponent(entity);
-            bool hasLookState = lookLookup.HasComponent(entity);
-            bool hasShootingState = shootingLookup.HasComponent(entity);
-            PlayerMovementState movementState = hasMovementState ? movementLookup[entity] : default;
-            PlayerLookState lookState = hasLookState ? lookLookup[entity] : default;
-            PlayerShootingState shootingState = hasShootingState ? shootingLookup[entity] : default;
+            bool hasMovementState = movementLookup.HasComponent(playerEntity);
+            bool hasLookState = lookLookup.HasComponent(playerEntity);
+            bool hasShootingState = shootingLookup.HasComponent(playerEntity);
+            PlayerMovementState movementState = hasMovementState ? movementLookup[playerEntity] : default;
+            PlayerLookState lookState = hasLookState ? lookLookup[playerEntity] : default;
+            PlayerShootingState shootingState = hasShootingState ? shootingLookup[playerEntity] : default;
 
             if (loggedMissingStateWarning == 0 && (!hasMovementState || !hasLookState || !hasShootingState))
             {
@@ -117,8 +120,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                 loggedMissingStateWarning = 1;
             }
 
-            PlayerPowerUpsState currentPowerUpsState = powerUpsStateLookup.HasComponent(entity)
-                ? powerUpsStateLookup[entity]
+            PlayerPowerUpsState currentPowerUpsState = powerUpsStateLookup.HasComponent(playerEntity)
+                ? powerUpsStateLookup[playerEntity]
                 : default;
 
             if (SuspendIfAnimatorHierarchyInactive(animator,
@@ -131,7 +134,7 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                 animator.enabled = true;
 
             EnsureAnimatorBindings(animator,
-                                   entity,
+                                   visualRuntimeEntity,
                                    in animatorControllerLookup,
                                    in animatorAvatarLookup);
 
@@ -147,7 +150,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             PlayerOutlineRuntimeMaterialSyncUtility.ApplyFromOutlineConfig(in outlineConfig.ValueRO);
             EnsureAnimatorOutline(animator, in outlineConfig.ValueRO);
             ApplyWeaponVisual(animator,
-                              entity,
+                              playerEntity,
+                              visualRuntimeEntity,
                               in visualBridgeConfig.ValueRO,
                               in powerUpsConfigLookup,
                               in powerUpsStateLookup,
@@ -173,8 +177,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
 
             float3 forward = DefaultForward;
 
-            if (localTransformLookup.HasComponent(entity))
-                forward = PlayerControllerMath.NormalizePlanar(math.forward(localTransformLookup[entity].Rotation), DefaultForward);
+            if (localTransformLookup.HasComponent(playerEntity))
+                forward = PlayerControllerMath.NormalizePlanar(math.forward(localTransformLookup[playerEntity].Rotation), DefaultForward);
 
             float3 right = math.normalize(math.cross(WorldUp, forward));
             float3 desiredLookDirection = ResolveLookDirection(lookState, forward);
@@ -187,9 +191,10 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                          isMoving);
             bool isShooting = shootingState.VisualShootingActive != 0;
             bool shootPulseThisFrame = shootingState.ShotPulseVersion != animatorRuntimeState.ValueRO.LastShotPulseVersion;
-            bool isDashing = dashLookup.HasComponent(entity) && dashLookup[entity].IsDashing != 0;
-            PlayerRuntimeShootingConfig runtimeShootingConfig = runtimeShootingLookup.HasComponent(entity)
-                ? runtimeShootingLookup[entity]
+            bool isDashing = dashLookup.HasComponent(playerEntity) &&
+                             dashLookup[playerEntity].IsDashing != 0;
+            PlayerRuntimeShootingConfig runtimeShootingConfig = runtimeShootingLookup.HasComponent(playerEntity)
+                ? runtimeShootingLookup[playerEntity]
                 : default;
             bool upperBodyActionActive = PlayerUpperBodyAnimationPresentationUtility.Update(animator,
                                                                                             in upperBodyAnimationClipConfig.ValueRO,
@@ -298,7 +303,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     /// Keeps Base Gun visible and resolves the equipped Switch Weapon attachment or scalable preset default attachment.
     /// </summary>
     /// <param name="animator">Animator used to resolve the owning visual hierarchy.</param>
-    /// <param name="entity">Player entity whose equipped active and passive power-ups drive the override.</param>
+    /// <param name="playerEntity">Player entity whose equipped active and passive power-ups drive the override.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion owning scalable weapon visual data.</param>
     /// <param name="visualBridgeConfig">Current scalable weapon visual references and default optional attachment.</param>
     /// <param name="powerUpsConfigLookup">Read-only lookup containing equipped active-slot configs.</param>
     /// <param name="powerUpsStateLookup">Read-only lookup containing active-slot equip-order metadata.</param>
@@ -311,7 +317,8 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
     /// <param name="passiveToolsState">Resolved aggregate containing the selected weapon visual and shooting animation.</param>
     /// <param name="additionalWeaponVisuals">Resolved runtime weapon visual table reused by upper-body presentation.</param>
     private static void ApplyWeaponVisual(Animator animator,
-                                          Entity entity,
+                                          Entity playerEntity,
+                                          Entity visualRuntimeEntity,
                                           in PlayerVisualRuntimeBridgeConfig visualBridgeConfig,
                                           in BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup,
                                           in ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
@@ -332,10 +339,14 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         if (animator == null)
             return;
 
-        PlayerPassiveToolsStateBufferUtility.Read(entity, in passiveToolsStateLookup, out passiveToolsState);
-        PlayerPowerUpsConfigBufferUtility.Read(entity, in powerUpsConfigLookup, out powerUpsConfig);
-        powerUpsState = powerUpsStateLookup.HasComponent(entity)
-            ? powerUpsStateLookup[entity]
+        PlayerPassiveToolsStateBufferUtility.Read(playerEntity,
+                                                  in passiveToolsStateLookup,
+                                                  out passiveToolsState);
+        PlayerPowerUpsConfigBufferUtility.Read(playerEntity,
+                                               in powerUpsConfigLookup,
+                                               out powerUpsConfig);
+        powerUpsState = powerUpsStateLookup.HasComponent(playerEntity)
+            ? powerUpsStateLookup[playerEntity]
             : default;
         PlayerPassiveToolsAggregationUtility.AccumulateEquippedActiveWeaponSwitch(in powerUpsConfig,
                                                                                    powerUpsState.PrimaryEquipOrder,
@@ -343,15 +354,16 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
                                                                                    ref passiveToolsState);
 
         // Conditional weapon switches honor power-up selections unless an entry opts to override.
-        if (conditionalWeaponSwitchStateLookup.HasComponent(entity))
+        if (conditionalWeaponSwitchStateLookup.HasComponent(playerEntity))
         {
-            PlayerConditionalWeaponSwitchState conditionalState = conditionalWeaponSwitchStateLookup[entity];
+            PlayerConditionalWeaponSwitchState conditionalState =
+                conditionalWeaponSwitchStateLookup[playerEntity];
             PlayerPassiveToolsAggregationUtility.AccumulateConditionalWeaponSwitch(in conditionalState,
                                                                                     ref passiveToolsState);
         }
 
-        if (additionalWeaponVisualLookup.HasBuffer(entity))
-            additionalWeaponVisuals = additionalWeaponVisualLookup[entity];
+        if (additionalWeaponVisualLookup.HasBuffer(visualRuntimeEntity))
+            additionalWeaponVisuals = additionalWeaponVisualLookup[visualRuntimeEntity];
 
         int animatorInstanceId = animator.GetInstanceID();
         PlayerWeaponVisualSet weaponVisualSet;
@@ -365,9 +377,9 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         if (weaponVisualSet == null || !additionalWeaponVisuals.IsCreated)
             return;
 
-        uint weaponVisualRevision = weaponVisualScalingStateLookup.HasComponent(entity) &&
-                                    weaponVisualScalingStateLookup[entity].Initialized != 0
-            ? weaponVisualScalingStateLookup[entity].LastScalableStatsHash
+        uint weaponVisualRevision = weaponVisualScalingStateLookup.HasComponent(visualRuntimeEntity) &&
+                                    weaponVisualScalingStateLookup[visualRuntimeEntity].Initialized != 0
+            ? weaponVisualScalingStateLookup[visualRuntimeEntity].LastScalableStatsHash
             : uint.MaxValue;
         weaponVisualSet.Apply(in visualBridgeConfig,
                               in additionalWeaponVisuals,
@@ -395,8 +407,15 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
         return new float2(math.dot(normalizedDirection, right), math.dot(normalizedDirection, forward));
     }
 
+    /// <summary>
+    /// Restores missing controller and avatar bindings from the baked presentation companion references.
+    /// </summary>
+    /// <param name="animator">Managed Animator receiving missing runtime bindings.</param>
+    /// <param name="visualRuntimeEntity">Presentation companion that owns the baked controller and avatar references.</param>
+    /// <param name="animatorControllerLookup">Read-only lookup for baked Animator controllers.</param>
+    /// <param name="animatorAvatarLookup">Read-only lookup for baked Animator avatars.</param>
     private static void EnsureAnimatorBindings(Animator animator,
-                                               Entity entity,
+                                               Entity visualRuntimeEntity,
                                                in ComponentLookup<PlayerAnimatorControllerReference> animatorControllerLookup,
                                                in ComponentLookup<PlayerAnimatorAvatarReference> animatorAvatarLookup)
     {
@@ -405,9 +424,11 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
 
         bool requiresRebind = false;
 
-        if (animator.runtimeAnimatorController == null && animatorControllerLookup.HasComponent(entity))
+        if (animator.runtimeAnimatorController == null &&
+            animatorControllerLookup.HasComponent(visualRuntimeEntity))
         {
-            RuntimeAnimatorController fallbackController = animatorControllerLookup[entity].Controller.Value;
+            RuntimeAnimatorController fallbackController =
+                animatorControllerLookup[visualRuntimeEntity].Controller.Value;
 
             if (fallbackController != null)
             {
@@ -416,9 +437,10 @@ public partial struct PlayerAnimatorSyncSystem : ISystem
             }
         }
 
-        if (animator.avatar == null && animatorAvatarLookup.HasComponent(entity))
+        if (animator.avatar == null &&
+            animatorAvatarLookup.HasComponent(visualRuntimeEntity))
         {
-            Avatar fallbackAvatar = animatorAvatarLookup[entity].Avatar.Value;
+            Avatar fallbackAvatar = animatorAvatarLookup[visualRuntimeEntity].Avatar.Value;
 
             if (fallbackAvatar != null)
             {

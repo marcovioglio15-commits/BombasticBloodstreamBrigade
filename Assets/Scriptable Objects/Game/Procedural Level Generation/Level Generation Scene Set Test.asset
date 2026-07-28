@@ -60,6 +60,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: db9b4142f3be40fe91087f876a939b12
+        quantity: 1
+        order: 0
     - technicalId: 0281afd42d8a97bd0d0d8469596bc90f
       tileId: TILE_LGTEST_METRO_NS
       sceneId: SCN_LGTEST_METRO_NS
@@ -70,6 +74,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 5d85aeeb5a2f474e9322c52685fc8842
+        quantity: 1
+        order: 0
     - technicalId: cf9139cd947bf7d5a54825a564482b6c
       tileId: TILE_LGTEST_METRO_EW
       sceneId: SCN_LGTEST_METRO_EW
@@ -80,6 +88,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 3a1f1bccc0184d25bb8b3e528eeb586e
+        quantity: 1
+        order: 0
     - technicalId: 39e6cbf0344823f58269bd8f17a7d599
       tileId: TILE_LGTEST_METRO_CROSS
       sceneId: SCN_LGTEST_METRO_CROSS
@@ -90,6 +102,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
     - technicalId: 7f96bcb0b6f283a2a36c74a78a13540f
       tileId: TILE_LGTEST_METRO_DOUBLE
       sceneId: SCN_LGTEST_METRO_DOUBLE
@@ -100,6 +116,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 460e522026994174b9e380dc280e7ab0
+        quantity: 1
+        order: 0
     - technicalId: cb7a6330474e7c26af57cea7e901ecdb
       tileId: TILE_LGTEST_METRO_BOSS
       sceneId: SCN_LGTEST_METRO_BOSS
@@ -107,9 +127,13 @@ MonoBehaviour:
       role: 2
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
-      useExactDepthConstraint: 0
-      exactDepth: 1
+      useExactDepthConstraint: 1
+      exactDepth: 4
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
+        quantity: 1
+        order: 0
   - technicalId: 31581e1d4c6aa6904ebf598d76dca6b0
     levelId: LEVEL_LGTEST_02
     displayName: Maintenance Tunnels
@@ -133,6 +157,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: db9b4142f3be40fe91087f876a939b12
+        quantity: 1
+        order: 0
     - technicalId: 88582e716d7493da0c46a8dcdd328340
       tileId: TILE_LGTEST_MAINT_CORNER_NE
       sceneId: SCN_LGTEST_MAINT_CORNER_NE
@@ -143,6 +171,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: c455a6c2921f4caeaeae608f257ecdb8
+        quantity: 1
+        order: 0
     - technicalId: 7269f7532f4510329d8616f570315bcf
       tileId: TILE_LGTEST_MAINT_CORNER_SW
       sceneId: SCN_LGTEST_MAINT_CORNER_SW
@@ -153,6 +185,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: e7f0e36054ed447fbcf710e9f1e02d6e
+        quantity: 1
+        order: 0
     - technicalId: 2ffb225a3f3d9ffa1d195cd3ba7d0c89
       tileId: TILE_LGTEST_MAINT_TRIAD
       sceneId: SCN_LGTEST_MAINT_TRIAD
@@ -163,6 +199,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: de9d51394cd144a9b5898e397b807340
+        quantity: 1
+        order: 0
     - technicalId: d2024b5e5eefea541eeb573023996934
       tileId: TILE_LGTEST_MAINT_HUB
       sceneId: SCN_LGTEST_MAINT_HUB
@@ -173,6 +213,10 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 9045a3e2240c4260aad200101aad1c26
+        quantity: 1
+        order: 0
     - technicalId: 6a71c3480f9a4ad3049cd7437c471a19
       tileId: TILE_LGTEST_MAINT_BOSS
       sceneId: SCN_LGTEST_MAINT_BOSS
@@ -183,15 +227,21 @@ MonoBehaviour:
       useExactDepthConstraint: 1
       exactDepth: 6
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
+        quantity: 1
+        order: 0
   roomMetadata:
   - sceneId: SCN_LGTEST_MAINT_BOSS
     sceneGuid: 82bb006d89574a24488682f06c9e1332
-    dependencyHash: cbadcffd63234de3d5806b3086c60d10
+    dependencyHash: e94951c7a39a28a50154ce5968fddcc4
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_BOSS.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_BOSS_NORTH_01
       side: 0
@@ -228,12 +278,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_MAINT_CORNER_NE
     sceneGuid: c56a428650e3345448e82cd5306813e9
-    dependencyHash: 260e85d4fc37979b03c6fdac59931b48
+    dependencyHash: 5ac7948a6e46086b522b01643cfc74bd
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_NE.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_NE.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_CORNER_NE_NORTH_01
       side: 0
@@ -246,12 +298,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_MAINT_CORNER_SW
     sceneGuid: f10e13dba6645024c946748fa4b1d1ac
-    dependencyHash: 9af10e6554ec71f2664e4ccc9e583746
+    dependencyHash: e533ccd4332f13f094a99eccefc7a2ad
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_SW.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_SW.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_CORNER_SW_SOUTH_01
       side: 1
@@ -264,12 +318,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_MAINT_HUB
     sceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
-    dependencyHash: 7f969e530004d55f8ca052a9527a377f
+    dependencyHash: d13756fa511e3b8319ce153fd588c598
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_HUB.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_HUB.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_HUB_NORTH_01
       side: 0
@@ -306,12 +362,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_MAINT_START
     sceneGuid: d0f579d17b03b154287cfa15e7887024
-    dependencyHash: 534679d382c2bb4a9bc6e3a0191c3751
+    dependencyHash: 0bfd6bfb083da6d5f6ee3781ac4dfdce
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_START.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_START.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_START_NORTH_01
       side: 0
@@ -332,12 +390,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_MAINT_TRIAD
     sceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
-    dependencyHash: 2cca5ac90cffab29f88a925f7e582cb0
+    dependencyHash: ed2d90d6bc3fd95cd4bc3a9c17ce4bab
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_TRIAD.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_TRIAD.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_MAINT_TRIAD_NORTH_01
       side: 0
@@ -354,12 +414,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_BOSS
     sceneGuid: 27d9e1327f828944794adba3410c0657
-    dependencyHash: c17eef4f471df189210a557fd19e543b
+    dependencyHash: 2baf1909ff528fda856a55d398b60dd8
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_BOSS.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_METRO_BOSS_NORTH_01
       side: 0
@@ -400,12 +462,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_CROSS
     sceneGuid: 86787f958b7747a44892e18620a2fe75
-    dependencyHash: 4ca51f411e54b93105cb5bdb6922f095
+    dependencyHash: f5c69117445138692a1f1082992c0a1f
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_CROSS.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: LGTEST_METRO_CROSS_NORTH_01
       side: 0
@@ -426,12 +490,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_DOUBLE
     sceneGuid: 433f03176860b0e409c1d762e15cd364
-    dependencyHash: 5fe84a0df458ac39ddd2c23c99460575
+    dependencyHash: 7c8ae332207fae440ef18e9d76359118
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_DOUBLE.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: LGTEST_METRO_DOUBLE_NORTH_01
       side: 0
@@ -460,12 +526,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_EW
     sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
-    dependencyHash: b0278e9b5823e86d636de5dad28ca2e1
+    dependencyHash: d2fb595c7b6fcb26dd657323d77e465e
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_EW.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: LGTEST_METRO_EW_EAST_01
       side: 2
@@ -478,12 +546,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_NS
     sceneGuid: 0b11934e90dbb314e87551aabe87ec57
-    dependencyHash: 9ef5b9ae6eda284b3a5dfe6cd231097f
+    dependencyHash: 30044f7c5519a6ac9e1b70d6cae77816
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_NS.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: LGTEST_METRO_NS_NORTH_01
       side: 0
@@ -496,12 +566,14 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_START
     sceneGuid: 54c97702b5bc17f439c3b98c04743afb
-    dependencyHash: 76593b29c49dfe9ecf62bc02f85f4221
+    dependencyHash: d9c96f626150a49d0ba512a698ed9341
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_START.unity
     centerAnchorCount: 1
+    activeSpawnerCount: 2
+    activeSpawnerWithWavesCount: 2
     portals:
     - portalId: LGTEST_METRO_START_NORTH_01
       side: 0

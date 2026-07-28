@@ -91,7 +91,8 @@ public enum GameProceduralLevelValidationCode : ushort
     NullRoomMetadata = 115,
     MissingRoomMetadataSceneId = 116,
     DuplicateRoomMetadataSceneId = 117,
-    BossMissingLevelExit = 118
+    BossMissingLevelExit = 118,
+    GenerationSeedUnsolvable = 119
 }
 
 /// <summary>
@@ -153,7 +154,7 @@ public readonly struct GameProceduralLevelValidationDiagnostic
     /// <param name="code">Stable validation category.</param>
     /// <param name="severity">Diagnostic severity.</param>
     /// <param name="context">Level, tile, scene or portal identifier associated with the finding.</param>
-    /// <param name="message">Actionable designer-facing explanation.</param>
+    /// <param name="message">Actionable -facing explanation.</param>
     public GameProceduralLevelValidationDiagnostic(GameProceduralLevelValidationCode code,
                                                    GameProceduralLevelValidationSeverity severity,
                                                    string context,

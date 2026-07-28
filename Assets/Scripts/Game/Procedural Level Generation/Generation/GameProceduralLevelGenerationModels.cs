@@ -107,7 +107,7 @@ public readonly struct GameProceduralLevelGraphNode
     /// </summary>
     /// <param name="nodeId">Zero-based node index stored by runtime graph buffers.</param>
     /// <param name="tileTechnicalId">Stable technical ID of the reusable source tile.</param>
-    /// <param name="tileId">Designer-facing tile label used by diagnostics and preview.</param>
+    /// <param name="tileId">-facing tile label used by diagnostics and preview.</param>
     /// <param name="sceneId">Canonical Scene Manager scene ID loaded for this node.</param>
     /// <param name="role">Structural Start, Regular or Boss role.</param>
     /// <param name="depth">Zero-based graph depth.</param>

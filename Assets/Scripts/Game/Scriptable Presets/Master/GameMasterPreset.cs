@@ -39,6 +39,10 @@ public sealed class GameMasterPreset : ScriptableObject
     [Tooltip("Procedural Level preset used to configure ordered levels, reusable room tiles and deterministic graph generation.")]
     [SerializeField]
     private GameProceduralLevelPreset proceduralLevelPreset;
+
+    [Tooltip("Room Clear Rewards preset used to configure room grants, temporary modifiers and shared reward presentation.")]
+    [SerializeField]
+    private GameRoomClearRewardsPreset roomClearRewardsPreset;
     #endregion
 
     #endregion
@@ -113,6 +117,14 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return proceduralLevelPreset;
+        }
+    }
+
+    public GameRoomClearRewardsPreset RoomClearRewardsPreset
+    {
+        get
+        {
+            return roomClearRewardsPreset;
         }
     }
     #endregion

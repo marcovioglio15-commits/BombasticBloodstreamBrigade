@@ -114,7 +114,7 @@ internal static class GameProceduralLevelPresetsPanelSectionsUtility
         GameProceduralLevelPresetsPanelFieldUtility.AddDelayedText(section,
                                                                   panel.PresetSerializedObject.FindProperty("description"),
                                                                   "Description",
-                                                                  "Short designer-facing summary of the ordered level configuration.",
+                                                                  "Short -facing summary of the ordered level configuration.",
                                                                   true);
         GameProceduralLevelPresetsPanelFieldUtility.AddBoundProperty(section,
                                                                     panel.PresetSerializedObject.FindProperty("sceneCatalogPreset"),
@@ -124,7 +124,7 @@ internal static class GameProceduralLevelPresetsPanelSectionsUtility
 
         Button refreshMetadataButton = new Button(() => GameProceduralLevelMetadataRefreshUiUtility.RefreshReferencedRooms(panel));
         refreshMetadataButton.text = "Refresh All Room Metadata";
-        refreshMetadataButton.tooltip = "Scan every unique room referenced by this preset without changing the designer's open-scene setup.";
+        refreshMetadataButton.tooltip = "Scan every unique room referenced by this preset without changing the 's open-scene setup.";
         refreshMetadataButton.style.width = 164f;
         refreshMetadataButton.style.marginTop = 4f;
         section.Add(refreshMetadataButton);
@@ -436,7 +436,7 @@ internal static class GameProceduralLevelPresetsPanelSectionsUtility
     /// <summary>
     /// Creates a compact explanatory or warning label for conditionally unavailable settings.
     /// </summary>
-    /// <param name="text">Message displayed to designers.</param>
+    /// <param name="text">Message displayed to s.</param>
     /// <param name="isWarning">True when the label should use the warning color.</param>
     /// <returns>Styled information label.</returns>
     private static Label CreateInfoLabel(string text, bool isWarning)

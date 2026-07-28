@@ -189,13 +189,12 @@ public partial class PlayerGhostTrailPresentationSystem : SystemBase
                                          List<Renderer> rendererScratch,
                                          List<GhostTrailRenderItem> items)
     {
-        if (!EntityManager.HasComponent<Animator>(playerEntity))
+        if (!PlayerPresentationRuntimeUtility.TryResolveAnimator(EntityManager,
+                                                                 playerEntity,
+                                                                 out Animator animator))
+        {
             return;
-
-        Animator animator = EntityManager.GetComponentObject<Animator>(playerEntity);
-
-        if (animator == null)
-            return;
+        }
 
         rendererScratch.Clear();
         animator.GetComponentsInChildren(true, rendererScratch);

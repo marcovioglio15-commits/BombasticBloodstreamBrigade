@@ -31,7 +31,7 @@ public sealed class ShootingSettings
     [SerializeField] private ShootingValues values = new ShootingValues();
 
     [Header("Conditional Weapon Switches")]
-    [Tooltip("Stat-driven weapon switch entries evaluated independently from the Switch Weapon power-up. Designers can opt one or more entries above the equipped power-up per-entry.")]
+    [Tooltip("Stat-driven weapon switch entries evaluated independently from the Switch Weapon power-up. s can opt one or more entries above the equipped power-up per-entry.")]
     [SerializeField] private PlayerConditionalWeaponSwitchSettings conditionalWeaponSwitches = new PlayerConditionalWeaponSwitchSettings();
 
     [Header("Object Pool")]

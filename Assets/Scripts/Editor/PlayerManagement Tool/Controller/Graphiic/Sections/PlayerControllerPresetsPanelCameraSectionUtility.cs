@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 /// and the two trauma-based shake dropdowns (Damage + Fire). Each shake exposes the master toggle, the envelope,
 /// per-axis enables (Right/Up/Forward), zoom FOV pulse, single-impulse motion mode and a Controller Rumble sub-foldout
 /// that can switch between Continuous (envelope-driven) and Single Impulse (clean fixed-duration burst) modes. Fields
-/// that depend on other settings are hidden until those settings make them relevant (rule 23) so designers only see the
+/// that depend on other settings are hidden until those settings make them relevant (rule 23) so s only see the
 /// knobs that actually affect the current configuration.
 /// </summary>
 internal static class PlayerControllerPresetsPanelCameraSectionUtility
@@ -106,7 +106,7 @@ internal static class PlayerControllerPresetsPanelCameraSectionUtility
     /// Builds the Damage Shake dropdown with scaling-aware fields and conditional visibility. The envelope detail block
     /// only shows while the shake is enabled. The damage-reference field only appears while Scale With Damage is on.
     /// Frequency only appears while Motion Mode is Continuous. Forward Amplitude follows the Axis Forward Enabled toggle
-    /// so designers can see the depth knob only when it can actually push the camera along its forward axis. Zoom FOV
+    /// so s can see the depth knob only when it can actually push the camera along its forward axis. Zoom FOV
     /// Delta only appears while Zoom is enabled. The Controller Rumble sub-foldout follows the same rule for its impulse
     /// duration: visible only while the rumble itself uses Single Impulse.
     /// </summary>

@@ -101,9 +101,9 @@ public static class HUDPlayerPortraitSectionUtility
         if (!runtimeEntityManager.Exists(playerEntity))
             return;
 
-        if (!runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
+        if (!runtimeEntityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity))
             LogDiagnosticOnce(ref loggedMissingPlayerReference,
-                              "[HUDPlayerPortraitSection] Player entity is missing PlayerPortraitHudVisualReference. The active player bake does not include the new Portrait HUD config yet; reimport/rebake the player prefab or owner scene.");
+                              "[HUDPlayerPortraitSection] Player entity is missing PlayerPresentationRuntimeReferences. The active player bake does not include the Portrait HUD companion yet; reimport/rebake the player prefab or owner scene.");
     }
 
     /// <summary>

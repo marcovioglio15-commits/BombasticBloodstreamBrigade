@@ -95,7 +95,7 @@ public static class PlayerJetpackVfxSmokeTest
                 !Mathf.Approximately(config.SpeedForMaximumScale, 8f) ||
                 !Mathf.Approximately(config.NormalScaleSpeedPercent, 40f) ||
                 !Mathf.Approximately(config.ScaleVariationPercent, 50f))
-                throw new Exception("Jetpack VFX bake did not preserve the designer-authored Visual Player reference.");
+                throw new Exception("Jetpack VFX bake did not preserve the -authored Visual Player reference.");
 
             Entity metadataEntity = metadataWorld.EntityManager.CreateEntity();
             DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> metadata =
@@ -175,26 +175,31 @@ public static class PlayerJetpackVfxSmokeTest
         World world = new World("PlayerJetpackVfxScalingSmokeTest");
         EntityManager entityManager = world.EntityManager;
         Entity playerEntity = entityManager.CreateEntity();
+        Entity visualRuntimeEntity = entityManager.CreateEntity();
 
         try
         {
             PlayerJetpackVfxConfig baseConfig = BuildRuntimeConfig();
-            entityManager.AddComponentData(playerEntity, new PlayerBaseJetpackVfxConfig
+            entityManager.AddComponentData(visualRuntimeEntity, new PlayerVisualRuntimeDataOwner
+            {
+                PlayerEntity = playerEntity
+            });
+            entityManager.AddComponentData(visualRuntimeEntity, new PlayerBaseJetpackVfxConfig
             {
                 Config = baseConfig
             });
-            entityManager.AddComponentData(playerEntity, baseConfig);
-            entityManager.AddComponentData(playerEntity, new PlayerJetpackVfxScalingState());
+            entityManager.AddComponentData(visualRuntimeEntity, baseConfig);
+            entityManager.AddComponentData(visualRuntimeEntity, new PlayerJetpackVfxScalingState());
             entityManager.AddComponentData(playerEntity, new PlayerRuntimeScalingState
             {
                 Initialized = 1,
                 LastScalableStatsHash = 1u
             });
-            entityManager.AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(playerEntity);
+            entityManager.AddBuffer<PlayerRuntimeJetpackVfxScalingElement>(visualRuntimeEntity);
             entityManager.AddBuffer<PlayerScalableStatElement>(playerEntity);
 
             DynamicBuffer<PlayerRuntimeJetpackVfxScalingElement> scaling =
-                entityManager.GetBuffer<PlayerRuntimeJetpackVfxScalingElement>(playerEntity);
+                entityManager.GetBuffer<PlayerRuntimeJetpackVfxScalingElement>(visualRuntimeEntity);
             DynamicBuffer<PlayerScalableStatElement> scalableStats =
                 entityManager.GetBuffer<PlayerScalableStatElement>(playerEntity);
             scaling.Add(BuildTokenScalingElement("runtimeReference",
@@ -217,7 +222,7 @@ public static class PlayerJetpackVfxSmokeTest
 
             SystemHandle scalingSystem = world.GetOrCreateSystem<PlayerRuntimeJetpackVfxScalingSystem>();
             scalingSystem.Update(world.Unmanaged);
-            AssertRuntimeScaling(entityManager.GetComponentData<PlayerJetpackVfxConfig>(playerEntity),
+            AssertRuntimeScaling(entityManager.GetComponentData<PlayerJetpackVfxConfig>(visualRuntimeEntity),
                                  JetpackReferenceB,
                                  PlayerJetpackVfxActivationMode.WhileRotating,
                                  3f,
@@ -235,7 +240,7 @@ public static class PlayerJetpackVfxSmokeTest
                 LastScalableStatsHash = 2u
             });
             scalingSystem.Update(world.Unmanaged);
-            AssertRuntimeScaling(entityManager.GetComponentData<PlayerJetpackVfxConfig>(playerEntity),
+            AssertRuntimeScaling(entityManager.GetComponentData<PlayerJetpackVfxConfig>(visualRuntimeEntity),
                                  JetpackReferenceA,
                                  PlayerJetpackVfxActivationMode.WhileMovingOrRotating,
                                  4f,
@@ -373,54 +378,59 @@ public static class PlayerJetpackVfxSmokeTest
         World world = new World("PlayerJetpackVfxActivitySmokeTest");
         world.SetTime(new TimeData(1d / 60d, 1f / 60f));
         EntityManager entityManager = world.EntityManager;
-        Entity playerEntity = entityManager.CreateEntity(typeof(PlayerJetpackVfxConfig),
-                                                          typeof(PlayerJetpackVfxRuntimeState),
-                                                          typeof(PlayerMovementState),
+        Entity playerEntity = entityManager.CreateEntity(typeof(PlayerMovementState),
                                                           typeof(LocalTransform));
+        Entity visualRuntimeEntity = entityManager.CreateEntity(typeof(PlayerVisualRuntimeDataOwner),
+                                                                 typeof(PlayerJetpackVfxConfig),
+                                                                 typeof(PlayerJetpackVfxRuntimeState));
 
         try
         {
             PlayerJetpackVfxConfig config = BuildRuntimeConfig();
-            entityManager.SetComponentData(playerEntity, config);
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerVisualRuntimeDataOwner
+            {
+                PlayerEntity = playerEntity
+            });
+            entityManager.SetComponentData(visualRuntimeEntity, config);
             entityManager.SetComponentData(playerEntity, new PlayerMovementState());
             entityManager.SetComponentData(playerEntity, LocalTransform.Identity);
             SystemHandle jetpackSystem = world.GetOrCreateSystem<PlayerJetpackVfxSystem>();
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredVisibility(entityManager, playerEntity, false, "stationary movement-only");
-            AssertDesiredScaleMultiplier(entityManager, playerEntity, 0.5f, "stationary shrink");
+            AssertDesiredVisibility(entityManager, visualRuntimeEntity, false, "stationary movement-only");
+            AssertDesiredScaleMultiplier(entityManager, visualRuntimeEntity, 0.5f, "stationary shrink");
 
             entityManager.SetComponentData(playerEntity, new PlayerMovementState
             {
                 Velocity = new float3(2f, 0f, 0f)
             });
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredVisibility(entityManager, playerEntity, true, "moving movement-only");
-            AssertDesiredScaleMultiplier(entityManager, playerEntity, 1f, "normal scale speed");
+            AssertDesiredVisibility(entityManager, visualRuntimeEntity, true, "moving movement-only");
+            AssertDesiredScaleMultiplier(entityManager, visualRuntimeEntity, 1f, "normal scale speed");
 
             entityManager.SetComponentData(playerEntity, new PlayerMovementState
             {
                 Velocity = new float3(4f, 0f, 0f)
             });
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredScaleMultiplier(entityManager, playerEntity, 1.5f, "maximum-size speed growth");
+            AssertDesiredScaleMultiplier(entityManager, visualRuntimeEntity, 1.5f, "maximum-size speed growth");
 
             config.ActivationMode = PlayerJetpackVfxActivationMode.WhileRotating;
-            entityManager.SetComponentData(playerEntity, config);
+            entityManager.SetComponentData(visualRuntimeEntity, config);
             entityManager.SetComponentData(playerEntity, new PlayerMovementState());
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredVisibility(entityManager, playerEntity, false, "rotation baseline");
+            AssertDesiredVisibility(entityManager, visualRuntimeEntity, false, "rotation baseline");
 
             entityManager.SetComponentData(playerEntity,
                                            LocalTransform.FromPositionRotationScale(float3.zero,
                                                                                     quaternion.RotateY(math.radians(90f)),
                                                                                     1f));
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredVisibility(entityManager, playerEntity, true, "active rotation");
+            AssertDesiredVisibility(entityManager, visualRuntimeEntity, true, "active rotation");
 
             config.ActivationMode = PlayerJetpackVfxActivationMode.Always;
-            entityManager.SetComponentData(playerEntity, config);
+            entityManager.SetComponentData(visualRuntimeEntity, config);
             jetpackSystem.Update(world.Unmanaged);
-            AssertDesiredVisibility(entityManager, playerEntity, true, "always-visible");
+            AssertDesiredVisibility(entityManager, visualRuntimeEntity, true, "always-visible");
         }
         finally
         {
@@ -429,11 +439,11 @@ public static class PlayerJetpackVfxSmokeTest
     }
 
     /// <summary>
-    /// Asserts the Jetpack activity system published the expected designer-scale multiplier.
+    /// Asserts the Jetpack activity system published the expected -scale multiplier.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the player state.</param>
-    /// <param name="playerEntity">Player entity to inspect.</param>
-    /// <param name="expectedScaleMultiplier">Expected multiplier over the designer-authored local scale.</param>
+    /// <param name="playerEntity">Visual runtime entity to inspect.</param>
+    /// <param name="expectedScaleMultiplier">Expected multiplier over the -authored local scale.</param>
     /// <param name="caseLabel">Scale case label included in failure messages.</param>
     private static void AssertDesiredScaleMultiplier(EntityManager entityManager,
                                                      Entity playerEntity,
@@ -450,7 +460,7 @@ public static class PlayerJetpackVfxSmokeTest
     /// Asserts the Jetpack activity system published the expected visibility state.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the player state.</param>
-    /// <param name="playerEntity">Player entity to inspect.</param>
+    /// <param name="playerEntity">Visual runtime entity to inspect.</param>
     /// <param name="expectedVisible">Expected desired visibility.</param>
     /// <param name="caseLabel">Activity case label included in failure messages.</param>
     private static void AssertDesiredVisibility(EntityManager entityManager,
@@ -467,21 +477,24 @@ public static class PlayerJetpackVfxSmokeTest
 
     #region Visual Player Presentation
     /// <summary>
-    /// Validates the runtime Visual Player child is toggled in place without modifying its designer-authored local pose.
+    /// Validates the runtime Visual Player child is toggled in place without modifying its -authored local pose.
     /// </summary>
     private static void ValidateManagedVisualPlayerToggle()
     {
         World world = new World("PlayerJetpackVfxVisualPlayerSmokeTest");
         EntityManager entityManager = world.EntityManager;
+        entityManager.CreateEntity(typeof(GameSceneManagerConfig));
         GameObject visualPrefab = BuildVisualPlayerPrefab("JetpackRuntimeVisual");
         GameObject companionVfx = new GameObject("BakedCompanionJetpackVfx");
         ParticleSystem companionParticleSystem = companionVfx.AddComponent<ParticleSystem>();
         GameObject runtimeVisual = null;
         Entity playerEntity = entityManager.CreateEntity(typeof(PlayerControllerConfig),
-                                                          typeof(PlayerVisualRuntimeBridgeConfig),
-                                                          typeof(PlayerJetpackVfxConfig),
-                                                          typeof(PlayerJetpackVfxRuntimeState),
+                                                          typeof(PlayerPresentationRuntimeReferences),
                                                           typeof(LocalTransform));
+        Entity visualRuntimeEntity = entityManager.CreateEntity(typeof(PlayerVisualRuntimeDataOwner),
+                                                                 typeof(PlayerVisualRuntimeBridgeConfig),
+                                                                 typeof(PlayerJetpackVfxConfig),
+                                                                 typeof(PlayerJetpackVfxRuntimeState));
         Entity companionEntity = entityManager.CreateEntity();
 
         try
@@ -491,13 +504,21 @@ public static class PlayerJetpackVfxSmokeTest
             {
                 Value = companionEntity
             });
-            entityManager.SetComponentData(playerEntity, new PlayerVisualRuntimeBridgeConfig
+            entityManager.SetComponentData(playerEntity, new PlayerPresentationRuntimeReferences
+            {
+                VisualRuntimeEntity = visualRuntimeEntity
+            });
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerVisualRuntimeBridgeConfig
             {
                 VisualPrefab = visualPrefab,
                 SyncRotation = 1,
                 SpawnWhenAnimatorMissing = 1
             });
-            entityManager.SetComponentData(playerEntity, new PlayerJetpackVfxConfig
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerVisualRuntimeDataOwner
+            {
+                PlayerEntity = playerEntity
+            });
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerJetpackVfxConfig
             {
                 RuntimeReference = new FixedString128Bytes(JetpackReferenceA)
             });
@@ -516,9 +537,9 @@ public static class PlayerJetpackVfxSmokeTest
                 throw new Exception("Runtime Visual Player bridge did not suspend the duplicate baked companion Jetpack VFX.");
 
             if (jetpackTransform.gameObject.activeSelf)
-                throw new Exception("Designer-authored Jetpack VFX was not disabled for a false desired state.");
+                throw new Exception("-authored Jetpack VFX was not disabled for a false desired state.");
 
-            entityManager.SetComponentData(playerEntity, new PlayerJetpackVfxRuntimeState
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerJetpackVfxRuntimeState
             {
                 DesiredVisible = 1,
                 DesiredScaleMultiplier = 0.5f
@@ -526,12 +547,12 @@ public static class PlayerJetpackVfxSmokeTest
             presentationSystem.Update(world.Unmanaged);
 
             if (!jetpackTransform.gameObject.activeSelf)
-                throw new Exception("Designer-authored Jetpack VFX was not enabled for a true desired state.");
+                throw new Exception("-authored Jetpack VFX was not enabled for a true desired state.");
 
             if (Vector3.Distance(jetpackTransform.localScale, authoredLocalScale * 0.5f) > 0.0001f)
-                throw new Exception("Designer-authored Jetpack VFX did not apply the requested shrink multiplier.");
+                throw new Exception("-authored Jetpack VFX did not apply the requested shrink multiplier.");
 
-            entityManager.SetComponentData(playerEntity, new PlayerJetpackVfxRuntimeState
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerJetpackVfxRuntimeState
             {
                 DesiredVisible = 1,
                 DesiredScaleMultiplier = 1.5f
@@ -539,7 +560,7 @@ public static class PlayerJetpackVfxSmokeTest
             presentationSystem.Update(world.Unmanaged);
 
             if (Vector3.Distance(jetpackTransform.localScale, authoredLocalScale * 1.5f) > 0.0001f)
-                throw new Exception("Designer-authored Jetpack VFX did not apply the requested growth multiplier.");
+                throw new Exception("-authored Jetpack VFX did not apply the requested growth multiplier.");
 
             entityManager.SetComponentData(playerEntity,
                                            LocalTransform.FromPositionRotationScale(new float3(10f, 0f, 0f),
@@ -551,13 +572,13 @@ public static class PlayerJetpackVfxSmokeTest
             if (Vector3.Distance(jetpackTransform.localPosition, authoredLocalPosition) > 0.0001f)
                 throw new Exception("Jetpack VFX local pose changed while the Visual Player moved.");
 
-            entityManager.SetComponentData(playerEntity, new PlayerJetpackVfxConfig());
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerJetpackVfxConfig());
             presentationSystem.Update(world.Unmanaged);
 
             if (Vector3.Distance(jetpackTransform.localScale, authoredLocalScale) > 0.0001f)
-                throw new Exception("Jetpack VFX did not restore its designer-authored local scale when its binding was removed.");
+                throw new Exception("Jetpack VFX did not restore its -authored local scale when its binding was removed.");
 
-            entityManager.SetComponentData(playerEntity, new PlayerVisualRuntimeBridgeConfig());
+            entityManager.SetComponentData(visualRuntimeEntity, new PlayerVisualRuntimeBridgeConfig());
             bridgeSystem.Update(world.Unmanaged);
 
             if (!companionVfx.activeSelf)
@@ -575,7 +596,7 @@ public static class PlayerJetpackVfxSmokeTest
     }
 
     /// <summary>
-    /// Builds one Visual Player prefab-like hierarchy containing an Animator and two designer-authored Jetpack VFX objects.
+    /// Builds one Visual Player prefab-like hierarchy containing an Animator and two -authored Jetpack VFX objects.
     /// </summary>
     /// <param name="name">Root object name.</param>
     /// <returns>Configured Visual Player hierarchy.</returns>
@@ -601,14 +622,14 @@ public static class PlayerJetpackVfxSmokeTest
     /// Resolves the required JetpackA object from a runtime Visual Player hierarchy.
     /// </summary>
     /// <param name="runtimeVisual">Runtime Visual Player root.</param>
-    /// <returns>Resolved designer-authored Jetpack transform.</returns>
+    /// <returns>Resolved -authored Jetpack transform.</returns>
     private static Transform ResolveRequiredJetpackTransform(GameObject runtimeVisual)
     {
         if (runtimeVisual == null ||
             !PlayerWeaponVisualReferenceUtility.TryResolve(runtimeVisual.transform,
                                                            JetpackReferenceA,
                                                            out Transform jetpackTransform))
-            throw new Exception("Runtime Visual Player did not contain the designer-authored Jetpack VFX.");
+            throw new Exception("Runtime Visual Player did not contain the -authored Jetpack VFX.");
 
         return jetpackTransform;
     }

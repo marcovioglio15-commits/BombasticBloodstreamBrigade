@@ -297,7 +297,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
             // Beam start and each damage tick mark a fresh Fire Shake pulse. Continuous beam frames between ticks would
             // otherwise stack one trauma unit per frame, sustaining the shake at saturation regardless of fire rate.
             // The pulse is also gated by the per-player Suppress On Laser Beam toggle authored on the fire-shake block
-            // so designers can keep the regular-shot shake while silencing it during the laser's continuous tick.
+            // so s can keep the regular-shot shake while silencing it during the laser's continuous tick.
             if ((beamStartedThisFrame || beamTickReadyThisFrame) &&
                 !IsFireShakeSuppressedByLaserBeam(playerEntity, in runtimeCameraConfigLookup))
                 EnqueueFireShakeRequest(playerEntity, ref cameraShakeStateLookup);

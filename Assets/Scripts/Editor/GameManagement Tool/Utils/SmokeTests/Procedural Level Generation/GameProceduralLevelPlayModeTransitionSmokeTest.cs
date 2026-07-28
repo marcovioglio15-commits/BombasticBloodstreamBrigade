@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using Unity.Collections;
 using Unity.Entities;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -61,6 +60,10 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     /// </summary>
     public static void Run()
     {
+        // Discard any recovered dirty editor backup before scanning, otherwise a room left open by an interrupted
+        // test correctly keeps its metadata stale and prevents this independent runtime regression from starting.
+        EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.BootstrapScenePath,
+                                     OpenSceneMode.Single);
         GameRoomMetadataRefreshReport metadataReport = GameRoomMetadataAutomaticRefreshUtility.RefreshAllStaleReferencedRooms();
 
         if (!metadataReport.Succeeded)
@@ -77,7 +80,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         GameProceduralCameraContinuitySmokeUtility.Reset();
         GameProceduralPlayerControlReleaseSmokeUtility.Reset();
         SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, true);
-        EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.BootstrapScenePath, OpenSceneMode.Single);
         EditorApplication.isPlaying = true;
     }
     #endregion
@@ -107,7 +109,8 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         if (!SessionState.GetBool(ActiveKey, false) || type != LogType.Exception && type != LogType.Error)
             return;
 
-        if (!ContainsTargetedFailure(condition) && !ContainsTargetedFailure(stackTrace))
+        if (!GameProceduralLevelTransitionSmokeDiagnosticUtility.ContainsTargetedFailure(condition) &&
+            !GameProceduralLevelTransitionSmokeDiagnosticUtility.ContainsTargetedFailure(stackTrace))
             return;
 
         SessionState.SetString(FailureKey, condition + Environment.NewLine + stackTrace);
@@ -153,7 +156,8 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         if (ResolveElapsedStepSeconds() >= StepTimeoutSeconds)
         {
             string diagnostic = hasManager
-                ? BuildRuntimeDiagnostic(entityManager, managerEntity)
+                ? GameProceduralLevelTransitionSmokeDiagnosticUtility.BuildRuntimeDiagnostic(entityManager,
+                                                                                              managerEntity)
                 : "The scene manager singleton was unavailable.";
             StopOrFinish(false,
                          "Timed out during phase '" + SessionState.GetString(PhaseKey, string.Empty) + "'. " +
@@ -239,6 +243,18 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         {
             return;
         }
+
+        if (!GameRoomRewardPresentationPlayModeSmokeUtility.TryValidate(entityManager,
+                                                                        managerEntity,
+                                                                        out bool presentationReady,
+                                                                        out string presentationFailure))
+        {
+            SessionState.SetString(FailureKey, presentationFailure);
+            return;
+        }
+
+        if (!presentationReady)
+            return;
 
         if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
                                                                         initialRoomControlCycle,
@@ -603,66 +619,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     }
 
     /// <summary>
-    /// Checks one log fragment for failures relevant to scene streaming, ECS buffer lifetime or procedural generation.
-    /// </summary>
-    /// <param name="value">Log fragment to inspect.</param>
-    /// <returns>True when the fragment contains a targeted runtime failure signature.</returns>
-    private static bool ContainsTargetedFailure(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return value.IndexOf("ObjectDisposedException", StringComparison.Ordinal) >= 0 ||
-               value.IndexOf("Attempted to access BufferTypeHandle", StringComparison.Ordinal) >= 0 ||
-               value.IndexOf("BlobAssetReference is not valid", StringComparison.Ordinal) >= 0 ||
-               value.IndexOf("[GameProceduralLevel]", StringComparison.Ordinal) >= 0;
-    }
-
-    /// <summary>
-    /// Builds a compact state snapshot when an asynchronous Play Mode step exceeds its timeout.
-    /// </summary>
-    /// <param name="entityManager">Default-world entity manager.</param>
-    /// <param name="managerEntity">Scene and procedural manager singleton.</param>
-    /// <returns>Transition, procedural context and target-portal state useful for identifying the blocked readiness condition.</returns>
-    private static string BuildRuntimeDiagnostic(EntityManager entityManager, Entity managerEntity)
-    {
-        GameSceneTransitionState transitionState = entityManager.GetComponentData<GameSceneTransitionState>(managerEntity);
-        GameProceduralLevelRuntimeState runtimeState = entityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
-        GameProceduralRoomTransitionContext context = entityManager.GetComponentData<GameProceduralRoomTransitionContext>(managerEntity);
-        EntityQuery portalQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortal>());
-        int matchingPortalCount = 0;
-
-        try
-        {
-            using NativeArray<GameRoomPortal> portals = portalQuery.ToComponentDataArray<GameRoomPortal>(Allocator.Temp);
-
-            // Count only the graph-selected arrival ID so stale or missing room authoring is immediately visible.
-            for (int portalIndex = 0; portalIndex < portals.Length; portalIndex++)
-            {
-                if (portals[portalIndex].PortalId.Equals(context.TargetPortalId))
-                    matchingPortalCount++;
-            }
-
-            return "Transition=" + transitionState.Phase +
-                   ", IsTransitioning=" + transitionState.IsTransitioning +
-                   ", Active='" + transitionState.ActiveSceneId +
-                   "', Target='" + transitionState.TargetSceneId +
-                   "', RuntimePhase=" + runtimeState.Phase +
-                   ", CurrentNode=" + runtimeState.CurrentNodeIndex +
-                   ", PendingNode=" + runtimeState.PendingNodeIndex +
-                   ", RelocationPending=" + context.RelocationPending +
-                   ", CommitPending=" + context.CommitPending +
-                   ", TargetPortal='" + context.TargetPortalId +
-                   "', MatchingPortals=" + matchingPortalCount +
-                   ", TotalPortals=" + portals.Length + ".";
-        }
-        finally
-        {
-            portalQuery.Dispose();
-        }
-    }
-
-    /// <summary>
     /// Restarts the wall-clock timeout for the current asynchronous transition step.
     /// </summary>
     private static void ResetStepTimeout()
@@ -723,7 +679,7 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         GameProceduralPlayerControlReleaseSmokeUtility.Reset();
 
         if (passed)
-            Debug.Log("[GameProceduralLevelPlayModeTransitionSmokeTest] Direct Start-room load, streamed traversal and Play Again restart passed.");
+            Debug.Log("[GameProceduralLevelPlayModeTransitionSmokeTest] Direct Start-room load, player and portal reward presentation, streamed traversal and Play Again restart passed.");
         else
             Debug.LogError("[GameProceduralLevelPlayModeTransitionSmokeTest] Failed: " + failure);
 

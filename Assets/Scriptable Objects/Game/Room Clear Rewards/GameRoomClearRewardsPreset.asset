@@ -1,0 +1,659 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 708ec2e126cf4f649a88d1bb5ecb900c, type: 3}
+  m_Name: GameRoomClearRewardsPreset
+  m_EditorClassIdentifier: Assembly-CSharp::GameRoomClearRewardsPreset
+  presetId: c9b380b3d11a416b9abae0ea418712f9
+  presetName: GameRoomClearRewardsPreset
+  description: Varied room-clear progression rewards for procedural combat rooms,
+    including permanent upgrades, resource recovery and temporary momentum bonuses.
+  version: 1.0.0
+  playerContextPreset: {fileID: 11400000, guid: 2aa7920f2d0dab444bbb97e34b3f90d8, type: 2}
+  modules:
+  - technicalId: 53a99168c62c45b094cfaa3b6df43f66
+    displayName: Permanent Damage Calibration
+    description: Adds a modest permanent damage increase through the unified stat
+      formula path.
+    targetDomain: 0
+    valueSource: 0
+    duration: 0
+    targetStatName: Damage
+    resource: 0
+    formula: '[Damage] = [this] + 0.15'
+    flatNumericValue: 0
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 0
+  - technicalId: 844d9f5111414309b8755b1e1105df12
+    displayName: Permanent Fire Rate Tuning
+    description: Adds a small permanent fire-rate delta.
+    targetDomain: 0
+    valueSource: 1
+    duration: 0
+    targetStatName: FireRate
+    resource: 0
+    formula: 
+    flatNumericValue: 0.1
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 10
+  - technicalId: 7024335dc061472a8195b4cbd4283864
+    displayName: Permanent Mobility Tuning
+    description: Adds a restrained permanent movement-speed delta.
+    targetDomain: 0
+    valueSource: 1
+    duration: 0
+    targetStatName: MovementSpeed
+    resource: 0
+    formula: 
+    flatNumericValue: 0.12
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 20
+  - technicalId: ed0e939255c94f9fa6deb0d8450671fa
+    displayName: Permanent Fortune
+    description: Adds one permanent Luck point for reward and drop interactions.
+    targetDomain: 0
+    valueSource: 1
+    duration: 0
+    targetStatName: Luck
+    resource: 0
+    formula: 
+    flatNumericValue: 1
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 30
+  - technicalId: b9af92cf2d15401383b76ade67666d6a
+    displayName: Permanent Ricochet
+    description: Adds one permanent bullet bounce.
+    targetDomain: 0
+    valueSource: 1
+    duration: 0
+    targetStatName: BulletBounces
+    resource: 0
+    formula: 
+    flatNumericValue: 1
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 40
+  - technicalId: 7866978378d1406f94a3d662a07dd30e
+    displayName: Field Repair
+    description: Restores one health resource point, clamped by the authoritative
+      player maximum.
+    targetDomain: 1
+    valueSource: 1
+    duration: 0
+    targetStatName: 
+    resource: 0
+    formula: 
+    flatNumericValue: 1
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 50
+  - technicalId: 6a0aed4815be49b4ba854dc9068c278f
+    displayName: Adaptive Experience
+    description: Grants experience scaled slightly by the current Luck stat.
+    targetDomain: 1
+    valueSource: 0
+    duration: 0
+    targetStatName: 
+    resource: 3
+    formula: 12 + [Luck] * 0.5
+    flatNumericValue: 0
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 60
+  - technicalId: d7200cd8727844ba8b98d5e88f8fbc20
+    displayName: Primary Energy Cell
+    description: Restores primary active power-up energy.
+    targetDomain: 1
+    valueSource: 1
+    duration: 0
+    targetStatName: 
+    resource: 1
+    formula: 
+    flatNumericValue: 12
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 70
+  - technicalId: 7bef22872c384297a8aa2ea8a936a244
+    displayName: Secondary Energy Cell
+    description: Restores secondary active power-up energy.
+    targetDomain: 1
+    valueSource: 1
+    duration: 0
+    targetStatName: 
+    resource: 2
+    formula: 
+    flatNumericValue: 10
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 1
+    sortOrder: 80
+  - technicalId: ffe555097726435aaf25a3fb31ddb911
+    displayName: Two-Room Damage Overdrive
+    description: Increases effective Damage by twenty percent during the next two
+      distinct rooms.
+    targetDomain: 0
+    valueSource: 0
+    duration: 1
+    targetStatName: Damage
+    resource: 0
+    formula: '[Damage] = [this] * 1.2'
+    flatNumericValue: 0
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 2
+    sortOrder: 90
+  - technicalId: 9fcf99aa71d842f48bcc2b96903aa490
+    displayName: Two-Room Fire Rate Overdrive
+    description: Increases effective FireRate by fifteen percent during the next
+      two distinct rooms.
+    targetDomain: 0
+    valueSource: 0
+    duration: 1
+    targetStatName: FireRate
+    resource: 0
+    formula: '[FireRate] = [this] * 1.15'
+    flatNumericValue: 0
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 2
+    sortOrder: 100
+  - technicalId: 1d5266557e594e5980edc2c4c4bfcab3
+    displayName: Two-Room Escape Momentum
+    description: Adds temporary movement speed during the next two distinct rooms.
+    targetDomain: 0
+    valueSource: 0
+    duration: 1
+    targetStatName: MovementSpeed
+    resource: 0
+    formula: '[MovementSpeed] = [this] + 0.35'
+    flatNumericValue: 0
+    flatBooleanValue: 0
+    flatTokenValue: 
+    durationRooms: 2
+    sortOrder: 110
+  rewards:
+  - technicalId: db9b4142f3be40fe91087f876a939b12
+    displayName: Survivor Supplies
+    description: Balanced sustain package with health and adaptive experience.
+    menuGroup: 1
+    modules:
+    - bindingId: 2c021d5b13ec4650b5c8905c8e9b2b14
+      moduleTechnicalId: 7866978378d1406f94a3d662a07dd30e
+      quantity: 1
+      order: 0
+      useOverridePayload: 1
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 2
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 030822f4c52a489080ba2a8e5c4be6d9
+      moduleTechnicalId: 6a0aed4815be49b4ba854dc9068c278f
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 225f71ef9e4f494dad247d9ab21306d2
+    displayName: Weapons Calibration
+    description: Permanent paired upgrade for damage output and firing cadence.
+    menuGroup: 0
+    modules:
+    - bindingId: bfb73dfde92d4afd8477a250d4406a17
+      moduleTechnicalId: 53a99168c62c45b094cfaa3b6df43f66
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: c3343692adee49cb9bf0bf918d54d6ae
+      moduleTechnicalId: 844d9f5111414309b8755b1e1105df12
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 5d85aeeb5a2f474e9322c52685fc8842
+    displayName: Pathfinder Kit
+    description: Permanent mobility and Luck package for exploration branches.
+    menuGroup: 0
+    modules:
+    - bindingId: 8df6ba56069040d593a294fe400389d6
+      moduleTechnicalId: 7024335dc061472a8195b4cbd4283864
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 907032c3f28e4414a0f0a840471c4b28
+      moduleTechnicalId: ed0e939255c94f9fa6deb0d8450671fa
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 460e522026994174b9e380dc280e7ab0
+    displayName: Ricochet Upgrade
+    description: Permanent ricochet utility backed by an experience grant.
+    menuGroup: 0
+    modules:
+    - bindingId: 218a93b11bcc4fde90603c98360096b5
+      moduleTechnicalId: b9af92cf2d15401383b76ade67666d6a
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: d55e21f9db4c43fb9d434c1638953935
+      moduleTechnicalId: 6a0aed4815be49b4ba854dc9068c278f
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 3a1f1bccc0184d25bb8b3e528eeb586e
+    displayName: Primary Charge
+    description: Primary energy recovery paired with adaptive experience.
+    menuGroup: 1
+    modules:
+    - bindingId: 375f6c4d18214b83828f657b83938dd0
+      moduleTechnicalId: d7200cd8727844ba8b98d5e88f8fbc20
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 97f4729b6e3a49e3a20da13eafb79704
+      moduleTechnicalId: 6a0aed4815be49b4ba854dc9068c278f
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: e7f0e36054ed447fbcf710e9f1e02d6e
+    displayName: Secondary Charge
+    description: Secondary energy recovery paired with adaptive experience.
+    menuGroup: 1
+    modules:
+    - bindingId: 7d027c4236314a2e92b88989706b53e8
+      moduleTechnicalId: 7bef22872c384297a8aa2ea8a936a244
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 2341764feffb49e2ab9538519abc166b
+      moduleTechnicalId: 6a0aed4815be49b4ba854dc9068c278f
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: de9d51394cd144a9b5898e397b807340
+    displayName: Combat Overdrive
+    description: Temporary two-room damage and fire-rate momentum package.
+    menuGroup: 2
+    modules:
+    - bindingId: 892e337d54204715aa052efb03f9682f
+      moduleTechnicalId: ffe555097726435aaf25a3fb31ddb911
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: ccae8a11e62f464ead67b41b60487468
+      moduleTechnicalId: 9fcf99aa71d842f48bcc2b96903aa490
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: c455a6c2921f4caeaeae608f257ecdb8
+    displayName: Escape Momentum
+    description: Temporary mobility paired with immediate field repair.
+    menuGroup: 3
+    modules:
+    - bindingId: 842033fe960547cda29d3901a7c22a86
+      moduleTechnicalId: 1d5266557e594e5980edc2c4c4bfcab3
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: ae8659ceabc74aa3a0cd7169a093fac0
+      moduleTechnicalId: 7866978378d1406f94a3d662a07dd30e
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 9045a3e2240c4260aad200101aad1c26
+    displayName: Veteran Arsenal
+    description: Mixed permanent damage and Luck progression with experience.
+    menuGroup: 0
+    modules:
+    - bindingId: fafe0290d11641d18e2d6d3378112517
+      moduleTechnicalId: 53a99168c62c45b094cfaa3b6df43f66
+      quantity: 1
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 3fc1c88e0f5c429e8366b71cdb265d24
+      moduleTechnicalId: ed0e939255c94f9fa6deb0d8450671fa
+      quantity: 1
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 83d4741e9b7c41a0a5b153727c5df240
+      moduleTechnicalId: 6a0aed4815be49b4ba854dc9068c278f
+      quantity: 1
+      order: 20
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  - technicalId: 42edc383944b49648e73bac5645b80c9
+    displayName: Boss Arsenal
+    description: High-value mixed arsenal and dual-energy reward for boss combat
+      rooms.
+    menuGroup: 0
+    modules:
+    - bindingId: d31c3b66de3d4bc0a0d075bafe0cb738
+      moduleTechnicalId: 53a99168c62c45b094cfaa3b6df43f66
+      quantity: 2
+      order: 0
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 4887c1ce48304409b1f30a09c70ba794
+      moduleTechnicalId: 844d9f5111414309b8755b1e1105df12
+      quantity: 2
+      order: 10
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: e6e48d9cefc64ce6bca3fb13b8675aa5
+      moduleTechnicalId: b9af92cf2d15401383b76ade67666d6a
+      quantity: 1
+      order: 20
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 5d62bab8c493452b9d06196524a36c11
+      moduleTechnicalId: d7200cd8727844ba8b98d5e88f8fbc20
+      quantity: 1
+      order: 30
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+    - bindingId: 0ad309895910429ab9f9526367259e85
+      moduleTechnicalId: 7bef22872c384297a8aa2ea8a936a244
+      quantity: 1
+      order: 40
+      useOverridePayload: 0
+      overridePayload:
+        targetStatName: 
+        resource: 0
+        formula: 
+        flatNumericValue: 0
+        flatBooleanValue: 0
+        flatTokenValue: 
+        durationRooms: 1
+  presentationMappings:
+  - targetDomain: 0
+    targetStatName: Damage
+    resource: 0
+    mode: 0
+    textColor: {r: 1, g: 0.35, b: 0.25, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Damage
+    spriteCaption: 
+    sortOrder: 0
+  - targetDomain: 0
+    targetStatName: FireRate
+    resource: 0
+    mode: 0
+    textColor: {r: 1, g: 0.72, b: 0.2, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Fire Rate
+    spriteCaption: 
+    sortOrder: 10
+  - targetDomain: 0
+    targetStatName: MovementSpeed
+    resource: 0
+    mode: 0
+    textColor: {r: 0.2, g: 0.85, b: 1, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Movement Speed
+    spriteCaption: 
+    sortOrder: 20
+  - targetDomain: 0
+    targetStatName: Luck
+    resource: 0
+    mode: 0
+    textColor: {r: 0.35, g: 1, b: 0.45, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Luck
+    spriteCaption: 
+    sortOrder: 30
+  - targetDomain: 0
+    targetStatName: BulletBounces
+    resource: 0
+    mode: 0
+    textColor: {r: 0.72, g: 0.5, b: 1, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Bullet Bounces
+    spriteCaption: 
+    sortOrder: 40
+  - targetDomain: 1
+    targetStatName: 
+    resource: 0
+    mode: 0
+    textColor: {r: 0.95, g: 0.2, b: 0.25, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Health
+    spriteCaption: 
+    sortOrder: 50
+  - targetDomain: 1
+    targetStatName: 
+    resource: 3
+    mode: 0
+    textColor: {r: 0.3, g: 1, b: 0.72, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Experience
+    spriteCaption: 
+    sortOrder: 60
+  - targetDomain: 1
+    targetStatName: 
+    resource: 1
+    mode: 0
+    textColor: {r: 0.25, g: 0.65, b: 1, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Primary Energy
+    spriteCaption: 
+    sortOrder: 70
+  - targetDomain: 1
+    targetStatName: 
+    resource: 2
+    mode: 0
+    textColor: {r: 1, g: 0.35, b: 0.85, a: 1}
+    sprite: {fileID: 0}
+    displayLabel: Secondary Energy
+    spriteCaption: 
+    sortOrder: 80
+  playerLogSettings:
+    worldOffset: {x: 0, y: 2.2, z: 0}
+    fontSize: 3.6
+    rowSpacing: 0.5
+    visibleRows: 6
+    queueCapacity: 24
+    enterDuration: 0.18
+    holdDuration: 1.4
+    exitDuration: 0.3
+    scrollDistance: 0.35
+    font: {fileID: 0}
+  portalMarqueeSettings:
+    worldOffset: {x: 0, y: 1.75, z: 0}
+    fontSize: 3.2
+    cellSpacing: 2
+    visibleCells: 1
+    scrollSpeed: 0.75
+    initialPause: 0.5
+    loopPause: 0.35
+    font: {fileID: 0}

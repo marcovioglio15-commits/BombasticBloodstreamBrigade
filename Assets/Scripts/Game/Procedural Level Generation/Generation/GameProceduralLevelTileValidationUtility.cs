@@ -16,7 +16,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// <param name="level">Owning level.</param>
     /// <param name="tile">Tile to inspect.</param>
     /// <param name="technicalIds">Tile technical IDs already encountered.</param>
-    /// <param name="tileIds">Designer-facing tile IDs already encountered.</param>
+    /// <param name="tileIds">-facing tile IDs already encountered.</param>
     /// <param name="validatedMetadataScenes">Scene metadata records already structurally inspected.</param>
     /// <param name="requiresLevelExit">Whether this level's Boss must expose progression to a later enabled level.</param>
     /// <param name="report">Destination report.</param>
@@ -122,7 +122,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// </summary>
     /// <param name="preset">Owning preset supplying the global technical depth limit.</param>
     /// <param name="tile">Tile whose exact placement constraint is inspected.</param>
-    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="context">-facing tile context.</param>
     /// <param name="report">Destination validation report.</param>
     private static void ValidateExactDepth(GameProceduralLevelPreset preset,
                                            GameProceduralRoomTileDefinition tile,
@@ -172,9 +172,9 @@ internal static class GameProceduralLevelTileValidationUtility
     /// Validates tile IDs stored in fixed runtime buffers and uniqueness within the level.
     /// </summary>
     /// <param name="tile">Tile whose identity is inspected.</param>
-    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="context">-facing tile context.</param>
     /// <param name="technicalIds">Technical IDs already encountered.</param>
-    /// <param name="tileIds">Designer-facing IDs already encountered.</param>
+    /// <param name="tileIds">-facing IDs already encountered.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateTileIdentity(GameProceduralRoomTileDefinition tile,
                                              string context,
@@ -202,7 +202,7 @@ internal static class GameProceduralLevelTileValidationUtility
             report.Add(GameProceduralLevelValidationCode.MissingTileId,
                        GameProceduralLevelValidationSeverity.Error,
                        context,
-                       "Enter a designer-facing Tile ID.");
+                       "Enter a -facing Tile ID.");
         else
         {
             GameProceduralLevelValidator.ValidateFixedString64(tile.TileId, context + " Tile ID", report);
@@ -232,7 +232,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// </summary>
     /// <param name="preset">Owning preset.</param>
     /// <param name="tile">Tile whose scene is resolved.</param>
-    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="context">-facing tile context.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateSceneReference(GameProceduralLevelPreset preset,
                                                GameProceduralRoomTileDefinition tile,
@@ -289,7 +289,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// <param name="level">Owning level.</param>
     /// <param name="tile">Tile referencing the metadata.</param>
     /// <param name="metadata">Cached room metadata.</param>
-    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="context">-facing tile context.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateMetadataState(GameProceduralLevelDefinition level,
                                               GameProceduralRoomTileDefinition tile,
@@ -346,7 +346,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// Validates individual portal IDs inside one cached room signature.
     /// </summary>
     /// <param name="metadata">Room metadata to inspect.</param>
-    /// <param name="context">Designer-facing room context.</param>
+    /// <param name="context">-facing room context.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidatePortalMetadata(GameRoomSceneMetadata metadata,
                                                string context,
@@ -394,7 +394,7 @@ internal static class GameProceduralLevelTileValidationUtility
     /// <param name="level">Owning level.</param>
     /// <param name="tile">Tile being inspected.</param>
     /// <param name="metadata">Cached portal signature for the tile scene.</param>
-    /// <param name="context">Designer-facing tile context.</param>
+    /// <param name="context">-facing tile context.</param>
     /// <param name="requiresLevelExit">Whether this level's Boss must expose progression to a later enabled level.</param>
     /// <param name="report">Destination report.</param>
     private static void ValidateTilePortalRole(GameProceduralLevelDefinition level,

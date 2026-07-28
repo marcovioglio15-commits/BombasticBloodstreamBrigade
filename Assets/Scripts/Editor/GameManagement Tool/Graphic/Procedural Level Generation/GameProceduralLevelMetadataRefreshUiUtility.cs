@@ -80,7 +80,7 @@ internal static class GameProceduralLevelMetadataRefreshUiUtility
     }
 
     /// <summary>
-    /// Formats scanner counts, warnings and blocking errors into one concise designer report.
+    /// Formats scanner counts, warnings and blocking errors into one concise  report.
     /// </summary>
     /// <param name="report">Scanner report being formatted.</param>
     /// <returns>Multiline result summary suitable for an editor dialog.</returns>

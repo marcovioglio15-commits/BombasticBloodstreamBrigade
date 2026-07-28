@@ -165,7 +165,7 @@ internal static class ExcelDataImportPreviewService
             new Dictionary<string, PreviewCandidate>(StringComparer.Ordinal);
         List<ExcelDataWorkbookSheetDefinition> sheets = layoutPreset.SheetDefinitions;
 
-        // Preserve authored sheet and sparse-cell order so preview output matches the layout designer.
+        // Preserve authored sheet and sparse-cell order so preview output matches the layout .
         for (int sheetIndex = 0; sheetIndex < sheets.Count; sheetIndex++)
         {
             ExcelDataWorkbookSheetDefinition sheet = sheets[sheetIndex];

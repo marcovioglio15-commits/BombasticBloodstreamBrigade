@@ -110,7 +110,7 @@ public sealed class HUDPlayerPortraitSection : MonoBehaviour
             return;
 
         if (!runtimeEntityManager.Exists(playerEntity) ||
-            !runtimeEntityManager.HasComponent<PlayerPortraitHudVisualReference>(playerEntity))
+            !runtimeEntityManager.HasComponent<PlayerPresentationRuntimeReferences>(playerEntity))
         {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             HUDPlayerPortraitSectionUtility.LogMissingPlayerReference(runtimeEntityManager,
@@ -121,8 +121,9 @@ public sealed class HUDPlayerPortraitSection : MonoBehaviour
             return;
         }
 
-        PlayerPortraitHudVisualReference visualReference = runtimeEntityManager.GetComponentData<PlayerPortraitHudVisualReference>(playerEntity);
-        Entity configEntity = visualReference.ConfigEntity;
+        PlayerPresentationRuntimeReferences visualReferences =
+            runtimeEntityManager.GetComponentData<PlayerPresentationRuntimeReferences>(playerEntity);
+        Entity configEntity = visualReferences.PortraitHudVisualEntity;
 
         if (!runtimeEntityManager.Exists(configEntity) ||
             !runtimeEntityManager.HasComponent<PlayerPortraitHudVisualConfig>(configEntity) ||

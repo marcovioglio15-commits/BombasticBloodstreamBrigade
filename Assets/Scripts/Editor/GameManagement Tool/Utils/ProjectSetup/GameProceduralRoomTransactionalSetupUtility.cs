@@ -14,7 +14,7 @@ internal static class GameProceduralRoomTransactionalSetupUtility
 
     #region Public Methods
     /// <summary>
-    /// Disables SubScene auto-load on every uniquely referenced room root without touching open dirty designer scenes.
+    /// Disables SubScene auto-load on every uniquely referenced room root without touching open dirty  scenes.
     /// </summary>
     /// <param name="preset">Procedural preset whose transactional room scenes are migrated.</param>
     public static void EnsureExplicitSubSceneOwnership(GameProceduralLevelPreset preset)

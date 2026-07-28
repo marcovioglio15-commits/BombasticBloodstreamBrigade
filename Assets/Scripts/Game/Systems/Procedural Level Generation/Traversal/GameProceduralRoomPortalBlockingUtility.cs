@@ -11,30 +11,13 @@ public static class GameProceduralRoomPortalBlockingUtility
 
     #region Public Methods
     /// <summary>
-    /// Builds the Unity Physics filter that exposes a closed portal to existing player wall queries.
+    /// Builds the Unity Physics filter that exposes a closed portal only to player movement queries.
     /// </summary>
-    /// <param name="wallsLayerMask">Unity layer bit used by PlayerWorldLayersConfig for wall collision.</param>
-    /// <returns>Collider filter in the configured Walls category, or a universal fail-closed filter when unavailable.</returns>
-    public static CollisionFilter BuildBlockingFilter(int wallsLayerMask)
+    /// <param name="portalBarrierLayerMask">Dedicated PortalBarrier Unity layer bit.</param>
+    /// <returns>Player-only blocker filter, or CollisionFilter.Zero when project setup is incomplete.</returns>
+    public static CollisionFilter BuildBlockingFilter(int portalBarrierLayerMask)
     {
-        uint wallsCategory = wallsLayerMask > 0 ? (uint)wallsLayerMask : 0u;
-
-        if (wallsCategory == 0u)
-        {
-            return new CollisionFilter
-            {
-                BelongsTo = uint.MaxValue,
-                CollidesWith = uint.MaxValue,
-                GroupIndex = 0
-            };
-        }
-
-        return new CollisionFilter
-        {
-            BelongsTo = wallsCategory,
-            CollidesWith = uint.MaxValue,
-            GroupIndex = 0
-        };
+        return WorldPortalBarrierCollisionUtility.BuildPortalBarrierFilter(portalBarrierLayerMask);
     }
 
     /// <summary>

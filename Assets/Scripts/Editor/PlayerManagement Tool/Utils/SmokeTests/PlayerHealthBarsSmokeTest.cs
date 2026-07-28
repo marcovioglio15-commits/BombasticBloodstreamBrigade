@@ -228,9 +228,9 @@ public static class PlayerHealthBarsSmokeTest
                 Initialized = 1,
                 LastScalableStatsHash = 123u
             });
-            entityManager.AddComponentData(playerEntity, new PlayerHealthBarVisualReference
+            entityManager.AddComponentData(playerEntity, new PlayerPresentationRuntimeReferences
             {
-                ConfigEntity = configEntity
+                HealthBarVisualEntity = configEntity
             });
             entityManager.AddComponentData(configEntity, new PlayerHealthBarVisualOwner
             {

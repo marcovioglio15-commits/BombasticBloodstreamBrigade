@@ -219,6 +219,38 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates, registers and assigns a new Room Clear Rewards preset to the selected Game Master preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    public static void CreateRoomClearRewardsPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameRoomClearRewardsPreset newPreset =
+            GameRoomClearRewardsPresetLibraryUtility.CreatePresetAsset("GameRoomClearRewardsPreset");
+
+        if (newPreset == null)
+            return;
+
+        GameRoomClearRewardsPresetLibrary rewardsLibrary =
+            GameRoomClearRewardsPresetLibraryUtility.GetOrCreateLibrary();
+        Undo.RegisterCreatedObjectUndo(newPreset, "Create Room Clear Rewards Preset");
+        Undo.RecordObject(rewardsLibrary, "Add Room Clear Rewards Preset");
+        rewardsLibrary.AddPreset(newPreset);
+        EditorUtility.SetDirty(rewardsLibrary);
+        AssignSubPreset(panel, "roomClearRewardsPreset", newPreset);
+        panel.OpenSidePanel(GameManagementWindow.PanelType.RoomClearRewards);
+
+        if (panel.SidePanels.TryGetValue(GameManagementWindow.PanelType.RoomClearRewards,
+                                         out GameMasterPresetsPanel.SidePanelEntry sidePanelEntry) &&
+            sidePanelEntry.RoomClearRewardsPanel != null)
+        {
+            sidePanelEntry.RoomClearRewardsPanel.SelectPresetFromExternal(newPreset);
+        }
+    }
+
+    /// <summary>
     /// Assigns one sub-preset reference to the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel with serialized master preset.</param>
@@ -319,6 +351,15 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.ProceduralLevel,
                             "Procedural Level",
                             panel.CreateProceduralLevelPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Room Clear Rewards Preset",
+                            "roomClearRewardsPreset",
+                            typeof(GameRoomClearRewardsPreset),
+                            "Room Clear Rewards preset used for room grants, future-room modifiers and shared player or portal presentation.",
+                            GameManagementWindow.PanelType.RoomClearRewards,
+                            "Room Clear Rewards",
+                            panel.CreateRoomClearRewardsPreset);
     }
 
     /// <summary>
@@ -448,6 +489,15 @@ internal static class GameMasterPresetsPanelSectionsUtility
         proceduralLevelButton.style.minWidth = 168f;
         proceduralLevelButton.style.marginTop = 4f;
         section.Add(proceduralLevelButton);
+
+        Button roomRewardsButton =
+            new Button(() => panel.OpenSidePanel(GameManagementWindow.PanelType.RoomClearRewards));
+        roomRewardsButton.text = "Open Room Clear Rewards";
+        roomRewardsButton.tooltip = "Open the Room Clear Rewards preset panel.";
+        roomRewardsButton.style.flexShrink = 0f;
+        roomRewardsButton.style.minWidth = 184f;
+        roomRewardsButton.style.marginTop = 4f;
+        section.Add(roomRewardsButton);
     }
     #endregion
 

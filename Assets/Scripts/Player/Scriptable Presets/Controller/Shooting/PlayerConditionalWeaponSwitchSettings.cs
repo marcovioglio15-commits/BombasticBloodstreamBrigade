@@ -80,7 +80,7 @@ public sealed class PlayerConditionalWeaponSwitchCondition
     #region Setup
     /// <summary>
     /// Pre-populates the condition with a fresh stat reference and default inclusive range. Used by the tool
-    /// when designers append a new condition slot via the Add button.
+    /// when s append a new condition slot via the Add button.
     /// </summary>
     /// <param name="statNameValue">Scalable stat name to bind initially.</param>
     public void Configure(string statNameValue)
@@ -110,7 +110,7 @@ public sealed class PlayerConditionalWeaponSwitchCondition
 /// Stores one conditional weapon-switch entry. Each entry binds a target Weapon Id to a list of conditions
 /// evaluated against the current scalable stats. The Priority field breaks ties between simultaneously matching
 /// entries and the Override Power Up Switch flag elevates one entry above the equipped Switch Weapon module so
-/// the conditional pipeline can override the power-up selection when designers explicitly opt in.
+/// the conditional pipeline can override the power-up selection when s explicitly opt in.
 /// </summary>
 [Serializable]
 public sealed class PlayerConditionalWeaponSwitchEntry
@@ -172,7 +172,7 @@ public sealed class PlayerConditionalWeaponSwitchEntry
     #region Setup
     /// <summary>
     /// Pre-populates a freshly created entry with the supplied Weapon Id and an empty condition list. Used by
-    /// the tool when designers append a new entry slot via the Add button.
+    /// the tool when s append a new entry slot via the Add button.
     /// </summary>
     /// <param name="weaponIdValue">Initial Weapon Id pre-selected on the new entry.</param>
     public void Configure(string weaponIdValue)
@@ -188,7 +188,7 @@ public sealed class PlayerConditionalWeaponSwitchEntry
 
     #region Validation
     /// <summary>
-    /// Ensures the condition list is allocated and forwards validation to every authored condition so designer
+    /// Ensures the condition list is allocated and forwards validation to every authored condition so 
     /// edits never produce null payloads at bake time.
     /// </summary>
     public void Validate()
@@ -218,7 +218,7 @@ public sealed class PlayerConditionalWeaponSwitchEntry
 
 /// <summary>
 /// Stores the conditional weapon-switch container nested under the shooting Values block. The ordered entry
-/// list is preserved as the tie-breaker after Priority so designers can predict resolution in dense rule sets.
+/// list is preserved as the tie-breaker after Priority so s can predict resolution in dense rule sets.
 /// </summary>
 [Serializable]
 public sealed class PlayerConditionalWeaponSwitchSettings
