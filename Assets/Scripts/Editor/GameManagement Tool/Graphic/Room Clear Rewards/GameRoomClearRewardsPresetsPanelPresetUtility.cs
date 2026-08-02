@@ -221,9 +221,7 @@ internal static class GameRoomClearRewardsPresetsPanelPresetUtility
         GameManagementPanelLayoutUtility.ConfigureDetailsPane(rightPane);
 
         ScrollView scrollView = new ScrollView();
-        scrollView.style.flexGrow = 1f;
-        scrollView.style.flexShrink = 1f;
-        scrollView.style.minWidth = 0f;
+        GameManagementPanelLayoutUtility.ConfigureDetailsScrollView(scrollView);
         panel.DetailsRoot = scrollView;
         rightPane.Add(scrollView);
         return rightPane;

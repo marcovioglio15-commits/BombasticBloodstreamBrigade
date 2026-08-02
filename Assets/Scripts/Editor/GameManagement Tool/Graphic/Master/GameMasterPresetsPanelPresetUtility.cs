@@ -227,9 +227,7 @@ internal static class GameMasterPresetsPanelPresetUtility
         GameManagementPanelLayoutUtility.ConfigureDetailsPane(rightPane);
 
         ScrollView detailsRoot = new ScrollView();
-        detailsRoot.style.flexGrow = 1f;
-        detailsRoot.style.flexShrink = 1f;
-        detailsRoot.style.minWidth = 0f;
+        GameManagementPanelLayoutUtility.ConfigureDetailsScrollView(detailsRoot);
         panel.DetailsRoot = detailsRoot;
         rightPane.Add(detailsRoot);
         return rightPane;

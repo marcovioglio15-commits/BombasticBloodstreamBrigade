@@ -220,6 +220,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     /// <param name="brushCategoryId">Stable selected brush category.</param>
     /// <param name="enemyCount">Enemy amount written into newly painted cells.</param>
     /// <param name="erase">Whether left-click removes a cell instead of painting it.</param>
+    /// <param name="zoom">Stable top-down magnification where one displays the complete grid.</param>
     /// <param name="selectedCell">Optional painted cell highlighted for detailed editing.</param>
     /// <param name="selectCell">Callback invoked by right-clicking a painted cell.</param>
     public void Draw(Rect rect,
@@ -229,6 +230,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
                      string brushCategoryId,
                      int enemyCount,
                      bool erase,
+                     float zoom,
                      Vector2Int? selectedCell,
                      Action<Vector2Int> selectCell)
     {
@@ -240,7 +242,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
             return;
         }
 
-        ConfigureCamera(rect);
+        ConfigureCamera(rect, zoom, selectedCell);
 
         // Render the static room only during repaint events; layout and pointer events reuse its camera geometry.
         if (Event.current.type == EventType.Repaint)
@@ -277,11 +279,18 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     /// Positions a stable orthographic camera above the spawner grid and fits every authored cell.
     /// </summary>
     /// <param name="rect">Preview rectangle whose aspect ratio drives grid framing.</param>
-    private void ConfigureCamera(Rect rect)
+    /// <param name="zoom">Requested centered magnification.</param>
+    /// <param name="selectedCell">Optional cell used as the zoom focus.</param>
+    private void ConfigureCamera(Rect rect, float zoom, Vector2Int? selectedCell)
     {
         Vector3 gridCenter = spawnerLocalToWorld.MultiplyPoint3x4(originOffset + Vector3.up * spawnHeightOffset);
         Vector3 gridUp = spawnerLocalToWorld.MultiplyVector(Vector3.up).normalized;
         Vector3 gridForward = spawnerLocalToWorld.MultiplyVector(Vector3.forward).normalized;
+        Vector3 focusCenter = gridCenter;
+
+        if (selectedCell.HasValue && zoom > 1f)
+            focusCenter = spawnerLocalToWorld.MultiplyPoint3x4(ResolveCellLocalCenter(selectedCell.Value));
+
         float highestSceneOffset = hasSceneBounds
             ? GameWavesPreviewSceneUtility.ResolveMaximumBoundsProjection(sceneBounds, gridCenter, gridUp)
             : 0f;
@@ -289,11 +298,12 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         Camera previewCamera = previewUtility.camera;
         previewCamera.orthographic = true;
         previewCamera.transform.rotation = Quaternion.LookRotation(-gridUp, gridForward);
-        previewCamera.transform.position = gridCenter + gridUp * cameraHeight;
+        previewCamera.transform.position = focusCenter + gridUp * cameraHeight;
         float aspect = Mathf.Max(0.1f, rect.width / Mathf.Max(1f, rect.height));
         float gridWidth = Mathf.Max(1f, gridSizeX * cellSize);
         float gridDepth = Mathf.Max(1f, gridSizeZ * cellSize);
-        previewCamera.orthographicSize = Mathf.Max(gridDepth * 0.5f, gridWidth * 0.5f / aspect) * GridPaddingScale;
+        float fitSize = Mathf.Max(gridDepth * 0.5f, gridWidth * 0.5f / aspect) * GridPaddingScale;
+        previewCamera.orthographicSize = fitSize / Mathf.Clamp(zoom, 1f, 4f);
         previewCamera.nearClipPlane = 0.05f;
         previewCamera.farClipPlane = Mathf.Max(500f, cameraHeight * 4f);
         previewCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -318,7 +328,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         bool hasHoveredCell = TryResolveCellCoordinate(rect,
                                                        Event.current.mousePosition,
                                                        out Vector2Int hoveredCoordinate);
-        EnsureLabelStyles();
+        GameWavesPreviewOverlayUtility.EnsureLabelStyles(ref coordinateLabelStyle, ref paintedLabelStyle);
         paintedCellIndexByCoordinate.Clear();
 
         // Index sparse authored cells once per repaint instead of scanning them for every grid coordinate.
@@ -358,7 +368,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
                     SerializedProperty cell = cells.GetArrayElementAtIndex(paintedCellIndex);
                     string categoryId = cell.FindPropertyRelative("brushCategoryId").stringValue;
                     int paintedEnemyCount = cell.FindPropertyRelative("enemyCount").intValue;
-                    fillColor = ResolveCategoryColor(wavesPreset, categoryId);
+                    fillColor = GameWavesPreviewOverlayUtility.ResolveCategoryColor(wavesPreset, categoryId);
                     fillColor.a = isHovered ? 0.78f : 0.58f;
                     outlineColor = isSelected
                         ? new Color(0.25f, 1f, 0.45f, 1f)
@@ -366,12 +376,43 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
                         ? new Color(1f, 0.88f, 0.2f, 1f)
                         : new Color(fillColor.r, fillColor.g, fillColor.b, 1f);
                     label = coordinate.x + "," + coordinate.y + "\n" +
-                            ResolveCategoryLabel(wavesPreset, categoryId) + " x" + paintedEnemyCount;
+                            GameWavesPreviewOverlayUtility.ResolveCategoryLabel(wavesPreset, categoryId) +
+                            " x" + paintedEnemyCount;
                     labelStyle = paintedLabelStyle;
                 }
 
-                DrawCellOverlay(rect, coordinate, fillColor, outlineColor, label, labelStyle);
+                GameWavesPreviewOverlayUtility.DrawCell(rect,
+                                                        previewUtility.camera,
+                                                        spawnerLocalToWorld,
+                                                        ResolveCellLocalCenter(coordinate),
+                                                        cellSize * CellInsetScale,
+                                                        overlayCorners,
+                                                        fillColor,
+                                                        outlineColor,
+                                                        label,
+                                                        labelStyle);
             }
+        }
+
+        // Show the complete brush name for the hovered painted cell, or the selected cell as a stable fallback.
+        int focusedCellIndex = hasHoveredCell &&
+                               paintedCellIndexByCoordinate.TryGetValue(hoveredCoordinate, out int hoveredCellIndex)
+            ? hoveredCellIndex
+            : selectedCell.HasValue &&
+              paintedCellIndexByCoordinate.TryGetValue(selectedCell.Value, out int selectedCellIndex)
+                ? selectedCellIndex
+                : -1;
+
+        if (focusedCellIndex >= 0)
+        {
+            SerializedProperty focusedCell = cells.GetArrayElementAtIndex(focusedCellIndex);
+            Vector2Int focusedCoordinate = focusedCell.FindPropertyRelative("cellCoordinate").vector2IntValue;
+            GameWavesPreviewOverlayUtility.DrawFocusedCellDetails(
+                rect,
+                wavesPreset,
+                focusedCell.FindPropertyRelative("brushCategoryId").stringValue,
+                focusedCell.FindPropertyRelative("enemyCount").intValue,
+                focusedCoordinate);
         }
     }
 
@@ -495,81 +536,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     }
 
     /// <summary>
-    /// Creates reusable high-contrast grid label styles for coordinate and painted-cell information.
-    /// </summary>
-    private void EnsureLabelStyles()
-    {
-        if (coordinateLabelStyle == null)
-        {
-            coordinateLabelStyle = new GUIStyle(EditorStyles.miniLabel)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.78f, 0.92f, 1f, 0.95f) },
-                fontSize = 9
-            };
-        }
-
-        if (paintedLabelStyle == null)
-        {
-            paintedLabelStyle = new GUIStyle(EditorStyles.miniBoldLabel)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.white },
-                fontSize = 9,
-                wordWrap = true
-            };
-        }
-    }
-
-    /// <summary>
-    /// Draws one projected cell polygon and centers its coordinate or spawn label inside the polygon.
-    /// </summary>
-    /// <param name="rect">Rendered preview rectangle.</param>
-    /// <param name="coordinate">Grid coordinate represented by the cell.</param>
-    /// <param name="fillColor">Translucent polygon fill color.</param>
-    /// <param name="outlineColor">Polygon border color.</param>
-    /// <param name="label">Coordinate and optional spawn information.</param>
-    /// <param name="labelStyle">GUI style used to render the label.</param>
-    private void DrawCellOverlay(Rect rect,
-                                 Vector2Int coordinate,
-                                 Color fillColor,
-                                 Color outlineColor,
-                                 string label,
-                                 GUIStyle labelStyle)
-    {
-        Vector3 localCenter = ResolveCellLocalCenter(coordinate);
-        float inset = cellSize * CellInsetScale;
-        overlayCorners[0] = WorldToGui(rect,
-                                       spawnerLocalToWorld.MultiplyPoint3x4(localCenter + new Vector3(-inset, 0f, -inset)));
-        overlayCorners[1] = WorldToGui(rect,
-                                       spawnerLocalToWorld.MultiplyPoint3x4(localCenter + new Vector3(-inset, 0f, inset)));
-        overlayCorners[2] = WorldToGui(rect,
-                                       spawnerLocalToWorld.MultiplyPoint3x4(localCenter + new Vector3(inset, 0f, inset)));
-        overlayCorners[3] = WorldToGui(rect,
-                                       spawnerLocalToWorld.MultiplyPoint3x4(localCenter + new Vector3(inset, 0f, -inset)));
-
-        if (overlayCorners[0].z <= 0f || overlayCorners[1].z <= 0f ||
-            overlayCorners[2].z <= 0f || overlayCorners[3].z <= 0f)
-            return;
-
-        // GUI handles must use a neutral depth so the overlay cannot be clipped by preview-camera distance.
-        for (int cornerIndex = 0; cornerIndex < overlayCorners.Length; cornerIndex++)
-            overlayCorners[cornerIndex].z = 0f;
-
-        Handles.BeginGUI();
-        Handles.DrawSolidRectangleWithOutline(overlayCorners, fillColor, outlineColor);
-        Handles.EndGUI();
-        float minimumX = Mathf.Min(overlayCorners[0].x, overlayCorners[1].x, overlayCorners[2].x, overlayCorners[3].x);
-        float maximumX = Mathf.Max(overlayCorners[0].x, overlayCorners[1].x, overlayCorners[2].x, overlayCorners[3].x);
-        float minimumY = Mathf.Min(overlayCorners[0].y, overlayCorners[1].y, overlayCorners[2].y, overlayCorners[3].y);
-        float maximumY = Mathf.Max(overlayCorners[0].y, overlayCorners[1].y, overlayCorners[2].y, overlayCorners[3].y);
-        Rect labelRect = Rect.MinMaxRect(minimumX, minimumY, maximumX, maximumY);
-
-        if (labelRect.width >= 20f && labelRect.height >= 14f)
-            GUI.Label(labelRect, label, labelStyle);
-    }
-
-    /// <summary>
     /// Converts one preview pointer position into a valid local spawner-grid coordinate.
     /// </summary>
     /// <param name="rect">Interactive preview rectangle.</param>
@@ -619,20 +585,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     }
 
     /// <summary>
-    /// Projects one world position into the IMGUI preview rectangle.
-    /// </summary>
-    /// <param name="rect">Rendered preview rectangle.</param>
-    /// <param name="worldPosition">World position to project.</param>
-    /// <returns>GUI x/y position with camera-space depth in z.</returns>
-    private Vector3 WorldToGui(Rect rect, Vector3 worldPosition)
-    {
-        Vector3 viewportPosition = previewUtility.camera.WorldToViewportPoint(worldPosition);
-        return new Vector3(rect.x + viewportPosition.x * rect.width,
-                           rect.y + (1f - viewportPosition.y) * rect.height,
-                           viewportPosition.z);
-    }
-
-    /// <summary>
     /// Resolves the painted-cell array for one visible wave.
     /// </summary>
     /// <param name="wavePresetObject">Serialized wave preset.</param>
@@ -670,33 +622,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         return -1;
     }
 
-    /// <summary>
-    /// Resolves a category overlay color with a visible fallback for missing identifiers.
-    /// </summary>
-    /// <param name="preset">Waves preset owning category definitions.</param>
-    /// <param name="categoryId">Stable category identifier stored by the cell.</param>
-    /// <returns>Authored category color or a fallback magenta.</returns>
-    private static Color ResolveCategoryColor(GameWavesPreset preset, string categoryId)
-    {
-        if (preset != null && preset.TryFindBrushCategory(categoryId, out EnemyBrushCategoryDefinition category))
-            return category.BrushColor;
-
-        return new Color(1f, 0.2f, 0.8f, 0.9f);
-    }
-
-    /// <summary>
-    /// Resolves a compact category label for painted-cell overlays.
-    /// </summary>
-    /// <param name="preset">Waves preset owning category definitions.</param>
-    /// <param name="categoryId">Stable category identifier stored by the cell.</param>
-    /// <returns>Designer-facing category label or a missing-category fallback.</returns>
-    private static string ResolveCategoryLabel(GameWavesPreset preset, string categoryId)
-    {
-        if (preset != null && preset.TryFindBrushCategory(categoryId, out EnemyBrushCategoryDefinition category))
-            return category.DisplayName;
-
-        return "Missing";
-    }
     #endregion
 
     #region Cleanup

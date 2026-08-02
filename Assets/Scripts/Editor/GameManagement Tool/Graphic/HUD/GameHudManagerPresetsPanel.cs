@@ -167,9 +167,7 @@ public sealed class GameHudManagerPresetsPanel
         GameManagementPanelLayoutUtility.ConfigureDetailsPane(rightPane);
 
         detailsRoot = new ScrollView();
-        detailsRoot.style.flexGrow = 1f;
-        detailsRoot.style.flexShrink = 1f;
-        detailsRoot.style.minWidth = 0f;
+        GameManagementPanelLayoutUtility.ConfigureDetailsScrollView(detailsRoot);
         rightPane.Add(detailsRoot);
         return rightPane;
     }

@@ -178,9 +178,13 @@ public static class GameWaveDifficultyIntegrationSmokeTest
         for (int presetIndex = 0; presetIndex < wavePresets.Count; presetIndex++)
         {
             EnemyWavePreset wavePreset = wavePresets[presetIndex];
+            List<string> parallelLabelWarnings = GameWavesValidationUtility.BuildParallelLabelWarnings(wavePreset);
 
             if (wavePreset.WavesPreset != wavesPreset)
                 failures.Add("Wave preset '" + wavePreset.name + "' is not linked to the active category source.");
+
+            for (int warningIndex = 0; warningIndex < parallelLabelWarnings.Count; warningIndex++)
+                failures.Add("Parallel wave label validation: " + parallelLabelWarnings[warningIndex]);
 
             for (int waveIndex = 0; waveIndex < wavePreset.Waves.Count; waveIndex++)
             {

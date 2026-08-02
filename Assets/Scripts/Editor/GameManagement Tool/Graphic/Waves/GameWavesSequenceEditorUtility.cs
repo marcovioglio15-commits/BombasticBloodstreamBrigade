@@ -32,9 +32,20 @@ internal static class GameWavesSequenceEditorUtility
             "Append one ordered sequence step containing a single wave.",
             () => AddStep(waveSerializedObject, rebuild)));
         root.Add(toolbar);
-        root.Add(new HelpBox(
+        HelpBox sequenceHelp = new HelpBox(
             "Steps run in ascending order. Waves inside the same step run in parallel; each later step evaluates its start condition against the preceding step as a whole.",
-            HelpBoxMessageType.Info));
+            HelpBoxMessageType.Info);
+        sequenceHelp.style.flexShrink = 0f;
+        root.Add(sequenceHelp);
+        List<string> labelWarnings = GameWavesValidationUtility.BuildParallelLabelWarnings(
+            waveSerializedObject.targetObject as EnemyWavePreset);
+
+        for (int warningIndex = 0; warningIndex < labelWarnings.Count; warningIndex++)
+        {
+            HelpBox warning = new HelpBox(labelWarnings[warningIndex], HelpBoxMessageType.Warning);
+            warning.style.flexShrink = 0f;
+            root.Add(warning);
+        }
 
         if (waves.arraySize == 0)
         {
@@ -45,6 +56,7 @@ internal static class GameWavesSequenceEditorUtility
 
         List<int> stepIndices = BuildStepIndices(waves);
         ScrollView scrollView = new ScrollView();
+        GameManagementPanelLayoutUtility.ConfigureDetailsScrollView(scrollView);
 
         // Render each ordered step with parallel wave children and structural controls.
         for (int stepPosition = 0; stepPosition < stepIndices.Count; stepPosition++)

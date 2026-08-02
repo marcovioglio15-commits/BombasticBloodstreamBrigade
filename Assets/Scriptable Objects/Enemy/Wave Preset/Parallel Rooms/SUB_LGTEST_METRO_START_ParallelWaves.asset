@@ -501,7 +501,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 6ceab9bacbbf4bb5860ca6ae96f89c77
-    waveLabel: PF_EnemySpawner_Grunts
+    waveLabel: PF_EnemySpawner_Grunts - Parallel 2
     sequenceStepIndex: 0
     referenceWaveId: 
     previewInScene: 0

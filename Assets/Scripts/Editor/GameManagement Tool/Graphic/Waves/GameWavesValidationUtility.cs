@@ -63,6 +63,21 @@ internal static class GameWavesValidationUtility
 
         return warnings;
     }
+
+    /// <summary>
+    /// Reports labels reused by two or more parallel waves inside the same ordered step.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset whose parallel labels are inspected.</param>
+    /// <returns>Actionable duplicate-label warnings for the selected wave asset.</returns>
+    public static List<string> BuildParallelLabelWarnings(EnemyWavePreset preset)
+    {
+        List<string> warnings = new List<string>();
+
+        if (preset != null)
+            ValidateParallelLabels(preset, warnings);
+
+        return warnings;
+    }
     #endregion
 
     #region Category Methods
@@ -128,6 +143,7 @@ internal static class GameWavesValidationUtility
             new Dictionary<string, EnemySpawnWaveAuthoring>(StringComparer.OrdinalIgnoreCase);
         Dictionary<string, int> difficultyGroupSteps = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         HashSet<int> sequenceSteps = new HashSet<int>();
+        ValidateParallelLabels(preset, warnings);
 
         for (int waveIndex = 0; waveIndex < preset.Waves.Count; waveIndex++)
         {
@@ -204,6 +220,39 @@ internal static class GameWavesValidationUtility
         }
 
         ValidateReferenceCycles(preset.name, wavesById, warnings);
+    }
+
+    /// <summary>
+    /// Validates that parallel members use distinct designer-facing labels inside each ordered step.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset being inspected.</param>
+    /// <param name="warnings">Output warning list.</param>
+    private static void ValidateParallelLabels(EnemyWavePreset preset, List<string> warnings)
+    {
+        Dictionary<int, HashSet<string>> labelsByStep =
+            new Dictionary<int, HashSet<string>>();
+
+        // Compare labels only within their parallel step because equal labels across sequential steps remain unambiguous.
+        for (int waveIndex = 0; waveIndex < preset.Waves.Count; waveIndex++)
+        {
+            EnemySpawnWaveAuthoring wave = preset.Waves[waveIndex];
+
+            if (wave == null || string.IsNullOrWhiteSpace(wave.WaveLabel) || wave.SequenceStepIndex < 0)
+                continue;
+
+            if (!labelsByStep.TryGetValue(wave.SequenceStepIndex, out HashSet<string> labels))
+            {
+                labels = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                labelsByStep.Add(wave.SequenceStepIndex, labels);
+            }
+
+            if (!labels.Add(wave.WaveLabel.Trim()))
+            {
+                warnings.Add("Wave asset '" + preset.name + "' step " + (wave.SequenceStepIndex + 1) +
+                             " contains duplicate parallel label '" + wave.WaveLabel +
+                             "'. Every parallel wave in one step requires a unique label.");
+            }
+        }
     }
 
     /// <summary>

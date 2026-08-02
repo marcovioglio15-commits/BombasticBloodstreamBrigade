@@ -154,29 +154,160 @@ internal static class GameWavesPanelUiUtility
     }
 
     /// <summary>
-    /// Builds readable wave popup choices while preserving the authored order.
+    /// Adds separate ordered-step and parallel-wave selectors while retaining flat serialized wave indices.
     /// </summary>
-    /// <param name="preset">Enemy Wave preset supplying waves.</param>
-    /// <returns>Non-empty popup choice list.</returns>
-    public static List<string> BuildWaveChoices(EnemyWavePreset preset)
+    /// <param name="rootElement">Toolbar receiving both selectors.</param>
+    /// <param name="preset">Enemy Wave preset supplying ordered steps and parallel members.</param>
+    /// <param name="selectedWaveIndex">Currently selected flat wave index.</param>
+    /// <param name="selectionChanged">Callback receiving the selected flat wave index.</param>
+    public static void AddWaveSequenceSelectors(VisualElement rootElement,
+                                                EnemyWavePreset preset,
+                                                int selectedWaveIndex,
+                                                Action<int> selectionChanged)
     {
-        List<string> choices = new List<string>();
+        if (preset == null || preset.Waves.Count == 0)
+            return;
+
+        selectedWaveIndex = ClampIndex(selectedWaveIndex, preset.Waves.Count);
+        List<int> stepIndices = BuildStepIndices(preset);
+
+        if (stepIndices.Count == 0)
+            return;
+
+        EnemySpawnWaveAuthoring selectedWave = preset.Waves[selectedWaveIndex];
+        int selectedStepIndex = selectedWave == null
+            ? stepIndices[0]
+            : selectedWave.SequenceStepIndex;
+        int selectedStepPosition = Mathf.Max(0, stepIndices.IndexOf(selectedStepIndex));
+        List<string> stepChoices = new List<string>(stepIndices.Count);
+
+        // Describe each ordered barrier independently from the parallel members it contains.
+        for (int stepPosition = 0; stepPosition < stepIndices.Count; stepPosition++)
+        {
+            int parallelCount = CountWavesInStep(preset, stepIndices[stepPosition]);
+            stepChoices.Add("Step " + (stepIndices[stepPosition] + 1) + " (" + parallelCount +
+                            (parallelCount == 1 ? " wave)" : " parallel waves)"));
+        }
+
+        PopupField<string> stepPopup = new PopupField<string>("Step", stepChoices, selectedStepPosition);
+        stepPopup.tooltip = "Ordered sequence step. Every wave inside the selected step starts as a parallel member.";
+        stepPopup.RegisterValueChangedCallback(evt =>
+        {
+            List<int> selectedStepWaves = BuildWaveIndicesForStep(preset, stepIndices[stepPopup.index]);
+
+            if (selectedStepWaves.Count > 0 && selectionChanged != null)
+                selectionChanged(selectedStepWaves[0]);
+        });
+        rootElement.Add(stepPopup);
+
+        List<int> waveIndices = BuildWaveIndicesForStep(preset, selectedStepIndex);
+        List<string> waveChoices = new List<string>(waveIndices.Count);
+
+        // Preserve the authored parallel order while making duplicate labels distinguishable by position.
+        for (int wavePosition = 0; wavePosition < waveIndices.Count; wavePosition++)
+        {
+            EnemySpawnWaveAuthoring wave = preset.Waves[waveIndices[wavePosition]];
+            string label = wave == null || string.IsNullOrWhiteSpace(wave.WaveLabel)
+                ? "Unnamed Wave"
+                : wave.WaveLabel;
+            waveChoices.Add("Parallel " + (wavePosition + 1) + " - " + label);
+        }
+
+        int selectedWavePosition = Mathf.Max(0, waveIndices.IndexOf(selectedWaveIndex));
+        PopupField<string> wavePopup = new PopupField<string>("Parallel Wave", waveChoices, selectedWavePosition);
+        wavePopup.tooltip = "Single parallel wave displayed and painted inside the selected ordered step.";
+        wavePopup.RegisterValueChangedCallback(evt =>
+        {
+            if (wavePopup.index >= 0 && wavePopup.index < waveIndices.Count && selectionChanged != null)
+                selectionChanged(waveIndices[wavePopup.index]);
+        });
+        rootElement.Add(wavePopup);
+    }
+
+    /// <summary>
+    /// Builds the selected-wave heading with separate ordered-step and parallel-member positions.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset containing the selected wave.</param>
+    /// <param name="selectedWaveIndex">Selected flat wave index.</param>
+    /// <returns>Readable step and parallel-member context.</returns>
+    public static string BuildWaveSelectionContext(EnemyWavePreset preset, int selectedWaveIndex)
+    {
+        if (preset == null || preset.Waves.Count == 0)
+            return "Selected Wave";
+
+        selectedWaveIndex = ClampIndex(selectedWaveIndex, preset.Waves.Count);
+        EnemySpawnWaveAuthoring selectedWave = preset.Waves[selectedWaveIndex];
+
+        if (selectedWave == null)
+            return "Selected Wave";
+
+        List<int> waveIndices = BuildWaveIndicesForStep(preset, selectedWave.SequenceStepIndex);
+        int parallelPosition = Mathf.Max(0, waveIndices.IndexOf(selectedWaveIndex));
+        return "Selected Wave - Step " + (selectedWave.SequenceStepIndex + 1) +
+               " / Parallel " + (parallelPosition + 1) + " of " + waveIndices.Count;
+    }
+
+    /// <summary>
+    /// Collects ascending authored sequence-step identifiers from one wave preset.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset to inspect.</param>
+    /// <returns>Ascending unique step identifiers.</returns>
+    private static List<int> BuildStepIndices(EnemyWavePreset preset)
+    {
+        List<int> stepIndices = new List<int>();
 
         for (int waveIndex = 0; waveIndex < preset.Waves.Count; waveIndex++)
         {
             EnemySpawnWaveAuthoring wave = preset.Waves[waveIndex];
-            string label = wave == null || string.IsNullOrWhiteSpace(wave.WaveLabel)
-                ? "Wave " + (waveIndex + 1)
-                : wave.WaveLabel;
-            choices.Add(wave == null
-                ? label
-                : "Step " + (wave.SequenceStepIndex + 1) + " - " + label);
+
+            if (wave != null && !stepIndices.Contains(wave.SequenceStepIndex))
+                stepIndices.Add(wave.SequenceStepIndex);
         }
 
-        if (choices.Count == 0)
-            choices.Add("No Waves");
+        stepIndices.Sort();
+        return stepIndices;
+    }
 
-        return choices;
+    /// <summary>
+    /// Collects flat wave indices belonging to one ordered sequence step.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset to inspect.</param>
+    /// <param name="stepIndex">Authored sequence step to match.</param>
+    /// <returns>Parallel member indices in authored order.</returns>
+    private static List<int> BuildWaveIndicesForStep(EnemyWavePreset preset, int stepIndex)
+    {
+        List<int> waveIndices = new List<int>();
+
+        for (int waveIndex = 0; waveIndex < preset.Waves.Count; waveIndex++)
+        {
+            EnemySpawnWaveAuthoring wave = preset.Waves[waveIndex];
+
+            if (wave != null && wave.SequenceStepIndex == stepIndex)
+                waveIndices.Add(waveIndex);
+        }
+
+        return waveIndices;
+    }
+
+    /// <summary>
+    /// Counts parallel members assigned to one sequence step.
+    /// </summary>
+    /// <param name="preset">Enemy Wave preset to inspect.</param>
+    /// <param name="stepIndex">Authored sequence step to count.</param>
+    /// <returns>Number of parallel waves in the step.</returns>
+    private static int CountWavesInStep(EnemyWavePreset preset, int stepIndex)
+    {
+        int count = 0;
+
+        for (int waveIndex = 0; waveIndex < preset.Waves.Count; waveIndex++)
+        {
+            EnemySpawnWaveAuthoring wave = preset.Waves[waveIndex];
+
+            if (wave != null && wave.SequenceStepIndex == stepIndex)
+                count++;
+        }
+
+        return count;
     }
 
     /// <summary>

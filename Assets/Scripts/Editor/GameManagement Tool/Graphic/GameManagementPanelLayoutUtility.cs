@@ -73,9 +73,25 @@ internal static class GameManagementPanelLayoutUtility
             return;
 
         toolbar.style.flexGrow = 0f;
-        toolbar.style.flexShrink = 1f;
+        toolbar.style.flexShrink = 0f;
         toolbar.style.flexWrap = Wrap.Wrap;
         toolbar.style.minWidth = 0f;
+    }
+
+    /// <summary>
+    /// Configures a variable-length vertical details area so excess content scrolls instead of compressing controls.
+    /// </summary>
+    /// <param name="scrollView">Vertical details view receiving the shared sizing rules.</param>
+    public static void ConfigureDetailsScrollView(ScrollView scrollView)
+    {
+        if (scrollView == null)
+            return;
+
+        scrollView.style.flexGrow = 1f;
+        scrollView.style.flexShrink = 1f;
+        scrollView.style.minWidth = 0f;
+        scrollView.style.minHeight = 0f;
+        scrollView.contentContainer.style.flexShrink = 0f;
     }
 
     /// <summary>

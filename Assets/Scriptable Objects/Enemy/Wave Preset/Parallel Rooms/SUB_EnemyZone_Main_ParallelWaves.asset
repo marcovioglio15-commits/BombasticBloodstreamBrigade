@@ -2865,7 +2865,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 76883814b5ca4806a9c11b1b2774bc6a
-    waveLabel: Wave 1
+    waveLabel: Wave 1 - Parallel 2
     sequenceStepIndex: 0
     referenceWaveId: 
     previewInScene: 0
@@ -3044,7 +3044,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: f16c873be4ca4bda97898d65b2167935
-    waveLabel: Wave 2
+    waveLabel: Wave 2 - Parallel 2
     sequenceStepIndex: 1
     referenceWaveId: 
     previewInScene: 0
@@ -3195,7 +3195,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 812f86adff34445ea5c439c3e12afe90
-    waveLabel: Wave 3
+    waveLabel: Wave 3 - Parallel 2
     sequenceStepIndex: 2
     referenceWaveId: 
     previewInScene: 0
@@ -3346,7 +3346,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: c35418005a5f42029dc8c188e11776d4
-    waveLabel: Wave 4
+    waveLabel: Wave 4 - Parallel 2
     sequenceStepIndex: 3
     referenceWaveId: 
     previewInScene: 0

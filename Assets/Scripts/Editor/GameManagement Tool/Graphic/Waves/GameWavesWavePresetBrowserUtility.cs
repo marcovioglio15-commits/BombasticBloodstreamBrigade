@@ -38,6 +38,7 @@ internal static class GameWavesWavePresetBrowserUtility
             value = resolvedPreset
         };
         presetField.tooltip = "Enemy Wave asset whose ordered and parallel sequence is edited. Any project asset can be selected, including preserved scene setups.";
+        presetField.style.flexShrink = 0f;
         presetField.RegisterValueChangedCallback(evt => selectionChanged(evt.newValue as EnemyWavePreset));
         root.Add(presetField);
 

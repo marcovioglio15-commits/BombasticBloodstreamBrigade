@@ -7,9 +7,11 @@ using UnityEngine;
 /// <summary>
 /// Evaluates the authoritative difficulty graph only when its built-in or player input context changes.
 /// </summary>
-[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateInGroup(typeof(PlayerControllerSystemGroup))]
+[UpdateAfter(typeof(PlayerLevelUpSystem))]
+[UpdateAfter(typeof(PlayerMilestonePowerUpSelectionResolveSystem))]
+[UpdateAfter(typeof(PlayerPowerUpCharacterTuningInitializeSystem))]
 [UpdateBefore(typeof(PlayerRuntimeScalingSyncSystem))]
-[UpdateBefore(typeof(EnemySystemGroup))]
 public partial class GameDifficultyScalingSystem : SystemBase
 {
     #region Constants

@@ -133,6 +133,7 @@ public sealed class GameDifficultyScalingPresetsPanel
 
         detailsRoot = new ScrollView();
         GameManagementPanelLayoutUtility.ConfigureDetailsPane(detailsRoot);
+        GameManagementPanelLayoutUtility.ConfigureDetailsScrollView(detailsRoot);
         splitView.Add(browserPane);
         splitView.Add(detailsRoot);
         return splitView;
