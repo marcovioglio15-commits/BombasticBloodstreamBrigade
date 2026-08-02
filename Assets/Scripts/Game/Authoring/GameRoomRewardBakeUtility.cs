@@ -413,7 +413,13 @@ public static class GameRoomRewardBakeUtility
                         TileIndex = flattenedTileIndex,
                         RewardIndex = rewardIndex,
                         Quantity = assignment.Quantity,
-                        Order = assignment.Order
+                        Order = assignment.Order,
+                        SelectionGroupId = new FixedString64Bytes(assignment.SelectionGroupId ?? string.Empty),
+                        DifficultyCoefficientId = new FixedString64Bytes(assignment.DifficultyCoefficientId ?? string.Empty),
+                        MinimumDifficulty = assignment.MinimumDifficulty,
+                        MaximumDifficulty = assignment.MaximumDifficulty,
+                        SelectionWeight = math.max(0f, assignment.SelectionWeight),
+                        UseDifficultySelection = assignment.UseDifficultySelection ? (byte)1 : (byte)0
                     });
                 }
 
@@ -472,7 +478,12 @@ public static class GameRoomRewardBakeUtility
 
                     if (assignment == null ||
                         !preset.TryFindReward(assignment.RewardTechnicalId, out GameRoomRewardDefinition _) ||
-                        assignment.Quantity <= 0)
+                        assignment.Quantity <= 0 ||
+                        (assignment.UseDifficultySelection &&
+                         (string.IsNullOrWhiteSpace(assignment.SelectionGroupId) ||
+                          string.IsNullOrWhiteSpace(assignment.DifficultyCoefficientId) ||
+                          assignment.MinimumDifficulty > assignment.MaximumDifficulty ||
+                          assignment.SelectionWeight <= 0f)))
                     {
                         failureMessage = string.Format("Tile '{0}' contains an invalid Room Clear Reward assignment at index {1}.",
                                                        tile.TileId,

@@ -199,6 +199,30 @@ public sealed class GameRoomRewardTileAssignment
     [Tooltip("Explicit grant order used when a tile contains multiple room rewards.")]
     [SerializeField]
     private int order;
+
+    [Tooltip("When enabled, this assignment competes with assignments in the same Selection Group using a difficulty coefficient and deterministic weight.")]
+    [SerializeField]
+    private bool useDifficultySelection;
+
+    [Tooltip("Stable group identifier. Exactly one eligible assignment is selected from each non-empty group when difficulty selection is enabled.")]
+    [SerializeField]
+    private string selectionGroupId;
+
+    [Tooltip("Difficulty coefficient used to determine assignment eligibility.")]
+    [SerializeField]
+    private string difficultyCoefficientId;
+
+    [Tooltip("Inclusive minimum coefficient value that makes this reward assignment eligible.")]
+    [SerializeField]
+    private float minimumDifficulty;
+
+    [Tooltip("Inclusive maximum coefficient value that makes this reward assignment eligible.")]
+    [SerializeField]
+    private float maximumDifficulty = 100f;
+
+    [Tooltip("Relative deterministic selection weight among eligible assignments in the same group.")]
+    [SerializeField]
+    private float selectionWeight = 1f;
     #endregion
 
     #endregion
@@ -227,5 +251,12 @@ public sealed class GameRoomRewardTileAssignment
             return order;
         }
     }
+
+    public bool UseDifficultySelection => useDifficultySelection;
+    public string SelectionGroupId => selectionGroupId;
+    public string DifficultyCoefficientId => difficultyCoefficientId;
+    public float MinimumDifficulty => minimumDifficulty;
+    public float MaximumDifficulty => maximumDifficulty;
+    public float SelectionWeight => selectionWeight;
     #endregion
 }

@@ -14,8 +14,9 @@ public sealed class EnemySpawnWaveCellAuthoring
     [Tooltip("Grid coordinate of the painted spawn cell. X is horizontal, Y is depth on the spawner local XZ plane.")]
     [SerializeField] private Vector2Int cellCoordinate;
 
-    [Tooltip("Enemy master preset painted on the cell. The visual preset of this master preset resolves the concrete enemy prefab.")]
-    [SerializeField] private EnemyMasterPreset masterPreset;
+    [Tooltip("Stable Waves brush category identifier used to resolve weighted, difficulty-aware enemy candidates for this painted cell.")]
+    [SerializeField]
+    private string brushCategoryId;
 
     [Tooltip("Total amount of enemies of this type emitted by this cell across the wave spawn duration.")]
     [SerializeField] private int enemyCount = 1;
@@ -38,13 +39,7 @@ public sealed class EnemySpawnWaveCellAuthoring
         }
     }
 
-    public EnemyMasterPreset MasterPreset
-    {
-        get
-        {
-            return masterPreset;
-        }
-    }
+    public string BrushCategoryId => brushCategoryId;
 
     public int EnemyCount
     {
@@ -95,13 +90,12 @@ public sealed class EnemySpawnWaveCellAuthoring
     }
 
     /// <summary>
-    /// Updates the authored master preset.
-    /// Used by inspector painting tools.
+    /// Updates the reusable brush category referenced by this painted cell.
     /// </summary>
-    /// <param name="value">New master preset assignment.</param>
-    internal void SetMasterPreset(EnemyMasterPreset value)
+    /// <param name="value">Stable category identifier selected by the Waves tool.</param>
+    internal void SetBrushCategoryId(string value)
     {
-        masterPreset = value;
+        brushCategoryId = value;
     }
 
     /// <summary>
@@ -137,8 +131,20 @@ public sealed class EnemySpawnWaveAuthoring
     #region Fields
 
     #region Serialized Fields
+    [Tooltip("Stable wave identifier used by optional explicit dependencies between authored waves.")]
+    [SerializeField]
+    private string waveId;
+
     [Tooltip("Optional label used in the inspector to identify this wave.")]
     [SerializeField] private string waveLabel = "Wave";
+
+    [Tooltip("Zero-based ordered step containing this wave. Every wave in the same step executes in parallel, while later steps wait for the previous step condition.")]
+    [SerializeField]
+    private int sequenceStepIndex;
+
+    [Tooltip("Optional explicit prerequisite wave ID overriding the previous sequence step. Leave empty for the normal ordered step dependency.")]
+    [SerializeField]
+    private string referenceWaveId;
 
     [Tooltip("When enabled, this is the only wave shown in scene previews and gizmos.")]
     [SerializeField] private bool previewInScene;
@@ -157,11 +163,37 @@ public sealed class EnemySpawnWaveAuthoring
 
     [Tooltip("Sparse list of painted spawn cells used by this wave.")]
     [SerializeField] private List<EnemySpawnWaveCellAuthoring> paintedCells = new List<EnemySpawnWaveCellAuthoring>();
+
+    [Tooltip("Enables deterministic difficulty-based selection for this wave instead of always enabling it.")]
+    [SerializeField]
+    private bool useDifficultySelection;
+
+    [Tooltip("Selection group shared by alternative waves. Exactly one eligible weighted wave is enabled in each non-empty group.")]
+    [SerializeField]
+    private string difficultySelectionGroupId;
+
+    [Tooltip("Difficulty coefficient used to determine whether this grouped wave is eligible.")]
+    [SerializeField]
+    private string difficultyCoefficientId;
+
+    [Tooltip("Inclusive minimum coefficient value that makes this grouped wave eligible.")]
+    [SerializeField]
+    private float minimumDifficulty;
+
+    [Tooltip("Inclusive maximum coefficient value that makes this grouped wave eligible.")]
+    [SerializeField]
+    private float maximumDifficulty = 100f;
+
+    [Tooltip("Relative deterministic selection weight among eligible waves in the same selection group.")]
+    [SerializeField]
+    private float selectionWeight = 1f;
     #endregion
 
     #endregion
 
     #region Properties
+    public string WaveId => waveId;
+
     public string WaveLabel
     {
         get
@@ -169,6 +201,9 @@ public sealed class EnemySpawnWaveAuthoring
             return waveLabel;
         }
     }
+
+    public int SequenceStepIndex => sequenceStepIndex;
+    public string ReferenceWaveId => referenceWaveId;
 
     public bool PreviewInScene
     {
@@ -217,11 +252,27 @@ public sealed class EnemySpawnWaveAuthoring
             return paintedCells;
         }
     }
+
+    public bool UseDifficultySelection => useDifficultySelection;
+    public string DifficultySelectionGroupId => difficultySelectionGroupId;
+    public string DifficultyCoefficientId => difficultyCoefficientId;
+    public float MinimumDifficulty => minimumDifficulty;
+    public float MaximumDifficulty => maximumDifficulty;
+    public float SelectionWeight => selectionWeight;
     #endregion
 
     #region Methods
 
     #region Internal Methods
+    /// <summary>
+    /// Ensures the wave owns a stable dependency identity without correcting authored sequence values.
+    /// </summary>
+    internal void EnsureIdentity()
+    {
+        if (string.IsNullOrWhiteSpace(waveId))
+            waveId = Guid.NewGuid().ToString("N");
+    }
+
     /// <summary>
     /// Updates the preview flag used by scene gizmos.
     /// </summary>

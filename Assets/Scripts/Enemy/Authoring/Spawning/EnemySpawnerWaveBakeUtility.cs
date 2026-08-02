@@ -11,7 +11,6 @@ public static class EnemySpawnerWaveBakeUtility
     private const int CurveSampleCount = 128;
     private const float EventPlacementRadiusScale = 0.31f;
     private const float GoldenAngleRadians = 2.39996323f;
-    private static readonly Color DefaultPaintColor = new Color(1f, 0.35f, 0.35f, 1f);
     #endregion
 
     #region Methods
@@ -35,31 +34,8 @@ public static class EnemySpawnerWaveBakeUtility
     /// <param name="gridSizeZ">Grid height in cells.</param>
     public static void ValidateWaves(List<EnemySpawnWaveAuthoring> waves, int gridSizeX, int gridSizeZ)
     {
-        if (waves == null)
-            return;
-
-        bool previewFound = false;
-
-        for (int waveIndex = 0; waveIndex < waves.Count; waveIndex++)
-        {
-            EnemySpawnWaveAuthoring wave = waves[waveIndex];
-
-            if (wave == null)
-                continue;
-
-            ValidateWave(wave, gridSizeX, gridSizeZ, waveIndex == 0);
-
-            if (!wave.PreviewInScene)
-                continue;
-
-            if (!previewFound)
-            {
-                previewFound = true;
-                continue;
-            }
-
-            wave.SetPreviewInScene(false);
-        }
+        // Runtime baking performs defensive clamps without rewriting designer-authored source data.
+        // The Waves panel reports invalid ranges, duplicate cells and timing values explicitly.
     }
 
     /// <summary>
@@ -160,30 +136,6 @@ public static class EnemySpawnerWaveBakeUtility
     }
 
     /// <summary>
-    /// Resolves the paint color associated with one master preset.
-    /// Used by scene gizmos and inspector previews.
-    /// </summary>
-    /// <param name="masterPreset">Enemy master preset currently painted on a cell.</param>
-    /// <returns>Resolved paint color, or a default fallback when no visual preset is available.</returns>
-    public static Color ResolvePaintColor(EnemyMasterPreset masterPreset)
-    {
-        if (masterPreset == null)
-            return DefaultPaintColor;
-
-        EnemyVisualPreset visualPreset = masterPreset.VisualPreset;
-
-        if (visualPreset == null)
-            return DefaultPaintColor;
-
-        EnemyVisualPrefabSettings prefabSettings = visualPreset.Prefabs;
-
-        if (prefabSettings == null)
-            return DefaultPaintColor;
-
-        return prefabSettings.SpawnPaintColor;
-    }
-
-    /// <summary>
     /// Resolves the prefab referenced by one master preset through its visual preset.
     /// </summary>
     /// <param name="masterPreset">Enemy master preset to inspect.</param>
@@ -233,17 +185,17 @@ public static class EnemySpawnerWaveBakeUtility
     }
 
     /// <summary>
-    /// Computes the amount of distinct master presets painted inside one wave.
+    /// Computes the amount of distinct brush categories painted inside one wave.
     /// Used by inspector summaries.
     /// </summary>
     /// <param name="wave">Wave to inspect.</param>
-    /// <returns>Number of distinct enemy master presets referenced by painted cells.</returns>
-    public static int CountWaveEnemyTypes(EnemySpawnWaveAuthoring wave)
+    /// <returns>Number of distinct non-empty brush category identifiers referenced by painted cells.</returns>
+    public static int CountWaveBrushCategories(EnemySpawnWaveAuthoring wave)
     {
         if (wave == null || wave.PaintedCells == null)
             return 0;
 
-        HashSet<EnemyMasterPreset> uniquePresets = new HashSet<EnemyMasterPreset>();
+        HashSet<string> uniqueCategoryIds = new HashSet<string>();
 
         for (int cellIndex = 0; cellIndex < wave.PaintedCells.Count; cellIndex++)
         {
@@ -252,13 +204,13 @@ public static class EnemySpawnerWaveBakeUtility
             if (cell == null)
                 continue;
 
-            if (cell.MasterPreset == null)
+            if (string.IsNullOrWhiteSpace(cell.BrushCategoryId))
                 continue;
 
-            uniquePresets.Add(cell.MasterPreset);
+            uniqueCategoryIds.Add(cell.BrushCategoryId);
         }
 
-        return uniquePresets.Count;
+        return uniqueCategoryIds.Count;
     }
     #endregion
 

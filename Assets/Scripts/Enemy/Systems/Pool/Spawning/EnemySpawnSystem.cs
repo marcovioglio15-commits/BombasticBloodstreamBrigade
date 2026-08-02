@@ -97,6 +97,9 @@ public partial struct EnemySpawnSystem : ISystem
 
         EnemySpawnWarningConfig warningConfig = entityManager.GetComponentData<EnemySpawnWarningConfig>(spawnerEntity);
         float4x4 localToWorld = entityManager.GetComponentData<LocalToWorld>(spawnerEntity).Value;
+        EnemyDifficultySelectionRuntimeUtility.ResolveWaveSelections(entityManager,
+                                                                     spawnerEntity,
+                                                                     in spawnerState);
         int waveCount = entityManager.GetBuffer<EnemySpawnerWaveDefinitionElement>(spawnerEntity).Length;
 
         for (int waveIndex = 0; waveIndex < waveCount; waveIndex++)
@@ -109,6 +112,9 @@ public partial struct EnemySpawnSystem : ISystem
 
             EnemySpawnerWaveDefinitionElement definition = waveDefinitions[waveIndex];
             EnemySpawnerWaveRuntimeElement runtime = waveRuntime[waveIndex];
+
+            if (runtime.Enabled == 0)
+                continue;
 
             if (runtime.Completed != 0)
                 continue;
@@ -142,7 +148,7 @@ public partial struct EnemySpawnSystem : ISystem
             }
 
             TryFinalizeWave(elapsedTime, definition, ref runtime);
-            SetWaveRuntime(entityManager, spawnerEntity, waveIndex, runtime);
+            EnemySpawnerBufferRuntimeUtility.SetWaveRuntime(entityManager, spawnerEntity, waveIndex, runtime);
         }
 
         entityManager.SetComponentData(spawnerEntity, spawnerState);
@@ -180,20 +186,12 @@ public partial struct EnemySpawnSystem : ISystem
             return;
 
         EnemySpawnerWaveDefinitionElement definition = waveDefinitions[waveIndex];
-        float referenceTime = spawnerState.StartTime;
-
-        if (waveIndex > 0)
-        {
-            EnemySpawnerWaveRuntimeElement previousWaveRuntime = waveRuntime[waveIndex - 1];
-            EnemySpawnerWaveDefinitionElement previousWaveDefinition = waveDefinitions[waveIndex - 1];
-
-            if (!TryResolveReferenceTime(spawnerState,
-                                         previousWaveDefinition,
-                                         previousWaveRuntime,
-                                         definition.StartMode,
-                                         out referenceTime))
-                return;
-        }
+        if (!EnemyWaveSequenceRuntimeUtility.TryResolveReferenceTime(spawnerState,
+                                                                     waveDefinitions,
+                                                                     waveRuntime,
+                                                                     definition,
+                                                                     out float referenceTime))
+            return;
 
         runtime.ScheduledStartTime = referenceTime + math.max(0f, definition.StartDelaySeconds);
         runtime.StartScheduled = 1;
@@ -262,6 +260,16 @@ public partial struct EnemySpawnSystem : ISystem
             }
 
             EnemySpawnerWaveEventElement waveEvent = waveEvents[eventIndex];
+
+            if (!EnemyDifficultySelectionRuntimeUtility.ResolveCategoryEventSelection(entityManager,
+                                                                                       spawnerEntity,
+                                                                                       eventIndex,
+                                                                                       ref waveEvent))
+            {
+                runtime.NextWarningEventIndex++;
+                continue;
+            }
+
             EnemySpawnWarningConfig eventWarningConfig = EnemySpawnWarningConfigUtility.ResolveEventWarningConfig(in waveEvent, in warningConfig);
             float leadTimeSeconds = EnemySpawnWarningConfigUtility.ResolveEffectiveLeadTimeSeconds(in eventWarningConfig);
             float spawnTime = actualWaveSpawnStartTime + math.max(0f, waveEvent.RelativeTime);
@@ -305,7 +313,7 @@ public partial struct EnemySpawnSystem : ISystem
                                                   warningState,
                                                   elapsedTime < spawnTime);
             waveEvent.ReservedEnemyEntity = enemyEntity;
-            SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
+            EnemySpawnerBufferRuntimeUtility.SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
             runtime.NextWarningEventIndex++;
             remainingReservationBudget--;
         }
@@ -345,6 +353,20 @@ public partial struct EnemySpawnSystem : ISystem
             }
 
             EnemySpawnerWaveEventElement waveEvent = waveEvents[eventIndex];
+
+            if (!EnemyDifficultySelectionRuntimeUtility.ResolveCategoryEventSelection(entityManager,
+                                                                                       spawnerEntity,
+                                                                                       eventIndex,
+                                                                                       ref waveEvent))
+            {
+                runtime.NextEventIndex++;
+
+                if (runtime.NextWarningEventIndex < runtime.NextEventIndex)
+                    runtime.NextWarningEventIndex = runtime.NextEventIndex;
+
+                continue;
+            }
+
             float dueTime = runtime.SpawnStartTime + math.max(0f, waveEvent.RelativeTime);
 
             if (elapsedTime < dueTime)
@@ -385,7 +407,7 @@ public partial struct EnemySpawnSystem : ISystem
 
             EnemyPoolUtility.ActivateReservedEnemy(entityManager, enemyEntity, worldPosition);
             waveEvent.ReservedEnemyEntity = Entity.Null;
-            SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
+            EnemySpawnerBufferRuntimeUtility.SetWaveEvent(entityManager, spawnerEntity, eventIndex, waveEvent);
             runtime.NextEventIndex++;
             runtime.AliveCount++;
             runtime.SpawnedCount++;
@@ -430,96 +452,6 @@ public partial struct EnemySpawnSystem : ISystem
 
         runtime.Completed = 1;
         runtime.CompletionTime = math.max(runtime.SpawnEndTime, elapsedTime);
-    }
-
-    /// <summary>
-    /// Writes one wave runtime element after any spawn-side structural changes have completed.
-    /// </summary>
-    /// <param name="entityManager">Entity manager used to reacquire the runtime buffer.</param>
-    /// <param name="spawnerEntity">Spawner that owns the runtime buffer.</param>
-    /// <param name="waveIndex">Wave index to update.</param>
-    /// <param name="runtime">Runtime data to store.</param>
-    private static void SetWaveRuntime(EntityManager entityManager,
-                                       Entity spawnerEntity,
-                                       int waveIndex,
-                                       EnemySpawnerWaveRuntimeElement runtime)
-    {
-        DynamicBuffer<EnemySpawnerWaveRuntimeElement> waveRuntime = entityManager.GetBuffer<EnemySpawnerWaveRuntimeElement>(spawnerEntity);
-
-        if (waveIndex >= 0 && waveIndex < waveRuntime.Length)
-            waveRuntime[waveIndex] = runtime;
-    }
-
-    /// <summary>
-    /// Writes one staged wave event after enemy reservation or activation has potentially changed archetypes.
-    /// </summary>
-    /// <param name="entityManager">Entity manager used to reacquire the event buffer.</param>
-    /// <param name="spawnerEntity">Spawner that owns the event buffer.</param>
-    /// <param name="eventIndex">Event index to update.</param>
-    /// <param name="waveEvent">Event data to store.</param>
-    private static void SetWaveEvent(EntityManager entityManager,
-                                     Entity spawnerEntity,
-                                     int eventIndex,
-                                     EnemySpawnerWaveEventElement waveEvent)
-    {
-        DynamicBuffer<EnemySpawnerWaveEventElement> waveEvents = entityManager.GetBuffer<EnemySpawnerWaveEventElement>(spawnerEntity);
-
-        if (eventIndex >= 0 && eventIndex < waveEvents.Length)
-            waveEvents[eventIndex] = waveEvent;
-    }
-
-    /// <summary>
-    /// Resolves the prerequisite reference time that drives scheduling for a non-first wave.
-    /// </summary>
-    /// <param name="spawnerState">Global mutable spawner state.</param>
-    /// <param name="previousWaveDefinition">Immutable definition of the previous wave.</param>
-    /// <param name="previousWaveRuntime">Mutable runtime state of the previous wave.</param>
-    /// <param name="startMode">Requested start mode for the current wave.</param>
-    /// <param name="referenceTime">Resolved reference time when the prerequisite is satisfied.</param>
-    /// <returns>True when the prerequisite is satisfied and the reference time is valid, otherwise false.</returns>
-    private static bool TryResolveReferenceTime(EnemySpawnerState spawnerState,
-                                                EnemySpawnerWaveDefinitionElement previousWaveDefinition,
-                                                EnemySpawnerWaveRuntimeElement previousWaveRuntime,
-                                                EnemyWaveStartMode startMode,
-                                                out float referenceTime)
-    {
-        switch (startMode)
-        {
-            case EnemyWaveStartMode.FromSpawnerStart:
-                referenceTime = spawnerState.StartTime;
-                return true;
-
-            case EnemyWaveStartMode.AfterPreviousWaveStart:
-                if (previousWaveRuntime.Started == 0)
-                    break;
-
-                referenceTime = previousWaveRuntime.SpawnStartTime;
-                return true;
-
-            case EnemyWaveStartMode.AfterPreviousWaveSpawnEnd:
-                if (previousWaveRuntime.Started == 0)
-                    break;
-
-                referenceTime = previousWaveRuntime.SpawnStartTime + math.max(0f, previousWaveDefinition.SpawnDurationSeconds);
-                return true;
-
-            case EnemyWaveStartMode.AfterPreviousWaveCompleted:
-                if (previousWaveRuntime.Completed == 0)
-                    break;
-
-                referenceTime = previousWaveRuntime.CompletionTime;
-                return true;
-
-            case EnemyWaveStartMode.AfterPreviousWaveFirstKill:
-                if (previousWaveRuntime.FirstKillRegistered == 0)
-                    break;
-
-                referenceTime = previousWaveRuntime.FirstKillTime;
-                return true;
-        }
-
-        referenceTime = 0f;
-        return false;
     }
 
     /// <summary>

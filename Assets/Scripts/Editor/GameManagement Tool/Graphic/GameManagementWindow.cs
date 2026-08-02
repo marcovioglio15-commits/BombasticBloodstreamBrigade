@@ -15,7 +15,6 @@ public sealed class GameManagementWindow : EditorWindow
     private VisualElement contentRoot;
     private Label sessionStatusLabel;
     private PanelType activePanel = PanelType.GameMasterPresets;
-    private IVisualElementScheduledItem pendingCheckSchedule;
     #endregion
 
     #region Menu
@@ -45,6 +44,11 @@ public sealed class GameManagementWindow : EditorWindow
         if (!GameManagementDraftSession.IsInitialized)
             GameManagementDraftSession.BeginSession();
 
+        GameManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        GameManagementDraftSession.PendingChangesChanged += RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
+        Undo.undoRedoPerformed += HandleUndoRedo;
+
         activePanel = ManagementToolStateUtility.LoadEnumValue(ActivePanelStateKey, PanelType.GameMasterPresets);
 
         if (activePanel != PanelType.GameMasterPresets)
@@ -62,12 +66,12 @@ public sealed class GameManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Stops pending-change polling while the window is disabled.
+    /// Detaches event-driven draft status tracking while the window is disabled.
     /// </summary>
     private void OnDisable()
     {
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
+        GameManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
     }
 
     /// <summary>
@@ -114,10 +118,6 @@ public sealed class GameManagementWindow : EditorWindow
         RefreshSessionStatus();
         ManagementToolInteractiveElementColorUtility.RegisterHierarchy(rootVisualElement, "NashCore.GameManagement.Controls");
 
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
-
-        pendingCheckSchedule = rootVisualElement.schedule.Execute(RefreshSessionStatus).Every(1000);
     }
 
     /// <summary>
@@ -304,17 +304,24 @@ public sealed class GameManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Recomputes draft session state and updates the toolbar status label.
+    /// Updates the toolbar status label from the event-driven draft state.
     /// </summary>
     private void RefreshSessionStatus()
     {
-        GameManagementDraftSession.RecomputePendingChanges();
         UpdateUnsavedState();
 
         if (sessionStatusLabel == null)
             return;
 
         sessionStatusLabel.text = hasUnsavedChanges ? "Pending Changes" : "Clean";
+    }
+
+    /// <summary>
+    /// Recomputes the draft snapshot once after native Unity Undo or Redo operations.
+    /// </summary>
+    private void HandleUndoRedo()
+    {
+        GameManagementDraftSession.RecomputePendingChanges();
     }
 
     /// <summary>
@@ -351,7 +358,9 @@ public sealed class GameManagementWindow : EditorWindow
         SettingsManager = 3,
         HudManager = 4,
         ProceduralLevel = 5,
-        RoomClearRewards = 6
+        RoomClearRewards = 6,
+        DifficultyScaling = 7,
+        Waves = 8
     }
     #endregion
 }

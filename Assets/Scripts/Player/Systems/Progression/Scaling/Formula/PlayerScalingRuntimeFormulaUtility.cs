@@ -41,6 +41,8 @@ internal static class PlayerScalingRuntimeFormulaUtility
 
             variableContext[variableName] = PlayerScalableStatValueUtility.ResolveRuntimeValue(in scalableStat);
         }
+
+        GameDifficultyRuntimeValueStore.AppendTo(variableContext);
     }
 
     /// <summary>
@@ -74,6 +76,8 @@ internal static class PlayerScalingRuntimeFormulaUtility
 
             variableContext[variableName] = PlayerScalableStatValueUtility.ResolveRuntimeValue(in scalableStat);
         }
+
+        GameDifficultyRuntimeValueStore.AppendTo(variableContext);
     }
 
     /// <summary>
@@ -104,6 +108,8 @@ internal static class PlayerScalingRuntimeFormulaUtility
 
             variableContext[variableName] = PlayerScalableStatClampUtility.ResolveNumericProjection(in scalableStat);
         }
+
+        GameDifficultyRuntimeValueStore.AppendTo(variableContext);
     }
 
     /// <summary>

@@ -13,6 +13,10 @@ public sealed class EnemyWavePreset : ScriptableObject
     #region Serialized Fields
     [Tooltip("Finite sequence of authored waves emitted by any spawner using this preset.")]
     [SerializeField] private List<EnemySpawnWaveAuthoring> waves = new List<EnemySpawnWaveAuthoring>();
+
+    [Tooltip("Waves preset supplying brush categories referenced by painted cells in this wave asset.")]
+    [SerializeField]
+    private GameWavesPreset wavesPreset;
     #endregion
 
     #endregion
@@ -26,6 +30,8 @@ public sealed class EnemyWavePreset : ScriptableObject
             return waves;
         }
     }
+
+    public GameWavesPreset WavesPreset => wavesPreset;
     #endregion
 
     #region Methods
@@ -37,6 +43,7 @@ public sealed class EnemyWavePreset : ScriptableObject
     private void OnValidate()
     {
         EnsureWaveList();
+        EnsureWaveIdentities();
         EnemySpawnerRuntimeBakeMetadataUtility.ClearRuntimeWavePresetCandidateCache();
     }
     #endregion
@@ -63,6 +70,20 @@ public sealed class EnemyWavePreset : ScriptableObject
     {
         if (waves == null)
             waves = new List<EnemySpawnWaveAuthoring>();
+    }
+
+    /// <summary>
+    /// Ensures every non-null wave owns a stable dependency identity without changing timing or tuning.
+    /// </summary>
+    private void EnsureWaveIdentities()
+    {
+        for (int waveIndex = 0; waveIndex < waves.Count; waveIndex++)
+        {
+            EnemySpawnWaveAuthoring wave = waves[waveIndex];
+
+            if (wave != null)
+                wave.EnsureIdentity();
+        }
     }
     #endregion
 

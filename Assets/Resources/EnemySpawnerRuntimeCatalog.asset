@@ -22,13 +22,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_BOSS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 1445cefc53858504595d53844ea1c106
-      spawnerGuid: 593de417218bb1e66d1fe78ab2df1dd5
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_BOSS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 684c0ac4006b3394eb08ccea8782e89b
   - sceneName: SCN_LGTEST_MAINT_CORNER_NE
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_NE.unity
     sceneGuid: c56a428650e3345448e82cd5306813e9
@@ -38,13 +32,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_CORNER_NE/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 0e48015b144c0bf40bc2313f9ff6e857
-      spawnerGuid: 5ceb05af0f9499fbb222b3eceed8f4fd
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_CORNER_NE/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: d5ebd8c263f046844a74a6089642e196
   - sceneName: SCN_LGTEST_MAINT_CORNER_SW
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_SW.unity
     sceneGuid: f10e13dba6645024c946748fa4b1d1ac
@@ -54,13 +42,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_CORNER_SW/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 4dc5b9b5f89cd9a4daa16405739f795d
-      spawnerGuid: 4147bfd91ca57ce0665b1741b8a644e8
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_CORNER_SW/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 28bb90c832a1bca40b8877370d425e9f
   - sceneName: SCN_LGTEST_MAINT_HUB
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_HUB.unity
     sceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
@@ -70,13 +52,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_HUB/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 639e2226352ce744d800e13ef0939777
-      spawnerGuid: 1396e5ffec5139a66110f5f5ea5ca80a
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_HUB/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 967311ac065d8ba408307e72a4366046
   - sceneName: SCN_LGTEST_MAINT_START
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_START.unity
     sceneGuid: d0f579d17b03b154287cfa15e7887024
@@ -86,13 +62,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_START/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 81ce760752675f04994cf109c0b3448c
-      spawnerGuid: b397d8abfbd3637605d0d6ceb3e647d5
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_START/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: e3a837cb228a6624a8390d7a3a1f3dc9
   - sceneName: SCN_LGTEST_MAINT_TRIAD
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_TRIAD.unity
     sceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
@@ -102,13 +72,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_MAINT_TRIAD/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: be0774ecaec68d54381a390484f9b644
-      spawnerGuid: 699444848886c71669606e896a2a1d49
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_MAINT_TRIAD/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 006f5c7823242de4789c51e3f6de02dd
   - sceneName: SCN_LGTEST_METRO_BOSS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
     sceneGuid: 27d9e1327f828944794adba3410c0657
@@ -118,13 +82,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_BOSS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: f478b078461c39a41a85f0474f1a408f
-      spawnerGuid: 69d96e6eb6a792619c4dddad93d88e6e
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_BOSS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: af1d65e57f343f546b4a3c7ae73e41bb
   - sceneName: SCN_LGTEST_METRO_CROSS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
     sceneGuid: 86787f958b7747a44892e18620a2fe75
@@ -134,13 +92,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_CROSS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 085e828ebb21b7045ae9e4b42612f20c
-    - ownerSceneGuid: 9e9cbe8c0d82f484ca2d1014f6d1b065
-      spawnerGuid: 0cdfe79276cddd82ec17566f158bab01
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_CROSS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 0
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: f0dbbe91f6b9c4241aaa8aa4a3c88e07
   - sceneName: SCN_LGTEST_METRO_DOUBLE
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
     sceneGuid: 433f03176860b0e409c1d762e15cd364
@@ -150,13 +102,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_DOUBLE/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 7a80f659dadfe5c46bd9bf341d74e1a2
-    - ownerSceneGuid: b913c7cd5b4ce754b86503a1a1db2267
-      spawnerGuid: e460db88e0548a84701d480fcc602cb8
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_DOUBLE/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 0
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 9191c508455616144bb05d0066edbc89
   - sceneName: SCN_LGTEST_METRO_EW
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
     sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
@@ -166,13 +112,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_EW/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: d83ea893f3b670446a6b82587119e832
-    - ownerSceneGuid: f322020fe50790b49917469e6a63e82e
-      spawnerGuid: dfd27ae386b605934ed3105c09bfd8ff
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_EW/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 0
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 3b1c24b9af242314d955db7ef131edd4
   - sceneName: SCN_LGTEST_METRO_NS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
     sceneGuid: 0b11934e90dbb314e87551aabe87ec57
@@ -182,13 +122,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_NS/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 7fdb6c11e4b219c46a717e6356bc6e63
-    - ownerSceneGuid: 4989da56774b24444a4e8df669174e42
-      spawnerGuid: d65fbb5d4c1f226e445f003b91905f3e
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_NS/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 0
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: d429b6143f1c1334e9a7099327c114bd
   - sceneName: SCN_LGTEST_METRO_START
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity
     sceneGuid: 54c97702b5bc17f439c3b98c04743afb
@@ -198,13 +132,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_LGTEST_METRO_START/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 45a410f0515124a49af5a8d4ff198eec
-    - ownerSceneGuid: d3688453e5f08c04496dcf80c5c0e215
-      spawnerGuid: d79d07fae605a396910f85a882f71c9a
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_LGTEST_METRO_START/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 45a410f0515124a49af5a8d4ff198eec
+      defaultWavePresetGuid: 410c7ac654c20ba4e9a4bba878964395
   - sceneName: SCN_MAIN_METRO_01
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_01.unity
     sceneGuid: 5a34e40218bcc094382de3b9fedebc81
@@ -224,13 +152,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_Main_Wave
       hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_Wave
       defaultEnabled: 1
-      defaultWavePresetGuid: 18b9c538d2c66114d8ab07d990edd337
-    - ownerSceneGuid: 7dd9022369bc6644e85041d97047103e
-      spawnerGuid: 7491e818253eeb37e8f362981ee8b2ac
-      spawnerName: PF_EnemySpawner_Main_WaveOnlyCowards
-      hierarchyPath: SUB_EnemyZone_Main/PF_EnemySpawner_Main_WaveOnlyCowards
-      defaultEnabled: 1
-      defaultWavePresetGuid: 9e22183972f48b6499bcddd50a3b6867
+      defaultWavePresetGuid: 423a2d4934efa334d9e1d877e4e3640c
   wavePresetFolders:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
@@ -298,6 +220,156 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_MediumHardNoCowards.asset
       assetGuid: 8dbc3c3fa5c3e1d479efcbc752ca897c
       preset: {fileID: 11400000, guid: 8dbc3c3fa5c3e1d479efcbc752ca897c, type: 2}
+  - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms
+    displayName: Wave Preset/Parallel Rooms
+    wavePresets:
+    - presetName: SUB_EnemyZone_Main_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_EnemyZone_Main_ParallelWaves.asset
+      assetGuid: 423a2d4934efa334d9e1d877e4e3640c
+      preset: {fileID: 11400000, guid: 423a2d4934efa334d9e1d877e4e3640c, type: 2}
+    - presetName: SUB_LGTEST_MAINT_BOSS_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_BOSS_ParallelWaves.asset
+      assetGuid: 684c0ac4006b3394eb08ccea8782e89b
+      preset: {fileID: 11400000, guid: 684c0ac4006b3394eb08ccea8782e89b, type: 2}
+    - presetName: SUB_LGTEST_MAINT_CORNER_NE_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_CORNER_NE_ParallelWaves.asset
+      assetGuid: d5ebd8c263f046844a74a6089642e196
+      preset: {fileID: 11400000, guid: d5ebd8c263f046844a74a6089642e196, type: 2}
+    - presetName: SUB_LGTEST_MAINT_CORNER_SW_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_CORNER_SW_ParallelWaves.asset
+      assetGuid: 28bb90c832a1bca40b8877370d425e9f
+      preset: {fileID: 11400000, guid: 28bb90c832a1bca40b8877370d425e9f, type: 2}
+    - presetName: SUB_LGTEST_MAINT_HUB_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_HUB_ParallelWaves.asset
+      assetGuid: 967311ac065d8ba408307e72a4366046
+      preset: {fileID: 11400000, guid: 967311ac065d8ba408307e72a4366046, type: 2}
+    - presetName: SUB_LGTEST_MAINT_START_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_START_ParallelWaves.asset
+      assetGuid: e3a837cb228a6624a8390d7a3a1f3dc9
+      preset: {fileID: 11400000, guid: e3a837cb228a6624a8390d7a3a1f3dc9, type: 2}
+    - presetName: SUB_LGTEST_MAINT_TRIAD_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_MAINT_TRIAD_ParallelWaves.asset
+      assetGuid: 006f5c7823242de4789c51e3f6de02dd
+      preset: {fileID: 11400000, guid: 006f5c7823242de4789c51e3f6de02dd, type: 2}
+    - presetName: SUB_LGTEST_METRO_BOSS_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_BOSS_ParallelWaves.asset
+      assetGuid: af1d65e57f343f546b4a3c7ae73e41bb
+      preset: {fileID: 11400000, guid: af1d65e57f343f546b4a3c7ae73e41bb, type: 2}
+    - presetName: SUB_LGTEST_METRO_CROSS_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_CROSS_ParallelWaves.asset
+      assetGuid: f0dbbe91f6b9c4241aaa8aa4a3c88e07
+      preset: {fileID: 11400000, guid: f0dbbe91f6b9c4241aaa8aa4a3c88e07, type: 2}
+    - presetName: SUB_LGTEST_METRO_DOUBLE_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_DOUBLE_ParallelWaves.asset
+      assetGuid: 9191c508455616144bb05d0066edbc89
+      preset: {fileID: 11400000, guid: 9191c508455616144bb05d0066edbc89, type: 2}
+    - presetName: SUB_LGTEST_METRO_EW_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_EW_ParallelWaves.asset
+      assetGuid: 3b1c24b9af242314d955db7ef131edd4
+      preset: {fileID: 11400000, guid: 3b1c24b9af242314d955db7ef131edd4, type: 2}
+    - presetName: SUB_LGTEST_METRO_NS_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_NS_ParallelWaves.asset
+      assetGuid: d429b6143f1c1334e9a7099327c114bd
+      preset: {fileID: 11400000, guid: d429b6143f1c1334e9a7099327c114bd, type: 2}
+    - presetName: SUB_LGTEST_METRO_START_ParallelWaves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Parallel Rooms/SUB_LGTEST_METRO_START_ParallelWaves.asset
+      assetGuid: 410c7ac654c20ba4e9a4bba878964395
+      preset: {fileID: 11400000, guid: 410c7ac654c20ba4e9a4bba878964395, type: 2}
+  - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves
+    displayName: Wave Preset/Scene Waves
+    wavePresets:
+    - presetName: SUB_EnemyZone_Main_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_Main_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: e9c5d59b4bd8b974aa214b123246ee73
+      preset: {fileID: 11400000, guid: e9c5d59b4bd8b974aa214b123246ee73, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_AcidWanderers_2_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_AcidWanderers_2_Waves.asset
+      assetGuid: 5979201a2e3ee364e9370868a1c24cd5
+      preset: {fileID: 11400000, guid: 5979201a2e3ee364e9370868a1c24cd5, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_BOSS_4_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_BOSS_4_Waves.asset
+      assetGuid: efcec22106edde94083538d1ab8fe43b
+      preset: {fileID: 11400000, guid: efcec22106edde94083538d1ab8fe43b, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Bombardier_3_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Bombardier_3_Waves.asset
+      assetGuid: 0cefdf5efb650004daf83e00e734ca8c
+      preset: {fileID: 11400000, guid: 0cefdf5efb650004daf83e00e734ca8c, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Cowards_5_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Cowards_5_Waves.asset
+      assetGuid: d266da71c30f5724cb5960c1026e462f
+      preset: {fileID: 11400000, guid: d266da71c30f5724cb5960c1026e462f, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_DVD_8_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_DVD_8_Waves.asset
+      assetGuid: 0ab566efadb6a0d45b1539502c0b9bb3
+      preset: {fileID: 11400000, guid: 0ab566efadb6a0d45b1539502c0b9bb3, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Grunts_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Grunts_1_Waves.asset
+      assetGuid: 8cf1d954584e88e42a6fa1a15afe9445
+      preset: {fileID: 11400000, guid: 8cf1d954584e88e42a6fa1a15afe9445, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Shooters_7_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Shooters_7_Waves.asset
+      assetGuid: a37b05a33d3cd714fb6f1eede755ea62
+      preset: {fileID: 11400000, guid: a37b05a33d3cd714fb6f1eede755ea62, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Stealer_10_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Stealer_10_Waves.asset
+      assetGuid: d402faabfe7a6d54797aeec074bee8ed
+      preset: {fileID: 11400000, guid: d402faabfe7a6d54797aeec074bee8ed, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_VilDemonio_6_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_VilDemonio_6_Waves.asset
+      assetGuid: dafaa81809e15b243b4fc18eedac9ea3
+      preset: {fileID: 11400000, guid: dafaa81809e15b243b4fc18eedac9ea3, type: 2}
+    - presetName: SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Wanderers_9_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_EnemyZone_temp_PF_EnemySpawner_Testing_Wanderers_9_Waves.asset
+      assetGuid: d2a0a1339c510b14ab1792419fcf199e
+      preset: {fileID: 11400000, guid: d2a0a1339c510b14ab1792419fcf199e, type: 2}
+    - presetName: SUB_LGTEST_MAINT_BOSS_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_BOSS_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 3587020287dcdbc4aa326be15d2e62a5
+      preset: {fileID: 11400000, guid: 3587020287dcdbc4aa326be15d2e62a5, type: 2}
+    - presetName: SUB_LGTEST_MAINT_CORNER_NE_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_CORNER_NE_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 24d38ba37da6a014281bd998cedd8ad4
+      preset: {fileID: 11400000, guid: 24d38ba37da6a014281bd998cedd8ad4, type: 2}
+    - presetName: SUB_LGTEST_MAINT_CORNER_SW_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_CORNER_SW_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 4e43b7c7e0f7dfc4b8dca6118ee8a6f7
+      preset: {fileID: 11400000, guid: 4e43b7c7e0f7dfc4b8dca6118ee8a6f7, type: 2}
+    - presetName: SUB_LGTEST_MAINT_HUB_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_HUB_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 19e3167a08c167c40b9f5f78339eaa35
+      preset: {fileID: 11400000, guid: 19e3167a08c167c40b9f5f78339eaa35, type: 2}
+    - presetName: SUB_LGTEST_MAINT_START_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_START_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 165431ece0738a94caa3c114e86e74db
+      preset: {fileID: 11400000, guid: 165431ece0738a94caa3c114e86e74db, type: 2}
+    - presetName: SUB_LGTEST_MAINT_TRIAD_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_MAINT_TRIAD_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: a2b598e46c8f8c541a48127d94d3ccaf
+      preset: {fileID: 11400000, guid: a2b598e46c8f8c541a48127d94d3ccaf, type: 2}
+    - presetName: SUB_LGTEST_METRO_BOSS_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_BOSS_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 9df89a0e35dae1049adc8e679730f173
+      preset: {fileID: 11400000, guid: 9df89a0e35dae1049adc8e679730f173, type: 2}
+    - presetName: SUB_LGTEST_METRO_CROSS_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_CROSS_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 3d02df2ee9c77b24c8b3488388c135ac
+      preset: {fileID: 11400000, guid: 3d02df2ee9c77b24c8b3488388c135ac, type: 2}
+    - presetName: SUB_LGTEST_METRO_DOUBLE_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_DOUBLE_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: 489f77f029f0ed744845d053dde8ac88
+      preset: {fileID: 11400000, guid: 489f77f029f0ed744845d053dde8ac88, type: 2}
+    - presetName: SUB_LGTEST_METRO_EW_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_EW_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: e334185511da5ff488b4e93a747a305d
+      preset: {fileID: 11400000, guid: e334185511da5ff488b4e93a747a305d, type: 2}
+    - presetName: SUB_LGTEST_METRO_NS_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_NS_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: b9eaeea0fc78e904b93f5f5887cc563f
+      preset: {fileID: 11400000, guid: b9eaeea0fc78e904b93f5f5887cc563f, type: 2}
+    - presetName: SUB_LGTEST_METRO_START_PF_EnemySpawner_Main_Wave_1_Waves
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/Scene Waves/SUB_LGTEST_METRO_START_PF_EnemySpawner_Main_Wave_1_Waves.asset
+      assetGuid: d3e179bc2ed35b44e9574a02afed2b57
+      preset: {fileID: 11400000, guid: d3e179bc2ed35b44e9574a02afed2b57, type: 2}
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset/Testing
     displayName: Wave Preset/Testing
     wavePresets:

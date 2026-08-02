@@ -1,0 +1,763 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 403086f4b10bce44e967bd7ac703c502, type: 3}
+  m_Name: WavesExcelDataWorkbookLayoutPreset
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::ExcelDataWorkbookLayoutPreset
+  presetId: b378835fd68a4f58b8d1409043235636
+  presetName: Waves Transfer Layout
+  objectsSheetName: Waves
+  defaultGridRows: 28
+  defaultGridColumns: 4
+  defaultCellWidth: 250
+  defaultCellHeight: 30
+  sheetDefinitions:
+  - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+    sheetName: Waves
+    previewRowCount: 28
+    previewColumnCount: 4
+    previewCellWidth: 250
+    previewCellHeight: 30
+    freezeRowCount: 4
+    freezeColumnCount: 1
+    visibility: 0
+    importEnabled: 1
+    exportEnabled: 1
+    cells:
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 1
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: WAVES WORKBOOK
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 2
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Concrete wave elements, spawn references and wave timing
+        values.
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 4
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SETTING
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 4
+      columnIndex: 2
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: VALUE
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 4
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SOURCE ASSET
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 4
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: SERIALIZED PATH
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 6
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: WAVE ASSET
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 8
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Preset Name
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 8
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Empty
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 8
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.waveLabel
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 8
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves.Array.data[0].waveLabel
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves.Array.data[0].waveLabel
+        pathTemplate: waves.Array.data[].waveLabel
+        expectedDataKind: 5
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 4bb31f2f7473414793f2d53f419d663e
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 9
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Wave Count
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 9
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Empty
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 9
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_Count
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 9
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves.Array.size
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves.Array.size
+        pathTemplate: waves.Array.size
+        expectedDataKind: 11
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: 
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 10
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: CONCRETE WAVE ELEMENT
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 12
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Enemy Reference
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 12
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Wave_EasyMedium
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 12
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.paintedCells_1.masterPreset
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 12
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:9cbb29f3fe1317e4db97052b606d7bf0:EnemyWavePreset:waves.Array.data[0].paintedCells.Array.data[0].masterPreset
+        domain: 4
+        ownerAssetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_EasyMedium.asset
+        serializedPath: waves.Array.data[0].paintedCells.Array.data[0].masterPreset
+        pathTemplate: waves.Array.data[].paintedCells.Array.data[].masterPreset
+        expectedDataKind: 6
+        concreteListIndices: 0000000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: dca0664021be484f91fcdae4ede988df
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 13
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Spawn Count
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 13
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Wave_EasyMedium
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 13
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.paintedCells_1.enemyCount
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 13
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:9cbb29f3fe1317e4db97052b606d7bf0:EnemyWavePreset:waves.Array.data[0].paintedCells.Array.data[0].enemyCount
+        domain: 4
+        ownerAssetGuid: 9cbb29f3fe1317e4db97052b606d7bf0
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Wave_EasyMedium.asset
+        serializedPath: waves.Array.data[0].paintedCells.Array.data[0].enemyCount
+        pathTemplate: waves.Array.data[].paintedCells.Array.data[].enemyCount
+        expectedDataKind: 2
+        concreteListIndices: 0000000000000000
+        stableListKeys:
+        - 
+        - 
+      literalText: 
+      brushId: f47036b3632b46b9ac77e3c57a7095cf
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 14
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Spawn Delay
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 14
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Empty
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 14
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.startDelaySeconds
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 14
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves.Array.data[0].startDelaySeconds
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves.Array.data[0].startDelaySeconds
+        pathTemplate: waves.Array.data[].startDelaySeconds
+        expectedDataKind: 2
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: f47036b3632b46b9ac77e3c57a7095cf
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 15
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Wave Mode
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 15
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Empty
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 15
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.startMode
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 15
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves.Array.data[0].startMode
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves.Array.data[0].startMode
+        pathTemplate: waves.Array.data[].startMode
+        expectedDataKind: 4
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: d6ded120e7114b05a59463652ce100f5
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 16
+      columnIndex: 1
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: Wave Enabled
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 16
+      columnIndex: 3
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: PF_EnemySpawner_Empty
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 16
+      columnIndex: 4
+      contentKind: 1
+      direction: 2
+      fieldBinding:
+        fieldId: 
+        domain: 0
+        ownerAssetGuid: 
+        ownerAssetTypeName: 
+        ownerAssetPath: 
+        serializedPath: 
+        pathTemplate: 
+        expectedDataKind: 0
+        concreteListIndices: 
+        stableListKeys: []
+      literalText: waves_1.previewInScene
+      brushId: 
+      numberFormat: 
+      validateLiteralDuringImport: 0
+    - sheetId: 27ca072fa06c44fe8c75e285cd9e47db
+      rowIndex: 16
+      columnIndex: 2
+      contentKind: 0
+      direction: 0
+      fieldBinding:
+        fieldId: Waves:00faa5bb1b1b4574c826cfbad8b060fb:EnemyWavePreset:waves.Array.data[0].previewInScene
+        domain: 4
+        ownerAssetGuid: 00faa5bb1b1b4574c826cfbad8b060fb
+        ownerAssetTypeName: EnemyWavePreset
+        ownerAssetPath: Assets/Scriptable Objects/Enemy/Wave Preset/OutdatedButNotQuite/PF_EnemySpawner_Empty.asset
+        serializedPath: waves.Array.data[0].previewInScene
+        pathTemplate: waves.Array.data[].previewInScene
+        expectedDataKind: 3
+        concreteListIndices: 00000000
+        stableListKeys:
+        - 
+      literalText: 
+      brushId: 7ef773466c8448528dfb2e77e3b2b6c3
+      numberFormat: 
+      validateLiteralDuringImport: 0

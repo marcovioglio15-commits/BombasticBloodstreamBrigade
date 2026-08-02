@@ -94,6 +94,12 @@ public struct GameRoomRewardTileBindingElement : IBufferElementData
     public int RewardIndex;
     public int Quantity;
     public int Order;
+    public FixedString64Bytes SelectionGroupId;
+    public FixedString64Bytes DifficultyCoefficientId;
+    public float MinimumDifficulty;
+    public float MaximumDifficulty;
+    public float SelectionWeight;
+    public byte UseDifficultySelection;
 }
 
 /// <summary>

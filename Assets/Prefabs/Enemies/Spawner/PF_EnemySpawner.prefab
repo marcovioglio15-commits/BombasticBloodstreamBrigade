@@ -53,7 +53,6 @@ MonoBehaviour:
   expandBatchPerPrefab: 12
   despawnDistance: 85
   wavePreset: {fileID: 11400000, guid: 9cbb29f3fe1317e4db97052b606d7bf0, type: 2}
-  waves: []
   drawGridGizmos: 1
   drawCellCoordinates: 1
   drawCellCounts: 1

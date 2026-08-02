@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b5c017ab000b8f43b71a26e78cf6a3f, type: 3}
+  m_Name: GameDifficultyScalingPreset_Default
+  m_EditorClassIdentifier: Assembly-CSharp::GameDifficultyScalingPreset
+  presetId: 58d9648a0e2f442daca01fe48f52f23d
+  presetName: New Difficulty Scaling Preset
+  description: 
+  version: 1.0.0
+  playerContextPreset: {fileID: 11400000, guid: 2aa7920f2d0dab444bbb97e34b3f90d8, type: 2}
+  coefficients:
+  - coefficientId: enemyIntensity
+    displayName: Enemy Intensity
+    description: Shared combat intensity used by wave and enemy-category selection.
+    scalingMode: 0
+    defaultValue: 1
+    minimumValue: 0
+    maximumValue: 100
+    formula: 1 + [roomsCleared] * 0.35 + [currentDepth] * 0.8 + [playerLevel] * 0.15
+    curveInputVariable: 
+    scalingCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    steps: []
+    debugInConsole: 0
+  - coefficientId: rewardTier
+    displayName: Reward Tier
+    description: Room reward tier derived from progress, level depth and player level.
+    scalingMode: 0
+    defaultValue: 0
+    minimumValue: 0
+    maximumValue: 100
+    formula: '[currentDepth] + [roomsCleared] * 0.15 + [playerLevel] * 0.1'
+    curveInputVariable: 
+    scalingCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    steps: []
+    debugInConsole: 0
+  - coefficientId: spawnPressure
+    displayName: Spawn Pressure
+    description: Curve-authored pressure available to wave timing and Player Management
+      formulas.
+    scalingMode: 1
+    defaultValue: 1
+    minimumValue: 0
+    maximumValue: 100
+    formula: '[currentDepth] + [roomsCleared] * 0.15 + [playerLevel] * 0.1'
+    curveInputVariable: roomsCleared
+    scalingCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 20
+        value: 10
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    steps: []
+    debugInConsole: 0

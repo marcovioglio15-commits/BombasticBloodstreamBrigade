@@ -168,6 +168,7 @@ internal static class GameProceduralLevelRoomRewardAssignmentEditorUtility
         row.Add(selector);
         AddBoundField(row, quantityProperty, "Quantity");
         AddBoundField(row, orderProperty, "Order");
+        AddDifficultySelectionFields(panel, row, assignment);
         Button removeButton = new Button(() => RemoveAssignment(panel,
                                                                 assignments,
                                                                 assignmentIndex));
@@ -175,6 +176,91 @@ internal static class GameProceduralLevelRoomRewardAssignmentEditorUtility
         removeButton.tooltip = "Remove this tile reward assignment.";
         row.Add(removeButton);
         return row;
+    }
+
+    /// <summary>
+    /// Adds conditionally visible weighted difficulty selection controls for one room reward assignment.
+    /// </summary>
+    /// <param name="panel">Procedural panel supplying the active Difficulty Scaling preset.</param>
+    /// <param name="row">Assignment foldout receiving controls.</param>
+    /// <param name="assignment">Serialized tile reward assignment.</param>
+    private static void AddDifficultySelectionFields(GameProceduralLevelPresetsPanel panel,
+                                                     VisualElement row,
+                                                     SerializedProperty assignment)
+    {
+        SerializedProperty enabledProperty = assignment.FindPropertyRelative("useDifficultySelection");
+        Toggle enabledToggle = new Toggle("Difficulty Selection");
+        enabledToggle.tooltip = enabledProperty.tooltip;
+        enabledToggle.BindProperty(enabledProperty);
+        row.Add(enabledToggle);
+        VisualElement settings = new VisualElement();
+        settings.style.marginLeft = 12f;
+        row.Add(settings);
+        AddBoundField(settings, assignment.FindPropertyRelative("selectionGroupId"), "Selection Group");
+        AddDifficultyCoefficientSelector(panel,
+                                         settings,
+                                         assignment.FindPropertyRelative("difficultyCoefficientId"));
+        AddBoundField(settings, assignment.FindPropertyRelative("minimumDifficulty"), "Minimum Difficulty");
+        AddBoundField(settings, assignment.FindPropertyRelative("maximumDifficulty"), "Maximum Difficulty");
+        AddBoundField(settings, assignment.FindPropertyRelative("selectionWeight"), "Selection Weight");
+
+        void RefreshVisibility(bool isEnabled)
+        {
+            settings.style.display = isEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+        }
+
+        RefreshVisibility(enabledProperty.boolValue);
+        enabledToggle.RegisterValueChangedCallback(evt =>
+        {
+            RefreshVisibility(evt.newValue);
+            GameManagementDraftSession.MarkDirty();
+        });
+    }
+
+    /// <summary>
+    /// Builds a dynamic coefficient selector from the active Game Master Difficulty Scaling preset.
+    /// </summary>
+    /// <param name="panel">Procedural panel supplying active Game Master context.</param>
+    /// <param name="root">Parent settings element.</param>
+    /// <param name="coefficientProperty">Serialized coefficient ID property updated by selection.</param>
+    private static void AddDifficultyCoefficientSelector(GameProceduralLevelPresetsPanel panel,
+                                                         VisualElement root,
+                                                         SerializedProperty coefficientProperty)
+    {
+        GameDifficultyScalingPreset difficultyPreset = panel.DifficultyScalingPreset;
+        List<string> coefficientIds = new List<string>();
+
+        if (difficultyPreset != null && difficultyPreset.Coefficients != null)
+        {
+            for (int coefficientIndex = 0; coefficientIndex < difficultyPreset.Coefficients.Count; coefficientIndex++)
+            {
+                GameDifficultyCoefficientDefinition definition = difficultyPreset.Coefficients[coefficientIndex];
+
+                if (definition != null && !string.IsNullOrWhiteSpace(definition.CoefficientId))
+                    coefficientIds.Add(definition.CoefficientId);
+            }
+        }
+
+        if (coefficientIds.Count == 0)
+        {
+            root.Add(new HelpBox("Assign and configure a Difficulty Scaling preset before enabling reward selection.",
+                                 HelpBoxMessageType.Warning));
+            return;
+        }
+
+        int selectedIndex = Mathf.Max(0, coefficientIds.IndexOf(coefficientProperty.stringValue));
+        PopupField<string> selector = new PopupField<string>("Difficulty Coefficient",
+                                                            coefficientIds,
+                                                            selectedIndex);
+        selector.tooltip = coefficientProperty.tooltip;
+        selector.RegisterValueChangedCallback(evt =>
+        {
+            GameProceduralLevelPresetsPanelFieldUtility.CommitMutation(
+                panel.PresetSerializedObject,
+                "Select Reward Difficulty Coefficient",
+                () => coefficientProperty.stringValue = evt.newValue);
+        });
+        root.Add(selector);
     }
 
     /// <summary>
@@ -264,6 +350,12 @@ internal static class GameProceduralLevelRoomRewardAssignmentEditorUtility
                 assignment.FindPropertyRelative("rewardTechnicalId").stringValue = rewardTechnicalId;
                 assignment.FindPropertyRelative("quantity").intValue = 1;
                 assignment.FindPropertyRelative("order").intValue = index;
+                assignment.FindPropertyRelative("useDifficultySelection").boolValue = false;
+                assignment.FindPropertyRelative("selectionGroupId").stringValue = string.Empty;
+                assignment.FindPropertyRelative("difficultyCoefficientId").stringValue = string.Empty;
+                assignment.FindPropertyRelative("minimumDifficulty").floatValue = 0f;
+                assignment.FindPropertyRelative("maximumDifficulty").floatValue = 100f;
+                assignment.FindPropertyRelative("selectionWeight").floatValue = 1f;
             });
         panel.BuildActiveSection();
     }

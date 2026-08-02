@@ -102,22 +102,23 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
     }
 
     /// <summary>
-    /// Draws the shared paint-brush controls inside the wave selected by the .
+    /// Draws category-based paint controls for the selected wave.
     /// </summary>
-    /// <param name="brushMasterPreset">Enemy master preset assigned while painting.</param>
+    /// <param name="brushCategoryId">Stable brush category identifier assigned while painting.</param>
+    /// <param name="wavesPreset">Waves preset supplying the selectable brush categories.</param>
     /// <param name="brushEnemyCount">Enemy count assigned while painting.</param>
     /// <param name="brushDistributionCurve">Distribution curve copied into painted cells.</param>
     /// <param name="eraseMode">True when painting removes existing cells.</param>
-    public static void DrawPainterSection(ref EnemyMasterPreset brushMasterPreset,
+    public static void DrawPainterSection(ref string brushCategoryId,
+                                          GameWavesPreset wavesPreset,
                                           ref int brushEnemyCount,
                                           ref AnimationCurve brushDistributionCurve,
                                           ref bool eraseMode)
     {
-        brushMasterPreset = EditorGUILayout.ObjectField(new GUIContent("Brush Master Preset",
-                                                                       "Enemy master preset painted by left click."),
-                                                        brushMasterPreset,
-                                                        typeof(EnemyMasterPreset),
-                                                        false) as EnemyMasterPreset;
+        brushCategoryId = DrawBrushCategoryPopup(new GUIContent("Brush Category",
+                                                                 "Reusable difficulty-aware enemy category painted by left click."),
+                                                  brushCategoryId,
+                                                  wavesPreset);
         brushEnemyCount = EditorGUILayout.IntField(new GUIContent("Brush Enemy Count",
                                                                   "Enemy count assigned when painting a new cell."),
                                                    Mathf.Max(1, brushEnemyCount));
@@ -129,15 +130,18 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
                                            eraseMode);
 
         Rect colorRect = EditorGUILayout.GetControlRect(false, 18f);
-        Color resolvedPaintColor = EnemySpawnerWaveBakeUtility.ResolvePaintColor(brushMasterPreset);
-        EditorGUI.PrefixLabel(colorRect, new GUIContent("Resolved Paint Color",
-                                                        "Color preview resolved from the current brush visual preset."));
+        Color resolvedPaintColor = ResolveCategoryColor(wavesPreset, brushCategoryId);
+        EditorGUI.PrefixLabel(colorRect, new GUIContent("Brush Color",
+                                                        "Color authored for the current reusable brush category."));
         Rect swatchRect = new Rect(colorRect.x + EditorGUIUtility.labelWidth, colorRect.y + 2f, 48f, colorRect.height - 4f);
         EditorGUI.DrawRect(swatchRect, resolvedPaintColor);
 
-        if (GUILayout.Button(new GUIContent("Open Enemy Management Tool",
-                                            "Open the Enemy Management Tool to edit master, visual and brain presets.")))
-            EnemyManagementWindow.ShowWindow();
+        if (wavesPreset == null || wavesPreset.BrushCategories == null || wavesPreset.BrushCategories.Count == 0)
+            EditorGUILayout.HelpBox("Assign a Waves preset with at least one brush category before painting.", MessageType.Warning);
+
+        if (GUILayout.Button(new GUIContent("Open Game Management Tool",
+                                            "Open the Waves sub-preset to edit brush categories and room wave layouts.")))
+            GameManagementWindow.ShowWindow();
     }
 
     /// <summary>
@@ -228,9 +232,14 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
         SerializedProperty defaultDistributionCurveProperty = waveProperty.FindPropertyRelative("defaultDistributionCurve");
         SerializedProperty useWaveDefaultDistributionProperty = cellProperty.FindPropertyRelative("useWaveDefaultDistribution");
         SerializedProperty distributionCurveOverrideProperty = cellProperty.FindPropertyRelative("distributionCurveOverride");
+        SerializedProperty brushCategoryIdProperty = cellProperty.FindPropertyRelative("brushCategoryId");
         bool previousUseWaveDefaultDistribution = useWaveDefaultDistributionProperty.boolValue;
 
-        EditorGUILayout.PropertyField(cellProperty.FindPropertyRelative("masterPreset"));
+        GameWavesPreset wavesPreset = cachedWavePreset != null ? cachedWavePreset.WavesPreset : null;
+        brushCategoryIdProperty.stringValue = DrawBrushCategoryPopup(new GUIContent("Brush Category",
+                                                                                    "Reusable difficulty-aware category used by this painted cell."),
+                                                                     brushCategoryIdProperty.stringValue,
+                                                                     wavesPreset);
         EditorGUILayout.PropertyField(cellProperty.FindPropertyRelative("enemyCount"));
         EditorGUILayout.PropertyField(useWaveDefaultDistributionProperty);
 
@@ -309,6 +318,75 @@ public static class EnemySpawnerAuthoringEditorSectionUtility
                                                                  selectedCellCoordinate,
                                                                  ref selectedWaveIndex,
                                                                  ref selectedCellCoordinate);
+    }
+
+    /// <summary>
+    /// Draws a stable category selector backed by the assigned Waves preset.
+    /// </summary>
+    /// <param name="label">Editor label and tooltip displayed beside the selector.</param>
+    /// <param name="currentCategoryId">Currently selected stable category identifier.</param>
+    /// <param name="wavesPreset">Waves preset supplying selectable categories.</param>
+    /// <returns>Selected stable category identifier, or an empty string when no category is available.</returns>
+    private static string DrawBrushCategoryPopup(GUIContent label,
+                                                 string currentCategoryId,
+                                                 GameWavesPreset wavesPreset)
+    {
+        if (wavesPreset == null || wavesPreset.BrushCategories == null || wavesPreset.BrushCategories.Count == 0)
+        {
+            EditorGUILayout.Popup(label, 0, new string[] { "No Categories" });
+            return string.Empty;
+        }
+
+        int selectedIndex = -1;
+        int categoryCount = wavesPreset.BrushCategories.Count;
+        string[] categoryNames = new string[categoryCount];
+
+        for (int categoryIndex = 0; categoryIndex < categoryCount; categoryIndex++)
+        {
+            EnemyBrushCategoryDefinition category = wavesPreset.BrushCategories[categoryIndex];
+            categoryNames[categoryIndex] = category == null || string.IsNullOrWhiteSpace(category.DisplayName)
+                ? "Category " + (categoryIndex + 1)
+                : category.DisplayName;
+
+            if (category != null && category.TechnicalId == currentCategoryId)
+                selectedIndex = categoryIndex;
+        }
+
+        if (selectedIndex < 0)
+        {
+            string[] categoryNamesWithCurrent = new string[categoryCount + 1];
+            System.Array.Copy(categoryNames, categoryNamesWithCurrent, categoryCount);
+            categoryNames = categoryNamesWithCurrent;
+            selectedIndex = categoryCount;
+            categoryNames[categoryCount] = string.IsNullOrWhiteSpace(currentCategoryId)
+                ? "Select Category"
+                : "Unresolved: " + currentCategoryId;
+        }
+
+        int nextIndex = EditorGUILayout.Popup(label, selectedIndex, categoryNames);
+
+        if (nextIndex >= categoryCount)
+            return currentCategoryId;
+
+        EnemyBrushCategoryDefinition selectedCategory = wavesPreset.BrushCategories[nextIndex];
+        return selectedCategory != null ? selectedCategory.TechnicalId : string.Empty;
+    }
+
+    /// <summary>
+    /// Resolves the authored color for one brush category.
+    /// </summary>
+    /// <param name="wavesPreset">Waves preset containing the category.</param>
+    /// <param name="categoryId">Stable category identifier to resolve.</param>
+    /// <returns>Authored category color, or a clear warning color when unresolved.</returns>
+    private static Color ResolveCategoryColor(GameWavesPreset wavesPreset, string categoryId)
+    {
+        if (wavesPreset != null &&
+            wavesPreset.TryFindBrushCategory(categoryId, out EnemyBrushCategoryDefinition category))
+        {
+            return category.BrushColor;
+        }
+
+        return new Color(1f, 0.2f, 0.2f, 0.9f);
     }
     #endregion
 

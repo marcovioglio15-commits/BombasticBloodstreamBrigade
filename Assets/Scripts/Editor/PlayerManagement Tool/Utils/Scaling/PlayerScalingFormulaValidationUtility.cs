@@ -105,8 +105,8 @@ public static class PlayerScalingFormulaValidationUtility
         if (requiredResultType != PlayerFormulaValueType.Invalid && resultType != requiredResultType)
         {
             warningMessage = string.Format("Formula resolves to {0} but {1} is required here.",
-                                           BuildTypeLabel(resultType),
-                                           BuildTypeLabel(requiredResultType));
+                                           PlayerScalingFormulaVariableCatalogUtility.BuildTypeLabel(resultType),
+                                           PlayerScalingFormulaVariableCatalogUtility.BuildTypeLabel(requiredResultType));
             return false;
         }
 
@@ -303,12 +303,17 @@ public static class PlayerScalingFormulaValidationUtility
             return variableTypes;
 
         if (TryCollectVariableTypesFromActiveMasterScope(targetObject, variableTypes))
+        {
+            PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyVariableTypes(variableTypes);
             return variableTypes;
+        }
 
         PlayerProgressionPreset progressionPreset = targetObject as PlayerProgressionPreset;
 
         if (progressionPreset != null)
-            CollectVariableTypesFromPreset(progressionPreset, variableTypes);
+            PlayerScalingFormulaVariableCatalogUtility.CollectVariableTypesFromPreset(progressionPreset, variableTypes);
+
+        PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyVariableTypes(variableTypes);
 
         return variableTypes;
     }
@@ -331,64 +336,36 @@ public static class PlayerScalingFormulaValidationUtility
             return variableTypes;
 
         if (TryCollectScalableTypesFromActiveMasterScope(targetObject, variableTypes))
+        {
+            PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyScalableTypes(variableTypes);
             return variableTypes;
+        }
 
         PlayerProgressionPreset progressionPreset = targetObject as PlayerProgressionPreset;
 
         if (progressionPreset != null)
-            CollectScalableTypesFromPreset(progressionPreset, variableTypes);
+            PlayerScalingFormulaVariableCatalogUtility.CollectScalableTypesFromPreset(progressionPreset, variableTypes);
+
+        PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyScalableTypes(variableTypes);
 
         return variableTypes;
     }
 
     /// <summary>
-    /// Formats the helper label that lists the variables available to one scaling or assignment formula.
+    /// Formats available variables using unified formula value types.
     /// </summary>
     /// <param name="allowedVariables">Case-insensitive variable set available in the current editor scope.</param>
+    /// <param name="variableTypes">Optional formula value-type map used to print precise type labels.</param>
     /// <returns>User-facing label text describing the available variables.</returns>
     public static string BuildAvailableVariablesLabelText(ISet<string> allowedVariables,
                                                           IReadOnlyDictionary<string, PlayerFormulaValueType> variableTypes = null)
     {
-        if (allowedVariables == null || allowedVariables.Count == 0)
-            return "Available Variables: [this]";
-
-        List<string> sortedVariables = new List<string>(allowedVariables);
-        sortedVariables.Sort(StringComparer.OrdinalIgnoreCase);
-
-        if (sortedVariables.Count == 1)
-        {
-            string singleVariableName = sortedVariables[0];
-
-            if (variableTypes != null && variableTypes.TryGetValue(singleVariableName, out PlayerFormulaValueType singleVariableType))
-            {
-                return string.Format("Available Variables: [this], [{0}:{1}]",
-                                     singleVariableName,
-                                     BuildTypeLabel(singleVariableType));
-            }
-
-            return string.Format("Available Variables: [this], [{0}]", singleVariableName);
-        }
-
-        string joinedVariables = string.Empty;
-
-        for (int index = 0; index < sortedVariables.Count; index++)
-        {
-            if (index > 0)
-                joinedVariables += ", ";
-
-            string variableName = sortedVariables[index];
-
-            if (variableTypes != null && variableTypes.TryGetValue(variableName, out PlayerFormulaValueType variableType))
-                joinedVariables += string.Format("[{0}:{1}]", variableName, BuildTypeLabel(variableType));
-            else
-                joinedVariables += string.Format("[{0}]", variableName);
-        }
-
-        return string.Format("Available Variables: [this], {0}", joinedVariables);
+        return PlayerScalingFormulaVariableCatalogUtility.BuildAvailableVariablesLabelText(allowedVariables,
+                                                                                            variableTypes);
     }
 
     /// <summary>
-    /// Formats the helper label that lists available scalable stats using the authoring-facing stat subtypes.
+    /// Formats available variables using authoring-facing scalable-stat subtypes.
     /// </summary>
     /// <param name="allowedVariables">Case-insensitive variable set available in the current editor scope.</param>
     /// <param name="variableTypes">Optional scalable-stat type map used to print precise subtype labels.</param>
@@ -396,49 +373,10 @@ public static class PlayerScalingFormulaValidationUtility
     public static string BuildAvailableVariablesLabelText(ISet<string> allowedVariables,
                                                           IReadOnlyDictionary<string, PlayerScalableStatType> variableTypes)
     {
-        if (allowedVariables == null || allowedVariables.Count == 0)
-            return "Available Variables: [this]";
-
-        List<string> sortedVariables = new List<string>(allowedVariables);
-        sortedVariables.Sort(StringComparer.OrdinalIgnoreCase);
-
-        if (sortedVariables.Count == 1)
-        {
-            string singleVariableName = sortedVariables[0];
-
-            if (variableTypes != null && variableTypes.TryGetValue(singleVariableName, out PlayerScalableStatType singleVariableType))
-            {
-                return string.Format("Available Variables: [this], [{0}:{1}]",
-                                     singleVariableName,
-                                     PlayerScalableStatTypeUtility.BuildDisplayLabel(singleVariableType));
-            }
-
-            return string.Format("Available Variables: [this], [{0}]", singleVariableName);
-        }
-
-        string joinedVariables = string.Empty;
-
-        for (int index = 0; index < sortedVariables.Count; index++)
-        {
-            if (index > 0)
-                joinedVariables += ", ";
-
-            string variableName = sortedVariables[index];
-
-            if (variableTypes != null && variableTypes.TryGetValue(variableName, out PlayerScalableStatType variableType))
-            {
-                joinedVariables += string.Format("[{0}:{1}]",
-                                                variableName,
-                                                PlayerScalableStatTypeUtility.BuildDisplayLabel(variableType));
-            }
-            else
-            {
-                joinedVariables += string.Format("[{0}]", variableName);
-            }
-        }
-
-        return string.Format("Available Variables: [this], {0}", joinedVariables);
+        return PlayerScalingFormulaVariableCatalogUtility.BuildAvailableVariablesLabelText(allowedVariables,
+                                                                                            variableTypes);
     }
+
     #endregion
 
     #region Helpers
@@ -523,15 +461,17 @@ public static class PlayerScalingFormulaValidationUtility
             return scopedVariables;
 
         if (TryCollectFromActiveMasterScope(targetObject, scopedVariables))
+        {
+            PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyVariables(scopedVariables);
             return scopedVariables;
+        }
 
         PlayerProgressionPreset progressionPreset = targetObject as PlayerProgressionPreset;
 
         if (progressionPreset != null)
-        {
-            CollectVariablesFromPreset(progressionPreset, scopedVariables);
-            return scopedVariables;
-        }
+            PlayerScalingFormulaVariableCatalogUtility.CollectVariablesFromPreset(progressionPreset, scopedVariables);
+
+        PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyVariables(scopedVariables);
 
         return scopedVariables;
     }
@@ -549,7 +489,7 @@ public static class PlayerScalingFormulaValidationUtility
         if (!DoesMasterReferenceTarget(activeMasterPreset, targetObject))
             return false;
 
-        CollectVariablesFromPreset(activeMasterPreset.ProgressionPreset, variables);
+        PlayerScalingFormulaVariableCatalogUtility.CollectVariablesFromPreset(activeMasterPreset.ProgressionPreset, variables);
         return true;
     }
 
@@ -591,6 +531,7 @@ public static class PlayerScalingFormulaValidationUtility
         globalVariableCache.Clear();
         CollectGlobalVariablesFromLibrary(globalVariableCache);
         CollectGlobalVariablesFromAssets(globalVariableCache);
+        PlayerScalingFormulaVariableCatalogUtility.AppendDifficultyVariables(globalVariableCache);
         lastGlobalVariableCacheRefreshTime = currentTime;
         return globalVariableCache;
     }
@@ -608,7 +549,7 @@ public static class PlayerScalingFormulaValidationUtility
             return;
 
         for (int index = 0; index < presets.Count; index++)
-            CollectVariablesFromPreset(presets[index], variables);
+            PlayerScalingFormulaVariableCatalogUtility.CollectVariablesFromPreset(presets[index], variables);
     }
 
     private static void CollectGlobalVariablesFromAssets(HashSet<string> variables)
@@ -624,104 +565,10 @@ public static class PlayerScalingFormulaValidationUtility
                 continue;
 
             PlayerProgressionPreset preset = AssetDatabase.LoadAssetAtPath<PlayerProgressionPreset>(presetPath);
-            CollectVariablesFromPreset(preset, variables);
+            PlayerScalingFormulaVariableCatalogUtility.CollectVariablesFromPreset(preset, variables);
         }
     }
 
-    private static void CollectVariablesFromPreset(PlayerProgressionPreset preset, HashSet<string> variables)
-    {
-        if (preset == null || variables == null)
-            return;
-
-        IReadOnlyList<PlayerScalableStatDefinition> scalableStats = preset.ScalableStats;
-
-        if (scalableStats == null)
-            return;
-
-        for (int statIndex = 0; statIndex < scalableStats.Count; statIndex++)
-        {
-            PlayerScalableStatDefinition statDefinition = scalableStats[statIndex];
-
-            if (statDefinition == null)
-                continue;
-
-            string statName = statDefinition.StatName;
-
-            if (string.IsNullOrWhiteSpace(statName))
-                continue;
-
-            statName = statName.Trim();
-
-            if (!PlayerScalableStatNameUtility.IsValid(statName))
-                continue;
-
-            variables.Add(statName);
-        }
-    }
-
-    private static void CollectVariableTypesFromPreset(PlayerProgressionPreset preset,
-                                                       Dictionary<string, PlayerFormulaValueType> variableTypes)
-    {
-        if (preset == null || variableTypes == null)
-            return;
-
-        IReadOnlyList<PlayerScalableStatDefinition> scalableStats = preset.ScalableStats;
-
-        if (scalableStats == null)
-            return;
-
-        for (int statIndex = 0; statIndex < scalableStats.Count; statIndex++)
-        {
-            PlayerScalableStatDefinition statDefinition = scalableStats[statIndex];
-
-            if (statDefinition == null)
-                continue;
-
-            string statName = statDefinition.StatName;
-
-            if (string.IsNullOrWhiteSpace(statName))
-                continue;
-
-            statName = statName.Trim();
-
-            if (!PlayerScalableStatNameUtility.IsValid(statName))
-                continue;
-
-            variableTypes[statName] = PlayerScalableStatTypeUtility.ToFormulaValueType(statDefinition.StatType);
-        }
-    }
-
-    private static void CollectScalableTypesFromPreset(PlayerProgressionPreset preset,
-                                                       Dictionary<string, PlayerScalableStatType> variableTypes)
-    {
-        if (preset == null || variableTypes == null)
-            return;
-
-        IReadOnlyList<PlayerScalableStatDefinition> scalableStats = preset.ScalableStats;
-
-        if (scalableStats == null)
-            return;
-
-        for (int statIndex = 0; statIndex < scalableStats.Count; statIndex++)
-        {
-            PlayerScalableStatDefinition statDefinition = scalableStats[statIndex];
-
-            if (statDefinition == null)
-                continue;
-
-            string statName = statDefinition.StatName;
-
-            if (string.IsNullOrWhiteSpace(statName))
-                continue;
-
-            statName = statName.Trim();
-
-            if (!PlayerScalableStatNameUtility.IsValid(statName))
-                continue;
-
-            variableTypes[statName] = statDefinition.StatType;
-        }
-    }
 
     private static bool TryCollectVariableTypesFromActiveMasterScope(UnityEngine.Object targetObject,
                                                                      Dictionary<string, PlayerFormulaValueType> variableTypes)
@@ -742,10 +589,10 @@ public static class PlayerScalingFormulaValidationUtility
         if (progressionPreset == null)
             return false;
 
-        CollectVariableTypesFromPreset(progressionPreset, variableTypes);
+        PlayerScalingFormulaVariableCatalogUtility.CollectVariableTypesFromPreset(progressionPreset, variableTypes);
 
         if (targetObject is PlayerProgressionPreset)
-            CollectVariableTypesFromPreset((PlayerProgressionPreset)targetObject, variableTypes);
+            PlayerScalingFormulaVariableCatalogUtility.CollectVariableTypesFromPreset((PlayerProgressionPreset)targetObject, variableTypes);
 
         return variableTypes.Count > 0;
     }
@@ -769,27 +616,12 @@ public static class PlayerScalingFormulaValidationUtility
         if (progressionPreset == null)
             return false;
 
-        CollectScalableTypesFromPreset(progressionPreset, variableTypes);
+        PlayerScalingFormulaVariableCatalogUtility.CollectScalableTypesFromPreset(progressionPreset, variableTypes);
 
         if (targetObject is PlayerProgressionPreset)
-            CollectScalableTypesFromPreset((PlayerProgressionPreset)targetObject, variableTypes);
+            PlayerScalingFormulaVariableCatalogUtility.CollectScalableTypesFromPreset((PlayerProgressionPreset)targetObject, variableTypes);
 
         return variableTypes.Count > 0;
-    }
-
-    private static string BuildTypeLabel(PlayerFormulaValueType type)
-    {
-        switch (type)
-        {
-            case PlayerFormulaValueType.Number:
-                return "Number";
-            case PlayerFormulaValueType.Boolean:
-                return "Boolean";
-            case PlayerFormulaValueType.Token:
-                return "Token";
-            default:
-                return "Invalid";
-        }
     }
 
     private static void TrimScopedCache()

@@ -186,6 +186,16 @@ public sealed class GameProceduralLevelPresetsPanel
                 : null;
         }
     }
+
+    internal GameDifficultyScalingPreset DifficultyScalingPreset
+    {
+        get
+        {
+            return masterPanel != null && masterPanel.SelectedPreset != null
+                ? masterPanel.SelectedPreset.DifficultyScalingPreset
+                : null;
+        }
+    }
     #endregion
 
     #region Constructors

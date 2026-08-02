@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: PF_EnemySpawner_Empty
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveLabel: PF_EnemySpawner_Grunts
+  - waveId: b1d9d0b1266c4e4f9bcb07e31da5f766
+    waveLabel: PF_EnemySpawner_Grunts
+    sequenceStepIndex: 0
+    referenceWaveId: 
     previewInScene: 1
     startMode: 0
     startDelaySeconds: 0
@@ -25,3 +28,10 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 0
     paintedCells: []
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  wavesPreset: {fileID: 11400000, guid: 458ea596921f12343a695aaf946d9657, type: 2}

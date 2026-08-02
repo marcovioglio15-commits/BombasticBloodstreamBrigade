@@ -463,12 +463,20 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
             EnemySpawnerWavePresetVariantDefinitionElement sourceDefinition = sourceDefinitions[sourceIndex];
             targetDefinitions.Add(new EnemySpawnerWaveDefinitionElement
             {
+                SequenceStepIndex = sourceDefinition.SequenceStepIndex,
                 StartMode = sourceDefinition.StartMode,
+                ReferenceWaveIndex = sourceDefinition.ReferenceWaveIndex,
+                ReferenceSequenceStepIndex = sourceDefinition.ReferenceSequenceStepIndex,
                 StartDelaySeconds = sourceDefinition.StartDelaySeconds,
                 SpawnDurationSeconds = sourceDefinition.SpawnDurationSeconds,
                 MaximumSpawnWarningLeadTimeSeconds = sourceDefinition.MaximumSpawnWarningLeadTimeSeconds,
                 FirstEventIndex = sourceDefinition.FirstEventIndex,
-                EventCount = sourceDefinition.EventCount
+                EventCount = sourceDefinition.EventCount,
+                DifficultySelectionGroupId = sourceDefinition.DifficultySelectionGroupId,
+                DifficultyCoefficientId = sourceDefinition.DifficultyCoefficientId,
+                MinimumDifficulty = sourceDefinition.MinimumDifficulty,
+                MaximumDifficulty = sourceDefinition.MaximumDifficulty,
+                SelectionWeight = sourceDefinition.SelectionWeight
             });
             targetRuntime.Add(CreateDefaultWaveRuntime());
         }
@@ -504,7 +512,13 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
                 PrefabEntity = sourceEvent.PrefabEntity,
                 ReservedEnemyEntity = Entity.Null,
                 HasSpawnWarningOverride = sourceEvent.HasSpawnWarningOverride,
-                SpawnWarningOverride = sourceEvent.SpawnWarningOverride
+                SpawnWarningOverride = sourceEvent.SpawnWarningOverride,
+                CategorySelectionKey = sourceEvent.CategorySelectionKey,
+                DifficultyCoefficientId = sourceEvent.DifficultyCoefficientId,
+                MinimumDifficulty = sourceEvent.MinimumDifficulty,
+                MaximumDifficulty = sourceEvent.MaximumDifficulty,
+                SelectionWeight = sourceEvent.SelectionWeight,
+                CategorySelectionState = sourceEvent.CategorySelectionKey > 0 ? (byte)0 : (byte)1
             });
         }
     }
@@ -583,7 +597,9 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
             Started = 0,
             SpawnFinished = 0,
             Completed = 0,
-            FirstKillRegistered = 0
+            FirstKillRegistered = 0,
+            SelectionResolved = 0,
+            Enabled = 1
         };
     }
     #endregion

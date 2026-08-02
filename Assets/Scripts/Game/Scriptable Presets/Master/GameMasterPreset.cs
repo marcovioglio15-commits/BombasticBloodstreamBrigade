@@ -43,6 +43,14 @@ public sealed class GameMasterPreset : ScriptableObject
     [Tooltip("Room Clear Rewards preset used to configure room grants, temporary modifiers and shared reward presentation.")]
     [SerializeField]
     private GameRoomClearRewardsPreset roomClearRewardsPreset;
+
+    [Tooltip("Difficulty Scaling preset used to resolve shared ECS coefficients for waves, rewards and Player Management formulas.")]
+    [SerializeField]
+    private GameDifficultyScalingPreset difficultyScalingPreset;
+
+    [Tooltip("Waves preset used to manage room scenes, ordered parallel steps and weighted enemy brush categories.")]
+    [SerializeField]
+    private GameWavesPreset wavesPreset;
     #endregion
 
     #endregion
@@ -125,6 +133,22 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return roomClearRewardsPreset;
+        }
+    }
+
+    public GameDifficultyScalingPreset DifficultyScalingPreset
+    {
+        get
+        {
+            return difficultyScalingPreset;
+        }
+    }
+
+    public GameWavesPreset WavesPreset
+    {
+        get
+        {
+            return wavesPreset;
         }
     }
     #endregion

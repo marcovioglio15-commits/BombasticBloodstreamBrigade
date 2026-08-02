@@ -473,6 +473,22 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates and assigns a new Difficulty Scaling preset.
+    /// </summary>
+    internal void CreateDifficultyScalingPreset()
+    {
+        GameMasterSubPresetCreationUtility.CreateDifficultyScalingPreset(this);
+    }
+
+    /// <summary>
+    /// Creates and assigns a new Waves preset.
+    /// </summary>
+    internal void CreateWavesPreset()
+    {
+        GameMasterSubPresetCreationUtility.CreateWavesPreset(this);
+    }
+
+    /// <summary>
     /// Opens or activates one side panel.
     /// </summary>
     /// <param name="panelType">Target panel type.</param>
@@ -580,6 +596,8 @@ public sealed class GameMasterPresetsPanel
         public GameHudManagerPresetsPanel HudPanel;
         public GameProceduralLevelPresetsPanel ProceduralLevelPanel;
         public GameRoomClearRewardsPresetsPanel RoomClearRewardsPanel;
+        public GameDifficultyScalingPresetsPanel DifficultyScalingPanel;
+        public GameWavesPresetsPanel WavesPanel;
     }
     #endregion
 }

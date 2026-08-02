@@ -67,12 +67,20 @@ public enum EnemyWaveStartMode : byte
 /// </summary>
 public struct EnemySpawnerWaveDefinitionElement : IBufferElementData
 {
+    public int SequenceStepIndex;
     public EnemyWaveStartMode StartMode;
+    public int ReferenceWaveIndex;
+    public int ReferenceSequenceStepIndex;
     public float StartDelaySeconds;
     public float SpawnDurationSeconds;
     public float MaximumSpawnWarningLeadTimeSeconds;
     public int FirstEventIndex;
     public int EventCount;
+    public FixedString64Bytes DifficultySelectionGroupId;
+    public FixedString64Bytes DifficultyCoefficientId;
+    public float MinimumDifficulty;
+    public float MaximumDifficulty;
+    public float SelectionWeight;
 }
 
 /// <summary>
@@ -94,6 +102,8 @@ public struct EnemySpawnerWaveRuntimeElement : IBufferElementData
     public byte SpawnFinished;
     public byte Completed;
     public byte FirstKillRegistered;
+    public byte SelectionResolved;
+    public byte Enabled;
 }
 
 /// <summary>
@@ -108,6 +118,12 @@ public struct EnemySpawnerWaveEventElement : IBufferElementData
     public Entity ReservedEnemyEntity;
     public byte HasSpawnWarningOverride;
     public EnemySpawnWarningConfig SpawnWarningOverride;
+    public int CategorySelectionKey;
+    public FixedString64Bytes DifficultyCoefficientId;
+    public float MinimumDifficulty;
+    public float MaximumDifficulty;
+    public float SelectionWeight;
+    public byte CategorySelectionState;
 }
 
 /// <summary>
@@ -149,12 +165,20 @@ public struct EnemySpawnerWavePresetVariantElement : IBufferElementData
 /// </summary>
 public struct EnemySpawnerWavePresetVariantDefinitionElement : IBufferElementData
 {
+    public int SequenceStepIndex;
     public EnemyWaveStartMode StartMode;
+    public int ReferenceWaveIndex;
+    public int ReferenceSequenceStepIndex;
     public float StartDelaySeconds;
     public float SpawnDurationSeconds;
     public float MaximumSpawnWarningLeadTimeSeconds;
     public int FirstEventIndex;
     public int EventCount;
+    public FixedString64Bytes DifficultySelectionGroupId;
+    public FixedString64Bytes DifficultyCoefficientId;
+    public float MinimumDifficulty;
+    public float MaximumDifficulty;
+    public float SelectionWeight;
 }
 
 /// <summary>
@@ -168,6 +192,11 @@ public struct EnemySpawnerWavePresetVariantEventElement : IBufferElementData
     public Entity PrefabEntity;
     public byte HasSpawnWarningOverride;
     public EnemySpawnWarningConfig SpawnWarningOverride;
+    public int CategorySelectionKey;
+    public FixedString64Bytes DifficultyCoefficientId;
+    public float MinimumDifficulty;
+    public float MaximumDifficulty;
+    public float SelectionWeight;
 }
 
 /// <summary>

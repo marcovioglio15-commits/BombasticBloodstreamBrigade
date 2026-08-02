@@ -111,25 +111,25 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         VisualElement warningsRoot = new VisualElement();
         warningsRoot.style.marginBottom = 4f;
         scalableStatsContainer.Add(warningsRoot);
-        RefreshScalableStatsWarnings(warningsRoot, scalableStatsProperty, scalingRulesProperty);
+        PlayerProgressionScalableStatsWarningsUtility.Refresh(warningsRoot, scalableStatsProperty, scalingRulesProperty);
 
         PropertyField scalableStatsField = new PropertyField(scalableStatsProperty, "Scalable Stats");
         scalableStatsField.BindProperty(scalableStatsProperty);
         scalableStatsField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
             PlayerManagementDraftSession.MarkDirty();
-            RefreshScalableStatsWarnings(warningsRoot, scalableStatsProperty, scalingRulesProperty);
+            PlayerProgressionScalableStatsWarningsUtility.Refresh(warningsRoot, scalableStatsProperty, scalingRulesProperty);
         });
         scalableStatsContainer.Add(scalableStatsField);
 
         scalableStatsContainer.RegisterCallback<ChangeEvent<string>>(evt =>
         {
-            RefreshScalableStatsWarnings(warningsRoot, scalableStatsProperty, scalingRulesProperty);
+            PlayerProgressionScalableStatsWarningsUtility.Refresh(warningsRoot, scalableStatsProperty, scalingRulesProperty);
         });
 
         scalableStatsContainer.RegisterCallback<ChangeEvent<bool>>(evt =>
         {
-            RefreshScalableStatsWarnings(warningsRoot, scalableStatsProperty, scalingRulesProperty);
+            PlayerProgressionScalableStatsWarningsUtility.Refresh(warningsRoot, scalableStatsProperty, scalingRulesProperty);
         });
     }
 
@@ -562,160 +562,6 @@ public static class PlayerProgressionPresetsPanelSectionsUtility
         return color.a < 0f || color.a > 1f;
     }
 
-    private static void RefreshScalableStatsWarnings(VisualElement warningsRoot,
-                                                     SerializedProperty scalableStatsProperty,
-                                                     SerializedProperty scalingRulesProperty)
-    {
-        if (warningsRoot == null || scalableStatsProperty == null)
-            return;
-
-        warningsRoot.Clear();
-
-        for (int statIndex = 0; statIndex < scalableStatsProperty.arraySize; statIndex++)
-        {
-            SerializedProperty statElementProperty = scalableStatsProperty.GetArrayElementAtIndex(statIndex);
-            SerializedProperty statNameProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("statName") : null;
-            string statName = statNameProperty != null ? statNameProperty.stringValue : string.Empty;
-            string warningText = ValidateScalableStatEntry(statName, statIndex, scalableStatsProperty);
-
-            if (string.IsNullOrWhiteSpace(warningText))
-                continue;
-
-            HelpBox warningBox = new HelpBox(string.Format("Stat {0}: {1}", statIndex + 1, warningText), HelpBoxMessageType.Warning);
-            warningBox.style.marginBottom = 2f;
-            warningsRoot.Add(warningBox);
-        }
-
-        List<string> dependencyWarnings = PlayerScalingDependencyValidationUtility.BuildScalableStatsDependencyWarnings(scalableStatsProperty,
-                                                                                                                         scalingRulesProperty);
-
-        for (int warningIndex = 0; warningIndex < dependencyWarnings.Count; warningIndex++)
-        {
-            string dependencyWarning = dependencyWarnings[warningIndex];
-
-            if (string.IsNullOrWhiteSpace(dependencyWarning))
-                continue;
-
-            HelpBox warningBox = new HelpBox(dependencyWarning, HelpBoxMessageType.Warning);
-            warningBox.style.marginBottom = 2f;
-            warningsRoot.Add(warningBox);
-        }
-    }
-
-    private static string ValidateScalableStatEntry(string statName, int statIndex, SerializedProperty scalableStatsProperty)
-    {
-        List<string> warnings = new List<string>();
-
-        if (!PlayerScalableStatNameUtility.IsValid(statName))
-            warnings.Add("Invalid name. Use letters/digits/underscore, start with letter or underscore, and avoid 'this'.");
-
-        SerializedProperty statElementProperty = scalableStatsProperty.GetArrayElementAtIndex(statIndex);
-        SerializedProperty statTypeProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("statType") : null;
-        SerializedProperty defaultValueProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("defaultValue") : null;
-        SerializedProperty minimumValueProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("minimumValue") : null;
-        SerializedProperty maximumValueProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("maximumValue") : null;
-        SerializedProperty defaultTokenValueProperty = statElementProperty != null ? statElementProperty.FindPropertyRelative("defaultTokenValue") : null;
-        PlayerScalableStatType statType = statTypeProperty != null
-            ? (PlayerScalableStatType)statTypeProperty.enumValueIndex
-            : PlayerScalableStatType.Float;
-
-        if ((statType == PlayerScalableStatType.Float ||
-             statType == PlayerScalableStatType.Integer ||
-             statType == PlayerScalableStatType.Unsigned) &&
-            minimumValueProperty != null &&
-            maximumValueProperty != null)
-        {
-            float minimumValue = minimumValueProperty.floatValue;
-            float maximumValue = maximumValueProperty.floatValue;
-
-            if (minimumValue > maximumValue)
-            {
-                warnings.Add("Min is above Max. Runtime uses the ordered pair without snapping authoring values.");
-            }
-
-            if (defaultValueProperty != null)
-            {
-                PlayerScalableStatClampUtility.ResolveOrderedRange(minimumValue,
-                                                                   maximumValue,
-                                                                   out float resolvedMinimumValue,
-                                                                   out float resolvedMaximumValue);
-                float defaultValue = defaultValueProperty.floatValue;
-
-                if (defaultValue < resolvedMinimumValue || defaultValue > resolvedMaximumValue)
-                {
-                    warnings.Add("Default Value is outside the configured clamp range and will be clamped only at runtime.");
-                }
-            }
-        }
-
-        if (statType == PlayerScalableStatType.Integer)
-        {
-            if (defaultValueProperty != null && HasFractionalPart(defaultValueProperty.floatValue))
-                warnings.Add("Default Value has decimals on an Integer stat and will be rounded only at runtime.");
-
-            if (minimumValueProperty != null && HasFractionalPart(minimumValueProperty.floatValue))
-                warnings.Add("Min has decimals on an Integer stat and may produce ambiguous runtime bounds.");
-
-            if (maximumValueProperty != null && HasFractionalPart(maximumValueProperty.floatValue))
-                warnings.Add("Max has decimals on an Integer stat and may produce ambiguous runtime bounds.");
-        }
-
-        if (statType == PlayerScalableStatType.Unsigned)
-        {
-            if (defaultValueProperty != null && defaultValueProperty.floatValue < 0f)
-                warnings.Add("Default Value is negative on an Unsigned stat and will be clamped only at runtime.");
-
-            if (minimumValueProperty != null && minimumValueProperty.floatValue < 0f)
-                warnings.Add("Min is negative on an Unsigned stat. Runtime will still enforce a zero lower bound.");
-
-            if (maximumValueProperty != null && maximumValueProperty.floatValue < 0f)
-                warnings.Add("Max is negative on an Unsigned stat and will collapse to zero at runtime.");
-
-            if (defaultValueProperty != null && HasFractionalPart(defaultValueProperty.floatValue))
-                warnings.Add("Default Value has decimals on an Unsigned stat and will be rounded only at runtime.");
-
-            if (minimumValueProperty != null && HasFractionalPart(minimumValueProperty.floatValue))
-                warnings.Add("Min has decimals on an Unsigned stat and may produce ambiguous runtime bounds.");
-
-            if (maximumValueProperty != null && HasFractionalPart(maximumValueProperty.floatValue))
-                warnings.Add("Max has decimals on an Unsigned stat and may produce ambiguous runtime bounds.");
-        }
-
-        if (statType == PlayerScalableStatType.Token && defaultTokenValueProperty != null)
-        {
-            string tokenValue = string.IsNullOrWhiteSpace(defaultTokenValueProperty.stringValue)
-                ? string.Empty
-                : defaultTokenValueProperty.stringValue.Trim();
-
-            if (Encoding.UTF8.GetByteCount(tokenValue) > 61)
-                warnings.Add("Default token value exceeds runtime FixedString64Bytes capacity and will not be writable at runtime.");
-        }
-
-        for (int index = 0; index < scalableStatsProperty.arraySize; index++)
-        {
-            if (index == statIndex)
-                continue;
-
-            SerializedProperty otherStatElement = scalableStatsProperty.GetArrayElementAtIndex(index);
-            SerializedProperty otherStatNameProperty = otherStatElement != null ? otherStatElement.FindPropertyRelative("statName") : null;
-
-            if (otherStatNameProperty == null)
-                continue;
-
-            if (!string.Equals(otherStatNameProperty.stringValue, statName, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            warnings.Add("Duplicate name.");
-            break;
-        }
-
-        return string.Join(Environment.NewLine, warnings);
-    }
-
-    private static bool HasFractionalPart(float value)
-    {
-        return Mathf.Abs(value - Mathf.Round(value)) > 0.0001f;
-    }
     #endregion
 
     #endregion

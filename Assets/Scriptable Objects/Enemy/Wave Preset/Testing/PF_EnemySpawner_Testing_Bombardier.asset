@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: PF_EnemySpawner_Testing_Bombardier
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveLabel: PF_EnemySpawner_Grunts
+  - waveId: fbc1b346bd474214977b51327f1ff91d
+    waveLabel: PF_EnemySpawner_Grunts
+    sequenceStepIndex: 0
+    referenceWaveId: 
     previewInScene: 1
     startMode: 0
     startDelaySeconds: 0
@@ -26,7 +29,7 @@ MonoBehaviour:
       m_RotationOrder: 0
     paintedCells:
     - cellCoordinate: {x: 3, y: 8}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -53,3 +56,10 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  wavesPreset: {fileID: 11400000, guid: 458ea596921f12343a695aaf946d9657, type: 2}

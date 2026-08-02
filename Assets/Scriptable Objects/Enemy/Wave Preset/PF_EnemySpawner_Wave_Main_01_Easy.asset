@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: PF_EnemySpawner_Wave_Main_01_Easy
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveLabel: Wave 1
+  - waveId: b3e0750d18154561a525184481d30bc7
+    waveLabel: Wave 1
+    sequenceStepIndex: 0
+    referenceWaveId: 
     previewInScene: 1
     startMode: 0
     startDelaySeconds: 1
@@ -44,7 +47,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 2d6bd7af6ef90e14c9b2765a18c8a0dd, type: 2}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -71,7 +74,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 2
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 2fc22f27db4c4694abe4ced6682d6f19
+    waveLabel: Wave 2
+    sequenceStepIndex: 1
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -102,7 +114,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -129,7 +141,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 3
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 7500a63a7b414714ad74aad8181e3eb6
+    waveLabel: Wave 3
+    sequenceStepIndex: 2
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -160,7 +181,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -187,7 +208,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 4
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 2586d3de8d884f9f8a6db2816b1a782b
+    waveLabel: Wave 4
+    sequenceStepIndex: 3
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -218,7 +248,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 3}
-      masterPreset: {fileID: 11400000, guid: 69fed44f89b848a4f97e1158eaae32b6, type: 2}
+      brushCategoryId: category_69fed44f89b848a4f97e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -245,7 +275,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 6
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: e47d6bdc622f442c9e3188d84695eb47
+    waveLabel: Wave 6
+    sequenceStepIndex: 4
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -276,7 +315,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 3}
-      masterPreset: {fileID: 11400000, guid: 44859ebceb11b7141aff6e15845c89d2, type: 2}
+      brushCategoryId: category_44859ebceb11b7141aff
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -303,7 +342,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 7
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 631f6e0a757a4a379a3365c2e48507b9
+    waveLabel: Wave 7
+    sequenceStepIndex: 5
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -334,7 +382,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -361,7 +409,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 8
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: f4de5a4ab4f047a9afddbadfa3df3625
+    waveLabel: Wave 8
+    sequenceStepIndex: 6
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -392,7 +449,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 3}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -419,7 +476,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 9
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 346c79e8721d4d25a2c06f6b6ec85407
+    waveLabel: Wave 9
+    sequenceStepIndex: 7
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -450,7 +516,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: a35ced4eda7a12b4dbaad09c4cd4af78, type: 2}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -477,7 +543,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 9
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 6ef7a316df2840b8bdba8cbd9edf122f
+    waveLabel: Wave 9
+    sequenceStepIndex: 8
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 1
@@ -508,7 +583,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -536,7 +611,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 14}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -564,7 +639,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -591,7 +666,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 10
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 2e7bd97671664ccaa666880136386099
+    waveLabel: Wave 10
+    sequenceStepIndex: 9
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -622,7 +706,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 2, y: 1}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -650,7 +734,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 6, y: 1}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -678,7 +762,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 13}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -705,7 +789,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 11
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 8fcff9398c714f2fb0f0f55b5bad1d59
+    waveLabel: Wave 11
+    sequenceStepIndex: 10
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -736,7 +829,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -764,7 +857,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 1}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -792,7 +885,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 11}
-      masterPreset: {fileID: 11400000, guid: 69fed44f89b848a4f97e1158eaae32b6, type: 2}
+      brushCategoryId: category_69fed44f89b848a4f97e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -819,7 +912,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 12
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 02d5b35043d54832874067a2725797cd
+    waveLabel: Wave 12
+    sequenceStepIndex: 11
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -850,7 +952,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 69fed44f89b848a4f97e1158eaae32b6, type: 2}
+      brushCategoryId: category_69fed44f89b848a4f97e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -878,7 +980,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 1}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -906,7 +1008,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 3, y: 10}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -934,7 +1036,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 5, y: 10}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -961,7 +1063,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 13
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: b6f2b75f4fe041ddb54e95272b10940f
+    waveLabel: Wave 13
+    sequenceStepIndex: 12
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -992,7 +1103,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 3, y: 12}
-      masterPreset: {fileID: 11400000, guid: 69fed44f89b848a4f97e1158eaae32b6, type: 2}
+      brushCategoryId: category_69fed44f89b848a4f97e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1020,7 +1131,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 5, y: 12}
-      masterPreset: {fileID: 11400000, guid: 69fed44f89b848a4f97e1158eaae32b6, type: 2}
+      brushCategoryId: category_69fed44f89b848a4f97e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1048,7 +1159,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1075,7 +1186,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 14
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: f99eb2b1948a4b76a53f0e40ba4f97ad
+    waveLabel: Wave 14
+    sequenceStepIndex: 13
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1106,7 +1226,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1134,7 +1254,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 4}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1162,7 +1282,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 8}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1189,7 +1309,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 15
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: e49979dd8d1a4d86ae85d69b263ead34
+    waveLabel: Wave 15
+    sequenceStepIndex: 14
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1220,7 +1349,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 2}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1248,7 +1377,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1276,7 +1405,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 8}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1303,7 +1432,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 16
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: e95b06b761b749b1acc27f36217bdf5a
+    waveLabel: Wave 16
+    sequenceStepIndex: 15
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1334,7 +1472,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 2, y: 13}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1362,7 +1500,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 6, y: 13}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1390,7 +1528,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 2}
-      masterPreset: {fileID: 11400000, guid: a35ced4eda7a12b4dbaad09c4cd4af78, type: 2}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1417,7 +1555,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 17
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 39018b4b630e45c98b1f58ab6fe54302
+    waveLabel: Wave 17
+    sequenceStepIndex: 16
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1448,7 +1595,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 14}
-      masterPreset: {fileID: 11400000, guid: a35ced4eda7a12b4dbaad09c4cd4af78, type: 2}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1476,7 +1623,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 1}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1504,7 +1651,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1532,7 +1679,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 3}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1560,7 +1707,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 7}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1587,7 +1734,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 18
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 115c0cbc30aa41fbaa6fe2809bb7e7a9
+    waveLabel: Wave 18
+    sequenceStepIndex: 17
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1618,7 +1774,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1646,7 +1802,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 1}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1674,7 +1830,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 7}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1702,7 +1858,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 2, y: 7}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1730,7 +1886,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 6, y: 7}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1757,7 +1913,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 19
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 9899873bc62048e1b047435e55821658
+    waveLabel: Wave 19
+    sequenceStepIndex: 18
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1788,7 +1953,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1816,7 +1981,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1844,7 +2009,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 14}
-      masterPreset: {fileID: 11400000, guid: a35ced4eda7a12b4dbaad09c4cd4af78, type: 2}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1871,7 +2036,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 20
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: bd887ffc17844c1fb645fcda93a17b66
+    waveLabel: Wave 20
+    sequenceStepIndex: 19
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -1902,7 +2076,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1930,7 +2104,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 1}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1958,7 +2132,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -1985,7 +2159,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 21
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 1c9c07022ad04e1e877c3315fa079a83
+    waveLabel: Wave 21
+    sequenceStepIndex: 20
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -2016,7 +2199,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 3, y: 1}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2044,7 +2227,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 5, y: 1}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2072,7 +2255,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 2}
-      masterPreset: {fileID: 11400000, guid: 44859ebceb11b7141aff6e15845c89d2, type: 2}
+      brushCategoryId: category_44859ebceb11b7141aff
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2099,7 +2282,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 22
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: fa97b4461fb94114830aff187c4bb023
+    waveLabel: Wave 22
+    sequenceStepIndex: 21
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -2130,7 +2322,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
-      masterPreset: {fileID: 11400000, guid: 44859ebceb11b7141aff6e15845c89d2, type: 2}
+      brushCategoryId: category_44859ebceb11b7141aff
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2158,7 +2350,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 0}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2186,7 +2378,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 14}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2214,7 +2406,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 9}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2241,7 +2433,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 23
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 6aedbbfc65bc464287997b40c8d52e74
+    waveLabel: Wave 23
+    sequenceStepIndex: 22
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -2272,7 +2473,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 13}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2300,7 +2501,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 2}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2328,7 +2529,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 7}
-      masterPreset: {fileID: 11400000, guid: c64113c66ddb2374d8f82e66d9000ff2, type: 2}
+      brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2356,7 +2557,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 4, y: 8}
-      masterPreset: {fileID: 11400000, guid: 9f65ffa9659e02a458f01071aafed820, type: 2}
+      brushCategoryId: category_9f65ffa9659e02a458f0
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2384,7 +2585,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 6, y: 10}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2412,7 +2613,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 2, y: 5}
-      masterPreset: {fileID: 11400000, guid: a35ced4eda7a12b4dbaad09c4cd4af78, type: 2}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2439,7 +2640,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 24
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 597705a0abfb48e18a65a78fb92d1035
+    waveLabel: Wave 24
+    sequenceStepIndex: 23
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -2470,7 +2680,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 1, y: 14}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2498,7 +2708,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 1}
-      masterPreset: {fileID: 11400000, guid: 5281a0b709fc544408ab13483cd552f8, type: 2}
+      brushCategoryId: category_5281a0b709fc544408ab
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2526,7 +2736,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 7, y: 14}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2554,7 +2764,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
     - cellCoordinate: {x: 1, y: 1}
-      masterPreset: {fileID: 11400000, guid: a2b7a40275fc25d4c91e22ad4a363193, type: 2}
+      brushCategoryId: category_a2b7a40275fc25d4c91e
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2581,7 +2791,16 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - waveLabel: Wave 25
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 143e945428b44b6abd99d6bcdf8d6cf2
+    waveLabel: Wave 25
+    sequenceStepIndex: 24
+    referenceWaveId: 
     previewInScene: 0
     startMode: 3
     startDelaySeconds: 0
@@ -2612,7 +2831,7 @@ MonoBehaviour:
       m_RotationOrder: 4
     paintedCells:
     - cellCoordinate: {x: 4, y: 11}
-      masterPreset: {fileID: 11400000, guid: a4cf28221b7bd284f94be6c64bef7329, type: 2}
+      brushCategoryId: category_a4cf28221b7bd284f94b
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -2639,3 +2858,10 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  wavesPreset: {fileID: 11400000, guid: 458ea596921f12343a695aaf946d9657, type: 2}

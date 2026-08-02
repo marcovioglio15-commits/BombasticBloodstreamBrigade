@@ -22,6 +22,13 @@ public static class GameManagementDraftSession
     private static bool hasPendingChanges;
     #endregion
 
+    #region Events
+    /// <summary>
+    /// Notifies editor windows only when the pending-change state actually changes.
+    /// </summary>
+    public static event Action PendingChangesChanged;
+    #endregion
+
     #region Properties
     public static bool IsInitialized
     {
@@ -52,7 +59,7 @@ public static class GameManagementDraftSession
         CaptureBaseline();
         stagedDeletePaths.Clear();
         isInitialized = true;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -61,7 +68,7 @@ public static class GameManagementDraftSession
     public static void EndSession()
     {
         isInitialized = false;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
         baselineJsonByPath.Clear();
         stagedDeletePaths.Clear();
     }
@@ -81,7 +88,7 @@ public static class GameManagementDraftSession
             return;
 
         stagedDeletePaths.Add(assetPath);
-        hasPendingChanges = true;
+        SetPendingChanges(true);
     }
 
     /// <summary>
@@ -108,7 +115,6 @@ public static class GameManagementDraftSession
     public static void PerformUndo()
     {
         Undo.PerformUndo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -117,7 +123,6 @@ public static class GameManagementDraftSession
     public static void PerformRedo()
     {
         Undo.PerformRedo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -125,7 +130,7 @@ public static class GameManagementDraftSession
     /// </summary>
     public static void MarkDirty()
     {
-        hasPendingChanges = true;
+        SetPendingChanges(true);
     }
 
     /// <summary>
@@ -135,7 +140,7 @@ public static class GameManagementDraftSession
     {
         if (!isInitialized)
         {
-            hasPendingChanges = false;
+            SetPendingChanges(false);
             return;
         }
 
@@ -143,7 +148,7 @@ public static class GameManagementDraftSession
 
         if (stagedDeletePaths.Count > 0)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
@@ -151,7 +156,7 @@ public static class GameManagementDraftSession
 
         if (currentState.Count != baselineJsonByPath.Count)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
@@ -159,18 +164,18 @@ public static class GameManagementDraftSession
         {
             if (!currentState.TryGetValue(baselineEntry.Key, out string currentJson))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
 
             if (!string.Equals(baselineEntry.Value, currentJson, StringComparison.Ordinal))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
         }
 
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -184,7 +189,7 @@ public static class GameManagementDraftSession
         AssetDatabase.Refresh();
         CaptureBaseline();
         stagedDeletePaths.Clear();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -201,7 +206,7 @@ public static class GameManagementDraftSession
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -216,6 +221,19 @@ public static class GameManagementDraftSession
     #endregion
 
     #region Session Helpers
+    /// <summary>
+    /// Updates the pending-change flag and emits one notification only when its value changes.
+    /// </summary>
+    /// <param name="value">New pending-change state.</param>
+    private static void SetPendingChanges(bool value)
+    {
+        if (hasPendingChanges == value)
+            return;
+
+        hasPendingChanges = value;
+        PendingChangesChanged?.Invoke();
+    }
+
     /// <summary>
     /// Captures the current tracked state as the clean draft baseline.
     /// </summary>
@@ -276,6 +294,9 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameProceduralLevelPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameRoomClearRewardsPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameRoomClearRewardsPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameDifficultyScalingPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameWavesPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<EnemyWavePreset>(uniquePaths, TrackedProjectRoot);
         AddAudioManagerPrefabPaths(uniquePaths);
         AddSceneManagerPrefabPaths(uniquePaths);
 

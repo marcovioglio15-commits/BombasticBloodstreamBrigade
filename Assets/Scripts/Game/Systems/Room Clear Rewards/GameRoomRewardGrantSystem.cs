@@ -193,8 +193,10 @@ public partial class GameRoomRewardGrantSystem : SystemBase
         PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer, out PlayerPowerUpsConfig powerUpsConfig);
 
         IReadOnlyList<int> orderedTileIndices =
-            GameRoomRewardRuntimeBufferUtility.BuildOrderedTileBindingIndices(tileBindings,
-                                                                              clearedEvent.TileIndex);
+            GameRoomRewardRuntimeBufferUtility.BuildResolvedTileBindingIndices(tileBindings,
+                                                                               clearedEvent.TileIndex,
+                                                                               clearedEvent.RunSeed,
+                                                                               clearedEvent.ClearVersion);
 
         for (int tileOrderIndex = 0; tileOrderIndex < orderedTileIndices.Count; tileOrderIndex++)
         {

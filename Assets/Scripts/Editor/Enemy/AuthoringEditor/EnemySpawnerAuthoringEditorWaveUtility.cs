@@ -103,8 +103,10 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
     /// Builds a coordinate lookup for existing painted cells of the current wave.
     /// </summary>
     /// <param name="paintedCellsProperty">Serialized array of painted cells.</param>
+    /// <param name="wavesPreset">Waves preset used to resolve category colors.</param>
     /// <returns>Coordinate-to-preview-data lookup.</returns>
-    public static Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> BuildCellPreviewMap(SerializedProperty paintedCellsProperty)
+    public static Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> BuildCellPreviewMap(SerializedProperty paintedCellsProperty,
+                                                                                              GameWavesPreset wavesPreset)
     {
         Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> cellPreviewByCoordinate = new Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData>();
 
@@ -120,8 +122,8 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
 
             Vector2Int coordinate = cellProperty.FindPropertyRelative("cellCoordinate").vector2IntValue;
             int enemyCount = Mathf.Max(0, cellProperty.FindPropertyRelative("enemyCount").intValue);
-            EnemyMasterPreset masterPreset = cellProperty.FindPropertyRelative("masterPreset").objectReferenceValue as EnemyMasterPreset;
-            Color color = EnemySpawnerWaveBakeUtility.ResolvePaintColor(masterPreset);
+            string categoryId = cellProperty.FindPropertyRelative("brushCategoryId").stringValue;
+            Color color = ResolveCategoryColor(wavesPreset, categoryId);
             color.a = 0.9f;
             cellPreviewByCoordinate[coordinate] = new EnemySpawnerGridCellPreviewData(enemyCount, color);
         }
@@ -160,7 +162,7 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
     /// <param name="waveIndex">Wave index receiving the change.</param>
     /// <param name="coordinate">Target grid coordinate.</param>
     /// <param name="eraseMode">True to erase instead of paint.</param>
-    /// <param name="brushMasterPreset">Master preset assigned while painting.</param>
+    /// <param name="brushCategoryId">Stable brush category identifier assigned while painting.</param>
     /// <param name="brushEnemyCount">Enemy count assigned while painting.</param>
     /// <param name="brushDistributionCurve">Default curve copied into new cells.</param>
     /// <param name="selectedWaveIndex">Current selected wave index, updated by the mutation.</param>
@@ -172,7 +174,7 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
                                  int waveIndex,
                                  Vector2Int coordinate,
                                  bool eraseMode,
-                                 EnemyMasterPreset brushMasterPreset,
+                                 string brushCategoryId,
                                  int brushEnemyCount,
                                  AnimationCurve brushDistributionCurve,
                                  ref int selectedWaveIndex,
@@ -203,7 +205,7 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
             return true;
         }
 
-        if (brushMasterPreset == null)
+        if (string.IsNullOrWhiteSpace(brushCategoryId))
             return false;
 
         SerializedProperty cellProperty;
@@ -218,7 +220,7 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
         }
 
         cellProperty.FindPropertyRelative("cellCoordinate").vector2IntValue = coordinate;
-        cellProperty.FindPropertyRelative("masterPreset").objectReferenceValue = brushMasterPreset;
+        cellProperty.FindPropertyRelative("brushCategoryId").stringValue = brushCategoryId;
         cellProperty.FindPropertyRelative("enemyCount").intValue = Mathf.Max(1, brushEnemyCount);
         cellProperty.FindPropertyRelative("useWaveDefaultDistribution").boolValue = false;
         cellProperty.FindPropertyRelative("distributionCurveOverride").animationCurveValue = CloneAnimationCurve(brushDistributionCurve);
@@ -228,6 +230,23 @@ public static class EnemySpawnerAuthoringEditorWaveUtility
         serializedObject.ApplyModifiedProperties();
         EditorUtility.SetDirty(targetObject);
         return true;
+    }
+
+    /// <summary>
+    /// Resolves a category color without retaining references to serialized editor properties.
+    /// </summary>
+    /// <param name="wavesPreset">Waves preset containing the brush category.</param>
+    /// <param name="categoryId">Stable category identifier stored on the cell.</param>
+    /// <returns>Authored category color, or a clear warning color when the category is unresolved.</returns>
+    private static Color ResolveCategoryColor(GameWavesPreset wavesPreset, string categoryId)
+    {
+        if (wavesPreset != null &&
+            wavesPreset.TryFindBrushCategory(categoryId, out EnemyBrushCategoryDefinition category))
+        {
+            return category.BrushColor;
+        }
+
+        return new Color(1f, 0.2f, 0.2f, 0.9f);
     }
 
     /// <summary>

@@ -88,6 +88,12 @@ internal static class GameMasterPresetsPanelSidePanelUtility
         if (intendedActivePanel == GameManagementWindow.PanelType.RoomClearRewards)
             TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.RoomClearRewards);
 
+        if (intendedActivePanel == GameManagementWindow.PanelType.DifficultyScaling)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.DifficultyScaling);
+
+        if (intendedActivePanel == GameManagementWindow.PanelType.Waves)
+            TryOpenSidePanelSafe(panel, GameManagementWindow.PanelType.Waves);
+
         if (!panel.SidePanels.ContainsKey(intendedActivePanel))
             intendedActivePanel = GameManagementWindow.PanelType.GameMasterPresets;
 
@@ -153,6 +159,12 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             case GameManagementWindow.PanelType.RoomClearRewards:
                 OpenRoomClearRewardsPanel(panel, panelType);
                 break;
+            case GameManagementWindow.PanelType.DifficultyScaling:
+                OpenDifficultyScalingPanel(panel, panelType);
+                break;
+            case GameManagementWindow.PanelType.Waves:
+                OpenWavesPanel(panel, panelType);
+                break;
             default:
                 return;
         }
@@ -194,6 +206,12 @@ internal static class GameMasterPresetsPanelSidePanelUtility
 
             if (entry.RoomClearRewardsPanel != null)
                 entry.RoomClearRewardsPanel.RefreshFromSessionChange();
+
+            if (entry.DifficultyScalingPanel != null)
+                entry.DifficultyScalingPanel.RefreshFromSessionChange();
+
+            if (entry.WavesPanel != null)
+                entry.WavesPanel.RefreshFromSessionChange();
         }
     }
 
@@ -321,6 +339,59 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     }
 
     /// <summary>
+    /// Creates and registers the Difficulty Scaling side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
+    private static void OpenDifficultyScalingPanel(GameMasterPresetsPanel panel,
+                                                   GameManagementWindow.PanelType panelType)
+    {
+        GameDifficultyScalingPresetsPanel difficultyPanel = new GameDifficultyScalingPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel,
+                                                     "Difficulty Scaling",
+                                                     difficultyPanel.Root,
+                                                     panelType);
+        AddTab(panel,
+               panelType,
+               "Difficulty Scaling",
+               panelRoot,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               difficultyPanel);
+    }
+
+    /// <summary>
+    /// Creates and registers the Waves side panel.
+    /// </summary>
+    /// <param name="panel">Owning panel with tab state.</param>
+    /// <param name="panelType">Side panel type.</param>
+    private static void OpenWavesPanel(GameMasterPresetsPanel panel,
+                                       GameManagementWindow.PanelType panelType)
+    {
+        GameWavesPresetsPanel wavesPanel = new GameWavesPresetsPanel();
+        VisualElement panelRoot = BuildSidePanelRoot(panel,
+                                                     "Waves",
+                                                     wavesPanel.Root,
+                                                     panelType);
+        AddTab(panel,
+               panelType,
+               "Waves",
+               panelRoot,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               wavesPanel);
+    }
+
+    /// <summary>
     /// Creates the side-panel root with a title and close button.
     /// </summary>
     /// <param name="panel">Owning panel used by the close callback.</param>
@@ -370,6 +441,8 @@ internal static class GameMasterPresetsPanelSidePanelUtility
     /// <param name="hudPanel">Optional HUD Manager panel controller.</param>
     /// <param name="proceduralLevelPanel">Optional Procedural Level panel controller.</param>
     /// <param name="roomClearRewardsPanel">Optional Room Clear Rewards panel controller.</param>
+    /// <param name="difficultyScalingPanel">Optional Difficulty Scaling panel controller.</param>
+    /// <param name="wavesPanel">Optional Waves panel controller.</param>
     private static void AddTab(GameMasterPresetsPanel panel,
                                GameManagementWindow.PanelType panelType,
                                string label,
@@ -379,7 +452,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
                                GameSettingsManagerPresetsPanel settingsPanel,
                                GameHudManagerPresetsPanel hudPanel,
                                GameProceduralLevelPresetsPanel proceduralLevelPanel,
-                               GameRoomClearRewardsPresetsPanel roomClearRewardsPanel = null)
+                               GameRoomClearRewardsPresetsPanel roomClearRewardsPanel = null,
+                               GameDifficultyScalingPresetsPanel difficultyScalingPanel = null,
+                               GameWavesPresetsPanel wavesPanel = null)
     {
         VisualElement tabContainer = new VisualElement();
         tabContainer.style.flexDirection = FlexDirection.Row;
@@ -403,7 +478,9 @@ internal static class GameMasterPresetsPanelSidePanelUtility
             SettingsPanel = settingsPanel,
             HudPanel = hudPanel,
             ProceduralLevelPanel = proceduralLevelPanel,
-            RoomClearRewardsPanel = roomClearRewardsPanel
+            RoomClearRewardsPanel = roomClearRewardsPanel,
+            DifficultyScalingPanel = difficultyScalingPanel,
+            WavesPanel = wavesPanel
         };
     }
 

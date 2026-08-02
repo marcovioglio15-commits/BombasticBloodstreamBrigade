@@ -51,6 +51,7 @@ internal static class PlayerScalableStatHashUtility
         }
 
         rollingHash = (rollingHash ^ (uint)scalableStats.Length) * FnvPrime;
+        rollingHash = (rollingHash ^ GameDifficultyRuntimeValueStore.Version) * FnvPrime;
         return rollingHash;
     }
     #endregion

@@ -87,6 +87,15 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     {
         return masterPreset != null ? masterPreset.RoomClearRewardsPreset : null;
     }
+
+    /// <summary>
+    /// Resolves the Difficulty Scaling preset associated with the selected Game Master preset.
+    /// </summary>
+    /// <returns>Assigned Difficulty Scaling preset, or null when shared difficulty coefficients are disabled.</returns>
+    public GameDifficultyScalingPreset ResolveDifficultyScalingPreset()
+    {
+        return masterPreset != null ? masterPreset.DifficultyScalingPreset : null;
+    }
     #endregion
 
     #region Unity Methods
@@ -161,6 +170,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         GameSceneManagementBakeUtility.PopulateSceneBuffer(resolvedPreset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(resolvedPreset, transitionBuffer);
         requestBuffer.Clear();
+        AddDifficultyRuntimeData(entityManager, entity, ResolveDifficultyScalingPreset());
         AddProceduralRuntimeData(entityManager,
                                  entity,
                                  ResolveProceduralLevelPreset(),
@@ -175,6 +185,44 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         });
         entityManager.SetComponentData(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
         return true;
+    }
+
+    /// <summary>
+    /// Adds optional Difficulty Scaling configuration to a regular-scene fallback singleton.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the fallback singleton.</param>
+    /// <param name="entity">Scene manager singleton receiving difficulty data.</param>
+    /// <param name="preset">Resolved Difficulty Scaling preset, or null when disabled.</param>
+    private static void AddDifficultyRuntimeData(EntityManager entityManager,
+                                                 Entity entity,
+                                                 GameDifficultyScalingPreset preset)
+    {
+        if (preset == null)
+            return;
+
+        preset.EnsureInitialized();
+
+        if (!GameDifficultyScalingBakeUtility.TryValidateRuntimeConfiguration(preset, out string failureMessage))
+        {
+            Debug.LogError("[GameSceneManagerAuthoring] Difficulty Scaling runtime bootstrap was disabled. " +
+                           failureMessage);
+            return;
+        }
+
+        entityManager.AddComponentData(entity, GameDifficultyScalingBakeUtility.BuildConfig(preset));
+        entityManager.AddComponentData(entity, new GameDifficultyRuntimeState());
+        entityManager.AddBuffer<GameDifficultyCoefficientDefinitionElement>(entity);
+        entityManager.AddBuffer<GameDifficultyCurveSampleElement>(entity);
+        entityManager.AddBuffer<GameDifficultyStepElement>(entity);
+        entityManager.AddBuffer<GameDifficultyStepConditionElement>(entity);
+        entityManager.AddBuffer<GameDifficultyCoefficientValueElement>(entity);
+        GameDifficultyScalingBakeUtility.PopulateBuffers(
+            preset,
+            entityManager.GetBuffer<GameDifficultyCoefficientDefinitionElement>(entity),
+            entityManager.GetBuffer<GameDifficultyCurveSampleElement>(entity),
+            entityManager.GetBuffer<GameDifficultyStepElement>(entity),
+            entityManager.GetBuffer<GameDifficultyStepConditionElement>(entity),
+            entityManager.GetBuffer<GameDifficultyCoefficientValueElement>(entity));
     }
 
     /// <summary>
@@ -316,6 +364,7 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         GameSceneManagementBakeUtility.PopulateSceneBuffer(preset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(preset, transitionBuffer);
         requestBuffer.Clear();
+        BakeDifficultyData(authoring, entity);
         BakeProceduralLevelData(authoring, entity, preset);
     }
     #endregion
@@ -373,10 +422,63 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
                         DependsOn(mapping.Sprite);
                 }
             }
+
+            if (authoring.MasterPreset.DifficultyScalingPreset != null)
+            {
+                DependsOn(authoring.MasterPreset.DifficultyScalingPreset);
+
+                if (authoring.MasterPreset.DifficultyScalingPreset.PlayerContextPreset != null)
+                {
+                    DependsOn(authoring.MasterPreset.DifficultyScalingPreset.PlayerContextPreset);
+
+                    if (authoring.MasterPreset.DifficultyScalingPreset.PlayerContextPreset.ProgressionPreset != null)
+                        DependsOn(authoring.MasterPreset.DifficultyScalingPreset.PlayerContextPreset.ProgressionPreset);
+                }
+            }
         }
 
         if (authoring.SceneManagerPreset != null)
             DependsOn(authoring.SceneManagerPreset);
+    }
+
+    /// <summary>
+    /// Bakes optional Difficulty Scaling definitions onto the scene manager singleton.
+    /// </summary>
+    /// <param name="authoring">Scene manager authoring component used to resolve the difficulty preset.</param>
+    /// <param name="entity">Scene manager singleton entity receiving difficulty buffers.</param>
+    private void BakeDifficultyData(GameSceneManagerAuthoring authoring, Entity entity)
+    {
+        GameDifficultyScalingPreset preset = authoring.ResolveDifficultyScalingPreset();
+
+        if (preset == null)
+            return;
+
+        if (!GameDifficultyScalingBakeUtility.TryValidateRuntimeConfiguration(preset, out string failureMessage))
+        {
+            Debug.LogError("[GameSceneManagerAuthoringBaker] Difficulty Scaling configuration was not baked. " +
+                           failureMessage,
+                           authoring);
+            return;
+        }
+
+        AddComponent(entity, GameDifficultyScalingBakeUtility.BuildConfig(preset));
+        AddComponent(entity, new GameDifficultyRuntimeState());
+        DynamicBuffer<GameDifficultyCoefficientDefinitionElement> definitionBuffer =
+            AddBuffer<GameDifficultyCoefficientDefinitionElement>(entity);
+        DynamicBuffer<GameDifficultyCurveSampleElement> curveBuffer =
+            AddBuffer<GameDifficultyCurveSampleElement>(entity);
+        DynamicBuffer<GameDifficultyStepElement> stepBuffer =
+            AddBuffer<GameDifficultyStepElement>(entity);
+        DynamicBuffer<GameDifficultyStepConditionElement> conditionBuffer =
+            AddBuffer<GameDifficultyStepConditionElement>(entity);
+        DynamicBuffer<GameDifficultyCoefficientValueElement> valueBuffer =
+            AddBuffer<GameDifficultyCoefficientValueElement>(entity);
+        GameDifficultyScalingBakeUtility.PopulateBuffers(preset,
+                                                         definitionBuffer,
+                                                         curveBuffer,
+                                                         stepBuffer,
+                                                         conditionBuffer,
+                                                         valueBuffer);
     }
 
     /// <summary>

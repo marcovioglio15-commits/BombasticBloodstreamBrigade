@@ -52,6 +52,300 @@ public static class PlayerScalingDependencyValidationUtility
 
         return warnings;
     }
+
+    /// <summary>
+    /// Builds cross-system cycle warnings for Player scalable stats and Difficulty Scaling coefficients.
+    /// </summary>
+    /// <param name="scalableStatsProperty">Serialized scalable stats list used to resolve player variable names.</param>
+    /// <param name="scalingRulesProperty">Serialized Add Scaling rules that may consume difficulty coefficients.</param>
+    /// <returns>Cross-system circular dependency warnings for the current Player progression context.</returns>
+    public static List<string> BuildDifficultyCrossDependencyWarnings(SerializedProperty scalableStatsProperty,
+                                                                      SerializedProperty scalingRulesProperty)
+    {
+        List<string> warnings = new List<string>();
+
+        if (scalableStatsProperty == null || scalingRulesProperty == null ||
+            !scalableStatsProperty.isArray || !scalingRulesProperty.isArray)
+        {
+            return warnings;
+        }
+
+        Dictionary<string, string> statNameByStatKey = new Dictionary<string, string>(StringComparer.Ordinal);
+        Dictionary<string, string> canonicalStatNameByLookup =
+            new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        BuildStatMaps(scalableStatsProperty, statNameByStatKey, canonicalStatNameByLookup);
+        Dictionary<string, HashSet<string>> dependencyGraph = BuildDependencyGraph(scalingRulesProperty,
+                                                                                    statNameByStatKey,
+                                                                                    canonicalStatNameByLookup);
+        PlayerProgressionPreset progressionPreset =
+            scalableStatsProperty.serializedObject.targetObject as PlayerProgressionPreset;
+        List<GameDifficultyScalingPreset> difficultyPresets = FindDifficultyPresets(progressionPreset);
+
+        // Build an independent graph per compatible preset so unrelated coefficient namespaces cannot collide.
+        for (int presetIndex = 0; presetIndex < difficultyPresets.Count; presetIndex++)
+        {
+            GameDifficultyScalingPreset difficultyPreset = difficultyPresets[presetIndex];
+            Dictionary<string, HashSet<string>> combinedGraph = CloneDependencyGraph(dependencyGraph);
+            Dictionary<string, string> coefficientNodeById = BuildCoefficientNodeMap(difficultyPreset,
+                                                                                      combinedGraph);
+            AppendPlayerCoefficientDependencies(scalingRulesProperty,
+                                                statNameByStatKey,
+                                                coefficientNodeById,
+                                                combinedGraph);
+            AppendDifficultyDependencies(difficultyPreset,
+                                         coefficientNodeById,
+                                         canonicalStatNameByLookup,
+                                         combinedGraph);
+            List<List<string>> circularGroups = FindCircularDependencyGroups(combinedGraph);
+
+            for (int groupIndex = 0; groupIndex < circularGroups.Count; groupIndex++)
+            {
+                if (!ContainsDifficultyNode(circularGroups[groupIndex]))
+                    continue;
+
+                warnings.Add(BuildCrossSystemWarning(difficultyPreset, circularGroups[groupIndex]));
+            }
+        }
+
+        return warnings;
+    }
+    #endregion
+
+    #region Difficulty Graph Construction
+    /// <summary>
+    /// Finds difficulty presets that explicitly use the current Player progression context.
+    /// </summary>
+    /// <param name="progressionPreset">Current Player progression preset.</param>
+    /// <returns>Compatible Difficulty Scaling presets sorted by asset discovery order.</returns>
+    private static List<GameDifficultyScalingPreset> FindDifficultyPresets(PlayerProgressionPreset progressionPreset)
+    {
+        List<GameDifficultyScalingPreset> presets = new List<GameDifficultyScalingPreset>();
+        string[] presetGuids = AssetDatabase.FindAssets("t:GameDifficultyScalingPreset", new string[] { "Assets" });
+
+        for (int presetIndex = 0; presetIndex < presetGuids.Length; presetIndex++)
+        {
+            GameDifficultyScalingPreset preset = AssetDatabase.LoadAssetAtPath<GameDifficultyScalingPreset>(
+                AssetDatabase.GUIDToAssetPath(presetGuids[presetIndex]));
+
+            if (preset == null || preset.PlayerContextPreset == null ||
+                preset.PlayerContextPreset.ProgressionPreset != progressionPreset)
+            {
+                continue;
+            }
+
+            presets.Add(preset);
+        }
+
+        return presets;
+    }
+
+    /// <summary>
+    /// Clones a dependency graph so every Difficulty Scaling preset is validated independently.
+    /// </summary>
+    /// <param name="source">Player-only dependency graph.</param>
+    /// <returns>Deep clone of graph nodes and dependency sets.</returns>
+    private static Dictionary<string, HashSet<string>> CloneDependencyGraph(
+        Dictionary<string, HashSet<string>> source)
+    {
+        Dictionary<string, HashSet<string>> clone =
+            new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (KeyValuePair<string, HashSet<string>> entry in source)
+            clone.Add(entry.Key, new HashSet<string>(entry.Value, StringComparer.OrdinalIgnoreCase));
+
+        return clone;
+    }
+
+    /// <summary>
+    /// Adds uniquely namespaced difficulty coefficient nodes to one combined dependency graph.
+    /// </summary>
+    /// <param name="preset">Difficulty Scaling preset supplying coefficient definitions.</param>
+    /// <param name="graph">Combined graph receiving nodes.</param>
+    /// <returns>Coefficient node keys indexed by formula identifier.</returns>
+    private static Dictionary<string, string> BuildCoefficientNodeMap(GameDifficultyScalingPreset preset,
+                                                                      Dictionary<string, HashSet<string>> graph)
+    {
+        Dictionary<string, string> nodes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        for (int coefficientIndex = 0; coefficientIndex < preset.Coefficients.Count; coefficientIndex++)
+        {
+            GameDifficultyCoefficientDefinition coefficient = preset.Coefficients[coefficientIndex];
+
+            if (coefficient == null || string.IsNullOrWhiteSpace(coefficient.CoefficientId) ||
+                nodes.ContainsKey(coefficient.CoefficientId))
+            {
+                continue;
+            }
+
+            string node = "difficulty::" + coefficient.CoefficientId;
+            nodes.Add(coefficient.CoefficientId, node);
+            graph[node] = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        return nodes;
+    }
+
+    /// <summary>
+    /// Adds Player Add Scaling references to difficulty coefficients as graph edges.
+    /// </summary>
+    /// <param name="scalingRulesProperty">Serialized Player Add Scaling rules.</param>
+    /// <param name="statNameByStatKey">Player stat names indexed by stable stat key.</param>
+    /// <param name="coefficientNodeById">Difficulty graph nodes indexed by coefficient ID.</param>
+    /// <param name="graph">Combined dependency graph receiving edges.</param>
+    private static void AppendPlayerCoefficientDependencies(SerializedProperty scalingRulesProperty,
+                                                            IReadOnlyDictionary<string, string> statNameByStatKey,
+                                                            IReadOnlyDictionary<string, string> coefficientNodeById,
+                                                            Dictionary<string, HashSet<string>> graph)
+    {
+        for (int ruleIndex = 0; ruleIndex < scalingRulesProperty.arraySize; ruleIndex++)
+        {
+            SerializedProperty rule = scalingRulesProperty.GetArrayElementAtIndex(ruleIndex);
+            SerializedProperty statKey = rule.FindPropertyRelative("statKey");
+            SerializedProperty addScaling = rule.FindPropertyRelative("addScaling");
+            SerializedProperty formula = rule.FindPropertyRelative("formula");
+
+            if (statKey == null || addScaling == null || formula == null || !addScaling.boolValue ||
+                !statNameByStatKey.TryGetValue(statKey.stringValue, out string statName) ||
+                !graph.TryGetValue(statName, out HashSet<string> dependencies))
+            {
+                continue;
+            }
+
+            PlayerStatFormulaCompileResult result = PlayerStatFormulaEngine.Compile(formula.stringValue, true);
+
+            if (!result.IsValid || result.CompiledFormula == null)
+                continue;
+
+            for (int variableIndex = 0; variableIndex < result.CompiledFormula.VariableNames.Count; variableIndex++)
+            {
+                if (coefficientNodeById.TryGetValue(result.CompiledFormula.VariableNames[variableIndex],
+                                                    out string coefficientNode))
+                {
+                    dependencies.Add(coefficientNode);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds coefficient references to Player stats and sibling coefficients for every scaling mode.
+    /// </summary>
+    /// <param name="preset">Difficulty Scaling preset supplying definitions.</param>
+    /// <param name="coefficientNodeById">Difficulty graph nodes indexed by coefficient ID.</param>
+    /// <param name="canonicalStatNameByLookup">Canonical Player stat names.</param>
+    /// <param name="graph">Combined dependency graph receiving edges.</param>
+    private static void AppendDifficultyDependencies(GameDifficultyScalingPreset preset,
+                                                     IReadOnlyDictionary<string, string> coefficientNodeById,
+                                                     IReadOnlyDictionary<string, string> canonicalStatNameByLookup,
+                                                     Dictionary<string, HashSet<string>> graph)
+    {
+        for (int coefficientIndex = 0; coefficientIndex < preset.Coefficients.Count; coefficientIndex++)
+        {
+            GameDifficultyCoefficientDefinition coefficient = preset.Coefficients[coefficientIndex];
+
+            if (coefficient == null ||
+                !coefficientNodeById.TryGetValue(coefficient.CoefficientId, out string coefficientNode))
+            {
+                continue;
+            }
+
+            HashSet<string> variableNames = CollectDifficultyVariableNames(coefficient);
+
+            foreach (string variableName in variableNames)
+            {
+                if (canonicalStatNameByLookup.TryGetValue(variableName, out string statNode))
+                    graph[coefficientNode].Add(statNode);
+                else if (coefficientNodeById.TryGetValue(variableName, out string dependencyCoefficientNode))
+                    graph[coefficientNode].Add(dependencyCoefficientNode);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Collects referenced variables from formula, curve and ordered step coefficient modes.
+    /// </summary>
+    /// <param name="coefficient">Difficulty coefficient being inspected.</param>
+    /// <returns>Case-insensitive referenced variable set.</returns>
+    private static HashSet<string> CollectDifficultyVariableNames(GameDifficultyCoefficientDefinition coefficient)
+    {
+        HashSet<string> variableNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        switch (coefficient.ScalingMode)
+        {
+            case GameDifficultyScalingMode.Curve:
+                variableNames.Add(coefficient.CurveInputVariable);
+                break;
+            case GameDifficultyScalingMode.Steps:
+                for (int stepIndex = 0; stepIndex < coefficient.Steps.Count; stepIndex++)
+                {
+                    GameDifficultyStepDefinition step = coefficient.Steps[stepIndex];
+
+                    if (step == null)
+                        continue;
+
+                    for (int conditionIndex = 0; conditionIndex < step.Conditions.Count; conditionIndex++)
+                    {
+                        GameDifficultyStepCondition condition = step.Conditions[conditionIndex];
+
+                        if (condition != null)
+                            variableNames.Add(condition.VariableName);
+                    }
+                }
+                break;
+            default:
+                PlayerStatFormulaCompileResult result = PlayerStatFormulaEngine.Compile(coefficient.Formula, true);
+
+                if (!result.IsValid || result.CompiledFormula == null)
+                    break;
+
+                for (int variableIndex = 0; variableIndex < result.CompiledFormula.VariableNames.Count; variableIndex++)
+                    variableNames.Add(result.CompiledFormula.VariableNames[variableIndex]);
+                break;
+        }
+
+        variableNames.Remove(PlayerScalableStatNameUtility.ReservedThisName);
+        variableNames.RemoveWhere(string.IsNullOrWhiteSpace);
+        return variableNames;
+    }
+
+    /// <summary>
+    /// Checks whether one strongly connected component crosses into Difficulty Scaling.
+    /// </summary>
+    /// <param name="nodes">Strongly connected component node keys.</param>
+    /// <returns>True when at least one coefficient node participates.</returns>
+    private static bool ContainsDifficultyNode(IReadOnlyList<string> nodes)
+    {
+        for (int nodeIndex = 0; nodeIndex < nodes.Count; nodeIndex++)
+        {
+            if (nodes[nodeIndex].StartsWith("difficulty::", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Formats one cross-system strongly connected component into an actionable warning.
+    /// </summary>
+    /// <param name="preset">Difficulty preset participating in the loop.</param>
+    /// <param name="nodes">Circular Player and difficulty nodes.</param>
+    /// <returns>Designer-facing cross-system cycle warning.</returns>
+    private static string BuildCrossSystemWarning(GameDifficultyScalingPreset preset, IReadOnlyList<string> nodes)
+    {
+        List<string> labels = new List<string>();
+
+        for (int nodeIndex = 0; nodeIndex < nodes.Count; nodeIndex++)
+        {
+            string node = nodes[nodeIndex];
+            labels.Add(node.StartsWith("difficulty::", StringComparison.OrdinalIgnoreCase)
+                ? "Difficulty [" + node.Substring("difficulty::".Length) + "]"
+                : "Player [" + node + "]");
+        }
+
+        labels.Sort(StringComparer.OrdinalIgnoreCase);
+        return "Cross-system scaling loop in Difficulty preset '" + preset.name + "': " +
+               string.Join(" <-> ", labels) + ". Break one formula dependency to keep rebuild order deterministic.";
+    }
     #endregion
 
     #region Graph Construction

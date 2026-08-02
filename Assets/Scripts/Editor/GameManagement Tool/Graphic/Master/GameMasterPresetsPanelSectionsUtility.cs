@@ -360,6 +360,24 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.RoomClearRewards,
                             "Room Clear Rewards",
                             panel.CreateRoomClearRewardsPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Difficulty Scaling Preset",
+                            "difficultyScalingPreset",
+                            typeof(GameDifficultyScalingPreset),
+                            "Difficulty coefficient graph shared by waves, room rewards and Player Management formulas.",
+                            GameManagementWindow.PanelType.DifficultyScaling,
+                            "Difficulty Scaling",
+                            panel.CreateDifficultyScalingPreset);
+        AddSubPresetControl(panel,
+                            section,
+                            "Waves Preset",
+                            "wavesPreset",
+                            typeof(GameWavesPreset),
+                            "Scene-native wave painting, parallel wave scheduling and reusable weighted enemy brush categories.",
+                            GameManagementWindow.PanelType.Waves,
+                            "Waves",
+                            panel.CreateWavesPreset);
     }
 
     /// <summary>

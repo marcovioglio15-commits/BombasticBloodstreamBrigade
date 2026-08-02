@@ -43,7 +43,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
     private SerializedProperty drawCellCountsProperty;
     private SerializedObject wavePresetSerializedObject;
     private EnemyWavePreset cachedWavePreset;
-    private EnemyMasterPreset brushMasterPreset;
+    private string brushCategoryId;
     private int brushEnemyCount = 1;
     private AnimationCurve brushDistributionCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f);
     private bool eraseMode;
@@ -328,7 +328,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         if (nextShowPainter)
         {
             EditorGUI.indentLevel++;
-            EnemySpawnerAuthoringEditorSectionUtility.DrawPainterSection(ref brushMasterPreset,
+            GameWavesPreset wavesPreset = cachedWavePreset != null ? cachedWavePreset.WavesPreset : null;
+            EnemySpawnerAuthoringEditorSectionUtility.DrawPainterSection(ref brushCategoryId,
+                                                                         wavesPreset,
                                                                          ref brushEnemyCount,
                                                                          ref brushDistributionCurve,
                                                                          ref eraseMode);
@@ -383,8 +385,8 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         EnemySpawnWaveAuthoring wave = authoredWaves[waveIndex];
         int totalEnemies = EnemySpawnerWaveBakeUtility.CountWaveEnemies(wave);
         int totalCells = wave != null && wave.PaintedCells != null ? wave.PaintedCells.Count : 0;
-        int totalTypes = EnemySpawnerWaveBakeUtility.CountWaveEnemyTypes(wave);
-        EditorGUILayout.HelpBox("Cells: " + totalCells + " | Enemies: " + totalEnemies + " | Types: " + totalTypes,
+        int totalCategories = EnemySpawnerWaveBakeUtility.CountWaveBrushCategories(wave);
+        EditorGUILayout.HelpBox("Cells: " + totalCells + " | Enemies: " + totalEnemies + " | Categories: " + totalCategories,
                                 MessageType.None);
     }
 
@@ -452,7 +454,9 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
         if (paintedCellsProperty == null)
             return;
 
-        Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> cellPreviewByCoordinate = EnemySpawnerAuthoringEditorWaveUtility.BuildCellPreviewMap(paintedCellsProperty);
+        GameWavesPreset wavesPreset = cachedWavePreset != null ? cachedWavePreset.WavesPreset : null;
+        Dictionary<Vector2Int, EnemySpawnerGridCellPreviewData> cellPreviewByCoordinate =
+            EnemySpawnerAuthoringEditorWaveUtility.BuildCellPreviewMap(paintedCellsProperty, wavesPreset);
         EnemySpawnerAuthoringEditorStyleUtility.SyncGridLabelStyles(ref gridCoordinateLabelStyle,
                                                                     ref gridCountLabelStyle,
                                                                     gridZoom);
@@ -566,7 +570,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                                                           waveIndex,
                                                                           coordinate,
                                                                           eraseMode,
-                                                                          brushMasterPreset,
+                                                                          brushCategoryId,
                                                                           brushEnemyCount,
                                                                           brushDistributionCurve,
                                                                           ref selectedWaveIndex,
@@ -600,7 +604,7 @@ public sealed class EnemySpawnerAuthoringEditor : Editor
                                                                           waveIndex,
                                                                           coordinate,
                                                                           eraseMode,
-                                                                          brushMasterPreset,
+                                                                          brushCategoryId,
                                                                           brushEnemyCount,
                                                                           brushDistributionCurve,
                                                                           ref selectedWaveIndex,

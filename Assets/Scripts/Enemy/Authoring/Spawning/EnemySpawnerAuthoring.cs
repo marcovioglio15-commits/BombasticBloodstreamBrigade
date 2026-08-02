@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -83,11 +82,8 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
     [SerializeField] private Color spawnWarningColor = new Color(1f, 0.72f, 0.18f, 1f);
 
     [Header("Waves")]
-    [Tooltip("Wave preset asset that contains the finite sequence of authored waves emitted by this spawner.")]
+    [Tooltip("Required wave preset asset containing every sequential or parallel lane emitted by this room's single spawner.")]
     [SerializeField] private EnemyWavePreset wavePreset;
-
-    [HideInInspector]
-    [SerializeField] private List<EnemySpawnWaveAuthoring> waves = new List<EnemySpawnWaveAuthoring>();
 
     [Header("Debug")]
     [Tooltip("Draw the authored grid and preview wave gizmos when the spawner is selected.")]
@@ -258,14 +254,11 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
         }
     }
 
-    public List<EnemySpawnWaveAuthoring> Waves
+    public System.Collections.Generic.List<EnemySpawnWaveAuthoring> Waves
     {
         get
         {
-            if (wavePreset != null)
-                return wavePreset.Waves;
-
-            return waves;
+            return wavePreset == null ? null : wavePreset.Waves;
         }
     }
 
@@ -305,40 +298,16 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
 
     #region Unity Methods
     /// <summary>
-    /// Sanitizes serialized values and wave data after inspector edits.
+    /// Reports invalid spawner values without silently rewriting designer-authored tuning.
     /// </summary>
     private void OnValidate()
     {
-        if (gridSizeX < 1)
-            gridSizeX = 1;
+        EnemySpawnerAuthoringValidationUtility.WarnInvalidValues(this);
 
-        if (gridSizeZ < 1)
-            gridSizeZ = 1;
-
-        if (cellSize < 0.1f)
-            cellSize = 0.1f;
-
-        if (initialPoolCapacityPerPrefab < 0)
-            initialPoolCapacityPerPrefab = 0;
-
-        if (expandBatchPerPrefab < 1)
-            expandBatchPerPrefab = 1;
-
-        if (despawnDistance < 0f)
-            despawnDistance = 0f;
-
-        WarnInvalidSpawnWarningValues();
-
-        if (wavePreset != null)
-        {
-            wavePreset.ValidateAgainstGrid(gridSizeX, gridSizeZ);
+        if (wavePreset == null)
             return;
-        }
 
-        if (waves == null)
-            waves = new List<EnemySpawnWaveAuthoring>();
-
-        EnemySpawnerWaveBakeUtility.ValidateWaves(waves, gridSizeX, gridSizeZ);
+        wavePreset.ValidateAgainstGrid(gridSizeX, gridSizeZ);
     }
 
     /// <summary>
@@ -387,7 +356,7 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
     /// <returns>True when a preview wave exists, otherwise false.</returns>
     public bool TryGetPreviewWaveIndex(out int waveIndex)
     {
-        List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
+        System.Collections.Generic.List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
 
         if (resolvedWaves != null)
         {
@@ -412,33 +381,6 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
     #endregion
 
     #region Gizmos
-    /// <summary>
-    /// Emits non-destructive warnings when authored spawn-warning values are inconsistent.
-    /// </summary>
-    private void WarnInvalidSpawnWarningValues()
-    {
-        if (!enableSpawnWarning)
-            return;
-
-        if (spawnWarningLeadTimeSeconds < 0f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Lead Time Seconds should be >= 0.", this);
-
-        if (spawnWarningRadiusScale <= 0f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Radius Scale should be > 0.", this);
-
-        if (spawnWarningRingWidth <= 0f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Ring Width should be > 0.", this);
-
-        if (spawnWarningHeightOffset < 0f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Height Offset should be >= 0.", this);
-
-        if (spawnWarningMaximumAlpha < 0f || spawnWarningMaximumAlpha > 1f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Maximum Alpha should stay in the [0..1] range.", this);
-
-        if (spawnWarningFadeOutSeconds < 0f)
-            Debug.LogWarning("[EnemySpawnerAuthoring] Spawn Warning Fade Out Seconds should be >= 0.", this);
-    }
-
     /// <summary>
     /// Draws the grid wireframe in local space.
     /// </summary>
@@ -473,7 +415,7 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
         if (!spawnerEnabled)
             return;
 
-        List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
+        System.Collections.Generic.List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
         int previewWaveIndex;
 
         if (!TryGetPreviewWaveIndex(out previewWaveIndex))
@@ -499,13 +441,31 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
 
             float3 localCenterValue = ResolveCellLocalCenter(cell.CellCoordinate);
             Vector3 localCenter = new Vector3(localCenterValue.x, localCenterValue.y, localCenterValue.z);
-            Color fillColor = EnemySpawnerWaveBakeUtility.ResolvePaintColor(cell.MasterPreset);
+            Color fillColor = ResolveCellPaintColor(cell);
             fillColor.a = 0.35f;
             Gizmos.color = fillColor;
             Gizmos.DrawCube(localCenter, new Vector3(cellSize * cellSizePaddingHorizontal, cellSizePaddingVertical, cellSize * cellSizePaddingHorizontal));
             Gizmos.color = new Color(fillColor.r, fillColor.g, fillColor.b, fillAlpha);
             Gizmos.DrawWireCube(localCenter, new Vector3(cellSize * cellSizePaddingHorizontal, cellSizePaddingVertical_Wired, cellSize * cellSizePaddingHorizontal));
         }
+    }
+
+    /// <summary>
+    /// Resolves the category-aware color used by scene preview gizmos.
+    /// </summary>
+    /// <param name="cell">Painted cell whose brush identity is rendered.</param>
+    /// <returns>Authored category color or a clear unresolved-category warning color.</returns>
+    private Color ResolveCellPaintColor(EnemySpawnWaveCellAuthoring cell)
+    {
+        GameWavesPreset wavesPreset = wavePreset != null ? wavePreset.WavesPreset : null;
+
+        if (wavesPreset != null &&
+            wavesPreset.TryFindBrushCategory(cell.BrushCategoryId, out EnemyBrushCategoryDefinition category))
+        {
+            return category.BrushColor;
+        }
+
+        return new Color(1f, 0.2f, 0.2f, 0.9f);
     }
 
 #if UNITY_EDITOR
@@ -568,7 +528,7 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
     /// </summary>
     private void DrawPreviewCellCountLabels()
     {
-        List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
+        System.Collections.Generic.List<EnemySpawnWaveAuthoring> resolvedWaves = Waves;
         int previewWaveIndex;
 
         if (!TryGetPreviewWaveIndex(out previewWaveIndex))
@@ -602,7 +562,7 @@ public sealed class EnemySpawnerAuthoring : MonoBehaviour
             if (screenPoint.z < 0f)
                 continue;
 
-            Color badgeColor = EnemySpawnerWaveBakeUtility.ResolvePaintColor(cell.MasterPreset);
+            Color badgeColor = ResolveCellPaintColor(cell);
             badgeColor.a = 0.92f;
             DrawSceneBadge(new Vector2(screenPoint.x, screenPoint.y - 20f),
                            "x" + math.max(0, cell.EnemyCount),

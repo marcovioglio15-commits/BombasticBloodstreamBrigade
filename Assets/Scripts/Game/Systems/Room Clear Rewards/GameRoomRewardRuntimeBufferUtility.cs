@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -9,6 +10,8 @@ public static class GameRoomRewardRuntimeBufferUtility
 {
     #region Fields
     private static readonly List<int> OrderedTileIndices = new List<int>(16);
+    private static readonly List<int> ResolvedTileIndices = new List<int>(16);
+    private static readonly List<FixedString64Bytes> ResolvedSelectionGroups = new List<FixedString64Bytes>(8);
     private static readonly List<int> OrderedModuleIndices = new List<int>(32);
     private static readonly List<int> OrderedResourceIndices = new List<int>(16);
     #endregion
@@ -51,6 +54,165 @@ public static class GameRoomRewardRuntimeBufferUtility
         }
 
         return OrderedTileIndices;
+    }
+
+    /// <summary>
+    /// Resolves deterministic weighted difficulty groups after stable tile binding ordering.
+    /// </summary>
+    /// <param name="bindings">All tile-to-reward bindings.</param>
+    /// <param name="tileIndex">Cleared flattened tile index.</param>
+    /// <param name="runSeed">Authoritative run seed contributing to deterministic selection.</param>
+    /// <param name="clearVersion">Monotonic room-clear version contributing to deterministic selection.</param>
+    /// <returns>Reusable ordered indices containing unconditional bindings and one candidate per resolved group.</returns>
+    public static IReadOnlyList<int> BuildResolvedTileBindingIndices(
+        DynamicBuffer<GameRoomRewardTileBindingElement> bindings,
+        int tileIndex,
+        uint runSeed,
+        uint clearVersion)
+    {
+        IReadOnlyList<int> orderedIndices = BuildOrderedTileBindingIndices(bindings, tileIndex);
+        ResolvedTileIndices.Clear();
+        ResolvedSelectionGroups.Clear();
+
+        for (int orderedIndex = 0; orderedIndex < orderedIndices.Count; orderedIndex++)
+        {
+            int bindingIndex = orderedIndices[orderedIndex];
+            GameRoomRewardTileBindingElement binding = bindings[bindingIndex];
+
+            if (binding.UseDifficultySelection == 0)
+            {
+                ResolvedTileIndices.Add(bindingIndex);
+                continue;
+            }
+
+            if (ContainsGroup(binding.SelectionGroupId))
+                continue;
+
+            ResolvedSelectionGroups.Add(binding.SelectionGroupId);
+            int selectedBindingIndex = ResolveDifficultyGroup(bindings,
+                                                              orderedIndices,
+                                                              binding.SelectionGroupId,
+                                                              runSeed,
+                                                              clearVersion,
+                                                              tileIndex);
+
+            if (selectedBindingIndex >= 0)
+                ResolvedTileIndices.Add(selectedBindingIndex);
+        }
+
+        // Restore explicit order after grouped candidates are selected from potentially separated source rows.
+        for (int index = 1; index < ResolvedTileIndices.Count; index++)
+        {
+            int candidate = ResolvedTileIndices[index];
+            int insertionIndex = index - 1;
+
+            while (insertionIndex >= 0 &&
+                   IsTileBindingAfter(bindings, ResolvedTileIndices[insertionIndex], candidate))
+            {
+                ResolvedTileIndices[insertionIndex + 1] = ResolvedTileIndices[insertionIndex];
+                insertionIndex--;
+            }
+
+            ResolvedTileIndices[insertionIndex + 1] = candidate;
+        }
+
+        return ResolvedTileIndices;
+    }
+
+    /// <summary>
+    /// Selects one eligible weighted reward binding from a shared difficulty selection group.
+    /// </summary>
+    /// <param name="bindings">All flattened tile bindings.</param>
+    /// <param name="orderedIndices">Stable indices targeting the cleared tile.</param>
+    /// <param name="selectionGroupId">Group identifier being resolved.</param>
+    /// <param name="runSeed">Authoritative run seed.</param>
+    /// <param name="clearVersion">Monotonic clear version.</param>
+    /// <param name="tileIndex">Cleared flattened tile index.</param>
+    /// <returns>Selected binding index, or negative one when no candidate is eligible.</returns>
+    private static int ResolveDifficultyGroup(DynamicBuffer<GameRoomRewardTileBindingElement> bindings,
+                                              IReadOnlyList<int> orderedIndices,
+                                              FixedString64Bytes selectionGroupId,
+                                              uint runSeed,
+                                              uint clearVersion,
+                                              int tileIndex)
+    {
+        float totalWeight = 0f;
+
+        for (int index = 0; index < orderedIndices.Count; index++)
+        {
+            GameRoomRewardTileBindingElement candidate = bindings[orderedIndices[index]];
+
+            if (candidate.UseDifficultySelection == 0 ||
+                !candidate.SelectionGroupId.Equals(selectionGroupId) ||
+                !IsDifficultyEligible(in candidate))
+            {
+                continue;
+            }
+
+            totalWeight += math.max(0f, candidate.SelectionWeight);
+        }
+
+        if (totalWeight <= 0f)
+            return -1;
+
+        uint selectionHash = math.hash(new uint4(runSeed,
+                                                 clearVersion,
+                                                 unchecked((uint)tileIndex),
+                                                 unchecked((uint)selectionGroupId.GetHashCode())));
+        float selectionPoint = (selectionHash & 0x00FFFFFFu) / 16777216f * totalWeight;
+        float cumulativeWeight = 0f;
+
+        for (int index = 0; index < orderedIndices.Count; index++)
+        {
+            int candidateIndex = orderedIndices[index];
+            GameRoomRewardTileBindingElement candidate = bindings[candidateIndex];
+
+            if (candidate.UseDifficultySelection == 0 ||
+                !candidate.SelectionGroupId.Equals(selectionGroupId) ||
+                !IsDifficultyEligible(in candidate))
+            {
+                continue;
+            }
+
+            cumulativeWeight += math.max(0f, candidate.SelectionWeight);
+
+            if (cumulativeWeight >= selectionPoint)
+                return candidateIndex;
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    /// Checks whether one reward candidate contains the current shared difficulty coefficient value.
+    /// </summary>
+    /// <param name="binding">Difficulty-aware reward binding being tested.</param>
+    /// <returns>True when the coefficient exists and lies inside the inclusive authored range.</returns>
+    private static bool IsDifficultyEligible(in GameRoomRewardTileBindingElement binding)
+    {
+        if (!GameDifficultyRuntimeValueStore.TryGetValue(binding.DifficultyCoefficientId.ToString(),
+                                                         out float coefficientValue))
+        {
+            return false;
+        }
+
+        return coefficientValue >= binding.MinimumDifficulty && coefficientValue <= binding.MaximumDifficulty;
+    }
+
+    /// <summary>
+    /// Checks whether a difficulty selection group has already been resolved in the current transaction.
+    /// </summary>
+    /// <param name="selectionGroupId">Group identifier to inspect.</param>
+    /// <returns>True when the group exists in the reusable processed-group list.</returns>
+    private static bool ContainsGroup(FixedString64Bytes selectionGroupId)
+    {
+        for (int index = 0; index < ResolvedSelectionGroups.Count; index++)
+        {
+            if (ResolvedSelectionGroups[index].Equals(selectionGroupId))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
