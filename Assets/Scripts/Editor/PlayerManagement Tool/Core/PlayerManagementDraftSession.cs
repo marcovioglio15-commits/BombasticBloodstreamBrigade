@@ -32,6 +32,8 @@ public static class PlayerManagementDraftSession
     private static readonly Dictionary<string, string> baselineJsonByPath = new Dictionary<string, string>();
     // This hash set holds the asset paths that are staged for deletion during the draft session.
     private static readonly HashSet<string> stagedDeletePaths = new HashSet<string>();
+    private static readonly ManagementToolDraftChangeVerifier pendingChangesVerifier =
+        new ManagementToolDraftChangeVerifier(RecomputePendingChanges);
 
     private static bool isInitialized;
     private static bool hasPendingChanges;
@@ -64,6 +66,7 @@ public static class PlayerManagementDraftSession
     /// </summary>
     public static void BeginSession()
     {
+        pendingChangesVerifier.Reset();
         CaptureBaseline();
         stagedDeletePaths.Clear();
         isInitialized = true;
@@ -72,6 +75,7 @@ public static class PlayerManagementDraftSession
 
     public static void EndSession()
     {
+        pendingChangesVerifier.Reset();
         isInitialized = false;
         hasPendingChanges = false;
         baselineJsonByPath.Clear();
@@ -136,9 +140,15 @@ public static class PlayerManagementDraftSession
         RecomputePendingChanges();
     }
 
+    /// <summary>
+    /// Verifies one tool-side dirty signal against the serialized baseline before changing pending state.
+    /// </summary>
     public static void MarkDirty()
     {
-        hasPendingChanges = true;
+        if (!isInitialized || hasPendingChanges)
+            return;
+
+        pendingChangesVerifier.VerifySignal();
     }
 
     public static void RecomputePendingChanges()
@@ -185,6 +195,7 @@ public static class PlayerManagementDraftSession
 
     public static void Apply()
     {
+        pendingChangesVerifier.Reset();
         ExecuteStagedDeletions();
         ExecuteRenames();
         AssetDatabase.SaveAssets();
@@ -199,6 +210,7 @@ public static class PlayerManagementDraftSession
         if (isInitialized == false)
             return;
 
+        pendingChangesVerifier.Reset();
         RestoreBaselineAssets();
         DeleteAssetsCreatedAfterBaseline();
         stagedDeletePaths.Clear();

@@ -18,6 +18,8 @@ public static class EnemyManagementDraftSession
     #region Fields
     private static readonly Dictionary<string, string> baselineJsonByPath = new Dictionary<string, string>();
     private static readonly HashSet<string> stagedDeletePaths = new HashSet<string>();
+    private static readonly ManagementToolDraftChangeVerifier pendingChangesVerifier =
+        new ManagementToolDraftChangeVerifier(RecomputePendingChanges);
 
     private static bool isInitialized;
     private static bool hasPendingChanges;
@@ -46,6 +48,7 @@ public static class EnemyManagementDraftSession
     #region Public Methods
     public static void BeginSession()
     {
+        pendingChangesVerifier.Reset();
         CaptureBaseline();
         stagedDeletePaths.Clear();
         isInitialized = true;
@@ -54,6 +57,7 @@ public static class EnemyManagementDraftSession
 
     public static void EndSession()
     {
+        pendingChangesVerifier.Reset();
         isInitialized = false;
         hasPendingChanges = false;
         baselineJsonByPath.Clear();
@@ -99,9 +103,15 @@ public static class EnemyManagementDraftSession
         RecomputePendingChanges();
     }
 
+    /// <summary>
+    /// Verifies one tool-side dirty signal against the serialized baseline before changing pending state.
+    /// </summary>
     public static void MarkDirty()
     {
-        hasPendingChanges = true;
+        if (!isInitialized || hasPendingChanges)
+            return;
+
+        pendingChangesVerifier.VerifySignal();
     }
 
     public static void RecomputePendingChanges()
@@ -148,6 +158,7 @@ public static class EnemyManagementDraftSession
 
     public static void Apply()
     {
+        pendingChangesVerifier.Reset();
         ExecuteStagedDeletions();
         ExecuteRenames();
         AssetDatabase.SaveAssets();
@@ -162,6 +173,7 @@ public static class EnemyManagementDraftSession
         if (!isInitialized)
             return;
 
+        pendingChangesVerifier.Reset();
         RestoreBaselineAssets();
         DeleteAssetsCreatedAfterBaseline();
         stagedDeletePaths.Clear();

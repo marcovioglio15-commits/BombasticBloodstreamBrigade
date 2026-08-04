@@ -10,6 +10,8 @@ public static class ExcelDataTransferDraftSession
 {
     #region Fields
     private static readonly Dictionary<string, string> baselineJsonByPath = new Dictionary<string, string>();
+    private static readonly ManagementToolDraftChangeVerifier pendingChangesVerifier =
+        new ManagementToolDraftChangeVerifier(RecomputePendingChanges);
 
     private static bool isInitialized;
     private static bool hasPendingChanges;
@@ -41,6 +43,7 @@ public static class ExcelDataTransferDraftSession
     /// </summary>
     public static void BeginSession()
     {
+        pendingChangesVerifier.Reset();
         ExcelDataTransferAssetUtility.GetOrCreateDefaultMasterPreset();
         CaptureBaseline();
         isInitialized = true;
@@ -52,6 +55,7 @@ public static class ExcelDataTransferDraftSession
     /// </summary>
     public static void EndSession()
     {
+        pendingChangesVerifier.Reset();
         isInitialized = false;
         hasPendingChanges = false;
         baselineJsonByPath.Clear();
@@ -76,11 +80,14 @@ public static class ExcelDataTransferDraftSession
     }
 
     /// <summary>
-    /// Marks the session dirty after a tool-side asset mutation.
+    /// Verifies one tool-side dirty signal against the serialized baseline before changing pending state.
     /// </summary>
     public static void MarkDirty()
     {
-        hasPendingChanges = true;
+        if (!isInitialized || hasPendingChanges)
+            return;
+
+        pendingChangesVerifier.VerifySignal();
     }
 
     /// <summary>
@@ -125,6 +132,7 @@ public static class ExcelDataTransferDraftSession
     /// </summary>
     public static void Apply()
     {
+        pendingChangesVerifier.Reset();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
@@ -139,6 +147,7 @@ public static class ExcelDataTransferDraftSession
         if (!isInitialized)
             return;
 
+        pendingChangesVerifier.Reset();
         RestoreBaselineAssets();
         DeleteAssetsCreatedAfterBaseline();
         AssetDatabase.SaveAssets();
