@@ -39,6 +39,21 @@ public static class EnemySpawnerWaveBakeUtility
     }
 
     /// <summary>
+    /// Checks whether one authored cell belongs to the finite spawner grid used for baking and painting.
+    /// </summary>
+    /// <param name="cellCoordinate">Authored zero-based grid coordinate.</param>
+    /// <param name="gridSizeX">Grid width in cells.</param>
+    /// <param name="gridSizeZ">Grid depth in cells.</param>
+    /// <returns>True when both coordinate axes are inside valid grid bounds.</returns>
+    public static bool IsCellInsideGrid(Vector2Int cellCoordinate, int gridSizeX, int gridSizeZ)
+    {
+        return cellCoordinate.x >= 0 &&
+               cellCoordinate.x < gridSizeX &&
+               cellCoordinate.y >= 0 &&
+               cellCoordinate.y < gridSizeZ;
+    }
+
+    /// <summary>
     /// Computes the local-space center of one grid cell using the spawner grid settings.
     /// </summary>
     /// <param name="gridSizeX">Grid width in cells.</param>

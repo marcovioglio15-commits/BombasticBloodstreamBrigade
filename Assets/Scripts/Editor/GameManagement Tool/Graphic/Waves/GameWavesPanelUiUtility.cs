@@ -191,6 +191,7 @@ internal static class GameWavesPanelUiUtility
 
         PopupField<string> stepPopup = new PopupField<string>("Step", stepChoices, selectedStepPosition);
         stepPopup.tooltip = "Ordered sequence step. Every wave inside the selected step starts as a parallel member.";
+        ConfigureSequencePopup(stepPopup);
         stepPopup.RegisterValueChangedCallback(evt =>
         {
             List<int> selectedStepWaves = BuildWaveIndicesForStep(preset, stepIndices[stepPopup.index]);
@@ -216,12 +217,25 @@ internal static class GameWavesPanelUiUtility
         int selectedWavePosition = Mathf.Max(0, waveIndices.IndexOf(selectedWaveIndex));
         PopupField<string> wavePopup = new PopupField<string>("Parallel Wave", waveChoices, selectedWavePosition);
         wavePopup.tooltip = "Single parallel wave displayed and painted inside the selected ordered step.";
+        ConfigureSequencePopup(wavePopup);
         wavePopup.RegisterValueChangedCallback(evt =>
         {
             if (wavePopup.index >= 0 && wavePopup.index < waveIndices.Count && selectionChanged != null)
                 selectionChanged(waveIndices[wavePopup.index]);
         });
         rootElement.Add(wavePopup);
+    }
+
+    /// <summary>
+    /// Keeps one sequence selector readable while allowing it to wrap inside constrained Scene Brush panes.
+    /// </summary>
+    /// <param name="popup">Step or parallel-wave popup receiving responsive bounds.</param>
+    private static void ConfigureSequencePopup(PopupField<string> popup)
+    {
+        popup.style.flexGrow = 1f;
+        popup.style.flexShrink = 1f;
+        popup.style.minWidth = 220f;
+        popup.style.maxWidth = 460f;
     }
 
     /// <summary>

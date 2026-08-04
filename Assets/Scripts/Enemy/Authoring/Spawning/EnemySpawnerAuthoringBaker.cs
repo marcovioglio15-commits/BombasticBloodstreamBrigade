@@ -232,6 +232,13 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             if (cell == null)
                 continue;
 
+            if (!EnemySpawnerWaveBakeUtility.IsCellInsideGrid(cell.CellCoordinate,
+                                                              authoring.GridSizeX,
+                                                              authoring.GridSizeZ))
+            {
+                continue;
+            }
+
             int enemyCount = math.max(0, cell.EnemyCount);
 
             if (enemyCount <= 0)

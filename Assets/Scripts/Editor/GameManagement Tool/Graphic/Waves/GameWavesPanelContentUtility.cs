@@ -75,17 +75,27 @@ internal static class GameWavesPanelContentUtility
                                    Vector2Int? selectedCell,
                                    Action<Vector2Int> selectCell)
     {
-        Rect previewRect = GUILayoutUtility.GetRect(100f,
-                                                    10000f,
-                                                    440f,
-                                                    10000f,
-                                                    GUILayout.ExpandWidth(true),
-                                                    GUILayout.ExpandHeight(true));
+        const float footerHeight = 46f;
+        Rect availableRect = GUILayoutUtility.GetRect(100f,
+                                                      10000f,
+                                                      240f,
+                                                      10000f,
+                                                      GUILayout.ExpandWidth(true),
+                                                      GUILayout.ExpandHeight(true));
+        Rect previewRect = new Rect(availableRect.x,
+                                    availableRect.y,
+                                    availableRect.width,
+                                    Mathf.Max(100f, availableRect.height - footerHeight));
+        Rect footerRect = new Rect(availableRect.x,
+                                   previewRect.yMax,
+                                   availableRect.width,
+                                   Mathf.Max(0f, availableRect.yMax - previewRect.yMax));
         EnemyBrushCategoryDefinition category = categoryIndex >= 0 &&
                                                 categoryIndex < wavesPreset.BrushCategories.Count
             ? wavesPreset.BrushCategories[categoryIndex]
             : null;
         renderer.Draw(previewRect,
+                      footerRect,
                       waveSerializedObject.targetObject as EnemyWavePreset,
                       waveIndex,
                       wavesPreset,

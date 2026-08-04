@@ -38,11 +38,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     private string loadWarning;
     #endregion
 
-    #region Properties
-    public bool HasSpawner => hasSpawner;
-    public string LoadWarning => loadWarning;
-    #endregion
-
     #region Methods
 
     #region Scene Loading
@@ -207,13 +202,36 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         spawnHeightOffset = resolvedSpawner.SpawnHeightOffset;
     }
 
+    /// <summary>
+    /// Applies valid transactional grid geometry immediately to the preview without mutating the SubScene.
+    /// </summary>
+    /// <param name="settings">Editor-only settings draft currently displayed by Scene Brush.</param>
+    public void ApplySpawnerSettings(GameWavesSpawnerSettingsDraft settings)
+    {
+        if (settings == null || !hasSpawner)
+            return;
+
+        originOffset = settings.OriginOffset;
+        spawnHeightOffset = settings.SpawnHeightOffset;
+
+        if (settings.GridSizeX > 0)
+            gridSizeX = settings.GridSizeX;
+
+        if (settings.GridSizeZ > 0)
+            gridSizeZ = settings.GridSizeZ;
+
+        if (settings.CellSize > 0f)
+            cellSize = settings.CellSize;
+    }
+
     #endregion
 
     #region Preview Drawing
     /// <summary>
     /// Draws the isolated room, wave overlay and direct paint interaction inside one IMGUI container.
     /// </summary>
-    /// <param name="rect">Available IMGUI preview rectangle.</param>
+    /// <param name="rect">Clipped IMGUI room-preview rectangle.</param>
+    /// <param name="footerRect">Dedicated status area below the interactive preview.</param>
     /// <param name="wavePreset">Wave preset modified through a preview-owned serialization stream.</param>
     /// <param name="waveIndex">Single wave currently visible and editable.</param>
     /// <param name="wavesPreset">Preset used to resolve per-category overlay colors.</param>
@@ -224,6 +242,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     /// <param name="selectedCell">Optional painted cell highlighted for detailed editing.</param>
     /// <param name="selectCell">Callback invoked by right-clicking a painted cell.</param>
     public void Draw(Rect rect,
+                     Rect footerRect,
                      EnemyWavePreset wavePreset,
                      int waveIndex,
                      GameWavesPreset wavesPreset,
@@ -235,10 +254,12 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
                      Action<Vector2Int> selectCell)
     {
         EditorGUI.DrawRect(rect, new Color(0.09f, 0.09f, 0.1f, 1f));
+        EditorGUI.DrawRect(footerRect, new Color(0.025f, 0.025f, 0.03f, 1f));
 
         if (previewUtility == null)
         {
             GUI.Label(new Rect(rect.x + 12f, rect.y + 12f, rect.width - 24f, 48f), loadWarning);
+            GameWavesPreviewOverlayUtility.DrawInstructions(footerRect, erase);
             return;
         }
 
@@ -256,11 +277,27 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         }
 
         SerializedObject wavePresetObject = ResolveWavePresetObject(wavePreset);
+        bool hasFocusedCell = false;
+        string focusedCategoryId = string.Empty;
+        int focusedEnemyCount = 0;
+        Vector2Int focusedCoordinate = default;
 
         if (hasSpawner && wavePresetObject != null)
         {
             if (Event.current.type == EventType.Repaint)
-                DrawGridOverlay(rect, wavePresetObject, waveIndex, wavesPreset, selectedCell);
+            {
+                GUI.BeginGroup(rect);
+                Rect clippedRect = new Rect(0f, 0f, rect.width, rect.height);
+                hasFocusedCell = DrawGridOverlay(clippedRect,
+                                                 wavePresetObject,
+                                                 waveIndex,
+                                                 wavesPreset,
+                                                 selectedCell,
+                                                 out focusedCategoryId,
+                                                 out focusedEnemyCount,
+                                                 out focusedCoordinate);
+                GUI.EndGroup();
+            }
 
             HandleInteraction(rect,
                               wavePresetObject,
@@ -272,7 +309,25 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         }
 
         if (Event.current.type == EventType.Repaint)
-            DrawInstructions(rect, erase);
+        {
+            if (hasFocusedCell)
+            {
+                GameWavesPreviewOverlayUtility.DrawFocusedCellDetails(footerRect,
+                                                                      wavesPreset,
+                                                                      focusedCategoryId,
+                                                                      focusedEnemyCount,
+                                                                      focusedCoordinate);
+            }
+
+            GameWavesPreviewOverlayUtility.DrawInstructions(footerRect, erase);
+
+            if (!string.IsNullOrWhiteSpace(loadWarning))
+            {
+                GUI.Label(new Rect(rect.x + 8f, rect.y + 8f, rect.width - 16f, 40f),
+                          loadWarning,
+                          EditorStyles.helpBox);
+            }
+        }
     }
 
     /// <summary>
@@ -303,7 +358,7 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         float gridWidth = Mathf.Max(1f, gridSizeX * cellSize);
         float gridDepth = Mathf.Max(1f, gridSizeZ * cellSize);
         float fitSize = Mathf.Max(gridDepth * 0.5f, gridWidth * 0.5f / aspect) * GridPaddingScale;
-        previewCamera.orthographicSize = fitSize / Mathf.Clamp(zoom, 1f, 4f);
+        previewCamera.orthographicSize = fitSize / Mathf.Clamp(zoom, 0.35f, 4f);
         previewCamera.nearClipPlane = 0.05f;
         previewCamera.farClipPlane = Mathf.Max(500f, cameraHeight * 4f);
         previewCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -318,13 +373,23 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
     /// <param name="waveIndex">Visible wave index.</param>
     /// <param name="wavesPreset">Waves preset used to resolve category labels and colors.</param>
     /// <param name="selectedCell">Optional painted-cell coordinate highlighted for detailed editing.</param>
-    private void DrawGridOverlay(Rect rect,
+    /// <param name="focusedCategoryId">Resolved category identifier for the hovered or selected painted cell.</param>
+    /// <param name="focusedEnemyCount">Resolved authored enemy count for the focused cell.</param>
+    /// <param name="focusedCoordinate">Resolved grid coordinate for the focused cell.</param>
+    /// <returns>True when a painted cell should be described in the dedicated footer.</returns>
+    private bool DrawGridOverlay(Rect rect,
                                  SerializedObject wavePresetObject,
                                  int waveIndex,
                                  GameWavesPreset wavesPreset,
-                                 Vector2Int? selectedCell)
+                                 Vector2Int? selectedCell,
+                                 out string focusedCategoryId,
+                                 out int focusedEnemyCount,
+                                 out Vector2Int focusedCoordinate)
     {
-        SerializedProperty cells = FindPaintedCells(wavePresetObject, waveIndex);
+        focusedCategoryId = string.Empty;
+        focusedEnemyCount = 0;
+        focusedCoordinate = default;
+        SerializedProperty cells = GameWavesPreviewWaveUtility.FindPaintedCells(wavePresetObject, waveIndex);
         bool hasHoveredCell = TryResolveCellCoordinate(rect,
                                                        Event.current.mousePosition,
                                                        out Vector2Int hoveredCoordinate);
@@ -406,14 +471,13 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         if (focusedCellIndex >= 0)
         {
             SerializedProperty focusedCell = cells.GetArrayElementAtIndex(focusedCellIndex);
-            Vector2Int focusedCoordinate = focusedCell.FindPropertyRelative("cellCoordinate").vector2IntValue;
-            GameWavesPreviewOverlayUtility.DrawFocusedCellDetails(
-                rect,
-                wavesPreset,
-                focusedCell.FindPropertyRelative("brushCategoryId").stringValue,
-                focusedCell.FindPropertyRelative("enemyCount").intValue,
-                focusedCoordinate);
+            focusedCoordinate = focusedCell.FindPropertyRelative("cellCoordinate").vector2IntValue;
+            focusedCategoryId = focusedCell.FindPropertyRelative("brushCategoryId").stringValue;
+            focusedEnemyCount = focusedCell.FindPropertyRelative("enemyCount").intValue;
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
@@ -446,12 +510,12 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         if (!TryResolveCellCoordinate(rect, currentEvent.mousePosition, out Vector2Int coordinate))
             return;
 
-        SerializedProperty cells = FindPaintedCells(wavePresetObject, waveIndex);
+        SerializedProperty cells = GameWavesPreviewWaveUtility.FindPaintedCells(wavePresetObject, waveIndex);
 
         if (cells == null)
             return;
 
-        int existingIndex = FindCellIndex(cells, coordinate);
+        int existingIndex = GameWavesPreviewWaveUtility.FindCellIndex(cells, coordinate);
 
         if (currentEvent.button == 1)
         {
@@ -496,23 +560,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
         currentEvent.Use();
     }
 
-    /// <summary>
-    /// Draws concise navigation and current paint-mode instructions over the preview.
-    /// </summary>
-    /// <param name="rect">Rendered preview rectangle.</param>
-    /// <param name="erase">Current toolbar erase state.</param>
-    private void DrawInstructions(Rect rect, bool erase)
-    {
-        string interaction = erase
-            ? "ERASE | Left click removes | Right click selects a painted cell"
-            : "PAINT | Left click paints | Shift + left click erases | Right click selects";
-        Rect labelRect = new Rect(rect.x + 8f, rect.yMax - 26f, rect.width - 16f, 20f);
-        EditorGUI.DrawRect(labelRect, new Color(0f, 0f, 0f, 0.62f));
-        GUI.Label(labelRect, interaction, EditorStyles.miniLabel);
-
-        if (!string.IsNullOrWhiteSpace(loadWarning))
-            GUI.Label(new Rect(rect.x + 8f, rect.y + 8f, rect.width - 16f, 40f), loadWarning, EditorStyles.helpBox);
-    }
     #endregion
 
     #region Geometry Helpers
@@ -582,44 +629,6 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
                            originOffset.y + spawnHeightOffset,
                            originOffset.z +
                            (coordinate.y - (gridSizeZ - 1) * 0.5f) * cellSize);
-    }
-
-    /// <summary>
-    /// Resolves the painted-cell array for one visible wave.
-    /// </summary>
-    /// <param name="wavePresetObject">Serialized wave preset.</param>
-    /// <param name="waveIndex">Requested visible wave index.</param>
-    /// <returns>Painted-cell array, or null when the index is invalid.</returns>
-    private static SerializedProperty FindPaintedCells(SerializedObject wavePresetObject, int waveIndex)
-    {
-        wavePresetObject.UpdateIfRequiredOrScript();
-        SerializedProperty waves = wavePresetObject.FindProperty("waves");
-
-        if (waves == null || waveIndex < 0 || waveIndex >= waves.arraySize)
-            return null;
-
-        return waves.GetArrayElementAtIndex(waveIndex).FindPropertyRelative("paintedCells");
-    }
-
-    /// <summary>
-    /// Finds one sparse painted cell by grid coordinate.
-    /// </summary>
-    /// <param name="cells">Serialized painted-cell array.</param>
-    /// <param name="coordinate">Grid coordinate being searched.</param>
-    /// <returns>Array index when found, otherwise -1.</returns>
-    private static int FindCellIndex(SerializedProperty cells, Vector2Int coordinate)
-    {
-        for (int cellIndex = 0; cellIndex < cells.arraySize; cellIndex++)
-        {
-            if (cells.GetArrayElementAtIndex(cellIndex)
-                     .FindPropertyRelative("cellCoordinate")
-                     .vector2IntValue == coordinate)
-            {
-                return cellIndex;
-            }
-        }
-
-        return -1;
     }
 
     #endregion

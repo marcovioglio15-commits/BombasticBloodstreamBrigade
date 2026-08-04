@@ -43,7 +43,7 @@ internal static class GameWavesPreviewOverlayUtility
     /// <summary>
     /// Draws one projected grid cell and centers its coordinate or brush label inside the visible polygon.
     /// </summary>
-    /// <param name="rect">Rendered preview rectangle.</param>
+    /// <param name="rect">Dedicated status footer rectangle below the rendered preview.</param>
     /// <param name="camera">Orthographic preview camera used for projection.</param>
     /// <param name="localToWorld">Spawner transform used to project local cell geometry.</param>
     /// <param name="localCenter">Spawner-local center of the represented cell.</param>
@@ -100,7 +100,7 @@ internal static class GameWavesPreviewOverlayUtility
     /// <summary>
     /// Draws the complete selected or hovered brush identity independently from the available cell-label area.
     /// </summary>
-    /// <param name="rect">Rendered preview rectangle.</param>
+    /// <param name="rect">Dedicated status footer rectangle below the rendered preview.</param>
     /// <param name="preset">Waves preset resolving the designer-facing brush category.</param>
     /// <param name="categoryId">Stable painted brush category identifier.</param>
     /// <param name="enemyCount">Enemy quantity authored in the focused cell.</param>
@@ -111,12 +111,27 @@ internal static class GameWavesPreviewOverlayUtility
                                               int enemyCount,
                                               Vector2Int coordinate)
     {
-        Rect detailsRect = new Rect(rect.x + 8f, rect.yMax - 52f, rect.width - 16f, 22f);
+        Rect detailsRect = new Rect(rect.x + 8f, rect.y + 1f, rect.width - 16f, 22f);
         EditorGUI.DrawRect(detailsRect, new Color(0.02f, 0.04f, 0.06f, 0.9f));
         GUI.Label(detailsRect,
                   "Cell [" + coordinate.x + ", " + coordinate.y + "]  |  Brush: " +
                   ResolveCategoryLabel(preset, categoryId) + "  |  Enemies: " + enemyCount,
                   EditorStyles.miniBoldLabel);
+    }
+
+    /// <summary>
+    /// Draws current paint-mode instructions in the dedicated non-interactive preview footer.
+    /// </summary>
+    /// <param name="rect">Dedicated footer rectangle below the room preview.</param>
+    /// <param name="erase">Current toolbar erase state.</param>
+    public static void DrawInstructions(Rect rect, bool erase)
+    {
+        string interaction = erase
+            ? "ERASE | Left click removes | Right click selects a painted cell"
+            : "PAINT | Left click paints | Shift + left click erases | Right click selects";
+        Rect labelRect = new Rect(rect.x + 8f, rect.yMax - 21f, rect.width - 16f, 20f);
+        EditorGUI.DrawRect(labelRect, new Color(0f, 0f, 0f, 0.62f));
+        GUI.Label(labelRect, interaction, EditorStyles.miniLabel);
     }
     #endregion
 

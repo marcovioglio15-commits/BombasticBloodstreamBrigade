@@ -58,6 +58,7 @@ public static class GameManagementDraftSession
     public static void BeginSession()
     {
         pendingChangesVerifier.Reset();
+        GameWavesSpawnerSettingsDraftSession.BeginSession();
         EnsureTrackedDefaults();
         CaptureBaseline();
         stagedDeletePaths.Clear();
@@ -71,6 +72,7 @@ public static class GameManagementDraftSession
     public static void EndSession()
     {
         pendingChangesVerifier.Reset();
+        GameWavesSpawnerSettingsDraftSession.EndSession();
         isInitialized = false;
         SetPendingChanges(false);
         baselineJsonByPath.Clear();
@@ -159,6 +161,12 @@ public static class GameManagementDraftSession
             return;
         }
 
+        if (GameWavesSpawnerSettingsDraftSession.HasPendingChanges)
+        {
+            SetPendingChanges(true);
+            return;
+        }
+
         Dictionary<string, string> currentState = BuildStateDictionary();
 
         if (currentState.Count != baselineJsonByPath.Count)
@@ -191,13 +199,14 @@ public static class GameManagementDraftSession
     public static void Apply()
     {
         pendingChangesVerifier.Reset();
+        GameWavesSpawnerSettingsDraftSession.Apply();
         ExecuteStagedDeletions();
         ExecuteRenames();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
         stagedDeletePaths.Clear();
-        SetPendingChanges(false);
+        SetPendingChanges(GameWavesSpawnerSettingsDraftSession.HasPendingChanges);
     }
 
     /// <summary>
@@ -209,6 +218,7 @@ public static class GameManagementDraftSession
             return;
 
         pendingChangesVerifier.Reset();
+        GameWavesSpawnerSettingsDraftSession.Discard();
         RestoreBaselineAssets();
         DeleteAssetsCreatedAfterBaseline();
         stagedDeletePaths.Clear();

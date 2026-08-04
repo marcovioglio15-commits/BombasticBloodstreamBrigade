@@ -75,6 +75,9 @@ internal static class GameManagementPanelLayoutUtility
         toolbar.style.flexGrow = 0f;
         toolbar.style.flexShrink = 0f;
         toolbar.style.flexWrap = Wrap.Wrap;
+        toolbar.style.alignItems = Align.FlexStart;
+        toolbar.style.height = StyleKeyword.Auto;
+        toolbar.style.minHeight = 20f;
         toolbar.style.minWidth = 0f;
     }
 

@@ -309,6 +309,8 @@ public sealed class GameWavesPresetsPanel
         tabContentRoot = new VisualElement();
         tabContentRoot.style.flexGrow = 1f;
         tabContentRoot.style.minHeight = 0f;
+        tabContentRoot.style.minWidth = 0f;
+        tabContentRoot.style.overflow = Overflow.Hidden;
         detailsRoot.Add(tabs);
         detailsRoot.Add(tabContentRoot);
         BuildActiveTab();
@@ -350,8 +352,12 @@ public sealed class GameWavesPresetsPanel
     private void BuildSceneBrushTab()
     {
         SerializedProperty sceneMappings = serializedPreset.FindProperty("sceneMappings");
-        VisualElement configurationRoot = new VisualElement();
+        ScrollView configurationRoot = new ScrollView();
         configurationRoot.style.flexShrink = 0f;
+        configurationRoot.style.minHeight = 0f;
+        configurationRoot.style.maxHeight = 340f;
+        configurationRoot.style.minWidth = 0f;
+        configurationRoot.contentContainer.style.flexShrink = 0f;
         tabContentRoot.Add(configurationRoot);
         Toolbar sceneToolbar = new Toolbar();
         GameManagementPanelLayoutUtility.ConfigureWrappingToolbar(sceneToolbar);
@@ -360,6 +366,9 @@ public sealed class GameWavesPresetsPanel
             GameWavesPanelUiUtility.BuildSceneChoices(sceneMappings),
             GameWavesPanelUiUtility.ClampIndex(selectedSceneIndex, sceneMappings.arraySize));
         scenePopup.tooltip = "Managed room scene whose single SubScene and enemy spawner are edited in isolation.";
+        scenePopup.style.flexGrow = 1f;
+        scenePopup.style.flexShrink = 1f;
+        scenePopup.style.minWidth = 220f;
         scenePopup.RegisterValueChangedCallback(evt =>
         {
             selectedSceneIndex = scenePopup.index;
@@ -385,23 +394,31 @@ public sealed class GameWavesPresetsPanel
         selectedSceneIndex = GameWavesPanelUiUtility.ClampIndex(selectedSceneIndex,
                                                                               sceneMappings.arraySize);
         SerializedProperty mapping = sceneMappings.GetArrayElementAtIndex(selectedSceneIndex);
-        GameWavesPanelUiUtility.AddBoundProperty(configurationRoot,
+        Foldout mappingDetails = new Foldout
+        {
+            text = "Scene Mapping",
+            value = false,
+            tooltip = "Inspect or change the main room, its resolved SubScene and the wave asset painted by this mapping."
+        };
+        mappingDetails.style.flexShrink = 0f;
+        GameWavesPanelUiUtility.AddBoundProperty(mappingDetails,
                                                           mapping.FindPropertyRelative("displayName"),
                                                           "Display Name");
         GameWavesPanelUiUtility.AddObjectReferenceField(
-            configurationRoot,
+            mappingDetails,
             serializedPreset,
             mapping.FindPropertyRelative("mainSceneAsset"),
             "Main Room Scene",
             typeof(SceneAsset),
             SynchronizeSelectedScene);
         GameWavesPanelUiUtility.AddObjectReferenceField(
-            configurationRoot,
+            mappingDetails,
             serializedPreset,
             mapping.FindPropertyRelative("wavePreset"),
             "Enemy Wave Preset",
             typeof(EnemyWavePreset),
             SynchronizeSelectedWavePreset);
+        configurationRoot.Add(mappingDetails);
 
         serializedPreset.ApplyModifiedProperties();
         EnemyWavePreset wavePreset = mapping.FindPropertyRelative("wavePreset").objectReferenceValue as EnemyWavePreset;
@@ -417,20 +434,63 @@ public sealed class GameWavesPresetsPanel
         }
 
         waveSerializedObject = new SerializedObject(wavePreset);
-        BuildBrushToolbar(configurationRoot, wavePreset);
-        BuildSelectedWaveSettings(configurationRoot);
+        GameWavesSceneBrushControlsUtility.BuildPaintingControls(
+            configurationRoot,
+            wavePreset,
+            selectedPreset,
+            selectedWaveIndex,
+            selectedCategoryIndex,
+            brushEnemyCount,
+            eraseBrush,
+            previewZoom,
+            SelectBrushWave,
+            categoryIndex => selectedCategoryIndex = categoryIndex,
+            enemyCount => brushEnemyCount = enemyCount,
+            erase => eraseBrush = erase,
+            zoom =>
+            {
+                previewZoom = zoom;
+                tabContentRoot.MarkDirtyRepaint();
+            });
+        GameWavesSceneBrushControlsUtility.BuildSelectedWaveSettings(configurationRoot,
+                                                                     waveSerializedObject,
+                                                                     selectedWaveIndex,
+                                                                     AddWave);
         string mainScenePath = mapping.FindPropertyRelative("mainScenePath").stringValue;
         string subScenePath = mapping.FindPropertyRelative("subScenePath").stringValue;
         previewRenderer.Load(mainScenePath, subScenePath);
+        GameWavesSpawnerSettingsDraft settingsDraft = null;
+
+        if (GameWavesSpawnerSettingsDraftSession.TryGetOrCreate(subScenePath,
+                                                                out settingsDraft,
+                                                                out string settingsWarning))
+        {
+            previewRenderer.ApplySpawnerSettings(settingsDraft);
+            GameWavesSpawnerSettingsEditorUtility.Build(
+                configurationRoot,
+                settingsDraft,
+                () => RefreshGridAfterSettingsChange(settingsDraft));
+        }
+        else if (!string.IsNullOrWhiteSpace(settingsWarning))
+        {
+            configurationRoot.Add(new HelpBox(settingsWarning, HelpBoxMessageType.Warning));
+        }
+
         IMGUIContainer preview = new IMGUIContainer(DrawPreview);
         preview.style.flexGrow = 1f;
         preview.style.flexShrink = 1f;
         preview.style.flexBasis = 0f;
-        preview.style.minHeight = 460f;
+        preview.style.minHeight = 280f;
+        preview.style.minWidth = 0f;
+        preview.style.overflow = Overflow.Hidden;
         preview.tooltip = "Concrete isolated room preview. Paint the selected wave directly on its ECS spawner grid.";
         tabContentRoot.Add(preview);
-        VisualElement cellEditorRoot = new VisualElement();
+        ScrollView cellEditorRoot = new ScrollView();
         cellEditorRoot.style.flexShrink = 0f;
+        cellEditorRoot.style.minHeight = 0f;
+        cellEditorRoot.style.maxHeight = 260f;
+        cellEditorRoot.style.minWidth = 0f;
+        cellEditorRoot.contentContainer.style.flexShrink = 0f;
         tabContentRoot.Add(cellEditorRoot);
         GameWavesCellEditorUtility.Build(cellEditorRoot,
                                          waveSerializedObject,
@@ -442,100 +502,28 @@ public sealed class GameWavesPresetsPanel
     }
 
     /// <summary>
-    /// Builds wave, brush category, count and erase controls immediately above the preview.
+    /// Applies one valid grid draft to the preview and removes cells invalidated across every mapped wave.
     /// </summary>
-    /// <param name="rootElement">Non-shrinking configuration section receiving the toolbar.</param>
-    /// <param name="wavePreset">Wave asset currently mapped to the selected scene.</param>
-    private void BuildBrushToolbar(VisualElement rootElement, EnemyWavePreset wavePreset)
+    /// <param name="settingsDraft">Transactional spawner grid currently edited in Scene Brush.</param>
+    private void RefreshGridAfterSettingsChange(GameWavesSpawnerSettingsDraft settingsDraft)
     {
-        Toolbar brushToolbar = new Toolbar();
-        GameManagementPanelLayoutUtility.ConfigureWrappingToolbar(brushToolbar);
-        GameWavesPanelUiUtility.AddWaveSequenceSelectors(brushToolbar,
-                                                         wavePreset,
-                                                         selectedWaveIndex,
-                                                         SelectBrushWave);
-
-        PopupField<string> categoryPopup = new PopupField<string>(
-            "Brush",
-            GameWavesPanelUiUtility.BuildCategoryChoices(selectedPreset),
-            GameWavesPanelUiUtility.ClampIndex(selectedCategoryIndex,
-                                                         selectedPreset.BrushCategories.Count));
-        categoryPopup.tooltip = "Reusable category painted into a cell; runtime selects one eligible weighted enemy preset.";
-        categoryPopup.RegisterValueChangedCallback(evt => selectedCategoryIndex = categoryPopup.index);
-        brushToolbar.Add(categoryPopup);
-
-        IntegerField countField = new IntegerField("Count") { value = brushEnemyCount };
-        countField.tooltip = "Enemy amount emitted from each newly painted logical cell.";
-        countField.RegisterValueChangedCallback(evt => brushEnemyCount = evt.newValue);
-        brushToolbar.Add(countField);
-        Toggle eraseToggle = new Toggle("Erase") { value = eraseBrush };
-        eraseToggle.tooltip = "Remove cells with left click. Holding Shift temporarily erases while Paint is active.";
-        eraseToggle.RegisterValueChangedCallback(evt => eraseBrush = evt.newValue);
-        brushToolbar.Add(eraseToggle);
-        Slider zoomSlider = new Slider("Zoom", 1f, 4f)
-        {
-            value = previewZoom,
-            showInputField = true
-        };
-        zoomSlider.style.width = 220f;
-        zoomSlider.style.flexShrink = 0f;
-        zoomSlider.tooltip = "Magnify the stable top-down preview. A selected cell becomes the zoom focus; Fit restores the full grid.";
-        zoomSlider.RegisterValueChangedCallback(evt =>
-        {
-            previewZoom = evt.newValue;
-            rootElement.MarkDirtyRepaint();
-        });
-        brushToolbar.Add(zoomSlider);
-        brushToolbar.Add(GameWavesPanelUiUtility.CreateToolbarButton(
-            "Fit",
-            "Restore the complete top-down grid framing.",
-            () =>
-            {
-                previewZoom = 1f;
-                zoomSlider.SetValueWithoutNotify(previewZoom);
-                rootElement.MarkDirtyRepaint();
-            }));
-        rootElement.Add(brushToolbar);
-    }
-
-    /// <summary>
-    /// Shows compact timing and optional difficulty selection controls for the visible wave without rebuilding bindings.
-    /// </summary>
-    /// <param name="rootElement">Non-shrinking configuration section receiving the selected-wave fields.</param>
-    private void BuildSelectedWaveSettings(VisualElement rootElement)
-    {
-        SerializedProperty waves = waveSerializedObject.FindProperty("waves");
-
-        if (waves == null || waves.arraySize == 0)
-        {
-            Button addWaveButton = new Button(AddWave) { text = "Add First Wave" };
-            addWaveButton.tooltip = "Create the first independently schedulable wave for this room.";
-            rootElement.Add(addWaveButton);
+        if (settingsDraft == null)
             return;
+
+        GameWavesGridResizeUtility.RemoveOutOfBoundsCells(waveSerializedObject,
+                                                         settingsDraft.GridSizeX,
+                                                         settingsDraft.GridSizeZ);
+        previewRenderer.ApplySpawnerSettings(settingsDraft);
+
+        if (selectedCellCoordinate.HasValue &&
+            !EnemySpawnerWaveBakeUtility.IsCellInsideGrid(selectedCellCoordinate.Value,
+                                                          settingsDraft.GridSizeX,
+                                                          settingsDraft.GridSizeZ))
+        {
+            selectedCellCoordinate = null;
         }
 
-        selectedWaveIndex = GameWavesPanelUiUtility.ClampIndex(selectedWaveIndex, waves.arraySize);
-        SerializedProperty wave = waves.GetArrayElementAtIndex(selectedWaveIndex);
-        Foldout settings = new Foldout
-        {
-            text = GameWavesPanelUiUtility.BuildWaveSelectionContext(
-                waveSerializedObject.targetObject as EnemyWavePreset,
-                selectedWaveIndex),
-            value = true
-        };
-        GameWavesPanelUiUtility.AddBoundWaveProperty(settings, waveSerializedObject,
-                                                              wave.FindPropertyRelative("waveLabel"), "Label");
-        GameWavesPanelUiUtility.AddBoundWaveProperty(settings, waveSerializedObject,
-                                                              wave.FindPropertyRelative("startMode"), "Start Condition");
-        GameWavesPanelUiUtility.AddBoundWaveProperty(settings, waveSerializedObject,
-                                                              wave.FindPropertyRelative("startDelaySeconds"), "Start Delay Seconds");
-        GameWavesPanelUiUtility.AddBoundWaveProperty(settings, waveSerializedObject,
-                                                              wave.FindPropertyRelative("spawnDurationSeconds"), "Spawn Duration Seconds");
-        GameWavesPanelUiUtility.AddBoundWaveProperty(settings, waveSerializedObject,
-                                                              wave.FindPropertyRelative("defaultDistributionCurve"), "Distribution Curve");
-        GameWavesSequenceEditorUtility.AddDifficultyFields(settings, waveSerializedObject, wave);
-
-        rootElement.Add(settings);
+        tabContentRoot.MarkDirtyRepaint();
     }
 
     /// <summary>
