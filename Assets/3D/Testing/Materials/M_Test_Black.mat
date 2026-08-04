@@ -42,7 +42,7 @@ Material:
     m_Floats:
     - _ReceiveShadows: 1
     m_Colors:
-    - _BaseColor: {r: 0.10062885, g: 0.10062885, b: 0.10062885, a: 1}
+    - _BaseColor: {r: 0.01886791, g: 0.01886791, b: 0.01886791, a: 1}
     - _Color: {r: 0.30317184, g: 0, b: 0.5597484, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
