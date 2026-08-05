@@ -157,6 +157,26 @@ MonoBehaviour:
       role: 1
       maximumCopies: 12
       preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
+    - technicalId: b5ef0cea144e406989212f94def2eb17
+      tileId: TILE_METRO_03
+      sceneId: SCN_MAIN_METRO_03
+      sceneGuid: c65cf1455f2597b45b5565007602b3f9
+      role: 1
+      maximumCopies: 12
+      preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 1
       exactDepth: 1
       baseSelectionWeight: 1
@@ -693,7 +713,7 @@ MonoBehaviour:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_01.unity
     centerAnchorCount: 1
     activeSpawnerCount: 1
-    activeSpawnerWithWavesCount: 0
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: LGTEST_METRO_NS_NORTH_01
       side: 0
@@ -711,20 +731,17 @@ MonoBehaviour:
       side: 3
       capability: 2
       connectionPolicy: 1
-    authoringWarnings:
-    - Enemy spawner 'PF_EnemySpawner_8x8' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_01.unity'
-      is active but has no wave containing at least one enemy, so its room cannot
-      receive Room Clear Rewards.
+    authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_02
     sceneGuid: eef1df284c2a6f148996f3c85310ad6a
-    dependencyHash: d4883e0745280ba957540c03c5f163e4
+    dependencyHash: d8406605dac171fe1acf6390a8e04a79
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_02.unity
     centerAnchorCount: 1
     activeSpawnerCount: 1
-    activeSpawnerWithWavesCount: 0
+    activeSpawnerWithWavesCount: 1
     portals:
     - portalId: MAIN_METRO_02_NORTH
       side: 0
@@ -734,7 +751,24 @@ MonoBehaviour:
       side: 1
       capability: 2
       connectionPolicy: 1
-    authoringWarnings:
-    - Enemy spawner 'PF_EnemySpawner_8x8' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_02.unity'
-      is active but has no wave containing at least one enemy, so its room cannot
-      receive Room Clear Rewards.
+    authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_03
+    sceneGuid: c65cf1455f2597b45b5565007602b3f9
+    dependencyHash: 5e4460e1b10b89c6daf01714606a194b
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/SCN_MAIN_METRO_03.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_03.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_03_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_03_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []

@@ -261,6 +261,17 @@ MonoBehaviour:
     roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
     addressableKey: SCN_MAIN_METRO_02
     sceneAsset: {fileID: 102900000, guid: eef1df284c2a6f148996f3c85310ad6a, type: 3}
+  - sceneId: SCN_MAIN_METRO_03
+    sceneName: SCN_MAIN_METRO_03
+    scenePath: Assets/SCN_MAIN_METRO_03.unity
+    sceneGuid: c65cf1455f2597b45b5565007602b3f9
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_MAIN_METRO_03
+    sceneAsset: {fileID: 102900000, guid: c65cf1455f2597b45b5565007602b3f9, type: 3}
   transitionDefinitions:
   - transitionId: TRN_MainMenu_To_Gameplay
     fromSceneId: SCN_MainMenu
