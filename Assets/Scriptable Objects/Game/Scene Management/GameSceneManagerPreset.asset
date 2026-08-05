@@ -143,7 +143,7 @@ MonoBehaviour:
   - sceneId: SCN_LGTEST_METRO_CROSS
     sceneName: SCN_LGTEST_METRO_CROSS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
-    sceneGuid: 78686627548425f47bb77c085237cf84
+    sceneGuid: 86787f958b7747a44892e18620a2fe75
     buildIndex: -1
     sceneKind: 2
     unloadPolicy: 0
@@ -250,6 +250,17 @@ MonoBehaviour:
     roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
     addressableKey: SCN_MAIN_METRO_01
     sceneAsset: {fileID: 102900000, guid: 5a34e40218bcc094382de3b9fedebc81, type: 3}
+  - sceneId: SCN_MAIN_METRO_02
+    sceneName: SCN_MAIN_METRO_02
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
+    sceneGuid: eef1df284c2a6f148996f3c85310ad6a
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_MAIN_METRO_02
+    sceneAsset: {fileID: 102900000, guid: eef1df284c2a6f148996f3c85310ad6a, type: 3}
   transitionDefinitions:
   - transitionId: TRN_MainMenu_To_Gameplay
     fromSceneId: SCN_MainMenu

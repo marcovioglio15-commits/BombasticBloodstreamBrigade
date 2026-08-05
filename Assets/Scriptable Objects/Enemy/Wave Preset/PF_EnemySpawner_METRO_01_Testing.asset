@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06dc4d4afdfd91e4186770a067a8f030, type: 3}
-  m_Name: PF_EnemySpawner_Testing_Cowards
+  m_Name: PF_EnemySpawner_METRO_01_Testing
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveId: 9fa20fbc11ea4e46821f92e6d915d853
-    waveLabel: PF_EnemySpawner_Grunts
+  - waveId: f93a72400991430d8bb4c7df2359012d
+    waveLabel: Wave 1
     sequenceStepIndex: 0
     referenceWaveId: 
-    previewInScene: 1
+    previewInScene: 0
     startMode: 0
     startDelaySeconds: 0
-    spawnDurationSeconds: 1
+    spawnDurationSeconds: 4
     defaultDistributionCurve:
       serializedVersion: 2
       m_Curve:
@@ -46,7 +46,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 2, y: 7}
+    - cellCoordinate: {x: 4, y: 3}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -56,7 +56,27 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 1, y: 7}
+    - cellCoordinate: {x: 3, y: 4}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 1
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 4, y: 4}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 1
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 3, y: 3}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
