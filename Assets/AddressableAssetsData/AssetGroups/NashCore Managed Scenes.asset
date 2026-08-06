@@ -99,8 +99,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c65cf1455f2597b45b5565007602b3f9
+    m_Address: SCN_MAIN_METRO_03
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d0f579d17b03b154287cfa15e7887024
     m_Address: SCN_LGTEST_MAINT_START
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: eef1df284c2a6f148996f3c85310ad6a
+    m_Address: SCN_MAIN_METRO_02
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene

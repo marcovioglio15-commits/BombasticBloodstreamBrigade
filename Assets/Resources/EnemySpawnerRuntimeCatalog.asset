@@ -138,11 +138,21 @@ MonoBehaviour:
     sceneGuid: 5a34e40218bcc094382de3b9fedebc81
     spawners:
     - ownerSceneGuid: 71a89c8d3835e6c419e0f79016c3670f
-      spawnerGuid: 3a7cdf7343da12e344b1fd47f2265165
-      spawnerName: PF_EnemySpawner_15x15
-      hierarchyPath: SUB_METRO_01/PF_EnemySpawner_15x15
+      spawnerGuid: 9d265ff20453a339a65808bd64c2a957
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_01/PF_EnemySpawner_8x8
       defaultEnabled: 1
-      defaultWavePresetGuid: 45a410f0515124a49af5a8d4ff198eec
+      defaultWavePresetGuid: 1bbf094f5f2d8374b99178884f87b8aa
+  - sceneName: SCN_MAIN_METRO_02
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
+    sceneGuid: eef1df284c2a6f148996f3c85310ad6a
+    spawners:
+    - ownerSceneGuid: 0301105feee2acf45a527565a44195dd
+      spawnerGuid: cefd8453e8de0e2462c2b4ccfa366a95
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_02/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: f28c8632e2b944a4aa9c2f8294c1195e
   - sceneName: SCN_MainScene
     scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
@@ -157,6 +167,14 @@ MonoBehaviour:
   - folderPath: Assets/Scriptable Objects/Enemy/Wave Preset
     displayName: Wave Preset
     wavePresets:
+    - presetName: PF_EnemySpawner_METRO_01_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_01_Testing.asset
+      assetGuid: 1bbf094f5f2d8374b99178884f87b8aa
+      preset: {fileID: 11400000, guid: 1bbf094f5f2d8374b99178884f87b8aa, type: 2}
+    - presetName: PF_EnemySpawner_METRO_02_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_02_Testing.asset
+      assetGuid: f28c8632e2b944a4aa9c2f8294c1195e
+      preset: {fileID: 11400000, guid: f28c8632e2b944a4aa9c2f8294c1195e, type: 2}
     - presetName: PF_EnemySpawner_Wave_Main_01_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_01_Easy.asset
       assetGuid: 18b9c538d2c66114d8ab07d990edd337

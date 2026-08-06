@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 06dc4d4afdfd91e4186770a067a8f030, type: 3}
-  m_Name: PF_EnemySpawner_Testing_Cowards
+  m_Name: PF_EnemySpawner_METRO_01_Testing
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveId: cb9a90a7062841cfa4954c9daa907f6b
+  - waveId: f93a72400991430d8bb4c7df2359012d
     waveLabel: Wave 1
     sequenceStepIndex: 0
     referenceWaveId: 
@@ -46,7 +46,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 0, y: 10}
+    - cellCoordinate: {x: 4, y: 3}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -56,7 +56,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 3, y: 10}
+    - cellCoordinate: {x: 3, y: 4}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -66,7 +66,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 3, y: 8}
+    - cellCoordinate: {x: 4, y: 4}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -76,7 +76,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 0, y: 8}
+    - cellCoordinate: {x: 3, y: 3}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -86,45 +86,6 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: c546006ba1884bfca64566b434e40d8d
-    waveLabel: Wave 2
-    sequenceStepIndex: 0
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 0
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells: []
     useDifficultySelection: 0
     difficultySelectionGroupId: 
     difficultyCoefficientId: 

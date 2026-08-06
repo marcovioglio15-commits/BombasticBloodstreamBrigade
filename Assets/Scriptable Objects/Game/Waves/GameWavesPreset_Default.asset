@@ -123,7 +123,7 @@ MonoBehaviour:
     mainSceneGuid: 5a34e40218bcc094382de3b9fedebc81
     subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_01.unity
     subSceneGuid: 71a89c8d3835e6c419e0f79016c3670f
-    wavePreset: {fileID: 11400000, guid: 45a410f0515124a49af5a8d4ff198eec, type: 2}
+    wavePreset: {fileID: 11400000, guid: 1bbf094f5f2d8374b99178884f87b8aa, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: 5a34e40218bcc094382de3b9fedebc81, type: 3}
   - displayName: SCN_LGTEST_MAINT_BOSS
     mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
@@ -223,3 +223,17 @@ MonoBehaviour:
     subSceneGuid: 7dd9022369bc6644e85041d97047103e
     wavePreset: {fileID: 11400000, guid: 423a2d4934efa334d9e1d877e4e3640c, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: 5fdf3b8e473d5f340ada5677c435b669, type: 3}
+  - displayName: SCN_MAIN_METRO_02
+    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
+    mainSceneGuid: eef1df284c2a6f148996f3c85310ad6a
+    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_02.unity
+    subSceneGuid: 0301105feee2acf45a527565a44195dd
+    wavePreset: {fileID: 11400000, guid: f28c8632e2b944a4aa9c2f8294c1195e, type: 2}
+    mainSceneAsset: {fileID: 102900000, guid: eef1df284c2a6f148996f3c85310ad6a, type: 3}
+  - displayName: SCN_MAIN_METRO_03
+    mainScenePath: Assets/SCN_MAIN_METRO_03.unity
+    mainSceneGuid: c65cf1455f2597b45b5565007602b3f9
+    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_03.unity
+    subSceneGuid: 71b2b2a45ccf2534cbccaad605040017
+    wavePreset: {fileID: 11400000, guid: 00800dbfdf5390640ae16a76456b2f64, type: 2}
+    mainSceneAsset: {fileID: 102900000, guid: c65cf1455f2597b45b5565007602b3f9, type: 3}
