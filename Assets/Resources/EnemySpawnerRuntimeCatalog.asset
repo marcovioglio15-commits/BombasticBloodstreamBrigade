@@ -13,6 +13,16 @@ MonoBehaviour:
   m_Name: EnemySpawnerRuntimeCatalog
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnerRuntimeCatalog
   scenes:
+  - sceneName: SCN_MAIN_METRO_03
+    scenePath: Assets/SCN_MAIN_METRO_03.unity
+    sceneGuid: c65cf1455f2597b45b5565007602b3f9
+    spawners:
+    - ownerSceneGuid: 71b2b2a45ccf2534cbccaad605040017
+      spawnerGuid: f3a5dc5a67f91b7b35c428a1a6da5f68
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_03/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: 00800dbfdf5390640ae16a76456b2f64
   - sceneName: SCN_LGTEST_MAINT_BOSS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
     sceneGuid: 82bb006d89574a24488682f06c9e1332
@@ -175,6 +185,10 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_02_Testing.asset
       assetGuid: f28c8632e2b944a4aa9c2f8294c1195e
       preset: {fileID: 11400000, guid: f28c8632e2b944a4aa9c2f8294c1195e, type: 2}
+    - presetName: PF_EnemySpawner_METRO_03_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_03_Testing.asset
+      assetGuid: 00800dbfdf5390640ae16a76456b2f64
+      preset: {fileID: 11400000, guid: 00800dbfdf5390640ae16a76456b2f64, type: 2}
     - presetName: PF_EnemySpawner_Wave_Main_01_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_01_Easy.asset
       assetGuid: 18b9c538d2c66114d8ab07d990edd337

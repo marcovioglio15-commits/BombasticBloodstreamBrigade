@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -63,9 +64,9 @@ internal static class GameDifficultyEditorVariableFieldUtility
                                         SerializedProperty formulaProperty,
                                         string label)
     {
-        UnityEditor.UIElements.PropertyField formulaField =
-            new UnityEditor.UIElements.PropertyField(formulaProperty, label);
+        PropertyField formulaField = new PropertyField(formulaProperty, label);
         formulaField.tooltip = formulaProperty.tooltip;
+        formulaField.BindProperty(formulaProperty);
         root.Add(formulaField);
         List<string> variables = BuildVariableChoices(formulaProperty.serializedObject);
         PopupField<string> variablePopup = new PopupField<string>("Insert Variable", variables, 0);
