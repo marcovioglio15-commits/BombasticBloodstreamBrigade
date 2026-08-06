@@ -237,3 +237,10 @@ MonoBehaviour:
     subSceneGuid: 71b2b2a45ccf2534cbccaad605040017
     wavePreset: {fileID: 11400000, guid: 00800dbfdf5390640ae16a76456b2f64, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: c65cf1455f2597b45b5565007602b3f9, type: 3}
+  - displayName: SCN_MAIN_METRO_04_SE
+    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SE.unity
+    mainSceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
+    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_04_SE.unity
+    subSceneGuid: 95824bf19dfca7d48aa032f301ed51d9
+    wavePreset: {fileID: 11400000, guid: be9b3750760fbbf4a9323efd7023cd2a, type: 2}
+    mainSceneAsset: {fileID: 102900000, guid: f4daaf1b9ca5fc04c8cc56d949181e3d, type: 3}

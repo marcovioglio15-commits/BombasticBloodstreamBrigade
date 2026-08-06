@@ -135,7 +135,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_01
       sceneGuid: 5a34e40218bcc094382de3b9fedebc81
       role: 1
-      maximumCopies: 12
+      maximumCopies: 1
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -155,7 +155,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_02
       sceneGuid: eef1df284c2a6f148996f3c85310ad6a
       role: 1
-      maximumCopies: 12
+      maximumCopies: 1
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -173,11 +173,11 @@ MonoBehaviour:
     - technicalId: b5ef0cea144e406989212f94def2eb17
       tileId: TILE_METRO_03
       sceneId: SCN_MAIN_METRO_03
-      sceneGuid: c65cf1455f2597b45b5565007602b3f9
+      sceneGuid: 
       role: 1
-      maximumCopies: 12
+      maximumCopies: 1
       preferredDepthRange: {x: 1, y: 8}
-      useExactDepthConstraint: 1
+      useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
       roomRewards:
@@ -190,6 +190,50 @@ MonoBehaviour:
         minimumDifficulty: 0
         maximumDifficulty: 100
         selectionWeight: 1
+    - technicalId: d4ebe2c18f564246a517b2b1824195d5
+      tileId: TILE_METRO_04_SE
+      sceneId: SCN_MAIN_METRO_04_SE
+      sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards: []
+    - technicalId: 1f287f4aba844fe3afb3bc26eb8e8900
+      tileId: TILE_METRO_04_SW
+      sceneId: SCN_MAIN_METRO_04_SW
+      sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards: []
+    - technicalId: 390f7f0bb072423082bc959a385f264b
+      tileId: TILE_METRO_04_NE
+      sceneId: SCN_MAIN_METRO_04_NE
+      sceneGuid: 20653c736dac57c49842cb85bddcc563
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards: []
+    - technicalId: eef58451fdfa4c97a77030d38243d89b
+      tileId: TILE_METRO_04_NW
+      sceneId: SCN_MAIN_METRO_04_NW
+      sceneGuid: 418b98d17eadea44fa63e7920b7d332f
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards: []
     - technicalId: cb7a6330474e7c26af57cea7e901ecdb
       tileId: TILE_LGTEST_METRO_BOSS
       sceneId: SCN_LGTEST_METRO_BOSS
@@ -754,10 +798,10 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_03
     sceneGuid: c65cf1455f2597b45b5565007602b3f9
-    dependencyHash: 5e4460e1b10b89c6daf01714606a194b
+    dependencyHash: 8e41171a8398f1d92a445f8f8f52958c
     cacheStale: 0
     sourceScenePaths:
-    - Assets/SCN_MAIN_METRO_03.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_03.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_03.unity
     centerAnchorCount: 1
     activeSpawnerCount: 1
@@ -772,3 +816,89 @@ MonoBehaviour:
       capability: 2
       connectionPolicy: 1
     authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_04_SE
+    sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
+    dependencyHash: 3d6b4bd65395ac3ab391f787bf0f5324
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SE.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_04_SE.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_04_SE_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_SE_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_04_SW
+    sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
+    dependencyHash: 0f59a1d2cdfc0e757905ccc6f02b3b15
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SW.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_04_SW.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_04_SW_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_SW_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings:
+    - SubScene component 'SUB_METRO_04_SW' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SW.unity'
+      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+  - sceneId: SCN_MAIN_METRO_04_NE
+    sceneGuid: 20653c736dac57c49842cb85bddcc563
+    dependencyHash: b8112961455054b848f84794cc020367
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_04_NE.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_04_NE_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NE_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings:
+    - SubScene component 'SUB_METRO_04_NE' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity'
+      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+  - sceneId: SCN_MAIN_METRO_04_NW
+    sceneGuid: 418b98d17eadea44fa63e7920b7d332f
+    dependencyHash: 8af4ccaf0d66584ccaff8496dae73c43
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NW.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_04_NW.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_04_NW_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NW_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings:
+    - SubScene component 'SUB_METRO_04_NW' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NW.unity'
+      must disable Auto Load Scene for duplicate-capable transactional room streaming.

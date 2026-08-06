@@ -13,16 +13,6 @@ MonoBehaviour:
   m_Name: EnemySpawnerRuntimeCatalog
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawnerRuntimeCatalog
   scenes:
-  - sceneName: SCN_MAIN_METRO_03
-    scenePath: Assets/SCN_MAIN_METRO_03.unity
-    sceneGuid: c65cf1455f2597b45b5565007602b3f9
-    spawners:
-    - ownerSceneGuid: 71b2b2a45ccf2534cbccaad605040017
-      spawnerGuid: f3a5dc5a67f91b7b35c428a1a6da5f68
-      spawnerName: PF_EnemySpawner_8x8
-      hierarchyPath: SUB_METRO_03/PF_EnemySpawner_8x8
-      defaultEnabled: 1
-      defaultWavePresetGuid: 00800dbfdf5390640ae16a76456b2f64
   - sceneName: SCN_LGTEST_MAINT_BOSS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
     sceneGuid: 82bb006d89574a24488682f06c9e1332
@@ -163,6 +153,46 @@ MonoBehaviour:
       hierarchyPath: SUB_METRO_02/PF_EnemySpawner_8x8
       defaultEnabled: 1
       defaultWavePresetGuid: f28c8632e2b944a4aa9c2f8294c1195e
+  - sceneName: SCN_MAIN_METRO_03
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_03.unity
+    sceneGuid: c65cf1455f2597b45b5565007602b3f9
+    spawners:
+    - ownerSceneGuid: 71b2b2a45ccf2534cbccaad605040017
+      spawnerGuid: f3a5dc5a67f91b7b35c428a1a6da5f68
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_03/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: 00800dbfdf5390640ae16a76456b2f64
+  - sceneName: SCN_MAIN_METRO_04_NE
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity
+    sceneGuid: 20653c736dac57c49842cb85bddcc563
+    spawners:
+    - ownerSceneGuid: 10ead51ee4f601d4997bc5381d83c840
+      spawnerGuid: f73f63295cb2ce48f8c35d722155f9b9
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_04_NE/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: 6b7113398cd98944c9b4456fcea48f0a
+  - sceneName: SCN_MAIN_METRO_04_SE
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SE.unity
+    sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
+    spawners:
+    - ownerSceneGuid: 95824bf19dfca7d48aa032f301ed51d9
+      spawnerGuid: 07369a57e68f93db724cfc41babaa48c
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_04_SE/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: be9b3750760fbbf4a9323efd7023cd2a
+  - sceneName: SCN_MAIN_METRO_04_SW
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SW.unity
+    sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
+    spawners:
+    - ownerSceneGuid: b7a0dc2e994fcc04ab59ab32fd45fb2b
+      spawnerGuid: 0b87f4e338f7b4b0b16305828bef3cab
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_04_SW/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: b6f2f7e3b15aa644897fd4f0d769bc26
   - sceneName: SCN_MainScene
     scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
@@ -189,6 +219,22 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_03_Testing.asset
       assetGuid: 00800dbfdf5390640ae16a76456b2f64
       preset: {fileID: 11400000, guid: 00800dbfdf5390640ae16a76456b2f64, type: 2}
+    - presetName: PF_EnemySpawner_METRO_04_NE_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_04_NE_Testing.asset
+      assetGuid: 6b7113398cd98944c9b4456fcea48f0a
+      preset: {fileID: 11400000, guid: 6b7113398cd98944c9b4456fcea48f0a, type: 2}
+    - presetName: PF_EnemySpawner_METRO_04_NW_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_04_NW_Testing.asset
+      assetGuid: 425a82b2a6ed0eb4498a489c9f344d6c
+      preset: {fileID: 11400000, guid: 425a82b2a6ed0eb4498a489c9f344d6c, type: 2}
+    - presetName: PF_EnemySpawner_METRO_04_SE_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_04_SE_Testing.asset
+      assetGuid: be9b3750760fbbf4a9323efd7023cd2a
+      preset: {fileID: 11400000, guid: be9b3750760fbbf4a9323efd7023cd2a, type: 2}
+    - presetName: PF_EnemySpawner_METRO_04_SW_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_04_SW_Testing.asset
+      assetGuid: b6f2f7e3b15aa644897fd4f0d769bc26
+      preset: {fileID: 11400000, guid: b6f2f7e3b15aa644897fd4f0d769bc26, type: 2}
     - presetName: PF_EnemySpawner_Wave_Main_01_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_01_Easy.asset
       assetGuid: 18b9c538d2c66114d8ab07d990edd337
