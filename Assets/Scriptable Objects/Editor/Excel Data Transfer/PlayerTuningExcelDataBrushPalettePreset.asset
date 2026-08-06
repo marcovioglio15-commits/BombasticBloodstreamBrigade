@@ -27,6 +27,7 @@ MonoBehaviour:
     listSize: {r: 0.86, g: 0.55, b: 0.24, a: 1}
     listValue: {r: 0.34, g: 0.72, b: 0.5, a: 1}
     literalText: {r: 0.82, g: 0.72, b: 0.32, a: 1}
+    formula: {r: 0.56, g: 0.42, b: 0.88, a: 1}
     unresolved: {r: 0.55, g: 0.2, b: 0.2, a: 1}
   brushes:
   - brushId: Any Field
@@ -187,3 +188,17 @@ MonoBehaviour:
     searchTokens: import list concrete array element item
     description: Test brush for importing concrete list elements and list-backed
       values.
+  - brushId: c7bbc33533b04cd1be730a6c4ac95932
+    brushName: Formula
+    domain: 0
+    dataKind: 0
+    listFilter: 0
+    sourceFilter: ''
+    sourceAssetFilter: ''
+    fieldSearchFilter: ''
+    direction: 2
+    color: {r: 0.56, g: 0.42, b: 0.88, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    searchTokens: formula excel expression calculation
+    description: Export-only brush for native Excel formula cells authored directly
+      in the workbook layout.

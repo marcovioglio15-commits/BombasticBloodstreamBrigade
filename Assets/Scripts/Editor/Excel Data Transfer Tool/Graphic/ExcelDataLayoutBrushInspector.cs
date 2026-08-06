@@ -17,6 +17,7 @@ internal sealed class ExcelDataLayoutBrushInspector
     private readonly VisualElement root = new VisualElement();
     private readonly VisualElement settingsRoot = new VisualElement();
     private readonly VisualElement literalSettingsRoot = new VisualElement();
+    private readonly VisualElement formulaSettingsRoot = new VisualElement();
     private readonly VisualElement numberFormatRoot = new VisualElement();
     private readonly Dictionary<ExcelDataLayoutBrushMode, ToolbarToggle> modeToggles =
         new Dictionary<ExcelDataLayoutBrushMode, ToolbarToggle>();
@@ -31,6 +32,8 @@ internal sealed class ExcelDataLayoutBrushInspector
     private Label styleLabel;
     private EnumField directionField;
     private TextField literalTextField;
+    private TextField formulaExpressionField;
+    private HelpBox formulaWarningBox;
     private Toggle validateLiteralField;
     private TextField numberFormatField;
     private ExcelDataLayoutBrushMode mode;
@@ -71,6 +74,14 @@ internal sealed class ExcelDataLayoutBrushInspector
         get
         {
             return literalTextField == null ? string.Empty : literalTextField.value;
+        }
+    }
+
+    public string FormulaExpression
+    {
+        get
+        {
+            return formulaExpressionField == null ? string.Empty : formulaExpressionField.value;
         }
     }
 
@@ -152,10 +163,14 @@ internal sealed class ExcelDataLayoutBrushInspector
         literalTextField.SetValueWithoutNotify(cell != null && cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText
             ? cell.LiteralText ?? string.Empty
             : literalTextField.value ?? string.Empty);
+        formulaExpressionField.SetValueWithoutNotify(cell != null && cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula
+            ? cell.FormulaExpression ?? string.Empty
+            : formulaExpressionField.value ?? string.Empty);
         validateLiteralField.SetValueWithoutNotify(cell != null && cell.ValidateLiteralDuringImport);
         numberFormatField.SetValueWithoutNotify(cell == null ? string.Empty : cell.NumberFormat ?? string.Empty);
         refreshingControls = false;
         RefreshConditionalVisibility();
+        RefreshFormulaWarning();
     }
 
     /// <summary>
@@ -173,6 +188,7 @@ internal sealed class ExcelDataLayoutBrushInspector
         directionField.SetValueWithoutNotify(ResolveDefaultDirection(mode));
         refreshingControls = false;
         RefreshConditionalVisibility();
+        RefreshFormulaWarning();
     }
 
     /// <summary>
@@ -182,7 +198,9 @@ internal sealed class ExcelDataLayoutBrushInspector
     public void SetPaintDirection(ExcelDataTransferDirection direction)
     {
         refreshingControls = true;
-        directionField.SetValueWithoutNotify(direction);
+        directionField.SetValueWithoutNotify(mode == ExcelDataLayoutBrushMode.Formula
+            ? ExcelDataTransferDirection.Export
+            : direction);
         refreshingControls = false;
     }
     #endregion
@@ -205,7 +223,7 @@ internal sealed class ExcelDataLayoutBrushInspector
         root.Add(authoringFoldout);
 
         Label modeLabel = new Label("Mode");
-        modeLabel.tooltip = "Choose whether a cell click selects, paints data, paints literal text or erases content.";
+        modeLabel.tooltip = "Choose whether a cell click selects, paints data, paints literal text, paints a native Excel formula or erases content.";
         modeLabel.style.unityFontStyleAndWeight = UnityEngine.FontStyle.Bold;
         authoringFoldout.Add(modeLabel);
 
@@ -223,6 +241,10 @@ internal sealed class ExcelDataLayoutBrushInspector
                       ExcelDataLayoutBrushMode.Text,
                       "Text",
                       "Paint exact literal text used for workbook labels and organization.");
+        AddModeToggle(modeToolbar,
+                      ExcelDataLayoutBrushMode.Formula,
+                      "Formula",
+                      "Paint an export-only native Excel formula. Unity preserves the expression without evaluating it.");
         AddModeToggle(modeToolbar,
                       ExcelDataLayoutBrushMode.Erase,
                       "Erase",
@@ -246,6 +268,22 @@ internal sealed class ExcelDataLayoutBrushInspector
         validateLiteralField.RegisterValueChangedCallback(evt => NotifySettingsChanged());
         literalSettingsRoot.Add(validateLiteralField);
         settingsRoot.Add(literalSettingsRoot);
+
+        formulaExpressionField = new TextField("Formula");
+        formulaExpressionField.multiline = true;
+        formulaExpressionField.tooltip = "Native Excel expression with an optional leading equals sign, for example =SUM(B2:B8).";
+        formulaExpressionField.style.minHeight = 48f;
+        formulaExpressionField.RegisterValueChangedCallback(evt =>
+        {
+            RefreshFormulaWarning();
+            NotifySettingsChanged();
+        });
+        formulaSettingsRoot.Add(formulaExpressionField);
+
+        formulaWarningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        formulaWarningBox.tooltip = "Formula cells are export-only and must contain a valid non-empty Excel expression.";
+        formulaSettingsRoot.Add(formulaWarningBox);
+        settingsRoot.Add(formulaSettingsRoot);
 
         numberFormatField = new TextField("Number Format");
         numberFormatField.tooltip = "Optional invariant Excel number format for a Data Field, for example 0.00 or 0%.";
@@ -342,6 +380,7 @@ internal sealed class ExcelDataLayoutBrushInspector
         directionField?.SetValueWithoutNotify(ResolveDefaultDirection(mode));
         refreshingControls = false;
         RefreshConditionalVisibility();
+        RefreshFormulaWarning();
     }
 
     /// <summary>
@@ -352,6 +391,7 @@ internal sealed class ExcelDataLayoutBrushInspector
         bool selectingAuthoredCell = mode == ExcelDataLayoutBrushMode.Select && hasSelectedCell;
         settingsRoot.style.display = mode == ExcelDataLayoutBrushMode.Data ||
                                      mode == ExcelDataLayoutBrushMode.Text ||
+                                     mode == ExcelDataLayoutBrushMode.Formula ||
                                      selectingAuthoredCell
             ? DisplayStyle.Flex
             : DisplayStyle.None;
@@ -359,22 +399,61 @@ internal sealed class ExcelDataLayoutBrushInspector
                                             selectingAuthoredCell && selectedContentKind == ExcelDataWorkbookCellContentKind.LiteralText
             ? DisplayStyle.Flex
             : DisplayStyle.None;
+        formulaSettingsRoot.style.display = mode == ExcelDataLayoutBrushMode.Formula ||
+                                            selectingAuthoredCell && selectedContentKind == ExcelDataWorkbookCellContentKind.Formula
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
         numberFormatRoot.style.display = mode == ExcelDataLayoutBrushMode.Data ||
                                          selectingAuthoredCell && selectedContentKind == ExcelDataWorkbookCellContentKind.DataField
             ? DisplayStyle.Flex
             : DisplayStyle.None;
+        directionField.style.display = mode == ExcelDataLayoutBrushMode.Formula ||
+                                       selectingAuthoredCell && selectedContentKind == ExcelDataWorkbookCellContentKind.Formula
+            ? DisplayStyle.None
+            : DisplayStyle.Flex;
     }
 
     /// <summary>
-    /// Returns the safest default direction for one new Data Field or Literal Text cell.
+    /// Returns the safest default direction for one new Data Field, Literal Text or Formula cell.
     /// </summary>
     /// <param name="brushMode">Active brush mode.</param>
-    /// <returns>Export for literal text and Both for other modes.</returns>
+    /// <returns>Export for literal text and formulas, or Both for data fields.</returns>
     private static ExcelDataTransferDirection ResolveDefaultDirection(ExcelDataLayoutBrushMode brushMode)
     {
-        return brushMode == ExcelDataLayoutBrushMode.Text
-            ? ExcelDataTransferDirection.Export
-            : ExcelDataTransferDirection.Both;
+        switch (brushMode)
+        {
+            case ExcelDataLayoutBrushMode.Text:
+            case ExcelDataLayoutBrushMode.Formula:
+                return ExcelDataTransferDirection.Export;
+            default:
+                return ExcelDataTransferDirection.Both;
+        }
+    }
+
+    /// <summary>
+    /// Shows an actionable warning only while the visible formula editor contains an invalid expression.
+    /// </summary>
+    private void RefreshFormulaWarning()
+    {
+        if (formulaWarningBox == null || formulaExpressionField == null)
+            return;
+
+        bool formulaEditorVisible = mode == ExcelDataLayoutBrushMode.Formula ||
+                                    mode == ExcelDataLayoutBrushMode.Select &&
+                                    hasSelectedCell &&
+                                    selectedContentKind == ExcelDataWorkbookCellContentKind.Formula;
+
+        if (!formulaEditorVisible)
+        {
+            formulaWarningBox.style.display = DisplayStyle.None;
+            return;
+        }
+
+        bool formulaValid = ExcelDataFormulaExpressionUtility.TryNormalize(formulaExpressionField.value,
+                                                                           out string _,
+                                                                           out string warning);
+        formulaWarningBox.text = warning;
+        formulaWarningBox.style.display = formulaValid ? DisplayStyle.None : DisplayStyle.Flex;
     }
 
     /// <summary>

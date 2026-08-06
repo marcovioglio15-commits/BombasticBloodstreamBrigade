@@ -51,6 +51,7 @@ internal static class ExcelDataExportService
                                          buildResult.WrittenCellCount,
                                          buildResult.DataFieldCellCount,
                                          buildResult.LiteralCellCount,
+                                         buildResult.FormulaCellCount,
                                          buildResult.ReferenceCellCount,
                                          buildResult.WarningCount,
                                          technicalRowCount,

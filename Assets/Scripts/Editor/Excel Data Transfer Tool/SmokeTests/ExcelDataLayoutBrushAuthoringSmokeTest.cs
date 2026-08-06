@@ -31,6 +31,7 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
             ValidateStructuralInsertion(layoutPreset);
             ValidateStructuralRemoval();
             ValidateLiteralAuthoring(layoutPreset);
+            ValidateFormulaAuthoring(layoutPreset);
             ValidateCoordinateGrid(layoutPreset);
             ValidateSidebarLayoutContract();
             ValidateStableListIdentity();
@@ -135,11 +136,12 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
         bool updated = ExcelDataWorkbookLayoutAuthoringUtility.UpdateCellSettings(layoutPreset,
                                                                                   SheetName,
                                                                                   2,
-                                                                                  2,
-                                                                                  ExcelDataTransferDirection.Both,
-                                                                                  "Section Name",
-                                                                                  false,
-                                                                                  string.Empty);
+                                                                                   2,
+                                                                                   ExcelDataTransferDirection.Both,
+                                                                                   "Section Name",
+                                                                                   string.Empty,
+                                                                                   false,
+                                                                                   string.Empty);
         Assert(updated, "Selected-cell inspector could not update the painted literal.");
         cell = sheet.FindCell(2, 2);
         AssertLiteral(cell, "Section Name", "updated B2 literal");
@@ -149,6 +151,45 @@ public static class ExcelDataLayoutBrushAuthoringSmokeTest
         Assert(ExcelDataWorkbookLayoutAuthoringUtility.EraseCell(layoutPreset, SheetName, 2, 2),
                "Erase mode did not report the removed cell.");
         Assert(sheet.FindCell(2, 2) == null, "Erase mode left the selected cell authored.");
+    }
+
+    /// <summary>
+    /// Verifies Formula painting, validation and selected-cell editing at one exact coordinate.
+    /// </summary>
+    /// <param name="layoutPreset">Transient layout receiving formula brush edits.</param>
+    private static void ValidateFormulaAuthoring(ExcelDataWorkbookLayoutPreset layoutPreset)
+    {
+        ExcelDataWorkbookSheetDefinition sheet = layoutPreset.SheetDefinitions[0];
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintFormulaCell(layoutPreset,
+                                                                 SheetName,
+                                                                 2,
+                                                                 2,
+                                                                 "=SUM(A1,2)",
+                                                                 "FormulaBrush");
+        ExcelDataWorkbookCellDefinition cell = sheet.FindCell(2, 2);
+
+        Assert(cell != null &&
+               cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula &&
+               cell.Direction == ExcelDataTransferDirection.Export &&
+               cell.FormulaExpression == "=SUM(A1,2)" &&
+               cell.BrushId == "FormulaBrush" &&
+               cell.IsUsable(),
+               "Formula mode did not preserve its expression, export-only direction or brush identity.");
+
+        bool updated = ExcelDataWorkbookLayoutAuthoringUtility.UpdateCellSettings(layoutPreset,
+                                                                                  SheetName,
+                                                                                  2,
+                                                                                  2,
+                                                                                  ExcelDataTransferDirection.Both,
+                                                                                  string.Empty,
+                                                                                  "AVERAGE(A1:A3)",
+                                                                                  false,
+                                                                                  string.Empty);
+        cell = sheet.FindCell(2, 2);
+        Assert(updated &&
+               cell.FormulaExpression == "AVERAGE(A1:A3)" &&
+               cell.Direction == ExcelDataTransferDirection.Export,
+               "Selected-cell formula editing lost the expression or export-only contract.");
     }
     #endregion
 

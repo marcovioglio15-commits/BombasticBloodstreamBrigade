@@ -158,7 +158,8 @@ public enum ExcelDataListElementFilterMode
 public enum ExcelDataWorkbookCellContentKind
 {
     DataField = 0,
-    LiteralText = 1
+    LiteralText = 1,
+    Formula = 2
 }
 
 /// <summary>
@@ -169,7 +170,8 @@ public enum ExcelDataLayoutBrushMode
     Select = 0,
     Data = 1,
     Text = 2,
-    Erase = 3
+    Erase = 3,
+    Formula = 4
 }
 
 /// <summary>

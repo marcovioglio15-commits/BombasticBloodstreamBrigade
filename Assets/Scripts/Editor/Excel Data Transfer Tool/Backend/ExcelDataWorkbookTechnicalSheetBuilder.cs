@@ -10,7 +10,8 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
 {
     #region Constants
     public const string TechnicalSheetName = "_TransferData";
-    public const string SchemaVersion = "3";
+    public const string SchemaVersion = "4";
+    public const string LegacySchemaVersion = "3";
 
     private const string WorkbookRecordType = "Workbook";
     private const string SheetRecordType = "Sheet";
@@ -63,7 +64,8 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
         "ReferenceName",
         "ReferenceGuid",
         "ReferencePath",
-        "Warning"
+        "Warning",
+        "FormulaExpression"
     };
     #endregion
 
@@ -254,6 +256,7 @@ internal static class ExcelDataWorkbookTechnicalSheetBuilder
         technicalSheet.SetValue(rowIndex, 36, cell.NumberFormat);
         technicalSheet.SetValue(rowIndex, 37, cell.ValidateLiteralDuringImport);
         technicalSheet.SetValue(rowIndex, 38, cell.LiteralText);
+        technicalSheet.SetValue(rowIndex, 45, cell.FormulaExpression);
 
         if (binding != null && cell.ContentKind == ExcelDataWorkbookCellContentKind.DataField)
             WriteBindingMetadata(technicalSheet, rowIndex, binding);

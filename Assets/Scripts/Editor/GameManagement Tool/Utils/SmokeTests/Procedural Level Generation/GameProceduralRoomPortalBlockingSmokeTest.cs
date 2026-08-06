@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
+using Unity.Scenes;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -328,7 +329,8 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
         GameRoomPortal duplicatePortal = entityManager.GetComponentData<GameRoomPortal>(levelExitPortal);
         GameRoomPortalRuntimeState duplicateState = entityManager.GetComponentData<GameRoomPortalRuntimeState>(levelExitPortal);
         Entity duplicateEntity = entityManager.CreateEntity(typeof(GameRoomPortal),
-                                                             typeof(GameRoomPortalRuntimeState));
+                                                             typeof(GameRoomPortalRuntimeState),
+                                                             typeof(SceneTag));
         entityManager.SetComponentData(duplicateEntity, duplicatePortal);
         entityManager.SetComponentData(duplicateEntity, duplicateState);
         int changedCount = GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(entityManager, managerEntity);
@@ -380,7 +382,8 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
                                        GameRoomPortalConnectionPolicy connectionPolicy = GameRoomPortalConnectionPolicy.Optional)
     {
         Entity portalEntity = entityManager.CreateEntity(typeof(GameRoomPortal),
-                                                          typeof(GameRoomPortalRuntimeState));
+                                                          typeof(GameRoomPortalRuntimeState),
+                                                          typeof(SceneTag));
         entityManager.SetComponentData(portalEntity, new GameRoomPortal
         {
             PortalId = new FixedString64Bytes(portalId),
@@ -410,7 +413,8 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
         Entity blockerEntity = entityManager.CreateEntity(typeof(GameRoomPortalBlocker),
                                                            typeof(PhysicsCollider),
                                                            typeof(LocalTransform),
-                                                           typeof(PhysicsWorldIndex));
+                                                           typeof(PhysicsWorldIndex),
+                                                           typeof(SceneTag));
         entityManager.SetComponentData(blockerEntity, new GameRoomPortalBlocker
         {
             PortalId = new FixedString64Bytes(portalId),

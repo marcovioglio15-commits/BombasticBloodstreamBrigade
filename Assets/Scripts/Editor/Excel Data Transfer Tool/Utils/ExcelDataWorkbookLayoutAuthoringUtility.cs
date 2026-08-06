@@ -127,6 +127,41 @@ internal static class ExcelDataWorkbookLayoutAuthoringUtility
     }
 
     /// <summary>
+    /// Paints one export-only native Excel formula at an exact workbook coordinate.
+    /// </summary>
+    /// <param name="layoutPreset">Layout preset receiving the formula cell.</param>
+    /// <param name="sheetName">Visible worksheet receiving the cell.</param>
+    /// <param name="rowIndex">One-based workbook row.</param>
+    /// <param name="columnIndex">One-based workbook column.</param>
+    /// <param name="formulaExpression">Excel expression with an optional leading equals sign.</param>
+    /// <param name="brushId">Stable selected brush identifier.</param>
+    public static void PaintFormulaCell(ExcelDataWorkbookLayoutPreset layoutPreset,
+                                        string sheetName,
+                                        int rowIndex,
+                                        int columnIndex,
+                                        string formulaExpression,
+                                        string brushId)
+    {
+        if (layoutPreset == null)
+            throw new ArgumentNullException(nameof(layoutPreset));
+
+        ExcelDataWorkbookSheetDefinition sheet = ResolveOrCreateSheet(layoutPreset, sheetName);
+        ExcelDataWorkbookCellDefinition cell = sheet.FindCell(rowIndex, columnIndex);
+
+        if (cell == null)
+        {
+            cell = new ExcelDataWorkbookCellDefinition();
+            sheet.Cells.Add(cell);
+        }
+
+        cell.ConfigureFormula(sheet.SheetId,
+                              rowIndex,
+                              columnIndex,
+                              formulaExpression,
+                              brushId);
+    }
+
+    /// <summary>
     /// Erases one exact cell from the authoritative worksheet.
     /// </summary>
     /// <param name="layoutPreset">Layout preset containing the cell.</param>
@@ -169,6 +204,7 @@ internal static class ExcelDataWorkbookLayoutAuthoringUtility
     /// <param name="columnIndex">One-based workbook column.</param>
     /// <param name="direction">Updated transfer direction.</param>
     /// <param name="literalText">Updated literal text when the cell is Literal Text.</param>
+    /// <param name="formulaExpression">Updated Excel expression when the cell is Formula.</param>
     /// <param name="validateLiteralDuringImport">Updated literal validation toggle.</param>
     /// <param name="numberFormat">Updated number format when the cell is a Data Field.</param>
     /// <returns>True when a selected cell was found and updated.</returns>
@@ -178,6 +214,7 @@ internal static class ExcelDataWorkbookLayoutAuthoringUtility
                                           int columnIndex,
                                           ExcelDataTransferDirection direction,
                                           string literalText,
+                                          string formulaExpression,
                                           bool validateLiteralDuringImport,
                                           string numberFormat)
     {
@@ -201,6 +238,13 @@ internal static class ExcelDataWorkbookLayoutAuthoringUtility
                                           direction,
                                           cell.BrushId,
                                           validateLiteralDuringImport);
+                break;
+            case ExcelDataWorkbookCellContentKind.Formula:
+                cell.ConfigureFormula(sheet.SheetId,
+                                      rowIndex,
+                                      columnIndex,
+                                      formulaExpression,
+                                      cell.BrushId);
                 break;
             default:
                 cell.ConfigureDataField(sheet.SheetId,

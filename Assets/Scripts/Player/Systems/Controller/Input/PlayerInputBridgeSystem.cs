@@ -21,6 +21,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     private bool suppressShootUntilReleased;
     private bool suppressSwapUntilReleased;
     private bool transitionHadMotionLock;
+    private bool wasLiveTransitionCombat;
     private bool wasLiveTransitionMotion;
     private bool wasSceneTransitioning;
     private int transitionReleaseDeltaGuardFrames;
@@ -71,6 +72,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
         GameSceneTransitionRuntimeGuardUtility.ResolveDefaultWorldPlayerPolicy(out bool isSceneTransitioning,
                                                                                out bool transitionBlocksGameplay,
                                                                                out bool allowsLiveTransitionMotion,
+                                                                               out bool allowsLiveTransitionCombat,
                                                                                out bool requiresStableMotionRelease);
         bool isGameplayPaused = PlayerGameplayPauseUtility.IsTimeScaleHardPaused() || transitionBlocksGameplay;
         bool suppressLoadFrameMotion = requiresStableMotionRelease && !wasLiveTransitionMotion;
@@ -78,7 +80,8 @@ public partial struct PlayerInputBridgeSystem : ISystem
         ComponentLookup<PlayerRunOutcomeState> runOutcomeLookup = SystemAPI.GetComponentLookup<PlayerRunOutcomeState>(true);
 
         // Sample only the current control state. Ready procedural FadeIn and spatially aligned traversal consume live
-        // movement and look without retaining deltas, while the transition gate discards all discrete actions.
+        // movement and look without retaining deltas. Safe room traversal also consumes current shooting input, while
+        // tools and slot swaps remain release-gated throughout every transition.
         if (isInputReady && (!isGameplayPaused || isSceneTransitioning))
         {
             if (moveAction != null)
@@ -124,6 +127,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
 
         bool pointerLookBlocked = ApplyTransitionRearmGate(isSceneTransitioning,
                                                            allowsLiveTransitionMotion,
+                                                           allowsLiveTransitionCombat,
                                                            useMousePointerLook,
                                                            ref shoot,
                                                            ref powerUpPrimary,
@@ -193,19 +197,21 @@ public partial struct PlayerInputBridgeSystem : ISystem
 
     #region Transition Gate
     /// <summary>
-    /// Discards discrete gameplay actions throughout scene transitions and requires held buttons to release before
-    /// rearming. Continuous move and controller-look vectors resume from their current sample without buffered deltas.
+    /// Discards mutable tool actions throughout scene transitions and requires held buttons to release before rearming.
+    /// Continuous movement, look and safe room-traversal shooting consume only their current samples.
     /// </summary>
     /// <param name="isSceneTransitioning">True while scene management owns the gameplay gate.</param>
     /// <param name="allowsLiveTransitionMotion">True when a stable target can consume current movement and look samples.</param>
+    /// <param name="allowsLiveTransitionCombat">True when safe room traversal can consume current shooting input.</param>
     /// <param name="useMousePointerLook">True when the current input context resolves look from the mouse pointer.</param>
     /// <param name="shoot">Mutable sampled shooting state.</param>
     /// <param name="powerUpPrimary">Mutable sampled primary power-up state.</param>
     /// <param name="powerUpSecondary">Mutable sampled secondary power-up state.</param>
     /// <param name="swapPowerUpSlots">Mutable sampled slot-swap state.</param>
-    /// <returns>True while mouse-pointer look must preserve the arrival-facing direction.</returns>
+    /// <returns>True while mouse-pointer look must preserve the pre-transition facing direction.</returns>
     private bool ApplyTransitionRearmGate(bool isSceneTransitioning,
                                           bool allowsLiveTransitionMotion,
+                                          bool allowsLiveTransitionCombat,
                                           bool useMousePointerLook,
                                           ref float shoot,
                                           ref float powerUpPrimary,
@@ -224,20 +230,29 @@ public partial struct PlayerInputBridgeSystem : ISystem
                     pointerRearmPosition = ResolvePointerPosition();
                 }
 
-                // Consume motion directly every frame, while discrete actions remain blocked and can only rearm after release.
-                suppressShootUntilReleased |= shoot > 0f;
+                // Consume only current samples. Shooting remains live for safe room traversal, while tools and slot
+                // changes stay blocked because they can mutate persistent configuration during scene ownership.
+                if (allowsLiveTransitionCombat)
+                    suppressShootUntilReleased = false;
+                else
+                {
+                    suppressShootUntilReleased |= shoot > 0f;
+                    shoot = 0f;
+                }
+
                 suppressPowerUpPrimaryUntilReleased |= powerUpPrimary > 0f;
                 suppressPowerUpSecondaryUntilReleased |= powerUpSecondary > 0f;
                 suppressSwapUntilReleased |= swapPowerUpSlots > 0f;
-                shoot = 0f;
                 powerUpPrimary = 0f;
                 powerUpSecondary = 0f;
                 swapPowerUpSlots = 0f;
+                wasLiveTransitionCombat = allowsLiveTransitionCombat;
                 wasLiveTransitionMotion = true;
                 return UpdatePointerRearmGate(useMousePointerLook);
             }
 
             transitionHadMotionLock = true;
+            wasLiveTransitionCombat = false;
             wasLiveTransitionMotion = false;
             suppressPointerUntilMoved = useMousePointerLook;
             return useMousePointerLook;
@@ -247,7 +262,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
         // vectors use the current sample immediately and therefore cannot release historical input as a burst.
         if (wasSceneTransitioning)
         {
-            suppressShootUntilReleased = shoot > 0f;
+            suppressShootUntilReleased = !wasLiveTransitionCombat && shoot > 0f;
             suppressPowerUpPrimaryUntilReleased = powerUpPrimary > 0f;
             suppressPowerUpSecondaryUntilReleased = powerUpSecondary > 0f;
             suppressSwapUntilReleased = swapPowerUpSlots > 0f;
@@ -259,6 +274,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
             }
 
             transitionHadMotionLock = false;
+            wasLiveTransitionCombat = false;
             wasLiveTransitionMotion = false;
             wasSceneTransitioning = false;
             transitionReleaseDeltaGuardFrames = transitionReleaseDeltaGuardFrameCount;
@@ -299,7 +315,7 @@ public partial struct PlayerInputBridgeSystem : ISystem
     /// vectors, an absolute pointer position would otherwise reinterpret movement performed while no target existed.
     /// </summary>
     /// <param name="useMousePointerLook">True when mouse screen position owns facing.</param>
-    /// <returns>True while pointer-facing must remain on the authored arrival direction.</returns>
+    /// <returns>True while pointer-facing must remain on the pre-transition direction.</returns>
     private bool UpdatePointerRearmGate(bool useMousePointerLook)
     {
         if (!useMousePointerLook)

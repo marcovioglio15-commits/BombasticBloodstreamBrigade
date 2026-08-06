@@ -46,7 +46,7 @@ public partial struct PlayerLaserBeamSimulationSystem : ISystem
     /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        if (PlayerGameplayPauseUtility.IsPlayerCombatHardPauseActive())
             return;
 
         float deltaTime = SystemAPI.Time.DeltaTime;

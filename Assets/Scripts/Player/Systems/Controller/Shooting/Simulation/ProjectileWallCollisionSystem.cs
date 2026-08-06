@@ -31,7 +31,7 @@ public partial struct ProjectileWallCollisionSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        if (PlayerGameplayPauseUtility.IsHardGameplayPauseActive())
+        if (PlayerGameplayPauseUtility.IsPlayerCombatHardPauseActive())
             return;
 
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();

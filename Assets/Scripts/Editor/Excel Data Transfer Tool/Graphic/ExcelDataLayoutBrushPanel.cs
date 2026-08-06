@@ -164,7 +164,7 @@ public sealed class ExcelDataLayoutBrushPanel
     }
 
     /// <summary>
-    /// Applies the active Select, Data, Text or Erase behavior to one exact coordinate.
+    /// Applies the active Select, Data, Text, Formula or Erase behavior to one exact coordinate.
     /// </summary>
     /// <param name="rowIndex">One-based grid row index.</param>
     /// <param name="columnIndex">One-based grid column index.</param>
@@ -180,6 +180,9 @@ public sealed class ExcelDataLayoutBrushPanel
                 break;
             case ExcelDataLayoutBrushMode.Text:
                 PaintLiteralCell();
+                break;
+            case ExcelDataLayoutBrushMode.Formula:
+                PaintFormulaCell();
                 break;
             case ExcelDataLayoutBrushMode.Erase:
                 EraseSelectedCell();
@@ -244,6 +247,36 @@ public sealed class ExcelDataLayoutBrushPanel
     }
 
     /// <summary>
+    /// Paints one validated export-only Excel formula using the current saved-brush style.
+    /// </summary>
+    private void PaintFormulaCell()
+    {
+        if (!ExcelDataFormulaExpressionUtility.TryNormalize(brushInspector.FormulaExpression,
+                                                            out string _,
+                                                            out string warning))
+        {
+            controls.SetStatus(warning);
+            RefreshSelectedCellInspector();
+            return;
+        }
+
+        ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
+        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
+
+        if (layoutPreset == null || sheet == null)
+            return;
+
+        Undo.RecordObject(layoutPreset, "Paint Excel Formula Cell");
+        ExcelDataWorkbookLayoutAuthoringUtility.PaintFormulaCell(layoutPreset,
+                                                                sheet.SheetName,
+                                                                selectedRowIndex,
+                                                                selectedColumnIndex,
+                                                                brushInspector.FormulaExpression,
+                                                                controls.GetSelectedBrushId());
+        CommitLayoutEdit(layoutPreset, "Painted Formula at " + BuildSelectedAddress(sheet) + ".");
+    }
+
+    /// <summary>
     /// Removes the selected authoritative cell in Erase mode.
     /// </summary>
     private void EraseSelectedCell()
@@ -280,8 +313,21 @@ public sealed class ExcelDataLayoutBrushPanel
         ExcelDataWorkbookLayoutPreset layoutPreset = GetLayoutPreset();
         ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
 
-        if (layoutPreset == null || sheet == null || sheet.FindCell(selectedRowIndex, selectedColumnIndex) == null)
+        ExcelDataWorkbookCellDefinition selectedCell = sheet == null
+            ? null
+            : sheet.FindCell(selectedRowIndex, selectedColumnIndex);
+
+        if (layoutPreset == null || selectedCell == null)
             return;
+
+        if (selectedCell.ContentKind == ExcelDataWorkbookCellContentKind.Formula &&
+            !ExcelDataFormulaExpressionUtility.TryNormalize(brushInspector.FormulaExpression,
+                                                            out string _,
+                                                            out string warning))
+        {
+            controls.SetStatus(warning);
+            return;
+        }
 
         Undo.RecordObject(layoutPreset, "Edit Excel Workbook Cell");
 
@@ -291,6 +337,7 @@ public sealed class ExcelDataLayoutBrushPanel
                                                                         selectedColumnIndex,
                                                                         brushInspector.Direction,
                                                                         brushInspector.LiteralText,
+                                                                        brushInspector.FormulaExpression,
                                                                         brushInspector.ValidateLiteralDuringImport,
                                                                         brushInspector.NumberFormat))
             return;
@@ -619,51 +666,11 @@ public sealed class ExcelDataLayoutBrushPanel
     /// </summary>
     private void RefreshSelectedCellInspector()
     {
-        ExcelDataWorkbookSheetDefinition sheet = GetActiveSheet();
-
-        if (sheet == null)
-        {
-            brushInspector.ClearSelectedCell();
-            return;
-        }
-
-        ExcelDataWorkbookCellDefinition cell = sheet.FindCell(selectedRowIndex, selectedColumnIndex);
-        string sourceText = string.Empty;
-        string valueText = string.Empty;
-        string styleText = string.Empty;
-
-        if (cell != null)
-        {
-            ExcelDataBrushDefinition brush = ExcelDataLayoutBrushPaletteUtility.FindBrushById(GetBrushPalettePreset(), cell.BrushId);
-            styleText = brush == null ? cell.BrushId : brush.BrushName;
-
-            if (!string.IsNullOrWhiteSpace(cell.NumberFormat))
-                styleText += " | " + cell.NumberFormat;
-
-            if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
-            {
-                sourceText = "Authored literal text";
-                valueText = cell.LiteralText;
-            }
-            else if (cell.FieldBinding != null)
-            {
-                sourceText = cell.FieldBinding.OwnerAssetPath + " | " + cell.FieldBinding.SerializedPath;
-                ExcelDataSerializedValueSnapshot snapshot =
-                    ExcelDataSerializedValueReader.ReadValue(cell.FieldBinding, true, true, true);
-                valueText = ExcelDataInvariantValueUtility.ToText(snapshot.Value);
-
-                if (!string.IsNullOrWhiteSpace(snapshot.Warning))
-                    valueText = snapshot.Warning;
-            }
-        }
-
-        brushInspector.SetSelectedCell(sheet.SheetName,
-                                       selectedRowIndex,
-                                       selectedColumnIndex,
-                                       cell,
-                                       sourceText,
-                                       valueText,
-                                       styleText);
+        ExcelDataLayoutBrushCellInspectorUtility.Refresh(brushInspector,
+                                                         GetActiveSheet(),
+                                                         GetBrushPalettePreset(),
+                                                         selectedRowIndex,
+                                                         selectedColumnIndex);
     }
 
     #endregion

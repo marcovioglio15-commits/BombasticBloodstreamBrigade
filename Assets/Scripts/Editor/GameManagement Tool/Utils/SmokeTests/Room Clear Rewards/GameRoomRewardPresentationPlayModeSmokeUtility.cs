@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Scenes;
 using UnityEngine;
 
 /// <summary>
@@ -125,12 +126,14 @@ internal static class GameRoomRewardPresentationPlayModeSmokeUtility
             entityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity, true);
         EntityQuery portalQuery =
             entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortal>(),
-                                            ComponentType.ReadOnly<GameRoomPortalRuntimeState>());
+                                            ComponentType.ReadOnly<GameRoomPortalRuntimeState>(),
+                                            ComponentType.ReadOnly<SceneTag>());
+        NativeList<Entity> portalEntities = new NativeList<Entity>(Allocator.Temp);
 
         try
         {
-            using NativeArray<Entity> portalEntities =
-                portalQuery.ToEntityArray(Allocator.Temp);
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(portalQuery,
+                                                                              ref portalEntities);
             bool hasOutgoingEdge = false;
             bool hasAssignedPortal = false;
 
@@ -188,6 +191,7 @@ internal static class GameRoomRewardPresentationPlayModeSmokeUtility
         }
         finally
         {
+            portalEntities.Dispose();
             portalQuery.Dispose();
         }
     }

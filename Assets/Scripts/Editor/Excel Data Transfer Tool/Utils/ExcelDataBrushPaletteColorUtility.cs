@@ -9,6 +9,7 @@ internal static class ExcelDataBrushPaletteColorUtility
 {
     #region Constants
     private static readonly Color DefaultLiteralColor = new Color(0.82f, 0.72f, 0.32f, 1f);
+    private static readonly Color DefaultFormulaColor = new Color(0.56f, 0.42f, 0.88f, 1f);
     private static readonly Color DefaultUnresolvedColor = new Color(0.55f, 0.2f, 0.2f, 1f);
     private static readonly Color DefaultPrimitiveColor = new Color(0.65f, 0.65f, 0.65f, 1f);
     #endregion
@@ -39,6 +40,9 @@ internal static class ExcelDataBrushPaletteColorUtility
 
         if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
             return typeColors == null ? DefaultLiteralColor : typeColors.LiteralText;
+
+        if (cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula)
+            return typeColors == null ? DefaultFormulaColor : typeColors.Formula;
 
         ExcelDataFieldBinding binding = cell.FieldBinding;
 

@@ -449,6 +449,16 @@ public static class ExcelDataTransferAssetUtility
                           "string label id name description",
                           "Brush for text identifiers, labels and descriptions.");
         AddBrushIfMissing(brushes,
+                          "Formula",
+                          ExcelDataTransferDomain.All,
+                          ExcelDataBrushDataKind.All,
+                          ExcelDataListElementFilterMode.AllBrushableFields,
+                          string.Empty,
+                          ExcelDataTransferDirection.Export,
+                          new Color(0.56f, 0.42f, 0.88f, 1f),
+                          "formula excel expression calculation",
+                          "Export-only brush for native Excel formula cells authored directly in the workbook layout.");
+        AddBrushIfMissing(brushes,
                           "References",
                           ExcelDataTransferDomain.All,
                           ExcelDataBrushDataKind.ObjectReference,

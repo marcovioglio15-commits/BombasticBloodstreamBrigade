@@ -33,6 +33,9 @@ public sealed class ExcelDataWorkbookCellDefinition
     [Tooltip("Exact workbook text used when Content Kind is Literal Text.")]
     [SerializeField] private string literalText;
 
+    [Tooltip("Excel formula expression written as an executable workbook formula when Content Kind is Formula. The leading equals sign is optional.")]
+    [SerializeField] private string formulaExpression;
+
     [Tooltip("Stable brush preset identifier used to preserve the authored grid color and behavior.")]
     [SerializeField] private string brushId;
 
@@ -102,6 +105,14 @@ public sealed class ExcelDataWorkbookCellDefinition
         }
     }
 
+    public string FormulaExpression
+    {
+        get
+        {
+            return formulaExpression;
+        }
+    }
+
     public string BrushId
     {
         get
@@ -154,6 +165,7 @@ public sealed class ExcelDataWorkbookCellDefinition
         contentKind = ExcelDataWorkbookCellContentKind.DataField;
         fieldBinding = newFieldBinding ?? new ExcelDataFieldBinding();
         literalText = string.Empty;
+        formulaExpression = string.Empty;
         direction = newDirection;
         brushId = newBrushId;
         numberFormat = newNumberFormat;
@@ -184,10 +196,38 @@ public sealed class ExcelDataWorkbookCellDefinition
         contentKind = ExcelDataWorkbookCellContentKind.LiteralText;
         fieldBinding = new ExcelDataFieldBinding();
         literalText = newLiteralText;
+        formulaExpression = string.Empty;
         direction = newDirection;
         brushId = newBrushId;
         numberFormat = string.Empty;
         validateLiteralDuringImport = newValidateLiteralDuringImport;
+    }
+
+    /// <summary>
+    /// Configures an export-only cell whose expression is emitted as a native Excel formula.
+    /// </summary>
+    /// <param name="newSheetId">Stable owner worksheet identifier.</param>
+    /// <param name="newRowIndex">One-based Excel row index.</param>
+    /// <param name="newColumnIndex">One-based Excel column index.</param>
+    /// <param name="newFormulaExpression">Authored Excel expression with an optional leading equals sign.</param>
+    /// <param name="newBrushId">Stable brush preset identifier.</param>
+    public void ConfigureFormula(string newSheetId,
+                                 int newRowIndex,
+                                 int newColumnIndex,
+                                 string newFormulaExpression,
+                                 string newBrushId)
+    {
+        sheetId = newSheetId;
+        rowIndex = newRowIndex;
+        columnIndex = newColumnIndex;
+        contentKind = ExcelDataWorkbookCellContentKind.Formula;
+        fieldBinding = new ExcelDataFieldBinding();
+        literalText = string.Empty;
+        formulaExpression = newFormulaExpression;
+        direction = ExcelDataTransferDirection.Export;
+        brushId = newBrushId;
+        numberFormat = string.Empty;
+        validateLiteralDuringImport = false;
     }
 
     /// <summary>
@@ -219,6 +259,10 @@ public sealed class ExcelDataWorkbookCellDefinition
                 return fieldBinding != null && fieldBinding.IsUsable();
             case ExcelDataWorkbookCellContentKind.LiteralText:
                 return true;
+            case ExcelDataWorkbookCellContentKind.Formula:
+                return ExcelDataFormulaExpressionUtility.TryNormalize(formulaExpression,
+                                                                      out string _,
+                                                                      out string _);
             default:
                 return false;
         }

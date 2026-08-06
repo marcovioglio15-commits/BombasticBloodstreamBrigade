@@ -1,6 +1,7 @@
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Physics;
+using Unity.Scenes;
 
 /// <summary>
 /// Synchronizes fail-closed portal barriers with graph assignments without polling them every frame.
@@ -41,19 +42,27 @@ public static class GameProceduralRoomPortalBlockingUtility
                                    Entity managerEntity)
     {
         EntityQuery portalQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortal>(),
-                                                                  ComponentType.ReadOnly<GameRoomPortalRuntimeState>());
+                                                                  ComponentType.ReadOnly<GameRoomPortalRuntimeState>(),
+                                                                  ComponentType.ReadOnly<SceneTag>());
         EntityQuery blockerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomPortalBlocker>(),
-                                                                   ComponentType.ReadWrite<PhysicsCollider>());
-        NativeArray<Entity> portalEntities = default;
-        NativeArray<Entity> blockerEntities = default;
+                                                                   ComponentType.ReadWrite<PhysicsCollider>(),
+                                                                   ComponentType.ReadOnly<SceneTag>());
+        NativeList<Entity> portalEntities = new NativeList<Entity>(Allocator.Temp);
+        NativeList<Entity> blockerEntities = new NativeList<Entity>(Allocator.Temp);
 
         try
         {
-            portalEntities = portalQuery.ToEntityArray(Allocator.Temp);
-            blockerEntities = blockerQuery.ToEntityArray(Allocator.Temp);
+            // Isolate the active room before validating IDs so resident duplicate templates cannot fail-close its exits.
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(portalQuery,
+                                                                              ref portalEntities);
+            GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(blockerQuery,
+                                                                              ref blockerEntities);
+            NativeArray<Entity> activePortalEntities = portalEntities.AsArray();
             int changedCount = 0;
 
-            UpdateTraversalAvailability(entityManager, managerEntity, portalEntities);
+            UpdateTraversalAvailability(entityManager,
+                                        managerEntity,
+                                        activePortalEntities);
 
             // Resolve each barrier independently so missing or duplicate logical IDs remain safely closed.
             for (int blockerIndex = 0; blockerIndex < blockerEntities.Length; blockerIndex++)
@@ -61,7 +70,7 @@ public static class GameProceduralRoomPortalBlockingUtility
                 Entity blockerEntity = blockerEntities[blockerIndex];
                 GameRoomPortalBlocker blocker = entityManager.GetComponentData<GameRoomPortalBlocker>(blockerEntity);
                 bool shouldBlock = ResolveShouldBlock(entityManager,
-                                                      portalEntities,
+                                                      activePortalEntities,
                                                       blocker.PortalId);
 
                 if (SetBlockingState(entityManager, blockerEntity, shouldBlock))
@@ -72,11 +81,8 @@ public static class GameProceduralRoomPortalBlockingUtility
         }
         finally
         {
-            if (portalEntities.IsCreated)
-                portalEntities.Dispose();
-
-            if (blockerEntities.IsCreated)
-                blockerEntities.Dispose();
+            portalEntities.Dispose();
+            blockerEntities.Dispose();
 
             portalQuery.Dispose();
             blockerQuery.Dispose();

@@ -40,8 +40,27 @@ internal static class PlayerGameplayPauseUtility
         GameSceneTransitionRuntimeGuardUtility.ResolveDefaultWorldPlayerPolicy(out bool _,
                                                                                out bool shouldBlockGameplay,
                                                                                out bool allowsLiveMotion,
+                                                                               out bool _,
                                                                                out bool _);
         return shouldBlockGameplay && !allowsLiveMotion;
+    }
+
+    /// <summary>
+    /// Resolves whether player shooting must freeze while scene management owns an unsafe destination. Combat resumes
+    /// for a ready room-traversal FadeIn and stays live throughout spatially aligned dual-slot traversal.
+    /// </summary>
+    /// <returns>True for time-scale pauses and transition phases that cannot safely simulate player combat.</returns>
+    public static bool IsPlayerCombatHardPauseActive()
+    {
+        if (IsTimeScaleHardPaused())
+            return true;
+
+        GameSceneTransitionRuntimeGuardUtility.ResolveDefaultWorldPlayerPolicy(out bool _,
+                                                                               out bool shouldBlockGameplay,
+                                                                               out bool _,
+                                                                               out bool allowsLiveCombat,
+                                                                               out bool _);
+        return shouldBlockGameplay && !allowsLiveCombat;
     }
 
     /// <summary>

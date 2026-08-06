@@ -18,6 +18,17 @@ internal static class ExcelDataWorkbookLayoutHashUtility
     /// <returns>Lower-case SHA-256 layout hash used by technical metadata and future import validation.</returns>
     public static string Calculate(ExcelDataWorkbookLayoutPreset layoutPreset)
     {
+        return Calculate(layoutPreset, true);
+    }
+
+    /// <summary>
+    /// Hashes one layout with optional v4 formula metadata for backward-compatible v3 snapshot validation.
+    /// </summary>
+    /// <param name="layoutPreset">Grid-authoritative layout preset to fingerprint.</param>
+    /// <param name="includeFormulaExpression">True for v4 layouts; false when validating a legacy v3 workbook.</param>
+    /// <returns>Lower-case SHA-256 layout hash matching the selected technical schema.</returns>
+    public static string Calculate(ExcelDataWorkbookLayoutPreset layoutPreset, bool includeFormulaExpression)
+    {
         if (layoutPreset == null)
             return string.Empty;
 
@@ -43,7 +54,7 @@ internal static class ExcelDataWorkbookLayoutHashUtility
             AppendToken(content, sheet.ExportEnabled ? "1" : "0");
             AppendToken(content, sheet.FreezeRowCount.ToString(CultureInfo.InvariantCulture));
             AppendToken(content, sheet.FreezeColumnCount.ToString(CultureInfo.InvariantCulture));
-            AppendCells(content, sheet.Cells);
+            AppendCells(content, sheet.Cells, includeFormulaExpression);
         }
 
         byte[] contentBytes = Encoding.UTF8.GetBytes(content.ToString());
@@ -68,7 +79,10 @@ internal static class ExcelDataWorkbookLayoutHashUtility
     /// </summary>
     /// <param name="content">Hash source buffer receiving stable tokens.</param>
     /// <param name="sourceCells">Sparse authored cell collection.</param>
-    private static void AppendCells(StringBuilder content, List<ExcelDataWorkbookCellDefinition> sourceCells)
+    /// <param name="includeFormulaExpression">True when v4 formula payloads participate in the hash.</param>
+    private static void AppendCells(StringBuilder content,
+                                    List<ExcelDataWorkbookCellDefinition> sourceCells,
+                                    bool includeFormulaExpression)
     {
         List<ExcelDataWorkbookCellDefinition> cells = new List<ExcelDataWorkbookCellDefinition>();
 
@@ -93,6 +107,10 @@ internal static class ExcelDataWorkbookLayoutHashUtility
             AppendToken(content, cell.BrushId);
             AppendToken(content, cell.NumberFormat);
             AppendToken(content, cell.ValidateLiteralDuringImport ? "1" : "0");
+
+            if (includeFormulaExpression)
+                AppendToken(content, cell.FormulaExpression);
+
             AppendBinding(content, cell.FieldBinding);
         }
     }

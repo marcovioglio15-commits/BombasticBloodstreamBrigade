@@ -216,7 +216,8 @@ internal sealed class ExcelDataLayoutBrushPanelControls
     public void SetModeVisibility(ExcelDataLayoutBrushMode mode)
     {
         brushStyleRoot.style.display = mode == ExcelDataLayoutBrushMode.Data ||
-                                       mode == ExcelDataLayoutBrushMode.Text
+                                       mode == ExcelDataLayoutBrushMode.Text ||
+                                       mode == ExcelDataLayoutBrushMode.Formula
             ? DisplayStyle.Flex
             : DisplayStyle.None;
         fieldCatalogRoot.style.display = mode == ExcelDataLayoutBrushMode.Data

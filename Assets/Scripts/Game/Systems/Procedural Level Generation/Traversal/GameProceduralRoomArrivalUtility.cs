@@ -73,22 +73,20 @@ internal static class GameProceduralRoomArrivalUtility
 
     #region Arrival Pose
     /// <summary>
-    /// Resolves either the unique room center anchor or the graph-selected target entrance pose.
+    /// Resolves either the unique room center anchor or the graph-selected target entrance position.
     /// </summary>
     /// <param name="entityManager">Entity manager owning freshly loaded room authoring components.</param>
     /// <param name="context">Pending logical transition context.</param>
     /// <param name="position">Resolved world-space player position.</param>
-    /// <param name="rotation">Resolved world-space player rotation.</param>
     /// <returns>True when the required target anchor is present.</returns>
-    private static bool TryResolveArrivalPose(EntityManager entityManager,
-                                              GameProceduralRoomTransitionContext context,
-                                              out float3 position,
-                                              out quaternion rotation)
+    private static bool TryResolveArrivalPosition(EntityManager entityManager,
+                                                  GameProceduralRoomTransitionContext context,
+                                                  out float3 position)
     {
         if (context.UsesCenterArrival != 0)
-            return TryResolveCenterArrival(entityManager, out position, out rotation);
+            return TryResolveCenterArrival(entityManager, out position);
 
-        return TryResolvePortalArrival(entityManager, context.TargetPortalId, out position, out rotation);
+        return TryResolvePortalArrival(entityManager, context.TargetPortalId, out position);
     }
 
     /// <summary>
@@ -96,14 +94,11 @@ internal static class GameProceduralRoomArrivalUtility
     /// </summary>
     /// <param name="entityManager">Entity manager owning active room components.</param>
     /// <param name="position">Resolved center position.</param>
-    /// <param name="rotation">Resolved center rotation.</param>
     /// <returns>True when exactly one center marker exists.</returns>
     private static bool TryResolveCenterArrival(EntityManager entityManager,
-                                                out float3 position,
-                                                out quaternion rotation)
+                                                out float3 position)
     {
         position = float3.zero;
-        rotation = quaternion.identity;
         EntityQuery query = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameRoomCenterAnchor>(),
                                                             ComponentType.ReadOnly<SceneTag>());
         NativeList<Entity> anchors = new NativeList<Entity>(Allocator.Temp);
@@ -117,7 +112,6 @@ internal static class GameProceduralRoomArrivalUtility
 
             GameRoomCenterAnchor anchor = entityManager.GetComponentData<GameRoomCenterAnchor>(anchors[0]);
             position = anchor.Position;
-            rotation = anchor.Rotation;
             return true;
         }
         finally
@@ -133,15 +127,12 @@ internal static class GameProceduralRoomArrivalUtility
     /// <param name="entityManager">Entity manager owning active room portals.</param>
     /// <param name="portalId">Graph-selected target portal ID.</param>
     /// <param name="position">Resolved authored arrival position.</param>
-    /// <param name="rotation">Resolved authored arrival rotation.</param>
     /// <returns>True when exactly one matching target portal exists.</returns>
     private static bool TryResolvePortalArrival(EntityManager entityManager,
                                                 FixedString64Bytes portalId,
-                                                out float3 position,
-                                                out quaternion rotation)
+                                                out float3 position)
     {
         position = float3.zero;
-        rotation = quaternion.identity;
 
         if (portalId.Length <= 0)
             return false;
@@ -163,7 +154,6 @@ internal static class GameProceduralRoomArrivalUtility
                     continue;
 
                 position = portal.ArrivalPosition;
-                rotation = portal.ArrivalRotation;
                 matchCount++;
             }
 
@@ -179,8 +169,8 @@ internal static class GameProceduralRoomArrivalUtility
 
     #region Player
     /// <summary>
-    /// Preserves the exact player pose only for optional aligned dual-slot traversal, or applies the authored arrival
-    /// pose for single-slot traversal and run boundaries while the environment is fully black.
+    /// Preserves the player's facing while applying the exact authored arrival position for single-slot traversal and
+    /// run boundaries. Optional aligned dual-slot traversal preserves the complete pose.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the persistent player.</param>
     /// <param name="config">Baked transition settings.</param>
@@ -209,19 +199,12 @@ internal static class GameProceduralRoomArrivalUtility
             // and serial replacement instead place the player on the exact graph-selected entrance behind black.
             if (!preservesContinuousMotion)
             {
-                if (!TryResolveArrivalPose(entityManager,
-                                           context,
-                                           out float3 arrivalPosition,
-                                           out quaternion arrivalRotation))
-                {
+                if (!TryResolveArrivalPosition(entityManager, context, out float3 arrivalPosition))
                     return false;
-                }
 
                 LocalTransform transform = entityManager.GetComponentData<LocalTransform>(playerEntity);
                 transform.Position = arrivalPosition;
-                transform.Rotation = arrivalRotation;
                 entityManager.SetComponentData(playerEntity, transform);
-                ApplyArrivalFacing(entityManager, playerEntity, arrivalRotation);
             }
 
             if (config.ClearPlayerVelocity != 0 && !preservesContinuousMotion)
@@ -236,40 +219,10 @@ internal static class GameProceduralRoomArrivalUtility
     }
 
     /// <summary>
-    /// Aligns optional look state with the authored arrival rotation so the next controller tick preserves facing.
+    /// Clears mutable movement channels that could carry physical momentum across a room boundary. Current-frame
+    /// input remains owned by the transition-aware input bridge so look and safe combat never require a manual rearm.
     /// </summary>
-    /// <param name="entityManager">Entity manager owning optional player look state.</param>
-    /// <param name="playerEntity">Relocated persistent player entity.</param>
-    /// <param name="rotation">Authored arrival rotation.</param>
-    private static void ApplyArrivalFacing(EntityManager entityManager, Entity playerEntity, quaternion rotation)
-    {
-        if (!entityManager.HasComponent<PlayerLookState>(playerEntity))
-            return;
-
-        PlayerLookState lookState = entityManager.GetComponentData<PlayerLookState>(playerEntity);
-        float3 forward = math.mul(rotation, new float3(0f, 0f, 1f));
-        forward.y = 0f;
-
-        if (math.lengthsq(forward) <= 0.0001f)
-            forward = new float3(0f, 0f, 1f);
-        else
-            forward = math.normalize(forward);
-
-        lookState.DesiredDirection = forward;
-        lookState.CurrentDirection = forward;
-        lookState.AngularSpeed = 0f;
-        lookState.PrevLookMask = 0;
-        lookState.CurrLookMask = 0;
-        lookState.LookPressTimes = float4.zero;
-        lookState.ReleaseHoldMask = 0;
-        lookState.ReleaseHoldUntilTime = 0f;
-        entityManager.SetComponentData(playerEntity, lookState);
-    }
-
-    /// <summary>
-    /// Clears mutable movement and input channels that could carry momentum across a room boundary.
-    /// </summary>
-    /// <param name="entityManager">Entity manager owning optional player movement and input state.</param>
+    /// <param name="entityManager">Entity manager owning optional player movement state.</param>
     /// <param name="playerEntity">Relocated persistent player entity.</param>
     private static void ClearPlayerMotion(EntityManager entityManager, Entity playerEntity)
     {
@@ -286,20 +239,6 @@ internal static class GameProceduralRoomArrivalUtility
             entityManager.SetComponentData(playerEntity, movementState);
         }
 
-        if (entityManager.HasComponent<PlayerInputState>(playerEntity))
-        {
-            PlayerInputState inputState = entityManager.GetComponentData<PlayerInputState>(playerEntity);
-            inputState.Move = float2.zero;
-            inputState.Look = float2.zero;
-            inputState.Shoot = 0f;
-            inputState.PowerUpPrimary = 0f;
-            inputState.PowerUpSecondary = 0f;
-            inputState.SwapPowerUpSlots = 0f;
-            inputState.MoveUsesAnalogSource = 0;
-            inputState.LookUsesAnalogSource = 0;
-            inputState.PointerLookBlocked = 1;
-            entityManager.SetComponentData(playerEntity, inputState);
-        }
     }
     #endregion
 

@@ -49,6 +49,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0

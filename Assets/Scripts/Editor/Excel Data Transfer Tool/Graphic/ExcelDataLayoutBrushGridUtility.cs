@@ -294,6 +294,9 @@ internal static class ExcelDataLayoutBrushGridUtility
         if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
             return cell.LiteralText ?? string.Empty;
 
+        if (cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula)
+            return ExcelDataFormulaExpressionUtility.BuildDisplayExpression(cell.FormulaExpression);
+
         ExcelDataFieldCatalogEntry entry = FindEntryById(allEntries,
                                                          cell.FieldBinding == null ? string.Empty : cell.FieldBinding.FieldId);
         if (entry != null && entry.IsConcreteListElement)
@@ -328,6 +331,10 @@ internal static class ExcelDataLayoutBrushGridUtility
 
         if (cell.ContentKind == ExcelDataWorkbookCellContentKind.LiteralText)
             return address + "\nLiteral Text | " + cell.Direction + "\n" + cell.LiteralText;
+
+        if (cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula)
+            return address + "\nFormula | Export\n" +
+                   ExcelDataFormulaExpressionUtility.BuildDisplayExpression(cell.FormulaExpression);
 
         ExcelDataFieldCatalogEntry entry = FindEntryById(allEntries,
                                                          cell.FieldBinding == null ? string.Empty : cell.FieldBinding.FieldId);

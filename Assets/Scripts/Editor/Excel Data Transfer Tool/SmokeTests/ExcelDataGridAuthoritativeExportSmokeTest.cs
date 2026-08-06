@@ -44,6 +44,7 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
         ExcelDataExportPreset exportPreset = ScriptableObject.CreateInstance<ExcelDataExportPreset>();
         ExcelDataImportPreset importPreset = ScriptableObject.CreateInstance<ExcelDataImportPreset>();
         ExcelDataBrushPalettePreset brushPreset = ScriptableObject.CreateInstance<ExcelDataBrushPalettePreset>();
+        ExcelDataWorkbookLayoutPreset restoredLayoutPreset = ScriptableObject.CreateInstance<ExcelDataWorkbookLayoutPreset>();
 
         ConfigureLayout(layoutPreset, brushPreset, numberEntry, booleanEntry, referenceEntry);
         masterPreset.AssignLinkedPresets(layoutPreset, brushPreset, importPreset, exportPreset);
@@ -55,6 +56,17 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
             ValidateVisibleSheet(result.WorkbookPath, expectedNumber, expectedBoolean, expectedReference);
             ValidateLayoutPresentation(result.WorkbookPath, true, true);
             ValidateTechnicalSheet(result);
+            ExcelDataWorkbookLayoutImportResult importResult =
+                ExcelDataWorkbookLayoutImportService.ImportLayoutSnapshot(restoredLayoutPreset, result.WorkbookPath);
+            ExcelDataWorkbookCellDefinition restoredFormula =
+                restoredLayoutPreset.SheetDefinitions[0].FindCell(1, 5);
+
+            if (!importResult.LayoutHashMatches ||
+                restoredFormula == null ||
+                restoredFormula.ContentKind != ExcelDataWorkbookCellContentKind.Formula ||
+                !string.Equals(restoredFormula.FormulaExpression, "=SUM(C2,1)", StringComparison.Ordinal))
+                throw new InvalidOperationException("Formula-aware v4 layout round-trip did not preserve the native expression.");
+
             ConfigureBrushColorExport(exportPreset, false, false);
             ExcelDataExportResult colorlessResult = ExcelDataExportService.ExportWorkbook(masterPreset, colorlessOutputPath);
             ValidateLayoutPresentation(colorlessResult.WorkbookPath, false, false);
@@ -67,6 +79,7 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
             ScriptableObject.DestroyImmediate(exportPreset);
             ScriptableObject.DestroyImmediate(importPreset);
             ScriptableObject.DestroyImmediate(brushPreset);
+            ScriptableObject.DestroyImmediate(restoredLayoutPreset);
         }
     }
     #endregion
@@ -99,6 +112,7 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
                         ExcelDataWorkbookSheetVisibility.Visible);
         sheet.Cells.Add(CreateLiteralCell(sheet.SheetId, 1, 1, "Player Label", presentationBrush.BrushId));
         sheet.Cells.Add(CreateLiteralCell(sheet.SheetId, 1, 4, "=A1", presentationBrush.BrushId));
+        sheet.Cells.Add(CreateFormulaCell(sheet.SheetId, 1, 5, "=SUM(C2,1)", presentationBrush.BrushId));
         layoutPreset.SheetDefinitions.Add(sheet);
         ExcelDataWorkbookLayoutAuthoringUtility.PaintDataFieldCell(layoutPreset,
                                                                   layoutPreset.ObjectsSheetName,
@@ -150,6 +164,26 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
                                   ExcelDataTransferDirection.Export,
                                   brushId,
                                   false);
+        return cell;
+    }
+
+    /// <summary>
+    /// Creates one export-only native formula cell.
+    /// </summary>
+    /// <param name="sheetId">Stable owner worksheet identifier.</param>
+    /// <param name="rowIndex">One-based workbook row.</param>
+    /// <param name="columnIndex">One-based workbook column.</param>
+    /// <param name="formulaExpression">Authored Excel expression.</param>
+    /// <param name="brushId">Stable exact presentation brush identifier.</param>
+    /// <returns>Configured formula cell.</returns>
+    private static ExcelDataWorkbookCellDefinition CreateFormulaCell(string sheetId,
+                                                                      int rowIndex,
+                                                                      int columnIndex,
+                                                                      string formulaExpression,
+                                                                      string brushId)
+    {
+        ExcelDataWorkbookCellDefinition cell = new ExcelDataWorkbookCellDefinition();
+        cell.ConfigureFormula(sheetId, rowIndex, columnIndex, formulaExpression, brushId);
         return cell;
     }
 
@@ -257,10 +291,13 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
         if (result == null || result.UserSheetCount != 1)
             throw new InvalidOperationException("Public export result did not report one user worksheet.");
 
-        if (result.AuthoredCellCount != 6 || result.WrittenCellCount != 5)
+        if (result.AuthoredCellCount != 7 || result.WrittenCellCount != 6)
             throw new InvalidOperationException("Public export result did not preserve authored and written cell counts.");
 
-        if (result.DataFieldCellCount != 4 || result.LiteralCellCount != 2 || result.ReferenceCellCount != 1)
+        if (result.DataFieldCellCount != 4 ||
+            result.LiteralCellCount != 2 ||
+            result.FormulaCellCount != 1 ||
+            result.ReferenceCellCount != 1)
             throw new InvalidOperationException("Public export result reported incorrect cell-kind counts.");
 
         if (result.WarningCount != 1 || result.Diagnostics.Count != 1)
@@ -271,7 +308,7 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
         if (diagnostic.SheetName != DataSheetName || diagnostic.RowIndex != 5 || diagnostic.ColumnIndex != 7)
             throw new InvalidOperationException("Public export warning lost its exact G5 coordinate.");
 
-        if (string.IsNullOrWhiteSpace(result.LayoutHash) || result.TechnicalRowCount != 9)
+        if (string.IsNullOrWhiteSpace(result.LayoutHash) || result.TechnicalRowCount != 10)
             throw new InvalidOperationException("Public export result is missing layout hash or technical row diagnostics.");
 
         FileInfo workbookFile = new FileInfo(result.WorkbookPath);
@@ -361,7 +398,27 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
                 throw new InvalidOperationException("User worksheet dimension is not the complete A1:H8 layout range.");
 
             XElement literalCell = FindCell(worksheet, "A1", spreadsheetNamespace);
+            XElement formulaCell = FindCell(worksheet, "E1", spreadsheetNamespace);
             XElement emptyCell = FindCell(worksheet, "H8", spreadsheetNamespace);
+            XElement formulaElement = formulaCell.Element(spreadsheetNamespace + "f");
+
+            if (formulaElement == null || formulaElement.Value != "SUM(C2,1)" ||
+                formulaCell.Attribute("t") != null)
+            {
+                throw new InvalidOperationException("Authored E1 formula was not exported as a native SpreadsheetML formula.");
+            }
+
+            XDocument workbook = ExcelDataOpenXmlPackageUtility.LoadXmlEntry(archive, "xl/workbook.xml");
+            XElement calculationProperties = workbook.Root.Element(spreadsheetNamespace + "calcPr");
+
+            if (calculationProperties == null ||
+                ReadAttribute(calculationProperties, "calcMode") != "auto" ||
+                ReadAttribute(calculationProperties, "fullCalcOnLoad") != "1" ||
+                ReadAttribute(calculationProperties, "forceFullCalc") != "1")
+            {
+                throw new InvalidOperationException("Formula-aware export did not request automatic full workbook recalculation.");
+            }
+
             XDocument styles = ExcelDataOpenXmlPackageUtility.LoadXmlEntry(archive, "xl/styles.xml");
             List<XElement> cellFormats = styles.Root.Element(spreadsheetNamespace + "cellXfs")
                                                       .Elements(spreadsheetNamespace + "xf")
@@ -539,10 +596,12 @@ public static class ExcelDataGridAuthoritativeExportSmokeTest
         AssertValue(ReadColumn(rows[1], "I"), result.LayoutHash, "technical layout hash");
         AssertValue(ReadColumn(rows[2], "A"), "Sheet", "technical sheet record");
 
-        if (string.IsNullOrWhiteSpace(Convert.ToString(ReadColumn(rows[7], "AP"), CultureInfo.InvariantCulture)))
+        AssertValue(ReadColumn(rows[5], "AS"), "=SUM(C2,1)", "technical formula expression");
+
+        if (string.IsNullOrWhiteSpace(Convert.ToString(ReadColumn(rows[8], "AP"), CultureInfo.InvariantCulture)))
             throw new InvalidOperationException("Reference cell technical record is missing its GUID.");
 
-        if (string.IsNullOrWhiteSpace(Convert.ToString(ReadColumn(rows[8], "AR"), CultureInfo.InvariantCulture)))
+        if (string.IsNullOrWhiteSpace(Convert.ToString(ReadColumn(rows[9], "AR"), CultureInfo.InvariantCulture)))
             throw new InvalidOperationException("Unresolved G5 technical record is missing its warning.");
     }
     #endregion

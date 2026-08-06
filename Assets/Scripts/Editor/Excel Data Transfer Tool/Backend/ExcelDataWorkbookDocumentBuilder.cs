@@ -137,7 +137,17 @@ internal static class ExcelDataWorkbookDocumentBuilder
                 continue;
 
             ExcelDataSerializedValueSnapshot snapshot = ResolveExportSnapshot(cell, fieldValueResolver);
-            sheet.SetValue(cell.RowIndex, cell.ColumnIndex, snapshot.Value);
+
+            if (cell.ContentKind == ExcelDataWorkbookCellContentKind.Formula &&
+                string.IsNullOrWhiteSpace(snapshot.Warning))
+            {
+                sheet.SetFormula(cell.RowIndex, cell.ColumnIndex, cell.FormulaExpression);
+            }
+            else
+            {
+                sheet.SetValue(cell.RowIndex, cell.ColumnIndex, snapshot.Value);
+            }
+
             result.RegisterCell(sheetDefinition, cell, snapshot);
         }
     }
@@ -170,6 +180,17 @@ internal static class ExcelDataWorkbookDocumentBuilder
         {
             case ExcelDataWorkbookCellContentKind.LiteralText:
                 return ExcelDataSerializedValueSnapshot.CreateValue(cell.LiteralText ?? string.Empty, string.Empty);
+            case ExcelDataWorkbookCellContentKind.Formula:
+                if (!ExcelDataFormulaExpressionUtility.TryNormalize(cell.FormulaExpression,
+                                                                    out string _,
+                                                                    out string warning))
+                {
+                    return ExcelDataSerializedValueSnapshot.CreateWarning(warning, string.Empty);
+                }
+
+                return ExcelDataSerializedValueSnapshot.CreateValue(
+                    ExcelDataFormulaExpressionUtility.BuildDisplayExpression(cell.FormulaExpression),
+                    string.Empty);
             case ExcelDataWorkbookCellContentKind.DataField:
                 if (cell.FieldBinding == null || !cell.FieldBinding.IsUsable())
                     return ExcelDataSerializedValueSnapshot.CreateWarning("Cell has no usable Data Field binding.", string.Empty);

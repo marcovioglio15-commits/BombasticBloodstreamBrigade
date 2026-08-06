@@ -46,6 +46,9 @@ public sealed class ExcelDataBrushTypeColorPalette
     [Tooltip("Fallback grid color for literal workbook labels painted with Text mode.")]
     [SerializeField] private Color literalText = new Color(0.82f, 0.72f, 0.32f, 1f);
 
+    [Tooltip("Fallback grid color for native Excel expressions painted with Formula mode.")]
+    [SerializeField] private Color formula = new Color(0.56f, 0.42f, 0.88f, 1f);
+
     [Tooltip("Fallback grid color for unresolved or unsupported field bindings that require attention.")]
     [SerializeField] private Color unresolved = new Color(0.55f, 0.20f, 0.20f, 1f);
     #endregion
@@ -58,6 +61,14 @@ public sealed class ExcelDataBrushTypeColorPalette
         get
         {
             return literalText;
+        }
+    }
+
+    public Color Formula
+    {
+        get
+        {
+            return formula;
         }
     }
 

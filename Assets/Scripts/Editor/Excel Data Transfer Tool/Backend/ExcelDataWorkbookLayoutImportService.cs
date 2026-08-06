@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 /// <summary>
-/// Restores complete grid-authoritative workbook layouts from the reserved v3 technical worksheet.
+/// Restores complete grid-authoritative workbook layouts from supported reserved technical worksheet schemas.
 /// </summary>
 internal static class ExcelDataWorkbookLayoutImportService
 {
@@ -28,7 +28,7 @@ internal static class ExcelDataWorkbookLayoutImportService
         ExcelDataWorkbookLayoutSnapshot snapshot = ExcelDataWorkbookLayoutSnapshotReader.Read(resolvedPath);
         ValidateSnapshot(snapshot);
         List<ExcelDataWorkbookSheetDefinition> restoredSheets = BuildRestoredSheets(snapshot);
-        string restoredHash = CalculateRestoredHash(restoredSheets);
+        string restoredHash = CalculateRestoredHash(restoredSheets, snapshot.SchemaVersion);
 
         if (!string.Equals(restoredHash, snapshot.LayoutHash, StringComparison.Ordinal))
             throw new InvalidOperationException("Workbook layout snapshot hash does not match its reconstructed content. The layout preset was not modified.");
@@ -71,12 +71,11 @@ internal static class ExcelDataWorkbookLayoutImportService
         if (!snapshot.WorkbookRecordFound)
             throw new InvalidOperationException("Workbook technical worksheet has no Workbook identity record.");
 
-        if (!string.Equals(snapshot.SchemaVersion,
-                           ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion,
-                           StringComparison.Ordinal))
+        if (!IsSupportedSchemaVersion(snapshot.SchemaVersion))
             throw new InvalidOperationException("Workbook layout schema " + snapshot.SchemaVersion +
-                                                " is not supported. Expected " +
-                                                ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion + ".");
+                                                 " is not supported. Expected " +
+                                                 ExcelDataWorkbookTechnicalSheetBuilder.LegacySchemaVersion + " or " +
+                                                 ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion + ".");
 
         if (snapshot.Sheets.Count <= 0)
             throw new InvalidOperationException("Workbook technical worksheet contains no authored Sheet records.");
@@ -86,6 +85,21 @@ internal static class ExcelDataWorkbookLayoutImportService
 
         if (string.IsNullOrWhiteSpace(snapshot.LayoutHash))
             throw new InvalidOperationException("Workbook technical worksheet contains no deterministic layout hash.");
+    }
+
+    /// <summary>
+    /// Reports whether one workbook schema can be restored without losing authored layout semantics.
+    /// </summary>
+    /// <param name="schemaVersion">Technical workbook schema identifier.</param>
+    /// <returns>True for legacy v3 scalar layouts and current v4 formula-aware layouts.</returns>
+    private static bool IsSupportedSchemaVersion(string schemaVersion)
+    {
+        return string.Equals(schemaVersion,
+                             ExcelDataWorkbookTechnicalSheetBuilder.LegacySchemaVersion,
+                             StringComparison.Ordinal) ||
+               string.Equals(schemaVersion,
+                             ExcelDataWorkbookTechnicalSheetBuilder.SchemaVersion,
+                             StringComparison.Ordinal);
     }
     #endregion
 
@@ -142,7 +156,7 @@ internal static class ExcelDataWorkbookLayoutImportService
     }
 
     /// <summary>
-    /// Recreates one Data Field or Literal Text cell from complete technical metadata.
+    /// Recreates one Data Field, Literal Text or Formula cell from complete technical metadata.
     /// </summary>
     /// <param name="sourceCell">Parsed cell snapshot.</param>
     /// <param name="sheetId">Validated owner worksheet identifier.</param>
@@ -162,6 +176,20 @@ internal static class ExcelDataWorkbookLayoutImportService
                                           sourceCell.Direction,
                                           sourceCell.BrushId,
                                           sourceCell.ValidateLiteralDuringImport);
+                return cell;
+            case ExcelDataWorkbookCellContentKind.Formula:
+                if (!ExcelDataFormulaExpressionUtility.TryNormalize(sourceCell.FormulaExpression,
+                                                                    out string _,
+                                                                    out string warning))
+                {
+                    throw new InvalidOperationException("Technical Formula cell is invalid: " + warning);
+                }
+
+                cell.ConfigureFormula(sheetId,
+                                      sourceCell.RowIndex,
+                                      sourceCell.ColumnIndex,
+                                      sourceCell.FormulaExpression,
+                                      sourceCell.BrushId);
                 return cell;
             case ExcelDataWorkbookCellContentKind.DataField:
                 if (string.IsNullOrWhiteSpace(sourceCell.FieldId))
@@ -249,15 +277,20 @@ internal static class ExcelDataWorkbookLayoutImportService
     /// Calculates the reconstructed hash on a transient owner without touching the selected project asset.
     /// </summary>
     /// <param name="restoredSheets">Detached restored worksheet definitions.</param>
+    /// <param name="snapshotSchemaVersion">Technical schema that authored the stored layout hash.</param>
     /// <returns>Deterministic reconstructed layout hash.</returns>
-    private static string CalculateRestoredHash(List<ExcelDataWorkbookSheetDefinition> restoredSheets)
+    private static string CalculateRestoredHash(List<ExcelDataWorkbookSheetDefinition> restoredSheets,
+                                                string snapshotSchemaVersion)
     {
         ExcelDataWorkbookLayoutPreset transientLayout = ScriptableObject.CreateInstance<ExcelDataWorkbookLayoutPreset>();
 
         try
         {
             transientLayout.SheetDefinitions.AddRange(restoredSheets);
-            return ExcelDataWorkbookLayoutHashUtility.Calculate(transientLayout);
+            bool includeFormulaExpression = !string.Equals(snapshotSchemaVersion,
+                                                           ExcelDataWorkbookTechnicalSheetBuilder.LegacySchemaVersion,
+                                                           StringComparison.Ordinal);
+            return ExcelDataWorkbookLayoutHashUtility.Calculate(transientLayout, includeFormulaExpression);
         }
         finally
         {
@@ -291,7 +324,7 @@ internal sealed class ExcelDataWorkbookLayoutImportResult
     /// </summary>
     /// <param name="workbookPath">Workbook path read during restoration.</param>
     /// <param name="importedSheetCount">Authoritative worksheets restored.</param>
-    /// <param name="importedCellCount">Exact Data Field and Literal Text cells restored.</param>
+    /// <param name="importedCellCount">Exact Data Field, Literal Text and Formula cells restored.</param>
     /// <param name="layoutHashMatches">True when reconstructed and workbook hashes match.</param>
     /// <param name="layoutHash">Validated deterministic layout hash.</param>
     public ExcelDataWorkbookLayoutImportResult(string workbookPath,

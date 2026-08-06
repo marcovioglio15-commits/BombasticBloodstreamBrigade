@@ -5,7 +5,7 @@ using Unity.Scenes;
 /// <summary>
 /// Filters gameplay queries through exact active room section handles so duplicate templates remain unambiguous.
 /// </summary>
-internal static class GameProceduralRoomInstanceQueryUtility
+public static class GameProceduralRoomInstanceQueryUtility
 {
     #region Methods
 
@@ -35,9 +35,9 @@ internal static class GameProceduralRoomInstanceQueryUtility
     /// <param name="instance">Exact room instance whose section handles constrain the query.</param>
     /// <param name="query">Query that includes SceneTag and the required room components.</param>
     /// <param name="destination">Temporary entity list receiving exact instance matches.</param>
-    public static void CollectRoomInstanceEntities(GameProceduralRoomStreamInstance instance,
-                                                   EntityQuery query,
-                                                   ref NativeList<Entity> destination)
+    internal static void CollectRoomInstanceEntities(GameProceduralRoomStreamInstance instance,
+                                                      EntityQuery query,
+                                                      ref NativeList<Entity> destination)
     {
         destination.Clear();
 

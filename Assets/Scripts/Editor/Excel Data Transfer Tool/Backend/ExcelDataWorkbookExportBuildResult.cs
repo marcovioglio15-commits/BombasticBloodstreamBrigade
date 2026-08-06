@@ -44,6 +44,12 @@ internal sealed class ExcelDataWorkbookExportBuildResult
         private set;
     }
 
+    public int FormulaCellCount
+    {
+        get;
+        private set;
+    }
+
     public int ReferenceCellCount
     {
         get;
@@ -109,6 +115,9 @@ internal sealed class ExcelDataWorkbookExportBuildResult
                 break;
             case ExcelDataWorkbookCellContentKind.LiteralText:
                 LiteralCellCount++;
+                break;
+            case ExcelDataWorkbookCellContentKind.Formula:
+                FormulaCellCount++;
                 break;
         }
 

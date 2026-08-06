@@ -85,21 +85,25 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     /// <summary>
     /// Resolves the complete player-facing transition policy from one cached singleton read. Gameplay remains blocked
     /// until completion, while live movement and look can resume once a procedural destination enters its stable
-    /// fade-in phase. Optional spatial dual-slot traversal remains live for its complete transaction.
+    /// fade-in phase. Room traversal also permits player combat in that safe phase, and optional spatial dual-slot
+    /// traversal keeps both channels live for its complete transaction.
     /// </summary>
     /// <param name="isSceneTransitioning">True while Scene Management owns an active transition.</param>
     /// <param name="shouldBlockGameplay">True while shooting, tools and other mutable gameplay must remain paused.</param>
     /// <param name="allowsLiveMotion">True when current movement and look samples can safely affect the ready player.</param>
+    /// <param name="allowsLiveCombat">True when room traversal can safely consume current player shooting input.</param>
     /// <param name="requiresStableMotionRelease">True during procedural FadeIn, whose first frame must discard the
     /// current sample so a load-frame delta cannot become visible player displacement.</param>
     public static void ResolveDefaultWorldPlayerPolicy(out bool isSceneTransitioning,
                                                        out bool shouldBlockGameplay,
                                                        out bool allowsLiveMotion,
+                                                       out bool allowsLiveCombat,
                                                        out bool requiresStableMotionRelease)
     {
         isSceneTransitioning = false;
         shouldBlockGameplay = false;
         allowsLiveMotion = false;
+        allowsLiveCombat = false;
         requiresStableMotionRelease = false;
 
         if (!TryGetDefaultTransitionState(out GameSceneTransitionState transitionState))
@@ -114,6 +118,8 @@ internal static class GameSceneTransitionRuntimeGuardUtility
         requiresStableMotionRelease = IsStableProceduralFadeIn(transitionState);
         allowsLiveMotion = requiresStableMotionRelease ||
                            IsContinuousPlayerTraversal(transitionState);
+        allowsLiveCombat = allowsLiveMotion &&
+                           transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
     }
 
     /// <summary>

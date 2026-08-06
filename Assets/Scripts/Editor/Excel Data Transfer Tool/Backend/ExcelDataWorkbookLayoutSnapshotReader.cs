@@ -115,6 +115,7 @@ internal static class ExcelDataWorkbookLayoutSnapshotReader
                                                        ReadText(row, "AJ"),
                                                        ReadBool(row, "AK"),
                                                        ReadText(row, "AL"),
+                                                       ReadText(row, "AS"),
                                                        DecodeIndices(ReadText(row, "AM")),
                                                        DecodeKeys(ReadText(row, "AN")));
     }

@@ -30,11 +30,14 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     private static PlayerMovementState baselineMovementState;
     private static PlayerLookState baselineLookState;
     private static float3 baselineCameraPosition;
+    private static quaternion arrivalFacingReference;
     private static float3 previousPosition;
     private static quaternion previousRotation;
     private static float maximumFadeInFrameDisplacement;
     private static float maximumFadeInFrameRotation;
     private static int baselineVisualInstanceId;
+    private static bool arrivalFacingPolicyResolved;
+    private static bool arrivalFacingValidated;
     private static bool hasBaseline;
     private static bool hasBaselineCamera;
     private static bool hasMovementState;
@@ -44,6 +47,7 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     private static bool sawLiveInput;
     private static bool sawLiveLook;
     private static bool sawMotionDuringFadeIn;
+    private static bool shouldValidateArrivalFacing;
     private static bool awaitingRestoredPresentationFrame;
     #endregion
 
@@ -91,6 +95,20 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
             return false;
         }
 
+        LocalTransform transform = entityManager.GetComponentData<LocalTransform>(playerEntity);
+
+        // Single-slot traversal must relocate only position. Capture facing before the destructive replacement so the
+        // first ready destination frame can reject any portal-authored rotation snap.
+        if (transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal &&
+            !arrivalFacingPolicyResolved)
+        {
+            shouldValidateArrivalFacing = ShouldValidateArrivalFacing(entityManager);
+            arrivalFacingPolicyResolved = true;
+
+            if (shouldValidateArrivalFacing)
+                arrivalFacingReference = transform.Rotation;
+        }
+
         PlayerInputState inputState = entityManager.GetComponentData<PlayerInputState>(playerEntity);
 
         if (transitionState.Phase != GameSceneTransitionPhase.FadeIn)
@@ -103,7 +121,19 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
             return false;
         }
 
-        LocalTransform transform = entityManager.GetComponentData<LocalTransform>(playerEntity);
+        if (shouldValidateArrivalFacing && !arrivalFacingValidated)
+        {
+            float arrivalRotation = ResolveRotationDeltaDegrees(arrivalFacingReference, transform.Rotation);
+
+            if (arrivalRotation > maximumAcceptedFrameRotationDegrees)
+            {
+                failure = cycle + " snapped player facing by " + arrivalRotation.ToString("0.###") +
+                          " degrees while applying the destination entrance position.";
+                return false;
+            }
+
+            arrivalFacingValidated = true;
+        }
 
         if (!hasBaseline)
             CaptureBaseline(entityManager, playerEntity, transform);
@@ -185,6 +215,12 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
             return false;
         }
 
+        if (shouldValidateArrivalFacing && !arrivalFacingValidated)
+        {
+            failure = cycle + " did not validate preserved facing after destination relocation.";
+            return false;
+        }
+
         if (maximumFadeInFrameDisplacement > maximumAcceptedFrameDisplacement)
         {
             failure = cycle + " moved " + maximumFadeInFrameDisplacement.ToString("0.###") +
@@ -253,7 +289,7 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     /// </summary>
     /// <param name="entityManager">Entity manager owning the player state.</param>
     /// <param name="playerEntity">Unique player receiving the probe input.</param>
-    /// <param name="transform">Current authored arrival transform.</param>
+    /// <param name="transform">Current post-arrival transform preserved before synthetic FadeIn motion.</param>
     private static void CaptureBaseline(EntityManager entityManager,
                                         Entity playerEntity,
                                         LocalTransform transform)
@@ -330,11 +366,14 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
         baselineMovementState = default;
         baselineLookState = default;
         baselineCameraPosition = float3.zero;
+        arrivalFacingReference = quaternion.identity;
         previousPosition = float3.zero;
         previousRotation = quaternion.identity;
         maximumFadeInFrameDisplacement = 0f;
         maximumFadeInFrameRotation = 0f;
         baselineVisualInstanceId = 0;
+        arrivalFacingPolicyResolved = false;
+        arrivalFacingValidated = false;
         hasBaseline = false;
         hasBaselineCamera = false;
         hasMovementState = false;
@@ -344,6 +383,7 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
         sawLiveInput = false;
         sawLiveLook = false;
         sawMotionDuringFadeIn = false;
+        shouldValidateArrivalFacing = false;
         awaitingRestoredPresentationFrame = false;
     }
     #endregion
@@ -391,6 +431,38 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
 
         failure = cycle + " reconstructed the managed player visual during room replacement.";
         return false;
+    }
+    #endregion
+
+    #region Transition Policy
+    /// <summary>
+    /// Resolves whether the active procedural configuration relocates the player instead of spatially aligning rooms.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning the unique procedural configuration.</param>
+    /// <returns>True when single-slot relocation must preserve the pre-transition facing direction.</returns>
+    private static bool ShouldValidateArrivalFacing(EntityManager entityManager)
+    {
+        EntityQuery configQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<GameProceduralLevelConfig>());
+
+        try
+        {
+            if (configQuery.CalculateEntityCount() != 1)
+                return false;
+
+            GameProceduralLevelConfig config = configQuery.GetSingleton<GameProceduralLevelConfig>();
+
+            switch (config.RoomStreamingMode)
+            {
+                case GameProceduralRoomStreamingMode.TransactionalDualSlot:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        finally
+        {
+            configQuery.Dispose();
+        }
     }
     #endregion
 

@@ -180,7 +180,7 @@ internal sealed class ExcelDataWorkbookLayoutSheetSnapshot
 }
 
 /// <summary>
-/// Stores one exact Data Field or Literal Text cell read from technical metadata.
+/// Stores one exact Data Field, Literal Text or Formula cell read from technical metadata.
 /// </summary>
 internal sealed class ExcelDataWorkbookLayoutCellSnapshot
 {
@@ -202,6 +202,7 @@ internal sealed class ExcelDataWorkbookLayoutCellSnapshot
     public string NumberFormat { get; }
     public bool ValidateLiteralDuringImport { get; }
     public string LiteralText { get; }
+    public string FormulaExpression { get; }
     public IReadOnlyList<int> ConcreteListIndices { get; }
     public IReadOnlyList<string> StableListKeys { get; }
     #endregion
@@ -215,7 +216,7 @@ internal sealed class ExcelDataWorkbookLayoutCellSnapshot
     /// <param name="sheetId">Stable owner worksheet identifier.</param>
     /// <param name="rowIndex">One-based worksheet row.</param>
     /// <param name="columnIndex">One-based worksheet column.</param>
-    /// <param name="contentKind">Data Field or Literal Text payload kind.</param>
+    /// <param name="contentKind">Data Field, Literal Text or Formula payload kind.</param>
     /// <param name="direction">Allowed transfer directions.</param>
     /// <param name="fieldId">Stable catalog field identifier.</param>
     /// <param name="domain">Management domain owning the field.</param>
@@ -229,6 +230,7 @@ internal sealed class ExcelDataWorkbookLayoutCellSnapshot
     /// <param name="numberFormat">Optional Excel number format.</param>
     /// <param name="validateLiteralDuringImport">True when import validates literal text.</param>
     /// <param name="literalText">Exact authored literal text.</param>
+    /// <param name="formulaExpression">Exact authored Excel formula expression.</param>
     /// <param name="concreteListIndices">Concrete zero-based list indexes.</param>
     /// <param name="stableListKeys">Stable list element keys.</param>
     public ExcelDataWorkbookLayoutCellSnapshot(string sheetId,
@@ -248,6 +250,7 @@ internal sealed class ExcelDataWorkbookLayoutCellSnapshot
                                                string numberFormat,
                                                bool validateLiteralDuringImport,
                                                string literalText,
+                                               string formulaExpression,
                                                IReadOnlyList<int> concreteListIndices,
                                                IReadOnlyList<string> stableListKeys)
     {
@@ -268,6 +271,7 @@ internal sealed class ExcelDataWorkbookLayoutCellSnapshot
         NumberFormat = numberFormat;
         ValidateLiteralDuringImport = validateLiteralDuringImport;
         LiteralText = literalText;
+        FormulaExpression = formulaExpression;
         ConcreteListIndices = concreteListIndices ?? new List<int>();
         StableListKeys = stableListKeys ?? new List<string>();
     }

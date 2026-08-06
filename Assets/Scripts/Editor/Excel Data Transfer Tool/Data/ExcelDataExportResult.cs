@@ -37,6 +37,11 @@ public sealed class ExcelDataExportResult
         get;
     }
 
+    public int FormulaCellCount
+    {
+        get;
+    }
+
     public int ReferenceCellCount
     {
         get;
@@ -75,6 +80,7 @@ public sealed class ExcelDataExportResult
     /// <param name="writtenCellCount">Number of authored cells that produced non-null workbook values.</param>
     /// <param name="dataFieldCellCount">Number of authored Data Field cells.</param>
     /// <param name="literalCellCount">Number of authored Literal Text cells.</param>
+    /// <param name="formulaCellCount">Number of authored native Excel Formula cells.</param>
     /// <param name="referenceCellCount">Number of Data Field cells targeting object references.</param>
     /// <param name="warningCount">Number of cell-local export warnings.</param>
     /// <param name="technicalRowCount">Technical worksheet rows including its header.</param>
@@ -86,6 +92,7 @@ public sealed class ExcelDataExportResult
                                  int writtenCellCount,
                                  int dataFieldCellCount,
                                  int literalCellCount,
+                                 int formulaCellCount,
                                  int referenceCellCount,
                                  int warningCount,
                                  int technicalRowCount,
@@ -98,6 +105,7 @@ public sealed class ExcelDataExportResult
         WrittenCellCount = writtenCellCount;
         DataFieldCellCount = dataFieldCellCount;
         LiteralCellCount = literalCellCount;
+        FormulaCellCount = formulaCellCount;
         ReferenceCellCount = referenceCellCount;
         WarningCount = warningCount;
         TechnicalRowCount = technicalRowCount;
@@ -118,6 +126,7 @@ public sealed class ExcelDataExportResult
                " cells across " + UserSheetCount.ToString(CultureInfo.InvariantCulture) +
                " user sheets. Data: " + DataFieldCellCount.ToString(CultureInfo.InvariantCulture) +
                ", literals: " + LiteralCellCount.ToString(CultureInfo.InvariantCulture) +
+               ", formulas: " + FormulaCellCount.ToString(CultureInfo.InvariantCulture) +
                ", references: " + ReferenceCellCount.ToString(CultureInfo.InvariantCulture) +
                ", warnings: " + WarningCount.ToString(CultureInfo.InvariantCulture) +
                ". Path: " + WorkbookPath;

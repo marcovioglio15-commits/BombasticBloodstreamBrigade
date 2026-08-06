@@ -99,6 +99,8 @@ internal sealed class ExcelDataWorkbookSheetDocument
     private readonly object[,] values;
     private readonly Color32?[,] backgroundColors;
     private readonly Color32?[,] textColors;
+    private readonly List<ExcelDataWorkbookFormulaDocumentCell> formulaCells =
+        new List<ExcelDataWorkbookFormulaDocumentCell>();
     #endregion
 
     #region Properties
@@ -135,6 +137,14 @@ internal sealed class ExcelDataWorkbookSheetDocument
     public bool FormatLayoutGrid
     {
         get;
+    }
+
+    public IReadOnlyList<ExcelDataWorkbookFormulaDocumentCell> FormulaCells
+    {
+        get
+        {
+            return formulaCells;
+        }
     }
     #endregion
 
@@ -183,6 +193,29 @@ internal sealed class ExcelDataWorkbookSheetDocument
     {
         ValidateCoordinate(rowIndex, columnIndex);
         values[rowIndex - 1, columnIndex - 1] = value;
+    }
+
+    /// <summary>
+    /// Writes one native Excel formula placeholder and records its normalized SpreadsheetML expression.
+    /// </summary>
+    /// <param name="rowIndex">One-based Excel row index.</param>
+    /// <param name="columnIndex">One-based Excel column index.</param>
+    /// <param name="formulaExpression">Authored expression with an optional leading equals sign.</param>
+    public void SetFormula(int rowIndex, int columnIndex, string formulaExpression)
+    {
+        ValidateCoordinate(rowIndex, columnIndex);
+
+        if (!ExcelDataFormulaExpressionUtility.TryNormalize(formulaExpression,
+                                                            out string normalizedExpression,
+                                                            out string warning))
+        {
+            throw new ArgumentException(warning, nameof(formulaExpression));
+        }
+
+        values[rowIndex - 1, columnIndex - 1] = "=" + normalizedExpression;
+        formulaCells.Add(new ExcelDataWorkbookFormulaDocumentCell(rowIndex,
+                                                                  columnIndex,
+                                                                  normalizedExpression));
     }
 
     /// <summary>
@@ -281,6 +314,39 @@ internal sealed class ExcelDataWorkbookSheetDocument
 
         if (columnIndex < 1 || columnIndex > ColumnCount)
             throw new ArgumentOutOfRangeException(nameof(columnIndex), columnIndex, "Workbook column is outside the sheet matrix.");
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Identifies one normalized formula payload inside a fixed worksheet document.
+/// </summary>
+internal readonly struct ExcelDataWorkbookFormulaDocumentCell
+{
+    #region Properties
+    public int RowIndex { get; }
+    public int ColumnIndex { get; }
+    public string Expression { get; }
+    #endregion
+
+    #region Methods
+
+    #region Constructors
+    /// <summary>
+    /// Creates one immutable formula coordinate consumed by the OpenXML post-processor.
+    /// </summary>
+    /// <param name="rowIndex">One-based worksheet row.</param>
+    /// <param name="columnIndex">One-based worksheet column.</param>
+    /// <param name="expression">Normalized formula expression without a leading equals sign.</param>
+    public ExcelDataWorkbookFormulaDocumentCell(int rowIndex,
+                                                int columnIndex,
+                                                string expression)
+    {
+        RowIndex = rowIndex;
+        ColumnIndex = columnIndex;
+        Expression = expression;
     }
     #endregion
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Scenes;
 using UnityEngine;
 
 /// <summary>
@@ -44,7 +45,8 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                      typeof(PlayerPowerUpsState),
                                      typeof(PlayerScalableStatElement));
         portalQuery = GetEntityQuery(typeof(GameRoomPortal),
-                                     typeof(GameRoomPortalRuntimeState));
+                                     typeof(GameRoomPortalRuntimeState),
+                                     typeof(SceneTag));
         portalQuery.SetChangedVersionFilter(typeof(GameRoomPortalRuntimeState));
     }
 
@@ -88,104 +90,119 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
         if (requiresFullRefresh)
             portalQuery.ResetFilter();
 
-        using NativeArray<Entity> portalEntities =
-            portalQuery.ToEntityArray(Allocator.Temp);
+        NativeList<Entity> portalEntities = new NativeList<Entity>(Allocator.Temp);
 
-        if (requiresFullRefresh)
-            portalQuery.SetChangedVersionFilter(typeof(GameRoomPortalRuntimeState));
-
-        if (graphChanged || roomChanged)
-            GameRoomPortalRewardLogAnchor.HideAll();
-
-        if (portalEntities.Length == 0)
-            return;
-
-        DynamicBuffer<GameProceduralRoomNodeElement> nodes =
-            EntityManager.GetBuffer<GameProceduralRoomNodeElement>(managerEntity, true);
-        DynamicBuffer<GameProceduralRoomEdgeElement> edges =
-            EntityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity, true);
-        DynamicBuffer<GameRoomRewardTileBindingElement> tileBindings =
-            EntityManager.GetBuffer<GameRoomRewardTileBindingElement>(managerEntity, true);
-        DynamicBuffer<GameRoomRewardDefinitionElement> rewards =
-            EntityManager.GetBuffer<GameRoomRewardDefinitionElement>(managerEntity, true);
-        DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindings =
-            EntityManager.GetBuffer<GameRoomRewardModuleBindingElement>(managerEntity, true);
-        DynamicBuffer<GameRoomRewardModuleElement> modules =
-            EntityManager.GetBuffer<GameRoomRewardModuleElement>(managerEntity, true);
-        DynamicBuffer<GameRoomRewardPresentationElement> mappings =
-            EntityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity, true);
-        DynamicBuffer<PlayerScalableStatElement> scalableStats =
-            EntityManager.GetBuffer<PlayerScalableStatElement>(playerEntity, true);
-        PlayerHealth health =
-            EntityManager.GetComponentData<PlayerHealth>(playerEntity);
-        PlayerExperience experience =
-            EntityManager.GetComponentData<PlayerExperience>(playerEntity);
-        PlayerPowerUpsState powerUpsState =
-            EntityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
-
-        // Each changed portal resolves its assigned edge once and rebuilds only when its signature differs.
-        for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
+        try
         {
-            Entity portalEntity = portalEntities[portalIndex];
-            GameRoomPortal portal = EntityManager.GetComponentData<GameRoomPortal>(portalEntity);
-            GameRoomPortalRuntimeState portalState =
-                EntityManager.GetComponentData<GameRoomPortalRuntimeState>(portalEntity);
-
-            if (!GameRoomPortalRewardLogAnchor.TryResolve(portal.PortalId,
-                                                              portal.Center,
-                                                              out GameRoomPortalRewardLogView view))
+            try
             {
-                continue;
+                // Restrict presentation ownership to the exact active room while staged and retired instances remain resident.
+                GameProceduralRoomInstanceQueryUtility.CollectActiveRoomEntities(portalQuery,
+                                                                                  ref portalEntities);
+            }
+            finally
+            {
+                // The shared-component collector resets query filters after visiting the active instance sections.
+                portalQuery.SetChangedVersionFilter(typeof(GameRoomPortalRuntimeState));
             }
 
-            if (view == null)
-                continue;
+            if (graphChanged || roomChanged)
+                GameRoomPortalRewardLogAnchor.HideAll();
 
-            if (portalState.AssignedEdgeIndex < 0 ||
-                portalState.TraversalEnabled == 0)
+            if (portalEntities.Length == 0)
+                return;
+
+            DynamicBuffer<GameProceduralRoomNodeElement> nodes =
+                EntityManager.GetBuffer<GameProceduralRoomNodeElement>(managerEntity, true);
+            DynamicBuffer<GameProceduralRoomEdgeElement> edges =
+                EntityManager.GetBuffer<GameProceduralRoomEdgeElement>(managerEntity, true);
+            DynamicBuffer<GameRoomRewardTileBindingElement> tileBindings =
+                EntityManager.GetBuffer<GameRoomRewardTileBindingElement>(managerEntity, true);
+            DynamicBuffer<GameRoomRewardDefinitionElement> rewards =
+                EntityManager.GetBuffer<GameRoomRewardDefinitionElement>(managerEntity, true);
+            DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindings =
+                EntityManager.GetBuffer<GameRoomRewardModuleBindingElement>(managerEntity, true);
+            DynamicBuffer<GameRoomRewardModuleElement> modules =
+                EntityManager.GetBuffer<GameRoomRewardModuleElement>(managerEntity, true);
+            DynamicBuffer<GameRoomRewardPresentationElement> mappings =
+                EntityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity, true);
+            DynamicBuffer<PlayerScalableStatElement> scalableStats =
+                EntityManager.GetBuffer<PlayerScalableStatElement>(playerEntity, true);
+            PlayerHealth health =
+                EntityManager.GetComponentData<PlayerHealth>(playerEntity);
+            PlayerExperience experience =
+                EntityManager.GetComponentData<PlayerExperience>(playerEntity);
+            PlayerPowerUpsState powerUpsState =
+                EntityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+
+            // Each changed active portal resolves its assigned edge once and rebuilds only when its signature differs.
+            for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
             {
-                view.Hide();
-                continue;
+                Entity portalEntity = portalEntities[portalIndex];
+                GameRoomPortal portal = EntityManager.GetComponentData<GameRoomPortal>(portalEntity);
+                GameRoomPortalRuntimeState portalState =
+                    EntityManager.GetComponentData<GameRoomPortalRuntimeState>(portalEntity);
+
+                if (!GameRoomPortalRewardLogAnchor.TryResolve(portal.PortalId,
+                                                               portal.Center,
+                                                               out GameRoomPortalRewardLogView view))
+                {
+                    continue;
+                }
+
+                if (view == null)
+                    continue;
+
+                if (portalState.AssignedEdgeIndex < 0 ||
+                    portalState.TraversalEnabled == 0)
+                {
+                    view.Hide();
+                    continue;
+                }
+
+                int signature = BuildSignature(runtimeState.GenerationVersion,
+                                               portalState.AssignedEdgeIndex,
+                                               portal.PortalId.GetHashCode());
+
+                if (!view.NeedsRebuild(signature))
+                    continue;
+
+                if (!TryResolveDestinationTileIndex(portalState.AssignedEdgeIndex,
+                                                    edges,
+                                                    nodes,
+                                                    out int tileIndex))
+                {
+                    view.Hide();
+                    continue;
+                }
+
+                BuildDestinationItems(tileIndex,
+                                      tileBindings,
+                                      rewards,
+                                      moduleBindings,
+                                      modules,
+                                      mappings,
+                                      scalableStats,
+                                      in health,
+                                      in experience,
+                                      in powerUpsState);
+
+                if (formattedItems.Count == 0)
+                {
+                    view.Hide();
+                    continue;
+                }
+
+                float3 center = portal.Center;
+                view.Rebuild(signature,
+                             formattedItems,
+                             new Vector3(center.x, center.y, center.z),
+                             in config);
             }
-
-            int signature = BuildSignature(runtimeState.GenerationVersion,
-                                           portalState.AssignedEdgeIndex,
-                                           portal.PortalId.GetHashCode());
-
-            if (!view.NeedsRebuild(signature))
-                continue;
-
-            if (!TryResolveDestinationTileIndex(portalState.AssignedEdgeIndex,
-                                                edges,
-                                                nodes,
-                                                out int tileIndex))
-            {
-                view.Hide();
-                continue;
-            }
-
-            BuildDestinationItems(tileIndex,
-                                  tileBindings,
-                                  rewards,
-                                  moduleBindings,
-                                  modules,
-                                  mappings,
-                                  scalableStats,
-                                  in health,
-                                  in experience,
-                                  in powerUpsState);
-
-            if (formattedItems.Count == 0)
-            {
-                view.Hide();
-                continue;
-            }
-
-            float3 center = portal.Center;
-            view.Rebuild(signature,
-                         formattedItems,
-                         new Vector3(center.x, center.y, center.z),
-                         in config);
+        }
+        finally
+        {
+            portalEntities.Dispose();
         }
     }
     #endregion
