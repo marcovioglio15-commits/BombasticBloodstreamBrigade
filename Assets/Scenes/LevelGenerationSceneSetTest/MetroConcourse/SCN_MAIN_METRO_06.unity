@@ -223,7 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Scenes::Unity.Scenes.SubScene
   _SceneAsset: {fileID: 102900000, guid: cf591a8442a973d4ba4401663e71ad87, type: 3}
   _HierarchyColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  AutoLoadScene: 1
+  AutoLoadScene: 0
   _SceneGUID:
     Value:
       x: 1218549244
