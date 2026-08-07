@@ -533,10 +533,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2124340502}
     m_Modifications:
-    - target: {fileID: 4708883588253899702, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
-      propertyPath: portalId
-      value: MAIN_METRO_05_EAST
-      objectReference: {fileID: 0}
     - target: {fileID: 1810322350805213233, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: m_Size.z
       value: 7
@@ -544,6 +540,10 @@ PrefabInstance:
     - target: {fileID: 4708883588253899702, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: portalId
       value: MAIN_METRO_05_EAST
+      objectReference: {fileID: 0}
+    - target: {fileID: 5098296206624047734, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
+      propertyPath: m_Name
+      value: Portal 01 - East - Both
       objectReference: {fileID: 0}
     - target: {fileID: 5756951345904279326, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -584,10 +584,6 @@ PrefabInstance:
     - target: {fileID: 5756951345904279326, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5098296206624047734, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
-      propertyPath: m_Name
-      value: Portal 01 - East - Both
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -732,7 +728,7 @@ PrefabInstance:
     - target: {fileID: 4734330562549475671, guid: 978e25ced641faa4a9bf0741ce473379, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: b6f2f7e3b15aa644897fd4f0d769bc26, type: 2}
+      objectReference: {fileID: 11400000, guid: a8189701080ab82449f075173ee24b27, type: 2}
     - target: {fileID: 4734330562549475671, guid: 978e25ced641faa4a9bf0741ce473379, type: 3}
       propertyPath: originOffset.x
       value: 7.5
@@ -988,6 +984,10 @@ PrefabInstance:
       propertyPath: m_Size.x
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 5831338050305197742, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
+      propertyPath: m_Size.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6989469530866898618, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
       propertyPath: m_Name
       value: Portal 01 - North - Both
@@ -1031,14 +1031,6 @@ PrefabInstance:
     - target: {fileID: 7485585004825855111, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5831338050305197742, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
-      propertyPath: m_Size.x
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 5831338050305197742, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
-      propertyPath: m_Size.z
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7720009711717620977, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
       propertyPath: portalId
