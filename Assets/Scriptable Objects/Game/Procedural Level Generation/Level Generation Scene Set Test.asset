@@ -200,7 +200,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: 1f287f4aba844fe3afb3bc26eb8e8900
       tileId: TILE_METRO_04_SW
       sceneId: SCN_MAIN_METRO_04_SW
@@ -211,7 +220,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: 390f7f0bb072423082bc959a385f264b
       tileId: TILE_METRO_04_NE
       sceneId: SCN_MAIN_METRO_04_NE
@@ -222,7 +240,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: eef58451fdfa4c97a77030d38243d89b
       tileId: TILE_METRO_04_NW
       sceneId: SCN_MAIN_METRO_04_NW
@@ -233,7 +260,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: ef1bef56293b48f797d66e03259fe688
       tileId: TILE_METRO_05
       sceneId: SCN_MAIN_METRO_05
@@ -244,7 +280,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: 9bed4dbdc3964846999b06d1a0bd79cf
       tileId: TILE_METRO_06
       sceneId: SCN_MAIN_METRO_06
@@ -255,7 +300,16 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: 1ce5ae6bb0f648c98206fa757e365506
       tileId: TILE_METRO_07
       sceneId: SCN_MAIN_METRO_07
@@ -266,11 +320,40 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: ff18ae57b3b6435f9aa1748710e0a033
       tileId: TILE_METRO_08
       sceneId: SCN_MAIN_METRO_08
       sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
+    - technicalId: 2b8924af73b74036bedb14a5408ea5a5
+      tileId: TILE_METRO_09_S
+      sceneId: SCN_MAIN_METRO_09_S
+      sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
       role: 1
       maximumCopies: 1
       preferredDepthRange: {x: 1, y: 8}
@@ -1048,6 +1131,30 @@ MonoBehaviour:
       capability: 2
       connectionPolicy: 1
     - portalId: MAIN_METRO_08_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_09_S
+    sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
+    dependencyHash: 013adbdf4103069ca090aeaebf79ad94
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_09_S_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_S_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_S_WEST
       side: 3
       capability: 2
       connectionPolicy: 1
