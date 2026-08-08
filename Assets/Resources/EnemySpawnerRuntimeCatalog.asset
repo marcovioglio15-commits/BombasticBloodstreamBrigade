@@ -243,6 +243,16 @@ MonoBehaviour:
       hierarchyPath: SUB_METRO_08/PF_EnemySpawner_8x8
       defaultEnabled: 1
       defaultWavePresetGuid: 1c2c7dcf9b00dbd4aa1b2483482eb9da
+  - sceneName: SCN_MAIN_METRO_09_N
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_N.unity
+    sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
+    spawners:
+    - ownerSceneGuid: 0cb2d4da877efca458353762fd2b423c
+      spawnerGuid: d654fe47ad548aef65afab4fe2b7bef0
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_09_N/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: f06a7ed2aee434d4fa80ae8e651ae45d
   - sceneName: SCN_MAIN_METRO_09_S
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
@@ -252,7 +262,7 @@ MonoBehaviour:
       spawnerName: PF_EnemySpawner_8x8
       hierarchyPath: SUB_METRO_09/PF_EnemySpawner_8x8
       defaultEnabled: 1
-      defaultWavePresetGuid: 1c2c7dcf9b00dbd4aa1b2483482eb9da
+      defaultWavePresetGuid: cab820f03cde53747ae2f47c665aa606
   - sceneName: SCN_MainScene
     scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
@@ -311,6 +321,10 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_08_Testing.asset
       assetGuid: 1c2c7dcf9b00dbd4aa1b2483482eb9da
       preset: {fileID: 11400000, guid: 1c2c7dcf9b00dbd4aa1b2483482eb9da, type: 2}
+    - presetName: PF_EnemySpawner_METRO_09_N_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_09_N_Testing.asset
+      assetGuid: f06a7ed2aee434d4fa80ae8e651ae45d
+      preset: {fileID: 11400000, guid: f06a7ed2aee434d4fa80ae8e651ae45d, type: 2}
     - presetName: PF_EnemySpawner_METRO_09_S_Testing
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_09_S_Testing.asset
       assetGuid: cab820f03cde53747ae2f47c665aa606

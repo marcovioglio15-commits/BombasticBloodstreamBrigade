@@ -138,7 +138,7 @@ PrefabInstance:
     - target: {fileID: 4734330562549475671, guid: 978e25ced641faa4a9bf0741ce473379, type: 3}
       propertyPath: wavePreset
       value: 
-      objectReference: {fileID: 11400000, guid: 1c2c7dcf9b00dbd4aa1b2483482eb9da, type: 2}
+      objectReference: {fileID: 11400000, guid: cab820f03cde53747ae2f47c665aa606, type: 2}
     - target: {fileID: 4734330562549475671, guid: 978e25ced641faa4a9bf0741ce473379, type: 3}
       propertyPath: originOffset.x
       value: 5.76

@@ -360,6 +360,26 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
+    - technicalId: efb61c328d0b4355951d1d677f818bdf
+      tileId: TILE_METRO_09_N
+      sceneId: SCN_MAIN_METRO_09_N
+      sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
       roomRewards: []
     - technicalId: cb7a6330474e7c26af57cea7e901ecdb
       tileId: TILE_LGTEST_METRO_BOSS
@@ -1137,11 +1157,11 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
-    dependencyHash: 013adbdf4103069ca090aeaebf79ad94
+    dependencyHash: 95edd2a4c2acdb2f7a86b8bc34edf594
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
-    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09_S.unity
     centerAnchorCount: 1
     activeSpawnerCount: 1
     activeSpawnerWithWavesCount: 1
@@ -1155,6 +1175,30 @@ MonoBehaviour:
       capability: 2
       connectionPolicy: 1
     - portalId: MAIN_METRO_09_S_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_09_N
+    sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
+    dependencyHash: e9cc2e1c960a0ad0a8fffcd75a194210
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_N.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09_N.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_09_N_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_N_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_N_WEST
       side: 3
       capability: 2
       connectionPolicy: 1
