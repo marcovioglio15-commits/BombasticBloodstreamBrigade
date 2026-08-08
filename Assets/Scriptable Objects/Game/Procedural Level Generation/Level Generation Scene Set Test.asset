@@ -259,6 +259,17 @@ MonoBehaviour:
     - technicalId: 1ce5ae6bb0f648c98206fa757e365506
       tileId: TILE_METRO_07
       sceneId: SCN_MAIN_METRO_07
+      sceneGuid: 1d02753ae1d89004f93b02d845ea2923
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards: []
+    - technicalId: ff18ae57b3b6435f9aa1748710e0a033
+      tileId: TILE_METRO_08
+      sceneId: SCN_MAIN_METRO_08
       sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
       role: 1
       maximumCopies: 1
@@ -986,8 +997,8 @@ MonoBehaviour:
       connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_07
-    sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
-    dependencyHash: a07e7b97b651fcd358a8e0ca1cf54cd8
+    sceneGuid: 1d02753ae1d89004f93b02d845ea2923
+    dependencyHash: c35754201cdea6cb7b1585ec9012c568
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_07.unity
@@ -1009,6 +1020,34 @@ MonoBehaviour:
       capability: 2
       connectionPolicy: 1
     - portalId: MAIN_METRO_07_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_08
+    sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
+    dependencyHash: b8d2b87eaad295e042a4ce22490a9dd9
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_08.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_08.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_08_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_08_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_08_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_08_WEST
       side: 3
       capability: 2
       connectionPolicy: 1

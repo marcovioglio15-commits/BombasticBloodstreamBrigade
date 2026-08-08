@@ -225,7 +225,7 @@ MonoBehaviour:
       defaultWavePresetGuid: fa288a1a2b569314a9c7512e16388af3
   - sceneName: SCN_MAIN_METRO_07
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_07.unity
-    sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
+    sceneGuid: 1d02753ae1d89004f93b02d845ea2923
     spawners:
     - ownerSceneGuid: 19f705a8c27c2ac41a6ede3a10a050ab
       spawnerGuid: e30c2288e1f23fdeebd66b8424b2e8ad
@@ -233,6 +233,16 @@ MonoBehaviour:
       hierarchyPath: SUB_METRO_07/PF_EnemySpawner_8x8
       defaultEnabled: 1
       defaultWavePresetGuid: e17007a10c47f3e419a856b6c369406a
+  - sceneName: SCN_MAIN_METRO_08
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_08.unity
+    sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
+    spawners:
+    - ownerSceneGuid: 3ec91327c704cac479b4cba826b166eb
+      spawnerGuid: e098187c34db26d53e04c252b9ab7d3c
+      spawnerName: PF_EnemySpawner_8x8
+      hierarchyPath: SUB_METRO_08/PF_EnemySpawner_8x8
+      defaultEnabled: 1
+      defaultWavePresetGuid: 1c2c7dcf9b00dbd4aa1b2483482eb9da
   - sceneName: SCN_MainScene
     scenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
     sceneGuid: 99c9720ab356a0642a771bea13969a05
@@ -287,6 +297,10 @@ MonoBehaviour:
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_07_Testing.asset
       assetGuid: e17007a10c47f3e419a856b6c369406a
       preset: {fileID: 11400000, guid: e17007a10c47f3e419a856b6c369406a, type: 2}
+    - presetName: PF_EnemySpawner_METRO_08_Testing
+      assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_METRO_08_Testing.asset
+      assetGuid: 1c2c7dcf9b00dbd4aa1b2483482eb9da
+      preset: {fileID: 11400000, guid: 1c2c7dcf9b00dbd4aa1b2483482eb9da, type: 2}
     - presetName: PF_EnemySpawner_Wave_Main_01_Easy
       assetPath: Assets/Scriptable Objects/Enemy/Wave Preset/PF_EnemySpawner_Wave_Main_01_Easy.asset
       assetGuid: 18b9c538d2c66114d8ab07d990edd337
