@@ -410,6 +410,26 @@ MonoBehaviour:
         minimumDifficulty: 0
         maximumDifficulty: 100
         selectionWeight: 1
+    - technicalId: 762096cabe24493091975040cfe3b3b4
+      tileId: TILE_METRO_11
+      sceneId: SCN_MAIN_METRO_11
+      sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: cb7a6330474e7c26af57cea7e901ecdb
       tileId: TILE_LGTEST_METRO_BOSS
       sceneId: SCN_LGTEST_METRO_BOSS
@@ -1234,7 +1254,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
-    dependencyHash: 2e6df0f83a53b0fcd1e4d718689fa9a0
+    dependencyHash: 48d5067358a658348f66e18f2411253e
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
@@ -1257,4 +1277,26 @@ MonoBehaviour:
       connectionPolicy: 1
     authoringWarnings:
     - SubScene component 'SUB_METRO_10' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity'
+      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+  - sceneId: SCN_MAIN_METRO_11
+    sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
+    dependencyHash: 218129434fe4c61056337808de62decf
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_11.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_11_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_11_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings:
+    - SubScene component 'SUB_METRO_11' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity'
       must disable Auto Load Scene for duplicate-capable transactional room streaming.
