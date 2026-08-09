@@ -380,7 +380,36 @@ MonoBehaviour:
       useExactDepthConstraint: 0
       exactDepth: 1
       baseSelectionWeight: 1
-      roomRewards: []
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
+    - technicalId: 9f5f18ebfdc24f94841cac78b01e6291
+      tileId: TILE_METRO_10
+      sceneId: SCN_MAIN_METRO_10
+      sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
+      role: 1
+      maximumCopies: 1
+      preferredDepthRange: {x: 1, y: 8}
+      useExactDepthConstraint: 0
+      exactDepth: 1
+      baseSelectionWeight: 1
+      roomRewards:
+      - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
+        quantity: 1
+        order: 0
+        useDifficultySelection: 0
+        selectionGroupId: 
+        difficultyCoefficientId: 
+        minimumDifficulty: 0
+        maximumDifficulty: 100
+        selectionWeight: 1
     - technicalId: cb7a6330474e7c26af57cea7e901ecdb
       tileId: TILE_LGTEST_METRO_BOSS
       sceneId: SCN_LGTEST_METRO_BOSS
@@ -1203,3 +1232,29 @@ MonoBehaviour:
       capability: 2
       connectionPolicy: 1
     authoringWarnings: []
+  - sceneId: SCN_MAIN_METRO_10
+    sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
+    dependencyHash: 2e6df0f83a53b0fcd1e4d718689fa9a0
+    cacheStale: 0
+    sourceScenePaths:
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
+    - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_10.unity
+    centerAnchorCount: 1
+    activeSpawnerCount: 1
+    activeSpawnerWithWavesCount: 1
+    portals:
+    - portalId: MAIN_METRO_10_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_10_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_10_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
+    authoringWarnings:
+    - SubScene component 'SUB_METRO_10' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity'
+      must disable Auto Load Scene for duplicate-capable transactional room streaming.
