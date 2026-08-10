@@ -57,6 +57,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 39a3d674b1a76df41a7d38f06a4964ef
+    m_Address: SCN_MAIN_METRO_11
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 418b98d17eadea44fa63e7920b7d332f
     m_Address: SCN_MAIN_METRO_04_NW
     m_ReadOnly: 0
@@ -77,6 +83,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5a34e40218bcc094382de3b9fedebc81
     m_Address: SCN_MAIN_METRO_01
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6376a2397f53e644b8259a1c274e7bdf
+    m_Address: SCN_MAIN_METRO_10
     m_ReadOnly: 0
     m_SerializedLabels:
     - ManagedScene
