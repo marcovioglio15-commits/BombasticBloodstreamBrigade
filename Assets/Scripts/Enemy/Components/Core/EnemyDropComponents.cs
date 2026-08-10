@@ -149,6 +149,7 @@ public struct EnemyExperienceDrop : IComponentData
     public float SpawnAnimationElapsed;
     public Entity PoolEntity;
     public byte IsAttracting;
+    public byte ConsumeWhenUnusable;
 }
 
 /// <summary>
@@ -193,5 +194,27 @@ public struct EnemyExperienceDropPoolState : IComponentData
 public struct EnemyExperienceDropPoolElement : IBufferElementData
 {
     public Entity DropEntity;
+}
+
+/// <summary>
+/// Identifies the unique runtime queue shared by active power-ups and authoritative room-clear collection.
+/// </summary>
+public struct EnemyDropCollectionRequestQueue : IComponentData
+{
+    public uint LastQueuedRunSeed;
+    public uint LastQueuedGenerationVersion;
+    public uint LastQueuedRoomClearVersion;
+    public byte HasQueuedRoomClear;
+}
+
+/// <summary>
+/// Stores one merged request that attracts drops in range or immediately consumes every active drop after room clear.
+/// </summary>
+[InternalBufferCapacity(1)]
+public struct EnemyDropCollectionRequest : IBufferElementData
+{
+    public float AttractionRadius;
+    public byte ConsumeUnusableDrops;
+    public byte CollectAllImmediately;
 }
 #endregion

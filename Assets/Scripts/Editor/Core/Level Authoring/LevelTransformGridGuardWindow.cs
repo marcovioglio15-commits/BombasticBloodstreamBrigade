@@ -9,13 +9,13 @@ public sealed class LevelTransformGridGuardWindow : EditorWindow
 {
     #region Constants
 
-    private const string MenuPath = "Transform Grid Guard";
-    private const string IncludePositionPreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.IncludePosition";
-    private const string IncludeRotationPreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.IncludeRotation";
-    private const string IncludeScalePreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.IncludeScale";
-    private const string PositionTolerancePreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.PositionTolerance";
-    private const string RotationTolerancePreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.RotationTolerance";
-    private const string ScaleTolerancePreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.ScaleTolerance";
+    private const string MenuPath = "Tools/Transform Grid Guard";
+    private const string IncludePositionPreferenceKey = "TransformGridGuard.IncludePosition";
+    private const string IncludeRotationPreferenceKey = "TransformGridGuard.IncludeRotation";
+    private const string IncludeScalePreferenceKey = "TransformGridGuard.IncludeScale";
+    private const string PositionTolerancePreferenceKey = "TransformGridGuard.PositionTolerance";
+    private const string RotationTolerancePreferenceKey = "TransformGridGuard.RotationTolerance";
+    private const string ScaleTolerancePreferenceKey = "TransformGridGuard.ScaleTolerance";
     private const int MaximumDisplayedDrifts = 100;
 
     #endregion

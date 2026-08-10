@@ -135,6 +135,18 @@ public static class PlayerPassiveToolsAggregationUtility
             passiveToolsState.WeaponId = passiveToolConfig.WeaponId;
         }
 
+        if (passiveToolConfig.HasDropAttraction != 0)
+        {
+            passiveToolsState.HasDropAttraction = 1;
+            passiveToolsState.DropAttraction.AttractionRadius = math.max(passiveToolsState.DropAttraction.AttractionRadius,
+                                                                         math.max(0f, passiveToolConfig.DropAttraction.AttractionRadius));
+            passiveToolsState.DropAttraction.ConsumeUnusableDrops =
+                passiveToolsState.DropAttraction.ConsumeUnusableDrops != 0 ||
+                passiveToolConfig.DropAttraction.ConsumeUnusableDrops != 0
+                    ? (byte)1
+                    : (byte)0;
+        }
+
         if (passiveToolConfig.HasProjectileSize != 0)
         {
             passiveToolsState.ProjectileSizeMultiplier *= math.max(0.01f, passiveToolConfig.ProjectileSize.SizeMultiplier);

@@ -257,6 +257,7 @@ internal static class EnemyRecoveryDropSpawnUtility
         dropData.SpawnAnimationElapsed = 0f;
         dropData.PoolEntity = poolEntity;
         dropData.IsAttracting = 0;
+        dropData.ConsumeWhenUnusable = 0;
         entityManager.SetComponentData(dropEntity, dropData);
         entityManager.SetComponentEnabled<EnemyExperienceDropActive>(dropEntity, true);
     }

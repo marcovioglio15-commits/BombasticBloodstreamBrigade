@@ -20,6 +20,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Registers every player state, request buffer and shared queue required by active power-up dispatch.
+    /// </summary>
+    /// <param name="state">Current ECS system state used to register update requirements.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerPowerUpsConfigElement>();
@@ -79,8 +83,13 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerHealOverTimeState>();
         state.RequireForUpdate<PlayerPassiveToolsStateElement>();
         state.RequireForUpdate<PlayerLaserBeamState>();
+        state.RequireForUpdate<EnemyDropCollectionRequestQueue>();
     }
 
+    /// <summary>
+    /// Processes both active slots and routes successful Drop Attraction activations into the shared collection queue.
+    /// </summary>
+    /// <param name="state">Current ECS system state providing player queries and mutable runtime lookups.</param>
     public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -145,6 +154,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
+        DynamicBuffer<EnemyDropCollectionRequest> dropCollectionRequests =
+            SystemAPI.GetSingletonBuffer<EnemyDropCollectionRequest>();
 
         foreach ((RefRO<PlayerInputState> inputState,
                   DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
@@ -406,6 +417,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
                                                                 shootRequests,
+                                                                dropCollectionRequests,
                                                                 audioRequests,
                                                                 canEnqueueAudioRequests,
                                                                 entity,
@@ -537,6 +549,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 bombRequests,
                                                                 orbitalProjectionRequests,
                                                                 shootRequests,
+                                                                dropCollectionRequests,
                                                                 audioRequests,
                                                                 canEnqueueAudioRequests,
                                                                 entity,

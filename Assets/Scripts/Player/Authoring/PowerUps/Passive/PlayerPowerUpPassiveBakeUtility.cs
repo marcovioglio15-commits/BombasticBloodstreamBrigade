@@ -227,6 +227,9 @@ public static class PlayerPowerUpPassiveBakeUtility
         LaserBeamPassiveConfig laserBeamConfig = default;
         bool hasOrbitalProjections = false;
         FixedList4096Bytes<OrbitalProjectionConfig> orbitalProjectionConfigs = default;
+        bool hasDropAttraction = false;
+        float dropAttractionRadius = 0f;
+        bool consumeUnusableDrops = false;
         bool hasWeaponSwitch = false;
         // Neutral default: only used when hasWeaponSwitch stays false, in which case downstream consumption is gated off.
         FixedString64Bytes weaponId = default;
@@ -528,6 +531,17 @@ public static class PlayerPowerUpPassiveBakeUtility
                     laserBeamConfig.SourceShape = candidateLaserBeamConfig.SourceShape;
                     laserBeamConfig.TerminalCapShape = candidateLaserBeamConfig.TerminalCapShape;
                     break;
+                case PowerUpModuleKind.AttractDrops:
+                    PowerUpDropAttractionModuleData dropAttractionData = payload.DropAttraction;
+
+                    if (dropAttractionData == null)
+                        break;
+
+                    hasDropAttraction = true;
+                    dropAttractionRadius = math.max(dropAttractionRadius,
+                                                    math.max(0f, dropAttractionData.AttractionRadius));
+                    consumeUnusableDrops = consumeUnusableDrops || dropAttractionData.ConsumeUnusableDrops;
+                    break;
                 case PowerUpModuleKind.SwitchWeapon:
                     if (payload.SwitchWeapon == null)
                         break;
@@ -565,8 +579,14 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasBulletTime = hasBulletTime && (bulletTimeEnemySlowPercent > 0f || bulletTimePlayerProjectileSlowPercent > 0f) ? (byte)1 : (byte)0,
             HasLaserBeam = hasLaserBeam ? (byte)1 : (byte)0,
             HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
+            HasDropAttraction = hasDropAttraction ? (byte)1 : (byte)0,
             HasWeaponSwitch = hasWeaponSwitch ? (byte)1 : (byte)0,
             WeaponId = weaponId,
+            DropAttraction = new DropAttractionPowerUpConfig
+            {
+                AttractionRadius = math.max(0f, dropAttractionRadius),
+                ConsumeUnusableDrops = consumeUnusableDrops ? (byte)1 : (byte)0
+            },
             ProjectileSize = new ProjectileSizePassiveConfig
             {
                 SizeMultiplier = math.max(0.01f, projectileSizeMultiplier),

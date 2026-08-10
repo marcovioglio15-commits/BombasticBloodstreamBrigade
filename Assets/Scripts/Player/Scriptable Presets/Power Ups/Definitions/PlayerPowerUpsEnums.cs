@@ -32,7 +32,8 @@ public enum ActiveToolKind
     PassiveToggle = 7,
     OrbitalProjections = 8,
     ImpactFrame = 9,
-    GhostTrail = 10
+    GhostTrail = 10,
+    DropAttraction = 11
 }
 
 /// <summary>
@@ -97,7 +98,8 @@ public enum PassiveToolKind
     ElementalTrail = 6,
     Custom = 7,
     BulletTime = 8,
-    LaserBeam = 9
+    LaserBeam = 9,
+    DropAttraction = 10
 }
 
 /// <summary>

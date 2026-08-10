@@ -100,6 +100,7 @@ public static class PlayerPowerUpActivationExecutionUtility
             case ActiveToolKind.PortableHealthPack:
                 break;
             case ActiveToolKind.OrbitalProjections:
+            case ActiveToolKind.DropAttraction:
                 break;
             case ActiveToolKind.PassiveToggle:
                 return;

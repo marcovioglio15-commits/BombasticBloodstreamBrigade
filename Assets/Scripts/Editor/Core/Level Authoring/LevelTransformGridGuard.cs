@@ -10,7 +10,7 @@ internal static class LevelTransformGridGuard
 {
     #region Constants
 
-    private const string EnabledPreferenceKey = "NashCore.LevelAuthoring.TransformGridGuard.Enabled";
+    private const string EnabledPreferenceKey = "TransformGridGuard.Enabled";
     private const double NotificationIntervalSeconds = 1d;
 
     #endregion

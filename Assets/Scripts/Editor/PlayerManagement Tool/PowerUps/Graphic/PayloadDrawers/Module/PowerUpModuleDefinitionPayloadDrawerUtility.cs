@@ -70,6 +70,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.Heal:
                 BuildHealPayloadUi(payloadContainer, payloadProperty);
                 return;
+            case PowerUpModuleKind.AttractDrops:
+                PowerUpDropAttractionPayloadDrawerUtility.Build(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.StateSuppressShooting:
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);
                 return;

@@ -205,6 +205,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         if (PlayerRuntimePowerUpGhostTrailScalingApplyUtility.TryApplyValue(payloadPath, resolvedValue, ref activeSlotConfig.GhostTrail))
             return;
 
+        if (PlayerRuntimePowerUpDropAttractionScalingApplyUtility.TryApplyValue(payloadPath,
+                                                                                resolvedValue,
+                                                                                ref activeSlotConfig.DropAttraction))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -475,6 +480,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         }
 
         if (TryApplyOrbitalProjectionValue(payloadPath, resolvedValue, ref passiveToolConfig))
+            return;
+
+        if (PlayerRuntimePowerUpDropAttractionScalingApplyUtility.TryApplyValue(payloadPath,
+                                                                                resolvedValue,
+                                                                                ref passiveToolConfig.DropAttraction))
             return;
 
         switch (payloadPath)
@@ -985,6 +995,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         if (PlayerRuntimePowerUpGhostTrailScalingApplyUtility.TryApplyBooleanValue(payloadPath, resolvedValue, ref activeSlotConfig.GhostTrail))
             return;
 
+        if (PlayerRuntimePowerUpDropAttractionScalingApplyUtility.TryApplyBooleanValue(payloadPath,
+                                                                                       resolvedValue,
+                                                                                       ref activeSlotConfig.DropAttraction))
+            return;
+
         switch (payloadPath)
         {
             case "stealProtected":
@@ -1061,6 +1076,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         }
 
         if (TryApplyOrbitalProjectionBooleanValue(payloadPath, resolvedValue, ref passiveToolConfig))
+            return;
+
+        if (PlayerRuntimePowerUpDropAttractionScalingApplyUtility.TryApplyBooleanValue(payloadPath,
+                                                                                       resolvedValue,
+                                                                                       ref passiveToolConfig.DropAttraction))
             return;
 
         switch (payloadPath)

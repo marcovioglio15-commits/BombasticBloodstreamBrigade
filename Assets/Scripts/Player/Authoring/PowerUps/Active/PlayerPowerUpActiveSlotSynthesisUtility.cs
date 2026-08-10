@@ -230,15 +230,30 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
         bombVfxScaleMultiplier = math.max(0.01f, resolvedVfxModuleData.VfxScaleMultiplier);
     }
 
+    /// <summary>
+    /// Resolves the primary active execution kind while preserving side-effect modules on the compiled slot config.
+    /// </summary>
+    /// <param name="hasHoldCharge">Whether the composition uses the hold-charge activation workflow.</param>
+    /// <param name="hasShotgun">Whether the composition emits a projectile cone.</param>
+    /// <param name="hasBomb">Whether the composition spawns a bomb payload.</param>
+    /// <param name="hasDash">Whether the composition executes player dash movement.</param>
+    /// <param name="hasBulletTime">Whether the composition applies enemy time dilation.</param>
+    /// <param name="hasImpactFrame">Whether the composition triggers Impact Frame feedback.</param>
+    /// <param name="hasGhostTrail">Whether the composition emits a Ghost Trail.</param>
+    /// <param name="hasHealthPack">Whether the composition restores player health.</param>
+    /// <param name="hasOrbitalProjections">Whether the composition spawns orbital projections.</param>
+    /// <param name="hasDropAttraction">Whether the composition attracts enemy drops on successful activation.</param>
+    /// <returns>Primary active tool kind used by activation dispatch.</returns>
     public static ActiveToolKind ResolveModularToolKind(bool hasHoldCharge,
-                                                        bool hasShotgun,
+                                                         bool hasShotgun,
                                                         bool hasBomb,
                                                         bool hasDash,
                                                         bool hasBulletTime,
                                                         bool hasImpactFrame,
                                                         bool hasGhostTrail,
                                                         bool hasHealthPack,
-                                                        bool hasOrbitalProjections)
+                                                        bool hasOrbitalProjections,
+                                                        bool hasDropAttraction)
     {
         if (hasHoldCharge)
             return ActiveToolKind.ChargeShot;
@@ -266,6 +281,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
 
         if (hasGhostTrail)
             return ActiveToolKind.GhostTrail;
+
+        if (hasDropAttraction)
+            return ActiveToolKind.DropAttraction;
 
         return ActiveToolKind.Custom;
     }

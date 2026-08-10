@@ -518,6 +518,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -951,6 +954,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1384,6 +1390,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1817,6 +1826,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2250,6 +2262,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2683,6 +2698,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3116,6 +3134,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3549,6 +3570,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3982,6 +4006,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4415,6 +4442,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4848,6 +4878,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5281,6 +5314,9 @@ MonoBehaviour:
         durationSeconds: 0
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5714,6 +5750,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6147,6 +6186,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6580,6 +6622,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 2
         cooldownSeconds: 0
@@ -7013,6 +7058,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7446,6 +7494,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7879,6 +7930,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8312,6 +8366,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8745,6 +8802,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9179,6 +9239,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9612,6 +9675,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10046,6 +10112,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10492,6 +10561,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -10925,6 +10997,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -11358,6 +11433,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -11791,6 +11869,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -12225,6 +12306,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -12671,6 +12755,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -13104,6 +13191,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -13537,6 +13627,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -13970,6 +14063,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14407,6 +14503,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14844,6 +14943,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15290,6 +15392,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15723,6 +15828,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16156,6 +16264,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16602,6 +16713,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17035,6 +17149,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17468,6 +17585,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17914,6 +18034,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18347,6 +18470,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18780,6 +18906,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19226,6 +19355,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19659,6 +19791,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20092,6 +20227,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20535,6 +20673,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20968,6 +21109,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21402,6 +21546,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21846,6 +21993,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -22277,6 +22427,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -22722,6 +22875,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23155,6 +23311,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23601,6 +23760,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24047,6 +24209,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24481,6 +24646,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24927,6 +25095,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25373,6 +25544,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25819,6 +25993,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -26261,6 +26438,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -26693,6 +26873,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -27135,6 +27318,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -27567,6 +27753,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -27999,6 +28188,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -28441,6 +28633,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -28873,6 +29068,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -29315,6 +29513,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -29747,6 +29948,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -30189,6 +30393,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -30621,6 +30828,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -31063,6 +31273,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -31495,6 +31708,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -31937,6 +32153,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -32369,6 +32588,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -32812,6 +33034,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -33255,6 +33480,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -33697,6 +33925,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -34129,6 +34360,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0

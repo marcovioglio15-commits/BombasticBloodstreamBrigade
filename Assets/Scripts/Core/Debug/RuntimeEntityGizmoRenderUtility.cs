@@ -26,6 +26,7 @@ public static class RuntimeEntityGizmoRenderUtility
     private const int MaxEnemyLabelCount = 12;
 
     private static readonly Color PlayerPickupRadiusColor = new Color(0.1f, 0.92f, 0.68f, 0.96f);
+    private static readonly Color PlayerDropAttractionRadiusColor = new Color(0.16f, 0.68f, 1f, 0.92f);
     private static readonly Color PlayerMoveVectorColor = new Color(0.24f, 0.82f, 1f, 0.96f);
     private static readonly Color PlayerLookDirectionColor = new Color(1f, 0.92f, 0.2f, 0.96f);
     private static readonly Color EnemyBodyRadiusColor = new Color(1f, 0.84f, 0.18f, 0.94f);
@@ -203,6 +204,12 @@ public static class RuntimeEntityGizmoRenderUtility
         {
             PlayerExperienceCollection pickup = entityManager.GetComponentData<PlayerExperienceCollection>(playerEntity);
             primitiveDrawer.DrawWireDisc(playerPosition, pickup.PickupRadius, PlayerPickupRadiusColor);
+            RuntimeEntityPlayerDropAttractionGizmoUtility.DrawEffectiveRadius(primitiveDrawer,
+                                                                              entityManager,
+                                                                              playerEntity,
+                                                                              playerPosition,
+                                                                              pickup.PickupRadius,
+                                                                              PlayerDropAttractionRadiusColor);
             drewPlayerGizmo = true;
         }
 

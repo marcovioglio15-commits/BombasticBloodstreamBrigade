@@ -16,6 +16,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
     #endregion
 
     #region Fields
+    private EntityQuery activeDropQuery;
     private EntityQuery playerQuery;
     #endregion
 
@@ -29,7 +30,9 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
     public void OnCreate(ref SystemState state)
     {
-        state.RequireForUpdate<EnemyExperienceDropActive>();
+        activeDropQuery = new EntityQueryBuilder(Allocator.Temp)
+                          .WithAll<EnemyExperienceDrop, LocalTransform, EnemyExperienceDropActive>()
+                          .Build(ref state);
         playerQuery = new EntityQueryBuilder(Allocator.Temp)
                           .WithAll<LocalTransform>()
                           .WithAll<PlayerMovementState>()
@@ -40,8 +43,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                           .WithAll<PlayerLevel>()
                           .WithAll<PlayerProgressionConfig>()
                           .WithAll<PlayerRuntimeGamePhaseElement>()
+                          .WithAll<PlayerPassiveToolsStateElement>()
                           .WithAll<PlayerRunOutcomeState>()
                           .Build(ref state);
+        state.RequireForUpdate<EnemyDropCollectionRequestQueue>();
         state.RequireForUpdate(playerQuery);
     }
 
@@ -58,9 +63,25 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             return;
 
         Entity playerEntity = playerQuery.GetSingletonEntity();
+        DynamicBuffer<EnemyDropCollectionRequest> dropCollectionRequests =
+            SystemAPI.GetSingletonBuffer<EnemyDropCollectionRequest>();
+        EnemyDropCollectionRequest pendingRequest = default;
+        bool hasPendingRequest = dropCollectionRequests.Length > 0;
+
+        // Consume the bounded command even when there are no drops, preventing stale one-shot pulses.
+        if (hasPendingRequest)
+        {
+            pendingRequest = dropCollectionRequests[0];
+            dropCollectionRequests.Clear();
+        }
+
+        if (activeDropQuery.CalculateEntityCount() <= 0)
+            return;
+
+        bool collectAllImmediately = pendingRequest.CollectAllImmediately != 0;
         PlayerRunOutcomeState runOutcomeState = entityManager.GetComponentData<PlayerRunOutcomeState>(playerEntity);
 
-        if (runOutcomeState.IsFinalized != 0)
+        if (runOutcomeState.IsFinalized != 0 && !collectAllImmediately)
             return;
 
         float3 playerPosition = entityManager.GetComponentData<LocalTransform>(playerEntity).Position;
@@ -74,6 +95,8 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
         PlayerExperience playerExperience = entityManager.GetComponentData<PlayerExperience>(playerEntity);
         PlayerHealth playerHealth = entityManager.GetComponentData<PlayerHealth>(playerEntity);
         PlayerShield playerShield = entityManager.GetComponentData<PlayerShield>(playerEntity);
+        PlayerPassiveToolsStateBufferUtility.Read(entityManager.GetBuffer<PlayerPassiveToolsStateElement>(playerEntity),
+                                                  out PlayerPassiveToolsState passiveToolsState);
         float remainingExperienceCapacity = PlayerProgressionPhaseUtility.ResolveRemainingExperienceUntilLevelCap(progressionConfig,
                                                                                                                    runtimeGamePhases,
                                                                                                                    playerLevel.Current,
@@ -81,10 +104,21 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
         float deltaTime = SystemAPI.Time.DeltaTime;
 
-        if (deltaTime <= 0f)
+        if (deltaTime <= 0f && !collectAllImmediately)
             return;
 
         float pickupRadiusSquared = pickupRadius * pickupRadius;
+        bool hasPassiveAttraction = passiveToolsState.HasDropAttraction != 0 &&
+                                    passiveToolsState.DropAttraction.AttractionRadius > 0f;
+        float passiveAttractionRadiusSquared = hasPassiveAttraction
+            ? passiveToolsState.DropAttraction.AttractionRadius * passiveToolsState.DropAttraction.AttractionRadius
+            : 0f;
+        bool hasRequestedAttraction = hasPendingRequest &&
+                                      !collectAllImmediately &&
+                                      pendingRequest.AttractionRadius > 0f;
+        float requestedAttractionRadiusSquared = hasRequestedAttraction
+            ? pendingRequest.AttractionRadius * pendingRequest.AttractionRadius
+            : 0f;
         float grantedExperience = 0f;
         bool healthChanged = false;
         bool shieldChanged = false;
@@ -101,9 +135,32 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                              .WithEntityAccess())
         {
             EnemyExperienceDrop currentDropData = dropData.ValueRO;
+            float3 dropPosition = dropTransform.ValueRO.Position;
+            float3 toPlayer = playerPosition - dropPosition;
+            toPlayer.y = 0f;
+            float distanceSquared = math.lengthsq(toPlayer);
+            bool isInsidePassiveAttraction = hasPassiveAttraction &&
+                                             distanceSquared <= passiveAttractionRadiusSquared;
+            bool isInsideRequestedAttraction = hasRequestedAttraction &&
+                                               distanceSquared <= requestedAttractionRadiusSquared;
+
+            // Capture one-shot and passive attraction while a drop is still completing its spawn arc.
+            if (isInsidePassiveAttraction || isInsideRequestedAttraction)
+            {
+                currentDropData.IsAttracting = 1;
+
+                if ((isInsidePassiveAttraction && passiveToolsState.DropAttraction.ConsumeUnusableDrops != 0) ||
+                    (isInsideRequestedAttraction && pendingRequest.ConsumeUnusableDrops != 0))
+                {
+                    currentDropData.ConsumeWhenUnusable = 1;
+                }
+            }
+
             float spawnAnimationDuration = math.max(0f, currentDropData.SpawnAnimationDuration);
 
-            if (spawnAnimationDuration > PrecisionEpsilon && currentDropData.SpawnAnimationElapsed < spawnAnimationDuration)
+            if (!collectAllImmediately &&
+                spawnAnimationDuration > PrecisionEpsilon &&
+                currentDropData.SpawnAnimationElapsed < spawnAnimationDuration)
             {
                 float nextSpawnAnimationElapsed = math.min(spawnAnimationDuration, currentDropData.SpawnAnimationElapsed + deltaTime);
                 float normalizedTime = nextSpawnAnimationElapsed / spawnAnimationDuration;
@@ -118,17 +175,27 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                     continue;
             }
 
-            float3 dropPosition = dropTransform.ValueRO.Position;
-            float3 toPlayer = playerPosition - dropPosition;
+            dropPosition = dropTransform.ValueRO.Position;
+            toPlayer = playerPosition - dropPosition;
             toPlayer.y = 0f;
-            float distanceSquared = math.lengthsq(toPlayer);
+            distanceSquared = math.lengthsq(toPlayer);
             float baseCollectDistance = math.max(0.01f, currentDropData.CollectDistance);
             float collectDistancePerPlayerSpeed = math.max(0f, currentDropData.CollectDistancePerPlayerSpeed);
             float collectDistance = baseCollectDistance + (playerSpeed * collectDistancePerPlayerSpeed);
             float collectDistanceSquared = collectDistance * collectDistance;
+            isInsidePassiveAttraction = hasPassiveAttraction && distanceSquared <= passiveAttractionRadiusSquared;
+            isInsideRequestedAttraction = hasRequestedAttraction && distanceSquared <= requestedAttractionRadiusSquared;
+            bool isInsidePickupRadius = distanceSquared <= pickupRadiusSquared;
+            bool canAffectPlayer = CanDropAffectPlayer(in currentDropData,
+                                                       remainingExperienceCapacity,
+                                                       in playerHealth,
+                                                       in playerShield);
+            bool consumeWhenUnusable = collectAllImmediately ||
+                                       currentDropData.ConsumeWhenUnusable != 0 ||
+                                       (isInsidePassiveAttraction && passiveToolsState.DropAttraction.ConsumeUnusableDrops != 0) ||
+                                       (isInsideRequestedAttraction && pendingRequest.ConsumeUnusableDrops != 0);
 
-            if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Experience &&
-                remainingExperienceCapacity <= PrecisionEpsilon)
+            if (!canAffectPlayer && !consumeWhenUnusable)
             {
                 if (currentDropData.IsAttracting != 0)
                 {
@@ -139,39 +206,39 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                 continue;
             }
 
-            if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Recovery &&
-                !CanRecoveryDropAffectPlayer(in currentDropData, in playerHealth, in playerShield))
-            {
-                if (currentDropData.IsAttracting != 0)
-                {
-                    currentDropData.IsAttracting = 0;
-                    dropData.ValueRW = currentDropData;
-                }
+            if (consumeWhenUnusable)
+                currentDropData.ConsumeWhenUnusable = 1;
 
-                continue;
-            }
-
-            if (distanceSquared <= collectDistanceSquared)
+            if (collectAllImmediately || distanceSquared <= collectDistanceSquared)
             {
-                if (currentDropData.RewardKind == EnemyDropPickupRewardKind.Experience)
+                switch (currentDropData.RewardKind)
                 {
-                    float collectedExperience = math.max(0f, currentDropData.ExperienceAmount);
-                    grantedExperience += collectedExperience;
-                    remainingExperienceCapacity -= collectedExperience;
-                }
-                else
-                {
-                    ApplyRecoveryDrop(in currentDropData,
-                                      ref playerHealth,
-                                      ref playerShield,
-                                      ref healthChanged,
-                                      ref shieldChanged);
+                    case EnemyDropPickupRewardKind.Experience:
+                        if (canAffectPlayer)
+                        {
+                            float collectedExperience = math.min(math.max(0f, currentDropData.ExperienceAmount),
+                                                                 remainingExperienceCapacity);
+                            grantedExperience += collectedExperience;
+                            remainingExperienceCapacity -= collectedExperience;
+                        }
+                        break;
+                    case EnemyDropPickupRewardKind.Recovery:
+                        if (canAffectPlayer)
+                        {
+                            ApplyRecoveryDrop(in currentDropData,
+                                              ref playerHealth,
+                                              ref playerShield,
+                                              ref healthChanged,
+                                              ref shieldChanged);
+                        }
+                        break;
                 }
 
                 LocalTransform parkedTransform = dropTransform.ValueRO;
                 parkedTransform.Position = DropParkingPosition;
                 dropTransform.ValueRW = parkedTransform;
                 currentDropData.IsAttracting = 0;
+                currentDropData.ConsumeWhenUnusable = 0;
                 dropData.ValueRW = currentDropData;
                 dropActive.ValueRW = false;
 
@@ -191,8 +258,11 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
             bool isAttracting = currentDropData.IsAttracting != 0;
 
-            if (!isAttracting && distanceSquared <= pickupRadiusSquared)
+            if (!isAttracting &&
+                (isInsidePickupRadius || isInsidePassiveAttraction || isInsideRequestedAttraction))
+            {
                 isAttracting = true;
+            }
 
             if (!isAttracting)
                 continue;
@@ -267,6 +337,31 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
     #endregion
 
     #region Recovery
+    /// <summary>
+    /// Resolves whether one drop can change the current player state before any consume-when-unusable policy is applied.
+    /// </summary>
+    /// <param name="dropData">Drop payload being tested.</param>
+    /// <param name="remainingExperienceCapacity">Experience still accepted before the configured level cap.</param>
+    /// <param name="playerHealth">Current player health state.</param>
+    /// <param name="playerShield">Current player shield state.</param>
+    /// <returns>True when the reward payload can currently change experience, health or shield.</returns>
+    private static bool CanDropAffectPlayer(in EnemyExperienceDrop dropData,
+                                            float remainingExperienceCapacity,
+                                            in PlayerHealth playerHealth,
+                                            in PlayerShield playerShield)
+    {
+        switch (dropData.RewardKind)
+        {
+            case EnemyDropPickupRewardKind.Experience:
+                return dropData.ExperienceAmount > PrecisionEpsilon &&
+                       remainingExperienceCapacity > PrecisionEpsilon;
+            case EnemyDropPickupRewardKind.Recovery:
+                return CanRecoveryDropAffectPlayer(in dropData, in playerHealth, in playerShield);
+            default:
+                return false;
+        }
+    }
+
     /// <summary>
     /// Resolves whether a recovery drop can currently change player health or shield.
     /// </summary>

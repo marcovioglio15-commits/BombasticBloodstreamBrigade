@@ -68,6 +68,8 @@ public struct PlayerPowerUpSlotConfig
     public ShotgunPowerUpConfig Shotgun;
     public ChargeShotPowerUpConfig ChargeShot;
     public PortableHealthPackPowerUpConfig PortableHealthPack;
+    public byte HasDropAttraction;
+    public DropAttractionPowerUpConfig DropAttraction;
     public PlayerPassiveToolConfig TriggeredProjectilePassiveTool;
     public PlayerPassiveToolConfig TogglePassiveTool;
 
@@ -307,6 +309,15 @@ public struct PortableHealthPackPowerUpConfig
 }
 
 /// <summary>
+/// Stores the radius and unusable-drop policy shared by active, passive, and toggleable drop-attraction effects.
+/// </summary>
+public struct DropAttractionPowerUpConfig
+{
+    public float AttractionRadius;
+    public byte ConsumeUnusableDrops;
+}
+
+/// <summary>
 /// Runtime trigger mode used by passive heal payloads.
 /// </summary>
 public enum PassiveHealTriggerMode
@@ -420,7 +431,9 @@ public struct PlayerPassiveToolConfig
     public byte HasLaserBeam;
     public byte HasOrbitalProjections;
     public byte HasWeaponSwitch;
+    public byte HasDropAttraction;
     public FixedString64Bytes WeaponId;
+    public DropAttractionPowerUpConfig DropAttraction;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;

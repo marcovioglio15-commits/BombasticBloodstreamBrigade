@@ -10,6 +10,59 @@ public static class PlayerPowerUpActivationSlotUtility
     #region Methods
 
     #region Slot Processing
+    /// <summary>
+    /// Processes one active slot input sample, including charge, toggle, resource, execution and shared side-effect requests.
+    /// </summary>
+    /// <param name="slotConfig">Compiled active slot configuration being processed.</param>
+    /// <param name="otherSlotConfig">Compiled peer slot configuration used by interruption rules.</param>
+    /// <param name="slotIndex">Stable active slot index used by slot-specific state.</param>
+    /// <param name="isPressed">Whether the bound input is currently held.</param>
+    /// <param name="pressedThisFrame">Whether the bound input started this frame.</param>
+    /// <param name="releasedThisFrame">Whether the bound input ended this frame.</param>
+    /// <param name="deltaTime">Scaled frame delta used by charge and resource workflows.</param>
+    /// <param name="localTransform">Current player transform.</param>
+    /// <param name="lookState">Resolved player look state used by directional effects.</param>
+    /// <param name="movementState">Current player movement state used by directional effects.</param>
+    /// <param name="runtimeMovementConfig">Scaled movement configuration used during active execution.</param>
+    /// <param name="runtimeShootingConfig">Scaled shooting configuration used by projectile actions.</param>
+    /// <param name="appliedElementSlots">Runtime elemental shooting slots available to projectile actions.</param>
+    /// <param name="passiveToolsState">Aggregated passive snapshot inherited by compatible active actions.</param>
+    /// <param name="muzzleLookup">Read-only muzzle lookup used to resolve projectile origins.</param>
+    /// <param name="transformLookup">Read-only transform lookup used by active action targeting.</param>
+    /// <param name="localToWorldLookup">Read-only world-pose lookup used by active action targeting.</param>
+    /// <param name="moveInput">Raw movement input used by directional active modules.</param>
+    /// <param name="lastValidMovementDirection">Cached movement fallback used by directional active modules.</param>
+    /// <param name="laserBeamState">Mutable player laser-beam runtime state.</param>
+    /// <param name="slotEnergy">Mutable current energy for this slot.</param>
+    /// <param name="cooldownRemaining">Mutable cooldown remaining for this slot.</param>
+    /// <param name="charge">Mutable hold-charge progress for this slot.</param>
+    /// <param name="isCharging">Mutable flag indicating that this slot is charging.</param>
+    /// <param name="isActive">Mutable flag indicating that this slot is active.</param>
+    /// <param name="maintenanceTickTimer">Mutable toggle maintenance timer for this slot.</param>
+    /// <param name="otherSlotCharge">Mutable hold-charge progress for the peer slot.</param>
+    /// <param name="otherSlotCooldownRemaining">Mutable cooldown remaining for the peer slot.</param>
+    /// <param name="otherSlotIsCharging">Mutable charging flag for the peer slot.</param>
+    /// <param name="otherSlotIsActive">Mutable active flag for the peer slot.</param>
+    /// <param name="otherSlotMaintenanceTickTimer">Mutable toggle maintenance timer for the peer slot.</param>
+    /// <param name="isShootingSuppressed">Mutable aggregate shooting-suppression flag.</param>
+    /// <param name="dashState">Mutable dash runtime state.</param>
+    /// <param name="bulletTimeState">Mutable bullet-time runtime state.</param>
+    /// <param name="impactFrameState">Mutable Impact Frame runtime state.</param>
+    /// <param name="ghostTrailState">Mutable Ghost Trail runtime state.</param>
+    /// <param name="healOverTimeState">Mutable healing-over-time runtime state.</param>
+    /// <param name="bombRequests">Output bomb spawn request buffer.</param>
+    /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
+    /// <param name="shootRequests">Output projectile shooting request buffer.</param>
+    /// <param name="dropCollectionRequests">Shared output queue for Drop Attraction pulses.</param>
+    /// <param name="audioRequests">Optional output audio request buffer.</param>
+    /// <param name="canEnqueueAudioRequests">Whether the audio request buffer is available.</param>
+    /// <param name="playerEntity">Player entity owning health, shield and active state.</param>
+    /// <param name="healthLookup">Mutable player health lookup.</param>
+    /// <param name="updatedHealth">Cached mutable health state reused across both slots.</param>
+    /// <param name="healthChanged">Whether the cached health state was fetched or changed.</param>
+    /// <param name="shieldLookup">Mutable player shield lookup.</param>
+    /// <param name="updatedShield">Cached mutable shield state reused across both slots.</param>
+    /// <param name="shieldChanged">Whether the cached shield state was fetched or changed.</param>
     public static void ProcessSlotInput(in PlayerPowerUpSlotConfig slotConfig,
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
                                         byte slotIndex,
@@ -50,6 +103,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         DynamicBuffer<PlayerBombSpawnRequest> bombRequests,
                                         DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
                                         DynamicBuffer<ShootRequest> shootRequests,
+                                        DynamicBuffer<EnemyDropCollectionRequest> dropCollectionRequests,
                                         DynamicBuffer<GameAudioEventRequest> audioRequests,
                                         bool canEnqueueAudioRequests,
                                         Entity playerEntity,
@@ -109,6 +163,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 moveInput,
                                                                                 lastValidMovementDirection,
                                                                                 orbitalProjectionRequests,
+                                                                                dropCollectionRequests,
                                                                                 audioRequests,
                                                                                 canEnqueueAudioRequests);
             return;
@@ -262,6 +317,14 @@ public static class PlayerPowerUpActivationSlotUtility
                                                             orbitalProjectionRequests,
                                                             shootRequests);
 
+        if (slotConfig.HasDropAttraction != 0)
+        {
+            EnemyDropCollectionRequestUtility.Enqueue(dropCollectionRequests,
+                                                      slotConfig.DropAttraction.AttractionRadius,
+                                                      slotConfig.DropAttraction.ConsumeUnusableDrops != 0,
+                                                      false);
+        }
+
         if (canEnqueueAudioRequests)
             EnqueueActiveToolAudio(in slotConfig, localTransform.Position, audioRequests);
 
@@ -406,6 +469,9 @@ public static class PlayerPowerUpActivationSlotUtility
                 return slotConfig.TriggeredProjectilePassiveTool.IsDefined != 0 &&
                        slotConfig.TriggeredProjectilePassiveTool.HasOrbitalProjections != 0 &&
                        slotConfig.TriggeredProjectilePassiveTool.OrbitalProjections.Length > 0;
+            case ActiveToolKind.DropAttraction:
+                return slotConfig.HasDropAttraction != 0 &&
+                       slotConfig.DropAttraction.AttractionRadius > 0f;
             case ActiveToolKind.ChargeShot:
                 if (slotConfig.ChargeShot.RequiredCharge <= 0f)
                     return false;

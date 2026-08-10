@@ -261,6 +261,8 @@ public struct PlayerPassiveToolsState
     public FixedList4096Bytes<OrbitalProjectionConfig> OrbitalProjections;
     public byte HasWeaponSwitch;
     public FixedString64Bytes WeaponId;
+    public byte HasDropAttraction;
+    public DropAttractionPowerUpConfig DropAttraction;
 }
 
 /// <summary>

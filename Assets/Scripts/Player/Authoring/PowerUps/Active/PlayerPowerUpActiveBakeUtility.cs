@@ -237,6 +237,9 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasCharacterTuning = false;
         bool applyCharacterTuningOnActiveTrigger = false;
         bool hasOrbitalProjections = false;
+        bool hasDropAttraction = false;
+        float dropAttractionRadius = 0f;
+        bool consumeUnusableDrops = false;
         bool hasActiveWeaponSwitch = false;
         FixedString64Bytes activeWeaponId = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
@@ -481,6 +484,17 @@ public static class PlayerPowerUpActiveBakeUtility
                     }
 
                     break;
+                case PowerUpModuleKind.AttractDrops:
+                    PowerUpDropAttractionModuleData dropAttractionData = payload.DropAttraction;
+
+                    if (dropAttractionData == null)
+                        break;
+
+                    hasDropAttraction = true;
+                    dropAttractionRadius = math.max(dropAttractionRadius,
+                                                    math.max(0f, dropAttractionData.AttractionRadius));
+                    consumeUnusableDrops = consumeUnusableDrops || dropAttractionData.ConsumeUnusableDrops;
+                    break;
                 case PowerUpModuleKind.SwitchWeapon:
                     if (payload.SwitchWeapon == null)
                         break;
@@ -522,7 +536,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasImpactFrame,
                                                                                               hasGhostTrail,
                                                                                               hasHealthPack,
-                                                                                              hasOrbitalProjections);
+                                                                                              hasOrbitalProjections,
+                                                                                              hasDropAttraction);
 
             if (resolvedToolKind == ActiveToolKind.ChargeShot ||
                 resolvedToolKind == ActiveToolKind.Shotgun ||
@@ -677,6 +692,12 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        activeWeaponId,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
+        slotConfig.HasDropAttraction = hasDropAttraction ? (byte)1 : (byte)0;
+        slotConfig.DropAttraction = new DropAttractionPowerUpConfig
+        {
+            AttractionRadius = math.max(0f, dropAttractionRadius),
+            ConsumeUnusableDrops = consumeUnusableDrops ? (byte)1 : (byte)0
+        };
     }
 
     /// <summary>

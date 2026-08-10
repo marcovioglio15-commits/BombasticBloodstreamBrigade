@@ -33,7 +33,7 @@ public sealed class RuntimeGizmoDebugPanelController : MonoBehaviour
     [SerializeField] private Toggle showLabelsToggle;
 
     [Header("Player Toggles")]
-    [Tooltip("Toggle used to show or hide the player pickup radius gizmo.")]
+    [Tooltip("Toggle used to show or hide the player's normal pickup radius and any larger passive drop-attraction radius.")]
     [SerializeField] private Toggle playerPickupRadiusToggle;
 
     [Tooltip("Toggle used to show or hide the player movement vector gizmo.")]

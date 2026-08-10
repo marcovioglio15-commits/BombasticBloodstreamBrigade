@@ -34,6 +34,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdStackable = "Module_Stackable";
     internal const string ModuleIdLaserBeam = "Module_LaserBeam";
     internal const string ModuleIdSwitchWeapon = "Module_SwitchWeapon";
+    internal const string ModuleIdAttractDrops = "Module_AttractDrops";
 
     internal const string ActivePowerUpIdShotgun = "ActiveShotgun";
     internal const string ActivePowerUpIdChargeShot = "ActiveChargeShot";
@@ -183,6 +184,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdStackable, "Stackable", PowerUpModuleKind.Stackable, PowerUpModuleStage.PostExecute, "Allows milestone reacquisition up to a configured total count."));
         definitions.Add(CreateModuleDefinition(ModuleIdLaserBeam, "Laser Beam", PowerUpModuleKind.LaserBeam, PowerUpModuleStage.Hook, "Overrides base projectile spawning with one or more continuous liquid beam lanes."));
         definitions.Add(CreateModuleDefinition(ModuleIdSwitchWeapon, "Switch Weapon", PowerUpModuleKind.SwitchWeapon, PowerUpModuleStage.Hook, "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with the mountable mesh identified by a defined Weapon Id while the owning power-up is equipped."));
+        definitions.Add(CreateModuleDefinition(ModuleIdAttractDrops, "Attract Drops", PowerUpModuleKind.AttractDrops, PowerUpModuleStage.Execute, "Attracts enemy drops inside a configurable player-centered radius and can optionally consume rewards that cannot currently be used."));
         return definitions;
     }
 
@@ -443,6 +445,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                 break;
             case PowerUpModuleKind.SwitchWeapon:
                 payload.SwitchWeapon.Configure(string.Empty);
+                break;
+            case PowerUpModuleKind.AttractDrops:
+                payload.DropAttraction.Configure(18f, false);
                 break;
             default:
                 break;

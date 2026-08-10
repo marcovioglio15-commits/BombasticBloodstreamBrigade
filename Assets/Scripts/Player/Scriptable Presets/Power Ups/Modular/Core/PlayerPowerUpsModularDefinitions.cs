@@ -58,6 +58,11 @@ public sealed class PowerUpModuleData
     [Tooltip("Healing settings used by Heal modules.")]
     [SerializeField] private PowerUpHealMissingHealthModuleData healMissingHealth = new PowerUpHealMissingHealthModuleData();
 
+    [Header("Execute - Drop Attraction")]
+    [Tooltip("Enemy-drop attraction settings used by AttractDrops modules.")]
+    [SerializeField]
+    private PowerUpDropAttractionModuleData dropAttraction = new PowerUpDropAttractionModuleData();
+
     [Header("Hook - Death Explosion")]
     [Tooltip("Explosion settings used by DeathExplosion modules.")]
     [SerializeField] private ExplosionPassiveToolData deathExplosion = new ExplosionPassiveToolData();
@@ -200,6 +205,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpDropAttractionModuleData DropAttraction
+    {
+        get
+        {
+            return dropAttraction;
+        }
+    }
+
     public ExplosionPassiveToolData DeathExplosion
     {
         get
@@ -322,6 +335,9 @@ public sealed class PowerUpModuleData
         if (healMissingHealth == null)
             healMissingHealth = new PowerUpHealMissingHealthModuleData();
 
+        if (dropAttraction == null)
+            dropAttraction = new PowerUpDropAttractionModuleData();
+
         if (deathExplosion == null)
             deathExplosion = new ExplosionPassiveToolData();
 
@@ -362,6 +378,7 @@ public sealed class PowerUpModuleData
         impactFrame.Validate();
         ghostTrail.Validate();
         healMissingHealth.Validate();
+        dropAttraction.Validate();
         deathExplosion.Validate();
         projectileOrbitOverride.Validate();
         orbitalProjections.Validate();

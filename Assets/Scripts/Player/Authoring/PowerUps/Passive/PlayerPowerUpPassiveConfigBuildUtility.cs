@@ -32,6 +32,7 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasBulletTime != 0 ||
                config.HasLaserBeam != 0 ||
                config.HasOrbitalProjections != 0 ||
+               config.HasDropAttraction != 0 ||
                config.HasWeaponSwitch != 0;
     }
 
@@ -74,6 +75,9 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
 
         if (config.HasWeaponSwitch != 0)
             return PassiveToolKind.Custom;
+
+        if (config.HasDropAttraction != 0)
+            return PassiveToolKind.DropAttraction;
 
         return PassiveToolKind.ProjectileSize;
     }

@@ -562,6 +562,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                 case PowerUpModuleKind.Dash:
                 case PowerUpModuleKind.TimeDilationEnemies:
                 case PowerUpModuleKind.Heal:
+                case PowerUpModuleKind.AttractDrops:
                     hasTriggerableTool = true;
                     break;
             }

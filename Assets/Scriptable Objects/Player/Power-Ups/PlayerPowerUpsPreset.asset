@@ -601,6 +601,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1034,6 +1037,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1467,6 +1473,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1900,6 +1909,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2333,6 +2345,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2766,6 +2781,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3199,6 +3217,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3632,6 +3653,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4065,6 +4089,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4498,6 +4525,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4931,6 +4961,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5364,6 +5397,9 @@ MonoBehaviour:
         durationSeconds: 0
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5797,6 +5833,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6230,6 +6269,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6663,6 +6705,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 2
         cooldownSeconds: 0
@@ -7096,6 +7141,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7529,6 +7577,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7962,6 +8013,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8395,6 +8449,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8828,6 +8885,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9261,6 +9321,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9722,6 +9785,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10155,6 +10221,9 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10589,6 +10658,445 @@ MonoBehaviour:
         durationSeconds: 2
         tickIntervalSeconds: 0.2
         stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
+      deathExplosion:
+        triggerMode: 0
+        cooldownSeconds: 2
+        radius: 4
+        damage: 20
+        affectAllEnemiesInRadius: 1
+        triggerOffset: {x: 0, y: 0, z: 0}
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      projectileOrbitOverride:
+        pathMode: 0
+        radialEntrySpeed: 12
+        orbitalSpeed: 8
+        orbitRadiusMin: 4
+        orbitRadiusMax: 6
+        orbitPulseFrequency: 0.7
+        orbitEntryRatio: 0.9
+        orbitBlendDuration: 0.3
+        heightOffset: 0
+        goldenAngleDegrees: 137.5
+        spiralStartRadius: 2.5
+        spiralMaximumRadius: 8
+        spiralAngularSpeedDegreesPerSecond: 240
+        spiralGrowthMultiplier: 1
+        spiralTurnsBeforeDespawn: 1.25
+        spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
+      projectileBounceOnWalls:
+        maxBounces: 2
+        speedPercentChangePerBounce: -5
+        minimumSpeedMultiplierAfterBounce: 0.1
+        maximumSpeedMultiplierAfterBounce: 3
+      projectileSplit:
+        triggerMode: 0
+        directionMode: 0
+        splitProjectileCount: 2
+        splitOffsetDegrees: 0
+        customAnglesDegrees:
+        - -20
+        - 20
+        splitDamagePercentFromOriginal: 50
+        splitSizePercentFromOriginal: 75
+        splitSpeedPercentFromOriginal: 85
+        splitLifetimePercentFromOriginal: 65
+      laserBeam:
+        damageMultiplier: 1
+        continuousDamagePerSecondMultiplier: 0.28
+        virtualProjectileSpeedMultiplier: 1
+        damageTickIntervalSeconds: 0.15
+        maximumContinuousActiveSeconds: 2.5
+        cooldownSeconds: 2
+        maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
+        visualPresetId: 0
+        bodyProfile: 2
+        sourceShape: 0
+        terminalCapShape: 1
+        bodyWidthMultiplier: 4.25
+        collisionWidthMultiplier: 1
+        sourceScaleMultiplier: 1.35
+        terminalCapScaleMultiplier: 1.85
+        contactFlareScaleMultiplier: 1.2
+        bodyOpacity: 0.96
+        coreWidthMultiplier: 0.52
+        coreBrightness: 1.45
+        rimBrightness: 1.32
+        flowScrollSpeed: 1.15
+        flowPulseFrequency: 1.6
+        stormTwistSpeed: 14
+        stormTickPostTravelHoldSeconds: 0.6
+        stormIdleIntensity: 0.48
+        stormBurstIntensity: 1.1
+        sourceOffset: 0.08
+        sourceDischargeIntensity: 1.2
+        stormShellWidthMultiplier: 1.12
+        stormShellSeparation: 0.32
+        stormRingFrequency: 5.4
+        stormRingThickness: 0.18
+        stormTickTravelSpeed: 1
+        stormTickDamageLengthTolerance: 0.18
+        terminalCapIntensity: 1.12
+        contactFlareIntensity: 1.28
+        wobbleAmplitude: 0.08
+        bubbleDriftSpeed: 1.8
+      switchWeapon:
+        weaponId: 
+      trailSpawn:
+        trailSegmentLifetimeSeconds: 1.5
+        trailSpawnDistance: 0.6
+        trailSpawnIntervalSeconds: 0.1
+        trailRadius: 1.2
+        maxActiveSegmentsPerPlayer: 30
+        trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+      elementalAreaTick:
+        effectData:
+          elementType: 0
+          effectKind: 0
+          procMode: 0
+          reapplyMode: 0
+          procThresholdStacks: 5
+          maximumStacks: 20
+          stackDecayPerSecond: 1
+          consumeStacksOnProc: 0
+          dotDamagePerTick: 4
+          dotTickInterval: 0.5
+          dotDurationSeconds: 2
+          impedimentSlowPercentPerStack: 10
+          impedimentProcSlowPercent: 50
+          impedimentMaxSlowPercent: 100
+          impedimentDurationSeconds: 2
+        stacksPerTick: 1
+        applyIntervalSeconds: 0.2
+      stackable:
+        maxAcquisitions: 2
+  - moduleId: Module_AttractDrops
+    displayName: Attract Drops
+    moduleKind: 24
+    defaultStage: 4
+    notes: 
+    data:
+      holdCharge:
+        requiredCharge: 500
+        maximumCharge: 500
+        chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
+        decayAfterRelease: 0
+        decayAfterReleasePercentPerSecond: 25
+        passiveChargeGainWhileReleased: 0
+        passiveChargeGainPercentPerSecond: 10
+        laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        slowPlayerWhileCharging: 0
+        maximumPlayerSlowPercent: 35
+        playerSlowCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      triggerEvent:
+        eventType: 0
+      resourceGate:
+        activationResource: 1
+        maintenanceResource: 1
+        maximumEnergy: 100
+        activationCost: 100
+        maintenanceCostPerSecond: 0
+        isToggleable: 0
+        maintenanceTicksPerSecond: 4
+        minimumActivationEnergyPercent: 0
+        chargeType: 0
+        chargePerTrigger: 100
+        cooldownSeconds: 1
+        allowRechargeDuringToggleStartupLock: 0
+      suppressShooting:
+        suppressBaseShootingWhileActive: 1
+        interruptOtherSlotOnEnter: 0
+        interruptOtherSlotChargingOnly: 1
+      projectilePatternCone:
+        projectileCount: 6
+        coneAngleDegrees: 45
+        laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+      characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas: []
+      bomb:
+        bombPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 1.2}
+        spawnOffsetOrientation: 0
+        deploySpeed: 4.5
+        velocityDirection: 0
+        collisionRadius: 0.18
+        bounceOnWalls: 1
+        bounceDamping: 0.65
+        linearDampingPerSecond: 1.2
+        fuseSeconds: 1.25
+        radius: 7
+        enableDamagePayload: 1
+        damage: 120
+        affectAllEnemiesInRadius: 1
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      dash:
+        distance: 6
+        directionMode: 0
+        duration: 0.18
+        speedTransitionInSeconds: 0.06
+        speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
+        grantsInvulnerability: 1
+        invulnerabilityExtraTime: 0.1
+      bulletTime:
+        duration: 3
+        enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
+        transitionTimeSeconds: 0.2
+      impactFrame:
+        durationMode: 0
+        durationFrames: 6
+        referenceFrameRate: 60
+        maximumUnscaledDurationSeconds: 0.12
+        easeInUnscaledSeconds: 0.02
+        easeOutUnscaledSeconds: 0.08
+        easingMode: 2
+        timeSlowdownPercent: 95
+        refreshOnShorterRequest: 0
+        presentationScope: 1
+        cameraFeedback:
+          enabled: 0
+          motionMode: 1
+          axisRightEnabled: 1
+          axisUpEnabled: 1
+          axisForwardEnabled: 0
+          positionalAmplitude: 0.35
+          forwardAmplitude: 0.12
+          rotationalAmplitude: 1.25
+          frequency: 18
+          zoomEnabled: 0
+          zoomFovDelta: -2
+        overlayIntensity: 1
+        filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+        desaturationAmount: 0.65
+        vignetteIntensity: 0.55
+        vignetteSoftness: 0.6
+        vignetteExtent: 0.35
+        vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+        radialVignetteIntensity: 0
+        radialVignetteRadius: 0.55
+        radialVignetteSoftness: 0.12
+        radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+        chromaticAberration: 0.012
+        scanlineIntensity: 0.18
+        scanlineFrequency: 320
+        flashIntensity: 0.35
+        radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+        buildIn:
+          enabled: 0
+          releaseUnscaledSeconds: 0.06
+          easingMode: 2
+          effect:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      healMissingHealth:
+        applyMode: 0
+        healAmount: 30
+        durationSeconds: 2
+        tickIntervalSeconds: 0.2
+        stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -11036,6 +11544,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -11469,6 +11980,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -11902,6 +12416,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -12335,6 +12852,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -12770,6 +13290,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -13217,6 +13740,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -13650,6 +14176,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14083,6 +14612,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14520,6 +15052,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14957,6 +15492,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15394,6 +15932,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15831,6 +16372,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16277,6 +16821,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16710,6 +17257,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17143,6 +17693,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17576,6 +18129,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18010,6 +18566,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18444,6 +19003,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18878,6 +19440,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19324,6 +19889,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19757,6 +20325,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20190,6 +20761,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20623,6 +21197,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21070,6 +21647,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21503,6 +22083,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21936,6 +22519,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22369,6 +22955,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22802,6 +23391,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23248,6 +23840,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23681,6 +24276,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24114,6 +24712,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24560,6 +25161,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24993,6 +25597,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25426,6 +26033,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25859,6 +26469,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26302,6 +26915,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26735,6 +27351,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27169,6 +27788,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27292,6 +27914,849 @@ MonoBehaviour:
           applyIntervalSeconds: 0.2
         stackable:
           maxAcquisitions: 2
+    stealProtected: 0
+  - commonData:
+      powerUpId: Active_MassCollector
+      displayName: Mass Collector
+      description: 
+      icon: {fileID: 21300000, guid: 07f626f0de0f90846895633ade142b90, type: 3}
+      dropPools:
+      - Milestone
+      dropTier: 1
+      purchaseCost: 0
+    moduleBindings:
+    - bindingId: 0bad2f9c8a5f4f50aced4ca3f85bdff3
+      moduleId: Module_AttractDrops
+      stage: 4
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0
+          chargedLaserBeam:
+            damageMultiplier: 0
+            continuousDamagePerSecondMultiplier: 0
+            virtualProjectileSpeedMultiplier: 0
+            damageTickIntervalSeconds: 0
+            maximumContinuousActiveSeconds: 0
+            cooldownSeconds: 0
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 0
+            firingRotationSpeedMultiplier: 0
+            visualPresetId: 0
+            bodyProfile: 0
+            sourceShape: 0
+            terminalCapShape: 0
+            bodyWidthMultiplier: 0
+            collisionWidthMultiplier: 0
+            sourceScaleMultiplier: 0
+            terminalCapScaleMultiplier: 0
+            contactFlareScaleMultiplier: 0
+            bodyOpacity: 0
+            coreWidthMultiplier: 0
+            coreBrightness: 0
+            rimBrightness: 0
+            flowScrollSpeed: 0
+            flowPulseFrequency: 0
+            stormTwistSpeed: 0
+            stormTickPostTravelHoldSeconds: 0
+            stormIdleIntensity: 0
+            stormBurstIntensity: 0
+            sourceOffset: 0
+            sourceDischargeIntensity: 0
+            stormShellWidthMultiplier: 0
+            stormShellSeparation: 0
+            stormRingFrequency: 0
+            stormRingThickness: 0
+            stormTickTravelSpeed: 0
+            stormTickDamageLengthTolerance: 0
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
+            wobbleAmplitude: 0
+            bubbleDriftSpeed: 0
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 0
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 0
+          maintenanceResource: 0
+          maximumEnergy: 0
+          activationCost: 0
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 0
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 0
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 0
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0
+          radius: 0
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0
+          enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
+          transitionTimeSeconds: 0
+        impactFrame:
+          durationMode: 0
+          durationFrames: 0
+          referenceFrameRate: 0
+          maximumUnscaledDurationSeconds: 0
+          easeInUnscaledSeconds: 0
+          easeOutUnscaledSeconds: 0
+          easingMode: 0
+          timeSlowdownPercent: 0
+          refreshOnShorterRequest: 0
+          presentationScope: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 0
+            axisRightEnabled: 0
+            axisUpEnabled: 0
+            axisForwardEnabled: 0
+            positionalAmplitude: 0
+            forwardAmplitude: 0
+            rotationalAmplitude: 0
+            frequency: 0
+            zoomEnabled: 0
+            zoomFovDelta: 0
+          overlayIntensity: 0
+          filterTint: {r: 0, g: 0, b: 0, a: 0}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0
+          vignetteExtent: 0
+          vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0
+          radialVignetteSoftness: 0
+          radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 0
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0
+          shockwaveThickness: 0
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 0
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 0
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+          buildIn:
+            enabled: 0
+            releaseUnscaledSeconds: 0
+            easingMode: 0
+            effect:
+              presentationScope: 0
+              timeSlowdownPercent: 0
+              cameraFeedback:
+                enabled: 0
+                motionMode: 0
+                axisRightEnabled: 0
+                axisUpEnabled: 0
+                axisForwardEnabled: 0
+                positionalAmplitude: 0
+                forwardAmplitude: 0
+                rotationalAmplitude: 0
+                frequency: 0
+                zoomEnabled: 0
+                zoomFovDelta: 0
+              overlayIntensity: 0
+              filterTint: {r: 0, g: 0, b: 0, a: 0}
+              desaturationAmount: 0
+              vignetteIntensity: 0
+              vignetteSoftness: 0
+              vignetteExtent: 0
+              vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+              radialVignetteIntensity: 0
+              radialVignetteRadius: 0
+              radialVignetteSoftness: 0
+              radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+              chromaticAberration: 0
+              scanlineIntensity: 0
+              scanlineFrequency: 0
+              flashIntensity: 0
+              radialDistortion: 0
+              shockwaveIntensity: 0
+              shockwaveRadius: 0
+              shockwaveThickness: 0
+              zoomPunchIntensity: 0
+              invertIntensity: 0
+              posterizeIntensity: 0
+              posterizeSteps: 0
+              edgeInkIntensity: 0
+              screenTearIntensity: 0
+              screenTearFrequency: 0
+              paletteFlashIntensity: 0
+              paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+        ghostTrail:
+          durationSeconds: 0
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0
+          easeOutUnscaledSeconds: 0
+          easingMode: 0
+          emissionIntervalSeconds: 0
+          snapshotLifetimeSeconds: 0
+          captureScope: 0
+          movementDistanceThreshold: 0
+          rotationAngleThresholdDegrees: 0
+          maximumActiveSnapshots: 0
+          tint: {x: 0, y: 0, z: 0, w: 0}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 0
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 0
+              axisRightEnabled: 0
+              axisUpEnabled: 0
+              axisForwardEnabled: 0
+              positionalAmplitude: 0
+              forwardAmplitude: 0
+              rotationalAmplitude: 0
+              frequency: 0
+              zoomEnabled: 0
+              zoomFovDelta: 0
+            overlayIntensity: 0
+            filterTint: {r: 0, g: 0, b: 0, a: 0}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0
+            vignetteExtent: 0
+            vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0
+            radialVignetteSoftness: 0
+            radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 0
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0
+            shockwaveThickness: 0
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 0
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 0
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0
+          stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 0
+          spawnAnimationSeconds: 0
+          despawnAnimationSeconds: 0
+          projections: []
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 0
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 0
+          continuousDamagePerSecondMultiplier: 0
+          virtualProjectileSpeedMultiplier: 0
+          damageTickIntervalSeconds: 0
+          maximumContinuousActiveSeconds: 0
+          cooldownSeconds: 0
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 0
+          terminalCapShape: 0
+          bodyWidthMultiplier: 0
+          collisionWidthMultiplier: 0
+          sourceScaleMultiplier: 0
+          terminalCapScaleMultiplier: 0
+          contactFlareScaleMultiplier: 0
+          bodyOpacity: 0
+          coreWidthMultiplier: 0
+          coreBrightness: 0
+          rimBrightness: 0
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0
+          sourceDischargeIntensity: 0
+          stormShellWidthMultiplier: 0
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0
+          stormTickTravelSpeed: 0
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 0
+          contactFlareIntensity: 0
+          wobbleAmplitude: 0
+          bubbleDriftSpeed: 0
+        switchWeapon:
+          weaponId: 
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 0
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0
+            maximumStacks: 0
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0
+            dotDurationSeconds: 0
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0
+          stacksPerTick: 0
+          applyIntervalSeconds: 0
+        stackable:
+          maxAcquisitions: 0
+    - bindingId: 80dbfa23815845b389becde7a359e8cd
+      moduleId: Module_GateResource
+      stage: 2
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 0
+          maximumCharge: 0
+          chargeRatePerSecond: 0
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 0
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 0
+          laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0
+          chargedLaserBeam:
+            damageMultiplier: 0
+            continuousDamagePerSecondMultiplier: 0
+            virtualProjectileSpeedMultiplier: 0
+            damageTickIntervalSeconds: 0
+            maximumContinuousActiveSeconds: 0
+            cooldownSeconds: 0
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 0
+            firingRotationSpeedMultiplier: 0
+            visualPresetId: 0
+            bodyProfile: 0
+            sourceShape: 0
+            terminalCapShape: 0
+            bodyWidthMultiplier: 0
+            collisionWidthMultiplier: 0
+            sourceScaleMultiplier: 0
+            terminalCapScaleMultiplier: 0
+            contactFlareScaleMultiplier: 0
+            bodyOpacity: 0
+            coreWidthMultiplier: 0
+            coreBrightness: 0
+            rimBrightness: 0
+            flowScrollSpeed: 0
+            flowPulseFrequency: 0
+            stormTwistSpeed: 0
+            stormTickPostTravelHoldSeconds: 0
+            stormIdleIntensity: 0
+            stormBurstIntensity: 0
+            sourceOffset: 0
+            sourceDischargeIntensity: 0
+            stormShellWidthMultiplier: 0
+            stormShellSeparation: 0
+            stormRingFrequency: 0
+            stormRingThickness: 0
+            stormTickTravelSpeed: 0
+            stormTickDamageLengthTolerance: 0
+            terminalCapIntensity: 0
+            contactFlareIntensity: 0
+            wobbleAmplitude: 0
+            bubbleDriftSpeed: 0
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 0
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve: []
+            m_PreInfinity: 0
+            m_PostInfinity: 0
+            m_RotationOrder: 0
+        triggerEvent:
+          eventType: 0
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 0
+          maximumEnergy: 100
+          activationCost: 15
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 100
+          chargeType: 1
+          chargePerTrigger: 5
+          cooldownSeconds: 3
+          allowRechargeDuringToggleStartupLock: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 0
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 0
+        projectilePatternCone:
+          projectileCount: 0
+          coneAngleDegrees: 0
+          laserDurationSeconds: 0
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 0}
+          spawnOffsetOrientation: 0
+          deploySpeed: 0
+          velocityDirection: 0
+          collisionRadius: 0
+          bounceOnWalls: 0
+          bounceDamping: 0
+          linearDampingPerSecond: 0
+          fuseSeconds: 0
+          radius: 0
+          enableDamagePayload: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        dash:
+          distance: 0
+          directionMode: 0
+          duration: 0
+          speedTransitionInSeconds: 0
+          speedTransitionOutSeconds: 0
+          wallBounceIntensity: 0
+          grantsInvulnerability: 0
+          invulnerabilityExtraTime: 0
+        bulletTime:
+          duration: 0
+          enemySlowPercent: 0
+          playerProjectileSlowPercent: 0
+          transitionTimeSeconds: 0
+        impactFrame:
+          durationMode: 0
+          durationFrames: 0
+          referenceFrameRate: 0
+          maximumUnscaledDurationSeconds: 0
+          easeInUnscaledSeconds: 0
+          easeOutUnscaledSeconds: 0
+          easingMode: 0
+          timeSlowdownPercent: 0
+          refreshOnShorterRequest: 0
+          presentationScope: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 0
+            axisRightEnabled: 0
+            axisUpEnabled: 0
+            axisForwardEnabled: 0
+            positionalAmplitude: 0
+            forwardAmplitude: 0
+            rotationalAmplitude: 0
+            frequency: 0
+            zoomEnabled: 0
+            zoomFovDelta: 0
+          overlayIntensity: 0
+          filterTint: {r: 0, g: 0, b: 0, a: 0}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0
+          vignetteExtent: 0
+          vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0
+          radialVignetteSoftness: 0
+          radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 0
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0
+          shockwaveThickness: 0
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 0
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 0
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+          buildIn:
+            enabled: 0
+            releaseUnscaledSeconds: 0
+            easingMode: 0
+            effect:
+              presentationScope: 0
+              timeSlowdownPercent: 0
+              cameraFeedback:
+                enabled: 0
+                motionMode: 0
+                axisRightEnabled: 0
+                axisUpEnabled: 0
+                axisForwardEnabled: 0
+                positionalAmplitude: 0
+                forwardAmplitude: 0
+                rotationalAmplitude: 0
+                frequency: 0
+                zoomEnabled: 0
+                zoomFovDelta: 0
+              overlayIntensity: 0
+              filterTint: {r: 0, g: 0, b: 0, a: 0}
+              desaturationAmount: 0
+              vignetteIntensity: 0
+              vignetteSoftness: 0
+              vignetteExtent: 0
+              vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+              radialVignetteIntensity: 0
+              radialVignetteRadius: 0
+              radialVignetteSoftness: 0
+              radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+              chromaticAberration: 0
+              scanlineIntensity: 0
+              scanlineFrequency: 0
+              flashIntensity: 0
+              radialDistortion: 0
+              shockwaveIntensity: 0
+              shockwaveRadius: 0
+              shockwaveThickness: 0
+              zoomPunchIntensity: 0
+              invertIntensity: 0
+              posterizeIntensity: 0
+              posterizeSteps: 0
+              edgeInkIntensity: 0
+              screenTearIntensity: 0
+              screenTearFrequency: 0
+              paletteFlashIntensity: 0
+              paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+        ghostTrail:
+          durationSeconds: 0
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0
+          easeOutUnscaledSeconds: 0
+          easingMode: 0
+          emissionIntervalSeconds: 0
+          snapshotLifetimeSeconds: 0
+          captureScope: 0
+          movementDistanceThreshold: 0
+          rotationAngleThresholdDegrees: 0
+          maximumActiveSnapshots: 0
+          tint: {x: 0, y: 0, z: 0, w: 0}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 0
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 0
+              axisRightEnabled: 0
+              axisUpEnabled: 0
+              axisForwardEnabled: 0
+              positionalAmplitude: 0
+              forwardAmplitude: 0
+              rotationalAmplitude: 0
+              frequency: 0
+              zoomEnabled: 0
+              zoomFovDelta: 0
+            overlayIntensity: 0
+            filterTint: {r: 0, g: 0, b: 0, a: 0}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0
+            vignetteExtent: 0
+            vignetteTint: {x: 0, y: 0, z: 0, w: 0}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0
+            radialVignetteSoftness: 0
+            radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 0
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0
+            shockwaveThickness: 0
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 0
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 0
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 0
+          durationSeconds: 0
+          tickIntervalSeconds: 0
+          stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 0
+          radius: 0
+          damage: 0
+          affectAllEnemiesInRadius: 0
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 0
+          vfxScaleMultiplier: 0
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 0
+          orbitalSpeed: 0
+          orbitRadiusMin: 0
+          orbitRadiusMax: 0
+          orbitPulseFrequency: 0
+          orbitEntryRatio: 0
+          orbitBlendDuration: 0
+          heightOffset: 0
+          goldenAngleDegrees: 0
+          spiralStartRadius: 0
+          spiralMaximumRadius: 0
+          spiralAngularSpeedDegreesPerSecond: 0
+          spiralGrowthMultiplier: 0
+          spiralTurnsBeforeDespawn: 0
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 0
+          spawnAnimationSeconds: 0
+          despawnAnimationSeconds: 0
+          projections: []
+        projectileBounceOnWalls:
+          maxBounces: 0
+          speedPercentChangePerBounce: 0
+          minimumSpeedMultiplierAfterBounce: 0
+          maximumSpeedMultiplierAfterBounce: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 0
+          splitOffsetDegrees: 0
+          customAnglesDegrees: []
+          splitDamagePercentFromOriginal: 0
+          splitSizePercentFromOriginal: 0
+          splitSpeedPercentFromOriginal: 0
+          splitLifetimePercentFromOriginal: 0
+        laserBeam:
+          damageMultiplier: 0
+          continuousDamagePerSecondMultiplier: 0
+          virtualProjectileSpeedMultiplier: 0
+          damageTickIntervalSeconds: 0
+          maximumContinuousActiveSeconds: 0
+          cooldownSeconds: 0
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 0
+          firingRotationSpeedMultiplier: 0
+          visualPresetId: 0
+          bodyProfile: 0
+          sourceShape: 0
+          terminalCapShape: 0
+          bodyWidthMultiplier: 0
+          collisionWidthMultiplier: 0
+          sourceScaleMultiplier: 0
+          terminalCapScaleMultiplier: 0
+          contactFlareScaleMultiplier: 0
+          bodyOpacity: 0
+          coreWidthMultiplier: 0
+          coreBrightness: 0
+          rimBrightness: 0
+          flowScrollSpeed: 0
+          flowPulseFrequency: 0
+          stormTwistSpeed: 0
+          stormTickPostTravelHoldSeconds: 0
+          stormIdleIntensity: 0
+          stormBurstIntensity: 0
+          sourceOffset: 0
+          sourceDischargeIntensity: 0
+          stormShellWidthMultiplier: 0
+          stormShellSeparation: 0
+          stormRingFrequency: 0
+          stormRingThickness: 0
+          stormTickTravelSpeed: 0
+          stormTickDamageLengthTolerance: 0
+          terminalCapIntensity: 0
+          contactFlareIntensity: 0
+          wobbleAmplitude: 0
+          bubbleDriftSpeed: 0
+        switchWeapon:
+          weaponId: 
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 0
+          trailSpawnDistance: 0
+          trailSpawnIntervalSeconds: 0
+          trailRadius: 0
+          maxActiveSegmentsPerPlayer: 0
+          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 0
+            maximumStacks: 0
+            stackDecayPerSecond: 0
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 0
+            dotTickInterval: 0
+            dotDurationSeconds: 0
+            impedimentSlowPercentPerStack: 0
+            impedimentProcSlowPercent: 0
+            impedimentMaxSlowPercent: 0
+            impedimentDurationSeconds: 0
+          stacksPerTick: 0
+          applyIntervalSeconds: 0
+        stackable:
+          maxAcquisitions: 0
     stealProtected: 0
   passivePowerUps:
   - commonData:
@@ -27617,6 +29082,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28050,6 +29518,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28496,6 +29967,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28942,6 +30416,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -29376,6 +30853,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -29824,6 +31304,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -30258,6 +31741,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -30692,6 +32178,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31138,6 +32627,9 @@ MonoBehaviour:
           durationSeconds: 2
           tickIntervalSeconds: 0.2
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31586,6 +33078,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -32032,6 +33527,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -32474,6 +33972,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -32906,6 +34407,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -33349,6 +34853,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -33781,6 +35288,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -34213,6 +35723,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -34655,6 +36168,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -35087,6 +36603,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -35529,6 +37048,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -35961,6 +37483,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -36404,6 +37929,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -36847,6 +38375,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -37289,6 +38820,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -37721,6 +39255,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -38153,6 +39690,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0.01
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -38577,6 +40117,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -39028,6 +40571,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -39479,6 +41025,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -39957,6 +41506,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -40397,6 +41949,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -40852,6 +42407,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41280,6 +42838,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41706,6 +43267,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42132,6 +43696,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42558,6 +44125,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42984,6 +44554,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43399,6 +44972,9 @@ MonoBehaviour:
           durationSeconds: 0
           tickIntervalSeconds: 0
           stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43522,9 +45098,8 @@ MonoBehaviour:
           maxAcquisitions: 2
     stealProtected: 0
   primaryActivePowerUpId: ActiveBasicDash
-  secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - Passive_AllRoundProtection
+  secondaryActivePowerUpId: Active_MassCollector
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

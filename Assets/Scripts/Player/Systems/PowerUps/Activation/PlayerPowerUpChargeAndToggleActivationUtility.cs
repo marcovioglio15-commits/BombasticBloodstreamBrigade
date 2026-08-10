@@ -52,6 +52,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="moveInput">Raw movement input used as final fallback for chained Dash modules.</param>
     /// <param name="lastValidMovementDirection">Cached movement direction used as fallback for chained Dash modules.</param>
     /// <param name="orbitalProjectionRequests">Output orbital projection spawn request buffer.</param>
+    /// <param name="dropCollectionRequests">Shared drop-collection request queue receiving activation side effects.</param>
     /// <param name="audioRequests">Optional audio request buffer used when a Game Audio singleton exists.</param>
     /// <param name="canEnqueueAudioRequests">True when audioRequests points to a valid buffer.</param>
     public static void ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
@@ -98,6 +99,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                              float2 moveInput,
                                              float3 lastValidMovementDirection,
                                              DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests,
+                                             DynamicBuffer<EnemyDropCollectionRequest> dropCollectionRequests,
                                              DynamicBuffer<GameAudioEventRequest> audioRequests,
                                              bool canEnqueueAudioRequests)
     {
@@ -222,6 +224,14 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                                           normalizedCharge,
                                                                           orbitalProjectionRequests,
                                                                           shootRequests);
+
+                if (slotConfig.HasDropAttraction != 0)
+                {
+                    EnemyDropCollectionRequestUtility.Enqueue(dropCollectionRequests,
+                                                              slotConfig.DropAttraction.AttractionRadius,
+                                                              slotConfig.DropAttraction.ConsumeUnusableDrops != 0,
+                                                              false);
+                }
 
                 PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,
                                                                             in lookState,

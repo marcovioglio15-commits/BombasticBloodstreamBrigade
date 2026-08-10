@@ -40,7 +40,8 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.ProjectileSplit,
         PowerUpModuleKind.Stackable,
         PowerUpModuleKind.LaserBeam,
-        PowerUpModuleKind.SwitchWeapon
+        PowerUpModuleKind.SwitchWeapon,
+        PowerUpModuleKind.AttractDrops
     };
     #endregion
 
@@ -152,6 +153,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Replaces base projectile emission with one or more continuous liquid-laser lanes derived from current shooting and projectile passives.";
             case PowerUpModuleKind.SwitchWeapon:
                 return "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with the mountable mesh identified by a Weapon Id while the owning passive or toggleable active power-up is in effect.";
+            case PowerUpModuleKind.AttractDrops:
+                return "Attracts enemy drops inside a player-centered radius. Passives apply continuously, standard actives emit one request per activation, and toggleable Resource Gates apply while active.";
             default:
                 return "No description available.";
         }
@@ -258,6 +261,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.SwitchWeapon:
                 relativePropertyPath = "switchWeapon";
                 payloadLabel = "Switch Weapon Payload";
+                return true;
+            case PowerUpModuleKind.AttractDrops:
+                relativePropertyPath = "dropAttraction";
+                payloadLabel = "Drop Attraction Payload";
                 return true;
             default:
                 relativePropertyPath = string.Empty;
