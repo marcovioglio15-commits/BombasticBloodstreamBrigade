@@ -27,6 +27,7 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     /// <returns>Aggregate refresh report; a zero count means every referenced room was already current.</returns>
     public static GameRoomMetadataRefreshReport RefreshStaleReferencedRooms(GameProceduralLevelPreset preset)
     {
+        SynchronizeSceneReferences();
         return RefreshStaleRooms(preset, GameRoomMetadataScannerUtility.CollectReferencedSceneIds(preset));
     }
 
@@ -39,6 +40,7 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     public static GameRoomMetadataRefreshReport RefreshStaleLevelRooms(GameProceduralLevelPreset preset,
                                                                        GameProceduralLevelDefinition level)
     {
+        SynchronizeSceneReferences();
         return RefreshStaleRooms(preset, GameRoomMetadataScannerUtility.CollectReferencedSceneIds(level));
     }
 
@@ -48,6 +50,7 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     /// <returns>Aggregate project refresh report containing every warning and blocking scan error.</returns>
     public static GameRoomMetadataRefreshReport RefreshAllStaleReferencedRooms()
     {
+        SynchronizeSceneReferences();
         GameRoomMetadataRefreshReport aggregateReport = new GameRoomMetadataRefreshReport();
         string[] presetGuids = AssetDatabase.FindAssets("t:GameProceduralLevelPreset", new[] { "Assets" });
 
@@ -62,7 +65,9 @@ public static class GameRoomMetadataAutomaticRefreshUtility
             if (preset == null)
                 continue;
 
-            GameRoomMetadataRefreshReport presetReport = RefreshStaleReferencedRooms(preset);
+            GameRoomMetadataRefreshReport presetReport = RefreshStaleRooms(
+                preset,
+                GameRoomMetadataScannerUtility.CollectReferencedSceneIds(preset));
             aggregateReport.Merge(presetReport);
 
             // Generated metadata must reach disk immediately: DOTS import workers and Play Mode bootstrap do not
@@ -105,6 +110,15 @@ public static class GameRoomMetadataAutomaticRefreshUtility
     #endregion
 
     #region Refresh Methods
+    /// <summary>
+    /// Repairs rename-sensitive scene catalogs and consumes queued structural changes before room scanning.
+    /// </summary>
+    private static void SynchronizeSceneReferences()
+    {
+        GameSceneReferenceMetadataSynchronizer.SynchronizeAllStableReferences();
+        GameSceneReferenceMetadataSynchronizer.SynchronizeQueuedSceneStructures();
+    }
+
     /// <summary>
     /// Filters one room set by cache freshness before invoking the scene scanner.
     /// </summary>

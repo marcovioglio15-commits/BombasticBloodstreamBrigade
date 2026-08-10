@@ -32,7 +32,9 @@ public static class GameRoomMetadataSceneSaveWatcher
         if (!scene.IsValid() || string.IsNullOrWhiteSpace(scene.path))
             return;
 
-        GameRoomMetadataCacheInvalidationUtility.MarkStaleForAssetPaths(new List<string> { scene.path });
+        List<string> savedScenePaths = new List<string> { scene.path };
+        GameRoomMetadataCacheInvalidationUtility.MarkStaleForAssetPaths(savedScenePaths);
+        GameSceneReferenceMetadataSynchronizer.QueueChangedScenePaths(savedScenePaths);
         GameRoomMetadataAutomaticRefreshUtility.ScheduleRefresh();
     }
     #endregion

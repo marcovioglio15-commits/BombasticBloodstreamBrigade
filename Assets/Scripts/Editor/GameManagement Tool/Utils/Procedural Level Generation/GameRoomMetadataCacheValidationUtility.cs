@@ -114,7 +114,7 @@ public static class GameRoomMetadataCacheValidationUtility
                                           List<string> warnings)
     {
         if (metadata.CacheStale)
-            warnings.Add(label + " is stale. Use Refresh Room Metadata before preview, bake or play.");
+            warnings.Add(label + " is stale and queued for automatic refresh. Use Refresh Room Metadata only to retry immediately.");
 
         if (metadata.SourceScenePaths == null || metadata.SourceScenePaths.Count == 0)
         {

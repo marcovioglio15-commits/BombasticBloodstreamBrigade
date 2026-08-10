@@ -20,38 +20,19 @@ internal static class GameWaveSceneEditorUtility
     /// <returns>Empty text on success, otherwise an actionable scene-structure warning.</returns>
     public static string SynchronizeMapping(SerializedProperty mappingProperty)
     {
-        if (mappingProperty == null)
-            return "Wave scene mapping is missing.";
+        SynchronizeMapping(mappingProperty, true, out string warning);
+        return warning;
+    }
 
-        SerializedProperty mainSceneAssetProperty = mappingProperty.FindPropertyRelative("mainSceneAsset");
-        SceneAsset mainSceneAsset = mainSceneAssetProperty == null
-            ? null
-            : mainSceneAssetProperty.objectReferenceValue as SceneAsset;
-
-        if (mainSceneAsset == null)
-        {
-            ClearResolvedSceneData(mappingProperty);
-            return "Select a managed main room scene.";
-        }
-
-        string mainScenePath = AssetDatabase.GetAssetPath(mainSceneAsset);
-        mappingProperty.FindPropertyRelative("mainScenePath").stringValue = mainScenePath;
-        mappingProperty.FindPropertyRelative("mainSceneGuid").stringValue = AssetDatabase.AssetPathToGUID(mainScenePath);
-
-        if (!TryResolveSingleSubScene(mainScenePath, out string subScenePath, out string warning))
-        {
-            ClearSubSceneData(mappingProperty);
-            return warning;
-        }
-
-        mappingProperty.FindPropertyRelative("subScenePath").stringValue = subScenePath;
-        mappingProperty.FindPropertyRelative("subSceneGuid").stringValue = AssetDatabase.AssetPathToGUID(subScenePath);
-
-        if (!TryResolveSingleSpawner(subScenePath, out EnemyWavePreset wavePreset, out warning))
-            return warning;
-
-        mappingProperty.FindPropertyRelative("wavePreset").objectReferenceValue = wavePreset;
-        return string.Empty;
+    /// <summary>
+    /// Refreshes one mapping from stable scene references without erasing its last valid metadata when an imported scene is temporarily unavailable.
+    /// </summary>
+    /// <param name="mappingProperty">Serialized GameWaveSceneDefinition being refreshed.</param>
+    /// <param name="warning">Empty text on success, otherwise an actionable scene-structure warning.</param>
+    /// <returns>True when the managed scene, SubScene and unique wave preset were resolved.</returns>
+    public static bool TrySynchronizeMapping(SerializedProperty mappingProperty, out string warning)
+    {
+        return SynchronizeMapping(mappingProperty, false, out warning);
     }
 
     /// <summary>
@@ -71,6 +52,12 @@ internal static class GameWaveSceneEditorUtility
         if (string.IsNullOrWhiteSpace(mainScenePath))
         {
             warning = "Managed main scene path is empty.";
+            return false;
+        }
+
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(mainScenePath) == null)
+        {
+            warning = "Managed main scene file was not found at '" + mainScenePath + "'.";
             return false;
         }
 
@@ -123,6 +110,19 @@ internal static class GameWaveSceneEditorUtility
     {
         wavePreset = null;
         warning = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(subScenePath))
+        {
+            warning = "ECS SubScene path is empty.";
+            return false;
+        }
+
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(subScenePath) == null)
+        {
+            warning = "ECS SubScene file was not found at '" + subScenePath + "'.";
+            return false;
+        }
+
         Scene scene = SceneManager.GetSceneByPath(subScenePath);
         bool closeScene = false;
 
@@ -182,6 +182,61 @@ internal static class GameWaveSceneEditorUtility
     #endregion
 
     #region Helper Methods
+    /// <summary>
+    /// Resolves scene paths, GUIDs and the wave preset from one editor-only main scene reference.
+    /// </summary>
+    /// <param name="mappingProperty">Serialized mapping receiving resolved metadata.</param>
+    /// <param name="clearInvalidData">True for explicit edits that should clear invalid dependent fields; false for non-destructive automatic refresh.</param>
+    /// <param name="warning">Empty text on success, otherwise an actionable scene-structure warning.</param>
+    /// <returns>True when every required mapping dependency was resolved.</returns>
+    private static bool SynchronizeMapping(SerializedProperty mappingProperty,
+                                           bool clearInvalidData,
+                                           out string warning)
+    {
+        warning = string.Empty;
+
+        if (mappingProperty == null)
+        {
+            warning = "Wave scene mapping is missing.";
+            return false;
+        }
+
+        SerializedProperty mainSceneAssetProperty = mappingProperty.FindPropertyRelative("mainSceneAsset");
+        SceneAsset mainSceneAsset = mainSceneAssetProperty == null
+            ? null
+            : mainSceneAssetProperty.objectReferenceValue as SceneAsset;
+
+        if (mainSceneAsset == null)
+        {
+            if (clearInvalidData)
+                ClearResolvedSceneData(mappingProperty);
+
+            warning = "Select a managed main room scene.";
+            return false;
+        }
+
+        string mainScenePath = AssetDatabase.GetAssetPath(mainSceneAsset);
+        mappingProperty.FindPropertyRelative("mainScenePath").stringValue = mainScenePath;
+        mappingProperty.FindPropertyRelative("mainSceneGuid").stringValue = AssetDatabase.AssetPathToGUID(mainScenePath);
+
+        if (!TryResolveSingleSubScene(mainScenePath, out string subScenePath, out warning))
+        {
+            if (clearInvalidData)
+                ClearSubSceneData(mappingProperty);
+
+            return false;
+        }
+
+        mappingProperty.FindPropertyRelative("subScenePath").stringValue = subScenePath;
+        mappingProperty.FindPropertyRelative("subSceneGuid").stringValue = AssetDatabase.AssetPathToGUID(subScenePath);
+
+        if (!TryResolveSingleSpawner(subScenePath, out EnemyWavePreset wavePreset, out warning))
+            return false;
+
+        mappingProperty.FindPropertyRelative("wavePreset").objectReferenceValue = wavePreset;
+        return true;
+    }
+
     /// <summary>
     /// Collects all nested components of one type from a loaded preview scene.
     /// </summary>

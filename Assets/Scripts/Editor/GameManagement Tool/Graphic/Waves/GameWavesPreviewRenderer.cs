@@ -67,6 +67,13 @@ internal sealed class GameWavesPreviewRenderer : IDisposable
             return;
         }
 
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(mainScenePath) == null ||
+            AssetDatabase.LoadAssetAtPath<SceneAsset>(subScenePath) == null)
+        {
+            loadWarning = "Mapped scene metadata is stale or missing. Re-select the main room scene if automatic GUID recovery cannot resolve it.";
+            return;
+        }
+
         previewUtility = new PreviewRenderUtility(true);
         previewUtility.ambientColor = new Color(0.32f, 0.32f, 0.34f, 1f);
         previewUtility.lights[0].intensity = 1.15f;

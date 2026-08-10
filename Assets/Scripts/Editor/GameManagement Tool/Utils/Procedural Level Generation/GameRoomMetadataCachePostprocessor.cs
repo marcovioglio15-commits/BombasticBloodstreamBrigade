@@ -44,6 +44,10 @@ public sealed class GameRoomMetadataCachePostprocessor : AssetPostprocessor
         AppendScenePaths(movedFromAssetPaths, removedScenePaths);
         GameRoomMetadataCacheInvalidationUtility.MarkStaleForAssetPaths(removedScenePaths);
 
+        // Stable scene identities repair renamed paths, while affected mappings receive one deferred structure scan.
+        GameSceneReferenceMetadataSynchronizer.QueueChangedScenePaths(importedScenePaths);
+        GameSceneReferenceMetadataSynchronizer.QueueChangedScenePaths(removedScenePaths);
+
         if (importedScenePaths.Count > 0 || removedScenePaths.Count > 0)
             GameRoomMetadataAutomaticRefreshUtility.ScheduleRefresh();
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 
 /// <summary>
 /// Produces non-mutating authoring warnings for brush categories, scene mappings and ordered wave sequences.
@@ -46,8 +47,20 @@ internal static class GameWavesValidationUtility
             else if (!mappedMainScenes.Add(mapping.MainScenePath))
                 warnings.Add(context + " duplicates main scene '" + mapping.MainScenePath + "'.");
 
+            ValidateSceneReference(context,
+                                   "managed main scene",
+                                   mapping.MainScenePath,
+                                   mapping.MainSceneGuid,
+                                   warnings);
+
             if (string.IsNullOrWhiteSpace(mapping.SubScenePath))
                 warnings.Add(context + " has no resolved single SubScene.");
+
+            ValidateSceneReference(context,
+                                   "ECS SubScene",
+                                   mapping.SubScenePath,
+                                   mapping.SubSceneGuid,
+                                   warnings);
 
             if (mapping.WavePreset == null)
             {
@@ -78,6 +91,45 @@ internal static class GameWavesValidationUtility
 
         return warnings;
     }
+    #endregion
+
+    #region Scene Mapping Methods
+
+    /// <summary>
+    /// Validates one serialized scene path against its stable Unity GUID without changing the mapping.
+    /// </summary>
+    /// <param name="context">Readable mapping label used by warnings.</param>
+    /// <param name="referenceLabel">Scene-reference role used by warnings.</param>
+    /// <param name="scenePath">Stored project-relative scene path.</param>
+    /// <param name="sceneGuid">Stored stable Unity scene GUID.</param>
+    /// <param name="warnings">Output warning list.</param>
+    private static void ValidateSceneReference(string context,
+                                               string referenceLabel,
+                                               string scenePath,
+                                               string sceneGuid,
+                                               List<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(scenePath))
+            return;
+
+        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) == null)
+            warnings.Add(context + " uses a missing or renamed " + referenceLabel + " path '" + scenePath + "'.");
+
+        if (string.IsNullOrWhiteSpace(sceneGuid))
+        {
+            warnings.Add(context + " has no stable GUID for its " + referenceLabel + ".");
+            return;
+        }
+
+        string guidPath = AssetDatabase.GUIDToAssetPath(sceneGuid);
+
+        if (string.IsNullOrWhiteSpace(guidPath))
+            warnings.Add(context + " references an unavailable " + referenceLabel + " GUID '" + sceneGuid + "'.");
+        else if (!string.Equals(scenePath, guidPath, StringComparison.OrdinalIgnoreCase))
+            warnings.Add(context + " stores a stale " + referenceLabel + " path; GUID '" + sceneGuid +
+                         "' currently resolves to '" + guidPath + "'.");
+    }
+
     #endregion
 
     #region Category Methods

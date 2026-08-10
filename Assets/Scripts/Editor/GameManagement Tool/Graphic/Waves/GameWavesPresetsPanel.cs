@@ -302,6 +302,7 @@ public sealed class GameWavesPresetsPanel
             return;
         }
 
+        GameSceneReferenceMetadataSynchronizer.SynchronizeWavesPreset(preset);
         preset.EnsureInitialized();
         EditorPrefs.SetString(SelectedPresetStateKey, AssetDatabase.GetAssetPath(preset));
         serializedPreset = new SerializedObject(preset);
