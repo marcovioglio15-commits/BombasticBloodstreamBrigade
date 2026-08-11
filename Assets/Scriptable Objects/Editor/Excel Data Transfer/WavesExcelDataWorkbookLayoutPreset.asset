@@ -49,6 +49,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: WAVES WORKBOOK
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -68,8 +69,8 @@ MonoBehaviour:
         expectedDataKind: 0
         concreteListIndices: 
         stableListKeys: []
-      literalText: Concrete wave elements, spawn references and wave timing
-        values.
+      literalText: Concrete wave elements, spawn references and wave timing values.
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -90,6 +91,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SETTING
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -110,6 +112,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: VALUE
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -130,6 +133,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SOURCE ASSET
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -150,6 +154,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SERIALIZED PATH
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -170,6 +175,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: WAVE ASSET
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -190,6 +196,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Preset Name
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -210,6 +217,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Empty
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -230,6 +238,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.waveLabel
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -251,6 +260,7 @@ MonoBehaviour:
         stableListKeys:
         - 
       literalText: 
+      formulaExpression: 
       brushId: 4bb31f2f7473414793f2d53f419d663e
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -271,6 +281,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Wave Count
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -291,6 +302,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Empty
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -311,6 +323,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_Count
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -331,6 +344,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -351,6 +365,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: CONCRETE WAVE ELEMENT
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -371,6 +386,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Enemy Reference
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -391,6 +407,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Wave_EasyMedium
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -411,6 +428,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.paintedCells_1.masterPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -433,6 +451,7 @@ MonoBehaviour:
         - 
         - 
       literalText: 
+      formulaExpression: 
       brushId: dca0664021be484f91fcdae4ede988df
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -453,6 +472,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Spawn Count
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -473,6 +493,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Wave_EasyMedium
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -493,6 +514,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.paintedCells_1.enemyCount
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -515,6 +537,7 @@ MonoBehaviour:
         - 
         - 
       literalText: 
+      formulaExpression: 
       brushId: f47036b3632b46b9ac77e3c57a7095cf
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -535,6 +558,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Spawn Delay
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -555,6 +579,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Empty
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -575,6 +600,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.startDelaySeconds
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -596,6 +622,7 @@ MonoBehaviour:
         stableListKeys:
         - 
       literalText: 
+      formulaExpression: 
       brushId: f47036b3632b46b9ac77e3c57a7095cf
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -616,6 +643,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Wave Mode
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -636,6 +664,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Empty
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -656,6 +685,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.startMode
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -677,6 +707,7 @@ MonoBehaviour:
         stableListKeys:
         - 
       literalText: 
+      formulaExpression: 
       brushId: d6ded120e7114b05a59463652ce100f5
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -697,6 +728,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Wave Enabled
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -717,6 +749,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: PF_EnemySpawner_Empty
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -737,6 +770,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: waves_1.previewInScene
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -758,6 +792,7 @@ MonoBehaviour:
         stableListKeys:
         - 
       literalText: 
+      formulaExpression: 
       brushId: 7ef773466c8448528dfb2e77e3b2b6c3
       numberFormat: 
       validateLiteralDuringImport: 0

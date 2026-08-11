@@ -2,7 +2,7 @@ using Unity.Collections;
 using Unity.Entities;
 
 /// <summary>
-/// Converts each authoritative procedural room-clear event into one immediate collect-all request exactly once.
+/// Marks all active drops for persistent attraction once per authoritative procedural room-clear event.
 /// </summary>
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(GameProceduralRoomCompletionSystem))]
@@ -30,7 +30,7 @@ public partial struct EnemyRoomClearDropCollectionSystem : ISystem
     }
 
     /// <summary>
-    /// Enqueues a distance-independent forced collection for the latest room-clear transaction.
+    /// Starts distance-independent attraction for every drop belonging to the latest room-clear transaction.
     /// </summary>
     /// <param name="state">Current ECS system state providing manager events and request-queue access.</param>
     public void OnUpdate(ref SystemState state)
@@ -53,13 +53,9 @@ public partial struct EnemyRoomClearDropCollectionSystem : ISystem
             requestQueue.LastQueuedRunSeed == clearedEvent.RunSeed &&
             requestQueue.LastQueuedGenerationVersion == clearedEvent.GenerationVersion &&
             requestQueue.LastQueuedRoomClearVersion == clearedEvent.ClearVersion)
-        {
             return;
-        }
 
-        DynamicBuffer<EnemyDropCollectionRequest> requests =
-            state.EntityManager.GetBuffer<EnemyDropCollectionRequest>(requestQueueEntity);
-        EnemyDropCollectionRequestUtility.Enqueue(requests, 0f, true, true);
+        EnemyDropRoomClearAttractionUtility.MarkActiveDrops(state.EntityManager);
         requestQueue.LastQueuedRunSeed = clearedEvent.RunSeed;
         requestQueue.LastQueuedGenerationVersion = clearedEvent.GenerationVersion;
         requestQueue.LastQueuedRoomClearVersion = clearedEvent.ClearVersion;

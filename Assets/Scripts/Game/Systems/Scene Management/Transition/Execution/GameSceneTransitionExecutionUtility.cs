@@ -208,6 +208,7 @@ internal static class GameSceneTransitionExecutionUtility
     /// <param name="hasSourceScene">True when the transition resolved a source scene definition.</param>
     /// <param name="sourceScene">Resolved source scene definition.</param>
     /// <param name="targetScene">Target scene definition for the active transition.</param>
+    /// <param name="purpose">Purpose of the active transition.</param>
     /// <param name="forceCleanup">True when procedural room isolation requires cleanup even between gameplay scenes.</param>
     /// <returns>True once the cleanup gate has been consumed for this transition.</returns>
     public static bool RunPreLoadRuntimeCleanupIfNeeded(EntityManager entityManager,
@@ -216,6 +217,7 @@ internal static class GameSceneTransitionExecutionUtility
                                                         bool hasSourceScene,
                                                         GameSceneDefinitionElement sourceScene,
                                                         GameSceneDefinitionElement targetScene,
+                                                        GameSceneTransitionPurpose purpose,
                                                         bool forceCleanup)
     {
         if (cleanupComplete)
@@ -229,7 +231,8 @@ internal static class GameSceneTransitionExecutionUtility
                                               !reloadActiveScene;
 
         if (forceCleanup || !preservesActiveGameplayRuntime)
-            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
+            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager,
+                                                                                                      ShouldPreserveRoomClearAttraction(purpose));
 
         return true;
     }
@@ -252,6 +255,23 @@ internal static class GameSceneTransitionExecutionUtility
             return true;
 
         return purpose == GameSceneTransitionPurpose.ProceduralInitialRoom;
+    }
+
+    /// <summary>
+    /// Resolves whether room-clear-attracted drops may cross the active procedural transition boundary.
+    /// </summary>
+    /// <param name="purpose">Purpose of the active transition.</param>
+    /// <returns>True for room traversal and level-boundary transitions inside the same procedural run.</returns>
+    public static bool ShouldPreserveRoomClearAttraction(GameSceneTransitionPurpose purpose)
+    {
+        switch (purpose)
+        {
+            case GameSceneTransitionPurpose.ProceduralRoomTraversal:
+            case GameSceneTransitionPurpose.ProceduralLevelBoundary:
+                return true;
+            default:
+                return false;
+        }
     }
     #endregion
 

@@ -41,15 +41,29 @@ public static class GameSceneTransitionGameplayRuntimeCleanupSmokeTest
             projectilePool.Add(new ProjectilePoolElement { ProjectileEntity = standaloneProjectile });
             DynamicBuffer<ShootRequest> shootRequests = entityManager.AddBuffer<ShootRequest>(shooterEntity);
             shootRequests.Add(default);
+            Entity persistentDrop = entityManager.CreateEntity(typeof(EnemyExperienceDrop),
+                                                               typeof(EnemyExperienceDropActive));
+            entityManager.SetComponentData(persistentDrop, new EnemyExperienceDrop
+            {
+                IsAttracting = 1,
+                ConsumeWhenUnusable = 1,
+                IsRoomClearAttraction = 1
+            });
+            Entity ordinaryDrop = entityManager.CreateEntity(typeof(EnemyExperienceDrop),
+                                                             typeof(EnemyExperienceDropActive));
 
             // Exercise the complete runtime cleanup path used before gameplay scene transitions.
-            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager);
+            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager, true);
 
             // Confirm that root-first cleanup removed the complete hierarchy and every standalone candidate.
             if (entityManager.Exists(projectileRoot) ||
                 entityManager.Exists(projectileChild) ||
-                entityManager.Exists(standaloneProjectile))
+                entityManager.Exists(standaloneProjectile) ||
+                entityManager.Exists(ordinaryDrop))
                 throw new Exception("Scene-transition cleanup did not destroy transient linked and standalone projectiles.");
+
+            if (!entityManager.Exists(persistentDrop))
+                throw new Exception("Scene-transition cleanup destroyed a room-clear-attracted drop during procedural traversal.");
 
             ProjectilePoolState poolState = entityManager.GetComponentData<ProjectilePoolState>(shooterEntity);
             DynamicBuffer<ProjectilePoolElement> refreshedProjectilePool = entityManager.GetBuffer<ProjectilePoolElement>(shooterEntity);
@@ -57,6 +71,11 @@ public static class GameSceneTransitionGameplayRuntimeCleanupSmokeTest
 
             if (refreshedProjectilePool.Length != 0 || refreshedShootRequests.Length != 0 || poolState.Initialized != 0)
                 throw new Exception("Scene-transition cleanup left stale projectile pool references on a surviving shooter.");
+
+            GameSceneTransitionGameplayRuntimeCleanupUtility.DestroyTransientGameplayRuntimeEntities(entityManager, false);
+
+            if (entityManager.Exists(persistentDrop))
+                throw new Exception("Run-boundary cleanup preserved a room-clear-attracted drop outside procedural traversal.");
 
             Debug.Log("[GameSceneTransitionGameplayRuntimeCleanupSmokeTest] Linked cleanup and surviving pool reset checks passed.");
         }

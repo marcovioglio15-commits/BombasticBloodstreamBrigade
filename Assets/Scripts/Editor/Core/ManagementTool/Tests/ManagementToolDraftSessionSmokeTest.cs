@@ -101,6 +101,7 @@ public static class ManagementToolDraftSessionSmokeTest
             () => pendingChanges = stateChanged);
 
         verifier.VerifySignal();
+        verifier.FlushPendingVerification();
 
         if (pendingChanges)
             failures.Add("Shared draft verifier accepted a no-op dirty signal.");
@@ -108,6 +109,7 @@ public static class ManagementToolDraftSessionSmokeTest
         verifier.Reset();
         stateChanged = true;
         verifier.VerifySignal();
+        verifier.FlushPendingVerification();
 
         if (!pendingChanges)
             failures.Add("Shared draft verifier rejected a real state difference.");
@@ -263,7 +265,7 @@ public static class ManagementToolDraftSessionSmokeTest
         /// <summary>
         /// Creates one immutable lifecycle adapter used by the shared smoke-test flow.
         /// </summary>
-        /// <param name="name">Designer-facing management tool name.</param>
+        /// <param name="name">Visible management tool name.</param>
         /// <param name="begin">Session baseline capture action.</param>
         /// <param name="end">Session cleanup action.</param>
         /// <param name="markDirty">Tool dirty-signal action.</param>

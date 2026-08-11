@@ -25,9 +25,9 @@ MonoBehaviour:
   logTransitions: 1
   fadeSettings:
     fadeColor: {r: 0, g: 0, b: 0, a: 1}
-    fadeOutSeconds: 0.2
+    fadeOutSeconds: 0.35
     postLoadReadyExtraSeconds: 0.08
-    fadeInSeconds: 0.2
+    fadeInSeconds: 0.35
     lockGameplayInput: 1
     setTimeScaleDuringTransition: 1
   loadingProgressSettings:

@@ -15,7 +15,6 @@ public sealed class ExcelDataTransferWindow : EditorWindow
     private VisualElement contentRoot;
     private Label sessionStatusLabel;
     private PanelType activePanel = PanelType.TransferPresets;
-    private IVisualElementScheduledItem pendingCheckSchedule;
     #endregion
 
     #region Methods
@@ -45,6 +44,11 @@ public sealed class ExcelDataTransferWindow : EditorWindow
         if (!ExcelDataTransferDraftSession.IsInitialized)
             ExcelDataTransferDraftSession.BeginSession();
 
+        ExcelDataTransferDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        ExcelDataTransferDraftSession.PendingChangesChanged += RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
+        Undo.undoRedoPerformed += HandleUndoRedo;
+
         activePanel = ManagementToolStateUtility.LoadEnumValue(ActivePanelStateKey, PanelType.TransferPresets);
 
         if (activePanel != PanelType.TransferPresets)
@@ -62,12 +66,12 @@ public sealed class ExcelDataTransferWindow : EditorWindow
     }
 
     /// <summary>
-    /// Stops pending-change polling while the window is disabled.
+    /// Detaches draft and Undo notifications while the window is disabled.
     /// </summary>
     private void OnDisable()
     {
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
+        ExcelDataTransferDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
     }
 
     /// <summary>
@@ -114,10 +118,6 @@ public sealed class ExcelDataTransferWindow : EditorWindow
         RefreshSessionStatus();
         ManagementToolInteractiveElementColorUtility.RegisterHierarchy(rootVisualElement, "NashCore.ExcelDataTransfer.Controls");
 
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
-
-        pendingCheckSchedule = rootVisualElement.schedule.Execute(RefreshSessionStatus).Every(1000);
     }
 
     /// <summary>
@@ -314,17 +314,24 @@ public sealed class ExcelDataTransferWindow : EditorWindow
     }
 
     /// <summary>
-    /// Recomputes draft session state and updates the toolbar status label.
+    /// Updates the toolbar from pending state already verified by mutation and Undo signals.
     /// </summary>
     private void RefreshSessionStatus()
     {
-        ExcelDataTransferDraftSession.RecomputePendingChanges();
         UpdateUnsavedState();
 
         if (sessionStatusLabel == null)
             return;
 
         sessionStatusLabel.text = hasUnsavedChanges ? "Pending Changes" : "Clean";
+    }
+
+    /// <summary>
+    /// Recomputes pending state once after Unity completes an Undo or Redo operation.
+    /// </summary>
+    private void HandleUndoRedo()
+    {
+        ExcelDataTransferDraftSession.RecomputePendingChanges();
     }
 
     /// <summary>

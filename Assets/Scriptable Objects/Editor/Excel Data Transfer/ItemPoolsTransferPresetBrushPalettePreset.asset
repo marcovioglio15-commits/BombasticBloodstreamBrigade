@@ -206,9 +206,9 @@ MonoBehaviour:
     domain: 0
     dataKind: 0
     listFilter: 0
-    sourceFilter: ''
-    sourceAssetFilter: ''
-    fieldSearchFilter: ''
+    sourceFilter: 
+    sourceAssetFilter: 
+    fieldSearchFilter: 
     direction: 2
     color: {r: 0.56, g: 0.42, b: 0.88, a: 1}
     textColor: {r: 1, g: 1, b: 1, a: 1}

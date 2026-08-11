@@ -173,46 +173,115 @@ internal static class GameHudManagerPresetsPanelUtility
     }
 
     /// <summary>
-    /// Builds the Combo Counter preset section with visual theme controls hidden when the section is disabled.
+    /// Builds the Synchro Meter preset section with wave and visibility controls hidden when the section is disabled.
     /// </summary>
     /// <param name="section">Section root receiving property fields.</param>
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
-    public static void BuildComboCounterSection(VisualElement section, SerializedObject serializedObject)
+    public static void BuildSynchroMeterSection(VisualElement section, SerializedObject serializedObject)
     {
-        Foldout activationFoldout = CreateFoldout("Activation", "Master combo counter toggle.");
-        PropertyField enabledField = AddProperty(activationFoldout, serializedObject, "comboCounterSettings.isEnabled", "Enabled");
+        Foldout activationFoldout = CreateFoldout("Activation", "Master Synchro Meter toggle.");
+        PropertyField enabledField = AddProperty(activationFoldout, serializedObject, "synchroMeterSettings.isEnabled", "Enabled");
         section.Add(activationFoldout);
 
-        VisualElement comboOptionsRoot = CreateConditionalOptionsRoot();
-        Foldout themeFoldout = CreateFoldout("Theme", "Fallback colors used when no rank-specific combo theme is active.");
-        AddProperty(themeFoldout, serializedObject, "comboCounterSettings.defaultBadgeTint", "Default Badge Tint");
-        AddProperty(themeFoldout, serializedObject, "comboCounterSettings.defaultRankTextColor", "Default Rank Text Color");
-        AddProperty(themeFoldout, serializedObject, "comboCounterSettings.defaultComboValueTextColor", "Default Combo Value Text Color");
-        AddProperty(themeFoldout, serializedObject, "comboCounterSettings.defaultProgressFillColor", "Default Progress Fill Color");
-        AddProperty(themeFoldout, serializedObject, "comboCounterSettings.defaultProgressBackgroundColor", "Default Progress Background Color");
-        comboOptionsRoot.Add(themeFoldout);
+        VisualElement meterOptionsRoot = CreateConditionalOptionsRoot();
+        Foldout layersFoldout = CreateFoldout("Layers", "Optional authored layers and text overlays shown by the meter.");
+        PropertyField showBackgroundField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showBackground", "Show Background");
+        PropertyField showCoverField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showCover", "Show Cover");
+        PropertyField showRankTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showRankText", "Show Rank Text");
+        PropertyField showValueTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showValueText", "Show Value Text");
+        PropertyField showProgressBarField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showProgressBar", "Show Progress Bar");
+        meterOptionsRoot.Add(layersFoldout);
 
-        Foldout elementsFoldout = CreateFoldout("Elements", "Optional visual elements shown by the combo counter.");
-        AddProperty(elementsFoldout, serializedObject, "comboCounterSettings.showRankBadgeImage", "Show Rank Badge Image");
-        AddProperty(elementsFoldout, serializedObject, "comboCounterSettings.showProgressBar", "Show Progress Bar");
-        comboOptionsRoot.Add(elementsFoldout);
+        Foldout themeFoldout = CreateFoldout("Theme", "Tints applied to the authored background, cover, waves, and text layers.");
+        VisualElement backgroundThemeRoot = CreateConditionalOptionsRoot();
+        AddProperty(backgroundThemeRoot, serializedObject, "synchroMeterSettings.backgroundTint", "Background Tint");
+        themeFoldout.Add(backgroundThemeRoot);
+        VisualElement coverThemeRoot = CreateConditionalOptionsRoot();
+        AddProperty(coverThemeRoot, serializedObject, "synchroMeterSettings.coverTint", "Cover Tint");
+        themeFoldout.Add(coverThemeRoot);
+        AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.primaryWaveTint", "Primary Wave Tint");
+        AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.secondaryWaveTint", "Secondary Wave Tint");
+        VisualElement rankTextThemeRoot = CreateConditionalOptionsRoot();
+        AddProperty(rankTextThemeRoot, serializedObject, "synchroMeterSettings.rankTextColor", "Rank Text Color");
+        themeFoldout.Add(rankTextThemeRoot);
+        VisualElement valueTextThemeRoot = CreateConditionalOptionsRoot();
+        AddProperty(valueTextThemeRoot, serializedObject, "synchroMeterSettings.valueTextColor", "Value Text Color");
+        themeFoldout.Add(valueTextThemeRoot);
+        VisualElement progressThemeRoot = CreateConditionalOptionsRoot();
+        AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressFillTint", "Progress Fill Tint");
+        AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressBackgroundTint", "Progress Background Tint");
+        themeFoldout.Add(progressThemeRoot);
+        meterOptionsRoot.Add(themeFoldout);
 
-        Foldout visibilityFoldout = CreateFoldout("Visibility", "Rules that hide the combo counter when it is not useful.");
-        AddProperty(visibilityFoldout, serializedObject, "comboCounterSettings.hideWhenPlayerMissing", "Hide When Player Missing");
-        AddProperty(visibilityFoldout, serializedObject, "comboCounterSettings.hideWhenZeroCombo", "Hide When Zero Combo");
-        AddProperty(visibilityFoldout, serializedObject, "comboCounterSettings.hideWhenNoActiveRank", "Hide When No Active Rank");
-        comboOptionsRoot.Add(visibilityFoldout);
+        Foldout wavesFoldout = CreateFoldout("Wave Motion", "Shared seamless scrolling and rank-driven relative phase convergence.");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.waveScrollCyclesPerSecond", "Scroll Cycles Per Second");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.lowestRankPhaseOffsetNormalized", "Lowest Rank Phase Offset");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.highestRankPhaseOffsetNormalized", "Highest Rank Phase Offset");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.phaseOffsetResponseExponent", "Phase Response Exponent");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.phaseTransitionDuration", "Phase Transition Duration");
+        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.useUnscaledTime", "Use Unscaled Time");
+        meterOptionsRoot.Add(wavesFoldout);
 
-        Foldout transitionsFoldout = CreateFoldout("Transitions", "Fade timings used when the combo counter changes visibility.");
-        AddProperty(transitionsFoldout, serializedObject, "comboCounterSettings.fadeInDuration", "Fade In Duration");
-        AddProperty(transitionsFoldout, serializedObject, "comboCounterSettings.fadeOutDuration", "Fade Out Duration");
-        comboOptionsRoot.Add(transitionsFoldout);
+        VisualElement progressOptionsRoot = CreateConditionalOptionsRoot();
+        Foldout progressFoldout = CreateFoldout("Progression", "Normalized progression shown below the wave display.");
+        AddProperty(progressFoldout, serializedObject, "synchroMeterSettings.progressSmoothingSeconds", "Smoothing Seconds");
+        progressOptionsRoot.Add(progressFoldout);
+        meterOptionsRoot.Add(progressOptionsRoot);
 
-        Foldout textFoldout = CreateFoldout("Text", "Fallback label used before the first combo rank is reached.");
-        AddProperty(textFoldout, serializedObject, "comboCounterSettings.idleRankLabel", "Idle Rank Label");
-        comboOptionsRoot.Add(textFoldout);
-        section.Add(comboOptionsRoot);
-        TrackConditionalVisibility(enabledField, comboOptionsRoot, serializedObject, "comboCounterSettings.isEnabled", true);
+        Foldout visibilityFoldout = CreateFoldout("Visibility", "Rules that hide the Synchro Meter when it is not useful.");
+        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenPlayerMissing", "Hide When Player Missing");
+        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenZeroValue", "Hide When Zero Value");
+        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenNoActiveRank", "Hide When No Active Rank");
+        meterOptionsRoot.Add(visibilityFoldout);
+
+        Foldout transitionsFoldout = CreateFoldout("Visibility Transitions", "Fade timings used when the Synchro Meter changes visibility.");
+        AddProperty(transitionsFoldout, serializedObject, "synchroMeterSettings.fadeInDuration", "Fade In Duration");
+        AddProperty(transitionsFoldout, serializedObject, "synchroMeterSettings.fadeOutDuration", "Fade Out Duration");
+        meterOptionsRoot.Add(transitionsFoldout);
+
+        VisualElement rankTextOptionsRoot = CreateConditionalOptionsRoot();
+        Foldout textFoldout = CreateFoldout("Text", "Fallback label used before the first synchro rank is reached.");
+        AddProperty(textFoldout, serializedObject, "synchroMeterSettings.idleRankLabel", "Idle Rank Label");
+        rankTextOptionsRoot.Add(textFoldout);
+        meterOptionsRoot.Add(rankTextOptionsRoot);
+        section.Add(meterOptionsRoot);
+
+        TrackConditionalVisibility(showBackgroundField,
+                                   backgroundThemeRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showBackground",
+                                   true);
+        TrackConditionalVisibility(showCoverField,
+                                   coverThemeRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showCover",
+                                   true);
+        TrackConditionalVisibility(showRankTextField,
+                                   rankTextThemeRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showRankText",
+                                   true);
+        TrackConditionalVisibility(showRankTextField,
+                                   rankTextOptionsRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showRankText",
+                                   true);
+        TrackConditionalVisibility(showValueTextField,
+                                   valueTextThemeRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showValueText",
+                                   true);
+        TrackConditionalVisibility(showProgressBarField,
+                                   progressThemeRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showProgressBar",
+                                   true);
+        TrackConditionalVisibility(showProgressBarField,
+                                   progressOptionsRoot,
+                                   serializedObject,
+                                   "synchroMeterSettings.showProgressBar",
+                                   true);
+        TrackConditionalVisibility(enabledField, meterOptionsRoot, serializedObject, "synchroMeterSettings.isEnabled", true);
     }
 
     /// <summary>
@@ -378,9 +447,7 @@ internal static class GameHudManagerPresetsPanelUtility
             return;
 
         driverField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
-        {
-            RefreshConditionalVisibilityFromEvent(targetRoot, evt, serializedObject, propertyPath, fallback);
-        });
+            RefreshConditionalVisibilityFromEvent(targetRoot, evt, serializedObject, propertyPath, fallback));
     }
 
     /// <summary>
@@ -551,7 +618,7 @@ internal enum DetailsSectionType
     LevelExperience = 1,
     ActivePowerUps = 2,
     RunTimer = 3,
-    Combo = 6,
+    SynchroMeter = 6,
     Milestone = 7,
     Damage = 8,
     Validation = 9

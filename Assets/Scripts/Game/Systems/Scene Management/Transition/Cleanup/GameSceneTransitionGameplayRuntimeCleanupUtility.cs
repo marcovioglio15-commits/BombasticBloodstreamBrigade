@@ -13,13 +13,15 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     /// Destroys runtime-only gameplay entities before a transition crosses a run boundary or reloads the active run.
     /// </summary>
     /// <param name="entityManager">Default world entity manager.</param>
-    public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager)
+    /// <param name="preserveRoomClearAttraction">True when room-clear-attracted drops must survive a procedural room boundary.</param>
+    public static void DestroyTransientGameplayRuntimeEntities(EntityManager entityManager,
+                                                               bool preserveRoomClearAttraction)
     {
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         ResetProjectilePoolsAfterCleanup(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);
-        DestroyNonPrefabEntitiesWith<EnemyExperienceDrop>(entityManager);
+        DestroyExperienceDrops(entityManager, preserveRoomClearAttraction);
         DestroyEntitiesWith<EnemyExperienceDropPoolState>(entityManager);
         DestroyEntitiesWith<EnemyExperienceDropPoolRegistry>(entityManager);
         DestroyNonPrefabEntitiesWith<PlayerPowerUpVfxPooled>(entityManager);
@@ -39,6 +41,59 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Destroys transient reward drops while optionally retaining active drops already committed to room-clear attraction.
+    /// </summary>
+    /// <param name="entityManager">Entity manager used for filtering and destruction.</param>
+    /// <param name="preserveRoomClearAttraction">True when active persistent-attraction drops must remain alive.</param>
+    private static void DestroyExperienceDrops(EntityManager entityManager,
+                                               bool preserveRoomClearAttraction)
+    {
+        EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadOnly<EnemyExperienceDrop>()
+            },
+            None = new ComponentType[]
+            {
+                ComponentType.ReadOnly<Prefab>()
+            },
+            Options = EntityQueryOptions.IncludeDisabledEntities
+        });
+        NativeArray<Entity> candidates = default;
+
+        try
+        {
+            candidates = query.ToEntityArray(Allocator.Temp);
+
+            // Remove preserved active drops from the cleanup snapshot before linked-group destruction begins.
+            if (preserveRoomClearAttraction)
+            {
+                for (int candidateIndex = 0; candidateIndex < candidates.Length; candidateIndex++)
+                {
+                    Entity candidate = candidates[candidateIndex];
+                    EnemyExperienceDrop dropData = entityManager.GetComponentData<EnemyExperienceDrop>(candidate);
+                    bool isActive = entityManager.HasComponent<EnemyExperienceDropActive>(candidate) &&
+                                    entityManager.IsComponentEnabled<EnemyExperienceDropActive>(candidate);
+
+                    if (isActive && dropData.IsRoomClearAttraction != 0)
+                        candidates[candidateIndex] = Entity.Null;
+                }
+            }
+
+            DestroyCandidates(entityManager, in candidates, true);
+            DestroyCandidates(entityManager, in candidates, false);
+        }
+        finally
+        {
+            if (candidates.IsCreated)
+                candidates.Dispose();
+
+            query.Dispose();
+        }
+    }
+
     /// <summary>
     /// Clears stale projectile entity references and marks surviving shooter pools for deterministic reinitialization.
     /// This is required for persistent player shooters after procedural room cleanup destroys their pooled instances.
@@ -169,6 +224,9 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
         for (int candidateIndex = 0; candidateIndex < candidates.Length; candidateIndex++)
         {
             Entity candidate = candidates[candidateIndex];
+
+            if (candidate == Entity.Null)
+                continue;
 
             if (!entityManager.Exists(candidate))
                 continue;

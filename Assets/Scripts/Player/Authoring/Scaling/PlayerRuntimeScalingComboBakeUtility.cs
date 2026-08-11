@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -122,47 +121,6 @@ internal static class PlayerRuntimeScalingComboBakeUtility
                 BonusFormulaCount = formulaCount,
                 PassiveUnlockStartIndex = passiveUnlockStartIndex,
                 PassiveUnlockCount = passiveUnlockCount
-            });
-        }
-    }
-
-    /// <summary>
-    /// Populates the baked combo-rank visual buffer used by the HUD runtime.
-    /// </summary>
-    /// <param name="preset">Progression preset that owns the authored combo-rank visuals.</param>
-    /// <param name="rankVisuals">Destination visual buffer indexed like the runtime combo-rank buffer.</param>
-    public static void PopulateComboCounterRankVisuals(PlayerProgressionPreset preset,
-                                                       DynamicBuffer<PlayerComboRankVisualElement> rankVisuals)
-    {
-        rankVisuals.Clear();
-
-        PlayerComboCounterDefinition comboCounter = preset != null ? preset.ComboCounter : null;
-        IReadOnlyList<PlayerComboRankDefinition> rankDefinitions = comboCounter != null ? comboCounter.RankDefinitions : null;
-
-        if (rankDefinitions == null)
-        {
-            return;
-        }
-
-        for (int rankIndex = 0; rankIndex < rankDefinitions.Count; rankIndex++)
-        {
-            PlayerComboRankDefinition rankDefinition = rankDefinitions[rankIndex];
-            PlayerComboRankVisualDefinition rankVisual = rankDefinition != null ? rankDefinition.RankVisuals : null;
-            Sprite badgeSprite = rankVisual != null ? rankVisual.BadgeSprite : null;
-            Color badgeTint = rankVisual != null ? rankVisual.BadgeTint : Color.white;
-            Color rankTextColor = rankVisual != null ? rankVisual.RankTextColor : Color.white;
-            Color comboValueTextColor = rankVisual != null ? rankVisual.ComboValueTextColor : Color.white;
-            Color progressFillColor = rankVisual != null ? rankVisual.ProgressFillColor : Color.white;
-            Color progressBackgroundColor = rankVisual != null ? rankVisual.ProgressBackgroundColor : Color.white;
-
-            rankVisuals.Add(new PlayerComboRankVisualElement
-            {
-                BadgeSprite = badgeSprite,
-                BadgeTint = ToFloat4(badgeTint),
-                RankTextColor = ToFloat4(rankTextColor),
-                ComboValueTextColor = ToFloat4(comboValueTextColor),
-                ProgressFillColor = ToFloat4(progressFillColor),
-                ProgressBackgroundColor = ToFloat4(progressBackgroundColor)
             });
         }
     }
@@ -597,15 +555,6 @@ internal static class PlayerRuntimeScalingComboBakeUtility
     }
 #endif
 
-    /// <summary>
-    /// Converts one Unity color to the float4 layout stored inside ECS buffers.
-    /// </summary>
-    /// <param name="color">Source color.</param>
-    /// <returns>Float4 representation of the provided color.</returns>
-    private static float4 ToFloat4(Color color)
-    {
-        return new float4(color.r, color.g, color.b, color.a);
-    }
     #endregion
 
     #endregion

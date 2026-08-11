@@ -30,7 +30,6 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
         SerializedProperty requiredComboValueProperty = property.FindPropertyRelative("requiredComboValue");
         SerializedProperty pointsDecayPerSecondProperty = property.FindPropertyRelative("pointsDecayPerSecond");
         SerializedProperty progressiveBoostPercentProperty = property.FindPropertyRelative("progressiveBoostPercent");
-        SerializedProperty rankVisualsProperty = property.FindPropertyRelative("rankVisuals");
         SerializedProperty rankBonusesProperty = property.FindPropertyRelative("rankBonuses");
         SerializedProperty passivePowerUpUnlocksProperty = property.FindPropertyRelative("passivePowerUpUnlocks");
         SerializedProperty scalingRulesProperty = property.serializedObject != null
@@ -41,7 +40,6 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
             requiredComboValueProperty == null ||
             pointsDecayPerSecondProperty == null ||
             progressiveBoostPercentProperty == null ||
-            rankVisualsProperty == null ||
             rankBonusesProperty == null ||
             passivePowerUpUnlocksProperty == null)
         {
@@ -62,8 +60,6 @@ public sealed class PlayerComboRankDefinitionPropertyDrawer : PropertyDrawer
         root.Add(PlayerScalingFieldElementFactory.CreateField(progressiveBoostPercentProperty,
                                                               scalingRulesProperty,
                                                               "Progressive Boost Percent"));
-        root.Add(CreateBoundField(rankVisualsProperty, "Rank Visuals"));
-
         PropertyField rankBonusesField = new PropertyField(rankBonusesProperty, "Rank Bonuses");
         rankBonusesField.BindProperty(rankBonusesProperty);
         root.Add(rankBonusesField);

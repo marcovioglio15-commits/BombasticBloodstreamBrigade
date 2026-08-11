@@ -286,6 +286,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                             hasSourceScene,
                                                                                                             sourceScene,
                                                                                                             targetScene,
+                                                                                                            activePurpose,
                                                                                                             GameSceneTransitionExecutionUtility.ShouldForceProceduralRuntimeCleanup(activePurpose,
                                                                                                                                                                                          transactionalRoomStreaming,
                                                                                                                                                                                          singleSlotRoomStreaming));
@@ -352,6 +353,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                             hasSourceScene,
                                                                                                             sourceScene,
                                                                                                             targetScene,
+                                                                                                            activePurpose,
                                                                                                             GameSceneTransitionExecutionUtility.ShouldForceProceduralRuntimeCleanup(activePurpose,
                                                                                                                                                                                         transactionalRoomStreaming,
                                                                                                                                                                                         singleSlotRoomStreaming));

@@ -49,6 +49,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GAME FLOW WORKBOOK
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -69,6 +70,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Game settings, scene flow, audio and HUD authoring values.
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -89,6 +91,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SETTING
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -109,6 +112,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: VALUE
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -129,6 +133,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SOURCE ASSET
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -149,6 +154,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SERIALIZED PATH
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -169,6 +175,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: IDENTITY
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -189,6 +196,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Preset Name
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -209,6 +217,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameMasterPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -229,6 +238,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: presetName
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -249,6 +259,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 4454ef416bf345088ec4ce3b8ab59c1e
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -269,6 +280,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Preset Version
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -289,6 +301,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameMasterPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -309,6 +322,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: version
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -329,6 +343,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 4454ef416bf345088ec4ce3b8ab59c1e
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -349,6 +364,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: SETTINGS
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -369,6 +385,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Numeric Setting
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -389,6 +406,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameAudioManagerPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -409,6 +427,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: playbackSettings.masterVolume
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -429,6 +448,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: d59ed2a86cbd445986ec10a48b0907bb
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -449,6 +469,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Enabled Setting
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -469,6 +490,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameAudioManagerPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -489,6 +511,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: playbackSettings.enabled
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -509,6 +532,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 2e5c8c66241b4bdda761bece3254e76f
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -529,6 +553,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Mode Setting
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -549,6 +574,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameSettingsManagerPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -569,6 +595,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: controllerNavigationSettings.gamepadNavigationMode
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -589,6 +616,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 57d39fcf374648568fe242e5239ba8b0
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -609,6 +637,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: NAVIGATION AND PRESENTATION
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -629,6 +658,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: Scene Reference
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -649,6 +679,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameMasterPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -669,6 +700,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: sceneManagerPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -689,6 +721,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 3b06bdc5926142b1ac3d79bc27b60fdc
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -709,6 +742,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: HUD Reference
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -729,6 +763,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: GameMasterPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -749,6 +784,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: hudManagerPreset
+      formulaExpression: 
       brushId: 
       numberFormat: 
       validateLiteralDuringImport: 0
@@ -769,6 +805,7 @@ MonoBehaviour:
         concreteListIndices: 
         stableListKeys: []
       literalText: 
+      formulaExpression: 
       brushId: 3b06bdc5926142b1ac3d79bc27b60fdc
       numberFormat: 
       validateLiteralDuringImport: 0

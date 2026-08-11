@@ -1254,7 +1254,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
-    dependencyHash: 48d5067358a658348f66e18f2411253e
+    dependencyHash: c15f08abdd41ac1548fe53d0181055b9
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
@@ -1275,12 +1275,10 @@ MonoBehaviour:
       side: 3
       capability: 2
       connectionPolicy: 1
-    authoringWarnings:
-    - SubScene component 'SUB_METRO_10' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity'
-      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+    authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_11
     sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
-    dependencyHash: 218129434fe4c61056337808de62decf
+    dependencyHash: c521d7076f41e0e55c7238029bf548b1
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity
@@ -1297,6 +1295,4 @@ MonoBehaviour:
       side: 1
       capability: 2
       connectionPolicy: 1
-    authoringWarnings:
-    - SubScene component 'SUB_METRO_11' in 'Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity'
-      must disable Auto Load Scene for duplicate-capable transactional room streaming.
+    authoringWarnings: []

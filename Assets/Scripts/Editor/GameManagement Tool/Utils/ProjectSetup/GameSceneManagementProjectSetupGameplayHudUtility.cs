@@ -55,7 +55,7 @@ internal static class GameSceneManagementProjectSetupGameplayHudUtility
         HUDGrowthSequenceSection growthSequenceSection = EnsureGrowthSequenceSection(gameplayUiScene, hudManager);
         HUDPowerUpOverlaySectionComponent powerUpOverlaySection = EnsurePowerUpOverlaySection(gameplayUiScene, hudManager);
         HUDRunTimerSection runTimerSection = EnsureRunTimerSection(gameplayUiScene, hudManager);
-        HUDComboCounterSection comboCounterSection = EnsureComboCounterSection(gameplayUiScene, hudManager);
+        HUDComboCounterSection synchroMeterSection = EnsureSynchroMeterSection(gameplayUiScene, hudManager);
         HUDMilestoneSelectionSection milestoneSection = EnsureMilestoneSelectionSection(gameplayUiScene, hudManager);
         HUDPowerUpContainerInteractionSection containerSection = EnsurePowerUpContainerInteractionSection(gameplayUiScene, hudManager);
         HUDPlayerDamageVignetteSection damageSection = EnsureDamageVignetteSection(gameplayUiScene, hudManager);
@@ -70,7 +70,7 @@ internal static class GameSceneManagementProjectSetupGameplayHudUtility
         SetObjectReference(serializedHudManager, "growthSequenceSection", growthSequenceSection);
         SetObjectReference(serializedHudManager, "powerUpOverlaySection", powerUpOverlaySection);
         SetObjectReference(serializedHudManager, "runTimerSection", runTimerSection);
-        SetObjectReference(serializedHudManager, "comboCounterSection", comboCounterSection);
+        SetObjectReference(serializedHudManager, "comboCounterSection", synchroMeterSection);
         SetObjectReference(serializedHudManager, "milestoneSelectionSection", milestoneSection);
         SetObjectReference(serializedHudManager, "powerUpContainerInteractionSection", containerSection);
         SetObjectReference(serializedHudManager, "damageVignetteSection", damageSection);
@@ -208,27 +208,14 @@ internal static class GameSceneManagementProjectSetupGameplayHudUtility
     }
 
     /// <summary>
-    /// Ensures the combo counter component exists on the combo panel root.
+    /// Ensures the authored Synchro Meter hierarchy and section bindings exist in the gameplay UI scene.
     /// </summary>
-    /// <param name="scene">Scene searched for combo UI.</param>
+    /// <param name="scene">Scene receiving the authored Synchro Meter.</param>
     /// <param name="hudManager">HUD manager used as fallback host.</param>
-    /// <returns>Configured combo counter section.</returns>
-    private static HUDComboCounterSection EnsureComboCounterSection(Scene scene, HUDManager hudManager)
+    /// <returns>Configured Synchro Meter section.</returns>
+    private static HUDComboCounterSection EnsureSynchroMeterSection(Scene scene, HUDManager hudManager)
     {
-        Transform root = FindTransformByNameContains(scene, "ComboCounter");
-        GameObject host = root != null ? root.gameObject : hudManager.gameObject;
-        HUDComboCounterSection section = EnsureComponent<HUDComboCounterSection>(host);
-        SerializedObject serializedSection = new SerializedObject(section);
-        serializedSection.Update();
-        SetObjectReference(serializedSection, "rootObject", host);
-        SetObjectReference(serializedSection, "rankText", FindFirstChildText(host.transform, "RankText"));
-        SetObjectReference(serializedSection, "comboValueText", FindFirstChildText(host.transform, "ComboValue"));
-        SetObjectReference(serializedSection, "rankBadgeImage", FindFirstChildImage(host.transform, "Badge"));
-        SetObjectReference(serializedSection, "progressFillImage", FindFirstChildImage(host.transform, "Fill"));
-        SetObjectReference(serializedSection, "progressBackgroundImage", FindFirstChildImage(host.transform, "Background"));
-        serializedSection.ApplyModifiedPropertiesWithoutUndo();
-        EditorUtility.SetDirty(section);
-        return section;
+        return GameSynchroMeterProjectSetupUtility.EnsureSceneMeter(scene, hudManager);
     }
 
     /// <summary>

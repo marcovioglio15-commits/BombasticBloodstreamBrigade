@@ -29,6 +29,7 @@ public static class PlayerDropAttractionPowerUpSmokeTest
         ValidateRuntimeScalingPaths();
         ValidateRequestMerging();
         ValidatePassiveAggregation();
+        ValidateTransitionDeltaTimePolicy();
         ValidateCollectionPolicies();
         Debug.Log("[PlayerDropAttractionPowerUpSmokeTest] All Drop Attraction checks passed.");
     }
@@ -135,14 +136,13 @@ public static class PlayerDropAttractionPowerUpSmokeTest
         {
             DynamicBuffer<EnemyDropCollectionRequest> requests =
                 world.EntityManager.AddBuffer<EnemyDropCollectionRequest>(requestEntity);
-            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, false, false);
-            EnemyDropCollectionRequestUtility.Enqueue(requests, 11f, true, false);
-            EnemyDropCollectionRequestUtility.Enqueue(requests, 0f, true, true);
+            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, false);
+            EnemyDropCollectionRequestUtility.Enqueue(requests, 11f, true);
+            EnemyDropCollectionRequestUtility.Enqueue(requests, 0f, true);
 
             if (requests.Length != 1 ||
                 math.abs(requests[0].AttractionRadius - 11f) > PrecisionEpsilon ||
-                requests[0].ConsumeUnusableDrops == 0 ||
-                requests[0].CollectAllImmediately == 0)
+                requests[0].ConsumeUnusableDrops == 0)
             {
                 throw new Exception("Drop-collection requests did not merge into one strict bounded command.");
             }
@@ -193,9 +193,26 @@ public static class PlayerDropAttractionPowerUpSmokeTest
     }
     #endregion
 
+    #region Transition Timing
+    /// <summary>
+    /// Verifies only persistent room-clear drops receive bounded unscaled movement during transition time-scale locks.
+    /// </summary>
+    private static void ValidateTransitionDeltaTimePolicy()
+    {
+        float persistentTransitionDelta = EnemyDropRoomClearAttractionUtility.ResolveDeltaTime(0f, 1f, true, true);
+        float normalTransitionDelta = EnemyDropRoomClearAttractionUtility.ResolveDeltaTime(0f, 1f, true, false);
+        float persistentPauseDelta = EnemyDropRoomClearAttractionUtility.ResolveDeltaTime(0f, 1f, false, true);
+
+        if (math.abs(persistentTransitionDelta - 0.1f) > PrecisionEpsilon ||
+            normalTransitionDelta > PrecisionEpsilon ||
+            persistentPauseDelta > PrecisionEpsilon)
+            throw new Exception("Room-clear transition timing did not isolate bounded unscaled movement to persistent drops.");
+    }
+    #endregion
+
     #region Runtime Collection
     /// <summary>
-    /// Verifies active custom policy, passive collection and finalized-room forced consumption through the shared ECS path.
+    /// Verifies active custom policy, passive collection and persistent room-clear attraction through the shared ECS path.
     /// </summary>
     private static void ValidateCollectionPolicies()
     {
@@ -217,14 +234,14 @@ public static class PlayerDropAttractionPowerUpSmokeTest
                 entityManager.GetBuffer<EnemyDropCollectionRequest>(requestEntity);
 
             // A pulse without the custom consume policy must leave unusable recovery available.
-            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, false, false);
+            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, false);
             collectionSystem.Update(world.Unmanaged);
 
             if (!entityManager.IsComponentEnabled<EnemyExperienceDropActive>(dropEntity))
                 throw new Exception("Drop Attraction consumed an unusable recovery while its custom policy was disabled.");
 
             // The same pulse consumes the drop once the explicit policy is enabled.
-            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, true, false);
+            EnemyDropCollectionRequestUtility.Enqueue(requests, 5f, true);
             collectionSystem.Update(world.Unmanaged);
 
             if (entityManager.IsComponentEnabled<EnemyExperienceDropActive>(dropEntity) ||
@@ -254,7 +271,7 @@ public static class PlayerDropAttractionPowerUpSmokeTest
                 entityManager.GetBuffer<EnemyExperienceDropPoolElement>(poolEntity).Length != 1)
                 throw new Exception("Passive Drop Attraction did not continuously consume an in-range unusable recovery.");
 
-            // Room clear must collect every drop even after the run outcome was finalized.
+            // Room clear must attract every distant drop without consuming it instantaneously.
             ResetDrop(entityManager, dropEntity, poolEntity, new float3(500f, 0f, 0f));
             entityManager.GetBuffer<EnemyExperienceDropPoolElement>(poolEntity).Clear();
             passiveState.Clear();
@@ -273,19 +290,28 @@ public static class PlayerDropAttractionPowerUpSmokeTest
             });
             SystemHandle roomClearSystem = world.GetOrCreateSystem<EnemyRoomClearDropCollectionSystem>();
             roomClearSystem.Update(world.Unmanaged);
+            float initialDropPosition = entityManager.GetComponentData<LocalTransform>(dropEntity).Position.x;
             collectionSystem.Update(world.Unmanaged);
+            EnemyExperienceDrop roomClearDropData = entityManager.GetComponentData<EnemyExperienceDrop>(dropEntity);
+            float movedDropPosition = entityManager.GetComponentData<LocalTransform>(dropEntity).Position.x;
 
-            if (entityManager.IsComponentEnabled<EnemyExperienceDropActive>(dropEntity) ||
-                entityManager.GetBuffer<EnemyExperienceDropPoolElement>(poolEntity).Length != 1)
-                throw new Exception("Room clear did not consume a distant unusable drop through the forced collection path.");
+            if (!entityManager.IsComponentEnabled<EnemyExperienceDropActive>(dropEntity) ||
+                roomClearDropData.IsRoomClearAttraction == 0 ||
+                roomClearDropData.ConsumeWhenUnusable == 0 ||
+                movedDropPosition >= initialDropPosition)
+            {
+                throw new Exception("Room clear did not start persistent flight for a distant unusable drop.");
+            }
 
-            // Reprocessing the retained event must not enqueue the same authoritative transaction twice.
+            // Reprocessing the retained event must not mark the same authoritative transaction twice.
+            roomClearDropData.IsRoomClearAttraction = 0;
+            entityManager.SetComponentData(dropEntity, roomClearDropData);
             roomClearSystem.Update(world.Unmanaged);
 
-            if (entityManager.GetBuffer<EnemyDropCollectionRequest>(requestEntity).Length != 0)
-                throw new Exception("Room-clear drop collection enqueued the same clear version more than once.");
+            if (entityManager.GetComponentData<EnemyExperienceDrop>(dropEntity).IsRoomClearAttraction != 0)
+                throw new Exception("Room-clear drop attraction processed the same clear version more than once.");
 
-            // A new run can legitimately reuse the same clear counter and must still enqueue collection.
+            // A new run can reuse the same clear counter and must mark the active drop again.
             DynamicBuffer<GameProceduralRoomClearedEvent> nextRunEvents =
                 entityManager.GetBuffer<GameProceduralRoomClearedEvent>(managerEntity);
             nextRunEvents[0] = new GameProceduralRoomClearedEvent
@@ -296,8 +322,16 @@ public static class PlayerDropAttractionPowerUpSmokeTest
             };
             roomClearSystem.Update(world.Unmanaged);
 
-            if (entityManager.GetBuffer<EnemyDropCollectionRequest>(requestEntity).Length != 1)
-                throw new Exception("Room-clear drop collection suppressed a valid clear transaction from a new run.");
+            if (entityManager.GetComponentData<EnemyExperienceDrop>(dropEntity).IsRoomClearAttraction == 0)
+                throw new Exception("Room-clear drop attraction suppressed a valid clear transaction from a new run.");
+
+            // Simulate source-room pool cleanup and verify the persistent drop still collects without becoming orphaned.
+            entityManager.DestroyEntity(poolEntity);
+            entityManager.SetComponentData(dropEntity, LocalTransform.FromPosition(new float3(0.5f, 0f, 0f)));
+            collectionSystem.Update(world.Unmanaged);
+
+            if (entityManager.Exists(dropEntity))
+                throw new Exception("A collected room-clear drop survived after its source-room pool was destroyed.");
         }
         finally
         {

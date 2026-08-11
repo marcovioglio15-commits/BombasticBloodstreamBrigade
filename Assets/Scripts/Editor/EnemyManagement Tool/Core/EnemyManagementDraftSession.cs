@@ -25,6 +25,13 @@ public static class EnemyManagementDraftSession
     private static bool hasPendingChanges;
     #endregion
 
+    #region Events
+    /// <summary>
+    /// Notifies the Enemy Management window only when the pending-change state actually changes.
+    /// </summary>
+    public static event Action PendingChangesChanged;
+    #endregion
+
     #region Properties
     public static bool IsInitialized
     {
@@ -52,14 +59,14 @@ public static class EnemyManagementDraftSession
         CaptureBaseline();
         stagedDeletePaths.Clear();
         isInitialized = true;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void EndSession()
     {
         pendingChangesVerifier.Reset();
         isInitialized = false;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
         baselineJsonByPath.Clear();
         stagedDeletePaths.Clear();
     }
@@ -75,7 +82,7 @@ public static class EnemyManagementDraftSession
             return;
 
         stagedDeletePaths.Add(assetPath);
-        hasPendingChanges = true;
+        SetPendingChanges(true);
     }
 
     public static bool IsAssetStagedForDeletion(UnityEngine.Object asset)
@@ -94,13 +101,11 @@ public static class EnemyManagementDraftSession
     public static void PerformUndo()
     {
         Undo.PerformUndo();
-        RecomputePendingChanges();
     }
 
     public static void PerformRedo()
     {
         Undo.PerformRedo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -108,7 +113,7 @@ public static class EnemyManagementDraftSession
     /// </summary>
     public static void MarkDirty()
     {
-        if (!isInitialized || hasPendingChanges)
+        if (!isInitialized)
             return;
 
         pendingChangesVerifier.VerifySignal();
@@ -118,7 +123,7 @@ public static class EnemyManagementDraftSession
     {
         if (!isInitialized)
         {
-            hasPendingChanges = false;
+            SetPendingChanges(false);
             return;
         }
 
@@ -126,7 +131,7 @@ public static class EnemyManagementDraftSession
 
         if (stagedDeletePaths.Count > 0)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
@@ -134,7 +139,7 @@ public static class EnemyManagementDraftSession
 
         if (currentState.Count != baselineJsonByPath.Count)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
@@ -142,18 +147,18 @@ public static class EnemyManagementDraftSession
         {
             if (!currentState.TryGetValue(baselineEntry.Key, out string currentJson))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
 
             if (!string.Equals(baselineEntry.Value, currentJson, StringComparison.Ordinal))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
         }
 
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void Apply()
@@ -165,7 +170,7 @@ public static class EnemyManagementDraftSession
         AssetDatabase.Refresh();
         CaptureBaseline();
         stagedDeletePaths.Clear();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void Discard()
@@ -180,7 +185,7 @@ public static class EnemyManagementDraftSession
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static string NormalizeAssetName(string rawName)
@@ -232,6 +237,19 @@ public static class EnemyManagementDraftSession
     #endregion
 
     #region Session Helpers
+    /// <summary>
+    /// Updates pending state and emits one notification only when the visible state changes.
+    /// </summary>
+    /// <param name="value">New pending-change state.</param>
+    private static void SetPendingChanges(bool value)
+    {
+        if (hasPendingChanges == value)
+            return;
+
+        hasPendingChanges = value;
+        PendingChangesChanged?.Invoke();
+    }
+
     private static void CaptureBaseline()
     {
         baselineJsonByPath.Clear();
@@ -259,7 +277,7 @@ public static class EnemyManagementDraftSession
             if (assetObject == null)
                 continue;
 
-            string serializedJson = EditorJsonUtility.ToJson(assetObject, true);
+            string serializedJson = EditorJsonUtility.ToJson(assetObject);
             stateByPath[assetPath] = serializedJson;
         }
 

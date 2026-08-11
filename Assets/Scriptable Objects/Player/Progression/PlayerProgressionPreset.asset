@@ -388,13 +388,6 @@ MonoBehaviour:
       requiredComboValue: 100
       pointsDecayPerSecond: 0
       progressiveBoostPercent: 0
-      rankVisuals:
-        badgeSprite: {fileID: 21300000, guid: 3db0b99557ecb974aa8ca90843c8e01b, type: 3}
-        badgeTint: {r: 1, g: 1, b: 1, a: 1}
-        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
-        comboValueTextColor: {r: 1, g: 0.8235294, b: 0, a: 1}
-        progressFillColor: {r: 0.7254902, g: 0.13725491, b: 0.13725491, a: 1}
-        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas:
@@ -404,13 +397,6 @@ MonoBehaviour:
       requiredComboValue: 250
       pointsDecayPerSecond: 0
       progressiveBoostPercent: 0
-      rankVisuals:
-        badgeSprite: {fileID: 21300000, guid: 62bad9c41e3f4f1489d55d6796073472, type: 3}
-        badgeTint: {r: 1, g: 1, b: 1, a: 1}
-        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
-        comboValueTextColor: {r: 1, g: 0.8235294, b: 0, a: 1}
-        progressFillColor: {r: 0.7254902, g: 0.13725491, b: 0.13725491, a: 1}
-        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas:
@@ -420,13 +406,6 @@ MonoBehaviour:
       requiredComboValue: 500
       pointsDecayPerSecond: 1
       progressiveBoostPercent: 0
-      rankVisuals:
-        badgeSprite: {fileID: 21300000, guid: 9ec9dadfd7a7b374d8bce46c1ecf2ab6, type: 3}
-        badgeTint: {r: 1, g: 1, b: 1, a: 1}
-        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
-        comboValueTextColor: {r: 1, g: 0.8235294, b: 0, a: 1}
-        progressFillColor: {r: 0.7254902, g: 0.13725491, b: 0.13725491, a: 1}
-        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas:
@@ -436,13 +415,6 @@ MonoBehaviour:
       requiredComboValue: 1000
       pointsDecayPerSecond: 2
       progressiveBoostPercent: 0
-      rankVisuals:
-        badgeSprite: {fileID: 21300000, guid: 83885801007554f42a819aa0c716ed0f, type: 3}
-        badgeTint: {r: 1, g: 1, b: 1, a: 1}
-        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
-        comboValueTextColor: {r: 1, g: 0.8235294, b: 0, a: 1}
-        progressFillColor: {r: 0.7254902, g: 0.13725491, b: 0.13725491, a: 1}
-        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas:
@@ -452,13 +424,6 @@ MonoBehaviour:
       requiredComboValue: 1500
       pointsDecayPerSecond: 5
       progressiveBoostPercent: 0
-      rankVisuals:
-        badgeSprite: {fileID: 21300000, guid: d991446632b496047ab28173c93bd55b, type: 3}
-        badgeTint: {r: 1, g: 1, b: 1, a: 1}
-        rankTextColor: {r: 1, g: 1, b: 1, a: 1}
-        comboValueTextColor: {r: 1, g: 0.8235294, b: 0, a: 1}
-        progressFillColor: {r: 0.7254902, g: 0.13725491, b: 0.13725491, a: 1}
-        progressBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
       rankBonuses:
         applyFormulasOnlyOnActiveTrigger: 0
         formulas:

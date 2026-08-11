@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using Unity.Entities;
@@ -7,127 +5,200 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Renders the runtime combo counter, current rank label, and progress toward the next combo rank from ECS data.
+/// Renders the ECS-authoritative combo state as a seamless two-wave Synchro Meter.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HUDComboCounterSection : MonoBehaviour
 {
     #region Constants
-    private const float ProgressComparisonEpsilon = 0.0001f;
     private const float VisibilityComparisonEpsilon = 0.001f;
+    private const float ProgressComparisonEpsilon = 0.0001f;
     #endregion
 
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Enables the combo HUD section and its ECS-driven presentation updates.")]
+    [Header("Runtime")]
+    [Tooltip("Enables the Synchro Meter and its ECS-driven presentation updates.")]
     [SerializeField] private bool isEnabled = true;
 
-    [Tooltip("Optional root GameObject shown or hidden as one block for the combo counter.")]
+    [Tooltip("Root GameObject shown or hidden as one block for the Synchro Meter.")]
     [SerializeField] private GameObject rootObject;
 
-    [Tooltip("Optional badge image used to display the current combo-rank sprite.")]
-    [SerializeField] private Image rankBadgeImage;
+    [Header("Authored Layers")]
+    [Tooltip("RectTransform defining the clipped wave display area and the reference width for diagnostics.")]
+    [SerializeField] private RectTransform waveViewport;
 
-    [Tooltip("TMP text used to render the current combo-rank label.")]
+    [Tooltip("Oscilloscope background image rendered behind both waves.")]
+    [SerializeField] private Image backgroundImage;
+
+    [Tooltip("Scanline cover image rendered above both waves.")]
+    [SerializeField] private Image coverImage;
+
+    [Tooltip("Leading image of the seamless primary-wave pair.")]
+    [SerializeField] private Image primaryWaveLeadingImage;
+
+    [Tooltip("Trailing image of the seamless primary-wave pair.")]
+    [SerializeField] private Image primaryWaveTrailingImage;
+
+    [Tooltip("Leading image of the seamless secondary-wave pair.")]
+    [SerializeField] private Image secondaryWaveLeadingImage;
+
+    [Tooltip("Trailing image of the seamless secondary-wave pair.")]
+    [SerializeField] private Image secondaryWaveTrailingImage;
+
+    [Tooltip("TMP text used to render the current synchro rank identifier.")]
     [SerializeField] private TMP_Text rankText;
 
-    [Tooltip("TMP text used to render the current combo numeric value.")]
-    [SerializeField] private TMP_Text comboValueText;
+    [Tooltip("TMP text used to render the current numeric synchro value.")]
+    [SerializeField] private TMP_Text valueText;
 
-    [Tooltip("Optional fill image used as progress bar toward the next combo rank.")]
+    [Tooltip("Horizontal filled image that renders normalized progression toward the next synchro rank.")]
     [SerializeField] private Image progressFillImage;
 
-    [Tooltip("Optional background image shown behind the progress fill.")]
+    [Tooltip("Track image rendered behind normalized synchro progression.")]
     [SerializeField] private Image progressBackgroundImage;
 
-    [Tooltip("Optional default badge sprite used when the active rank does not define a specific sprite.")]
-    [SerializeField] private Sprite defaultBadgeSprite;
+    [Header("Theme Fallback")]
+    [Tooltip("Fallback tint applied to the oscilloscope background image.")]
+    [SerializeField] private Color backgroundTint = Color.white;
 
-    [Tooltip("Fallback tint applied to the badge image when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultBadgeTint = Color.white;
+    [Tooltip("Fallback tint applied to the scanline cover image.")]
+    [SerializeField] private Color coverTint = Color.white;
 
-    [Tooltip("Fallback color applied to the rank label when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultRankTextColor = Color.white;
+    [Tooltip("Fallback tint applied to both primary-wave images.")]
+    [SerializeField] private Color primaryWaveTint = Color.white;
 
-    [Tooltip("Fallback color applied to the combo numeric label when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultComboValueTextColor = Color.white;
+    [Tooltip("Fallback tint applied to both secondary-wave images.")]
+    [SerializeField] private Color secondaryWaveTint = Color.white;
 
-    [Tooltip("Fallback color applied to the progress fill when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultProgressFillColor = Color.white;
+    [Tooltip("Fallback color applied to the current rank label.")]
+    [SerializeField] private Color rankTextColor = Color.white;
 
-    [Tooltip("Fallback color applied to the progress background when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultProgressBackgroundColor = new Color(1f, 1f, 1f, 0.25f);
+    [Tooltip("Fallback color applied to the current numeric value.")]
+    [SerializeField] private Color valueTextColor = Color.white;
 
-    [Tooltip("When disabled, the badge image stays hidden even if it is assigned.")]
-    [SerializeField] private bool showRankBadgeImage = true;
+    [Tooltip("Fallback tint applied to the progression fill below the wave display.")]
+    [SerializeField] private Color progressFillTint = new Color(0f, 0.85f, 1f, 1f);
 
-    [Tooltip("When disabled, the progress bar stays hidden even if the images are assigned.")]
+    [Tooltip("Fallback tint applied to the progression track below the wave display.")]
+    [SerializeField] private Color progressBackgroundTint = new Color(0f, 0f, 0f, 0.65f);
+
+    [Header("Layer Visibility")]
+    [Tooltip("Shows the background layer when its image is assigned.")]
+    [SerializeField] private bool showBackground = true;
+
+    [Tooltip("Shows the scanline cover layer when its image is assigned.")]
+    [SerializeField] private bool showCover = true;
+
+    [Tooltip("Shows the current rank label over the wave display.")]
+    [SerializeField] private bool showRankText = true;
+
+    [Tooltip("Shows the current numeric value over the wave display.")]
+    [SerializeField] private bool showValueText = true;
+
+    [Tooltip("Shows normalized progression toward the next synchro rank below the wave display.")]
     [SerializeField] private bool showProgressBar = true;
 
-    [Tooltip("Hides the combo HUD while no valid player entity is available.")]
+    [Header("Wave Animation")]
+    [Tooltip("Number of complete wave-image tile cycles scrolled per second.")]
+    [SerializeField] private float waveScrollCyclesPerSecond = 0.12f;
+
+    [Tooltip("Normalized separation between waves at the first rank, measured over one complete image tile.")]
+    [SerializeField] private float lowestRankPhaseOffsetNormalized = 0.25f;
+
+    [Tooltip("Normalized separation between waves at the maximum rank. Use 0 for complete overlap.")]
+    [SerializeField] private float highestRankPhaseOffsetNormalized;
+
+    [Tooltip("Exponent shaping wave convergence across rank indices.")]
+    [SerializeField] private float phaseOffsetResponseExponent = 1f;
+
+    [Tooltip("Seconds used to blend the secondary wave toward the phase required by a new rank.")]
+    [SerializeField] private float phaseTransitionDuration = 0.3f;
+
+    [Tooltip("Uses unscaled time so wave animation remains independent from gameplay time scale.")]
+    [SerializeField] private bool useUnscaledTime = true;
+
+    [Tooltip("Seconds used to smooth progression fill changes. Use 0 for immediate authoritative updates.")]
+    [SerializeField] private float progressSmoothingSeconds = 0.08f;
+
+    [Header("Visibility")]
+    [Tooltip("Hides the Synchro Meter while no valid player entity is available.")]
     [SerializeField] private bool hideWhenPlayerMissing = true;
 
-    [Tooltip("Hides the combo HUD while the current combo value is 0.")]
-    [SerializeField] private bool hideWhenZeroCombo = true;
+    [Tooltip("Hides the Synchro Meter while the current synchro value is 0.")]
+    [SerializeField] private bool hideWhenZeroValue = true;
 
-    [Tooltip("Hides the combo HUD whenever the current combo value no longer reaches any authored rank threshold.")]
+    [Tooltip("Hides the Synchro Meter whenever no authored rank threshold is active.")]
     [SerializeField] private bool hideWhenNoActiveRank = true;
 
-    [Tooltip("Seconds used to fade the combo HUD when it becomes visible.")]
+    [Tooltip("Seconds used to fade the Synchro Meter when it becomes visible.")]
     [SerializeField] private float fadeInDuration = 0.18f;
 
-    [Tooltip("Seconds used to fade the combo HUD when it becomes hidden.")]
+    [Tooltip("Seconds used to fade the Synchro Meter when it becomes hidden.")]
     [SerializeField] private float fadeOutDuration = 0.18f;
 
-    [Tooltip("Fallback label shown before the first combo rank is reached.")]
-    [SerializeField] private string idleRankLabel = "COMBO";
-
-    [Tooltip("Legacy per-rank visual themes kept hidden only as a backward-compatible fallback for existing scene data.")]
-    [HideInInspector]
-    [SerializeField] private List<HUDComboCounterRankVisualDefinition> rankVisuals = new List<HUDComboCounterRankVisualDefinition>();
+    [Tooltip("Fallback label shown before the first synchro rank is reached.")]
+    [SerializeField] private string idleRankLabel = "SYNCHRO";
     #endregion
 
-    private int displayedComboValue = int.MinValue;
-    private float displayedProgressNormalized = -1f;
-    private int displayedRankVisualIndex = int.MinValue;
+    private int displayedValue = int.MinValue;
     private string displayedRankLabel = string.Empty;
-    private bool rankThemeInitialized;
+    private float scrollPhaseNormalized;
+    private float currentWaveOffsetNormalized;
+    private float targetWaveOffsetNormalized;
     private float currentVisibilityAlpha;
     private float targetVisibilityAlpha;
+    private bool wavePhaseInitialized;
     private bool visibilityStateInitialized;
     private bool resetCachedStateWhenHidden;
     private CanvasGroup rootCanvasGroup;
-    private PlayerProgressionPreset progressionPreset;
+    private float displayedProgressNormalized = float.MinValue;
+    private float targetProgressNormalized;
     #endregion
 
     #region Methods
 
     #region Public Methods
     /// <summary>
-    /// Applies the baked HUD Manager preset values before initialization or runtime update.
+    /// Applies the baked HUD Manager settings used by the managed Synchro Meter presentation.
     /// </summary>
-    /// <param name="config">Runtime HUD config resolved from ECS.</param>
+    /// <param name="config">Runtime HUD config resolved from the ECS singleton.</param>
     public void ApplySettings(in GameHudRuntimeConfig config)
     {
-        isEnabled = config.ComboCounterEnabled != 0;
-        defaultBadgeTint = ToColor(config.ComboDefaultBadgeTint);
-        defaultRankTextColor = ToColor(config.ComboDefaultRankTextColor);
-        defaultComboValueTextColor = ToColor(config.ComboDefaultValueTextColor);
-        defaultProgressFillColor = ToColor(config.ComboDefaultProgressFillColor);
-        defaultProgressBackgroundColor = ToColor(config.ComboDefaultProgressBackgroundColor);
-        showRankBadgeImage = config.ComboShowRankBadgeImage != 0;
-        showProgressBar = config.ComboShowProgressBar != 0;
-        hideWhenPlayerMissing = config.ComboHideWhenPlayerMissing != 0;
-        hideWhenZeroCombo = config.ComboHideWhenZero != 0;
-        hideWhenNoActiveRank = config.ComboHideWhenNoActiveRank != 0;
-        fadeInDuration = Mathf.Max(0f, config.ComboFadeInDuration);
-        fadeOutDuration = Mathf.Max(0f, config.ComboFadeOutDuration);
-        idleRankLabel = config.ComboIdleRankLabel.ToString();
+        isEnabled = config.SynchroMeterEnabled != 0;
+        backgroundTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroBackgroundTint);
+        coverTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroCoverTint);
+        primaryWaveTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroPrimaryWaveTint);
+        secondaryWaveTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroSecondaryWaveTint);
+        rankTextColor = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroRankTextColor);
+        valueTextColor = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroValueTextColor);
+        progressFillTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroProgressFillTint);
+        progressBackgroundTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroProgressBackgroundTint);
+        showBackground = config.SynchroShowBackground != 0;
+        showCover = config.SynchroShowCover != 0;
+        showRankText = config.SynchroShowRankText != 0;
+        showValueText = config.SynchroShowValueText != 0;
+        showProgressBar = config.SynchroShowProgressBar != 0;
+        waveScrollCyclesPerSecond = config.SynchroWaveScrollCyclesPerSecond;
+        lowestRankPhaseOffsetNormalized = config.SynchroLowestRankPhaseOffsetNormalized;
+        highestRankPhaseOffsetNormalized = config.SynchroHighestRankPhaseOffsetNormalized;
+        phaseOffsetResponseExponent = config.SynchroPhaseOffsetResponseExponent;
+        phaseTransitionDuration = config.SynchroPhaseTransitionDuration;
+        useUnscaledTime = config.SynchroUseUnscaledTime != 0;
+        progressSmoothingSeconds = config.SynchroProgressSmoothingSeconds;
+        hideWhenPlayerMissing = config.SynchroHideWhenPlayerMissing != 0;
+        hideWhenZeroValue = config.SynchroHideWhenZeroValue != 0;
+        hideWhenNoActiveRank = config.SynchroHideWhenNoActiveRank != 0;
+        fadeInDuration = config.SynchroFadeInDuration;
+        fadeOutDuration = config.SynchroFadeOutDuration;
+        idleRankLabel = config.SynchroIdleRankLabel.ToString();
+        ApplyTheme();
+        wavePhaseInitialized = false;
     }
 
     /// <summary>
-    /// Applies the initial authored visual state before runtime ECS data becomes available.
+    /// Applies the authored initial state after HUD settings and scene bindings are available.
     /// </summary>
     public void Initialize()
     {
@@ -135,22 +206,19 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies the initial visual state used before a valid player entity is resolved.
+    /// Resets cached text, phase, and visibility before a valid player entity is resolved.
     /// </summary>
     public void ApplyInitialVisualState()
     {
-        EnsureFadeBindings();
+        EnsureBindings();
         ResetCachedPresentationState();
+        ApplyTheme();
+        targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.SanitizeNormalizedPhase(lowestRankPhaseOffsetNormalized, 0.25f);
+        currentWaveOffsetNormalized = targetWaveOffsetNormalized;
+        wavePhaseInitialized = true;
+        ApplyWaveTransforms();
 
-        if (!isEnabled)
-        {
-            InitializeVisibility(false);
-            return;
-        }
-
-        progressionPreset = HUDComboCounterPresetRuntimeUtility.ResolveProgressionPreset();
-
-        if (hideWhenPlayerMissing)
+        if (!isEnabled || hideWhenPlayerMissing)
         {
             InitializeVisibility(false);
             return;
@@ -161,42 +229,35 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies the missing-player visual state and clears cached values so the next resolved player rebuilds the HUD.
+    /// Applies missing-player visibility while keeping the seamless animation valid for the next resolved player.
     /// </summary>
     public void HandleMissingPlayer()
     {
         ResetCachedPresentationState();
 
-        if (!isEnabled)
-        {
-            RequestVisibility(false, false);
-            AdvanceVisibilityFade(Time.unscaledDeltaTime);
-            return;
-        }
-
-        if (hideWhenPlayerMissing)
+        if (!isEnabled || hideWhenPlayerMissing)
         {
             RequestVisibility(false, true);
-            AdvanceVisibilityFade(Time.unscaledDeltaTime);
+            AdvancePresentation(ResolveDeltaTime());
             return;
         }
 
         ApplyFallbackVisibleState();
         RequestVisibility(true, false);
-        AdvanceVisibilityFade(Time.unscaledDeltaTime);
+        AdvancePresentation(ResolveDeltaTime());
     }
 
     /// <summary>
-    /// Updates the combo HUD from ECS combo components owned by the current player entity.
+    /// Updates labels, visibility, rank-derived wave separation, and seamless scrolling from ECS combo state.
     /// </summary>
-    /// <param name="runtimeEntityManager">Entity manager used to read combo runtime components.</param>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
+    /// <param name="runtimeEntityManager">Entity manager used to read authoritative combo state and rank count.</param>
+    /// <param name="playerEntity">Player entity currently driving the Synchro Meter.</param>
     public void UpdateSection(EntityManager runtimeEntityManager, Entity playerEntity)
     {
         if (!isEnabled)
         {
             RequestVisibility(false, false);
-            AdvanceVisibilityFade(Time.unscaledDeltaTime);
+            AdvancePresentation(ResolveDeltaTime());
             return;
         }
 
@@ -208,87 +269,162 @@ public sealed class HUDComboCounterSection : MonoBehaviour
             return;
         }
 
+        // Resolve authoritative visibility and rank data before changing any visual state.
         PlayerRuntimeComboCounterConfig runtimeComboConfig = runtimeEntityManager.GetComponentData<PlayerRuntimeComboCounterConfig>(playerEntity);
         PlayerComboCounterState comboCounterState = runtimeEntityManager.GetComponentData<PlayerComboCounterState>(playerEntity);
         bool shouldBeVisible = runtimeComboConfig.Enabled != 0;
 
         if (hideWhenNoActiveRank && comboCounterState.CurrentRankIndex < 0)
-        {
             shouldBeVisible = false;
-        }
 
-        if (hideWhenZeroCombo && comboCounterState.CurrentValue <= 0)
-        {
+        if (hideWhenZeroValue && comboCounterState.CurrentValue <= 0)
             shouldBeVisible = false;
-        }
+
+        // Recompute phase only from rank topology; per-frame combo progress does not destabilize wave alignment.
+        int rankCount = ResolveRuntimeRankCount(runtimeEntityManager, playerEntity, comboCounterState.CurrentRankIndex);
+        targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(comboCounterState.CurrentRankIndex,
+                                                                                      rankCount,
+                                                                                      lowestRankPhaseOffsetNormalized,
+                                                                                      highestRankPhaseOffsetNormalized,
+                                                                                      phaseOffsetResponseExponent);
 
         if (shouldBeVisible)
-        {
-            ApplyVisibleState(runtimeEntityManager,
-                              playerEntity,
-                              comboCounterState.CurrentValue,
-                              comboCounterState.CurrentRankIndex,
-                              comboCounterState.CurrentRankId,
-                              comboCounterState.ProgressNormalized);
-        }
+            ApplyVisibleText(comboCounterState.CurrentValue, comboCounterState.CurrentRankId);
+
+        targetProgressNormalized = Mathf.Clamp01(comboCounterState.ProgressNormalized);
 
         RequestVisibility(shouldBeVisible, false);
-        AdvanceVisibilityFade(Time.unscaledDeltaTime);
+        AdvancePresentation(ResolveDeltaTime());
     }
     #endregion
 
-    #region Private Methods
+    #region Presentation
     /// <summary>
-    /// Applies the current combo state to all authored UI bindings.
+    /// Applies the current rank identifier and numeric value while avoiding unchanged TMP assignments.
     /// </summary>
-    /// <param name="runtimeEntityManager">Entity manager used to resolve baked combo-rank visuals.</param>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    /// <param name="comboValue">Current combo numeric value.</param>
-    /// <param name="currentRankIndex">Current combo-rank index.</param>
-    /// <param name="currentRankId">Current combo-rank identifier.</param>
-    /// <param name="progressNormalized">Current normalized progress toward the next rank.</param>
-    private void ApplyVisibleState(EntityManager runtimeEntityManager,
-                                   Entity playerEntity,
-                                   int comboValue,
-                                   int currentRankIndex,
-                                   FixedString64Bytes currentRankId,
-                                   float progressNormalized)
+    /// <param name="value">Current authoritative combo value presented as synchro intensity.</param>
+    /// <param name="rankId">Current authoritative combo-rank identifier.</param>
+    private void ApplyVisibleText(int value, FixedString64Bytes rankId)
     {
-        ApplyRankTheme(runtimeEntityManager, playerEntity, currentRankIndex, currentRankId);
-        ApplyRankLabel(currentRankId);
-        ApplyComboValue(comboValue);
-        ApplyProgress(progressNormalized);
+        string resolvedRankLabel = rankId.Length > 0 ? rankId.ToString() : ResolveIdleRankLabel();
+
+        if (rankText != null && !string.Equals(displayedRankLabel, resolvedRankLabel, System.StringComparison.Ordinal))
+        {
+            rankText.SetText(resolvedRankLabel);
+            displayedRankLabel = resolvedRankLabel;
+        }
+
+        if (valueText != null && displayedValue != value)
+        {
+            valueText.SetText("{0}", value);
+            displayedValue = value;
+        }
     }
 
     /// <summary>
-    /// Applies the fallback non-runtime visible state used when the HUD should remain visible without a player entity.
+    /// Applies the visible fallback state used when player absence is configured not to hide the meter.
     /// </summary>
     private void ApplyFallbackVisibleState()
     {
-        ApplyResolvedTheme(new HUDComboCounterResolvedVisualTheme(defaultBadgeSprite,
-                                                                 defaultBadgeTint,
-                                                                 defaultRankTextColor,
-                                                                 defaultComboValueTextColor,
-                                                                 defaultProgressFillColor,
-                                                                 defaultProgressBackgroundColor));
-        ApplyRankLabel(default);
-        ApplyComboValue(0);
-        ApplyProgress(0f);
+        ApplyVisibleText(0, default);
+        targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.SanitizeNormalizedPhase(lowestRankPhaseOffsetNormalized, 0.25f);
     }
 
     /// <summary>
-    /// Requests the target visible state while preserving the currently rendered visuals during fade-out.
+    /// Advances visibility, wave phase convergence, and seamless scrolling using one shared delta time.
+    /// </summary>
+    /// <param name="deltaTime">Frame delta time selected by the configured time domain.</param>
+    private void AdvancePresentation(float deltaTime)
+    {
+        AdvanceVisibilityFade(deltaTime);
+        AdvanceProgress(deltaTime);
+
+        if (currentVisibilityAlpha <= VisibilityComparisonEpsilon &&
+            targetVisibilityAlpha <= VisibilityComparisonEpsilon)
+        {
+            return;
+        }
+
+        if (!wavePhaseInitialized)
+        {
+            currentWaveOffsetNormalized = targetWaveOffsetNormalized;
+            wavePhaseInitialized = true;
+        }
+
+        currentWaveOffsetNormalized = HUDSynchroMeterWaveUtility.AdvancePhase(currentWaveOffsetNormalized,
+                                                                              targetWaveOffsetNormalized,
+                                                                              phaseTransitionDuration,
+                                                                              deltaTime);
+        scrollPhaseNormalized = HUDSynchroMeterWaveUtility.AdvanceScroll(scrollPhaseNormalized,
+                                                                         waveScrollCyclesPerSecond,
+                                                                         deltaTime);
+        ApplyWaveTransforms();
+    }
+
+    /// <summary>
+    /// Positions both authored image pairs so each wave scrolls continuously and retains the requested relative phase.
+    /// </summary>
+    private void ApplyWaveTransforms()
+    {
+        HUDSynchroMeterWaveUtility.ApplySeamlessPair(primaryWaveLeadingImage,
+                                                     primaryWaveTrailingImage,
+                                                     scrollPhaseNormalized);
+        HUDSynchroMeterWaveUtility.ApplySeamlessPair(secondaryWaveLeadingImage,
+                                                     secondaryWaveTrailingImage,
+                                                     scrollPhaseNormalized + currentWaveOffsetNormalized);
+    }
+
+    /// <summary>
+    /// Applies configured colors to all authored image and TMP bindings.
+    /// </summary>
+    private void ApplyTheme()
+    {
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(backgroundImage, backgroundTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(coverImage, coverTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(primaryWaveLeadingImage, primaryWaveTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(primaryWaveTrailingImage, primaryWaveTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(secondaryWaveLeadingImage, secondaryWaveTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(secondaryWaveTrailingImage, secondaryWaveTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(rankText, rankTextColor);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(valueText, valueTextColor);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressFillImage, progressFillTint);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressBackgroundImage, progressBackgroundTint);
+    }
+
+    /// <summary>
+    /// Advances the progression fill toward the authoritative normalized value without redundant Image writes.
+    /// </summary>
+    /// <param name="deltaTime">Frame delta time selected by the configured time domain.</param>
+    private void AdvanceProgress(float deltaTime)
+    {
+        float nextProgress = HUDSynchroMeterPresentationUtility.AdvanceProgress(displayedProgressNormalized,
+                                                                                targetProgressNormalized,
+                                                                                progressSmoothingSeconds,
+                                                                                deltaTime);
+
+        if (displayedProgressNormalized != float.MinValue &&
+            Mathf.Abs(displayedProgressNormalized - nextProgress) <= ProgressComparisonEpsilon)
+            return;
+
+        displayedProgressNormalized = nextProgress;
+
+        if (progressFillImage != null)
+            progressFillImage.fillAmount = displayedProgressNormalized;
+    }
+    #endregion
+
+    #region Visibility
+    /// <summary>
+    /// Requests a target visible state while preserving authored visuals during fade-out.
     /// </summary>
     /// <param name="visible">True when the section should fade toward full visibility.</param>
-    /// <param name="resetCachedStateAfterHide">True when the cached presentation state should be invalidated once fully hidden.</param>
+    /// <param name="resetCachedStateAfterHide">True when cached text should be invalidated after reaching zero alpha.</param>
     private void RequestVisibility(bool visible, bool resetCachedStateAfterHide)
     {
-        EnsureFadeBindings();
+        EnsureBindings();
 
         if (!visibilityStateInitialized)
-        {
             InitializeVisibility(visible);
-        }
 
         if (visible)
         {
@@ -299,17 +435,15 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         }
 
         if (resetCachedStateAfterHide)
-        {
             resetCachedStateWhenHidden = true;
-        }
 
         targetVisibilityAlpha = 0f;
     }
 
     /// <summary>
-    /// Initializes the current and target visibility state without performing an animated transition.
+    /// Initializes current and target visibility without an animated transition.
     /// </summary>
-    /// <param name="visible">True when the section should start visible.</param>
+    /// <param name="visible">True when the meter should start visible.</param>
     private void InitializeVisibility(bool visible)
     {
         currentVisibilityAlpha = visible ? 1f : 0f;
@@ -320,86 +454,66 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Advances the visibility fade toward the requested alpha target using unscaled time.
+    /// Advances the root alpha toward its target and disables the authored hierarchy after fade-out completes.
     /// </summary>
-    /// <param name="deltaTime">Unscaled delta time used by the HUD fade.</param>
+    /// <param name="deltaTime">Frame delta time used for the visibility transition.</param>
     private void AdvanceVisibilityFade(float deltaTime)
     {
-        EnsureFadeBindings();
+        EnsureBindings();
 
         if (!visibilityStateInitialized)
-        {
             InitializeVisibility(false);
-        }
 
-        float sanitizedDeltaTime = Mathf.Max(0f, deltaTime);
-        float resolvedTargetAlpha = Mathf.Clamp01(targetVisibilityAlpha);
-        float resolvedFadeDuration = resolvedTargetAlpha > currentVisibilityAlpha
-            ? Mathf.Max(0f, fadeInDuration)
-            : Mathf.Max(0f, fadeOutDuration);
+        float targetAlpha = Mathf.Clamp01(targetVisibilityAlpha);
+        float fadeDuration = targetAlpha > currentVisibilityAlpha
+            ? HUDSynchroMeterWaveUtility.SanitizeNonNegative(fadeInDuration, 0f)
+            : HUDSynchroMeterWaveUtility.SanitizeNonNegative(fadeOutDuration, 0f);
 
-        if (Mathf.Abs(currentVisibilityAlpha - resolvedTargetAlpha) > VisibilityComparisonEpsilon)
+        if (Mathf.Abs(currentVisibilityAlpha - targetAlpha) > VisibilityComparisonEpsilon)
         {
-            if (resolvedFadeDuration <= 0f)
-            {
-                currentVisibilityAlpha = resolvedTargetAlpha;
-            }
-            else
-            {
-                float alphaStep = sanitizedDeltaTime / resolvedFadeDuration;
-                currentVisibilityAlpha = Mathf.MoveTowards(currentVisibilityAlpha, resolvedTargetAlpha, alphaStep);
-            }
-
+            float alphaStep = fadeDuration <= 0f
+                ? 1f
+                : HUDSynchroMeterWaveUtility.SanitizeNonNegative(deltaTime, 0f) / fadeDuration;
+            currentVisibilityAlpha = Mathf.MoveTowards(currentVisibilityAlpha, targetAlpha, alphaStep);
             ApplyVisibilityAlpha(currentVisibilityAlpha);
         }
 
-        bool hasVisiblePresence = currentVisibilityAlpha > VisibilityComparisonEpsilon || resolvedTargetAlpha > VisibilityComparisonEpsilon;
-        SetVisualPresence(hasVisiblePresence);
+        bool hasVisualPresence = currentVisibilityAlpha > VisibilityComparisonEpsilon ||
+                                 targetAlpha > VisibilityComparisonEpsilon;
+        SetVisualPresence(hasVisualPresence);
 
-        if (currentVisibilityAlpha > VisibilityComparisonEpsilon || resolvedTargetAlpha > VisibilityComparisonEpsilon)
-        {
+        if (hasVisualPresence || !resetCachedStateWhenHidden)
             return;
-        }
 
-        if (resetCachedStateWhenHidden)
-        {
-            ResetCachedPresentationState();
-            resetCachedStateWhenHidden = false;
-        }
+        ResetCachedPresentationState();
+        resetCachedStateWhenHidden = false;
     }
 
     /// <summary>
-    /// Ensures the root CanvasGroup used for alpha fades exists when a root object is assigned.
+    /// Shows or hides bound layers while respecting the independent layer toggles.
     /// </summary>
-    private void EnsureFadeBindings()
+    /// <param name="visible">True when the authored meter hierarchy must remain renderable.</param>
+    private void SetVisualPresence(bool visible)
     {
-        if (rootObject == null)
-        {
-            rootCanvasGroup = null;
-            return;
-        }
+        if (rootObject != null)
+            rootObject.SetActive(visible);
 
-        if (rootCanvasGroup != null && rootCanvasGroup.gameObject == rootObject)
-        {
-            return;
-        }
-
-        CanvasGroup resolvedCanvasGroup = rootObject.GetComponent<CanvasGroup>();
-
-        if (resolvedCanvasGroup == null)
-        {
-            resolvedCanvasGroup = rootObject.AddComponent<CanvasGroup>();
-        }
-
-        rootCanvasGroup = resolvedCanvasGroup;
-        rootCanvasGroup.interactable = false;
-        rootCanvasGroup.blocksRaycasts = false;
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(backgroundImage, visible && showBackground);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(coverImage, visible && showCover);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(primaryWaveLeadingImage, visible);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(primaryWaveTrailingImage, visible);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(secondaryWaveLeadingImage, visible);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(secondaryWaveTrailingImage, visible);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(rankText, visible && showRankText);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(valueText, visible && showValueText);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressFillImage, visible && showProgressBar);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressBackgroundImage, visible && showProgressBar);
     }
 
     /// <summary>
-    /// Applies the current visibility alpha either through the root CanvasGroup or directly through individual graphics.
+    /// Applies visibility alpha through the authored CanvasGroup or through individual graphics as a safe fallback.
     /// </summary>
-    /// <param name="alpha">Normalized visibility alpha in the 0..1 range.</param>
+    /// <param name="alpha">Normalized visibility alpha.</param>
     private void ApplyVisibilityAlpha(float alpha)
     {
         float clampedAlpha = Mathf.Clamp01(alpha);
@@ -410,246 +524,80 @@ public sealed class HUDComboCounterSection : MonoBehaviour
             return;
         }
 
-        ApplyGraphicAlpha(rankBadgeImage, clampedAlpha);
-        ApplyGraphicAlpha(rankText, clampedAlpha);
-        ApplyGraphicAlpha(comboValueText, clampedAlpha);
-        ApplyGraphicAlpha(progressFillImage, clampedAlpha);
-        ApplyGraphicAlpha(progressBackgroundImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(backgroundImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(coverImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(primaryWaveLeadingImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(primaryWaveTrailingImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(secondaryWaveLeadingImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(secondaryWaveTrailingImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(rankText, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(valueText, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(progressFillImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(progressBackgroundImage, clampedAlpha);
     }
+    #endregion
 
+    #region Helpers
     /// <summary>
-    /// Shows or hides the bound visual elements while respecting optional badge and progress toggles.
+    /// Resolves authored scene bindings without creating UI components at runtime.
     /// </summary>
-    /// <param name="visible">True when the bound UI elements must stay active for rendering or fade.</param>
-    private void SetVisualPresence(bool visible)
+    private void EnsureBindings()
     {
-        if (rootObject != null)
-        {
-            rootObject.SetActive(visible);
-        }
+        rootCanvasGroup = rootObject != null ? rootObject.GetComponent<CanvasGroup>() : null;
 
-        if (rankBadgeImage != null)
-        {
-            rankBadgeImage.enabled = visible && showRankBadgeImage;
-        }
+        if (rootCanvasGroup == null)
+            return;
 
-        if (rankText != null)
-        {
-            rankText.enabled = visible;
-        }
-
-        if (comboValueText != null)
-        {
-            comboValueText.enabled = visible;
-        }
-
-        bool showProgress = visible && showProgressBar;
-
-        if (progressFillImage != null)
-        {
-            progressFillImage.enabled = showProgress;
-        }
-
-        if (progressBackgroundImage != null)
-        {
-            progressBackgroundImage.enabled = showProgress;
-        }
+        rootCanvasGroup.interactable = false;
+        rootCanvasGroup.blocksRaycasts = false;
     }
 
     /// <summary>
-    /// Applies the current combo-rank visual theme when the active rank changes.
+    /// Resolves the number of runtime ranks used to normalize phase convergence.
     /// </summary>
-    /// <param name="runtimeEntityManager">Entity manager used to resolve baked combo-rank visuals.</param>
-    /// <param name="playerEntity">Player entity currently driving the HUD.</param>
-    /// <param name="currentRankIndex">Current combo-rank index.</param>
-    /// <param name="currentRankId">Current combo-rank identifier.</param>
-    private void ApplyRankTheme(EntityManager runtimeEntityManager,
-                                Entity playerEntity,
-                                int currentRankIndex,
-                                FixedString64Bytes currentRankId)
+    /// <param name="runtimeEntityManager">Entity manager owning the player rank buffer.</param>
+    /// <param name="playerEntity">Player entity driving the meter.</param>
+    /// <param name="currentRankIndex">Current rank index used as a safe fallback.</param>
+    /// <returns>Available runtime rank count, or a positive fallback derived from the current rank.</returns>
+    private static int ResolveRuntimeRankCount(EntityManager runtimeEntityManager,
+                                               Entity playerEntity,
+                                               int currentRankIndex)
     {
-        if (rankThemeInitialized && displayedRankVisualIndex == currentRankIndex)
-        {
-            return;
-        }
+        if (runtimeEntityManager.HasBuffer<PlayerRuntimeComboRankElement>(playerEntity))
+            return Mathf.Max(1, runtimeEntityManager.GetBuffer<PlayerRuntimeComboRankElement>(playerEntity, true).Length);
 
-        displayedRankVisualIndex = currentRankIndex;
-        rankThemeInitialized = true;
-
-        HUDComboCounterResolvedVisualTheme resolvedTheme;
-
-        if (HUDComboCounterVisualThemeRuntimeUtility.TryResolveRuntimeTheme(runtimeEntityManager,
-                                                                           playerEntity,
-                                                                           currentRankIndex,
-                                                                           defaultBadgeSprite,
-                                                                           defaultBadgeTint,
-                                                                           defaultRankTextColor,
-                                                                           defaultComboValueTextColor,
-                                                                           defaultProgressFillColor,
-                                                                           defaultProgressBackgroundColor,
-                                                                           out resolvedTheme))
-        {
-            ApplyResolvedTheme(resolvedTheme);
-            return;
-        }
-
-        if (progressionPreset == null)
-        {
-            progressionPreset = HUDComboCounterPresetRuntimeUtility.ResolveProgressionPreset();
-        }
-
-        PlayerComboRankVisualDefinition rankVisual = HUDComboCounterVisualThemeRuntimeUtility.ResolvePresetRankVisual(progressionPreset,
-                                                                                                                      currentRankIndex);
-        HUDComboCounterRankVisualDefinition legacyRankVisual = rankVisual == null
-            ? HUDComboCounterVisualThemeRuntimeUtility.ResolveLegacyRankVisual(rankVisuals, currentRankId)
-            : null;
-        resolvedTheme = HUDComboCounterVisualThemeRuntimeUtility.ResolveTheme(rankVisual,
-                                                                              legacyRankVisual,
-                                                                              defaultBadgeSprite,
-                                                                              defaultBadgeTint,
-                                                                              defaultRankTextColor,
-                                                                              defaultComboValueTextColor,
-                                                                              defaultProgressFillColor,
-                                                                              defaultProgressBackgroundColor);
-        ApplyResolvedTheme(resolvedTheme);
+        return Mathf.Max(1, currentRankIndex + 1);
     }
 
     /// <summary>
-    /// Applies one fully resolved visual theme to the bound HUD elements.
+    /// Selects scaled or unscaled frame time according to the baked HUD setting.
     /// </summary>
-    /// <param name="resolvedTheme">Fully resolved theme to assign.</param>
-    private void ApplyResolvedTheme(HUDComboCounterResolvedVisualTheme resolvedTheme)
+    /// <returns>Selected Unity frame delta time.</returns>
+    private float ResolveDeltaTime()
     {
-        if (rankBadgeImage != null)
-        {
-            rankBadgeImage.sprite = resolvedTheme.BadgeSprite;
-            rankBadgeImage.color = resolvedTheme.BadgeTint;
-        }
-
-        if (rankText != null)
-        {
-            rankText.color = resolvedTheme.RankTextColor;
-        }
-
-        if (comboValueText != null)
-        {
-            comboValueText.color = resolvedTheme.ComboValueTextColor;
-        }
-
-        if (progressFillImage != null)
-        {
-            progressFillImage.color = resolvedTheme.ProgressFillColor;
-        }
-
-        if (progressBackgroundImage != null)
-        {
-            progressBackgroundImage.color = resolvedTheme.ProgressBackgroundColor;
-        }
+        return useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
     }
 
     /// <summary>
-    /// Applies the displayed rank label only when it actually changed.
+    /// Resolves the authored idle label with a stable Synchro fallback.
     /// </summary>
-    /// <param name="currentRankId">Current combo-rank identifier.</param>
-    private void ApplyRankLabel(FixedString64Bytes currentRankId)
+    /// <returns>Non-empty idle rank label.</returns>
+    private string ResolveIdleRankLabel()
     {
-        if (rankText == null)
-        {
-            return;
-        }
-
-        string resolvedLabel = currentRankId.Length > 0 ? currentRankId.ToString() : idleRankLabel;
-
-        if (string.Equals(displayedRankLabel, resolvedLabel, StringComparison.Ordinal))
-        {
-            return;
-        }
-
-        displayedRankLabel = resolvedLabel;
-        rankText.text = resolvedLabel;
+        return string.IsNullOrWhiteSpace(idleRankLabel) ? "SYNCHRO" : idleRankLabel;
     }
 
     /// <summary>
-    /// Applies the displayed combo numeric label only when it actually changed.
-    /// </summary>
-    /// <param name="comboValue">Current combo numeric value.</param>
-    private void ApplyComboValue(int comboValue)
-    {
-        if (comboValueText == null)
-        {
-            return;
-        }
-
-        int sanitizedComboValue = Mathf.Max(0, comboValue);
-
-        if (displayedComboValue == sanitizedComboValue)
-        {
-            return;
-        }
-
-        displayedComboValue = sanitizedComboValue;
-        comboValueText.text = string.Format("x{0}", sanitizedComboValue);
-    }
-
-    /// <summary>
-    /// Applies the displayed progress fill only when it actually changed.
-    /// </summary>
-    /// <param name="progressNormalized">Current normalized progress toward the next rank.</param>
-    private void ApplyProgress(float progressNormalized)
-    {
-        if (progressFillImage == null)
-        {
-            return;
-        }
-
-        float sanitizedProgress = Mathf.Clamp01(progressNormalized);
-
-        if (Mathf.Abs(displayedProgressNormalized - sanitizedProgress) <= ProgressComparisonEpsilon)
-        {
-            return;
-        }
-
-        displayedProgressNormalized = sanitizedProgress;
-        progressFillImage.fillAmount = sanitizedProgress;
-    }
-
-    /// <summary>
-    /// Resets cached presentation values so the next applied state rebuilds every visual binding.
+    /// Invalidates cached TMP values so the next visible update reapplies authoritative content.
     /// </summary>
     private void ResetCachedPresentationState()
     {
-        displayedComboValue = int.MinValue;
-        displayedProgressNormalized = -1f;
-        displayedRankVisualIndex = int.MinValue;
+        displayedValue = int.MinValue;
         displayedRankLabel = string.Empty;
-        rankThemeInitialized = false;
-        progressionPreset = null;
+        displayedProgressNormalized = float.MinValue;
+        targetProgressNormalized = 0f;
     }
 
-    /// <summary>
-    /// Applies one alpha value directly to one graphic canvas renderer.
-    /// </summary>
-    /// <param name="graphic">Graphic receiving the alpha.</param>
-    /// <param name="alpha">Alpha value applied to the canvas renderer.</param>
-    private static void ApplyGraphicAlpha(Graphic graphic, float alpha)
-    {
-        if (graphic == null)
-        {
-            return;
-        }
-
-        graphic.canvasRenderer.SetAlpha(Mathf.Clamp01(alpha));
-    }
-
-    /// <summary>
-    /// Converts a baked ECS color into a Unity UI color.
-    /// </summary>
-    /// <param name="color">Baked RGBA color channels.</param>
-    /// <returns>Unity color used by managed UI components.</returns>
-    private static Color ToColor(Unity.Mathematics.float4 color)
-    {
-        return new Color(color.x, color.y, color.z, color.w);
-    }
     #endregion
 
     #endregion

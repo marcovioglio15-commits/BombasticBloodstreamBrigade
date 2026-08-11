@@ -6,8 +6,9 @@ using Unity.Transforms;
 /// <summary>
 /// Moves active reward drops toward the player and grants their payload on collection.
 /// </summary>
-[UpdateInGroup(typeof(EnemySystemGroup))]
-[UpdateAfter(typeof(EnemyExperienceDropSpawnSystem))]
+[UpdateInGroup(typeof(SimulationSystemGroup))]
+[UpdateAfter(typeof(EnemySystemGroup))]
+[UpdateBefore(typeof(GameProceduralRoomCompletionSystem))]
 public partial struct EnemyExperienceDropCollectSystem : ISystem
 {
     #region Constants
@@ -78,11 +79,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
         if (activeDropQuery.CalculateEntityCount() <= 0)
             return;
 
-        bool collectAllImmediately = pendingRequest.CollectAllImmediately != 0;
         PlayerRunOutcomeState runOutcomeState = entityManager.GetComponentData<PlayerRunOutcomeState>(playerEntity);
-
-        if (runOutcomeState.IsFinalized != 0 && !collectAllImmediately)
-            return;
 
         float3 playerPosition = entityManager.GetComponentData<LocalTransform>(playerEntity).Position;
         float3 planarVelocity = entityManager.GetComponentData<PlayerMovementState>(playerEntity).Velocity;
@@ -102,9 +99,12 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                                                                                                                    playerLevel.Current,
                                                                                                                    playerExperience.Current);
 
-        float deltaTime = SystemAPI.Time.DeltaTime;
+        float scaledDeltaTime = math.max(0f, SystemAPI.Time.DeltaTime);
+        bool isSceneTransitioning = SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
+                                    transitionState.IsTransitioning != 0;
+        float unscaledDeltaTime = isSceneTransitioning ? UnityEngine.Time.unscaledDeltaTime : 0f;
 
-        if (deltaTime <= 0f && !collectAllImmediately)
+        if (scaledDeltaTime <= 0f && unscaledDeltaTime <= 0f)
             return;
 
         float pickupRadiusSquared = pickupRadius * pickupRadius;
@@ -114,7 +114,6 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             ? passiveToolsState.DropAttraction.AttractionRadius * passiveToolsState.DropAttraction.AttractionRadius
             : 0f;
         bool hasRequestedAttraction = hasPendingRequest &&
-                                      !collectAllImmediately &&
                                       pendingRequest.AttractionRadius > 0f;
         float requestedAttractionRadiusSquared = hasRequestedAttraction
             ? pendingRequest.AttractionRadius * pendingRequest.AttractionRadius
@@ -125,6 +124,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         BufferLookup<EnemyExperienceDropPoolElement> poolLookup = SystemAPI.GetBufferLookup<EnemyExperienceDropPoolElement>(false);
+        EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
 
         foreach ((RefRW<EnemyExperienceDrop> dropData,
                   RefRW<LocalTransform> dropTransform,
@@ -135,6 +135,17 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                              .WithEntityAccess())
         {
             EnemyExperienceDrop currentDropData = dropData.ValueRO;
+            float dropDeltaTime = EnemyDropRoomClearAttractionUtility.ResolveDeltaTime(scaledDeltaTime,
+                                                                                        unscaledDeltaTime,
+                                                                                        isSceneTransitioning,
+                                                                                        currentDropData.IsRoomClearAttraction != 0);
+
+            if (runOutcomeState.IsFinalized != 0 && currentDropData.IsRoomClearAttraction == 0)
+                continue;
+
+            if (dropDeltaTime <= 0f)
+                continue;
+
             float3 dropPosition = dropTransform.ValueRO.Position;
             float3 toPlayer = playerPosition - dropPosition;
             toPlayer.y = 0f;
@@ -158,11 +169,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
 
             float spawnAnimationDuration = math.max(0f, currentDropData.SpawnAnimationDuration);
 
-            if (!collectAllImmediately &&
-                spawnAnimationDuration > PrecisionEpsilon &&
+            if (spawnAnimationDuration > PrecisionEpsilon &&
                 currentDropData.SpawnAnimationElapsed < spawnAnimationDuration)
             {
-                float nextSpawnAnimationElapsed = math.min(spawnAnimationDuration, currentDropData.SpawnAnimationElapsed + deltaTime);
+                float nextSpawnAnimationElapsed = math.min(spawnAnimationDuration, currentDropData.SpawnAnimationElapsed + dropDeltaTime);
                 float normalizedTime = nextSpawnAnimationElapsed / spawnAnimationDuration;
                 float easedTime = normalizedTime * normalizedTime * (3f - (2f * normalizedTime));
                 LocalTransform animatedTransform = dropTransform.ValueRO;
@@ -190,8 +200,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                                                        remainingExperienceCapacity,
                                                        in playerHealth,
                                                        in playerShield);
-            bool consumeWhenUnusable = collectAllImmediately ||
-                                       currentDropData.ConsumeWhenUnusable != 0 ||
+            bool consumeWhenUnusable = currentDropData.ConsumeWhenUnusable != 0 ||
                                        (isInsidePassiveAttraction && passiveToolsState.DropAttraction.ConsumeUnusableDrops != 0) ||
                                        (isInsideRequestedAttraction && pendingRequest.ConsumeUnusableDrops != 0);
 
@@ -209,7 +218,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             if (consumeWhenUnusable)
                 currentDropData.ConsumeWhenUnusable = 1;
 
-            if (collectAllImmediately || distanceSquared <= collectDistanceSquared)
+            if (distanceSquared <= collectDistanceSquared)
             {
                 switch (currentDropData.RewardKind)
                 {
@@ -239,6 +248,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                 dropTransform.ValueRW = parkedTransform;
                 currentDropData.IsAttracting = 0;
                 currentDropData.ConsumeWhenUnusable = 0;
+                currentDropData.IsRoomClearAttraction = 0;
                 dropData.ValueRW = currentDropData;
                 dropActive.ValueRW = false;
 
@@ -251,6 +261,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
                     {
                         DropEntity = dropEntity
                     });
+                }
+                else
+                {
+                    commandBuffer.DestroyEntity(dropEntity);
                 }
 
                 continue;
@@ -275,7 +289,7 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             if (attractionSpeed <= PrecisionEpsilon)
                 continue;
 
-            float moveDistance = attractionSpeed * deltaTime;
+            float moveDistance = attractionSpeed * dropDeltaTime;
 
             if (moveDistance <= PrecisionEpsilon)
                 continue;
@@ -302,6 +316,10 @@ public partial struct EnemyExperienceDropCollectSystem : ISystem
             updatedTransform.Position += moveDirection * moveDistance;
             dropTransform.ValueRW = updatedTransform;
         }
+
+        // Destroy collected persistent drops whose source-room pool disappeared during transition cleanup.
+        commandBuffer.Playback(entityManager);
+        commandBuffer.Dispose();
 
         if (grantedExperience <= PrecisionEpsilon)
         {

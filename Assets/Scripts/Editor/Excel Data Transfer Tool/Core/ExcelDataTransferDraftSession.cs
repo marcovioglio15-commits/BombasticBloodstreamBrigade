@@ -17,6 +17,13 @@ public static class ExcelDataTransferDraftSession
     private static bool hasPendingChanges;
     #endregion
 
+    #region Events
+    /// <summary>
+    /// Notifies the Excel Data Transfer window only when the pending-change state actually changes.
+    /// </summary>
+    public static event Action PendingChangesChanged;
+    #endregion
+
     #region Properties
     public static bool IsInitialized
     {
@@ -47,7 +54,7 @@ public static class ExcelDataTransferDraftSession
         ExcelDataTransferAssetUtility.GetOrCreateDefaultMasterPreset();
         CaptureBaseline();
         isInitialized = true;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -57,7 +64,7 @@ public static class ExcelDataTransferDraftSession
     {
         pendingChangesVerifier.Reset();
         isInitialized = false;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
         baselineJsonByPath.Clear();
     }
 
@@ -67,7 +74,6 @@ public static class ExcelDataTransferDraftSession
     public static void PerformUndo()
     {
         Undo.PerformUndo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -76,7 +82,6 @@ public static class ExcelDataTransferDraftSession
     public static void PerformRedo()
     {
         Undo.PerformRedo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -84,7 +89,7 @@ public static class ExcelDataTransferDraftSession
     /// </summary>
     public static void MarkDirty()
     {
-        if (!isInitialized || hasPendingChanges)
+        if (!isInitialized)
             return;
 
         pendingChangesVerifier.VerifySignal();
@@ -97,7 +102,7 @@ public static class ExcelDataTransferDraftSession
     {
         if (!isInitialized)
         {
-            hasPendingChanges = false;
+            SetPendingChanges(false);
             return;
         }
 
@@ -105,7 +110,7 @@ public static class ExcelDataTransferDraftSession
 
         if (currentState.Count != baselineJsonByPath.Count)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
@@ -113,18 +118,18 @@ public static class ExcelDataTransferDraftSession
         {
             if (!currentState.TryGetValue(baselineEntry.Key, out string currentJson))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
 
             if (!string.Equals(baselineEntry.Value, currentJson, StringComparison.Ordinal))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
         }
 
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -136,7 +141,7 @@ public static class ExcelDataTransferDraftSession
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     /// <summary>
@@ -153,11 +158,24 @@ public static class ExcelDataTransferDraftSession
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
     #endregion
 
     #region Session Helpers
+    /// <summary>
+    /// Updates pending state and emits one notification only when the visible state changes.
+    /// </summary>
+    /// <param name="value">New pending-change state.</param>
+    private static void SetPendingChanges(bool value)
+    {
+        if (hasPendingChanges == value)
+            return;
+
+        hasPendingChanges = value;
+        PendingChangesChanged?.Invoke();
+    }
+
     /// <summary>
     /// Captures every tracked transfer preset as JSON for future discard comparisons.
     /// </summary>
@@ -191,7 +209,7 @@ public static class ExcelDataTransferDraftSession
             if (assetObject == null)
                 continue;
 
-            stateByPath[assetPath] = EditorJsonUtility.ToJson(assetObject, true);
+            stateByPath[assetPath] = EditorJsonUtility.ToJson(assetObject);
         }
 
         return stateByPath;

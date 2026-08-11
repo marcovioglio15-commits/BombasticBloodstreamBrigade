@@ -175,88 +175,6 @@ public sealed class PlayerComboCounterDefinition
 }
 
 /// <summary>
-/// Stores one combo rank milestone with its display identifier and temporary Character Tuning bonus formulas.
-/// none.
-/// </summary>
-[Serializable]
-public sealed class PlayerComboRankVisualDefinition
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Optional sprite shown inside the combo HUD badge while this rank is active.")]
-    [SerializeField] private Sprite badgeSprite;
-
-    [Tooltip("Tint applied to the combo HUD badge image while this rank is active.")]
-    [SerializeField] private Color badgeTint = Color.white;
-
-    [Tooltip("Text color applied to the combo HUD rank label while this rank is active.")]
-    [SerializeField] private Color rankTextColor = Color.white;
-
-    [Tooltip("Text color applied to the combo HUD numeric combo value while this rank is active.")]
-    [SerializeField] private Color comboValueTextColor = Color.white;
-
-    [Tooltip("Tint applied to the combo HUD progress fill while this rank is active.")]
-    [SerializeField] private Color progressFillColor = Color.white;
-
-    [Tooltip("Tint applied to the combo HUD progress background while this rank is active.")]
-    [SerializeField] private Color progressBackgroundColor = Color.white;
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public Sprite BadgeSprite
-    {
-        get
-        {
-            return badgeSprite;
-        }
-    }
-
-    public Color BadgeTint
-    {
-        get
-        {
-            return badgeTint;
-        }
-    }
-
-    public Color RankTextColor
-    {
-        get
-        {
-            return rankTextColor;
-        }
-    }
-
-    public Color ComboValueTextColor
-    {
-        get
-        {
-            return comboValueTextColor;
-        }
-    }
-
-    public Color ProgressFillColor
-    {
-        get
-        {
-            return progressFillColor;
-        }
-    }
-
-    public Color ProgressBackgroundColor
-    {
-        get
-        {
-            return progressBackgroundColor;
-        }
-    }
-    #endregion
-}
-
-/// <summary>
 /// Stores one temporary passive power-up acquisition granted while its combo rank remains reached.
 /// none.
 /// </summary>
@@ -348,9 +266,6 @@ public sealed class PlayerComboRankDefinition
     [Tooltip("Percentage of this rank's numeric Character Tuning boost distributed linearly while progressing from the previous rank threshold to this rank threshold.")]
     [SerializeField] private float progressiveBoostPercent;
 
-    [Tooltip("Optional HUD presentation overrides applied automatically while this rank is active.")]
-    [SerializeField] private PlayerComboRankVisualDefinition rankVisuals = new PlayerComboRankVisualDefinition();
-
     [Tooltip("Ordered Character Tuning formulas applied while this rank remains active. Active combo ranks stack cumulatively in ascending milestone order.")]
     [SerializeField] private PowerUpCharacterTuningModuleData rankBonuses = new PowerUpCharacterTuningModuleData();
 
@@ -401,14 +316,6 @@ public sealed class PlayerComboRankDefinition
         }
     }
 
-    public PlayerComboRankVisualDefinition RankVisuals
-    {
-        get
-        {
-            return rankVisuals;
-        }
-    }
-
     public IReadOnlyList<PlayerComboPassivePowerUpUnlockDefinition> PassivePowerUpUnlocks
     {
         get
@@ -422,20 +329,18 @@ public sealed class PlayerComboRankDefinition
 
     #region Setup
     /// <summary>
-    /// Assigns the authored combo-rank identity, milestone threshold, optional HUD visuals, point-decay rate, and temporary Character Tuning bonuses.
+    /// Assigns the authored combo-rank identity, milestone threshold, point-decay rate, and temporary Character Tuning bonuses.
     /// </summary>
     /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
     /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
     /// <param name="pointsDecayPerSecondValue">Combo points removed per second while this rank is active.</param>
     /// <param name="progressiveBoostPercentValue">Percent of numeric rank bonus distributed before this rank is reached.</param>
-    /// <param name="rankVisualsValue">Optional HUD visuals resolved automatically while this rank is active.</param>
     /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
     /// <param name="passivePowerUpUnlocksValue">Passive power-ups granted while this rank remains reached.</param>
     public void Configure(string rankIdValue,
                           int requiredComboValueValue,
                           float pointsDecayPerSecondValue,
                           float progressiveBoostPercentValue,
-                          PlayerComboRankVisualDefinition rankVisualsValue,
                           PowerUpCharacterTuningModuleData rankBonusesValue,
                           List<PlayerComboPassivePowerUpUnlockDefinition> passivePowerUpUnlocksValue)
     {
@@ -443,36 +348,12 @@ public sealed class PlayerComboRankDefinition
         requiredComboValue = requiredComboValueValue;
         pointsDecayPerSecond = pointsDecayPerSecondValue;
         progressiveBoostPercent = progressiveBoostPercentValue;
-        rankVisuals = rankVisualsValue ?? new PlayerComboRankVisualDefinition();
         rankBonuses = rankBonusesValue;
         passivePowerUpUnlocks = passivePowerUpUnlocksValue;
     }
 
     /// <summary>
-    /// Assigns the authored combo-rank identity, milestone threshold, optional HUD visuals, point-decay rate, and temporary Character Tuning bonuses while preserving passive unlocks.
-    /// </summary>
-    /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
-    /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
-    /// <param name="pointsDecayPerSecondValue">Combo points removed per second while this rank is active.</param>
-    /// <param name="rankVisualsValue">Optional HUD visuals resolved automatically while this rank is active.</param>
-    /// <param name="rankBonusesValue">Character Tuning formulas applied while the rank is active.</param>
-    public void Configure(string rankIdValue,
-                          int requiredComboValueValue,
-                          float pointsDecayPerSecondValue,
-                          PlayerComboRankVisualDefinition rankVisualsValue,
-                          PowerUpCharacterTuningModuleData rankBonusesValue)
-    {
-        Configure(rankIdValue,
-                  requiredComboValueValue,
-                  pointsDecayPerSecondValue,
-                  progressiveBoostPercent,
-                  rankVisualsValue,
-                  rankBonusesValue,
-                  passivePowerUpUnlocks);
-    }
-
-    /// <summary>
-    /// Assigns the authored combo-rank identity, milestone threshold, point-decay rate, and temporary Character Tuning bonuses while preserving current HUD visuals.
+    /// Assigns the authored combo-rank identity, milestone threshold, point-decay rate, and temporary Character Tuning bonuses while preserving passive unlocks.
     /// </summary>
     /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
     /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
@@ -487,13 +368,12 @@ public sealed class PlayerComboRankDefinition
                   requiredComboValueValue,
                   pointsDecayPerSecondValue,
                   progressiveBoostPercent,
-                  rankVisuals,
                   rankBonusesValue,
                   passivePowerUpUnlocks);
     }
 
     /// <summary>
-    /// Assigns the authored combo-rank identity, milestone threshold, and temporary Character Tuning bonuses while preserving current HUD visuals and point-decay rate.
+    /// Assigns the authored combo-rank identity, milestone threshold, and temporary Character Tuning bonuses while preserving point-decay rate.
     /// </summary>
     /// <param name="rankIdValue">Stable rank identifier shown by the runtime combo label.</param>
     /// <param name="requiredComboValueValue">Minimum combo value required by this rank.</param>
@@ -503,7 +383,6 @@ public sealed class PlayerComboRankDefinition
         Configure(rankIdValue,
                   requiredComboValueValue,
                   pointsDecayPerSecond,
-                  rankVisuals,
                   rankBonusesValue);
     }
     #endregion
@@ -524,11 +403,6 @@ public sealed class PlayerComboRankDefinition
         if (rankBonuses == null)
         {
             rankBonuses = new PowerUpCharacterTuningModuleData();
-        }
-
-        if (rankVisuals == null)
-        {
-            rankVisuals = new PlayerComboRankVisualDefinition();
         }
 
         if (passivePowerUpUnlocks == null)

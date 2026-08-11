@@ -2,7 +2,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
-/// Merges drop-collection requests so multiple active slots and room clear share one bounded ECS queue entry.
+/// Merges drop-attraction requests from multiple active power-up slots into one bounded ECS queue entry.
 /// </summary>
 public static class EnemyDropCollectionRequestUtility
 {
@@ -15,23 +15,20 @@ public static class EnemyDropCollectionRequestUtility
     /// <param name="requests">Shared request buffer receiving the merged command.</param>
     /// <param name="attractionRadius">World-space player-centered radius used for a standard attraction pulse.</param>
     /// <param name="consumeUnusableDrops">Whether affected drops remain consumable when their reward cannot change player state.</param>
-    /// <param name="collectAllImmediately">Whether every active drop must be consumed immediately regardless of distance and attraction speed.</param>
     public static void Enqueue(DynamicBuffer<EnemyDropCollectionRequest> requests,
                                float attractionRadius,
-                               bool consumeUnusableDrops,
-                               bool collectAllImmediately)
+                               bool consumeUnusableDrops)
     {
         if (!requests.IsCreated)
             return;
 
-        if (!collectAllImmediately && attractionRadius <= 0f)
+        if (attractionRadius <= 0f)
             return;
 
         EnemyDropCollectionRequest request = new EnemyDropCollectionRequest
         {
-            AttractionRadius = collectAllImmediately ? 0f : math.max(0f, attractionRadius),
-            ConsumeUnusableDrops = consumeUnusableDrops || collectAllImmediately ? (byte)1 : (byte)0,
-            CollectAllImmediately = collectAllImmediately ? (byte)1 : (byte)0
+            AttractionRadius = math.max(0f, attractionRadius),
+            ConsumeUnusableDrops = consumeUnusableDrops ? (byte)1 : (byte)0
         };
 
         if (requests.Length <= 0)
@@ -45,10 +42,6 @@ public static class EnemyDropCollectionRequestUtility
         pendingRequest.ConsumeUnusableDrops = pendingRequest.ConsumeUnusableDrops != 0 || request.ConsumeUnusableDrops != 0
             ? (byte)1
             : (byte)0;
-        pendingRequest.CollectAllImmediately = pendingRequest.CollectAllImmediately != 0 || request.CollectAllImmediately != 0
-            ? (byte)1
-            : (byte)0;
-
         if (requests.Length > 1)
             requests.RemoveRange(1, requests.Length - 1);
     }

@@ -4,8 +4,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Draws the combo-counter HUD section and exposes warnings for missing authored bindings.
-/// none.
+/// Draws Synchro Meter scene bindings and reports missing authored wave layers without mutating the hierarchy.
 /// </summary>
 [CustomPropertyDrawer(typeof(HUDComboCounterSection))]
 public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
@@ -14,88 +13,164 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
 
     #region Public Methods
     /// <summary>
-    /// Builds the UI Toolkit inspector for the combo-counter HUD section.
+    /// Builds the UI Toolkit inspector for the authored Synchro Meter section.
     /// </summary>
-    /// <param name="property">Serialized combo-counter HUD section property.</param>
+    /// <param name="property">Serialized Synchro Meter section property.</param>
     /// <returns>Root UI element used by the inspector.</returns>
     public override VisualElement CreatePropertyGUI(SerializedProperty property)
     {
         if (HUDSectionPropertyDrawerUtility.TryCreateObjectReferenceField(property,
-                                                                         "Scene HUD combo counter section component referenced by HUDManager.",
+                                                                         "Scene Synchro Meter component referenced by HUDManager.",
                                                                          out VisualElement referenceField))
             return referenceField;
 
         VisualElement root = new VisualElement();
         SerializedProperty isEnabledProperty = property.FindPropertyRelative("isEnabled");
         SerializedProperty rootObjectProperty = property.FindPropertyRelative("rootObject");
-        SerializedProperty rankBadgeImageProperty = property.FindPropertyRelative("rankBadgeImage");
+        SerializedProperty waveViewportProperty = property.FindPropertyRelative("waveViewport");
+        SerializedProperty backgroundImageProperty = property.FindPropertyRelative("backgroundImage");
+        SerializedProperty coverImageProperty = property.FindPropertyRelative("coverImage");
+        SerializedProperty primaryLeadingProperty = property.FindPropertyRelative("primaryWaveLeadingImage");
+        SerializedProperty primaryTrailingProperty = property.FindPropertyRelative("primaryWaveTrailingImage");
+        SerializedProperty secondaryLeadingProperty = property.FindPropertyRelative("secondaryWaveLeadingImage");
+        SerializedProperty secondaryTrailingProperty = property.FindPropertyRelative("secondaryWaveTrailingImage");
         SerializedProperty rankTextProperty = property.FindPropertyRelative("rankText");
-        SerializedProperty comboValueTextProperty = property.FindPropertyRelative("comboValueText");
-        SerializedProperty progressFillImageProperty = property.FindPropertyRelative("progressFillImage");
-        SerializedProperty progressBackgroundImageProperty = property.FindPropertyRelative("progressBackgroundImage");
+        SerializedProperty valueTextProperty = property.FindPropertyRelative("valueText");
+        SerializedProperty progressFillProperty = property.FindPropertyRelative("progressFillImage");
+        SerializedProperty progressBackgroundProperty = property.FindPropertyRelative("progressBackgroundImage");
+        SerializedProperty showBackgroundProperty = property.FindPropertyRelative("showBackground");
+        SerializedProperty showCoverProperty = property.FindPropertyRelative("showCover");
+        SerializedProperty showRankTextProperty = property.FindPropertyRelative("showRankText");
+        SerializedProperty showValueTextProperty = property.FindPropertyRelative("showValueText");
+        SerializedProperty showProgressBarProperty = property.FindPropertyRelative("showProgressBar");
 
         if (isEnabledProperty == null ||
             rootObjectProperty == null ||
-            rankBadgeImageProperty == null ||
-            rankTextProperty == null ||
-            comboValueTextProperty == null ||
-            progressFillImageProperty == null ||
-            progressBackgroundImageProperty == null)
+            waveViewportProperty == null ||
+            primaryLeadingProperty == null ||
+            primaryTrailingProperty == null ||
+            secondaryLeadingProperty == null ||
+            secondaryTrailingProperty == null)
         {
-            HelpBox missingHelpBox = new HelpBox("Combo counter HUD section fields are missing.", HelpBoxMessageType.Warning);
-            root.Add(missingHelpBox);
+            root.Add(new HelpBox("Synchro Meter section fields are missing.", HelpBoxMessageType.Warning));
             return root;
         }
 
-        HelpBox infoBox = new HelpBox("This section configures only the combo HUD bindings and fallback defaults. Per-rank visual overrides are authored directly on each combo rank inside the progression preset.", HelpBoxMessageType.Info);
-        root.Add(infoBox);
+        root.Add(new HelpBox("The two images in each wave pair must share the same width and touch edge-to-edge inside the masked viewport. Runtime only repositions these authored images; it never creates UI objects.", HelpBoxMessageType.Info));
         root.Add(CreateBoundField(isEnabledProperty, "Enabled"));
         root.Add(CreateBoundField(rootObjectProperty, "Root Object"));
-        root.Add(CreateBoundField(rankBadgeImageProperty, "Rank Badge Image"));
+        root.Add(CreateBoundField(waveViewportProperty, "Wave Viewport"));
+        root.Add(CreateBoundField(backgroundImageProperty, "Background Image"));
+        root.Add(CreateBoundField(primaryLeadingProperty, "Primary Wave Leading"));
+        root.Add(CreateBoundField(primaryTrailingProperty, "Primary Wave Trailing"));
+        root.Add(CreateBoundField(secondaryLeadingProperty, "Secondary Wave Leading"));
+        root.Add(CreateBoundField(secondaryTrailingProperty, "Secondary Wave Trailing"));
+        root.Add(CreateBoundField(coverImageProperty, "Cover Image"));
         root.Add(CreateBoundField(rankTextProperty, "Rank Text"));
-        root.Add(CreateBoundField(comboValueTextProperty, "Combo Value Text"));
-        root.Add(CreateBoundField(progressFillImageProperty, "Progress Fill Image"));
-        root.Add(CreateBoundField(progressBackgroundImageProperty, "Progress Background Image"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultBadgeSprite"), "Default Badge Sprite"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultBadgeTint"), "Default Badge Tint"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultRankTextColor"), "Default Rank Text Color"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultComboValueTextColor"), "Default Combo Value Text Color"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultProgressFillColor"), "Default Progress Fill Color"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("defaultProgressBackgroundColor"), "Default Progress Background Color"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("showRankBadgeImage"), "Show Rank Badge Image"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("showProgressBar"), "Show Progress Bar"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("hideWhenPlayerMissing"), "Hide When Player Missing"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("hideWhenZeroCombo"), "Hide When Zero Combo"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("hideWhenNoActiveRank"), "Hide When No Active Rank"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("fadeInDuration"), "Fade In Duration"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("fadeOutDuration"), "Fade Out Duration"));
-        root.Add(CreateBoundField(property.FindPropertyRelative("idleRankLabel"), "Idle Rank Label"));
+        root.Add(CreateBoundField(valueTextProperty, "Value Text"));
+        root.Add(CreateBoundField(progressFillProperty, "Progress Fill"));
+        root.Add(CreateBoundField(progressBackgroundProperty, "Progress Background"));
+
+        Foldout fallbackFoldout = new Foldout
+        {
+            text = "Scene Fallback Settings"
+        };
+        fallbackFoldout.tooltip = "Fallback values used before the baked HUD Manager preset becomes available.";
+        AddFallbackFields(fallbackFoldout, property);
+        root.Add(fallbackFoldout);
 
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         root.Add(warningBox);
 
-        root.RegisterCallback<SerializedPropertyChangeEvent>(_ =>
-        {
-            RefreshWarnings(rootObjectProperty,
-                            rankBadgeImageProperty,
-                            rankTextProperty,
-                            comboValueTextProperty,
-                            progressFillImageProperty,
-                            progressBackgroundImageProperty,
-                            warningBox);
-        });
+        // Refresh warnings whenever a binding or visibility toggle changes.
+        root.RegisterCallback<SerializedPropertyChangeEvent>(_ => RefreshWarnings(rootObjectProperty,
+                                                                                  waveViewportProperty,
+                                                                                  backgroundImageProperty,
+                                                                                  coverImageProperty,
+                                                                                  primaryLeadingProperty,
+                                                                                  primaryTrailingProperty,
+                                                                                  secondaryLeadingProperty,
+                                                                                  secondaryTrailingProperty,
+                                                                                  rankTextProperty,
+                                                                                  valueTextProperty,
+                                                                                  progressFillProperty,
+                                                                                  progressBackgroundProperty,
+                                                                                  showBackgroundProperty,
+                                                                                  showCoverProperty,
+                                                                                  showRankTextProperty,
+                                                                                  showValueTextProperty,
+                                                                                  showProgressBarProperty,
+                                                                                  warningBox));
         RefreshWarnings(rootObjectProperty,
-                        rankBadgeImageProperty,
+                        waveViewportProperty,
+                        backgroundImageProperty,
+                        coverImageProperty,
+                        primaryLeadingProperty,
+                        primaryTrailingProperty,
+                        secondaryLeadingProperty,
+                        secondaryTrailingProperty,
                         rankTextProperty,
-                        comboValueTextProperty,
-                        progressFillImageProperty,
-                        progressBackgroundImageProperty,
+                        valueTextProperty,
+                        progressFillProperty,
+                        progressBackgroundProperty,
+                        showBackgroundProperty,
+                        showCoverProperty,
+                        showRankTextProperty,
+                        showValueTextProperty,
+                        showProgressBarProperty,
                         warningBox);
         return root;
     }
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Adds fallback theme, motion, layer, and visibility fields used before ECS settings are applied.
+    /// </summary>
+    /// <param name="parent">Foldout receiving fallback fields.</param>
+    /// <param name="property">Serialized section property owning the fallback values.</param>
+    private static void AddFallbackFields(VisualElement parent, SerializedProperty property)
+    {
+        string[] fieldNames =
+        {
+            "backgroundTint",
+            "coverTint",
+            "primaryWaveTint",
+            "secondaryWaveTint",
+            "rankTextColor",
+            "valueTextColor",
+            "progressFillTint",
+            "progressBackgroundTint",
+            "showBackground",
+            "showCover",
+            "showRankText",
+            "showValueText",
+            "showProgressBar",
+            "waveScrollCyclesPerSecond",
+            "lowestRankPhaseOffsetNormalized",
+            "highestRankPhaseOffsetNormalized",
+            "phaseOffsetResponseExponent",
+            "phaseTransitionDuration",
+            "useUnscaledTime",
+            "progressSmoothingSeconds",
+            "hideWhenPlayerMissing",
+            "hideWhenZeroValue",
+            "hideWhenNoActiveRank",
+            "fadeInDuration",
+            "fadeOutDuration",
+            "idleRankLabel"
+        };
+
+        // Unity supplies labels and tooltips directly from the serialized field metadata.
+        for (int fieldIndex = 0; fieldIndex < fieldNames.Length; fieldIndex++)
+        {
+            SerializedProperty childProperty = property.FindPropertyRelative(fieldNames[fieldIndex]);
+
+            if (childProperty != null)
+                parent.Add(CreateBoundField(childProperty, childProperty.displayName));
+        }
+    }
+
     /// <summary>
     /// Creates one bound property field with the requested display label.
     /// </summary>
@@ -110,63 +185,80 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
     }
 
     /// <summary>
-    /// Rebuilds validation warnings for the combo HUD bindings.
+    /// Rebuilds warnings for mandatory image pairs and currently enabled optional layers.
     /// </summary>
-    /// <param name="rootObjectProperty">Serialized combo HUD root object property.</param>
-    /// <param name="rankBadgeImageProperty">Serialized rank badge image property.</param>
-    /// <param name="rankTextProperty">Serialized rank text property.</param>
-    /// <param name="comboValueTextProperty">Serialized combo value text property.</param>
-    /// <param name="progressFillImageProperty">Serialized progress fill image property.</param>
-    /// <param name="progressBackgroundImageProperty">Serialized progress background image property.</param>
+    /// <param name="rootObjectProperty">Serialized meter root object.</param>
+    /// <param name="waveViewportProperty">Serialized masked wave viewport.</param>
+    /// <param name="backgroundImageProperty">Serialized background image.</param>
+    /// <param name="coverImageProperty">Serialized scanline cover image.</param>
+    /// <param name="primaryLeadingProperty">Serialized primary leading wave image.</param>
+    /// <param name="primaryTrailingProperty">Serialized primary trailing wave image.</param>
+    /// <param name="secondaryLeadingProperty">Serialized secondary leading wave image.</param>
+    /// <param name="secondaryTrailingProperty">Serialized secondary trailing wave image.</param>
+    /// <param name="rankTextProperty">Serialized rank text.</param>
+    /// <param name="valueTextProperty">Serialized value text.</param>
+    /// <param name="progressFillProperty">Serialized progression fill image.</param>
+    /// <param name="progressBackgroundProperty">Serialized progression track image.</param>
+    /// <param name="showBackgroundProperty">Serialized background visibility toggle.</param>
+    /// <param name="showCoverProperty">Serialized cover visibility toggle.</param>
+    /// <param name="showRankTextProperty">Serialized rank-text visibility toggle.</param>
+    /// <param name="showValueTextProperty">Serialized value-text visibility toggle.</param>
+    /// <param name="showProgressBarProperty">Serialized progression-bar visibility toggle.</param>
     /// <param name="warningBox">Warning help box refreshed in place.</param>
     private static void RefreshWarnings(SerializedProperty rootObjectProperty,
-                                        SerializedProperty rankBadgeImageProperty,
+                                        SerializedProperty waveViewportProperty,
+                                        SerializedProperty backgroundImageProperty,
+                                        SerializedProperty coverImageProperty,
+                                        SerializedProperty primaryLeadingProperty,
+                                        SerializedProperty primaryTrailingProperty,
+                                        SerializedProperty secondaryLeadingProperty,
+                                        SerializedProperty secondaryTrailingProperty,
                                         SerializedProperty rankTextProperty,
-                                        SerializedProperty comboValueTextProperty,
-                                        SerializedProperty progressFillImageProperty,
-                                        SerializedProperty progressBackgroundImageProperty,
+                                        SerializedProperty valueTextProperty,
+                                        SerializedProperty progressFillProperty,
+                                        SerializedProperty progressBackgroundProperty,
+                                        SerializedProperty showBackgroundProperty,
+                                        SerializedProperty showCoverProperty,
+                                        SerializedProperty showRankTextProperty,
+                                        SerializedProperty showValueTextProperty,
+                                        SerializedProperty showProgressBarProperty,
                                         HelpBox warningBox)
     {
         if (warningBox == null)
-        {
             return;
-        }
 
         List<string> warningLines = new List<string>();
-        bool hasAnyVisualBinding = rootObjectProperty.objectReferenceValue != null ||
-                                   rankTextProperty.objectReferenceValue != null ||
-                                   comboValueTextProperty.objectReferenceValue != null;
-        bool hasProgressBinding = progressFillImageProperty.objectReferenceValue != null;
 
-        if (!hasAnyVisualBinding)
-        {
-            warningLines.Add("Assign at least a Root Object or the Rank/Combo TMP texts so the combo HUD can be rendered.");
-        }
+        if (rootObjectProperty.objectReferenceValue == null)
+            warningLines.Add("Assign the Synchro Meter root object used for visibility and fading.");
 
-        if (progressBackgroundImageProperty.objectReferenceValue == null && progressFillImageProperty.objectReferenceValue != null)
-        {
-            warningLines.Add("Progress Fill Image is assigned without a Progress Background Image.");
-        }
+        if (waveViewportProperty.objectReferenceValue == null)
+            warningLines.Add("Assign the masked Wave Viewport so both seamless pairs remain clipped to the display.");
 
-        if (!hasProgressBinding)
-        {
-            warningLines.Add("Progress Fill Image is missing. The combo HUD can still render rank and value, but it cannot show next-rank progress.");
-        }
+        if (primaryLeadingProperty.objectReferenceValue == null || primaryTrailingProperty.objectReferenceValue == null)
+            warningLines.Add("Assign both Primary Wave images; one image cannot cover the seamless wrap boundary.");
 
-        if (rankBadgeImageProperty.objectReferenceValue == null)
-        {
-            warningLines.Add("Rank Badge Image is missing. Rank-specific badge sprites authored on combo ranks will not be visible.");
-        }
+        if (secondaryLeadingProperty.objectReferenceValue == null || secondaryTrailingProperty.objectReferenceValue == null)
+            warningLines.Add("Assign both Secondary Wave images; phase convergence requires a complete seamless pair.");
 
-        if (warningLines.Count <= 0)
-        {
-            warningBox.text = string.Empty;
-            warningBox.style.display = DisplayStyle.None;
-            return;
-        }
+        if (showBackgroundProperty.boolValue && backgroundImageProperty.objectReferenceValue == null)
+            warningLines.Add("Show Background is enabled, but no background image is assigned.");
+
+        if (showCoverProperty.boolValue && coverImageProperty.objectReferenceValue == null)
+            warningLines.Add("Show Cover is enabled, but no scanline cover image is assigned.");
+
+        if (showRankTextProperty.boolValue && rankTextProperty.objectReferenceValue == null)
+            warningLines.Add("Show Rank Text is enabled, but no TMP rank label is assigned.");
+
+        if (showValueTextProperty.boolValue && valueTextProperty.objectReferenceValue == null)
+            warningLines.Add("Show Value Text is enabled, but no TMP value label is assigned.");
+
+        if (showProgressBarProperty.boolValue &&
+            (progressFillProperty.objectReferenceValue == null || progressBackgroundProperty.objectReferenceValue == null))
+            warningLines.Add("Show Progress Bar is enabled, but its fill or background image is not assigned.");
 
         warningBox.text = string.Join("\n", warningLines);
-        warningBox.style.display = DisplayStyle.Flex;
+        warningBox.style.display = warningLines.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
     }
     #endregion
 

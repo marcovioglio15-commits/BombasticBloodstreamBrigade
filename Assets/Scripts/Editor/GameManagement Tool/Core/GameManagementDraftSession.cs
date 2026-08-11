@@ -136,7 +136,7 @@ public static class GameManagementDraftSession
     /// </summary>
     public static void MarkDirty()
     {
-        if (!isInitialized || hasPendingChanges)
+        if (!isInitialized)
             return;
 
         pendingChangesVerifier.VerifySignal();
@@ -286,7 +286,7 @@ public static class GameManagementDraftSession
             if (assetObject == null)
                 continue;
 
-            stateByPath[assetPath] = EditorJsonUtility.ToJson(assetObject, true);
+            stateByPath[assetPath] = EditorJsonUtility.ToJson(assetObject);
         }
 
         return stateByPath;

@@ -437,8 +437,8 @@ public sealed class GameHudManagerPresetsPanel
             case DetailsSectionType.RunTimer:
                 GameHudManagerPresetsPanelUtility.BuildRunTimerSection(CreateSection("Run Timer"), presetSerializedObject);
                 break;
-            case DetailsSectionType.Combo:
-                GameHudManagerPresetsPanelUtility.BuildComboCounterSection(CreateSection("Combo Counter"), presetSerializedObject);
+            case DetailsSectionType.SynchroMeter:
+                GameHudManagerPresetsPanelUtility.BuildSynchroMeterSection(CreateSection("Synchro Meter"), presetSerializedObject);
                 break;
             case DetailsSectionType.Milestone:
                 GameHudManagerPresetsPanelUtility.BuildMilestoneSelectionSection(CreateSection("Milestone Selection"), presetSerializedObject);
@@ -535,7 +535,7 @@ public sealed class GameHudManagerPresetsPanel
         AddSectionButton(buttonsRoot, DetailsSectionType.LevelExperience, "Level & Experience", 148f);
         AddSectionButton(buttonsRoot, DetailsSectionType.ActivePowerUps, "Active Power-Ups", 132f);
         AddSectionButton(buttonsRoot, DetailsSectionType.RunTimer, "Run Timer", 88f);
-        AddSectionButton(buttonsRoot, DetailsSectionType.Combo, "Combo", 72f);
+        AddSectionButton(buttonsRoot, DetailsSectionType.SynchroMeter, "Synchro Meter", 112f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Milestone, "Milestone", 92f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Damage, "Damage", 84f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Validation, "Validation", 92f);

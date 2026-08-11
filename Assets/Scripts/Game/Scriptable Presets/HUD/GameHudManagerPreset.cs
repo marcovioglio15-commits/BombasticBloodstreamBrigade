@@ -33,8 +33,8 @@ public sealed class GameHudManagerPreset : ScriptableObject
     [Tooltip("Run timer ECS setup and fallback visibility behavior.")]
     [SerializeField] private GameHudRunTimerSettings runTimerSettings = new GameHudRunTimerSettings();
 
-    [Tooltip("Combo counter fallback theme and visibility behavior.")]
-    [SerializeField] private GameHudComboCounterSettings comboCounterSettings = new GameHudComboCounterSettings();
+    [Tooltip("Synchro Meter wave animation, theme, text, and visibility behavior.")]
+    [SerializeField] private GameHudSynchroMeterSettings synchroMeterSettings = new GameHudSynchroMeterSettings();
 
     [Tooltip("Milestone selection navigation and interaction behavior.")]
     [SerializeField] private GameHudMilestoneSelectionSettings milestoneSelectionSettings = new GameHudMilestoneSelectionSettings();
@@ -102,11 +102,11 @@ public sealed class GameHudManagerPreset : ScriptableObject
         }
     }
 
-    public GameHudComboCounterSettings ComboCounterSettings
+    public GameHudSynchroMeterSettings SynchroMeterSettings
     {
         get
         {
-            return comboCounterSettings;
+            return synchroMeterSettings;
         }
     }
 
@@ -147,8 +147,8 @@ public sealed class GameHudManagerPreset : ScriptableObject
         if (runTimerSettings == null)
             runTimerSettings = new GameHudRunTimerSettings();
 
-        if (comboCounterSettings == null)
-            comboCounterSettings = new GameHudComboCounterSettings();
+        if (synchroMeterSettings == null)
+            synchroMeterSettings = new GameHudSynchroMeterSettings();
 
         if (milestoneSelectionSettings == null)
             milestoneSelectionSettings = new GameHudMilestoneSelectionSettings();
@@ -311,72 +311,122 @@ public sealed class GameHudRunTimerSettings
 }
 
 /// <summary>
-/// Combo counter fallback theme and visibility behavior.
+/// Stores Synchro Meter wave animation, theme, text, and visibility behavior.
 /// </summary>
 [Serializable]
-public sealed class GameHudComboCounterSettings
+public sealed class GameHudSynchroMeterSettings
 {
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Enables the combo HUD section and its ECS-driven presentation updates.")]
+    [Tooltip("Enables the Synchro Meter and its ECS-driven presentation updates.")]
     [SerializeField] private bool isEnabled = true;
 
-    [Tooltip("Fallback tint applied to the badge image when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultBadgeTint = Color.white;
+    [Tooltip("Tint applied to the oscilloscope background image.")]
+    [SerializeField] private Color backgroundTint = Color.white;
 
-    [Tooltip("Fallback color applied to the rank label when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultRankTextColor = Color.white;
+    [Tooltip("Tint applied to the scanline cover rendered above both waves.")]
+    [SerializeField] private Color coverTint = Color.white;
 
-    [Tooltip("Fallback color applied to the combo numeric label when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultComboValueTextColor = Color.white;
+    [Tooltip("Tint applied to both seamless images composing the primary wave.")]
+    [SerializeField] private Color primaryWaveTint = Color.white;
 
-    [Tooltip("Fallback color applied to the progress fill when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultProgressFillColor = Color.white;
+    [Tooltip("Tint applied to both seamless images composing the secondary wave.")]
+    [SerializeField] private Color secondaryWaveTint = Color.white;
 
-    [Tooltip("Fallback color applied to the progress background when no rank-specific theme matches.")]
-    [SerializeField] private Color defaultProgressBackgroundColor = new Color(1f, 1f, 1f, 0.25f);
+    [Tooltip("Color applied to the current synchro rank label.")]
+    [SerializeField] private Color rankTextColor = Color.white;
 
-    [Tooltip("When disabled, the badge image stays hidden even if it is assigned.")]
-    [SerializeField] private bool showRankBadgeImage = true;
+    [Tooltip("Color applied to the current numeric synchro value.")]
+    [SerializeField] private Color valueTextColor = Color.white;
 
-    [Tooltip("When disabled, the progress bar stays hidden even if the images are assigned.")]
+    [Tooltip("Tint applied to the progression fill shown below the wave display.")]
+    [SerializeField] private Color progressFillTint = new Color(0f, 0.85f, 1f, 1f);
+
+    [Tooltip("Tint applied to the progression track shown below the wave display.")]
+    [SerializeField] private Color progressBackgroundTint = new Color(0f, 0f, 0f, 0.65f);
+
+    [Tooltip("Shows the oscilloscope background layer when its image is assigned.")]
+    [SerializeField] private bool showBackground = true;
+
+    [Tooltip("Shows the scanline cover layer when its image is assigned.")]
+    [SerializeField] private bool showCover = true;
+
+    [Tooltip("Shows the current rank label over the wave display.")]
+    [SerializeField] private bool showRankText = true;
+
+    [Tooltip("Shows the current numeric synchro value over the wave display.")]
+    [SerializeField] private bool showValueText = true;
+
+    [Tooltip("Shows rank progression below the wave display using the authoritative normalized combo progress.")]
     [SerializeField] private bool showProgressBar = true;
 
-    [Tooltip("Hides the combo HUD while no valid player entity is available.")]
+    [Tooltip("Number of complete wave-image tile cycles scrolled per second. Both waves share this rate so their relative phase remains stable.")]
+    [SerializeField] private float waveScrollCyclesPerSecond = 0.12f;
+
+    [Tooltip("Normalized horizontal separation between the two waves at the first rank. A value of 1 represents one complete image tile.")]
+    [SerializeField] private float lowestRankPhaseOffsetNormalized = 0.25f;
+
+    [Tooltip("Normalized horizontal separation between the two waves at the maximum rank. Use 0 for complete overlap.")]
+    [SerializeField] private float highestRankPhaseOffsetNormalized;
+
+    [Tooltip("Exponent shaping phase convergence across rank indices. Values above 1 preserve separation longer; values below 1 synchronize earlier.")]
+    [SerializeField] private float phaseOffsetResponseExponent = 1f;
+
+    [Tooltip("Seconds used to blend the secondary wave toward its new phase after a rank change.")]
+    [SerializeField] private float phaseTransitionDuration = 0.3f;
+
+    [Tooltip("Uses unscaled time for wave scrolling and phase blending so UI motion remains independent from gameplay time scale.")]
+    [SerializeField] private bool useUnscaledTime = true;
+
+    [Tooltip("Seconds used to smooth the progression fill after authoritative combo progress changes. Use 0 for immediate updates.")]
+    [SerializeField] private float progressSmoothingSeconds = 0.08f;
+
+    [Tooltip("Hides the Synchro Meter while no valid player entity is available.")]
     [SerializeField] private bool hideWhenPlayerMissing = true;
 
-    [Tooltip("Hides the combo HUD while the current combo value is 0.")]
-    [SerializeField] private bool hideWhenZeroCombo = true;
+    [Tooltip("Hides the Synchro Meter while the current synchro value is 0.")]
+    [SerializeField] private bool hideWhenZeroValue = true;
 
-    [Tooltip("Hides the combo HUD whenever the current combo value no longer reaches any authored rank threshold.")]
+    [Tooltip("Hides the Synchro Meter whenever the current value no longer reaches an authored rank threshold.")]
     [SerializeField] private bool hideWhenNoActiveRank = true;
 
-    [Tooltip("Seconds used to fade the combo HUD when it becomes visible.")]
-    [Min(0f)]
+    [Tooltip("Seconds used to fade the Synchro Meter when it becomes visible.")]
     [SerializeField] private float fadeInDuration = 0.18f;
 
-    [Tooltip("Seconds used to fade the combo HUD when it becomes hidden.")]
-    [Min(0f)]
+    [Tooltip("Seconds used to fade the Synchro Meter when it becomes hidden.")]
     [SerializeField] private float fadeOutDuration = 0.18f;
 
-    [Tooltip("Fallback label shown before the first combo rank is reached.")]
-    [SerializeField] private string idleRankLabel = "COMBO";
+    [Tooltip("Fallback label shown before the first synchro rank is reached.")]
+    [SerializeField] private string idleRankLabel = "SYNCHRO";
     #endregion
 
     #endregion
 
     #region Properties
     public bool IsEnabled => isEnabled;
-    public Color DefaultBadgeTint => defaultBadgeTint;
-    public Color DefaultRankTextColor => defaultRankTextColor;
-    public Color DefaultComboValueTextColor => defaultComboValueTextColor;
-    public Color DefaultProgressFillColor => defaultProgressFillColor;
-    public Color DefaultProgressBackgroundColor => defaultProgressBackgroundColor;
-    public bool ShowRankBadgeImage => showRankBadgeImage;
+    public Color BackgroundTint => backgroundTint;
+    public Color CoverTint => coverTint;
+    public Color PrimaryWaveTint => primaryWaveTint;
+    public Color SecondaryWaveTint => secondaryWaveTint;
+    public Color RankTextColor => rankTextColor;
+    public Color ValueTextColor => valueTextColor;
+    public Color ProgressFillTint => progressFillTint;
+    public Color ProgressBackgroundTint => progressBackgroundTint;
+    public bool ShowBackground => showBackground;
+    public bool ShowCover => showCover;
+    public bool ShowRankText => showRankText;
+    public bool ShowValueText => showValueText;
     public bool ShowProgressBar => showProgressBar;
+    public float WaveScrollCyclesPerSecond => waveScrollCyclesPerSecond;
+    public float LowestRankPhaseOffsetNormalized => lowestRankPhaseOffsetNormalized;
+    public float HighestRankPhaseOffsetNormalized => highestRankPhaseOffsetNormalized;
+    public float PhaseOffsetResponseExponent => phaseOffsetResponseExponent;
+    public float PhaseTransitionDuration => phaseTransitionDuration;
+    public bool UseUnscaledTime => useUnscaledTime;
+    public float ProgressSmoothingSeconds => progressSmoothingSeconds;
     public bool HideWhenPlayerMissing => hideWhenPlayerMissing;
-    public bool HideWhenZeroCombo => hideWhenZeroCombo;
+    public bool HideWhenZeroValue => hideWhenZeroValue;
     public bool HideWhenNoActiveRank => hideWhenNoActiveRank;
     public float FadeInDuration => fadeInDuration;
     public float FadeOutDuration => fadeOutDuration;

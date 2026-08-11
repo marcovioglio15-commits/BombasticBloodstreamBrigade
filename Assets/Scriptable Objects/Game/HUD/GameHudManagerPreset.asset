@@ -40,21 +40,34 @@ MonoBehaviour:
     direction: 1
     initialSeconds: 450
     hideWhenPlayerMissing: 1
-  comboCounterSettings:
+  synchroMeterSettings:
     isEnabled: 1
-    defaultBadgeTint: {r: 1, g: 1, b: 1, a: 1}
-    defaultRankTextColor: {r: 1, g: 1, b: 1, a: 1}
-    defaultComboValueTextColor: {r: 1, g: 1, b: 1, a: 1}
-    defaultProgressFillColor: {r: 1, g: 1, b: 1, a: 1}
-    defaultProgressBackgroundColor: {r: 1, g: 1, b: 1, a: 0.25}
-    showRankBadgeImage: 1
+    backgroundTint: {r: 1, g: 1, b: 1, a: 1}
+    coverTint: {r: 1, g: 1, b: 1, a: 1}
+    primaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
+    secondaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
+    rankTextColor: {r: 1, g: 1, b: 1, a: 1}
+    valueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    progressFillTint: {r: 0, g: 0.85, b: 1, a: 1}
+    progressBackgroundTint: {r: 0, g: 0, b: 0, a: 0.65}
+    showBackground: 1
+    showCover: 1
+    showRankText: 1
+    showValueText: 1
     showProgressBar: 1
+    waveScrollCyclesPerSecond: 0.12
+    lowestRankPhaseOffsetNormalized: 0.25
+    highestRankPhaseOffsetNormalized: 0
+    phaseOffsetResponseExponent: 1
+    phaseTransitionDuration: 1.5
+    useUnscaledTime: 1
+    progressSmoothingSeconds: 0.08
     hideWhenPlayerMissing: 1
-    hideWhenZeroCombo: 1
+    hideWhenZeroValue: 1
     hideWhenNoActiveRank: 1
     fadeInDuration: 0.18
     fadeOutDuration: 0.18
-    idleRankLabel: COMBO
+    idleRankLabel: SYNCHRO
   milestoneSelectionSettings:
     hideOptionTitleNumbers: 1
     skipHoldFillImageName: SkipHoldFill

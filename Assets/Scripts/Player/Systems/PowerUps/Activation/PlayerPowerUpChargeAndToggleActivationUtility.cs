@@ -229,8 +229,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                 {
                     EnemyDropCollectionRequestUtility.Enqueue(dropCollectionRequests,
                                                               slotConfig.DropAttraction.AttractionRadius,
-                                                              slotConfig.DropAttraction.ConsumeUnusableDrops != 0,
-                                                              false);
+                                                              slotConfig.DropAttraction.ConsumeUnusableDrops != 0);
                 }
 
                 PlayerPowerUpDashActivationUtility.ExecuteDashIfConfigured(in slotConfig,

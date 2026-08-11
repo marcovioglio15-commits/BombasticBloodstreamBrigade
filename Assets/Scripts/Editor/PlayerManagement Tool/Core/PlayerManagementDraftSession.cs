@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// This class manages a draft session for player-related assets in the Unity Editor. 
@@ -21,8 +20,6 @@ using UnityEngine.InputSystem;
 public static class PlayerManagementDraftSession
 {
     #region Constants
-    private const string TrackedPlayerAssetsRoot = "Assets/Scriptable Objects/Player";
-    private const string TrackedProjectRoot = "Assets";
     #endregion
 
     #region Fields
@@ -37,6 +34,13 @@ public static class PlayerManagementDraftSession
 
     private static bool isInitialized;
     private static bool hasPendingChanges;
+    #endregion
+
+    #region Events
+    /// <summary>
+    /// Notifies the Player Management window only when the pending-change state actually changes.
+    /// </summary>
+    public static event Action PendingChangesChanged;
     #endregion
 
     #region Properties
@@ -70,14 +74,14 @@ public static class PlayerManagementDraftSession
         CaptureBaseline();
         stagedDeletePaths.Clear();
         isInitialized = true;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void EndSession()
     {
         pendingChangesVerifier.Reset();
         isInitialized = false;
-        hasPendingChanges = false;
+        SetPendingChanges(false);
         baselineJsonByPath.Clear();
         stagedDeletePaths.Clear();
     }
@@ -93,7 +97,7 @@ public static class PlayerManagementDraftSession
             return;
 
         stagedDeletePaths.Add(assetPath);
-        hasPendingChanges = true;
+        SetPendingChanges(true);
     }
 
     /// <summary>
@@ -111,8 +115,8 @@ public static class PlayerManagementDraftSession
         if (string.IsNullOrWhiteSpace(assetPath))
             return;
 
-        if (stagedDeletePaths.Contains(assetPath))
-            stagedDeletePaths.Remove(assetPath);
+        if (stagedDeletePaths.Remove(assetPath))
+            RecomputePendingChanges();
     }
 
     public static bool IsAssetStagedForDeletion(UnityEngine.Object asset)
@@ -131,13 +135,11 @@ public static class PlayerManagementDraftSession
     public static void PerformUndo()
     {
         Undo.PerformUndo();
-        RecomputePendingChanges();
     }
 
     public static void PerformRedo()
     {
         Undo.PerformRedo();
-        RecomputePendingChanges();
     }
 
     /// <summary>
@@ -145,7 +147,7 @@ public static class PlayerManagementDraftSession
     /// </summary>
     public static void MarkDirty()
     {
-        if (!isInitialized || hasPendingChanges)
+        if (!isInitialized)
             return;
 
         pendingChangesVerifier.VerifySignal();
@@ -153,9 +155,9 @@ public static class PlayerManagementDraftSession
 
     public static void RecomputePendingChanges()
     {
-        if (isInitialized == false)
+        if (!isInitialized)
         {
-            hasPendingChanges = false;
+            SetPendingChanges(false);
             return;
         }
 
@@ -163,34 +165,34 @@ public static class PlayerManagementDraftSession
 
         if (stagedDeletePaths.Count > 0)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
-        Dictionary<string, string> currentState = BuildStateDictionary();
+        Dictionary<string, string> currentState = PlayerManagementDraftAssetUtility.BuildStateDictionary();
 
         if (currentState.Count != baselineJsonByPath.Count)
         {
-            hasPendingChanges = true;
+            SetPendingChanges(true);
             return;
         }
 
         foreach (KeyValuePair<string, string> baselineEntry in baselineJsonByPath)
         {
-            if (currentState.TryGetValue(baselineEntry.Key, out string currentJson) == false)
+            if (!currentState.TryGetValue(baselineEntry.Key, out string currentJson))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
 
-            if (string.Equals(baselineEntry.Value, currentJson, StringComparison.Ordinal) == false)
+            if (!string.Equals(baselineEntry.Value, currentJson, StringComparison.Ordinal))
             {
-                hasPendingChanges = true;
+                SetPendingChanges(true);
                 return;
             }
         }
 
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void Apply()
@@ -202,12 +204,12 @@ public static class PlayerManagementDraftSession
         AssetDatabase.Refresh();
         CaptureBaseline();
         stagedDeletePaths.Clear();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
 
     public static void Discard()
     {
-        if (isInitialized == false)
+        if (!isInitialized)
             return;
 
         pendingChangesVerifier.Reset();
@@ -217,11 +219,24 @@ public static class PlayerManagementDraftSession
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         CaptureBaseline();
-        hasPendingChanges = false;
+        SetPendingChanges(false);
     }
     #endregion
 
     #region Session Helpers
+    /// <summary>
+    /// Updates pending state and emits one notification only when the visible state changes.
+    /// </summary>
+    /// <param name="value">New pending-change state.</param>
+    private static void SetPendingChanges(bool value)
+    {
+        if (hasPendingChanges == value)
+            return;
+
+        hasPendingChanges = value;
+        PendingChangesChanged?.Invoke();
+    }
+
     /// <summary>
     /// This method captures the baseline state of relevant player assets by building 
     /// a dictionary that maps asset paths to their serialized JSON representations.
@@ -230,123 +245,10 @@ public static class PlayerManagementDraftSession
     {
         baselineJsonByPath.Clear();
 
-        Dictionary<string, string> currentState = BuildStateDictionary();
+        Dictionary<string, string> currentState = PlayerManagementDraftAssetUtility.BuildStateDictionary();
 
         foreach (KeyValuePair<string, string> stateEntry in currentState)
             baselineJsonByPath[stateEntry.Key] = stateEntry.Value;
-    }
-
-    /// <summary>
-    /// Builds a dictionary that maps asset paths to their serialized JSON representations
-    /// for all relevant player assets.
-    /// </summary>
-    /// <returns></returns>
-    private static Dictionary<string, string> BuildStateDictionary()
-    {
-        Dictionary<string, string> stateByPath = new Dictionary<string, string>();
-        List<string> assetPaths = CollectTrackedAssetPaths();
-
-        for (int pathIndex = 0; pathIndex < assetPaths.Count; pathIndex++)
-        {
-            string assetPath = assetPaths[pathIndex];
-
-            if (string.IsNullOrWhiteSpace(assetPath))
-                continue;
-
-            UnityEngine.Object assetObject = AssetDatabase.LoadMainAssetAtPath(assetPath);
-
-            if (assetObject == null)
-                continue;
-
-            string serializedJson = EditorJsonUtility.ToJson(assetObject, true);
-            stateByPath[assetPath] = serializedJson;
-        }
-
-        return stateByPath;
-    }
-
-    /// <summary>
-    /// Collects the asset paths of all relevant player assets that should be tracked during the draft session.
-    /// </summary>
-    /// <returns></returns>
-    private static List<string> CollectTrackedAssetPaths()
-    {
-        HashSet<string> uniquePaths = new HashSet<string>();
-        AddAssetPathsOfType<PlayerMasterPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerMasterPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerControllerPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerControllerPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerProgressionPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerProgressionPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerPowerUpsPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerPowerUpsPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerVisualPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerVisualPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerUiVisualPresetLibrary>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerUiVisualPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<PlayerAnimationBindingsPreset>(uniquePaths, TrackedPlayerAssetsRoot);
-        AddAssetPathsOfType<InputActionAsset>(uniquePaths, TrackedProjectRoot);
-        AddPlayerPrefabPaths(uniquePaths);
-
-        List<string> paths = new List<string>(uniquePaths);
-        paths.Sort(StringComparer.Ordinal);
-        return paths;
-    }
-
-    /// <summary>
-    /// Adds the asset paths of all assets of the specified type that are located 
-    /// within the specified search root folder to the provided hash set.
-    /// </summary>
-    /// <typeparam name="TAsset"></typeparam>
-    /// <param name="uniquePaths"></param>
-    /// <param name="searchRoot"></param>
-    private static void AddAssetPathsOfType<TAsset>(HashSet<string> uniquePaths, string searchRoot) where TAsset : UnityEngine.Object
-    {
-        if (string.IsNullOrWhiteSpace(searchRoot))
-            return;
-
-        string[] searchFolders = new string[] { searchRoot };
-        string[] guids = AssetDatabase.FindAssets("t:" + typeof(TAsset).Name, searchFolders);
-
-        for (int guidIndex = 0; guidIndex < guids.Length; guidIndex++)
-        {
-            string guid = guids[guidIndex];
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-
-            if (string.IsNullOrWhiteSpace(path))
-                continue;
-
-            uniquePaths.Add(path);
-        }
-    }
-
-    /// <summary>
-    /// Adds the asset paths of all player prefab assets that are located within the project to the provided hash set.
-    /// </summary>
-    /// <param name="uniquePaths"></param>
-    private static void AddPlayerPrefabPaths(HashSet<string> uniquePaths)
-    {
-        string[] searchFolders = new string[] { TrackedProjectRoot };
-        string[] prefabGuids = AssetDatabase.FindAssets("t:Prefab PlayerAuthoring", searchFolders);
-
-        for (int guidIndex = 0; guidIndex < prefabGuids.Length; guidIndex++)
-        {
-            string prefabGuid = prefabGuids[guidIndex];
-            string prefabPath = AssetDatabase.GUIDToAssetPath(prefabGuid);
-
-            if (string.IsNullOrWhiteSpace(prefabPath))
-                continue;
-
-            GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
-
-            if (prefabAsset == null)
-                continue;
-
-            if (prefabAsset.GetComponent<PlayerAuthoring>() == null)
-                continue;
-
-            uniquePaths.Add(prefabPath);
-        }
     }
 
     /// <summary>
@@ -372,13 +274,13 @@ public static class PlayerManagementDraftSession
 
     private static void DeleteAssetsCreatedAfterBaseline()
     {
-        List<string> currentPaths = CollectTrackedAssetPaths();
+        List<string> currentPaths = PlayerManagementDraftAssetUtility.CollectTrackedAssetPaths();
 
         for (int pathIndex = 0; pathIndex < currentPaths.Count; pathIndex++)
         {
             string currentPath = currentPaths[pathIndex];
 
-            if (currentPath.StartsWith(TrackedPlayerAssetsRoot, StringComparison.Ordinal) == false)
+            if (!currentPath.StartsWith(PlayerManagementDraftAssetUtility.PlayerAssetsRoot, StringComparison.Ordinal))
                 continue;
 
             if (baselineJsonByPath.ContainsKey(currentPath))
@@ -414,7 +316,7 @@ public static class PlayerManagementDraftSession
     /// </summary>
     private static void ExecuteRenames()
     {
-        List<string> assetPaths = CollectTrackedAssetPaths();
+        List<string> assetPaths = PlayerManagementDraftAssetUtility.CollectTrackedAssetPaths();
 
         for (int pathIndex = 0; pathIndex < assetPaths.Count; pathIndex++)
         {
@@ -428,7 +330,7 @@ public static class PlayerManagementDraftSession
 
             UnityEngine.Object assetObject = AssetDatabase.LoadMainAssetAtPath(assetPath);
 
-            if (IsRenamablePresetAsset(assetObject) == false)
+            if (!IsRenamablePresetAsset(assetObject))
                 continue;
 
             string currentFileName = Path.GetFileNameWithoutExtension(assetPath);
@@ -456,7 +358,7 @@ public static class PlayerManagementDraftSession
             string uniquePath = AssetDatabase.GenerateUniqueAssetPath(requestedPath);
             string renameError = AssetDatabase.MoveAsset(assetPath, uniquePath);
 
-            if (string.IsNullOrWhiteSpace(renameError) == false)
+            if (!string.IsNullOrWhiteSpace(renameError))
             {
                 Debug.LogWarning(string.Format("PlayerManagementDraftSession: failed to rename asset '{0}' to '{1}'. Error: {2}", assetPath, targetFileName, renameError));
                 continue;
@@ -599,7 +501,7 @@ public static class PlayerManagementDraftSession
         {
             string stagedPath = stagedPaths[pathIndex];
 
-            if (IsPathReferencedByLibraries(stagedPath) == false)
+            if (!IsPathReferencedByLibraries(stagedPath))
                 continue;
 
             stagedDeletePaths.Remove(stagedPath);
@@ -667,7 +569,7 @@ public static class PlayerManagementDraftSession
 
             string presetPath = AssetDatabase.GetAssetPath(preset);
 
-            if (string.Equals(presetPath, assetPath, StringComparison.Ordinal) == false)
+            if (!string.Equals(presetPath, assetPath, StringComparison.Ordinal))
                 continue;
 
             return true;

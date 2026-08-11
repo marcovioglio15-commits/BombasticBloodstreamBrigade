@@ -150,6 +150,7 @@ public struct EnemyExperienceDrop : IComponentData
     public Entity PoolEntity;
     public byte IsAttracting;
     public byte ConsumeWhenUnusable;
+    public byte IsRoomClearAttraction;
 }
 
 /// <summary>
@@ -208,13 +209,12 @@ public struct EnemyDropCollectionRequestQueue : IComponentData
 }
 
 /// <summary>
-/// Stores one merged request that attracts drops in range or immediately consumes every active drop after room clear.
+/// Stores one merged request that attracts drops inside the widest requested player-centered radius.
 /// </summary>
 [InternalBufferCapacity(1)]
 public struct EnemyDropCollectionRequest : IBufferElementData
 {
     public float AttractionRadius;
     public byte ConsumeUnusableDrops;
-    public byte CollectAllImmediately;
 }
 #endregion

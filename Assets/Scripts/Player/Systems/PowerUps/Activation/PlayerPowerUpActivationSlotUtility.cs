@@ -321,8 +321,7 @@ public static class PlayerPowerUpActivationSlotUtility
         {
             EnemyDropCollectionRequestUtility.Enqueue(dropCollectionRequests,
                                                       slotConfig.DropAttraction.AttractionRadius,
-                                                      slotConfig.DropAttraction.ConsumeUnusableDrops != 0,
-                                                      false);
+                                                      slotConfig.DropAttraction.ConsumeUnusableDrops != 0);
         }
 
         if (canEnqueueAudioRequests)

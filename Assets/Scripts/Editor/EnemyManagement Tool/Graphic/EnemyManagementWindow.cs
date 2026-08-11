@@ -16,7 +16,6 @@ public sealed class EnemyManagementWindow : EditorWindow
     private VisualElement contentRoot;
     private Label sessionStatusLabel;
     private PanelType activePanel = PanelType.EnemyMasterPresets;
-    private IVisualElementScheduledItem pendingCheckSchedule;
     #endregion
 
     #region Menu
@@ -51,6 +50,11 @@ public sealed class EnemyManagementWindow : EditorWindow
         if (!EnemyManagementDraftSession.IsInitialized)
             EnemyManagementDraftSession.BeginSession();
 
+        EnemyManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        EnemyManagementDraftSession.PendingChangesChanged += RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
+        Undo.undoRedoPerformed += HandleUndoRedo;
+
         // Restore last active top-level panel and clamp unsupported values.
         activePanel = ManagementToolStateUtility.LoadEnumValue(ActivePanelStateKey, PanelType.EnemyMasterPresets);
 
@@ -71,14 +75,13 @@ public sealed class EnemyManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Pauses periodic pending-change polling when the window gets disabled.
+    /// Detaches draft and Undo notifications while the window is disabled.
     /// Called by Unity on disable lifecycle.
     /// </summary>
     private void OnDisable()
     {
-        // Stop scheduled callback to avoid running while window is inactive.
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
+        EnemyManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
     }
 
     /// <summary>
@@ -135,11 +138,6 @@ public sealed class EnemyManagementWindow : EditorWindow
         RefreshSessionStatus();
         ManagementToolInteractiveElementColorUtility.RegisterHierarchy(rootVisualElement, "NashCore.EnemyManagement.Controls");
 
-        // Restart periodic pending state refresh.
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
-
-        pendingCheckSchedule = rootVisualElement.schedule.Execute(RefreshSessionStatus).Every(1000);
     }
 
     /// <summary>
@@ -372,13 +370,10 @@ public sealed class EnemyManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Recomputes pending changes and updates toolbar status label.
-    /// Called periodically by scheduled polling and after session actions.
+    /// Updates the toolbar from pending state already verified by mutation and Undo signals.
     /// </summary>
     private void RefreshSessionStatus()
     {
-        // Recalculate dirty state from draft session snapshot comparison.
-        EnemyManagementDraftSession.RecomputePendingChanges();
         UpdateUnsavedState();
 
         // Skip label update if UI is not available yet.
@@ -390,6 +385,14 @@ public sealed class EnemyManagementWindow : EditorWindow
             sessionStatusLabel.text = "Pending Changes";
         else
             sessionStatusLabel.text = "Clean";
+    }
+
+    /// <summary>
+    /// Recomputes pending state once after Unity completes an Undo or Redo operation.
+    /// </summary>
+    private void HandleUndoRedo()
+    {
+        EnemyManagementDraftSession.RecomputePendingChanges();
     }
 
     /// <summary>

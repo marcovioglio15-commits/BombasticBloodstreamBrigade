@@ -952,7 +952,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             DynamicBuffer<PlayerRuntimeComboRankElement> runtimeComboRanksBuffer = AddBuffer<PlayerRuntimeComboRankElement>(entity);
             DynamicBuffer<PlayerBaseComboPassiveUnlockElement> baseComboPassiveUnlocksBuffer = AddBuffer<PlayerBaseComboPassiveUnlockElement>(entity);
             DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimeComboPassiveUnlocksBuffer = AddBuffer<PlayerRuntimeComboPassiveUnlockElement>(entity);
-            DynamicBuffer<PlayerComboRankVisualElement> comboRankVisualsBuffer = AddBuffer<PlayerComboRankVisualElement>(entity);
             DynamicBuffer<PlayerRuntimeComboCounterScalingElement> comboScalingBuffer = AddBuffer<PlayerRuntimeComboCounterScalingElement>(entity);
             PlayerRuntimeScalingBakeUtility.PopulateProgressionPhaseBuffers(progressionPreset,
                                                                            sourceProgressionPreset,
@@ -967,8 +966,6 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
                                                                                 characterTuningFormulaBuffer,
                                                                                 out PlayerBaseComboCounterConfig baseComboConfig,
                                                                                 out PlayerRuntimeComboCounterConfig runtimeComboConfig);
-            PlayerRuntimeScalingComboBakeUtility.PopulateComboCounterRankVisuals(sourceProgressionPreset != null ? sourceProgressionPreset : progressionPreset,
-                                                                                 comboRankVisualsBuffer);
             AddComponent(entity, baseComboConfig);
             AddComponent(entity, runtimeComboConfig);
             AddComponent(entity, new PlayerComboCounterState

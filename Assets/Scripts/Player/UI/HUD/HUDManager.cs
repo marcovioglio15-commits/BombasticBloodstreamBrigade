@@ -32,7 +32,7 @@ public sealed class HUDManager : MonoBehaviour
     [Tooltip("Scene component that configures and renders the authoritative run timer.")]
     [SerializeField] private HUDRunTimerSection runTimerSection;
 
-    [Tooltip("Scene component that renders the combo meter, current rank and next-rank progress.")]
+    [Tooltip("Scene component that renders the two-wave Synchro Meter from authoritative combo state.")]
     [SerializeField] private HUDComboCounterSection comboCounterSection;
 
     [Tooltip("Scene component that renders milestone choices and sends ECS selection commands.")]
@@ -344,7 +344,33 @@ public sealed class HUDManager : MonoBehaviour
                left.RunTimerEnabled == right.RunTimerEnabled &&
                left.RunTimerDirection == right.RunTimerDirection &&
                Mathf.Approximately(left.RunTimerInitialSeconds, right.RunTimerInitialSeconds) &&
-               left.ComboCounterEnabled == right.ComboCounterEnabled &&
+               left.SynchroMeterEnabled == right.SynchroMeterEnabled &&
+               left.SynchroBackgroundTint.Equals(right.SynchroBackgroundTint) &&
+               left.SynchroCoverTint.Equals(right.SynchroCoverTint) &&
+               left.SynchroPrimaryWaveTint.Equals(right.SynchroPrimaryWaveTint) &&
+               left.SynchroSecondaryWaveTint.Equals(right.SynchroSecondaryWaveTint) &&
+               left.SynchroRankTextColor.Equals(right.SynchroRankTextColor) &&
+               left.SynchroValueTextColor.Equals(right.SynchroValueTextColor) &&
+               left.SynchroProgressFillTint.Equals(right.SynchroProgressFillTint) &&
+               left.SynchroProgressBackgroundTint.Equals(right.SynchroProgressBackgroundTint) &&
+               left.SynchroShowBackground == right.SynchroShowBackground &&
+               left.SynchroShowCover == right.SynchroShowCover &&
+               left.SynchroShowRankText == right.SynchroShowRankText &&
+               left.SynchroShowValueText == right.SynchroShowValueText &&
+               left.SynchroShowProgressBar == right.SynchroShowProgressBar &&
+               Mathf.Approximately(left.SynchroWaveScrollCyclesPerSecond, right.SynchroWaveScrollCyclesPerSecond) &&
+               Mathf.Approximately(left.SynchroLowestRankPhaseOffsetNormalized, right.SynchroLowestRankPhaseOffsetNormalized) &&
+               Mathf.Approximately(left.SynchroHighestRankPhaseOffsetNormalized, right.SynchroHighestRankPhaseOffsetNormalized) &&
+               Mathf.Approximately(left.SynchroPhaseOffsetResponseExponent, right.SynchroPhaseOffsetResponseExponent) &&
+               Mathf.Approximately(left.SynchroPhaseTransitionDuration, right.SynchroPhaseTransitionDuration) &&
+               left.SynchroUseUnscaledTime == right.SynchroUseUnscaledTime &&
+               Mathf.Approximately(left.SynchroProgressSmoothingSeconds, right.SynchroProgressSmoothingSeconds) &&
+               left.SynchroHideWhenPlayerMissing == right.SynchroHideWhenPlayerMissing &&
+               left.SynchroHideWhenZeroValue == right.SynchroHideWhenZeroValue &&
+               left.SynchroHideWhenNoActiveRank == right.SynchroHideWhenNoActiveRank &&
+               Mathf.Approximately(left.SynchroFadeInDuration, right.SynchroFadeInDuration) &&
+               Mathf.Approximately(left.SynchroFadeOutDuration, right.SynchroFadeOutDuration) &&
+               left.SynchroIdleRankLabel.Equals(right.SynchroIdleRankLabel) &&
                left.DamageVignetteEnabled == right.DamageVignetteEnabled;
     }
     #endregion

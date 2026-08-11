@@ -13,12 +13,10 @@ public sealed class PlayerManagementWindow : EditorWindow
     private const string ActivePanelStateKey = "NashCore.PlayerManagement.Window.ActivePanel";
 
     private PlayerMasterPresetsPanel masterPresetsPanel;
-    private PlayerControllerPresetsPanel controllerPresetsPanel;
     private VisualElement contentRoot;
     private VisualElement placeholderPanel;
     private Label sessionStatusLabel;
     private PanelType activePanel = PanelType.PlayerMasterPresets;
-    private IVisualElementScheduledItem pendingCheckSchedule;
     #endregion
 
     #region Menu
@@ -53,6 +51,11 @@ public sealed class PlayerManagementWindow : EditorWindow
         if (!PlayerManagementDraftSession.IsInitialized)
             PlayerManagementDraftSession.BeginSession();
 
+        PlayerManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        PlayerManagementDraftSession.PendingChangesChanged += RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
+        Undo.undoRedoPerformed += HandleUndoRedo;
+
         // Restore previously active panel and sync unsaved state flag.
         activePanel = ManagementToolStateUtility.LoadEnumValue(ActivePanelStateKey, PanelType.PlayerMasterPresets);
         UpdateUnsavedState();
@@ -68,14 +71,13 @@ public sealed class PlayerManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Pauses periodic pending-check scheduling while the window is disabled.
+    /// Detaches draft and Undo notifications while the window is disabled.
     /// Called by Unity on disable.
     /// </summary>
     private void OnDisable()
     {
-        // Stop scheduled callbacks to avoid polling when inactive.
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
+        PlayerManagementDraftSession.PendingChangesChanged -= RefreshSessionStatus;
+        Undo.undoRedoPerformed -= HandleUndoRedo;
     }
 
     /// <summary>
@@ -110,7 +112,7 @@ public sealed class PlayerManagementWindow : EditorWindow
 
     #region Layout
     /// <summary>
-    /// Rebuilds complete window layout and restarts status polling.
+    /// Rebuilds the complete window layout and displays the current event-driven draft state.
     /// Called by CreateGUI and layout rebuild flows.
     /// </summary>
     private void BuildWindowLayout()
@@ -132,11 +134,6 @@ public sealed class PlayerManagementWindow : EditorWindow
         RefreshSessionStatus();
         ManagementToolInteractiveElementColorUtility.RegisterHierarchy(rootVisualElement, "NashCore.PlayerManagement.Controls");
 
-        // Restart periodic refresh of pending status.
-        if (pendingCheckSchedule != null)
-            pendingCheckSchedule.Pause();
-
-        pendingCheckSchedule = rootVisualElement.schedule.Execute(RefreshSessionStatus).Every(1000);
     }
 
     /// <summary>
@@ -262,9 +259,8 @@ public sealed class PlayerManagementWindow : EditorWindow
     /// </summary>
     private void BuildPanels()
     {
-        // Build currently implemented panels.
+        // Build the master workspace; its tab host constructs secondary panels only when they are open.
         masterPresetsPanel = new PlayerMasterPresetsPanel();
-        controllerPresetsPanel = new PlayerControllerPresetsPanel();
 
         // Build fallback placeholder for not-yet-implemented sections.
         placeholderPanel = new VisualElement();
@@ -299,9 +295,6 @@ public sealed class PlayerManagementWindow : EditorWindow
 
         if (panelType == PanelType.PlayerMasterPresets)
             panelContent = masterPresetsPanel.Root;
-
-        if (panelType == PanelType.PlayerControllerPresets)
-            panelContent = controllerPresetsPanel.Root;
 
         contentRoot.Add(panelContent);
         ManagementToolInteractiveElementColorUtility.RefreshRegisteredSubtree(contentRoot);
@@ -380,13 +373,10 @@ public sealed class PlayerManagementWindow : EditorWindow
     }
 
     /// <summary>
-    /// Recomputes pending changes and updates status label text.
-    /// Called by scheduled polling and post-action refresh.
+    /// Updates status label text from the draft state already verified by mutation and Undo signals.
     /// </summary>
     private void RefreshSessionStatus()
     {
-        // Recompute session dirty state from baseline comparison.
-        PlayerManagementDraftSession.RecomputePendingChanges();
         UpdateUnsavedState();
 
         // Skip label updates when UI is not ready.
@@ -401,6 +391,14 @@ public sealed class PlayerManagementWindow : EditorWindow
     }
 
     /// <summary>
+    /// Recomputes pending state once after Unity completes an Undo or Redo operation.
+    /// </summary>
+    private void HandleUndoRedo()
+    {
+        PlayerManagementDraftSession.RecomputePendingChanges();
+    }
+
+    /// <summary>
     /// Refreshes panels impacted by draft session changes and then refreshes status.
     /// Called after undo/redo/apply/discard actions.
     /// </summary>
@@ -410,15 +408,12 @@ public sealed class PlayerManagementWindow : EditorWindow
         if (masterPresetsPanel != null)
             masterPresetsPanel.RefreshFromSessionChange();
 
-        if (controllerPresetsPanel != null)
-            controllerPresetsPanel.RefreshFromSessionChange();
-
         RefreshSessionStatus();
     }
 
     /// <summary>
     /// Updates EditorWindow unsaved state from draft session.
-    /// Called during initialization and periodic status refresh.
+    /// Called during initialization and event-driven status refresh.
     /// </summary>
     private void UpdateUnsavedState()
     {

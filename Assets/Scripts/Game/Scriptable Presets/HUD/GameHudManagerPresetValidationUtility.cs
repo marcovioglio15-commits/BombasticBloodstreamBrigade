@@ -29,7 +29,7 @@ public static class GameHudManagerPresetValidationUtility
         ValidateLevelExperienceSettings(preset.LevelExperienceSettings, warnings);
         ValidateActivePowerUpSettings(preset.ActivePowerUpSettings, warnings);
         ValidateRunTimerSettings(preset.RunTimerSettings, warnings);
-        ValidateComboCounterSettings(preset.ComboCounterSettings, warnings);
+        ValidateSynchroMeterSettings(preset.SynchroMeterSettings, warnings);
         ValidateMilestoneSelectionSettings(preset.MilestoneSelectionSettings, warnings);
         ValidateDamageVignetteSettings(preset.DamageVignetteSettings, warnings);
     }
@@ -89,23 +89,32 @@ public static class GameHudManagerPresetValidationUtility
     }
 
     /// <summary>
-    /// Validates combo counter visibility and fade settings.
+    /// Validates Synchro Meter wave, phase, visibility, and fade settings.
     /// </summary>
-    /// <param name="settings">Combo counter settings to inspect.</param>
+    /// <param name="settings">Synchro Meter settings to inspect.</param>
     /// <param name="warnings">Mutable warning output list.</param>
-    private static void ValidateComboCounterSettings(GameHudComboCounterSettings settings, List<string> warnings)
+    private static void ValidateSynchroMeterSettings(GameHudSynchroMeterSettings settings, List<string> warnings)
     {
         if (settings == null)
         {
-            warnings.Add("Combo Counter settings are missing.");
+            warnings.Add("Synchro Meter settings are missing.");
             return;
         }
 
-        ValidateNonNegative(settings.FadeInDuration, "Combo Fade In Duration", warnings);
-        ValidateNonNegative(settings.FadeOutDuration, "Combo Fade Out Duration", warnings);
+        ValidateNonNegative(settings.WaveScrollCyclesPerSecond, "Synchro Wave Scroll Cycles Per Second", warnings);
+        ValidateNormalized(settings.LowestRankPhaseOffsetNormalized, "Synchro Lowest Rank Phase Offset", warnings);
+        ValidateNormalized(settings.HighestRankPhaseOffsetNormalized, "Synchro Highest Rank Phase Offset", warnings);
+        ValidatePositive(settings.PhaseOffsetResponseExponent, "Synchro Phase Offset Response Exponent", warnings);
+        ValidateNonNegative(settings.PhaseTransitionDuration, "Synchro Phase Transition Duration", warnings);
+        ValidateNonNegative(settings.ProgressSmoothingSeconds, "Synchro Progress Smoothing Seconds", warnings);
+        ValidateNonNegative(settings.FadeInDuration, "Synchro Fade In Duration", warnings);
+        ValidateNonNegative(settings.FadeOutDuration, "Synchro Fade Out Duration", warnings);
+
+        if (settings.HighestRankPhaseOffsetNormalized > settings.LowestRankPhaseOffsetNormalized)
+            warnings.Add("Synchro Highest Rank Phase Offset exceeds the Lowest Rank value, so higher ranks will diverge instead of converging.");
 
         if (string.IsNullOrWhiteSpace(settings.IdleRankLabel))
-            warnings.Add("Combo Idle Rank Label is empty. Runtime fallback will display COMBO.");
+            warnings.Add("Synchro Idle Rank Label is empty. Runtime fallback will display SYNCHRO.");
     }
 
     /// <summary>
@@ -149,8 +158,38 @@ public static class GameHudManagerPresetValidationUtility
     /// <param name="warnings">Mutable warning output list.</param>
     private static void ValidateNonNegative(float value, string label, List<string> warnings)
     {
+        if (float.IsNaN(value) || float.IsInfinity(value))
+        {
+            warnings.Add(label + " is not finite. Runtime will use a safe fallback.");
+            return;
+        }
+
         if (value < 0f)
             warnings.Add(label + " is negative. Runtime will use a safe non-negative fallback.");
+    }
+
+    /// <summary>
+    /// Adds a warning when a scalar is not finite or does not remain strictly above zero.
+    /// </summary>
+    /// <param name="value">Authored scalar value.</param>
+    /// <param name="label">Display label included in warnings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidatePositive(float value, string label, List<string> warnings)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value <= 0f)
+            warnings.Add(label + " should be finite and above 0. Runtime will use a safe positive fallback.");
+    }
+
+    /// <summary>
+    /// Adds a warning when a phase value is not finite or lies outside one normalized image-tile cycle.
+    /// </summary>
+    /// <param name="value">Authored normalized phase value.</param>
+    /// <param name="label">Display label included in warnings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidateNormalized(float value, string label, List<string> warnings)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f || value > 1f)
+            warnings.Add(label + " should stay within the finite 0..1 range. Runtime will clamp the effective phase.");
     }
     #endregion
 

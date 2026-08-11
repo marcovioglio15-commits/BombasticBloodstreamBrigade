@@ -8,8 +8,7 @@ internal sealed class ManagementToolDraftChangeVerifier
 {
     #region Fields
     private readonly Action verification;
-    private bool receivedAdditionalSignal;
-    private bool verifiedDuringCurrentUpdate;
+    private bool isVerificationQueued;
     #endregion
 
     #region Methods
@@ -27,24 +26,19 @@ internal sealed class ManagementToolDraftChangeVerifier
 
     #region Verification Methods
     /// <summary>
-    /// Verifies the first dirty signal immediately and coalesces later signals into one update-boundary recheck.
+    /// Coalesces all dirty signals from one UI update into one baseline verification at the update boundary.
     /// </summary>
     public void VerifySignal()
     {
         if (verification == null)
             return;
 
-        if (verifiedDuringCurrentUpdate)
-        {
-            receivedAdditionalSignal = true;
+        if (isVerificationQueued)
             return;
-        }
 
-        verifiedDuringCurrentUpdate = true;
-        receivedAdditionalSignal = false;
+        isVerificationQueued = true;
         EditorApplication.delayCall -= CompleteUpdate;
         EditorApplication.delayCall += CompleteUpdate;
-        verification();
     }
 
     /// <summary>
@@ -53,21 +47,28 @@ internal sealed class ManagementToolDraftChangeVerifier
     public void Reset()
     {
         EditorApplication.delayCall -= CompleteUpdate;
-        receivedAdditionalSignal = false;
-        verifiedDuringCurrentUpdate = false;
+        isVerificationQueued = false;
     }
 
     /// <summary>
-    /// Rechecks the baseline when more binding signals arrived after the first verification in one update.
+    /// Flushes one queued verification for deterministic editor tests and lifecycle integrations.
+    /// </summary>
+    internal void FlushPendingVerification()
+    {
+        if (!isVerificationQueued)
+            return;
+
+        EditorApplication.delayCall -= CompleteUpdate;
+        isVerificationQueued = false;
+        verification();
+    }
+
+    /// <summary>
+    /// Executes the queued verification at the end of the current editor update.
     /// </summary>
     private void CompleteUpdate()
     {
-        bool shouldVerifyAgain = receivedAdditionalSignal;
-        receivedAdditionalSignal = false;
-        verifiedDuringCurrentUpdate = false;
-
-        if (shouldVerifyAgain)
-            verification();
+        FlushPendingVerification();
     }
     #endregion
 

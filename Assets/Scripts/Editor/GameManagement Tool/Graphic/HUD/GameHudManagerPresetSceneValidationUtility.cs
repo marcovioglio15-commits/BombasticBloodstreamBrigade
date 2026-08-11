@@ -88,7 +88,7 @@ internal static class GameHudManagerPresetSceneValidationUtility
                                                                                        warnings);
         HUDComboCounterSection comboCounterSection = CheckRequiredReference<HUDComboCounterSection>(serializedHudManager,
                                                                                                     "comboCounterSection",
-                                                                                                    "HUDManager Combo Counter Section",
+                                                                                                    "HUDManager Synchro Meter Section",
                                                                                                     warnings);
         HUDMilestoneSelectionSection milestoneSelectionSection = CheckRequiredReference<HUDMilestoneSelectionSection>(serializedHudManager,
                                                                                                                       "milestoneSelectionSection",
@@ -109,7 +109,7 @@ internal static class GameHudManagerPresetSceneValidationUtility
         ValidateGrowthSequenceSection(growthSequenceSection, warnings);
         ValidatePowerUpOverlaySection(powerUpOverlaySection, warnings);
         ValidateRunTimerSection(runTimerSection, preset, warnings);
-        ValidateComboCounterSection(comboCounterSection, preset, warnings);
+        ValidateSynchroMeterSection(comboCounterSection, preset, warnings);
         ValidateMilestoneSelectionSection(milestoneSelectionSection, preset, warnings);
         ValidateContainerInteractionSection(containerInteractionSection, warnings);
         ValidateDamageVignetteSection(damageVignetteSection, preset, warnings);
@@ -263,33 +263,43 @@ internal static class GameHudManagerPresetSceneValidationUtility
     }
 
     /// <summary>
-    /// Validates combo counter references that are required by enabled visual options.
+    /// Validates authored Synchro Meter references required by enabled visual options.
     /// </summary>
-    /// <param name="section">Combo counter section assigned on HUDManager.</param>
+    /// <param name="section">Synchro Meter section assigned on HUDManager.</param>
     /// <param name="preset">Selected HUD manager preset used to skip disabled visual options.</param>
     /// <param name="warnings">Mutable warning list receiving scene-binding diagnostics.</param>
-    private static void ValidateComboCounterSection(HUDComboCounterSection section, GameHudManagerPreset preset, List<string> warnings)
+    private static void ValidateSynchroMeterSection(HUDComboCounterSection section,
+                                                    GameHudManagerPreset preset,
+                                                    List<string> warnings)
     {
         if (section == null)
             return;
 
-        if (preset != null && preset.ComboCounterSettings != null && !preset.ComboCounterSettings.IsEnabled)
+        if (preset != null && preset.SynchroMeterSettings != null && !preset.SynchroMeterSettings.IsEnabled)
             return;
 
         SerializedObject serializedSection = new SerializedObject(section);
         serializedSection.Update();
-        CheckRequiredReference<GameObject>(serializedSection, "rootObject", "Combo Counter root object", warnings);
-        CheckRequiredReference<TMP_Text>(serializedSection, "rankText", "Combo Counter rank text", warnings);
-        CheckRequiredReference<TMP_Text>(serializedSection, "comboValueText", "Combo Counter value text", warnings);
+        CheckRequiredReference<GameObject>(serializedSection, "rootObject", "Synchro Meter root object", warnings);
+        CheckRequiredReference<RectTransform>(serializedSection, "waveViewport", "Synchro Meter wave viewport", warnings);
+        CheckRequiredReference<Image>(serializedSection, "primaryWaveLeadingImage", "Synchro Meter primary leading wave", warnings);
+        CheckRequiredReference<Image>(serializedSection, "primaryWaveTrailingImage", "Synchro Meter primary trailing wave", warnings);
+        CheckRequiredReference<Image>(serializedSection, "secondaryWaveLeadingImage", "Synchro Meter secondary leading wave", warnings);
+        CheckRequiredReference<Image>(serializedSection, "secondaryWaveTrailingImage", "Synchro Meter secondary trailing wave", warnings);
 
-        if (preset == null || preset.ComboCounterSettings == null || preset.ComboCounterSettings.ShowRankBadgeImage)
-            CheckRequiredReference<Image>(serializedSection, "rankBadgeImage", "Combo Counter rank badge image", warnings);
+        GameHudSynchroMeterSettings settings = preset != null ? preset.SynchroMeterSettings : null;
 
-        if (preset == null || preset.ComboCounterSettings == null || preset.ComboCounterSettings.ShowProgressBar)
-        {
-            CheckRequiredReference<Image>(serializedSection, "progressFillImage", "Combo Counter progress fill image", warnings);
-            CheckRequiredReference<Image>(serializedSection, "progressBackgroundImage", "Combo Counter progress background image", warnings);
-        }
+        if (settings == null || settings.ShowBackground)
+            CheckRequiredReference<Image>(serializedSection, "backgroundImage", "Synchro Meter background image", warnings);
+
+        if (settings == null || settings.ShowCover)
+            CheckRequiredReference<Image>(serializedSection, "coverImage", "Synchro Meter cover image", warnings);
+
+        if (settings == null || settings.ShowRankText)
+            CheckRequiredReference<TMP_Text>(serializedSection, "rankText", "Synchro Meter rank text", warnings);
+
+        if (settings == null || settings.ShowValueText)
+            CheckRequiredReference<TMP_Text>(serializedSection, "valueText", "Synchro Meter value text", warnings);
     }
 
     /// <summary>
