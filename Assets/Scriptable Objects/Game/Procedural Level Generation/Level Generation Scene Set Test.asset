@@ -70,66 +70,6 @@ MonoBehaviour:
         minimumDifficulty: 0
         maximumDifficulty: 100
         selectionWeight: 1
-    - technicalId: 0281afd42d8a97bd0d0d8469596bc90f
-      tileId: TILE_LGTEST_METRO_NS
-      sceneId: SCN_LGTEST_METRO_NS
-      sceneGuid: 0b11934e90dbb314e87551aabe87ec57
-      role: 1
-      maximumCopies: 3
-      preferredDepthRange: {x: 1, y: 5}
-      useExactDepthConstraint: 0
-      exactDepth: 1
-      baseSelectionWeight: 1
-      roomRewards:
-      - rewardTechnicalId: 5d85aeeb5a2f474e9322c52685fc8842
-        quantity: 1
-        order: 0
-        useDifficultySelection: 0
-        selectionGroupId: 
-        difficultyCoefficientId: 
-        minimumDifficulty: 0
-        maximumDifficulty: 100
-        selectionWeight: 1
-    - technicalId: cf9139cd947bf7d5a54825a564482b6c
-      tileId: TILE_LGTEST_METRO_EW
-      sceneId: SCN_LGTEST_METRO_EW
-      sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
-      role: 1
-      maximumCopies: 3
-      preferredDepthRange: {x: 1, y: 5}
-      useExactDepthConstraint: 0
-      exactDepth: 1
-      baseSelectionWeight: 1
-      roomRewards:
-      - rewardTechnicalId: 3a1f1bccc0184d25bb8b3e528eeb586e
-        quantity: 1
-        order: 0
-        useDifficultySelection: 0
-        selectionGroupId: 
-        difficultyCoefficientId: 
-        minimumDifficulty: 0
-        maximumDifficulty: 100
-        selectionWeight: 1
-    - technicalId: 7f96bcb0b6f283a2a36c74a78a13540f
-      tileId: TILE_LGTEST_METRO_DOUBLE
-      sceneId: SCN_LGTEST_METRO_DOUBLE
-      sceneGuid: 433f03176860b0e409c1d762e15cd364
-      role: 1
-      maximumCopies: 3
-      preferredDepthRange: {x: 1, y: 5}
-      useExactDepthConstraint: 0
-      exactDepth: 1
-      baseSelectionWeight: 1
-      roomRewards:
-      - rewardTechnicalId: 460e522026994174b9e380dc280e7ab0
-        quantity: 1
-        order: 0
-        useDifficultySelection: 0
-        selectionGroupId: 
-        difficultyCoefficientId: 
-        minimumDifficulty: 0
-        maximumDifficulty: 100
-        selectionWeight: 1
     - technicalId: a076a30f7f254caa99b2b75876bf6a20
       tileId: TILE_METRO_01
       sceneId: SCN_MAIN_METRO_01
@@ -974,7 +914,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_02
     sceneGuid: eef1df284c2a6f148996f3c85310ad6a
-    dependencyHash: 8f060a01017eb6f04a6a07dabf86b572
+    dependencyHash: 7dd2a02f9b14cce26d5898a2221b5858
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
@@ -1014,7 +954,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SE
     sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
-    dependencyHash: 3d6b4bd65395ac3ab391f787bf0f5324
+    dependencyHash: fc9eb7197cb8921c023caac2a15b7627
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SE.unity
@@ -1034,7 +974,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SW
     sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
-    dependencyHash: a5c46a9859f6e2e7f2b2d4a73749e129
+    dependencyHash: eedc4bcb783f0d19c3e5063fe9abbb1d
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SW.unity
@@ -1054,7 +994,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NE
     sceneGuid: 20653c736dac57c49842cb85bddcc563
-    dependencyHash: 7727d5ebaa4545a7cd5bc79b1ab68213
+    dependencyHash: d0e2b881ed6c7fc4a544c399d404711b
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity
@@ -1074,7 +1014,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NW
     sceneGuid: 418b98d17eadea44fa63e7920b7d332f
-    dependencyHash: 6ee5f90d3a5a5d1084c7b6238197c2c9
+    dependencyHash: 0e402728edf89342076083b92647a4e9
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NW.unity
@@ -1094,7 +1034,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_05
     sceneGuid: 65fda9dbaf737904cab55a5bfac83af7
-    dependencyHash: e00ffddf0407106f9b54a9fc5890fcb1
+    dependencyHash: c9a3df7b960340e4fda82c9fa7b5873c
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_05.unity
@@ -1122,7 +1062,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_06
     sceneGuid: 9c92c06e192f18f48b91af96b0f282f4
-    dependencyHash: 140429e63e54131c88199bed7c50e9f0
+    dependencyHash: 3713b05605a8223108e3e18b97042027
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_06.unity
@@ -1134,23 +1074,23 @@ MonoBehaviour:
     - portalId: MAIN_METRO_06_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_06_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_06_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_06_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_07
     sceneGuid: 1d02753ae1d89004f93b02d845ea2923
-    dependencyHash: c35754201cdea6cb7b1585ec9012c568
+    dependencyHash: 8143cb02a90a4caadf48ac50d3368765
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_07.unity
@@ -1162,23 +1102,23 @@ MonoBehaviour:
     - portalId: MAIN_METRO_07_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_07_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_07_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_07_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_08
     sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
-    dependencyHash: b8d2b87eaad295e042a4ce22490a9dd9
+    dependencyHash: 452b093bac61d4444626df39eb27fc9c
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_08.unity
@@ -1206,7 +1146,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
-    dependencyHash: 95edd2a4c2acdb2f7a86b8bc34edf594
+    dependencyHash: 11be1731b4fbe4d327b0fed6433bdc6d
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
@@ -1230,7 +1170,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_N
     sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
-    dependencyHash: c5c6ce4e36d7c107ab55863685f3ff2e
+    dependencyHash: 003cba0089e4e34fa2f5834d61ca816d
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_N.unity
@@ -1254,7 +1194,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
-    dependencyHash: c15f08abdd41ac1548fe53d0181055b9
+    dependencyHash: fa5943ffa5df11759d8bd65b9eebd770
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
@@ -1278,7 +1218,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_11
     sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
-    dependencyHash: c521d7076f41e0e55c7238029bf548b1
+    dependencyHash: ea86c1b29030bcea0c751343862cdae4
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity

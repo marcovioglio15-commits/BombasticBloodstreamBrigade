@@ -70,7 +70,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_EW_WEST_02
   side: 3
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 1965374107918840196}
   arrivalAnchor: {fileID: 4639769033298697673}
   inwardOffset: 0.75

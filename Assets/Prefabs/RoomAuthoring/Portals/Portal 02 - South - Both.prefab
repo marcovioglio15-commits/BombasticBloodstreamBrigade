@@ -70,7 +70,7 @@ MonoBehaviour:
   portalId: LGTEST_METRO_NS_SOUTH_02
   side: 1
   capability: 2
-  connectionPolicy: 1
+  connectionPolicy: 0
   portalVolume: {fileID: 4649037868646300206}
   arrivalAnchor: {fileID: 1300808242486141463}
   inwardOffset: 0.75

@@ -573,6 +573,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PF_LAYOUT_METRO_08
       objectReference: {fileID: 0}
+    - target: {fileID: 8680703620642270284, guid: 1045d599c29d471439f987a266e0739e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.06
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
