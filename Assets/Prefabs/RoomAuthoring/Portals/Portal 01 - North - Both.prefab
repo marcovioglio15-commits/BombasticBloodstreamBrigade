@@ -101,9 +101,9 @@ MonoBehaviour:
   portalId: LGTEST_METRO_NS_NORTH_01
   side: 0
   capability: 2
-  connectionPolicy: 0
+  connectionPolicy: 1
   portalVolume: {fileID: 5831338050305197742}
   arrivalAnchor: {fileID: 2376496176421116756}
   inwardOffset: 0.75
-  requireRoomClear: 0
+  requireRoomClear: 1
   drawGizmos: 1

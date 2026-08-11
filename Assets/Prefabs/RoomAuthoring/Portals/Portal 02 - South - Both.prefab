@@ -70,11 +70,11 @@ MonoBehaviour:
   portalId: LGTEST_METRO_NS_SOUTH_02
   side: 1
   capability: 2
-  connectionPolicy: 0
+  connectionPolicy: 1
   portalVolume: {fileID: 4649037868646300206}
   arrivalAnchor: {fileID: 1300808242486141463}
   inwardOffset: 0.75
-  requireRoomClear: 0
+  requireRoomClear: 1
   drawGizmos: 1
 --- !u!1 &8214751570630700131
 GameObject:

@@ -41,13 +41,13 @@ MonoBehaviour:
     levelId: LEVEL_LGTEST_01
     displayName: Metro Concourse
     enabled: 1
-    targetNodeCountRange: {x: 8, y: 11}
-    preferredBossDepthRange: {x: 3, y: 6}
+    targetNodeCountRange: {x: 14, y: 16}
+    preferredBossDepthRange: {x: 5, y: 7}
     ruleSettings:
       roomDepthScore: 2
       bossDepthScore: 20
       fittingScore: 2
-    requireRoomClearBeforeExit: 1
+    requireRoomClearBeforeExit: 0
     useCenterArrival: 0
     roomTiles:
     - technicalId: 139d60ef1a4682ffb6644fa339a27c3b
@@ -75,7 +75,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_01
       sceneGuid: 5a34e40218bcc094382de3b9fedebc81
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -95,7 +95,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_02
       sceneGuid: eef1df284c2a6f148996f3c85310ad6a
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -115,7 +115,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_03
       sceneGuid: 
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -135,7 +135,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_04_SE
       sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -155,7 +155,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_04_SW
       sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -175,7 +175,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_04_NE
       sceneGuid: 20653c736dac57c49842cb85bddcc563
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -195,7 +195,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_04_NW
       sceneGuid: 418b98d17eadea44fa63e7920b7d332f
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -215,7 +215,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_05
       sceneGuid: 65fda9dbaf737904cab55a5bfac83af7
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -235,7 +235,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_06
       sceneGuid: 9c92c06e192f18f48b91af96b0f282f4
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -255,7 +255,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_07
       sceneGuid: 1d02753ae1d89004f93b02d845ea2923
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -275,7 +275,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_08
       sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -295,7 +295,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_09_S
       sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -315,7 +315,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_09_N
       sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -335,7 +335,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_10
       sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -355,7 +355,7 @@ MonoBehaviour:
       sceneId: SCN_MAIN_METRO_11
       sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
       role: 1
-      maximumCopies: 1
+      maximumCopies: 6
       preferredDepthRange: {x: 1, y: 8}
       useExactDepthConstraint: 0
       exactDepth: 1
@@ -378,7 +378,7 @@ MonoBehaviour:
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
       useExactDepthConstraint: 1
-      exactDepth: 4
+      exactDepth: 6
       baseSelectionWeight: 1
       roomRewards:
       - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
@@ -898,19 +898,19 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_NS_NORTH_01
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_NS_SOUTH_02
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_EW_EAST_01
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_EW_WEST_02
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_02
     sceneGuid: eef1df284c2a6f148996f3c85310ad6a
@@ -926,11 +926,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_02_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_02_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_03
     sceneGuid: c65cf1455f2597b45b5565007602b3f9
@@ -946,11 +946,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_03_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_03_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SE
     sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
@@ -966,11 +966,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_04_SE_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_04_SE_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SW
     sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
@@ -986,11 +986,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_04_SW_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_04_SW_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NE
     sceneGuid: 20653c736dac57c49842cb85bddcc563
@@ -1006,11 +1006,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_04_NE_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_04_NE_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NW
     sceneGuid: 418b98d17eadea44fa63e7920b7d332f
@@ -1026,11 +1026,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_04_NW_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_04_NW_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_05
     sceneGuid: 65fda9dbaf737904cab55a5bfac83af7
@@ -1046,19 +1046,19 @@ MonoBehaviour:
     - portalId: MAIN_METRO_05_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_05_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_05_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_05_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_06
     sceneGuid: 9c92c06e192f18f48b91af96b0f282f4
@@ -1130,19 +1130,19 @@ MonoBehaviour:
     - portalId: MAIN_METRO_08_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_08_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_08_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_08_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
@@ -1158,15 +1158,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_09_S_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_09_S_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_09_S_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_N
     sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
@@ -1182,15 +1182,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_09_N_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_09_N_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_09_N_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
@@ -1206,15 +1206,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_10_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_10_EAST
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_10_WEST
       side: 3
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_11
     sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
@@ -1230,9 +1230,9 @@ MonoBehaviour:
     - portalId: MAIN_METRO_11_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: MAIN_METRO_11_SOUTH
       side: 1
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     authoringWarnings: []
