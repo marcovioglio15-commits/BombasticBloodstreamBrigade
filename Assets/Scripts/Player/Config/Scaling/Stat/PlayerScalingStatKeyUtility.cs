@@ -9,34 +9,6 @@ using UnityEditor;
 /// </summary>
 public static class PlayerScalingStatKeyUtility
 {
-    #region Constants
-    private static readonly string[] StableStringIdPropertyNames =
-    {
-        "powerUpId",
-        "moduleId",
-        "bindingId",
-        "presetId",
-        "statName",
-        "scheduleId",
-        "phaseID",
-        "rankId",
-        "passivePowerUpId",
-        "weaponId",
-        "animationId"
-    };
-
-    private static readonly string[] StableNestedStringIdPropertyPaths =
-    {
-        "commonData.powerUpId"
-    };
-
-    private static readonly string[] StableIntegerIdPropertyNames =
-    {
-        "milestoneLevel",
-        "stepIndex"
-    };
-    #endregion
-
     #region Methods
     #region Public Methods
     /// <summary>
@@ -166,7 +138,7 @@ public static class PlayerScalingStatKeyUtility
 
                 string elementPath = currentPathBuilder.ToString();
                 SerializedProperty arrayElementProperty = serializedObject.FindProperty(elementPath);
-                string stableToken = ResolveStableArrayElementToken(arrayElementProperty);
+                string stableToken = PlayerScalingStableIdUtility.ResolveArrayElementToken(arrayElementProperty);
 
                 if (!string.IsNullOrWhiteSpace(stableToken))
                 {
@@ -508,51 +480,12 @@ public static class PlayerScalingStatKeyUtility
         if (string.IsNullOrWhiteSpace(idPropertyName))
             return false;
 
-        SerializedProperty idProperty = ResolveStableIdProperty(arrayElement, idPropertyName);
+        SerializedProperty idProperty = PlayerScalingStableIdUtility.ResolveIdProperty(arrayElement, idPropertyName);
 
         if (idProperty == null)
             return false;
 
         return IsMatchingStableIdProperty(idProperty, idPropertyValue);
-    }
-
-    /// <summary>
-    /// Resolves the serialized property used as stable identifier for one array element.
-    /// Supports both direct fields and flattened token names emitted from nested stable ID paths.
-    /// </summary>
-    /// <param name="arrayElement">Array element that owns the identifier field.</param>
-    /// <param name="idPropertyName">Stable token name stored inside the stat key.</param>
-    /// <returns>Matching serialized identifier property when found; otherwise null.</returns>
-    private static SerializedProperty ResolveStableIdProperty(SerializedProperty arrayElement, string idPropertyName)
-    {
-        if (arrayElement == null)
-            return null;
-
-        if (string.IsNullOrWhiteSpace(idPropertyName))
-            return null;
-
-        // Check the direct relative field first because most stable IDs are stored at the array-element root.
-        SerializedProperty directProperty = arrayElement.FindPropertyRelative(idPropertyName);
-
-        if (directProperty != null)
-            return directProperty;
-
-        // Nested stable IDs are flattened to their terminal token when the stat key is generated.
-        for (int candidateIndex = 0; candidateIndex < StableNestedStringIdPropertyPaths.Length; candidateIndex++)
-        {
-            string candidatePath = StableNestedStringIdPropertyPaths[candidateIndex];
-            string candidateTokenName = ResolveStableTokenName(candidatePath);
-
-            if (!string.Equals(candidateTokenName, idPropertyName, StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            SerializedProperty nestedProperty = arrayElement.FindPropertyRelative(candidatePath);
-
-            if (nestedProperty != null)
-                return nestedProperty;
-        }
-
-        return null;
     }
 
     private static bool IsMatchingStableIdProperty(SerializedProperty idProperty, string tokenValue)
@@ -582,82 +515,6 @@ public static class PlayerScalingStatKeyUtility
         }
 
         return false;
-    }
-
-    private static string ResolveStableArrayElementToken(SerializedProperty arrayElementProperty)
-    {
-        if (arrayElementProperty == null)
-            return string.Empty;
-
-        for (int candidateIndex = 0; candidateIndex < StableStringIdPropertyNames.Length; candidateIndex++)
-        {
-            string candidateName = StableStringIdPropertyNames[candidateIndex];
-            SerializedProperty candidateProperty = arrayElementProperty.FindPropertyRelative(candidateName);
-
-            if (candidateProperty == null)
-                continue;
-
-            if (candidateProperty.propertyType != SerializedPropertyType.String)
-                continue;
-
-            if (string.IsNullOrWhiteSpace(candidateProperty.stringValue))
-                continue;
-
-            string sanitizedValue = candidateProperty.stringValue.Trim();
-            return string.Format("{0}:{1}", candidateName, sanitizedValue);
-        }
-
-        for (int candidateIndex = 0; candidateIndex < StableNestedStringIdPropertyPaths.Length; candidateIndex++)
-        {
-            string candidatePath = StableNestedStringIdPropertyPaths[candidateIndex];
-            SerializedProperty candidateProperty = arrayElementProperty.FindPropertyRelative(candidatePath);
-
-            if (candidateProperty == null)
-                continue;
-
-            if (candidateProperty.propertyType != SerializedPropertyType.String)
-                continue;
-
-            if (string.IsNullOrWhiteSpace(candidateProperty.stringValue))
-                continue;
-
-            string sanitizedValue = candidateProperty.stringValue.Trim();
-            string tokenName = ResolveStableTokenName(candidatePath);
-
-            if (string.IsNullOrWhiteSpace(tokenName))
-                continue;
-
-            return string.Format("{0}:{1}", tokenName, sanitizedValue);
-        }
-
-        for (int candidateIndex = 0; candidateIndex < StableIntegerIdPropertyNames.Length; candidateIndex++)
-        {
-            string candidateName = StableIntegerIdPropertyNames[candidateIndex];
-            SerializedProperty candidateProperty = arrayElementProperty.FindPropertyRelative(candidateName);
-
-            if (candidateProperty == null)
-                continue;
-
-            if (candidateProperty.propertyType != SerializedPropertyType.Integer)
-                continue;
-
-            return string.Format(CultureInfo.InvariantCulture, "{0}:{1}", candidateName, candidateProperty.intValue);
-        }
-
-        return string.Empty;
-    }
-
-    private static string ResolveStableTokenName(string propertyPath)
-    {
-        if (string.IsNullOrWhiteSpace(propertyPath))
-            return string.Empty;
-
-        int lastSeparatorIndex = propertyPath.LastIndexOf('.');
-
-        if (lastSeparatorIndex < 0 || lastSeparatorIndex >= propertyPath.Length - 1)
-            return propertyPath.Trim();
-
-        return propertyPath.Substring(lastSeparatorIndex + 1).Trim();
     }
 
     /// <summary>

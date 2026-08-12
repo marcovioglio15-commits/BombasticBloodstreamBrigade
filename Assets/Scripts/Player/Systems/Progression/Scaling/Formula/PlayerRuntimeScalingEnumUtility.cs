@@ -311,6 +311,36 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe combo counter topology from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped combo counter mode.</returns>
+    public static PlayerComboCounterMode ResolveComboCounterMode(float value)
+    {
+        return (PlayerComboCounterMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe single-rank value display mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped single-rank value display mode.</returns>
+    public static PlayerComboSingleRankValueDisplayMode ResolveComboSingleRankValueDisplayMode(float value)
+    {
+        return (PlayerComboSingleRankValueDisplayMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe single-rank formula distribution mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped single-rank formula distribution mode.</returns>
+    public static PlayerComboSingleRankFormulaDistributionMode ResolveComboSingleRankFormulaDistributionMode(float value)
+    {
+        return (PlayerComboSingleRankFormulaDistributionMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe ProjectileOrbitPathMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

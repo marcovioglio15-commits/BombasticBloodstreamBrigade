@@ -179,109 +179,7 @@ internal static class GameHudManagerPresetsPanelUtility
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     public static void BuildSynchroMeterSection(VisualElement section, SerializedObject serializedObject)
     {
-        Foldout activationFoldout = CreateFoldout("Activation", "Master Synchro Meter toggle.");
-        PropertyField enabledField = AddProperty(activationFoldout, serializedObject, "synchroMeterSettings.isEnabled", "Enabled");
-        section.Add(activationFoldout);
-
-        VisualElement meterOptionsRoot = CreateConditionalOptionsRoot();
-        Foldout layersFoldout = CreateFoldout("Layers", "Optional authored layers and text overlays shown by the meter.");
-        PropertyField showBackgroundField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showBackground", "Show Background");
-        PropertyField showCoverField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showCover", "Show Cover");
-        PropertyField showRankTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showRankText", "Show Rank Text");
-        PropertyField showValueTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showValueText", "Show Value Text");
-        PropertyField showProgressBarField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showProgressBar", "Show Progress Bar");
-        meterOptionsRoot.Add(layersFoldout);
-
-        Foldout themeFoldout = CreateFoldout("Theme", "Tints applied to the authored background, cover, waves, and text layers.");
-        VisualElement backgroundThemeRoot = CreateConditionalOptionsRoot();
-        AddProperty(backgroundThemeRoot, serializedObject, "synchroMeterSettings.backgroundTint", "Background Tint");
-        themeFoldout.Add(backgroundThemeRoot);
-        VisualElement coverThemeRoot = CreateConditionalOptionsRoot();
-        AddProperty(coverThemeRoot, serializedObject, "synchroMeterSettings.coverTint", "Cover Tint");
-        themeFoldout.Add(coverThemeRoot);
-        AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.primaryWaveTint", "Primary Wave Tint");
-        AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.secondaryWaveTint", "Secondary Wave Tint");
-        VisualElement rankTextThemeRoot = CreateConditionalOptionsRoot();
-        AddProperty(rankTextThemeRoot, serializedObject, "synchroMeterSettings.rankTextColor", "Rank Text Color");
-        themeFoldout.Add(rankTextThemeRoot);
-        VisualElement valueTextThemeRoot = CreateConditionalOptionsRoot();
-        AddProperty(valueTextThemeRoot, serializedObject, "synchroMeterSettings.valueTextColor", "Value Text Color");
-        themeFoldout.Add(valueTextThemeRoot);
-        VisualElement progressThemeRoot = CreateConditionalOptionsRoot();
-        AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressFillTint", "Progress Fill Tint");
-        AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressBackgroundTint", "Progress Background Tint");
-        themeFoldout.Add(progressThemeRoot);
-        meterOptionsRoot.Add(themeFoldout);
-
-        Foldout wavesFoldout = CreateFoldout("Wave Motion", "Shared seamless scrolling and rank-driven relative phase convergence.");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.waveScrollCyclesPerSecond", "Scroll Cycles Per Second");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.lowestRankPhaseOffsetNormalized", "Lowest Rank Phase Offset");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.highestRankPhaseOffsetNormalized", "Highest Rank Phase Offset");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.phaseOffsetResponseExponent", "Phase Response Exponent");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.phaseTransitionDuration", "Phase Transition Duration");
-        AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.useUnscaledTime", "Use Unscaled Time");
-        meterOptionsRoot.Add(wavesFoldout);
-
-        VisualElement progressOptionsRoot = CreateConditionalOptionsRoot();
-        Foldout progressFoldout = CreateFoldout("Progression", "Normalized progression shown below the wave display.");
-        AddProperty(progressFoldout, serializedObject, "synchroMeterSettings.progressSmoothingSeconds", "Smoothing Seconds");
-        progressOptionsRoot.Add(progressFoldout);
-        meterOptionsRoot.Add(progressOptionsRoot);
-
-        Foldout visibilityFoldout = CreateFoldout("Visibility", "Rules that hide the Synchro Meter when it is not useful.");
-        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenPlayerMissing", "Hide When Player Missing");
-        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenZeroValue", "Hide When Zero Value");
-        AddProperty(visibilityFoldout, serializedObject, "synchroMeterSettings.hideWhenNoActiveRank", "Hide When No Active Rank");
-        meterOptionsRoot.Add(visibilityFoldout);
-
-        Foldout transitionsFoldout = CreateFoldout("Visibility Transitions", "Fade timings used when the Synchro Meter changes visibility.");
-        AddProperty(transitionsFoldout, serializedObject, "synchroMeterSettings.fadeInDuration", "Fade In Duration");
-        AddProperty(transitionsFoldout, serializedObject, "synchroMeterSettings.fadeOutDuration", "Fade Out Duration");
-        meterOptionsRoot.Add(transitionsFoldout);
-
-        VisualElement rankTextOptionsRoot = CreateConditionalOptionsRoot();
-        Foldout textFoldout = CreateFoldout("Text", "Fallback label used before the first synchro rank is reached.");
-        AddProperty(textFoldout, serializedObject, "synchroMeterSettings.idleRankLabel", "Idle Rank Label");
-        rankTextOptionsRoot.Add(textFoldout);
-        meterOptionsRoot.Add(rankTextOptionsRoot);
-        section.Add(meterOptionsRoot);
-
-        TrackConditionalVisibility(showBackgroundField,
-                                   backgroundThemeRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showBackground",
-                                   true);
-        TrackConditionalVisibility(showCoverField,
-                                   coverThemeRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showCover",
-                                   true);
-        TrackConditionalVisibility(showRankTextField,
-                                   rankTextThemeRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showRankText",
-                                   true);
-        TrackConditionalVisibility(showRankTextField,
-                                   rankTextOptionsRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showRankText",
-                                   true);
-        TrackConditionalVisibility(showValueTextField,
-                                   valueTextThemeRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showValueText",
-                                   true);
-        TrackConditionalVisibility(showProgressBarField,
-                                   progressThemeRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showProgressBar",
-                                   true);
-        TrackConditionalVisibility(showProgressBarField,
-                                   progressOptionsRoot,
-                                   serializedObject,
-                                   "synchroMeterSettings.showProgressBar",
-                                   true);
-        TrackConditionalVisibility(enabledField, meterOptionsRoot, serializedObject, "synchroMeterSettings.isEnabled", true);
+        GameHudManagerSynchroMeterPanelUtility.Build(section, serializedObject);
     }
 
     /// <summary>
@@ -403,7 +301,7 @@ internal static class GameHudManagerPresetsPanelUtility
     /// <param name="title">Group title shown in the tool.</param>
     /// <param name="tooltip">Tooltip explaining the grouped fields.</param>
     /// <returns>Configured foldout.</returns>
-    private static Foldout CreateFoldout(string title, string tooltip)
+    internal static Foldout CreateFoldout(string title, string tooltip)
     {
         Foldout foldout = new Foldout();
         foldout.text = title;
@@ -420,7 +318,7 @@ internal static class GameHudManagerPresetsPanelUtility
     /// Creates a child container whose visibility can be refreshed without rebuilding the owning section.
     /// </summary>
     /// <returns>Configured child container.</returns>
-    private static VisualElement CreateConditionalOptionsRoot()
+    internal static VisualElement CreateConditionalOptionsRoot()
     {
         VisualElement root = new VisualElement();
         root.style.flexDirection = FlexDirection.Column;
@@ -435,11 +333,11 @@ internal static class GameHudManagerPresetsPanelUtility
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     /// <param name="propertyPath">Serialized Boolean property path.</param>
     /// <param name="fallback">Fallback visibility when the controlling property is missing.</param>
-    private static void TrackConditionalVisibility(PropertyField driverField,
-                                                   VisualElement targetRoot,
-                                                   SerializedObject serializedObject,
-                                                   string propertyPath,
-                                                   bool fallback)
+    internal static void TrackConditionalVisibility(PropertyField driverField,
+                                                    VisualElement targetRoot,
+                                                    SerializedObject serializedObject,
+                                                    string propertyPath,
+                                                    bool fallback)
     {
         RefreshConditionalVisibility(targetRoot, serializedObject, propertyPath, fallback);
 

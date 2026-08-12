@@ -311,6 +311,15 @@ public sealed class GameHudRunTimerSettings
 }
 
 /// <summary>
+/// Selects how single-rank Synchro Meter wave convergence advances through the progression window.
+/// </summary>
+public enum GameHudSynchroSingleRankConvergenceMode : byte
+{
+    Linear = 0,
+    Steps = 1
+}
+
+/// <summary>
 /// Stores Synchro Meter wave animation, theme, text, and visibility behavior.
 /// </summary>
 [Serializable]
@@ -361,9 +370,11 @@ public sealed class GameHudSynchroMeterSettings
     [Tooltip("Shows rank progression below the wave display using the authoritative normalized combo progress.")]
     [SerializeField] private bool showProgressBar = true;
 
+    [Header("Wave Motion")]
     [Tooltip("Number of complete wave-image tile cycles scrolled per second. Both waves share this rate so their relative phase remains stable.")]
     [SerializeField] private float waveScrollCyclesPerSecond = 0.12f;
 
+    [Header("Rank Convergence")]
     [Tooltip("Normalized horizontal separation between the two waves at the first rank. A value of 1 represents one complete image tile.")]
     [SerializeField] private float lowestRankPhaseOffsetNormalized = 0.25f;
 
@@ -373,6 +384,32 @@ public sealed class GameHudSynchroMeterSettings
     [Tooltip("Exponent shaping phase convergence across rank indices. Values above 1 preserve separation longer; values below 1 synchronize earlier.")]
     [SerializeField] private float phaseOffsetResponseExponent = 1f;
 
+    [Header("Single Rank Progression")]
+    [Tooltip("Increases both wave scroll rates linearly from the base speed to the authored maximum while Single Rank Progression advances.")]
+    [SerializeField] private bool singleRankAccelerateWavesWithProgress = true;
+
+    [Tooltip("Wave-image tile cycles per second reached at full Single Rank Progression when acceleration is enabled.")]
+    [SerializeField] private float singleRankMaximumWaveScrollCyclesPerSecond = 0.3f;
+
+    [Tooltip("Controls whether Single Rank Progression converges the two waves continuously or through equally spaced progression steps.")]
+    [SerializeField] private GameHudSynchroSingleRankConvergenceMode singleRankConvergenceMode;
+
+    [Tooltip("Normalized horizontal separation between the two waves before Single Rank Progression convergence starts. A value of 1 represents one complete image tile.")]
+    [SerializeField] private float singleRankInitialPhaseOffsetNormalized = 0.25f;
+
+    [Tooltip("Normalized horizontal separation between the two waves after Single Rank Progression convergence ends. Use 0 for complete overlap.")]
+    [SerializeField] private float singleRankFinalPhaseOffsetNormalized;
+
+    [Tooltip("Single Rank Progression percentage at which the waves begin moving toward their final separation.")]
+    [SerializeField] private float singleRankConvergenceStartProgressPercent;
+
+    [Tooltip("Single Rank Progression percentage at which the waves reach their final separation.")]
+    [SerializeField] private float singleRankConvergenceEndProgressPercent = 100f;
+
+    [Tooltip("Number of equal convergence intervals used by Steps mode across the configured progression window.")]
+    [SerializeField] private int singleRankConvergenceStepCount = 5;
+
+    [Header("Shared Wave Transition")]
     [Tooltip("Seconds used to blend the secondary wave toward its new phase after a rank change.")]
     [SerializeField] private float phaseTransitionDuration = 0.3f;
 
@@ -422,6 +459,14 @@ public sealed class GameHudSynchroMeterSettings
     public float LowestRankPhaseOffsetNormalized => lowestRankPhaseOffsetNormalized;
     public float HighestRankPhaseOffsetNormalized => highestRankPhaseOffsetNormalized;
     public float PhaseOffsetResponseExponent => phaseOffsetResponseExponent;
+    public bool SingleRankAccelerateWavesWithProgress => singleRankAccelerateWavesWithProgress;
+    public float SingleRankMaximumWaveScrollCyclesPerSecond => singleRankMaximumWaveScrollCyclesPerSecond;
+    public GameHudSynchroSingleRankConvergenceMode SingleRankConvergenceMode => singleRankConvergenceMode;
+    public float SingleRankInitialPhaseOffsetNormalized => singleRankInitialPhaseOffsetNormalized;
+    public float SingleRankFinalPhaseOffsetNormalized => singleRankFinalPhaseOffsetNormalized;
+    public float SingleRankConvergenceStartProgressPercent => singleRankConvergenceStartProgressPercent;
+    public float SingleRankConvergenceEndProgressPercent => singleRankConvergenceEndProgressPercent;
+    public int SingleRankConvergenceStepCount => singleRankConvergenceStepCount;
     public float PhaseTransitionDuration => phaseTransitionDuration;
     public bool UseUnscaledTime => useUnscaledTime;
     public float ProgressSmoothingSeconds => progressSmoothingSeconds;

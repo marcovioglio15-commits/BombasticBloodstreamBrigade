@@ -46,6 +46,69 @@ public static class HUDSynchroMeterWaveUtility
     }
 
     /// <summary>
+    /// Resolves continuous or stepped wave convergence across a configured Single Rank Progression window.
+    /// </summary>
+    /// <param name="progressNormalized">Authoritative normalized progress across the single rank.</param>
+    /// <param name="initialOffset">Normalized separation before convergence starts.</param>
+    /// <param name="finalOffset">Normalized separation after convergence ends.</param>
+    /// <param name="startProgressPercent">Progress percentage at which convergence begins.</param>
+    /// <param name="endProgressPercent">Progress percentage at which convergence ends.</param>
+    /// <param name="mode">Continuous or stepped convergence mode.</param>
+    /// <param name="stepCount">Number of equal convergence intervals used by Steps mode.</param>
+    /// <returns>Safe normalized wave separation for current single-rank progress.</returns>
+    public static float ResolveSingleRankPhaseOffset(float progressNormalized,
+                                                     float initialOffset,
+                                                     float finalOffset,
+                                                     float startProgressPercent,
+                                                     float endProgressPercent,
+                                                     GameHudSynchroSingleRankConvergenceMode mode,
+                                                     int stepCount)
+    {
+        float safeProgress = SanitizeNormalizedPhase(progressNormalized, 0f);
+        float safeStart = SanitizeNormalizedPhase(startProgressPercent * 0.01f, 0f);
+        float safeEnd = SanitizeNormalizedPhase(endProgressPercent * 0.01f, 1f);
+        float windowProgress = safeEnd > safeStart + PrecisionEpsilon
+            ? Mathf.InverseLerp(safeStart, safeEnd, safeProgress)
+            : safeProgress;
+
+        if (mode == GameHudSynchroSingleRankConvergenceMode.Steps)
+        {
+            int safeStepCount = Mathf.Max(1, stepCount);
+            windowProgress = Mathf.Floor(windowProgress * safeStepCount) / safeStepCount;
+
+            if (safeProgress >= safeEnd)
+                windowProgress = 1f;
+        }
+
+        return Mathf.Lerp(SanitizeNormalizedPhase(initialOffset, 0.25f),
+                          SanitizeNormalizedPhase(finalOffset, 0f),
+                          windowProgress);
+    }
+
+    /// <summary>
+    /// Resolves a shared wave scroll rate that accelerates linearly across Single Rank Progression.
+    /// </summary>
+    /// <param name="baseCyclesPerSecond">Wave tile cycles per second used at zero progress.</param>
+    /// <param name="maximumCyclesPerSecond">Wave tile cycles per second used at full progress.</param>
+    /// <param name="progressNormalized">Authoritative normalized progress across the single rank.</param>
+    /// <param name="accelerateWithProgress">Whether progression controls the scroll rate.</param>
+    /// <returns>Finite non-negative wave tile cycles per second.</returns>
+    public static float ResolveSingleRankScrollCycles(float baseCyclesPerSecond,
+                                                      float maximumCyclesPerSecond,
+                                                      float progressNormalized,
+                                                      bool accelerateWithProgress)
+    {
+        float safeBase = SanitizeNonNegative(baseCyclesPerSecond, 0.12f);
+
+        if (!accelerateWithProgress)
+            return safeBase;
+
+        return Mathf.Lerp(safeBase,
+                          SanitizeNonNegative(maximumCyclesPerSecond, safeBase),
+                          SanitizeNormalizedPhase(progressNormalized, 0f));
+    }
+
+    /// <summary>
     /// Advances one phase value toward its target using a duration expressed for one normalized tile cycle.
     /// </summary>
     /// <param name="currentPhase">Current normalized relative wave phase.</param>

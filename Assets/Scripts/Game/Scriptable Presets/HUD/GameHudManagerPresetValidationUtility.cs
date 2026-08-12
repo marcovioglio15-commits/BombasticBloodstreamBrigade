@@ -105,6 +105,11 @@ public static class GameHudManagerPresetValidationUtility
         ValidateNormalized(settings.LowestRankPhaseOffsetNormalized, "Synchro Lowest Rank Phase Offset", warnings);
         ValidateNormalized(settings.HighestRankPhaseOffsetNormalized, "Synchro Highest Rank Phase Offset", warnings);
         ValidatePositive(settings.PhaseOffsetResponseExponent, "Synchro Phase Offset Response Exponent", warnings);
+        ValidateNonNegative(settings.SingleRankMaximumWaveScrollCyclesPerSecond, "Synchro Single Rank Maximum Wave Scroll Cycles Per Second", warnings);
+        ValidateNormalized(settings.SingleRankInitialPhaseOffsetNormalized, "Synchro Single Rank Initial Phase Offset", warnings);
+        ValidateNormalized(settings.SingleRankFinalPhaseOffsetNormalized, "Synchro Single Rank Final Phase Offset", warnings);
+        ValidatePercentage(settings.SingleRankConvergenceStartProgressPercent, "Synchro Single Rank Convergence Start Progress Percent", warnings);
+        ValidatePercentage(settings.SingleRankConvergenceEndProgressPercent, "Synchro Single Rank Convergence End Progress Percent", warnings);
         ValidateNonNegative(settings.PhaseTransitionDuration, "Synchro Phase Transition Duration", warnings);
         ValidateNonNegative(settings.ProgressSmoothingSeconds, "Synchro Progress Smoothing Seconds", warnings);
         ValidateNonNegative(settings.FadeInDuration, "Synchro Fade In Duration", warnings);
@@ -112,6 +117,23 @@ public static class GameHudManagerPresetValidationUtility
 
         if (settings.HighestRankPhaseOffsetNormalized > settings.LowestRankPhaseOffsetNormalized)
             warnings.Add("Synchro Highest Rank Phase Offset exceeds the Lowest Rank value, so higher ranks will diverge instead of converging.");
+
+        if (settings.SingleRankFinalPhaseOffsetNormalized > settings.SingleRankInitialPhaseOffsetNormalized)
+            warnings.Add("Synchro Single Rank Final Phase Offset exceeds its Initial Phase Offset, so progression will make the waves diverge instead of converge.");
+
+        if (settings.SingleRankFinalPhaseOffsetNormalized > 0f)
+            warnings.Add("Synchro Single Rank Final Phase Offset is above 0, so the waves will retain separation at full progression instead of overlapping.");
+
+        if (settings.SingleRankConvergenceEndProgressPercent <= settings.SingleRankConvergenceStartProgressPercent)
+            warnings.Add("Synchro Single Rank Convergence End Progress Percent should be greater than its Start Progress Percent.");
+
+        if (settings.SingleRankConvergenceMode == GameHudSynchroSingleRankConvergenceMode.Steps &&
+            settings.SingleRankConvergenceStepCount <= 0)
+            warnings.Add("Synchro Single Rank Convergence Step Count should be > 0 while Steps mode is selected.");
+
+        if (settings.SingleRankAccelerateWavesWithProgress &&
+            settings.SingleRankMaximumWaveScrollCyclesPerSecond < settings.WaveScrollCyclesPerSecond)
+            warnings.Add("Synchro Single Rank Maximum Wave Scroll Cycles Per Second is below the base speed, so progression will slow the waves instead of accelerating them.");
 
         if (string.IsNullOrWhiteSpace(settings.IdleRankLabel))
             warnings.Add("Synchro Idle Rank Label is empty. Runtime fallback will display SYNCHRO.");
@@ -178,6 +200,18 @@ public static class GameHudManagerPresetValidationUtility
     {
         if (float.IsNaN(value) || float.IsInfinity(value) || value <= 0f)
             warnings.Add(label + " should be finite and above 0. Runtime will use a safe positive fallback.");
+    }
+
+    /// <summary>
+    /// Adds a warning when a percentage is not finite or lies outside the inclusive 0..100 range.
+    /// </summary>
+    /// <param name="value">Authored percentage value.</param>
+    /// <param name="label">Display label included in warnings.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidatePercentage(float value, string label, List<string> warnings)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < 0f || value > 100f)
+            warnings.Add(label + " should be finite and remain between 0 and 100.");
     }
 
     /// <summary>

@@ -10,14 +10,9 @@ using UnityEditor;
 
 /// <summary>
 /// Builds combo-counter baselines, runtime data, and Add Scaling metadata used by progression baking.
-/// none.
 /// </summary>
 internal static class PlayerRuntimeScalingComboBakeUtility
 {
-    #region Constants
-    private const string ComboRanksRoot = "comboCounter.rankDefinitions.Array.data[";
-    #endregion
-
     #region Methods
 
     #region Public Methods
@@ -56,10 +51,16 @@ internal static class PlayerRuntimeScalingComboBakeUtility
         runtimeConfig = new PlayerRuntimeComboCounterConfig
         {
             Enabled = resolvedRuntimeSourceConfig.Enabled,
+            Mode = resolvedRuntimeSourceConfig.Mode,
             ComboGainPerKill = resolvedRuntimeSourceConfig.ComboGainPerKill,
             DamageBreakMode = resolvedRuntimeSourceConfig.DamageBreakMode,
             ShieldDamageBreaksCombo = resolvedRuntimeSourceConfig.ShieldDamageBreaksCombo,
-            PreventDecayIntoNonDecayingRanks = resolvedRuntimeSourceConfig.PreventDecayIntoNonDecayingRanks
+            PreventDecayIntoNonDecayingRanks = resolvedRuntimeSourceConfig.PreventDecayIntoNonDecayingRanks,
+            SingleRankId = resolvedRuntimeSourceConfig.SingleRankId,
+            SingleRankMaximumComboValue = resolvedRuntimeSourceConfig.SingleRankMaximumComboValue,
+            SingleRankPointsDecayPerSecond = resolvedRuntimeSourceConfig.SingleRankPointsDecayPerSecond,
+            SingleRankValueDisplayMode = resolvedRuntimeSourceConfig.SingleRankValueDisplayMode,
+            SingleRankFormulaDistributionMode = resolvedRuntimeSourceConfig.SingleRankFormulaDistributionMode
         };
 
         IReadOnlyList<PlayerComboRankDefinition> sourceRanks = sourceCombo != null ? sourceCombo.RankDefinitions : null;
@@ -93,17 +94,21 @@ internal static class PlayerRuntimeScalingComboBakeUtility
                 ? scaledRank.ProgressiveBoostPercent
                 : sourceRank != null ? sourceRank.ProgressiveBoostPercent : 0f;
             int formulaStartIndex = characterTuningFormulaBuffer.Length;
-            int formulaCount = AppendRankBonusFormulas(formulaSourceRank, characterTuningFormulaBuffer);
+            int formulaCount = AppendBonusFormulas(formulaSourceRank != null ? formulaSourceRank.RankBonuses : null,
+                                                   characterTuningFormulaBuffer);
             int passiveUnlockStartIndex = basePassiveUnlocks.Length;
-            int passiveUnlockCount = AppendPassiveUnlocks(sourceRank,
-                                                          scaledRank,
-                                                          basePassiveUnlocks,
-                                                          runtimePassiveUnlocks);
+            int passiveUnlockCount = AppendPassiveUnlocks(sourceRank != null ? sourceRank.PassivePowerUpUnlocks : null,
+                                                           scaledRank != null ? scaledRank.PassivePowerUpUnlocks : null,
+                                                           basePassiveUnlocks,
+                                                           runtimePassiveUnlocks);
 
             baseRanks.Add(new PlayerBaseComboRankElement
             {
+                Mode = PlayerComboCounterMode.Ranks,
                 RankId = new FixedString64Bytes(rankId),
+                Enabled = 1,
                 RequiredComboValue = requiredBaseValue,
+                RequiredProgressPercent = 0f,
                 PointsDecayPerSecond = pointsDecayPerSecondBaseValue,
                 ProgressiveBoostPercent = progressiveBoostPercentBaseValue,
                 BonusFormulaStartIndex = formulaStartIndex,
@@ -113,8 +118,11 @@ internal static class PlayerRuntimeScalingComboBakeUtility
             });
             runtimeRanks.Add(new PlayerRuntimeComboRankElement
             {
+                Mode = PlayerComboCounterMode.Ranks,
                 RankId = new FixedString64Bytes(rankId),
+                Enabled = 1,
                 RequiredComboValue = requiredRuntimeValue,
+                RequiredProgressPercent = 0f,
                 PointsDecayPerSecond = pointsDecayPerSecondRuntimeValue,
                 ProgressiveBoostPercent = progressiveBoostPercentRuntimeValue,
                 BonusFormulaStartIndex = formulaStartIndex,
@@ -123,6 +131,16 @@ internal static class PlayerRuntimeScalingComboBakeUtility
                 PassiveUnlockCount = passiveUnlockCount
             });
         }
+
+        AppendSingleRankMilestones(sourceCombo != null ? sourceCombo.SingleRankProgression : null,
+                                   scaledCombo != null ? scaledCombo.SingleRankProgression : null,
+                                   in resolvedBaseConfig,
+                                   in resolvedRuntimeSourceConfig,
+                                   baseRanks,
+                                   runtimeRanks,
+                                   basePassiveUnlocks,
+                                   runtimePassiveUnlocks,
+                                   characterTuningFormulaBuffer);
     }
 
 #if UNITY_EDITOR
@@ -157,25 +175,26 @@ internal static class PlayerRuntimeScalingComboBakeUtility
                 continue;
             }
 
-            if (!TryMapComboFieldId(scalingRule.StatKey,
-                                    out int rankIndex,
-                                    out int passiveUnlockIndex,
-                                    out PlayerRuntimeComboCounterFieldId fieldId))
-            {
-                continue;
-            }
-
             if (!PlayerScalingStatKeyUtility.TryFindPropertyByStatKey(serializedPreset, scalingRule.StatKey, out SerializedProperty property))
             {
                 continue;
             }
 
-            if (!TryResolveComboScalingBaseMetadata(property,
-                                                    out byte valueType,
-                                                    out float baseValue,
-                                                    out byte baseBooleanValue,
-                                                    out byte isInteger,
-                                                    out FixedString64Bytes baseTokenValue))
+            if (!PlayerRuntimeScalingComboFieldMappingUtility.TryMapFieldId(property.propertyPath,
+                                                                            out PlayerComboCounterMode entryMode,
+                                                                            out int rankIndex,
+                                                                            out int passiveUnlockIndex,
+                                                                            out PlayerRuntimeComboCounterFieldId fieldId))
+            {
+                continue;
+            }
+
+            if (!PlayerRuntimeScalingComboFieldMappingUtility.TryResolveBaseMetadata(property,
+                                                                                      out byte valueType,
+                                                                                      out float baseValue,
+                                                                                      out byte baseBooleanValue,
+                                                                                      out byte isInteger,
+                                                                                      out FixedString64Bytes baseTokenValue))
             {
                 continue;
             }
@@ -183,6 +202,7 @@ internal static class PlayerRuntimeScalingComboBakeUtility
             scalingBuffer.Add(new PlayerRuntimeComboCounterScalingElement
             {
                 FieldId = fieldId,
+                EntryMode = entryMode,
                 RankIndex = rankIndex,
                 PassiveUnlockIndex = passiveUnlockIndex,
                 ValueType = valueType,
@@ -210,11 +230,38 @@ internal static class PlayerRuntimeScalingComboBakeUtility
         return new PlayerBaseComboCounterConfig
         {
             Enabled = comboDefinition != null && comboDefinition.IsEnabled ? (byte)1 : (byte)0,
+            Mode = comboDefinition != null ? comboDefinition.Mode : PlayerComboCounterMode.Ranks,
             ComboGainPerKill = comboDefinition != null ? comboDefinition.ComboGainPerKill : 0,
             DamageBreakMode = comboDefinition != null ? comboDefinition.DamageBreakMode : PlayerComboDamageBreakMode.ResetCombo,
             ShieldDamageBreaksCombo = comboDefinition != null && comboDefinition.ShieldDamageBreaksCombo ? (byte)1 : (byte)0,
-            PreventDecayIntoNonDecayingRanks = comboDefinition != null && comboDefinition.PreventDecayIntoNonDecayingRanks ? (byte)1 : (byte)0
+            PreventDecayIntoNonDecayingRanks = comboDefinition != null && comboDefinition.PreventDecayIntoNonDecayingRanks ? (byte)1 : (byte)0,
+            SingleRankId = new FixedString64Bytes(ResolveSingleRankId(comboDefinition != null ? comboDefinition.SingleRankProgression : null)),
+            SingleRankMaximumComboValue = comboDefinition != null && comboDefinition.SingleRankProgression != null
+                ? comboDefinition.SingleRankProgression.MaximumComboValue
+                : 0,
+            SingleRankPointsDecayPerSecond = comboDefinition != null && comboDefinition.SingleRankProgression != null
+                ? comboDefinition.SingleRankProgression.PointsDecayPerSecond
+                : 0f,
+            SingleRankValueDisplayMode = comboDefinition != null && comboDefinition.SingleRankProgression != null
+                ? comboDefinition.SingleRankProgression.ValueDisplayMode
+                : PlayerComboSingleRankValueDisplayMode.CurrentValue,
+            SingleRankFormulaDistributionMode = comboDefinition != null && comboDefinition.SingleRankProgression != null
+                ? comboDefinition.SingleRankProgression.FormulaDistributionMode
+                : PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps
         };
+    }
+
+    /// <summary>
+    /// Resolves the authored single-rank identifier with a stable presentation fallback.
+    /// </summary>
+    /// <param name="singleRankDefinition">Authored single-rank progression settings.</param>
+    /// <returns>Trimmed rank identifier or SYNCHRO when no identifier is available.</returns>
+    private static string ResolveSingleRankId(PlayerComboSingleRankDefinition singleRankDefinition)
+    {
+        if (singleRankDefinition == null || string.IsNullOrWhiteSpace(singleRankDefinition.RankId))
+            return "SYNCHRO";
+
+        return singleRankDefinition.RankId.Trim();
     }
 
     /// <summary>
@@ -243,16 +290,100 @@ internal static class PlayerRuntimeScalingComboBakeUtility
     }
 
     /// <summary>
-    /// Appends all valid Character Tuning formulas defined by one combo rank into the shared flattened runtime buffer.
+    /// Appends both source and scaled single-rank reward milestones so runtime formula scaling can switch topology without rebaking.
     /// </summary>
-    /// <param name="rankDefinition">Authored combo rank inspected for bonus formulas.</param>
+    /// <param name="sourceDefinition">Unscaled single-rank definition used for immutable baselines.</param>
+    /// <param name="scaledDefinition">Scaled single-rank definition used for initial runtime values.</param>
+    /// <param name="baseConfig">Immutable combo config containing the authored progression maximum.</param>
+    /// <param name="runtimeConfig">Initial runtime combo config containing the scaled progression maximum.</param>
+    /// <param name="baseRanks">Destination immutable reward-entry buffer.</param>
+    /// <param name="runtimeRanks">Destination mutable reward-entry buffer.</param>
+    /// <param name="basePassiveUnlocks">Destination immutable passive-unlock buffer.</param>
+    /// <param name="runtimePassiveUnlocks">Destination mutable passive-unlock buffer.</param>
     /// <param name="characterTuningFormulaBuffer">Shared flattened Character Tuning formula buffer.</param>
-    /// <returns>Number of formulas appended for the provided rank.</returns>
-    private static int AppendRankBonusFormulas(PlayerComboRankDefinition rankDefinition,
-                                               DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer)
+    private static void AppendSingleRankMilestones(PlayerComboSingleRankDefinition sourceDefinition,
+                                                   PlayerComboSingleRankDefinition scaledDefinition,
+                                                   in PlayerBaseComboCounterConfig baseConfig,
+                                                   in PlayerBaseComboCounterConfig runtimeConfig,
+                                                   DynamicBuffer<PlayerBaseComboRankElement> baseRanks,
+                                                   DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks,
+                                                   DynamicBuffer<PlayerBaseComboPassiveUnlockElement> basePassiveUnlocks,
+                                                   DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks,
+                                                   DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer)
     {
-        PowerUpCharacterTuningModuleData rankBonuses = rankDefinition != null ? rankDefinition.RankBonuses : null;
-        IReadOnlyList<PowerUpCharacterTuningFormulaData> formulas = rankBonuses != null ? rankBonuses.Formulas : null;
+        IReadOnlyList<PlayerComboBonusMilestoneDefinition> sourceMilestones = sourceDefinition != null ? sourceDefinition.BonusMilestones : null;
+        IReadOnlyList<PlayerComboBonusMilestoneDefinition> scaledMilestones = scaledDefinition != null ? scaledDefinition.BonusMilestones : null;
+        int sourceMilestoneCount = sourceMilestones != null ? sourceMilestones.Count : 0;
+        int scaledMilestoneCount = scaledMilestones != null ? scaledMilestones.Count : 0;
+        int milestoneCount = math.max(sourceMilestoneCount, scaledMilestoneCount);
+
+        for (int milestoneIndex = 0; milestoneIndex < milestoneCount; milestoneIndex++)
+        {
+            PlayerComboBonusMilestoneDefinition sourceMilestone = sourceMilestones != null && milestoneIndex < sourceMilestoneCount
+                ? sourceMilestones[milestoneIndex]
+                : null;
+            PlayerComboBonusMilestoneDefinition scaledMilestone = scaledMilestones != null && milestoneIndex < scaledMilestoneCount
+                ? scaledMilestones[milestoneIndex]
+                : null;
+            PlayerComboBonusMilestoneDefinition formulaSource = sourceMilestone != null ? sourceMilestone : scaledMilestone;
+            float baseProgressPercent = sourceMilestone != null
+                ? sourceMilestone.RequiredProgressPercent
+                : scaledMilestone != null ? scaledMilestone.RequiredProgressPercent : 0f;
+            float runtimeProgressPercent = scaledMilestone != null
+                ? scaledMilestone.RequiredProgressPercent
+                : sourceMilestone != null ? sourceMilestone.RequiredProgressPercent : 0f;
+            int formulaStartIndex = characterTuningFormulaBuffer.Length;
+            int formulaCount = AppendBonusFormulas(formulaSource != null ? formulaSource.Bonuses : null,
+                                                   characterTuningFormulaBuffer);
+            int passiveUnlockStartIndex = basePassiveUnlocks.Length;
+            int passiveUnlockCount = AppendPassiveUnlocks(sourceMilestone != null ? sourceMilestone.PassivePowerUpUnlocks : null,
+                                                           scaledMilestone != null ? scaledMilestone.PassivePowerUpUnlocks : null,
+                                                           basePassiveUnlocks,
+                                                           runtimePassiveUnlocks);
+
+            baseRanks.Add(new PlayerBaseComboRankElement
+            {
+                Mode = PlayerComboCounterMode.SingleRankProgression,
+                RankId = new FixedString64Bytes(ResolveMilestoneId(milestoneIndex, sourceMilestone, scaledMilestone)),
+                Enabled = ResolveMilestoneEnabled(sourceMilestone, scaledMilestone),
+                RequiredComboValue = PlayerComboCounterRuntimeUtility.ResolveSingleRankMilestoneRequiredValue(baseConfig.SingleRankMaximumComboValue,
+                                                                                                               baseProgressPercent),
+                RequiredProgressPercent = baseProgressPercent,
+                PointsDecayPerSecond = 0f,
+                ProgressiveBoostPercent = 0f,
+                BonusFormulaStartIndex = formulaStartIndex,
+                BonusFormulaCount = formulaCount,
+                PassiveUnlockStartIndex = passiveUnlockStartIndex,
+                PassiveUnlockCount = passiveUnlockCount
+            });
+            runtimeRanks.Add(new PlayerRuntimeComboRankElement
+            {
+                Mode = PlayerComboCounterMode.SingleRankProgression,
+                RankId = new FixedString64Bytes(ResolveMilestoneId(milestoneIndex, scaledMilestone, sourceMilestone)),
+                Enabled = ResolveMilestoneEnabled(scaledMilestone, sourceMilestone),
+                RequiredComboValue = PlayerComboCounterRuntimeUtility.ResolveSingleRankMilestoneRequiredValue(runtimeConfig.SingleRankMaximumComboValue,
+                                                                                                               runtimeProgressPercent),
+                RequiredProgressPercent = runtimeProgressPercent,
+                PointsDecayPerSecond = 0f,
+                ProgressiveBoostPercent = 0f,
+                BonusFormulaStartIndex = formulaStartIndex,
+                BonusFormulaCount = formulaCount,
+                PassiveUnlockStartIndex = passiveUnlockStartIndex,
+                PassiveUnlockCount = passiveUnlockCount
+            });
+        }
+    }
+
+    /// <summary>
+    /// Appends all valid Character Tuning formulas owned by one combo reward entry.
+    /// </summary>
+    /// <param name="bonuses">Authored Character Tuning payload inspected for formulas.</param>
+    /// <param name="characterTuningFormulaBuffer">Shared flattened Character Tuning formula buffer.</param>
+    /// <returns>Number of formulas appended for the provided reward entry.</returns>
+    private static int AppendBonusFormulas(PowerUpCharacterTuningModuleData bonuses,
+                                           DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer)
+    {
+        IReadOnlyList<PowerUpCharacterTuningFormulaData> formulas = bonuses != null ? bonuses.Formulas : null;
 
         if (formulas == null)
         {
@@ -284,18 +415,16 @@ internal static class PlayerRuntimeScalingComboBakeUtility
     /// <summary>
     /// Appends base and runtime passive unlock entries authored under one combo rank.
     /// </summary>
-    /// <param name="sourceRank">Unscaled rank used for immutable baseline values.</param>
-    /// <param name="scaledRank">Scaled rank used for initial runtime values.</param>
+    /// <param name="sourceUnlocks">Unscaled passive unlock list used for immutable baseline values.</param>
+    /// <param name="scaledUnlocks">Scaled passive unlock list used for initial runtime values.</param>
     /// <param name="basePassiveUnlocks">Destination immutable passive unlock buffer.</param>
     /// <param name="runtimePassiveUnlocks">Destination mutable passive unlock buffer.</param>
     /// <returns>Number of unlock entries appended for the rank.</returns>
-    private static int AppendPassiveUnlocks(PlayerComboRankDefinition sourceRank,
-                                            PlayerComboRankDefinition scaledRank,
+    private static int AppendPassiveUnlocks(IReadOnlyList<PlayerComboPassivePowerUpUnlockDefinition> sourceUnlocks,
+                                            IReadOnlyList<PlayerComboPassivePowerUpUnlockDefinition> scaledUnlocks,
                                             DynamicBuffer<PlayerBaseComboPassiveUnlockElement> basePassiveUnlocks,
                                             DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> runtimePassiveUnlocks)
     {
-        IReadOnlyList<PlayerComboPassivePowerUpUnlockDefinition> sourceUnlocks = sourceRank != null ? sourceRank.PassivePowerUpUnlocks : null;
-        IReadOnlyList<PlayerComboPassivePowerUpUnlockDefinition> scaledUnlocks = scaledRank != null ? scaledRank.PassivePowerUpUnlocks : null;
         int sourceUnlockCount = sourceUnlocks != null ? sourceUnlocks.Count : 0;
         int scaledUnlockCount = scaledUnlocks != null ? scaledUnlocks.Count : 0;
         int unlockCount = math.max(sourceUnlockCount, scaledUnlockCount);
@@ -317,6 +446,41 @@ internal static class PlayerRuntimeScalingComboBakeUtility
         }
 
         return unlockCount;
+    }
+
+    /// <summary>
+    /// Resolves one milestone identifier from preferred and fallback authoring entries.
+    /// </summary>
+    /// <param name="milestoneIndex">Zero-based milestone index used by the generated fallback.</param>
+    /// <param name="preferredMilestone">Preferred authored milestone.</param>
+    /// <param name="fallbackMilestone">Fallback authored milestone.</param>
+    /// <returns>Stable non-empty milestone identifier.</returns>
+    private static string ResolveMilestoneId(int milestoneIndex,
+                                             PlayerComboBonusMilestoneDefinition preferredMilestone,
+                                             PlayerComboBonusMilestoneDefinition fallbackMilestone)
+    {
+        if (preferredMilestone != null && !string.IsNullOrWhiteSpace(preferredMilestone.MilestoneId))
+            return preferredMilestone.MilestoneId.Trim();
+
+        if (fallbackMilestone != null && !string.IsNullOrWhiteSpace(fallbackMilestone.MilestoneId))
+            return fallbackMilestone.MilestoneId.Trim();
+
+        return string.Format("Milestone{0:00}", milestoneIndex + 1);
+    }
+
+    /// <summary>
+    /// Resolves one milestone enable flag from preferred and fallback authoring entries.
+    /// </summary>
+    /// <param name="preferredMilestone">Preferred authored milestone.</param>
+    /// <param name="fallbackMilestone">Fallback authored milestone.</param>
+    /// <returns>One when the resolved milestone is enabled; otherwise zero.</returns>
+    private static byte ResolveMilestoneEnabled(PlayerComboBonusMilestoneDefinition preferredMilestone,
+                                                PlayerComboBonusMilestoneDefinition fallbackMilestone)
+    {
+        if (preferredMilestone != null)
+            return preferredMilestone.IsEnabled ? (byte)1 : (byte)0;
+
+        return fallbackMilestone != null && fallbackMilestone.IsEnabled ? (byte)1 : (byte)0;
     }
 
     /// <summary>
@@ -362,198 +526,6 @@ internal static class PlayerRuntimeScalingComboBakeUtility
 
         return 0;
     }
-
-#if UNITY_EDITOR
-    /// <summary>
-    /// Resolves combo scaling baseline metadata, including token-backed passive PowerUpId fields.
-    /// </summary>
-    /// <param name="property">Serialized property targeted by Add Scaling.</param>
-    /// <param name="valueType">Runtime formula value type.</param>
-    /// <param name="baseValue">Numeric base value when applicable.</param>
-    /// <param name="baseBooleanValue">Boolean base value when applicable.</param>
-    /// <param name="isInteger">True when numeric values should be rounded before assignment.</param>
-    /// <param name="baseTokenValue">Token base value when applicable.</param>
-    /// <returns>True when the serialized property can be converted to combo scaling metadata.</returns>
-    private static bool TryResolveComboScalingBaseMetadata(SerializedProperty property,
-                                                           out byte valueType,
-                                                           out float baseValue,
-                                                           out byte baseBooleanValue,
-                                                           out byte isInteger,
-                                                           out FixedString64Bytes baseTokenValue)
-    {
-        baseTokenValue = default;
-
-        if (property != null && property.propertyType == SerializedPropertyType.String)
-        {
-            valueType = (byte)PlayerFormulaValueType.Token;
-            baseValue = 0f;
-            baseBooleanValue = 0;
-            isInteger = 0;
-            string tokenValue = string.IsNullOrWhiteSpace(property.stringValue)
-                ? string.Empty
-                : property.stringValue.Trim();
-            baseTokenValue = new FixedString64Bytes(tokenValue);
-            return true;
-        }
-
-        return PlayerRuntimeScalingBakeUtility.TryResolveScalingBaseMetadata(property,
-                                                                             out valueType,
-                                                                             out baseValue,
-                                                                             out baseBooleanValue,
-                                                                             out isInteger);
-    }
-
-    /// <summary>
-    /// Maps one progression Add Scaling stat key to the combo runtime field targeted by that rule.
-    /// </summary>
-    /// <param name="statKey">Stable Add Scaling stat key emitted by the progression preset.</param>
-    /// <param name="rankIndex">Resolved combo rank index when the mapping targets one rank milestone.</param>
-    /// <param name="passiveUnlockIndex">Resolved passive unlock index when the mapping targets one nested passive unlock.</param>
-    /// <param name="fieldId">Resolved combo runtime field identifier.</param>
-    /// <returns>True when the stat key targets the combo module; otherwise false.</returns>
-    private static bool TryMapComboFieldId(string statKey,
-                                           out int rankIndex,
-                                           out int passiveUnlockIndex,
-                                           out PlayerRuntimeComboCounterFieldId fieldId)
-    {
-        rankIndex = -1;
-        passiveUnlockIndex = -1;
-        fieldId = default;
-
-        if (string.IsNullOrWhiteSpace(statKey))
-        {
-            return false;
-        }
-
-        if (string.Equals(statKey, "comboCounter.isEnabled", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.Enabled;
-            return true;
-        }
-
-        if (string.Equals(statKey, "comboCounter.comboGainPerKill", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.ComboGainPerKill;
-            return true;
-        }
-
-        if (string.Equals(statKey, "comboCounter.shieldDamageBreaksCombo", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.ShieldDamageBreaksCombo;
-            return true;
-        }
-
-        if (string.Equals(statKey, "comboCounter.preventDecayIntoNonDecayingRanks", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.PreventDecayIntoNonDecayingRanks;
-            return true;
-        }
-
-        if (string.Equals(statKey, "comboCounter.damageBreakMode", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.DamageBreakMode;
-            return true;
-        }
-
-        if (!statKey.StartsWith(ComboRanksRoot, StringComparison.Ordinal))
-        {
-            return false;
-        }
-
-        if (!TryParseStableArrayIndex(statKey, 0, out rankIndex))
-        {
-            rankIndex = -1;
-            return false;
-        }
-
-        if (statKey.Contains(".passivePowerUpUnlocks.Array.data[", StringComparison.Ordinal))
-        {
-            if (!TryParseStableArrayIndex(statKey, 1, out passiveUnlockIndex))
-            {
-                rankIndex = -1;
-                passiveUnlockIndex = -1;
-                return false;
-            }
-
-            if (statKey.EndsWith(".isEnabled", StringComparison.Ordinal))
-            {
-                fieldId = PlayerRuntimeComboCounterFieldId.RankPassiveUnlockEnabled;
-                return true;
-            }
-
-            if (statKey.EndsWith(".passivePowerUpId", StringComparison.Ordinal))
-            {
-                fieldId = PlayerRuntimeComboCounterFieldId.RankPassiveUnlockPowerUpId;
-                return true;
-            }
-
-            rankIndex = -1;
-            passiveUnlockIndex = -1;
-            return false;
-        }
-
-        if (statKey.EndsWith(".requiredComboValue", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.RankRequiredComboValue;
-            return true;
-        }
-
-        if (statKey.EndsWith(".pointsDecayPerSecond", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.RankPointsDecayPerSecond;
-            return true;
-        }
-
-        if (statKey.EndsWith(".progressiveBoostPercent", StringComparison.Ordinal))
-        {
-            fieldId = PlayerRuntimeComboCounterFieldId.RankProgressiveBoostPercent;
-            return true;
-        }
-
-        rankIndex = -1;
-        passiveUnlockIndex = -1;
-        return false;
-    }
-
-    /// <summary>
-    /// Extracts one authored array index from a stable Add Scaling key token such as data[2|rankId:S].
-    /// </summary>
-    /// <param name="statKey">Stable Add Scaling stat key containing array tokens.</param>
-    /// <param name="occurrenceIndex">Zero-based data[] occurrence to parse.</param>
-    /// <param name="arrayIndex">Parsed authored array index.</param>
-    /// <returns>True when the requested array token was parsed successfully; otherwise false.</returns>
-    private static bool TryParseStableArrayIndex(string statKey, int occurrenceIndex, out int arrayIndex)
-    {
-        arrayIndex = -1;
-
-        int dataStartIndex = -1;
-        int searchStartIndex = 0;
-
-        for (int currentOccurrenceIndex = 0; currentOccurrenceIndex <= occurrenceIndex; currentOccurrenceIndex++)
-        {
-            dataStartIndex = statKey.IndexOf("data[", searchStartIndex, StringComparison.Ordinal);
-
-            if (dataStartIndex < 0)
-            {
-                return false;
-            }
-
-            searchStartIndex = dataStartIndex + 5;
-        }
-
-        int dataEndIndex = statKey.IndexOf(']', dataStartIndex);
-
-        if (dataStartIndex < 0 || dataEndIndex <= dataStartIndex)
-        {
-            return false;
-        }
-
-        string token = statKey.Substring(dataStartIndex + 5, dataEndIndex - dataStartIndex - 5);
-        int separatorIndex = token.IndexOf('|');
-        string indexText = separatorIndex >= 0 ? token.Substring(0, separatorIndex) : token;
-        return int.TryParse(indexText, out arrayIndex);
-    }
-#endif
 
     #endregion
 

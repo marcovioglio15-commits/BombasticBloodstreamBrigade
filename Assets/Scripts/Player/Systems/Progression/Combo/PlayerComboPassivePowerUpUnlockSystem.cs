@@ -169,6 +169,10 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
         for (int rankIndex = 0; rankIndex <= clampedActiveRankIndex; rankIndex++)
         {
             PlayerRuntimeComboRankElement runtimeRank = runtimeRanks[rankIndex];
+
+            if (runtimeRank.Mode != runtimeRanks[clampedActiveRankIndex].Mode || runtimeRank.Enabled == 0)
+                continue;
+
             int firstUnlockIndex = math.max(0, runtimeRank.PassiveUnlockStartIndex);
             int lastUnlockIndex = math.min(runtimePassiveUnlocks.Length, firstUnlockIndex + math.max(0, runtimeRank.PassiveUnlockCount));
 
@@ -289,6 +293,10 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
         for (int rankIndex = 0; rankIndex <= clampedActiveRankIndex; rankIndex++)
         {
             PlayerRuntimeComboRankElement runtimeRank = runtimeRanks[rankIndex];
+
+            if (runtimeRank.Mode != runtimeRanks[clampedActiveRankIndex].Mode || runtimeRank.Enabled == 0)
+                continue;
+
             int firstUnlockIndex = math.max(0, runtimeRank.PassiveUnlockStartIndex);
             int lastUnlockIndex = math.min(runtimePassiveUnlocks.Length, firstUnlockIndex + math.max(0, runtimeRank.PassiveUnlockCount));
 
@@ -334,6 +342,10 @@ public partial struct PlayerComboPassivePowerUpUnlockSystem : ISystem
         }
 
         PlayerRuntimeComboRankElement runtimeRank = runtimeRanks[grant.RankIndex];
+
+        if (runtimeRank.Enabled == 0 || runtimeRank.Mode != runtimeRanks[activeRankIndex].Mode)
+            return false;
+
         int firstUnlockIndex = math.max(0, runtimeRank.PassiveUnlockStartIndex);
         int lastUnlockIndex = math.min(runtimePassiveUnlocks.Length, firstUnlockIndex + math.max(0, runtimeRank.PassiveUnlockCount));
 

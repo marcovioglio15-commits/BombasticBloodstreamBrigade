@@ -5,8 +5,7 @@ using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Draws the combo-counter preset module with scalable global settings and list-level validation warnings.
-/// none.
+/// Draws the combo-counter preset module with scalable global settings and topology-specific validation warnings.
 /// </summary>
 [CustomPropertyDrawer(typeof(PlayerComboCounterDefinition))]
 public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
@@ -23,32 +22,39 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
     {
         VisualElement root = new VisualElement();
         SerializedProperty isEnabledProperty = property.FindPropertyRelative("isEnabled");
+        SerializedProperty modeProperty = property.FindPropertyRelative("mode");
         SerializedProperty comboGainPerKillProperty = property.FindPropertyRelative("comboGainPerKill");
         SerializedProperty damageBreakModeProperty = property.FindPropertyRelative("damageBreakMode");
         SerializedProperty shieldDamageBreaksComboProperty = property.FindPropertyRelative("shieldDamageBreaksCombo");
         SerializedProperty preventDecayIntoNonDecayingRanksProperty = property.FindPropertyRelative("preventDecayIntoNonDecayingRanks");
         SerializedProperty rankDefinitionsProperty = property.FindPropertyRelative("rankDefinitions");
+        SerializedProperty singleRankProgressionProperty = property.FindPropertyRelative("singleRankProgression");
         SerializedProperty scalingRulesProperty = property.serializedObject != null
             ? property.serializedObject.FindProperty("scalingRules")
             : null;
 
         if (isEnabledProperty == null ||
+            modeProperty == null ||
             comboGainPerKillProperty == null ||
             damageBreakModeProperty == null ||
             shieldDamageBreaksComboProperty == null ||
             preventDecayIntoNonDecayingRanksProperty == null ||
-            rankDefinitionsProperty == null)
+            rankDefinitionsProperty == null ||
+            singleRankProgressionProperty == null)
         {
             HelpBox missingHelpBox = new HelpBox("Combo counter fields are missing.", HelpBoxMessageType.Warning);
             root.Add(missingHelpBox);
             return root;
         }
 
-        HelpBox infoBox = new HelpBox("Health damage always triggers the selected Damage Break Mode. Shield damage uses the same break mode only when Shield Damage Breaks Combo is enabled, and each rank can also define point decay, progressive Character Tuning boost, and passive power-up unlocks. All numeric, boolean, enum, and token fields below support Add Scaling where applicable.", HelpBoxMessageType.Info);
+        HelpBox infoBox = new HelpBox("Health damage always triggers the selected Damage Break Mode. Ranks uses independent thresholds and bonuses; Single Rank Progression exposes one capped bar with percentage reward milestones. Every dedicated numeric, Boolean, enum, and token field supports Add Scaling.", HelpBoxMessageType.Info);
         root.Add(infoBox);
         root.Add(PlayerScalingFieldElementFactory.CreateField(isEnabledProperty,
                                                               scalingRulesProperty,
                                                               "Enabled"));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(modeProperty,
+                                                              scalingRulesProperty,
+                                                              "Mode"));
         root.Add(PlayerScalingFieldElementFactory.CreateField(comboGainPerKillProperty,
                                                               scalingRulesProperty,
                                                               "Combo Gain Per Kill"));
@@ -58,13 +64,17 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         root.Add(PlayerScalingFieldElementFactory.CreateField(shieldDamageBreaksComboProperty,
                                                               scalingRulesProperty,
                                                               "Shield Damage Breaks Combo"));
-        root.Add(PlayerScalingFieldElementFactory.CreateField(preventDecayIntoNonDecayingRanksProperty,
-                                                              scalingRulesProperty,
-                                                              "Prevent Decay Into Non-Decaying Ranks"));
-
+        VisualElement ranksOptionsRoot = new VisualElement();
+        ranksOptionsRoot.Add(PlayerScalingFieldElementFactory.CreateField(preventDecayIntoNonDecayingRanksProperty,
+                                                                          scalingRulesProperty,
+                                                                          "Prevent Decay Into Non-Decaying Ranks"));
         PropertyField rankDefinitionsField = new PropertyField(rankDefinitionsProperty, "Rank Definitions");
         rankDefinitionsField.BindProperty(rankDefinitionsProperty);
-        root.Add(rankDefinitionsField);
+        ranksOptionsRoot.Add(rankDefinitionsField);
+        root.Add(ranksOptionsRoot);
+
+        VisualElement singleRankOptionsRoot = BuildSingleRankOptions(singleRankProgressionProperty, scalingRulesProperty);
+        root.Add(singleRankOptionsRoot);
 
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         root.Add(warningBox);
@@ -72,19 +82,26 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         root.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
             PlayerManagementDraftSession.MarkDirty();
+            PlayerManagementSelectionContext.NotifyProgressionPresetContentChanged();
             RefreshWarnings(isEnabledProperty,
+                            modeProperty,
                             comboGainPerKillProperty,
                             damageBreakModeProperty,
                             preventDecayIntoNonDecayingRanksProperty,
                             rankDefinitionsProperty,
+                            singleRankProgressionProperty,
                             warningBox);
+            RefreshModeVisibility(modeProperty, ranksOptionsRoot, singleRankOptionsRoot);
         });
 
+        RefreshModeVisibility(modeProperty, ranksOptionsRoot, singleRankOptionsRoot);
         RefreshWarnings(isEnabledProperty,
+                        modeProperty,
                         comboGainPerKillProperty,
                         damageBreakModeProperty,
                         preventDecayIntoNonDecayingRanksProperty,
                         rankDefinitionsProperty,
+                        singleRankProgressionProperty,
                         warningBox);
         return root;
     }
@@ -92,19 +109,83 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
 
     #region Private Methods
     /// <summary>
+    /// Builds all fields dedicated to continuous single-rank progression without exposing power-up-only trigger scope data.
+    /// </summary>
+    /// <param name="singleRankProgressionProperty">Serialized single-rank progression payload.</param>
+    /// <param name="scalingRulesProperty">Serialized progression Add Scaling rule list.</param>
+    /// <returns>Container holding single-rank-only options.</returns>
+    private static VisualElement BuildSingleRankOptions(SerializedProperty singleRankProgressionProperty,
+                                                        SerializedProperty scalingRulesProperty)
+    {
+        VisualElement root = new VisualElement();
+        SerializedProperty rankIdProperty = singleRankProgressionProperty.FindPropertyRelative("rankId");
+        SerializedProperty maximumComboValueProperty = singleRankProgressionProperty.FindPropertyRelative("maximumComboValue");
+        SerializedProperty pointsDecayPerSecondProperty = singleRankProgressionProperty.FindPropertyRelative("pointsDecayPerSecond");
+        SerializedProperty valueDisplayModeProperty = singleRankProgressionProperty.FindPropertyRelative("valueDisplayMode");
+        SerializedProperty formulaDistributionModeProperty = singleRankProgressionProperty.FindPropertyRelative("formulaDistributionMode");
+        SerializedProperty bonusMilestonesProperty = singleRankProgressionProperty.FindPropertyRelative("bonusMilestones");
+        root.Add(new HelpBox("The single rank is active from the first combo point to Maximum Combo Value. Milestone Steps grants formulas at authored percentages; Linear Across Progression blends every enabled milestone's numeric formulas from zero to full strength across the complete bar.", HelpBoxMessageType.Info));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(rankIdProperty,
+                                                              scalingRulesProperty,
+                                                              "Rank ID",
+                                                              null,
+                                                              true));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(maximumComboValueProperty,
+                                                              scalingRulesProperty,
+                                                              "Maximum Combo Value"));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(pointsDecayPerSecondProperty,
+                                                              scalingRulesProperty,
+                                                              "Points Decay Per Second"));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(valueDisplayModeProperty,
+                                                              scalingRulesProperty,
+                                                              "Value Display Mode"));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(formulaDistributionModeProperty,
+                                                              scalingRulesProperty,
+                                                              "Formula Distribution Mode"));
+
+        if (bonusMilestonesProperty != null)
+        {
+            PropertyField milestonesField = new PropertyField(bonusMilestonesProperty, "Bonus Milestones");
+            milestonesField.BindProperty(bonusMilestonesProperty);
+            root.Add(milestonesField);
+        }
+
+        return root;
+    }
+
+    /// <summary>
+    /// Shows only the option group owned by the currently authored combo topology.
+    /// </summary>
+    /// <param name="modeProperty">Serialized combo mode.</param>
+    /// <param name="ranksOptionsRoot">Traditional rank option container.</param>
+    /// <param name="singleRankOptionsRoot">Continuous single-rank option container.</param>
+    private static void RefreshModeVisibility(SerializedProperty modeProperty,
+                                              VisualElement ranksOptionsRoot,
+                                              VisualElement singleRankOptionsRoot)
+    {
+        bool usesSingleRank = ResolveMode(modeProperty) == PlayerComboCounterMode.SingleRankProgression;
+        ranksOptionsRoot.style.display = usesSingleRank ? DisplayStyle.None : DisplayStyle.Flex;
+        singleRankOptionsRoot.style.display = usesSingleRank ? DisplayStyle.Flex : DisplayStyle.None;
+    }
+
+    /// <summary>
     /// Rebuilds the warning message shown for the combo-counter module.
     /// </summary>
     /// <param name="isEnabledProperty">Serialized combo enabled property.</param>
+    /// <param name="modeProperty">Serialized combo topology.</param>
     /// <param name="comboGainPerKillProperty">Serialized kill gain property.</param>
     /// <param name="damageBreakModeProperty">Serialized damage-break mode property.</param>
     /// <param name="preventDecayIntoNonDecayingRanksProperty">Serialized decay-floor preservation property.</param>
     /// <param name="rankDefinitionsProperty">Serialized combo-rank list property.</param>
+    /// <param name="singleRankProgressionProperty">Serialized continuous single-rank payload.</param>
     /// <param name="warningBox">Warning help box refreshed in place.</param>
     private static void RefreshWarnings(SerializedProperty isEnabledProperty,
+                                        SerializedProperty modeProperty,
                                         SerializedProperty comboGainPerKillProperty,
                                         SerializedProperty damageBreakModeProperty,
                                         SerializedProperty preventDecayIntoNonDecayingRanksProperty,
                                         SerializedProperty rankDefinitionsProperty,
+                                        SerializedProperty singleRankProgressionProperty,
                                         HelpBox warningBox)
     {
         if (warningBox == null)
@@ -122,6 +203,15 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
             comboGainPerKillProperty.intValue <= 0)
         {
             warningLines.Add("Combo Gain Per Kill should be > 0 while the combo counter is enabled.");
+        }
+
+        if (ResolveMode(modeProperty) == PlayerComboCounterMode.SingleRankProgression)
+        {
+            AppendSingleRankWarnings(singleRankProgressionProperty,
+                                     usesRankDowngrade,
+                                     warningLines);
+            ApplyWarnings(warningLines, warningBox);
+            return;
         }
 
         if (rankDefinitionsProperty == null || !rankDefinitionsProperty.isArray)
@@ -207,6 +297,104 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
             }
         }
 
+        ApplyWarnings(warningLines, warningBox);
+    }
+
+    /// <summary>
+    /// Appends validation messages for the continuous single-rank topology.
+    /// </summary>
+    /// <param name="singleRankProgressionProperty">Serialized continuous single-rank payload.</param>
+    /// <param name="usesRankDowngrade">Whether damage attempts to downgrade one reward milestone.</param>
+    /// <param name="warningLines">Destination warning collection.</param>
+    private static void AppendSingleRankWarnings(SerializedProperty singleRankProgressionProperty,
+                                                 bool usesRankDowngrade,
+                                                 List<string> warningLines)
+    {
+        if (singleRankProgressionProperty == null)
+        {
+            warningLines.Add("Single Rank Progression settings are not available.");
+            return;
+        }
+
+        SerializedProperty rankIdProperty = singleRankProgressionProperty.FindPropertyRelative("rankId");
+        SerializedProperty maximumComboValueProperty = singleRankProgressionProperty.FindPropertyRelative("maximumComboValue");
+        SerializedProperty pointsDecayPerSecondProperty = singleRankProgressionProperty.FindPropertyRelative("pointsDecayPerSecond");
+        SerializedProperty bonusMilestonesProperty = singleRankProgressionProperty.FindPropertyRelative("bonusMilestones");
+
+        if (rankIdProperty == null || string.IsNullOrWhiteSpace(rankIdProperty.stringValue))
+            warningLines.Add("Single Rank Progression should define a non-empty Rank ID.");
+
+        if (maximumComboValueProperty == null || maximumComboValueProperty.intValue <= 0)
+            warningLines.Add("Maximum Combo Value should be > 0 so progression and percentage milestones can be evaluated.");
+
+        if (pointsDecayPerSecondProperty != null &&
+            (float.IsNaN(pointsDecayPerSecondProperty.floatValue) ||
+             float.IsInfinity(pointsDecayPerSecondProperty.floatValue) ||
+             pointsDecayPerSecondProperty.floatValue < 0f))
+            warningLines.Add("Points Decay Per Second should be finite and >= 0.");
+
+        if (bonusMilestonesProperty == null || !bonusMilestonesProperty.isArray)
+        {
+            warningLines.Add("Bonus Milestones are not available.");
+            return;
+        }
+
+        HashSet<string> visitedMilestoneIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        float previousPercentage = float.NegativeInfinity;
+        int enabledMilestoneCount = 0;
+
+        // Validate only enabled milestones because disabled entries do not participate in runtime progression.
+        for (int milestoneIndex = 0; milestoneIndex < bonusMilestonesProperty.arraySize; milestoneIndex++)
+        {
+            SerializedProperty milestoneProperty = bonusMilestonesProperty.GetArrayElementAtIndex(milestoneIndex);
+            SerializedProperty enabledProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("isEnabled") : null;
+
+            if (enabledProperty != null && !enabledProperty.boolValue)
+                continue;
+
+            SerializedProperty milestoneIdProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("milestoneId") : null;
+            SerializedProperty requiredPercentageProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("requiredProgressPercent") : null;
+            string milestoneId = milestoneIdProperty != null && !string.IsNullOrWhiteSpace(milestoneIdProperty.stringValue)
+                ? milestoneIdProperty.stringValue.Trim()
+                : string.Empty;
+            float requiredPercentage = requiredPercentageProperty != null
+                ? requiredPercentageProperty.floatValue
+                : 0f;
+            enabledMilestoneCount++;
+
+            if (string.IsNullOrWhiteSpace(milestoneId))
+                warningLines.Add(string.Format("Enabled milestone #{0} should define a non-empty Milestone ID.", milestoneIndex + 1));
+            else if (!visitedMilestoneIds.Add(milestoneId))
+                warningLines.Add(string.Format("Milestone ID '{0}' is duplicated. Stable Add Scaling keys and reward-state labels can become ambiguous.", milestoneId));
+
+            if (float.IsNaN(requiredPercentage) ||
+                float.IsInfinity(requiredPercentage) ||
+                requiredPercentage < 0f ||
+                requiredPercentage > 100f)
+                warningLines.Add(string.Format("Milestone '{0}' should use a finite Required Progress Percent from 0 to 100.", string.IsNullOrWhiteSpace(milestoneId) ? "#" + (milestoneIndex + 1) : milestoneId));
+
+            if (requiredPercentage < previousPercentage)
+                warningLines.Add(string.Format("Milestone '{0}' should not require a lower percentage than the previous enabled milestone.", string.IsNullOrWhiteSpace(milestoneId) ? "#" + (milestoneIndex + 1) : milestoneId));
+            else if (usesRankDowngrade && requiredPercentage == previousPercentage)
+                warningLines.Add(string.Format("Milestone '{0}' shares its percentage with the previous enabled milestone. Downgrade To Previous Rank may skip an expected reward boundary.", string.IsNullOrWhiteSpace(milestoneId) ? "#" + (milestoneIndex + 1) : milestoneId));
+
+            previousPercentage = requiredPercentage;
+        }
+
+        if (enabledMilestoneCount <= 0)
+            warningLines.Add("No enabled bonus milestones are configured. The bar can still progress, but it cannot grant milestone rewards.");
+
+        if (usesRankDowngrade && enabledMilestoneCount < 2)
+            warningLines.Add("Downgrade To Previous Rank behaves like a full reset until at least two bonus milestones are enabled.");
+    }
+
+    /// <summary>
+    /// Applies a warning collection to a reusable help box.
+    /// </summary>
+    /// <param name="warningLines">Validated warning messages.</param>
+    /// <param name="warningBox">Warning help box refreshed in place.</param>
+    private static void ApplyWarnings(List<string> warningLines, HelpBox warningBox)
+    {
         if (warningLines.Count <= 0)
         {
             warningBox.text = string.Empty;
@@ -216,6 +404,21 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
 
         warningBox.text = string.Join("\n", warningLines);
         warningBox.style.display = DisplayStyle.Flex;
+    }
+
+    /// <summary>
+    /// Resolves the authored combo topology with a safe enum fallback.
+    /// </summary>
+    /// <param name="modeProperty">Serialized combo mode property.</param>
+    /// <returns>Resolved authored combo topology.</returns>
+    private static PlayerComboCounterMode ResolveMode(SerializedProperty modeProperty)
+    {
+        if (modeProperty != null &&
+            modeProperty.propertyType == SerializedPropertyType.Enum &&
+            modeProperty.enumValueIndex == (int)PlayerComboCounterMode.SingleRankProgression)
+            return PlayerComboCounterMode.SingleRankProgression;
+
+        return PlayerComboCounterMode.Ranks;
     }
 
     /// <summary>

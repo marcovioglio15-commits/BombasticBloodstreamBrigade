@@ -372,6 +372,7 @@ MonoBehaviour:
   equippedScheduleId: ScheduleRookie
   comboCounter:
     isEnabled: 1
+    mode: 0
     comboGainPerKill: 10
     damageBreakMode: 0
     shieldDamageBreaksCombo: 0
@@ -422,6 +423,13 @@ MonoBehaviour:
         formulas:
         - formula: '[InfinitePenetration]=true'
       passivePowerUpUnlocks: []
+    singleRankProgression:
+      rankId: SYNCHRO
+      maximumComboValue: 1500
+      pointsDecayPerSecond: 0
+      valueDisplayMode: 1
+      formulaDistributionMode: 0
+      bonusMilestones: []
   legacyExperienceRequiredPerLevel: 100
   levelCap: 100
   experiencePickupRadius: 1

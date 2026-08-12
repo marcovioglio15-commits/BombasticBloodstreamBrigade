@@ -114,6 +114,7 @@ internal static class PlayerRuntimeScalingApplyUtility
         uint currentHash = PlayerComboCounterRuntimeUtility.ComputeRuntimeScalingHash(effectiveBaseHash,
                                                                                      activeComboRankIndex,
                                                                                      comboCounterState.CurrentValue,
+                                                                                     in runtimeComboConfig,
                                                                                      runtimeComboRanks);
 
         if (!forceApply &&
@@ -124,7 +125,6 @@ internal static class PlayerRuntimeScalingApplyUtility
         }
 
         runtimeScalingState.Initialized = 1;
-        runtimeScalingState.LastScalableStatsHash = currentHash;
         PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats, effectiveScalableStats);
         PlayerRoomRewardTemporaryModifierUtility.ApplyActiveModifiers(temporaryModifiers,
                                                                       temporaryState.LastVisitOrdinal,
@@ -141,8 +141,14 @@ internal static class PlayerRuntimeScalingApplyUtility
         activeComboRankIndex = PlayerComboCounterRuntimeUtility.ResolveActiveRankIndex(comboCounterState.CurrentValue,
                                                                                       in runtimeComboConfig,
                                                                                       runtimeComboRanks);
+        runtimeScalingState.LastScalableStatsHash = PlayerComboCounterRuntimeUtility.ComputeRuntimeScalingHash(effectiveBaseHash,
+                                                                                                                activeComboRankIndex,
+                                                                                                                comboCounterState.CurrentValue,
+                                                                                                                in runtimeComboConfig,
+                                                                                                                runtimeComboRanks);
         PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(activeComboRankIndex,
                                                                           comboCounterState.CurrentValue,
+                                                                          in runtimeComboConfig,
                                                                           runtimeComboRanks,
                                                                           characterTuningFormulas,
                                                                           effectiveScalableStats);

@@ -3,7 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Centralizes combo-rank resolution, time-based decay, HUD presentation data, and runtime-scaling signatures.
-/// none.
 /// </summary>
 internal static class PlayerComboCounterRuntimeUtility
 {
@@ -43,10 +42,11 @@ internal static class PlayerComboCounterRuntimeUtility
         {
             PlayerRuntimeComboRankElement rankElement = runtimeRanks[rankIndex];
 
-            if (sanitizedComboValue < math.max(0, rankElement.RequiredComboValue))
-            {
+            if (rankElement.Mode != runtimeConfig.Mode || rankElement.Enabled == 0)
                 continue;
-            }
+
+            if (sanitizedComboValue < math.max(0, rankElement.RequiredComboValue))
+                continue;
 
             activeRankIndex = rankIndex;
         }
@@ -77,13 +77,23 @@ internal static class PlayerComboCounterRuntimeUtility
             return;
         }
 
-        if (!runtimeRanks.IsCreated || runtimeRanks.Length <= 0)
+        if (runtimeConfig.Mode == PlayerComboCounterMode.SingleRankProgression)
         {
+            comboCounterState.CurrentValue = math.min(sanitizedComboValue, math.max(0, runtimeConfig.SingleRankMaximumComboValue));
+            comboCounterState.CurrentRankIndex = comboCounterState.CurrentValue > 0 ? 0 : -1;
+            comboCounterState.CurrentRankId = runtimeConfig.SingleRankId;
+            comboCounterState.CurrentRankRequiredValue = 0;
+            comboCounterState.NextRankRequiredValue = math.max(0, runtimeConfig.SingleRankMaximumComboValue);
+            comboCounterState.ProgressNormalized = ResolveSingleRankProgressNormalized(comboCounterState.CurrentValue,
+                                                                                       runtimeConfig.SingleRankMaximumComboValue);
             return;
         }
 
+        if (!runtimeRanks.IsCreated || runtimeRanks.Length <= 0)
+            return;
+
         int activeRankIndex = ResolveActiveRankIndex(sanitizedComboValue, in runtimeConfig, runtimeRanks);
-        int nextRankIndex = ResolveNextRankIndex(sanitizedComboValue, runtimeRanks);
+        int nextRankIndex = ResolveNextRankIndex(sanitizedComboValue, runtimeConfig.Mode, runtimeRanks);
 
         if (activeRankIndex >= 0)
         {
@@ -119,6 +129,7 @@ internal static class PlayerComboCounterRuntimeUtility
         {
             case PlayerComboDamageBreakMode.DowngradeToPreviousRank:
                 return ResolvePreviousRankRequiredValue(ResolveActiveRankIndex(comboValue, in runtimeConfig, runtimeRanks),
+                                                        runtimeConfig.Mode,
                                                         runtimeRanks);
             default:
                 return 0;
@@ -144,7 +155,19 @@ internal static class PlayerComboCounterRuntimeUtility
             return;
         }
 
-        if (runtimeConfig.Enabled == 0 || !runtimeRanks.IsCreated || runtimeRanks.Length <= 0)
+        if (runtimeConfig.Enabled == 0)
+        {
+            comboCounterState.DecayPointsCarry = 0f;
+            return;
+        }
+
+        if (runtimeConfig.Mode == PlayerComboCounterMode.SingleRankProgression)
+        {
+            ApplySingleRankDecay(ref comboCounterState, in runtimeConfig, safeDeltaTime);
+            return;
+        }
+
+        if (!runtimeRanks.IsCreated || runtimeRanks.Length <= 0)
         {
             comboCounterState.DecayPointsCarry = 0f;
             return;
@@ -243,15 +266,24 @@ internal static class PlayerComboCounterRuntimeUtility
     /// <param name="scalableStatsHash">Hash built from permanent scalable stats.</param>
     /// <param name="activeRankIndex">Currently active combo-rank index, or -1 when no combo bonus is active.</param>
     /// <param name="comboValue">Current combo value used only when the next rank exposes progressive boost.</param>
+    /// <param name="runtimeConfig">Current combo mode and single-rank formula distribution settings.</param>
     /// <param name="runtimeRanks">Current runtime combo-rank thresholds and progressive boost settings.</param>
     /// <returns>Combined runtime-scaling signature.</returns>
     public static uint ComputeRuntimeScalingHash(uint scalableStatsHash,
                                                  int activeRankIndex,
                                                  int comboValue,
+                                                 in PlayerRuntimeComboCounterConfig runtimeConfig,
                                                  DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
     {
         uint baseHash = ComputeRuntimeScalingHash(scalableStatsHash, activeRankIndex);
-        int nextRankIndex = activeRankIndex + 1;
+
+        if (runtimeConfig.Mode == PlayerComboCounterMode.SingleRankProgression &&
+            runtimeConfig.SingleRankFormulaDistributionMode == PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression)
+        {
+            return math.hash(new uint2(baseHash, (uint)math.max(0, comboValue)));
+        }
+
+        int nextRankIndex = ResolveNextEntryIndex(activeRankIndex, runtimeConfig.Mode, runtimeRanks);
 
         if (!runtimeRanks.IsCreated || nextRankIndex < 0 || nextRankIndex >= runtimeRanks.Length)
         {
@@ -265,6 +297,60 @@ internal static class PlayerComboCounterRuntimeUtility
 
         uint progressSignature = (uint)math.max(0, comboValue);
         return math.hash(new uint2(baseHash, progressSignature));
+    }
+
+    /// <summary>
+    /// Resolves the integer combo threshold represented by one authored single-rank percentage milestone.
+    /// </summary>
+    /// <param name="maximumComboValue">Current single-rank progression maximum.</param>
+    /// <param name="requiredProgressPercent">Authored percentage required by the milestone.</param>
+    /// <returns>Safe integer threshold within the current single-rank progression range.</returns>
+    public static int ResolveSingleRankMilestoneRequiredValue(int maximumComboValue, float requiredProgressPercent)
+    {
+        int safeMaximum = math.max(0, maximumComboValue);
+        float safePercent = math.clamp(math.isfinite(requiredProgressPercent) ? requiredProgressPercent : 0f, 0f, 100f);
+        return (int)math.round(safeMaximum * safePercent * 0.01f);
+    }
+
+    /// <summary>
+    /// Resolves continuous progress across the complete single-rank range.
+    /// </summary>
+    /// <param name="comboValue">Current combo numeric value.</param>
+    /// <param name="maximumComboValue">Combo value that completes the progression.</param>
+    /// <returns>Normalized single-rank progress in the 0..1 range.</returns>
+    public static float ResolveSingleRankProgressNormalized(int comboValue, int maximumComboValue)
+    {
+        int safeMaximum = math.max(0, maximumComboValue);
+
+        if (safeMaximum <= 0)
+            return 0f;
+
+        return math.saturate((float)math.max(0, comboValue) / safeMaximum);
+    }
+
+    /// <summary>
+    /// Counts enabled reward entries belonging to one combo topology.
+    /// </summary>
+    /// <param name="mode">Combo topology whose entries should be counted.</param>
+    /// <param name="runtimeRanks">Combined runtime rank and milestone buffer.</param>
+    /// <returns>Number of enabled entries owned by the requested topology.</returns>
+    public static int CountEnabledEntries(PlayerComboCounterMode mode,
+                                          DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
+    {
+        if (!runtimeRanks.IsCreated)
+            return 0;
+
+        int count = 0;
+
+        for (int entryIndex = 0; entryIndex < runtimeRanks.Length; entryIndex++)
+        {
+            PlayerRuntimeComboRankElement entry = runtimeRanks[entryIndex];
+
+            if (entry.Mode == mode && entry.Enabled != 0)
+                count += 1;
+        }
+
+        return count;
     }
 
     /// <summary>
@@ -313,16 +399,20 @@ internal static class PlayerComboCounterRuntimeUtility
     /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
     /// <returns>Next unreached rank index, or -1 when the top rank is already active.</returns>
     private static int ResolveNextRankIndex(int comboValue,
+                                            PlayerComboCounterMode mode,
                                             DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
     {
         int sanitizedComboValue = math.max(0, comboValue);
 
         for (int rankIndex = 0; rankIndex < runtimeRanks.Length; rankIndex++)
         {
-            if (sanitizedComboValue >= math.max(0, runtimeRanks[rankIndex].RequiredComboValue))
-            {
+            PlayerRuntimeComboRankElement rank = runtimeRanks[rankIndex];
+
+            if (rank.Mode != mode || rank.Enabled == 0)
                 continue;
-            }
+
+            if (sanitizedComboValue >= math.max(0, rank.RequiredComboValue))
+                continue;
 
             return rankIndex;
         }
@@ -337,21 +427,48 @@ internal static class PlayerComboCounterRuntimeUtility
     /// <param name="runtimeRanks">Current runtime combo-rank thresholds.</param>
     /// <returns>Previous-rank threshold, or zero when no lower rank exists.</returns>
     private static int ResolvePreviousRankRequiredValue(int activeRankIndex,
+                                                        PlayerComboCounterMode mode,
                                                         DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
     {
         if (!runtimeRanks.IsCreated || activeRankIndex <= 0)
-        {
             return 0;
+
+        for (int previousRankIndex = math.min(activeRankIndex - 1, runtimeRanks.Length - 1);
+             previousRankIndex >= 0;
+             previousRankIndex--)
+        {
+            PlayerRuntimeComboRankElement previousRank = runtimeRanks[previousRankIndex];
+
+            if (previousRank.Mode == mode && previousRank.Enabled != 0)
+                return math.max(0, previousRank.RequiredComboValue);
         }
 
-        int previousRankIndex = activeRankIndex - 1;
+        return 0;
+    }
 
-        if (previousRankIndex >= runtimeRanks.Length)
+    /// <summary>
+    /// Resolves the next enabled buffer entry belonging to the requested combo topology.
+    /// </summary>
+    /// <param name="activeEntryIndex">Current absolute buffer index, or -1 before the first entry.</param>
+    /// <param name="mode">Combo topology whose next entry should be resolved.</param>
+    /// <param name="runtimeRanks">Combined runtime rank and milestone buffer.</param>
+    /// <returns>Next absolute buffer index, or -1 when no later matching entry exists.</returns>
+    private static int ResolveNextEntryIndex(int activeEntryIndex,
+                                             PlayerComboCounterMode mode,
+                                             DynamicBuffer<PlayerRuntimeComboRankElement> runtimeRanks)
+    {
+        if (!runtimeRanks.IsCreated)
+            return -1;
+
+        for (int entryIndex = math.max(0, activeEntryIndex + 1); entryIndex < runtimeRanks.Length; entryIndex++)
         {
-            return 0;
+            PlayerRuntimeComboRankElement entry = runtimeRanks[entryIndex];
+
+            if (entry.Mode == mode && entry.Enabled != 0)
+                return entryIndex;
         }
 
-        return math.max(0, runtimeRanks[previousRankIndex].RequiredComboValue);
+        return -1;
     }
 
     /// <summary>
@@ -404,12 +521,51 @@ internal static class PlayerComboCounterRuntimeUtility
         }
 
         if (!runtimeRanks.IsCreated || activeRankIndex <= 0 || activeRankIndex >= runtimeRanks.Length)
-        {
             return false;
+
+        for (int previousRankIndex = activeRankIndex - 1; previousRankIndex >= 0; previousRankIndex--)
+        {
+            PlayerRuntimeComboRankElement previousRank = runtimeRanks[previousRankIndex];
+
+            if (previousRank.Mode != runtimeConfig.Mode || previousRank.Enabled == 0)
+                continue;
+
+            return previousRank.PointsDecayPerSecond <= 0f;
         }
 
-        PlayerRuntimeComboRankElement previousRank = runtimeRanks[activeRankIndex - 1];
-        return previousRank.PointsDecayPerSecond <= 0f;
+        return false;
+    }
+
+    /// <summary>
+    /// Applies continuous single-rank point decay while preserving fractional loss between simulation ticks.
+    /// </summary>
+    /// <param name="comboCounterState">Mutable combo state receiving the decayed value and fractional carry.</param>
+    /// <param name="runtimeConfig">Current single-rank maximum and decay rate.</param>
+    /// <param name="deltaTime">Safe positive simulation delta time.</param>
+    private static void ApplySingleRankDecay(ref PlayerComboCounterState comboCounterState,
+                                             in PlayerRuntimeComboCounterConfig runtimeConfig,
+                                             float deltaTime)
+    {
+        int currentValue = math.min(math.max(0, comboCounterState.CurrentValue),
+                                    math.max(0, runtimeConfig.SingleRankMaximumComboValue));
+        float pointsDecayPerSecond = math.max(0f, runtimeConfig.SingleRankPointsDecayPerSecond);
+
+        if (currentValue <= 0 || pointsDecayPerSecond <= 0f)
+        {
+            comboCounterState.CurrentValue = currentValue;
+            comboCounterState.DecayPointsCarry = 0f;
+            return;
+        }
+
+        float totalDecayPoints = math.clamp(comboCounterState.DecayPointsCarry, 0f, MaximumStoredDecayCarry) +
+                                 pointsDecayPerSecond * deltaTime;
+        int wholeDecayPoints = totalDecayPoints >= int.MaxValue
+            ? int.MaxValue
+            : (int)math.floor(totalDecayPoints);
+        comboCounterState.CurrentValue = math.max(0, currentValue - wholeDecayPoints);
+        comboCounterState.DecayPointsCarry = comboCounterState.CurrentValue > 0
+            ? totalDecayPoints - wholeDecayPoints
+            : 0f;
     }
 
     /// <summary>

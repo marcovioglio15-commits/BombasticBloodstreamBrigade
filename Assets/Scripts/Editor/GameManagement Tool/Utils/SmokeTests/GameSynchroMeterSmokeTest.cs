@@ -55,6 +55,14 @@ public static class GameSynchroMeterSmokeTest
             SetFloat(serializedPreset, "synchroMeterSettings.lowestRankPhaseOffsetNormalized", 0.6f);
             SetFloat(serializedPreset, "synchroMeterSettings.highestRankPhaseOffsetNormalized", 0.05f);
             SetFloat(serializedPreset, "synchroMeterSettings.phaseOffsetResponseExponent", 1.8f);
+            SetBool(serializedPreset, "synchroMeterSettings.singleRankAccelerateWavesWithProgress", true);
+            SetFloat(serializedPreset, "synchroMeterSettings.singleRankMaximumWaveScrollCyclesPerSecond", 0.82f);
+            SetEnum(serializedPreset, "synchroMeterSettings.singleRankConvergenceMode", (int)GameHudSynchroSingleRankConvergenceMode.Steps);
+            SetFloat(serializedPreset, "synchroMeterSettings.singleRankInitialPhaseOffsetNormalized", 0.48f);
+            SetFloat(serializedPreset, "synchroMeterSettings.singleRankFinalPhaseOffsetNormalized", 0f);
+            SetFloat(serializedPreset, "synchroMeterSettings.singleRankConvergenceStartProgressPercent", 10f);
+            SetFloat(serializedPreset, "synchroMeterSettings.singleRankConvergenceEndProgressPercent", 90f);
+            SetInteger(serializedPreset, "synchroMeterSettings.singleRankConvergenceStepCount", 4);
             SetFloat(serializedPreset, "synchroMeterSettings.phaseTransitionDuration", 0.42f);
             SetFloat(serializedPreset, "synchroMeterSettings.progressSmoothingSeconds", 0.16f);
             SetColor(serializedPreset, "synchroMeterSettings.progressFillTint", new Color(0.2f, 0.4f, 0.8f, 0.9f));
@@ -69,6 +77,14 @@ public static class GameSynchroMeterSmokeTest
                 Mathf.Abs(config.SynchroLowestRankPhaseOffsetNormalized - 0.6f) > PrecisionEpsilon ||
                 Mathf.Abs(config.SynchroHighestRankPhaseOffsetNormalized - 0.05f) > PrecisionEpsilon ||
                 Mathf.Abs(config.SynchroPhaseOffsetResponseExponent - 1.8f) > PrecisionEpsilon ||
+                config.SynchroSingleRankAccelerateWavesWithProgress == 0 ||
+                Mathf.Abs(config.SynchroSingleRankMaximumWaveScrollCyclesPerSecond - 0.82f) > PrecisionEpsilon ||
+                config.SynchroSingleRankConvergenceMode != GameHudSynchroSingleRankConvergenceMode.Steps ||
+                Mathf.Abs(config.SynchroSingleRankInitialPhaseOffsetNormalized - 0.48f) > PrecisionEpsilon ||
+                Mathf.Abs(config.SynchroSingleRankFinalPhaseOffsetNormalized) > PrecisionEpsilon ||
+                Mathf.Abs(config.SynchroSingleRankConvergenceStartProgressPercent - 10f) > PrecisionEpsilon ||
+                Mathf.Abs(config.SynchroSingleRankConvergenceEndProgressPercent - 90f) > PrecisionEpsilon ||
+                config.SynchroSingleRankConvergenceStepCount != 4 ||
                 Mathf.Abs(config.SynchroPhaseTransitionDuration - 0.42f) > PrecisionEpsilon ||
                 Mathf.Abs(config.SynchroProgressSmoothingSeconds - 0.16f) > PrecisionEpsilon ||
                 math.distance(config.SynchroProgressFillTint, new float4(0.2f, 0.4f, 0.8f, 0.9f)) > PrecisionEpsilon ||
@@ -104,6 +120,21 @@ public static class GameSynchroMeterSmokeTest
         float firstRankOffset = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(0, 5, 0.4f, 0f, 1f);
         float middleRankOffset = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(2, 5, 0.4f, 0f, 1f);
         float maximumRankOffset = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(4, 5, 0.4f, 0f, 1f);
+        float linearSingleRankOffset = HUDSynchroMeterWaveUtility.ResolveSingleRankPhaseOffset(0.5f,
+                                                                                              0.4f,
+                                                                                              0f,
+                                                                                              0f,
+                                                                                              100f,
+                                                                                              GameHudSynchroSingleRankConvergenceMode.Linear,
+                                                                                              4);
+        float steppedSingleRankOffset = HUDSynchroMeterWaveUtility.ResolveSingleRankPhaseOffset(0.74f,
+                                                                                                0.4f,
+                                                                                                0f,
+                                                                                                0f,
+                                                                                                100f,
+                                                                                                GameHudSynchroSingleRankConvergenceMode.Steps,
+                                                                                                4);
+        float acceleratedScroll = HUDSynchroMeterWaveUtility.ResolveSingleRankScrollCycles(0.1f, 0.5f, 0.5f, true);
         float wrappedScroll = HUDSynchroMeterWaveUtility.AdvanceScroll(0.95f, 0.1f, 1f);
         float initializedProgress = HUDSynchroMeterPresentationUtility.AdvanceProgress(float.MinValue, 0.65f, 0.5f, 0.1f);
         float smoothedProgress = HUDSynchroMeterPresentationUtility.AdvanceProgress(0.1f, 1f, 1f, 0.2f);
@@ -111,6 +142,9 @@ public static class GameSynchroMeterSmokeTest
         if (Mathf.Abs(firstRankOffset - 0.4f) > PrecisionEpsilon ||
             Mathf.Abs(middleRankOffset - 0.2f) > PrecisionEpsilon ||
             Mathf.Abs(maximumRankOffset) > PrecisionEpsilon ||
+            Mathf.Abs(linearSingleRankOffset - 0.2f) > PrecisionEpsilon ||
+            Mathf.Abs(steppedSingleRankOffset - 0.2f) > PrecisionEpsilon ||
+            Mathf.Abs(acceleratedScroll - 0.3f) > PrecisionEpsilon ||
             Mathf.Abs(wrappedScroll - 0.05f) > PrecisionEpsilon ||
             Mathf.Abs(initializedProgress - 0.65f) > PrecisionEpsilon ||
             Mathf.Abs(smoothedProgress - 0.3f) > PrecisionEpsilon)
@@ -280,6 +314,38 @@ public static class GameSynchroMeterSmokeTest
             throw new Exception("Missing serialized Synchro Meter property: " + propertyPath);
 
         property.boolValue = value;
+    }
+
+    /// <summary>
+    /// Assigns one enum field through its complete serialized property path.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object owning the field.</param>
+    /// <param name="propertyPath">Complete private field path.</param>
+    /// <param name="value">Enum index assigned to the field.</param>
+    private static void SetEnum(SerializedObject serializedObject, string propertyPath, int value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyPath);
+
+        if (property == null)
+            throw new Exception("Missing serialized Synchro Meter property: " + propertyPath);
+
+        property.enumValueIndex = value;
+    }
+
+    /// <summary>
+    /// Assigns one integer field through its complete serialized property path.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object owning the field.</param>
+    /// <param name="propertyPath">Complete private field path.</param>
+    /// <param name="value">Integer assigned to the field.</param>
+    private static void SetInteger(SerializedObject serializedObject, string propertyPath, int value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyPath);
+
+        if (property == null)
+            throw new Exception("Missing serialized Synchro Meter property: " + propertyPath);
+
+        property.intValue = value;
     }
 
     /// <summary>

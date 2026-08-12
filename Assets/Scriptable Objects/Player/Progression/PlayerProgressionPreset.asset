@@ -379,6 +379,7 @@ MonoBehaviour:
   equippedScheduleId: ScheduleRookie
   comboCounter:
     isEnabled: 1
+    mode: 1
     comboGainPerKill: 10
     damageBreakMode: 0
     shieldDamageBreaksCombo: 0
@@ -429,6 +430,53 @@ MonoBehaviour:
         formulas:
         - formula: '[InfinitePenetration]=true'
       passivePowerUpUnlocks: []
+    singleRankProgression:
+      rankId: SYNCHRO
+      maximumComboValue: 1500
+      pointsDecayPerSecond: 2
+      valueDisplayMode: 1
+      formulaDistributionMode: 1
+      bonusMilestones:
+      - milestoneId: D
+        isEnabled: 1
+        requiredProgressPercent: 6.666667
+        bonuses:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[GatheringRadius]=[GatheringRadius]*1.2'
+        passivePowerUpUnlocks: []
+      - milestoneId: C
+        isEnabled: 1
+        requiredProgressPercent: 16.666666
+        bonuses:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[MovementSpeed]=[MovementSpeed]*1.2'
+        passivePowerUpUnlocks: []
+      - milestoneId: B
+        isEnabled: 1
+        requiredProgressPercent: 33.333332
+        bonuses:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[ShotRange]=[ShotRange]*1.2'
+        passivePowerUpUnlocks: []
+      - milestoneId: A
+        isEnabled: 1
+        requiredProgressPercent: 66.666664
+        bonuses:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[FireRate]=[FireRate]*1.2'
+        passivePowerUpUnlocks: []
+      - milestoneId: S
+        isEnabled: 1
+        requiredProgressPercent: 100
+        bonuses:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas:
+          - formula: '[InfinitePenetration]=true'
+        passivePowerUpUnlocks: []
   legacyExperienceRequiredPerLevel: 100
   levelCap: 100
   experiencePickupRadius: 1

@@ -174,6 +174,7 @@ internal static class HUDMilestoneSkipConfirmationRuntimeUtility
                                                                                           comboRanks);
             PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(activeRankIndex,
                                                                               comboState.CurrentValue,
+                                                                              in comboConfig,
                                                                               comboRanks,
                                                                               entityManager.GetBuffer<PlayerPowerUpCharacterTuningFormulaElement>(playerEntity),
                                                                               EffectiveScalableStats);

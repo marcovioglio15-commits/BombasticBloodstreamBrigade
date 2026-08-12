@@ -362,6 +362,14 @@ public sealed class HUDManager : MonoBehaviour
                Mathf.Approximately(left.SynchroLowestRankPhaseOffsetNormalized, right.SynchroLowestRankPhaseOffsetNormalized) &&
                Mathf.Approximately(left.SynchroHighestRankPhaseOffsetNormalized, right.SynchroHighestRankPhaseOffsetNormalized) &&
                Mathf.Approximately(left.SynchroPhaseOffsetResponseExponent, right.SynchroPhaseOffsetResponseExponent) &&
+               left.SynchroSingleRankAccelerateWavesWithProgress == right.SynchroSingleRankAccelerateWavesWithProgress &&
+               Mathf.Approximately(left.SynchroSingleRankMaximumWaveScrollCyclesPerSecond, right.SynchroSingleRankMaximumWaveScrollCyclesPerSecond) &&
+               left.SynchroSingleRankConvergenceMode == right.SynchroSingleRankConvergenceMode &&
+               Mathf.Approximately(left.SynchroSingleRankInitialPhaseOffsetNormalized, right.SynchroSingleRankInitialPhaseOffsetNormalized) &&
+               Mathf.Approximately(left.SynchroSingleRankFinalPhaseOffsetNormalized, right.SynchroSingleRankFinalPhaseOffsetNormalized) &&
+               Mathf.Approximately(left.SynchroSingleRankConvergenceStartProgressPercent, right.SynchroSingleRankConvergenceStartProgressPercent) &&
+               Mathf.Approximately(left.SynchroSingleRankConvergenceEndProgressPercent, right.SynchroSingleRankConvergenceEndProgressPercent) &&
+               left.SynchroSingleRankConvergenceStepCount == right.SynchroSingleRankConvergenceStepCount &&
                Mathf.Approximately(left.SynchroPhaseTransitionDuration, right.SynchroPhaseTransitionDuration) &&
                left.SynchroUseUnscaledTime == right.SynchroUseUnscaledTime &&
                Mathf.Approximately(left.SynchroProgressSmoothingSeconds, right.SynchroProgressSmoothingSeconds) &&

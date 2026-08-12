@@ -3,7 +3,6 @@ using Unity.Mathematics;
 
 /// <summary>
 /// Tracks consecutive enemy kills, rank-based point decay, and the configured damage-break behavior when the player is hit.
-/// none.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerPowerUpCharacterTuningInitializeSystem))]
@@ -93,7 +92,7 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
         if (comboCounterState.Initialized == 0)
         {
-            comboCounterState.CurrentValue = math.max(0, comboCounterState.CurrentValue);
+            comboCounterState.CurrentValue = ResolveCappedComboValue(comboCounterState.CurrentValue, in runtimeComboConfig);
             comboCounterState.DecayPointsCarry = 0f;
             comboCounterState.GainPointsCarry = gainPointsCarry;
             comboCounterState.PreviousObservedHealth = currentHealth;
@@ -104,7 +103,7 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
         bool healthDamageTaken = currentHealth + DamageComparisonEpsilon < comboCounterState.PreviousObservedHealth;
         bool shieldDamageTaken = currentShield + DamageComparisonEpsilon < comboCounterState.PreviousObservedShield;
-        int currentComboValue = math.max(0, comboCounterState.CurrentValue);
+        int currentComboValue = ResolveCappedComboValue(comboCounterState.CurrentValue, in runtimeComboConfig);
         float decayPointsCarry = math.max(0f, comboCounterState.DecayPointsCarry);
 
         if (runtimeComboConfig.Enabled == 0 || runtimeComboConfig.ComboGainPerKill <= 0 || currentHealth <= 0f)
@@ -146,6 +145,13 @@ public partial struct PlayerComboCounterValueSystem : ISystem
                                                 runtimeComboConfig.ComboGainPerKill,
                                                 killedEnemyGainMultiplierSum,
                                                 ref gainPointsCarry);
+                currentComboValue = ResolveCappedComboValue(currentComboValue, in runtimeComboConfig);
+
+                if (runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression &&
+                    currentComboValue >= math.max(0, runtimeComboConfig.SingleRankMaximumComboValue))
+                {
+                    gainPointsCarry = 0f;
+                }
             }
         }
 
@@ -208,6 +214,23 @@ public partial struct PlayerComboCounterValueSystem : ISystem
 
         gainPointsCarry = totalGainPoints - wholeGainPoints;
         return (int)resolvedValue;
+    }
+
+    /// <summary>
+    /// Clamps combo state to non-negative range and enforces the authored single-rank progression maximum.
+    /// </summary>
+    /// <param name="comboValue">Raw combo value to constrain.</param>
+    /// <param name="runtimeComboConfig">Current combo topology and progression maximum.</param>
+    /// <returns>Safe combo value accepted by the active topology.</returns>
+    private static int ResolveCappedComboValue(int comboValue,
+                                               in PlayerRuntimeComboCounterConfig runtimeComboConfig)
+    {
+        int safeValue = math.max(0, comboValue);
+
+        if (runtimeComboConfig.Mode != PlayerComboCounterMode.SingleRankProgression)
+            return safeValue;
+
+        return math.min(safeValue, math.max(0, runtimeComboConfig.SingleRankMaximumComboValue));
     }
     #endregion
 

@@ -113,6 +113,32 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [Tooltip("Exponent shaping wave convergence across rank indices.")]
     [SerializeField] private float phaseOffsetResponseExponent = 1f;
 
+    [Header("Single Rank Wave Animation")]
+    [Tooltip("Increases both wave scroll rates linearly while Single Rank Progression advances.")]
+    [SerializeField] private bool singleRankAccelerateWavesWithProgress = true;
+
+    [Tooltip("Wave-image tile cycles per second reached at full Single Rank Progression when acceleration is enabled.")]
+    [SerializeField] private float singleRankMaximumWaveScrollCyclesPerSecond = 0.3f;
+
+    [Tooltip("Controls whether Single Rank Progression converges the two waves continuously or through equal progression steps.")]
+    [SerializeField] private GameHudSynchroSingleRankConvergenceMode singleRankConvergenceMode;
+
+    [Tooltip("Normalized wave separation used before Single Rank Progression convergence starts.")]
+    [SerializeField] private float singleRankInitialPhaseOffsetNormalized = 0.25f;
+
+    [Tooltip("Normalized wave separation reached after Single Rank Progression convergence ends. Use 0 for complete overlap.")]
+    [SerializeField] private float singleRankFinalPhaseOffsetNormalized;
+
+    [Tooltip("Single Rank Progression percentage at which wave convergence starts.")]
+    [SerializeField] private float singleRankConvergenceStartProgressPercent;
+
+    [Tooltip("Single Rank Progression percentage at which wave convergence ends.")]
+    [SerializeField] private float singleRankConvergenceEndProgressPercent = 100f;
+
+    [Tooltip("Number of equal convergence intervals used when Single Rank Progression selects Steps mode.")]
+    [SerializeField] private int singleRankConvergenceStepCount = 5;
+
+    [Header("Shared Wave Animation")]
     [Tooltip("Seconds used to blend the secondary wave toward the phase required by a new rank.")]
     [SerializeField] private float phaseTransitionDuration = 0.3f;
 
@@ -143,8 +169,11 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     #endregion
 
     private int displayedValue = int.MinValue;
+    private int displayedMaximumValue = int.MinValue;
+    private PlayerComboSingleRankValueDisplayMode displayedValueMode = (PlayerComboSingleRankValueDisplayMode)byte.MaxValue;
     private string displayedRankLabel = string.Empty;
     private float scrollPhaseNormalized;
+    private float currentWaveScrollCyclesPerSecond;
     private float currentWaveOffsetNormalized;
     private float targetWaveOffsetNormalized;
     private float currentVisibilityAlpha;
@@ -184,6 +213,14 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         lowestRankPhaseOffsetNormalized = config.SynchroLowestRankPhaseOffsetNormalized;
         highestRankPhaseOffsetNormalized = config.SynchroHighestRankPhaseOffsetNormalized;
         phaseOffsetResponseExponent = config.SynchroPhaseOffsetResponseExponent;
+        singleRankAccelerateWavesWithProgress = config.SynchroSingleRankAccelerateWavesWithProgress != 0;
+        singleRankMaximumWaveScrollCyclesPerSecond = config.SynchroSingleRankMaximumWaveScrollCyclesPerSecond;
+        singleRankConvergenceMode = config.SynchroSingleRankConvergenceMode;
+        singleRankInitialPhaseOffsetNormalized = config.SynchroSingleRankInitialPhaseOffsetNormalized;
+        singleRankFinalPhaseOffsetNormalized = config.SynchroSingleRankFinalPhaseOffsetNormalized;
+        singleRankConvergenceStartProgressPercent = config.SynchroSingleRankConvergenceStartProgressPercent;
+        singleRankConvergenceEndProgressPercent = config.SynchroSingleRankConvergenceEndProgressPercent;
+        singleRankConvergenceStepCount = config.SynchroSingleRankConvergenceStepCount;
         phaseTransitionDuration = config.SynchroPhaseTransitionDuration;
         useUnscaledTime = config.SynchroUseUnscaledTime != 0;
         progressSmoothingSeconds = config.SynchroProgressSmoothingSeconds;
@@ -193,6 +230,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         fadeInDuration = config.SynchroFadeInDuration;
         fadeOutDuration = config.SynchroFadeOutDuration;
         idleRankLabel = config.SynchroIdleRankLabel.ToString();
+        currentWaveScrollCyclesPerSecond = waveScrollCyclesPerSecond;
         ApplyTheme();
         wavePhaseInitialized = false;
     }
@@ -215,6 +253,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         ApplyTheme();
         targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.SanitizeNormalizedPhase(lowestRankPhaseOffsetNormalized, 0.25f);
         currentWaveOffsetNormalized = targetWaveOffsetNormalized;
+        currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.SanitizeNonNegative(waveScrollCyclesPerSecond, 0.12f);
         wavePhaseInitialized = true;
         ApplyWaveTransforms();
 
@@ -280,18 +319,44 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         if (hideWhenZeroValue && comboCounterState.CurrentValue <= 0)
             shouldBeVisible = false;
 
-        // Recompute phase only from rank topology; per-frame combo progress does not destabilize wave alignment.
-        int rankCount = ResolveRuntimeRankCount(runtimeEntityManager, playerEntity, comboCounterState.CurrentRankIndex);
-        targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(comboCounterState.CurrentRankIndex,
-                                                                                      rankCount,
-                                                                                      lowestRankPhaseOffsetNormalized,
-                                                                                      highestRankPhaseOffsetNormalized,
-                                                                                      phaseOffsetResponseExponent);
+        targetProgressNormalized = Mathf.Clamp01(comboCounterState.ProgressNormalized);
+
+        // Select topology-specific phase and scroll behavior from authoritative combo configuration.
+        if (runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression)
+        {
+            targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.ResolveSingleRankPhaseOffset(targetProgressNormalized,
+                                                                                                  singleRankInitialPhaseOffsetNormalized,
+                                                                                                  singleRankFinalPhaseOffsetNormalized,
+                                                                                                  singleRankConvergenceStartProgressPercent,
+                                                                                                  singleRankConvergenceEndProgressPercent,
+                                                                                                  singleRankConvergenceMode,
+                                                                                                  singleRankConvergenceStepCount);
+            currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.ResolveSingleRankScrollCycles(waveScrollCyclesPerSecond,
+                                                                                                        singleRankMaximumWaveScrollCyclesPerSecond,
+                                                                                                        targetProgressNormalized,
+                                                                                                        singleRankAccelerateWavesWithProgress);
+        }
+        else
+        {
+            int rankCount = HUDComboCounterRuntimePresentationUtility.ResolveRankCount(runtimeEntityManager,
+                                                                                        playerEntity,
+                                                                                        comboCounterState.CurrentRankIndex,
+                                                                                        runtimeComboConfig.Mode);
+            targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.ResolveRankPhaseOffset(comboCounterState.CurrentRankIndex,
+                                                                                          rankCount,
+                                                                                          lowestRankPhaseOffsetNormalized,
+                                                                                          highestRankPhaseOffsetNormalized,
+                                                                                          phaseOffsetResponseExponent);
+            currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.SanitizeNonNegative(waveScrollCyclesPerSecond, 0.12f);
+        }
 
         if (shouldBeVisible)
-            ApplyVisibleText(comboCounterState.CurrentValue, comboCounterState.CurrentRankId);
-
-        targetProgressNormalized = Mathf.Clamp01(comboCounterState.ProgressNormalized);
+            ApplyVisibleText(comboCounterState.CurrentValue,
+                             comboCounterState.CurrentRankId,
+                             runtimeComboConfig.SingleRankMaximumComboValue,
+                             runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression
+                                 ? runtimeComboConfig.SingleRankValueDisplayMode
+                                 : PlayerComboSingleRankValueDisplayMode.CurrentValue);
 
         RequestVisibility(shouldBeVisible, false);
         AdvancePresentation(ResolveDeltaTime());
@@ -304,7 +369,12 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     /// </summary>
     /// <param name="value">Current authoritative combo value presented as synchro intensity.</param>
     /// <param name="rankId">Current authoritative combo-rank identifier.</param>
-    private void ApplyVisibleText(int value, FixedString64Bytes rankId)
+    /// <param name="maximumValue">Maximum value shown by Current And Maximum mode.</param>
+    /// <param name="valueDisplayMode">Single-rank numeric label format.</param>
+    private void ApplyVisibleText(int value,
+                                  FixedString64Bytes rankId,
+                                  int maximumValue,
+                                  PlayerComboSingleRankValueDisplayMode valueDisplayMode)
     {
         string resolvedRankLabel = rankId.Length > 0 ? rankId.ToString() : ResolveIdleRankLabel();
 
@@ -314,10 +384,25 @@ public sealed class HUDComboCounterSection : MonoBehaviour
             displayedRankLabel = resolvedRankLabel;
         }
 
-        if (valueText != null && displayedValue != value)
+        if (valueText != null &&
+            (displayedValue != value ||
+             displayedMaximumValue != maximumValue ||
+             displayedValueMode != valueDisplayMode))
         {
-            valueText.SetText("{0}", value);
+            switch (valueDisplayMode)
+            {
+                case PlayerComboSingleRankValueDisplayMode.CurrentAndMaximum:
+                    valueText.SetText("{0}/{1}", value, maximumValue);
+                    break;
+
+                default:
+                    valueText.SetText("{0}", value);
+                    break;
+            }
+
             displayedValue = value;
+            displayedMaximumValue = maximumValue;
+            displayedValueMode = valueDisplayMode;
         }
     }
 
@@ -326,8 +411,9 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     /// </summary>
     private void ApplyFallbackVisibleState()
     {
-        ApplyVisibleText(0, default);
+        ApplyVisibleText(0, default, 0, PlayerComboSingleRankValueDisplayMode.CurrentValue);
         targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.SanitizeNormalizedPhase(lowestRankPhaseOffsetNormalized, 0.25f);
+        currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.SanitizeNonNegative(waveScrollCyclesPerSecond, 0.12f);
     }
 
     /// <summary>
@@ -356,7 +442,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
                                                                               phaseTransitionDuration,
                                                                               deltaTime);
         scrollPhaseNormalized = HUDSynchroMeterWaveUtility.AdvanceScroll(scrollPhaseNormalized,
-                                                                         waveScrollCyclesPerSecond,
+                                                                         currentWaveScrollCyclesPerSecond,
                                                                          deltaTime);
         ApplyWaveTransforms();
     }
@@ -553,23 +639,6 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves the number of runtime ranks used to normalize phase convergence.
-    /// </summary>
-    /// <param name="runtimeEntityManager">Entity manager owning the player rank buffer.</param>
-    /// <param name="playerEntity">Player entity driving the meter.</param>
-    /// <param name="currentRankIndex">Current rank index used as a safe fallback.</param>
-    /// <returns>Available runtime rank count, or a positive fallback derived from the current rank.</returns>
-    private static int ResolveRuntimeRankCount(EntityManager runtimeEntityManager,
-                                               Entity playerEntity,
-                                               int currentRankIndex)
-    {
-        if (runtimeEntityManager.HasBuffer<PlayerRuntimeComboRankElement>(playerEntity))
-            return Mathf.Max(1, runtimeEntityManager.GetBuffer<PlayerRuntimeComboRankElement>(playerEntity, true).Length);
-
-        return Mathf.Max(1, currentRankIndex + 1);
-    }
-
-    /// <summary>
     /// Selects scaled or unscaled frame time according to the baked HUD setting.
     /// </summary>
     /// <returns>Selected Unity frame delta time.</returns>
@@ -593,6 +662,8 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     private void ResetCachedPresentationState()
     {
         displayedValue = int.MinValue;
+        displayedMaximumValue = int.MinValue;
+        displayedValueMode = (PlayerComboSingleRankValueDisplayMode)byte.MaxValue;
         displayedRankLabel = string.Empty;
         displayedProgressNormalized = float.MinValue;
         targetProgressNormalized = 0f;

@@ -63,6 +63,7 @@ internal static class PlayerRuntimeScalingFormulaContextUtility
                                                                                           comboRanks);
             PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(activeRankIndex,
                                                                               comboState.CurrentValue,
+                                                                              in comboConfig,
                                                                               comboRanks,
                                                                               characterTuningLookup[entity],
                                                                               effectiveScalableStats);

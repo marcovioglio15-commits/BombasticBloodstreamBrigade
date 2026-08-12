@@ -4,7 +4,6 @@ using UnityEngine;
 
 /// <summary>
 /// Describes how the combo reacts after a damage event configured to break it.
-/// none.
 /// </summary>
 public enum PlayerComboDamageBreakMode : byte
 {
@@ -14,7 +13,6 @@ public enum PlayerComboDamageBreakMode : byte
 
 /// <summary>
 /// Stores authored combo-counter rules used by progression presets to grant temporary rank-based bonuses.
-/// none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboCounterDefinition
@@ -25,6 +23,9 @@ public sealed class PlayerComboCounterDefinition
     [Header("Runtime")]
     [Tooltip("Enables combo accumulation, rank evaluation, and temporary combo bonuses for this progression preset.")]
     [SerializeField] private bool isEnabled = true;
+
+    [Tooltip("Selects traditional multi-rank progression or one continuous rank with percentage-based bonus milestones.")]
+    [SerializeField] private PlayerComboCounterMode mode;
 
     [Tooltip("Amount added to the combo counter every time one enemy is killed while the combo remains unbroken.")]
     [SerializeField] private int comboGainPerKill = 1;
@@ -41,6 +42,10 @@ public sealed class PlayerComboCounterDefinition
     [Header("Ranks")]
     [Tooltip("Ordered rank milestones used to resolve the active combo rank and its temporary Character Tuning bonuses.")]
     [SerializeField] private List<PlayerComboRankDefinition> rankDefinitions = new List<PlayerComboRankDefinition>();
+
+    [Header("Single Rank Progression")]
+    [Tooltip("Continuous progression settings used only when Mode is Single Rank Progression.")]
+    [SerializeField] private PlayerComboSingleRankDefinition singleRankProgression = new PlayerComboSingleRankDefinition();
     #endregion
 
     #endregion
@@ -59,6 +64,14 @@ public sealed class PlayerComboCounterDefinition
         get
         {
             return comboGainPerKill;
+        }
+    }
+
+    public PlayerComboCounterMode Mode
+    {
+        get
+        {
+            return mode;
         }
     }
 
@@ -91,6 +104,14 @@ public sealed class PlayerComboCounterDefinition
         get
         {
             return rankDefinitions;
+        }
+    }
+
+    public PlayerComboSingleRankDefinition SingleRankProgression
+    {
+        get
+        {
+            return singleRankProgression;
         }
     }
     #endregion
@@ -152,9 +173,10 @@ public sealed class PlayerComboCounterDefinition
     public void Validate()
     {
         if (rankDefinitions == null)
-        {
             rankDefinitions = new List<PlayerComboRankDefinition>();
-        }
+
+        if (singleRankProgression == null)
+            singleRankProgression = new PlayerComboSingleRankDefinition();
 
         for (int rankIndex = 0; rankIndex < rankDefinitions.Count; rankIndex++)
         {
@@ -168,6 +190,8 @@ public sealed class PlayerComboCounterDefinition
 
             rankDefinition.Validate();
         }
+
+        singleRankProgression.Validate();
     }
     #endregion
 
@@ -246,7 +270,6 @@ public sealed class PlayerComboPassivePowerUpUnlockDefinition
 
 /// <summary>
 /// Stores one combo rank milestone with its display identifier, HUD presentation overrides, time-based point decay, and temporary Character Tuning bonus formulas.
-/// none.
 /// </summary>
 [Serializable]
 public sealed class PlayerComboRankDefinition

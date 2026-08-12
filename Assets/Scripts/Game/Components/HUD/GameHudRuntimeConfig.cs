@@ -47,6 +47,14 @@ public struct GameHudRuntimeConfig : IComponentData
     public float SynchroLowestRankPhaseOffsetNormalized;
     public float SynchroHighestRankPhaseOffsetNormalized;
     public float SynchroPhaseOffsetResponseExponent;
+    public byte SynchroSingleRankAccelerateWavesWithProgress;
+    public float SynchroSingleRankMaximumWaveScrollCyclesPerSecond;
+    public GameHudSynchroSingleRankConvergenceMode SynchroSingleRankConvergenceMode;
+    public float SynchroSingleRankInitialPhaseOffsetNormalized;
+    public float SynchroSingleRankFinalPhaseOffsetNormalized;
+    public float SynchroSingleRankConvergenceStartProgressPercent;
+    public float SynchroSingleRankConvergenceEndProgressPercent;
+    public int SynchroSingleRankConvergenceStepCount;
     public float SynchroPhaseTransitionDuration;
     public byte SynchroUseUnscaledTime;
     public float SynchroProgressSmoothingSeconds;
