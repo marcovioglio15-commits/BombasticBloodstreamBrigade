@@ -429,6 +429,9 @@ MonoBehaviour:
       pointsDecayPerSecond: 0
       valueDisplayMode: 1
       formulaDistributionMode: 0
+      linearBonusRangeMode: 0
+      showMeterOnlyAfterFirstMilestone: 0
+      startLinearBonusesAtFirstMilestone: 0
       bonusMilestones: []
   legacyExperienceRequiredPerLevel: 100
   levelCap: 100

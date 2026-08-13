@@ -112,6 +112,15 @@ internal static class PlayerRuntimeScalingComboFieldMappingUtility
             case "comboCounter.singleRankProgression.formulaDistributionMode":
                 fieldId = PlayerRuntimeComboCounterFieldId.SingleRankFormulaDistributionMode;
                 return true;
+            case "comboCounter.singleRankProgression.linearBonusRangeMode":
+                fieldId = PlayerRuntimeComboCounterFieldId.SingleRankLinearBonusRangeMode;
+                return true;
+            case "comboCounter.singleRankProgression.showMeterOnlyAfterFirstMilestone":
+                fieldId = PlayerRuntimeComboCounterFieldId.SingleRankShowMeterOnlyAfterFirstMilestone;
+                return true;
+            case "comboCounter.singleRankProgression.startLinearBonusesAtFirstMilestone":
+                fieldId = PlayerRuntimeComboCounterFieldId.SingleRankStartLinearBonusesAtFirstMilestone;
+                return true;
         }
 
         if (statKey.StartsWith(ComboRanksRoot, StringComparison.Ordinal))

@@ -30,14 +30,18 @@ public static class PlayerComboSingleRankSmokeTest
             EntityManager entityManager = world.EntityManager;
             Entity entity = entityManager.CreateEntity();
             entityManager.AddBuffer<PlayerRuntimeComboRankElement>(entity);
+            entityManager.AddBuffer<PlayerRuntimeComboPassiveUnlockElement>(entity);
             entityManager.AddBuffer<PlayerPowerUpCharacterTuningFormulaElement>(entity);
             DynamicBuffer<PlayerRuntimeComboRankElement> ranks = entityManager.GetBuffer<PlayerRuntimeComboRankElement>(entity);
+            DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> passiveUnlocks = entityManager.GetBuffer<PlayerRuntimeComboPassiveUnlockElement>(entity);
             DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> formulas = entityManager.GetBuffer<PlayerPowerUpCharacterTuningFormulaElement>(entity);
             BuildMilestones(ranks, formulas);
+            ValidateScalingPipeline(ranks, passiveUnlocks);
             ValidateThresholdsAndPresentation(ranks);
+            ValidateFirstMilestonePresentationGate(ranks);
             ValidateDamageDowngradeAndDecay(ranks);
             ValidateFormulaDistribution(ranks, formulas);
-            Debug.Log("[PlayerComboSingleRankSmokeTest] Threshold, presentation, downgrade, decay, and formula checks passed.");
+            Debug.Log("[PlayerComboSingleRankSmokeTest] Threshold, gated presentation, scaling, downgrade, decay, and formula-range checks passed.");
         }
         finally
         {
@@ -47,6 +51,98 @@ public static class PlayerComboSingleRankSmokeTest
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Verifies first-milestone Boolean keys and the linear range enum accept unified formula results.
+    /// </summary>
+    /// <param name="ranks">Runtime milestone buffer required by the shared field-apply path.</param>
+    /// <param name="passiveUnlocks">Runtime passive-unlock buffer required by the shared field-apply path.</param>
+    private static void ValidateScalingPipeline(DynamicBuffer<PlayerRuntimeComboRankElement> ranks,
+                                                DynamicBuffer<PlayerRuntimeComboPassiveUnlockElement> passiveUnlocks)
+    {
+        PlayerComboCounterMode entryMode;
+        int entryIndex;
+        int passiveUnlockIndex;
+        PlayerRuntimeComboCounterFieldId visibilityFieldId;
+        PlayerRuntimeComboCounterFieldId formulaFieldId;
+        PlayerRuntimeComboCounterFieldId rangeModeFieldId;
+        bool mapsVisibility = PlayerRuntimeScalingComboFieldMappingUtility.TryMapFieldId(
+            "comboCounter.singleRankProgression.showMeterOnlyAfterFirstMilestone",
+            out entryMode,
+            out entryIndex,
+            out passiveUnlockIndex,
+            out visibilityFieldId);
+        bool mapsFormula = PlayerRuntimeScalingComboFieldMappingUtility.TryMapFieldId(
+            "comboCounter.singleRankProgression.startLinearBonusesAtFirstMilestone",
+            out entryMode,
+            out entryIndex,
+            out passiveUnlockIndex,
+            out formulaFieldId);
+        bool mapsRangeMode = PlayerRuntimeScalingComboFieldMappingUtility.TryMapFieldId(
+            "comboCounter.singleRankProgression.linearBonusRangeMode",
+            out entryMode,
+            out entryIndex,
+            out passiveUnlockIndex,
+            out rangeModeFieldId);
+        PlayerRuntimeComboCounterConfig config = CreateConfig(PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression);
+        PlayerRuntimeScalingComboFieldApplyUtility.ApplyBooleanValue(visibilityFieldId,
+                                                                      entryMode,
+                                                                      entryIndex,
+                                                                      passiveUnlockIndex,
+                                                                      true,
+                                                                      ref config,
+                                                                      ranks,
+                                                                      passiveUnlocks);
+        PlayerRuntimeScalingComboFieldApplyUtility.ApplyBooleanValue(formulaFieldId,
+                                                                      entryMode,
+                                                                      entryIndex,
+                                                                      passiveUnlockIndex,
+                                                                      true,
+                                                                      ref config,
+                                                                      ranks,
+                                                                      passiveUnlocks);
+        PlayerRuntimeScalingComboFieldApplyUtility.ApplyNumericValue(rangeModeFieldId,
+                                                                      entryMode,
+                                                                      entryIndex,
+                                                                      1f,
+                                                                      ref config,
+                                                                      ranks);
+
+        if (!mapsVisibility ||
+            !mapsFormula ||
+            !mapsRangeMode ||
+            visibilityFieldId != PlayerRuntimeComboCounterFieldId.SingleRankShowMeterOnlyAfterFirstMilestone ||
+            formulaFieldId != PlayerRuntimeComboCounterFieldId.SingleRankStartLinearBonusesAtFirstMilestone ||
+            rangeModeFieldId != PlayerRuntimeComboCounterFieldId.SingleRankLinearBonusRangeMode ||
+            config.SingleRankShowMeterOnlyAfterFirstMilestone == 0 ||
+            config.SingleRankStartLinearBonusesAtFirstMilestone == 0 ||
+            config.SingleRankLinearBonusRangeMode != PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone)
+            throw new Exception("Single-rank formula options did not complete their typed Add Scaling pipeline.");
+    }
+
+    /// <summary>
+    /// Verifies the optional presentation gate keeps the meter inactive until the first enabled milestone threshold.
+    /// </summary>
+    /// <param name="ranks">Runtime milestone buffer used to resolve the first threshold.</param>
+    private static void ValidateFirstMilestonePresentationGate(DynamicBuffer<PlayerRuntimeComboRankElement> ranks)
+    {
+        PlayerRuntimeComboCounterConfig config = CreateConfig(PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps);
+        config.SingleRankShowMeterOnlyAfterFirstMilestone = 1;
+        PlayerComboCounterState state = new PlayerComboCounterState
+        {
+            CurrentValue = 249
+        };
+        PlayerComboCounterRuntimeUtility.UpdatePresentation(ref state, in config, ranks);
+
+        if (state.CurrentRankIndex >= 0)
+            throw new Exception("Single-rank presentation became active before the first enabled milestone.");
+
+        state.CurrentValue = 250;
+        PlayerComboCounterRuntimeUtility.UpdatePresentation(ref state, in config, ranks);
+
+        if (state.CurrentRankIndex != 0 || Math.Abs(state.ProgressNormalized - 0.25f) > PrecisionEpsilon)
+            throw new Exception("Single-rank presentation did not activate at the first enabled milestone.");
+    }
+
     /// <summary>
     /// Builds three enabled milestone entries and two flattened formula ranges for deterministic checks.
     /// </summary>
@@ -141,7 +237,7 @@ public static class PlayerComboSingleRankSmokeTest
     }
 
     /// <summary>
-    /// Verifies milestone formulas apply cumulatively at steps and blend across total progress in linear mode.
+    /// Verifies milestone formulas apply cumulatively at steps and blend across rank-wide or milestone-local intervals.
     /// </summary>
     /// <param name="ranks">Runtime milestone buffer owning formula ranges.</param>
     /// <param name="formulas">Flattened formula buffer evaluated by combo bonuses.</param>
@@ -161,6 +257,51 @@ public static class PlayerComboSingleRankSmokeTest
 
         if (Math.Abs(stats[0].Value - 25f) > PrecisionEpsilon)
             throw new Exception("Single-rank formulas did not blend linearly across total progression.");
+
+        stats = CreateDamageStatList();
+        config.SingleRankStartLinearBonusesAtFirstMilestone = 1;
+        PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(0, 249, in config, ranks, formulas, stats);
+
+        if (Math.Abs(stats[0].Value - 10f) > PrecisionEpsilon)
+            throw new Exception("Single-rank linear formulas became active before the first enabled milestone.");
+
+        stats = CreateDamageStatList();
+        PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(0, 250, in config, ranks, formulas, stats);
+
+        if (Math.Abs(stats[0].Value - 10f) > PrecisionEpsilon)
+            throw new Exception("Single-rank linear formulas should begin at zero weight on the first enabled milestone.");
+
+        stats = CreateDamageStatList();
+        PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(1, 625, in config, ranks, formulas, stats);
+
+        if (Math.Abs(stats[0].Value - 25f) > PrecisionEpsilon)
+            throw new Exception("Single-rank formulas did not blend linearly across progression after the first milestone.");
+
+        stats = CreateDamageStatList();
+        config.SingleRankLinearBonusRangeMode = PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone;
+        PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(0, 375, in config, ranks, formulas, stats);
+
+        if (Math.Abs(stats[0].Value - 15f) > PrecisionEpsilon)
+            throw new Exception("The first single-rank formula did not blend inside its milestone segment.");
+
+        stats = CreateDamageStatList();
+        PlayerRuntimeScalingComboApplyUtility.ApplyActiveComboRankBonuses(1, 750, in config, ranks, formulas, stats);
+
+        if (Math.Abs(stats[0].Value - 30f) > PrecisionEpsilon)
+            throw new Exception("Single-rank formulas did not accumulate across consecutive milestone segments.");
+
+        float finalMilestoneWeightBeforeCompletion = PlayerComboSingleRankLinearBonusUtility.ResolveMilestoneProgressNormalized(999,
+                                                                                                                                 2,
+                                                                                                                                 in config,
+                                                                                                                                 ranks);
+        float finalMilestoneWeightAtCompletion = PlayerComboSingleRankLinearBonusUtility.ResolveMilestoneProgressNormalized(1000,
+                                                                                                                             2,
+                                                                                                                             in config,
+                                                                                                                             ranks);
+
+        if (finalMilestoneWeightBeforeCompletion > PrecisionEpsilon ||
+            Math.Abs(finalMilestoneWeightAtCompletion - 1f) > PrecisionEpsilon)
+            throw new Exception("A final milestone at maximum progression did not activate deterministically at completion.");
     }
 
     /// <summary>

@@ -41,6 +41,12 @@ internal static class PlayerRuntimeScalingComboFieldApplyUtility
             case PlayerRuntimeComboCounterFieldId.PreventDecayIntoNonDecayingRanks:
                 runtimeComboConfig.PreventDecayIntoNonDecayingRanks = resolvedBoolean ? (byte)1 : (byte)0;
                 break;
+            case PlayerRuntimeComboCounterFieldId.SingleRankShowMeterOnlyAfterFirstMilestone:
+                runtimeComboConfig.SingleRankShowMeterOnlyAfterFirstMilestone = resolvedBoolean ? (byte)1 : (byte)0;
+                break;
+            case PlayerRuntimeComboCounterFieldId.SingleRankStartLinearBonusesAtFirstMilestone:
+                runtimeComboConfig.SingleRankStartLinearBonusesAtFirstMilestone = resolvedBoolean ? (byte)1 : (byte)0;
+                break;
             case PlayerRuntimeComboCounterFieldId.SingleRankMilestoneEnabled:
                 if (!TryResolveRuntimeEntryIndex(entryMode, entryIndex, runtimeComboRanks, out int absoluteEntryIndex))
                     return;
@@ -105,6 +111,9 @@ internal static class PlayerRuntimeScalingComboFieldApplyUtility
                 return;
             case PlayerRuntimeComboCounterFieldId.SingleRankFormulaDistributionMode:
                 runtimeComboConfig.SingleRankFormulaDistributionMode = PlayerRuntimeScalingEnumUtility.ResolveComboSingleRankFormulaDistributionMode(resolvedValue);
+                return;
+            case PlayerRuntimeComboCounterFieldId.SingleRankLinearBonusRangeMode:
+                runtimeComboConfig.SingleRankLinearBonusRangeMode = PlayerRuntimeScalingEnumUtility.ResolveComboSingleRankLinearBonusRangeMode(resolvedValue);
                 return;
         }
 

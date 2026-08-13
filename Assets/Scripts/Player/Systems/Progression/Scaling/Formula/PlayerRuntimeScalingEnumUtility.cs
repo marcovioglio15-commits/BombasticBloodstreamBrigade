@@ -341,6 +341,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe single-rank linear bonus range mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped single-rank linear bonus range mode.</returns>
+    public static PlayerComboSingleRankLinearBonusRangeMode ResolveComboSingleRankLinearBonusRangeMode(float value)
+    {
+        return (PlayerComboSingleRankLinearBonusRangeMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe ProjectileOrbitPathMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

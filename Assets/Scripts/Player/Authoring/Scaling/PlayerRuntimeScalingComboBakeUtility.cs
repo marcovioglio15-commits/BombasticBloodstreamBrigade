@@ -60,7 +60,10 @@ internal static class PlayerRuntimeScalingComboBakeUtility
             SingleRankMaximumComboValue = resolvedRuntimeSourceConfig.SingleRankMaximumComboValue,
             SingleRankPointsDecayPerSecond = resolvedRuntimeSourceConfig.SingleRankPointsDecayPerSecond,
             SingleRankValueDisplayMode = resolvedRuntimeSourceConfig.SingleRankValueDisplayMode,
-            SingleRankFormulaDistributionMode = resolvedRuntimeSourceConfig.SingleRankFormulaDistributionMode
+            SingleRankFormulaDistributionMode = resolvedRuntimeSourceConfig.SingleRankFormulaDistributionMode,
+            SingleRankLinearBonusRangeMode = resolvedRuntimeSourceConfig.SingleRankLinearBonusRangeMode,
+            SingleRankShowMeterOnlyAfterFirstMilestone = resolvedRuntimeSourceConfig.SingleRankShowMeterOnlyAfterFirstMilestone,
+            SingleRankStartLinearBonusesAtFirstMilestone = resolvedRuntimeSourceConfig.SingleRankStartLinearBonusesAtFirstMilestone
         };
 
         IReadOnlyList<PlayerComboRankDefinition> sourceRanks = sourceCombo != null ? sourceCombo.RankDefinitions : null;
@@ -247,7 +250,20 @@ internal static class PlayerRuntimeScalingComboBakeUtility
                 : PlayerComboSingleRankValueDisplayMode.CurrentValue,
             SingleRankFormulaDistributionMode = comboDefinition != null && comboDefinition.SingleRankProgression != null
                 ? comboDefinition.SingleRankProgression.FormulaDistributionMode
-                : PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps
+                : PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps,
+            SingleRankLinearBonusRangeMode = comboDefinition != null && comboDefinition.SingleRankProgression != null
+                ? comboDefinition.SingleRankProgression.LinearBonusRangeMode
+                : PlayerComboSingleRankLinearBonusRangeMode.EntireProgression,
+            SingleRankShowMeterOnlyAfterFirstMilestone = comboDefinition != null &&
+                                                         comboDefinition.SingleRankProgression != null &&
+                                                         comboDefinition.SingleRankProgression.ShowMeterOnlyAfterFirstMilestone
+                ? (byte)1
+                : (byte)0,
+            SingleRankStartLinearBonusesAtFirstMilestone = comboDefinition != null &&
+                                                           comboDefinition.SingleRankProgression != null &&
+                                                           comboDefinition.SingleRankProgression.StartLinearBonusesAtFirstMilestone
+                ? (byte)1
+                : (byte)0
         };
     }
 

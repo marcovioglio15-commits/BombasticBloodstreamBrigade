@@ -21,12 +21,21 @@ public enum PlayerComboSingleRankValueDisplayMode : byte
 }
 
 /// <summary>
-/// Selects whether single-rank Character Tuning formulas activate at milestones or blend across the complete progression.
+/// Selects whether single-rank Character Tuning formulas activate at milestones or blend across the configured progression range.
 /// </summary>
 public enum PlayerComboSingleRankFormulaDistributionMode : byte
 {
     MilestoneSteps = 0,
     LinearAcrossProgression = 1
+}
+
+/// <summary>
+/// Selects the progression interval used to blend linear single-rank formulas.
+/// </summary>
+public enum PlayerComboSingleRankLinearBonusRangeMode : byte
+{
+    EntireProgression = 0,
+    MilestoneToNextMilestone = 1
 }
 
 /// <summary>
@@ -51,8 +60,17 @@ public sealed class PlayerComboSingleRankDefinition
     [Tooltip("Controls whether the HUD shows only the current combo value or the current value followed by the progression maximum.")]
     [SerializeField] private PlayerComboSingleRankValueDisplayMode valueDisplayMode = PlayerComboSingleRankValueDisplayMode.CurrentAndMaximum;
 
-    [Tooltip("Controls whether Character Tuning formulas activate at their milestone percentages or blend linearly from zero to their full result across the complete progression.")]
+    [Tooltip("Controls whether Character Tuning formulas activate at their milestone percentages or blend linearly from zero to their full result across the configured progression range.")]
     [SerializeField] private PlayerComboSingleRankFormulaDistributionMode formulaDistributionMode = PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps;
+
+    [Tooltip("When Linear Across Progression is selected, controls whether all formulas share the complete rank interval or each milestone formula reaches full strength at the next enabled milestone.")]
+    [SerializeField] private PlayerComboSingleRankLinearBonusRangeMode linearBonusRangeMode = PlayerComboSingleRankLinearBonusRangeMode.EntireProgression;
+
+    [Tooltip("Keeps the Synchro Meter hidden until combo progress reaches the first enabled bonus milestone. Combo accumulation remains active while the meter is hidden.")]
+    [SerializeField] private bool showMeterOnlyAfterFirstMilestone;
+
+    [Tooltip("When Linear Across Progression is selected, keeps every linear Character Tuning bonus inactive until the first enabled milestone, then distributes it across the remaining progression.")]
+    [SerializeField] private bool startLinearBonusesAtFirstMilestone;
 
     [Header("Rewards")]
     [Tooltip("Ordered percentage milestones that grant cumulative Character Tuning formulas and temporary passive power-ups inside the single rank.")]
@@ -67,6 +85,9 @@ public sealed class PlayerComboSingleRankDefinition
     public float PointsDecayPerSecond => pointsDecayPerSecond;
     public PlayerComboSingleRankValueDisplayMode ValueDisplayMode => valueDisplayMode;
     public PlayerComboSingleRankFormulaDistributionMode FormulaDistributionMode => formulaDistributionMode;
+    public PlayerComboSingleRankLinearBonusRangeMode LinearBonusRangeMode => linearBonusRangeMode;
+    public bool ShowMeterOnlyAfterFirstMilestone => showMeterOnlyAfterFirstMilestone;
+    public bool StartLinearBonusesAtFirstMilestone => startLinearBonusesAtFirstMilestone;
     public IReadOnlyList<PlayerComboBonusMilestoneDefinition> BonusMilestones => bonusMilestones;
     #endregion
 
@@ -82,12 +103,18 @@ public sealed class PlayerComboSingleRankDefinition
     /// <param name="valueDisplayModeValue">Numeric HUD text format.</param>
     /// <param name="formulaDistributionModeValue">Character Tuning formula distribution behavior.</param>
     /// <param name="bonusMilestonesValue">Ordered percentage milestone list.</param>
+    /// <param name="showMeterOnlyAfterFirstMilestoneValue">Whether presentation waits for the first enabled milestone.</param>
+    /// <param name="startLinearBonusesAtFirstMilestoneValue">Whether linear formulas start from the first enabled milestone.</param>
+    /// <param name="linearBonusRangeModeValue">Progression interval used by linear formulas.</param>
     public void Configure(string rankIdValue,
                           int maximumComboValueValue,
                           float pointsDecayPerSecondValue,
                           PlayerComboSingleRankValueDisplayMode valueDisplayModeValue,
                           PlayerComboSingleRankFormulaDistributionMode formulaDistributionModeValue,
-                          List<PlayerComboBonusMilestoneDefinition> bonusMilestonesValue)
+                          List<PlayerComboBonusMilestoneDefinition> bonusMilestonesValue,
+                          bool showMeterOnlyAfterFirstMilestoneValue = false,
+                          bool startLinearBonusesAtFirstMilestoneValue = false,
+                          PlayerComboSingleRankLinearBonusRangeMode linearBonusRangeModeValue = PlayerComboSingleRankLinearBonusRangeMode.EntireProgression)
     {
         rankId = rankIdValue;
         maximumComboValue = maximumComboValueValue;
@@ -95,6 +122,9 @@ public sealed class PlayerComboSingleRankDefinition
         valueDisplayMode = valueDisplayModeValue;
         formulaDistributionMode = formulaDistributionModeValue;
         bonusMilestones = bonusMilestonesValue;
+        showMeterOnlyAfterFirstMilestone = showMeterOnlyAfterFirstMilestoneValue;
+        startLinearBonusesAtFirstMilestone = startLinearBonusesAtFirstMilestoneValue;
+        linearBonusRangeMode = linearBonusRangeModeValue;
     }
     #endregion
 

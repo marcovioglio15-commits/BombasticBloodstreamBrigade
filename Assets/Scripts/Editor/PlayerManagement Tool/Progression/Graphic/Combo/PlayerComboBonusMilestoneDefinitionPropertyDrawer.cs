@@ -44,7 +44,7 @@ public sealed class PlayerComboBonusMilestoneDefinitionPropertyDrawer : Property
             return root;
         }
 
-        root.Add(new HelpBox("Milestone rewards remain cumulative while progression stays above their percentage. Linear formula distribution blends numeric formulas across the complete rank, while passive unlocks still activate at their milestone percentage.", HelpBoxMessageType.Info));
+        root.Add(new HelpBox("Milestone rewards remain cumulative while progression stays above their percentage. Linear numeric formulas use the interval selected by Single Rank Progression, while passive unlocks still activate directly at their milestone percentage.", HelpBoxMessageType.Info));
         root.Add(PlayerScalingFieldElementFactory.CreateField(milestoneIdProperty,
                                                               scalingRulesProperty,
                                                               "Milestone ID",

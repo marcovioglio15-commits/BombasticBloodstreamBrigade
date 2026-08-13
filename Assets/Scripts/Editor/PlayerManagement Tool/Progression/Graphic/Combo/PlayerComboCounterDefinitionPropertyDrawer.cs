@@ -123,8 +123,11 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         SerializedProperty pointsDecayPerSecondProperty = singleRankProgressionProperty.FindPropertyRelative("pointsDecayPerSecond");
         SerializedProperty valueDisplayModeProperty = singleRankProgressionProperty.FindPropertyRelative("valueDisplayMode");
         SerializedProperty formulaDistributionModeProperty = singleRankProgressionProperty.FindPropertyRelative("formulaDistributionMode");
+        SerializedProperty linearBonusRangeModeProperty = singleRankProgressionProperty.FindPropertyRelative("linearBonusRangeMode");
+        SerializedProperty showMeterOnlyAfterFirstMilestoneProperty = singleRankProgressionProperty.FindPropertyRelative("showMeterOnlyAfterFirstMilestone");
+        SerializedProperty startLinearBonusesAtFirstMilestoneProperty = singleRankProgressionProperty.FindPropertyRelative("startLinearBonusesAtFirstMilestone");
         SerializedProperty bonusMilestonesProperty = singleRankProgressionProperty.FindPropertyRelative("bonusMilestones");
-        root.Add(new HelpBox("The single rank is active from the first combo point to Maximum Combo Value. Milestone Steps grants formulas at authored percentages; Linear Across Progression blends every enabled milestone's numeric formulas from zero to full strength across the complete bar.", HelpBoxMessageType.Info));
+        root.Add(new HelpBox("The single rank uses one capped progression bar. Its meter can appear from the first combo point or wait for the first enabled milestone. Linear formulas can share one rank-wide weight or progress independently from their milestone to the next enabled threshold.", HelpBoxMessageType.Info));
         root.Add(PlayerScalingFieldElementFactory.CreateField(rankIdProperty,
                                                               scalingRulesProperty,
                                                               "Rank ID",
@@ -142,6 +145,19 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         root.Add(PlayerScalingFieldElementFactory.CreateField(formulaDistributionModeProperty,
                                                               scalingRulesProperty,
                                                               "Formula Distribution Mode"));
+        root.Add(PlayerScalingFieldElementFactory.CreateField(showMeterOnlyAfterFirstMilestoneProperty,
+                                                              scalingRulesProperty,
+                                                              "Show Meter Only After First Milestone"));
+        VisualElement linearFormulaOptionsRoot = new VisualElement();
+        linearFormulaOptionsRoot.Add(PlayerScalingFieldElementFactory.CreateField(linearBonusRangeModeProperty,
+                                                                                   scalingRulesProperty,
+                                                                                   "Linear Bonus Range Mode"));
+        VisualElement entireProgressionOptionsRoot = new VisualElement();
+        entireProgressionOptionsRoot.Add(PlayerScalingFieldElementFactory.CreateField(startLinearBonusesAtFirstMilestoneProperty,
+                                                                                       scalingRulesProperty,
+                                                                                       "Start Linear Bonuses At First Milestone"));
+        linearFormulaOptionsRoot.Add(entireProgressionOptionsRoot);
+        root.Add(linearFormulaOptionsRoot);
 
         if (bonusMilestonesProperty != null)
         {
@@ -150,7 +166,43 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
             root.Add(milestonesField);
         }
 
+        root.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+        {
+            RefreshSingleRankFormulaVisibility(formulaDistributionModeProperty,
+                                               linearBonusRangeModeProperty,
+                                               linearFormulaOptionsRoot,
+                                               entireProgressionOptionsRoot);
+        });
+        RefreshSingleRankFormulaVisibility(formulaDistributionModeProperty,
+                                           linearBonusRangeModeProperty,
+                                           linearFormulaOptionsRoot,
+                                           entireProgressionOptionsRoot);
+
         return root;
+    }
+
+    /// <summary>
+    /// Shows linear settings only for continuous formulas and rank-wide settings only for their matching range mode.
+    /// </summary>
+    /// <param name="formulaDistributionModeProperty">Serialized single-rank formula distribution mode.</param>
+    /// <param name="linearBonusRangeModeProperty">Serialized interval selection for linear formulas.</param>
+    /// <param name="linearFormulaOptionsRoot">Container holding settings that only affect linear formulas.</param>
+    /// <param name="entireProgressionOptionsRoot">Container holding settings that only affect rank-wide blending.</param>
+    private static void RefreshSingleRankFormulaVisibility(SerializedProperty formulaDistributionModeProperty,
+                                                           SerializedProperty linearBonusRangeModeProperty,
+                                                           VisualElement linearFormulaOptionsRoot,
+                                                           VisualElement entireProgressionOptionsRoot)
+    {
+        bool usesLinearDistribution = ResolveSingleRankFormulaDistributionMode(formulaDistributionModeProperty) ==
+                                      PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression;
+        linearFormulaOptionsRoot.style.display = usesLinearDistribution
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
+        entireProgressionOptionsRoot.style.display = usesLinearDistribution &&
+                                                     ResolveSingleRankLinearBonusRangeMode(linearBonusRangeModeProperty) ==
+                                                     PlayerComboSingleRankLinearBonusRangeMode.EntireProgression
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
     }
 
     /// <summary>
@@ -319,7 +371,23 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         SerializedProperty rankIdProperty = singleRankProgressionProperty.FindPropertyRelative("rankId");
         SerializedProperty maximumComboValueProperty = singleRankProgressionProperty.FindPropertyRelative("maximumComboValue");
         SerializedProperty pointsDecayPerSecondProperty = singleRankProgressionProperty.FindPropertyRelative("pointsDecayPerSecond");
+        SerializedProperty formulaDistributionModeProperty = singleRankProgressionProperty.FindPropertyRelative("formulaDistributionMode");
+        SerializedProperty linearBonusRangeModeProperty = singleRankProgressionProperty.FindPropertyRelative("linearBonusRangeMode");
+        SerializedProperty showMeterOnlyAfterFirstMilestoneProperty = singleRankProgressionProperty.FindPropertyRelative("showMeterOnlyAfterFirstMilestone");
+        SerializedProperty startLinearBonusesAtFirstMilestoneProperty = singleRankProgressionProperty.FindPropertyRelative("startLinearBonusesAtFirstMilestone");
         SerializedProperty bonusMilestonesProperty = singleRankProgressionProperty.FindPropertyRelative("bonusMilestones");
+
+        bool delaysMeterUntilFirstMilestone = showMeterOnlyAfterFirstMilestoneProperty != null &&
+                                               showMeterOnlyAfterFirstMilestoneProperty.boolValue;
+        bool usesLinearBonuses = ResolveSingleRankFormulaDistributionMode(formulaDistributionModeProperty) ==
+                                 PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression;
+        bool usesSegmentedLinearBonuses = usesLinearBonuses &&
+                                          ResolveSingleRankLinearBonusRangeMode(linearBonusRangeModeProperty) ==
+                                          PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone;
+        bool delaysLinearBonusesUntilFirstMilestone = usesLinearBonuses &&
+                                                       !usesSegmentedLinearBonuses &&
+                                                       startLinearBonusesAtFirstMilestoneProperty != null &&
+                                                       startLinearBonusesAtFirstMilestoneProperty.boolValue;
 
         if (rankIdProperty == null || string.IsNullOrWhiteSpace(rankIdProperty.stringValue))
             warningLines.Add("Single Rank Progression should define a non-empty Rank ID.");
@@ -341,6 +409,7 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
 
         HashSet<string> visitedMilestoneIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         float previousPercentage = float.NegativeInfinity;
+        float firstEnabledPercentage = float.PositiveInfinity;
         int enabledMilestoneCount = 0;
 
         // Validate only enabled milestones because disabled entries do not participate in runtime progression.
@@ -354,6 +423,8 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
 
             SerializedProperty milestoneIdProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("milestoneId") : null;
             SerializedProperty requiredPercentageProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("requiredProgressPercent") : null;
+            SerializedProperty bonusesProperty = milestoneProperty != null ? milestoneProperty.FindPropertyRelative("bonuses") : null;
+            SerializedProperty formulasProperty = bonusesProperty != null ? bonusesProperty.FindPropertyRelative("formulas") : null;
             string milestoneId = milestoneIdProperty != null && !string.IsNullOrWhiteSpace(milestoneIdProperty.stringValue)
                 ? milestoneIdProperty.stringValue.Trim()
                 : string.Empty;
@@ -361,6 +432,9 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
                 ? requiredPercentageProperty.floatValue
                 : 0f;
             enabledMilestoneCount++;
+
+            if (requiredPercentage < firstEnabledPercentage)
+                firstEnabledPercentage = requiredPercentage;
 
             if (string.IsNullOrWhiteSpace(milestoneId))
                 warningLines.Add(string.Format("Enabled milestone #{0} should define a non-empty Milestone ID.", milestoneIndex + 1));
@@ -378,11 +452,34 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
             else if (usesRankDowngrade && requiredPercentage == previousPercentage)
                 warningLines.Add(string.Format("Milestone '{0}' shares its percentage with the previous enabled milestone. Downgrade To Previous Rank may skip an expected reward boundary.", string.IsNullOrWhiteSpace(milestoneId) ? "#" + (milestoneIndex + 1) : milestoneId));
 
+            if (usesSegmentedLinearBonuses &&
+                requiredPercentage >= 100f &&
+                formulasProperty != null &&
+                formulasProperty.isArray &&
+                formulasProperty.arraySize > 0)
+                warningLines.Add(string.Format("Milestone '{0}' starts at 100%, so its segmented linear formulas have no interpolation interval and become full at completion.", string.IsNullOrWhiteSpace(milestoneId) ? "#" + (milestoneIndex + 1) : milestoneId));
+
             previousPercentage = requiredPercentage;
         }
 
         if (enabledMilestoneCount <= 0)
+        {
             warningLines.Add("No enabled bonus milestones are configured. The bar can still progress, but it cannot grant milestone rewards.");
+
+            if (delaysMeterUntilFirstMilestone)
+                warningLines.Add("Show Meter Only After First Milestone is enabled, but no enabled milestone can make the meter visible.");
+
+            if (delaysLinearBonusesUntilFirstMilestone)
+                warningLines.Add("Start Linear Bonuses At First Milestone is enabled, but no enabled milestone can activate linear formulas.");
+        }
+        else if (firstEnabledPercentage <= 0f)
+        {
+            if (delaysMeterUntilFirstMilestone)
+                warningLines.Add("Show Meter Only After First Milestone has no practical delay because the first enabled milestone starts at 0%.");
+
+            if (delaysLinearBonusesUntilFirstMilestone)
+                warningLines.Add("Start Linear Bonuses At First Milestone has no practical delay because the first enabled milestone starts at 0%.");
+        }
 
         if (usesRankDowngrade && enabledMilestoneCount < 2)
             warningLines.Add("Downgrade To Previous Rank behaves like a full reset until at least two bonus milestones are enabled.");
@@ -439,6 +536,36 @@ public sealed class PlayerComboCounterDefinitionPropertyDrawer : PropertyDrawer
         }
 
         return PlayerComboDamageBreakMode.ResetCombo;
+    }
+
+    /// <summary>
+    /// Resolves the authored single-rank formula distribution mode with a safe enum fallback.
+    /// </summary>
+    /// <param name="formulaDistributionModeProperty">Serialized single-rank formula distribution mode.</param>
+    /// <returns>Resolved formula distribution behavior.</returns>
+    private static PlayerComboSingleRankFormulaDistributionMode ResolveSingleRankFormulaDistributionMode(SerializedProperty formulaDistributionModeProperty)
+    {
+        if (formulaDistributionModeProperty != null &&
+            formulaDistributionModeProperty.propertyType == SerializedPropertyType.Enum &&
+            formulaDistributionModeProperty.enumValueIndex == (int)PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression)
+            return PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression;
+
+        return PlayerComboSingleRankFormulaDistributionMode.MilestoneSteps;
+    }
+
+    /// <summary>
+    /// Resolves the authored single-rank linear bonus interval with a safe enum fallback.
+    /// </summary>
+    /// <param name="linearBonusRangeModeProperty">Serialized single-rank linear bonus range mode.</param>
+    /// <returns>Resolved linear bonus interval behavior.</returns>
+    private static PlayerComboSingleRankLinearBonusRangeMode ResolveSingleRankLinearBonusRangeMode(SerializedProperty linearBonusRangeModeProperty)
+    {
+        if (linearBonusRangeModeProperty != null &&
+            linearBonusRangeModeProperty.propertyType == SerializedPropertyType.Enum &&
+            linearBonusRangeModeProperty.enumValueIndex == (int)PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone)
+            return PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone;
+
+        return PlayerComboSingleRankLinearBonusRangeMode.EntireProgression;
     }
     #endregion
 

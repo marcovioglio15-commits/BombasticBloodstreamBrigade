@@ -43,7 +43,10 @@ internal static class PlayerRuntimeScalingComboApplyUtility
             SingleRankMaximumComboValue = baseComboConfig.SingleRankMaximumComboValue,
             SingleRankPointsDecayPerSecond = baseComboConfig.SingleRankPointsDecayPerSecond,
             SingleRankValueDisplayMode = baseComboConfig.SingleRankValueDisplayMode,
-            SingleRankFormulaDistributionMode = baseComboConfig.SingleRankFormulaDistributionMode
+            SingleRankFormulaDistributionMode = baseComboConfig.SingleRankFormulaDistributionMode,
+            SingleRankLinearBonusRangeMode = baseComboConfig.SingleRankLinearBonusRangeMode,
+            SingleRankShowMeterOnlyAfterFirstMilestone = baseComboConfig.SingleRankShowMeterOnlyAfterFirstMilestone,
+            SingleRankStartLinearBonusesAtFirstMilestone = baseComboConfig.SingleRankStartLinearBonusesAtFirstMilestone
         };
 
         if (!runtimeComboRanks.IsCreated || !runtimePassiveUnlocks.IsCreated)
@@ -279,10 +282,10 @@ internal static class PlayerRuntimeScalingComboApplyUtility
 
     #region Private Methods
     /// <summary>
-    /// Applies every enabled single-rank numeric formula with a weight derived from complete progression.
+    /// Applies every enabled single-rank numeric formula with a weight derived from the configured progression range.
     /// </summary>
-    /// <param name="comboValue">Current combo value used to resolve the shared application weight.</param>
-    /// <param name="runtimeComboConfig">Current single-rank progression maximum.</param>
+    /// <param name="comboValue">Current combo value used to resolve formula application weights.</param>
+    /// <param name="runtimeComboConfig">Current single-rank progression maximum and linear range rules.</param>
     /// <param name="runtimeComboRanks">Combined runtime reward-entry buffer.</param>
     /// <param name="characterTuningFormulas">Shared flattened Character Tuning formula buffer.</param>
     /// <param name="mutableScalableStats">Mutable effective scalable-stat list updated in place.</param>
@@ -292,17 +295,42 @@ internal static class PlayerRuntimeScalingComboApplyUtility
                                                      DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
                                                      List<PlayerScalableStatElement> mutableScalableStats)
     {
-        float applicationWeight = PlayerComboCounterRuntimeUtility.ResolveSingleRankProgressNormalized(comboValue,
-                                                                                                        runtimeComboConfig.SingleRankMaximumComboValue);
+        float sharedApplicationWeight = 0f;
 
-        if (applicationWeight <= 0f)
-            return;
+        if (runtimeComboConfig.SingleRankLinearBonusRangeMode == PlayerComboSingleRankLinearBonusRangeMode.EntireProgression)
+        {
+            sharedApplicationWeight = PlayerComboSingleRankLinearBonusUtility.ResolveRankProgressNormalized(comboValue,
+                                                                                                              in runtimeComboConfig,
+                                                                                                              runtimeComboRanks);
 
+            if (sharedApplicationWeight <= 0f)
+                return;
+        }
+
+        // Apply each milestone with either the shared rank weight or its threshold-local segment weight.
         for (int entryIndex = 0; entryIndex < runtimeComboRanks.Length; entryIndex++)
         {
             PlayerRuntimeComboRankElement entry = runtimeComboRanks[entryIndex];
 
             if (entry.Mode != PlayerComboCounterMode.SingleRankProgression || entry.Enabled == 0)
+                continue;
+
+            float applicationWeight;
+
+            switch (runtimeComboConfig.SingleRankLinearBonusRangeMode)
+            {
+                case PlayerComboSingleRankLinearBonusRangeMode.MilestoneToNextMilestone:
+                    applicationWeight = PlayerComboSingleRankLinearBonusUtility.ResolveMilestoneProgressNormalized(comboValue,
+                                                                                                                    entryIndex,
+                                                                                                                    in runtimeComboConfig,
+                                                                                                                    runtimeComboRanks);
+                    break;
+                default:
+                    applicationWeight = sharedApplicationWeight;
+                    break;
+            }
+
+            if (applicationWeight <= 0f)
                 continue;
 
             PlayerPowerUpCharacterTuningRuntimeUtility.TryApplyCharacterTuningRange(entry.BonusFormulaStartIndex,

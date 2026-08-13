@@ -313,6 +313,11 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         PlayerComboCounterState comboCounterState = runtimeEntityManager.GetComponentData<PlayerComboCounterState>(playerEntity);
         bool shouldBeVisible = runtimeComboConfig.Enabled != 0;
 
+        if (runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression &&
+            runtimeComboConfig.SingleRankShowMeterOnlyAfterFirstMilestone != 0 &&
+            comboCounterState.CurrentRankIndex < 0)
+            shouldBeVisible = false;
+
         if (hideWhenNoActiveRank && comboCounterState.CurrentRankIndex < 0)
             shouldBeVisible = false;
 

@@ -80,7 +80,17 @@ internal static class PlayerComboCounterRuntimeUtility
         if (runtimeConfig.Mode == PlayerComboCounterMode.SingleRankProgression)
         {
             comboCounterState.CurrentValue = math.min(sanitizedComboValue, math.max(0, runtimeConfig.SingleRankMaximumComboValue));
-            comboCounterState.CurrentRankIndex = comboCounterState.CurrentValue > 0 ? 0 : -1;
+            bool presentationThresholdReached = true;
+
+            // Resolve milestone data only when the authored visibility gate needs it.
+            if (runtimeConfig.SingleRankShowMeterOnlyAfterFirstMilestone != 0)
+            {
+                int firstMilestoneRequiredValue = PlayerComboSingleRankLinearBonusUtility.ResolveFirstEnabledMilestoneRequiredValue(runtimeRanks);
+                presentationThresholdReached = firstMilestoneRequiredValue >= 0 &&
+                                               comboCounterState.CurrentValue >= firstMilestoneRequiredValue;
+            }
+
+            comboCounterState.CurrentRankIndex = comboCounterState.CurrentValue > 0 && presentationThresholdReached ? 0 : -1;
             comboCounterState.CurrentRankId = runtimeConfig.SingleRankId;
             comboCounterState.CurrentRankRequiredValue = 0;
             comboCounterState.NextRankRequiredValue = math.max(0, runtimeConfig.SingleRankMaximumComboValue);

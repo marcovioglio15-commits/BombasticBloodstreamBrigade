@@ -433,13 +433,16 @@ MonoBehaviour:
     singleRankProgression:
       rankId: SYNCHRO
       maximumComboValue: 1500
-      pointsDecayPerSecond: 2
+      pointsDecayPerSecond: 0
       valueDisplayMode: 1
       formulaDistributionMode: 1
+      linearBonusRangeMode: 1
+      showMeterOnlyAfterFirstMilestone: 1
+      startLinearBonusesAtFirstMilestone: 1
       bonusMilestones:
       - milestoneId: D
         isEnabled: 1
-        requiredProgressPercent: 6.666667
+        requiredProgressPercent: 6
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -447,7 +450,7 @@ MonoBehaviour:
         passivePowerUpUnlocks: []
       - milestoneId: C
         isEnabled: 1
-        requiredProgressPercent: 16.666666
+        requiredProgressPercent: 17
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -455,7 +458,7 @@ MonoBehaviour:
         passivePowerUpUnlocks: []
       - milestoneId: B
         isEnabled: 1
-        requiredProgressPercent: 33.333332
+        requiredProgressPercent: 33
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
@@ -463,7 +466,7 @@ MonoBehaviour:
         passivePowerUpUnlocks: []
       - milestoneId: A
         isEnabled: 1
-        requiredProgressPercent: 66.666664
+        requiredProgressPercent: 66
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:

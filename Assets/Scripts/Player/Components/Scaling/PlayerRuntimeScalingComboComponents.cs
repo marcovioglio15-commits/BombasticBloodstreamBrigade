@@ -17,6 +17,9 @@ public struct PlayerBaseComboCounterConfig : IComponentData
     public float SingleRankPointsDecayPerSecond;
     public PlayerComboSingleRankValueDisplayMode SingleRankValueDisplayMode;
     public PlayerComboSingleRankFormulaDistributionMode SingleRankFormulaDistributionMode;
+    public PlayerComboSingleRankLinearBonusRangeMode SingleRankLinearBonusRangeMode;
+    public byte SingleRankShowMeterOnlyAfterFirstMilestone;
+    public byte SingleRankStartLinearBonusesAtFirstMilestone;
 }
 
 /// <summary>
@@ -35,6 +38,9 @@ public struct PlayerRuntimeComboCounterConfig : IComponentData
     public float SingleRankPointsDecayPerSecond;
     public PlayerComboSingleRankValueDisplayMode SingleRankValueDisplayMode;
     public PlayerComboSingleRankFormulaDistributionMode SingleRankFormulaDistributionMode;
+    public PlayerComboSingleRankLinearBonusRangeMode SingleRankLinearBonusRangeMode;
+    public byte SingleRankShowMeterOnlyAfterFirstMilestone;
+    public byte SingleRankStartLinearBonusesAtFirstMilestone;
 }
 
 /// <summary>
@@ -118,7 +124,10 @@ public enum PlayerRuntimeComboCounterFieldId : byte
     SingleRankFormulaDistributionMode = 15,
     SingleRankMilestoneId = 16,
     SingleRankMilestoneEnabled = 17,
-    SingleRankMilestoneRequiredProgressPercent = 18
+    SingleRankMilestoneRequiredProgressPercent = 18,
+    SingleRankShowMeterOnlyAfterFirstMilestone = 19,
+    SingleRankStartLinearBonusesAtFirstMilestone = 20,
+    SingleRankLinearBonusRangeMode = 21
 }
 
 /// <summary>
