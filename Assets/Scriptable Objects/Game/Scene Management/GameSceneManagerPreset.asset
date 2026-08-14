@@ -118,6 +118,17 @@ MonoBehaviour:
     roomTags: LevelGenerationSceneSetTest,MetroConcourse
     addressableKey: SCN_LGTEST_METRO_START
     sceneAsset: {fileID: 102900000, guid: 54c97702b5bc17f439c3b98c04743afb, type: 3}
+  - sceneId: SCN_MAIN_METRO_START
+    sceneName: SCN_MAIN_METRO_START
+    scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_START.unity
+    sceneGuid: 231f2d11e6deb854e8e91c2aba8a48ef
+    buildIndex: -1
+    sceneKind: 2
+    unloadPolicy: 0
+    companionUiSceneId: SCN_MainScene_UI
+    roomTags: LevelGenerationSceneSetTest,MaintenanceTunnels
+    addressableKey: SCN_MAIN_METRO_START
+    sceneAsset: {fileID: 102900000, guid: 231f2d11e6deb854e8e91c2aba8a48ef, type: 3}
   - sceneId: SCN_LGTEST_METRO_NS
     sceneName: SCN_LGTEST_METRO_NS
     scenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
