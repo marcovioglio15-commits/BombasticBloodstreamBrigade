@@ -974,7 +974,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_02
     sceneGuid: eef1df284c2a6f148996f3c85310ad6a
-    dependencyHash: 407f76ff5fd502650a6ca14f22f3dc7a
+    dependencyHash: 74bd1ff40f000ca8415c281d1610f965
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
