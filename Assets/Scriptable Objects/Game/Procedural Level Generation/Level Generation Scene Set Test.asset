@@ -19,11 +19,11 @@ MonoBehaviour:
   version: 1.0.0
   sceneCatalogPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
   generationSettings:
-    seedMode: 1
+    seedMode: 0
     fixedSeed: 2165703038
     maximumNodeCount: 32
     maximumDepth: 12
-    maximumGenerationAttempts: 5
+    maximumGenerationAttempts: 20
   transitionSettings:
     roomStreamingMode: 0
     adjacentPreloadPolicy: 2
@@ -438,7 +438,7 @@ MonoBehaviour:
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
       useExactDepthConstraint: 1
-      exactDepth: 5
+      exactDepth: 6
       baseSelectionWeight: 1
       roomRewards:
       - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
