@@ -10,14 +10,6 @@ using UnityEngine;
 [CustomEditor(typeof(GameRoomPortalRewardLogAnchor))]
 internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
 {
-    #region Constants
-    private const string LocatorContractMessage =
-        "Do not move this root to position the visible reward log. The root is an ECS locator and must remain " +
-        "exactly at the matching SubScene Portal Volume center. Configure the visible log position through " +
-        "Game Management Tool > Room Clear Rewards > Portal Log > World Offset. Re-synchronize managed " +
-        "portal anchors after changing a SubScene reference, Portal Id, or Portal Volume transform.";
-    #endregion
-
     #region Methods
 
     #region Unity Methods
@@ -26,8 +18,6 @@ internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
     /// </summary>
     public override void OnInspectorGUI()
     {
-        EditorGUILayout.HelpBox(LocatorContractMessage, MessageType.Warning);
-        EditorGUILayout.Space();
         DrawDefaultInspector();
         DrawAlignmentControls(target as GameRoomPortalRewardLogAnchor);
     }
