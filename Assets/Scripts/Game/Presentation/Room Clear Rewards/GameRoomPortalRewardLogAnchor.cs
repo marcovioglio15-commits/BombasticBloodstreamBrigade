@@ -11,7 +11,10 @@ using UnityEngine;
 public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 {
     #region Constants
-    private const float MaximumPositionErrorSquared = 0.0625f;
+    /// <summary>
+    /// Gets the maximum world-space distance allowed between a managed anchor and its matching ECS portal center.
+    /// </summary>
+    public const float MaximumPositionError = 0.25f;
     #endregion
 
     #region Fields
@@ -35,6 +38,16 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     #endregion
 
     #region Properties
+    /// <summary>
+    /// Gets the stable portal identifier mirrored from the bakeable SubScene authoring.
+    /// </summary>
+    public string PortalId => portalId;
+
+    /// <summary>
+    /// Gets the fixed managed log controlled by the ECS presentation bridge.
+    /// </summary>
+    public GameRoomPortalRewardLogView LogView => logView;
+
     public static uint Revision => revision;
     #endregion
 
@@ -104,7 +117,7 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
             view = anchor.logView;
         }
 
-        if (nearestDistanceSquared <= MaximumPositionErrorSquared)
+        if (nearestDistanceSquared <= MaximumPositionError * MaximumPositionError)
             return true;
 
         view = null;

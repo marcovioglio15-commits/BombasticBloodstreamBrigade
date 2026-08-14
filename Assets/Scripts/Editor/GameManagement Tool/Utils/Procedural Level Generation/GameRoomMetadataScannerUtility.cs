@@ -224,6 +224,8 @@ public static class GameRoomMetadataScannerUtility
         HashSet<string> portalIds = new HashSet<string>(StringComparer.Ordinal);
         List<Scene> openedByScanner = new List<Scene>();
         Scene originalActiveScene = SceneManager.GetActiveScene();
+        GameRoomRewardPortalAnchorValidationContext portalAnchorValidation =
+            new GameRoomRewardPortalAnchorValidationContext(rootScenePath);
         pendingPaths.Enqueue(rootScenePath);
 
         try
@@ -252,13 +254,17 @@ public static class GameRoomMetadataScannerUtility
                     snapshot.AuthoringWarnings.Add("Source scene '" + scenePath + "' has unsaved changes. The scan preserved them, but this cache remains stale until the scene is saved and refreshed.");
                 }
 
+                bool isManagedRootScene =
+                    string.Equals(scenePath, rootScenePath, StringComparison.Ordinal);
                 ScanAuthoringComponents(scene,
-                                        string.Equals(scenePath, rootScenePath, StringComparison.Ordinal),
+                                        isManagedRootScene,
                                         snapshot,
                                         portalIds);
+                portalAnchorValidation.ScanScene(scene, isManagedRootScene);
                 EnqueueReferencedSubScenes(scene, pendingPaths, snapshot.AuthoringWarnings);
             }
 
+            portalAnchorValidation.AppendWarnings(snapshot.AuthoringWarnings);
             return true;
         }
         catch (Exception exception)
@@ -599,7 +605,7 @@ public static class GameRoomMetadataScannerUtility
     /// </summary>
     /// <param name="transform">Authoring transform to describe.</param>
     /// <returns>Slash-separated hierarchy path.</returns>
-    private static string BuildHierarchyPath(Transform transform)
+    internal static string BuildHierarchyPath(Transform transform)
     {
         if (transform == null)
             return string.Empty;

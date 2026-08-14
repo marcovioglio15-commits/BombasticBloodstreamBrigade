@@ -40,6 +40,67 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     }
     #endregion
 
+    #region Anchor Alignment
+    /// <summary>
+    /// Resolves one unique SubScene portal volume center for an anchor edited in a loaded managed room scene.
+    /// </summary>
+    /// <param name="roomScene">Loaded managed room scene containing the anchor and its SubScene references.</param>
+    /// <param name="portalId">Exact stable portal identifier already assigned to the managed anchor.</param>
+    /// <param name="worldCenter">Resolved authoritative portal volume center when lookup succeeds.</param>
+    /// <param name="failure">Actionable explanation when the identifier cannot resolve exactly one portal.</param>
+    /// <returns>True when exactly one valid SubScene portal matches the requested identifier.</returns>
+    internal static bool TryResolvePortalWorldCenter(Scene roomScene,
+                                                     string portalId,
+                                                     out Vector3 worldCenter,
+                                                     out string failure)
+    {
+        worldCenter = Vector3.zero;
+        failure = string.Empty;
+
+        if (!roomScene.IsValid() || !roomScene.isLoaded)
+        {
+            failure = "The managed room scene is not loaded.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(portalId))
+        {
+            failure = "Assign a non-empty Portal ID before aligning the anchor.";
+            return false;
+        }
+
+        List<PortalPresentationSource> sources = CollectPortalSources(roomScene);
+        bool found = false;
+
+        // Require one exact identity so duplicate portal authoring can never move an anchor ambiguously.
+        for (int sourceIndex = 0; sourceIndex < sources.Count; sourceIndex++)
+        {
+            PortalPresentationSource source = sources[sourceIndex];
+
+            if (!string.Equals(source.PortalId, portalId, StringComparison.Ordinal))
+                continue;
+
+            if (found)
+            {
+                worldCenter = Vector3.zero;
+                failure = "Portal ID '" + portalId +
+                          "' is duplicated across the referenced SubScenes. Keep the ID unique before aligning.";
+                return false;
+            }
+
+            found = true;
+            worldCenter = source.WorldCenter;
+        }
+
+        if (found)
+            return true;
+
+        failure = "Portal ID '" + portalId +
+                  "' does not exist on a valid Portal Volume in the referenced SubScenes.";
+        return false;
+    }
+    #endregion
+
     #region Scene Discovery
     /// <summary>
     /// Collects unique managed room scene paths from every authored procedural level preset.
