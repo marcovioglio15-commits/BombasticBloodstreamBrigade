@@ -140,7 +140,21 @@ public static class GameProceduralLevelRunRequestUtility
         if (config.SeedMode == GameProceduralLevelSeedMode.External && request.HasExplicitSeed == 0)
             return false;
 
-        world.EntityManager.GetBuffer<GameProceduralLevelRunRequest>(managerEntity).Add(request);
+        DynamicBuffer<GameProceduralLevelRunRequest> requests =
+            world.EntityManager.GetBuffer<GameProceduralLevelRunRequest>(managerEntity);
+
+        // Absorb repeated UI submits while an equivalent authoritative run command is already pending.
+        for (int requestIndex = 0; requestIndex < requests.Length; requestIndex++)
+        {
+            GameProceduralLevelRunRequest pendingRequest = requests[requestIndex];
+
+            if (pendingRequest.RunSeed == request.RunSeed &&
+                pendingRequest.HasExplicitSeed == request.HasExplicitSeed &&
+                pendingRequest.Restart == request.Restart)
+                return true;
+        }
+
+        requests.Add(request);
         return true;
     }
     #endregion

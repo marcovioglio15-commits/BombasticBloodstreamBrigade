@@ -40,8 +40,9 @@ internal static class GameSynchroMeterPrefabSetupUtility
         EnsurePrefabFolder();
         TMP_FontAsset rankFont = ResolveExistingFont("RankText");
         TMP_FontAsset valueFont = ResolveExistingFont("ValueText");
+        TMP_FontAsset progressionFont = ResolveExistingFont("ProgressionText");
         BuildDisplayPrefab();
-        BuildProgressPrefab();
+        BuildProgressPrefab(progressionFont);
         BuildLabelsPrefab(rankFont, valueFont);
         BuildPanelPrefab();
         AssetDatabase.SaveAssets();
@@ -85,9 +86,10 @@ internal static class GameSynchroMeterPrefabSetupUtility
     }
 
     /// <summary>
-    /// Builds the progression track and horizontal fill as one reusable prefab below the wave display.
+    /// Builds the standard progression bar and the alternative progression label at one shared authored position.
     /// </summary>
-    private static void BuildProgressPrefab()
+    /// <param name="progressionFont">Font preserved for the optional progression label when available.</param>
+    private static void BuildProgressPrefab(TMP_FontAsset progressionFont)
     {
         GameObject root = CreateUiObject("SynchroMeterProgress", typeof(RectTransform));
 
@@ -106,6 +108,22 @@ internal static class GameSynchroMeterPrefabSetupUtility
             fill.fillClockwise = true;
             fill.fillAmount = 0f;
             StretchToParent(fill.rectTransform, Vector2.zero, Vector2.zero);
+            TMP_Text progressionText = CreateText("ProgressionText",
+                                                  rootTransform,
+                                                  progressionFont,
+                                                  GameHudSynchroMeterSettings.DefaultProgressionTextFormat.Replace(
+                                                      GameHudSynchroMeterSettings.ProgressionPercentageToken,
+                                                      "0"),
+                                                  8f,
+                                                  14f,
+                                                  TextAlignmentOptions.Center);
+            SetRect(progressionText.rectTransform,
+                    new Vector2(0.5f, 0.5f),
+                    new Vector2(0.5f, 0.5f),
+                    Vector2.zero,
+                    new Vector2(ProgressWidth, 22f),
+                    new Vector2(0.5f, 0.5f));
+            progressionText.enabled = false;
             SavePrefab(root, ProgressPrefabPath);
         }
         finally
@@ -127,9 +145,9 @@ internal static class GameSynchroMeterPrefabSetupUtility
         {
             RectTransform rootTransform = root.GetComponent<RectTransform>();
             SetRect(rootTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(PanelWidth, DisplayHeight), new Vector2(0.5f, 0.5f));
-            TMP_Text rankText = CreateText("RankText", rootTransform, rankFont, "SYNCHRO", 28f, TextAlignmentOptions.TopLeft);
+            TMP_Text rankText = CreateText("RankText", rootTransform, rankFont, "SYNCHRO", 14f, 28f, TextAlignmentOptions.TopLeft);
             SetRect(rankText.rectTransform, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(16f, -12f), new Vector2(220f, 48f), new Vector2(0f, 1f));
-            TMP_Text valueText = CreateText("ValueText", rootTransform, valueFont, "0", 24f, TextAlignmentOptions.BottomRight);
+            TMP_Text valueText = CreateText("ValueText", rootTransform, valueFont, "0", 14f, 24f, TextAlignmentOptions.BottomRight);
             SetRect(valueText.rectTransform, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-16f, 12f), new Vector2(180f, 42f), new Vector2(1f, 0f));
             SavePrefab(root, LabelsPrefabPath);
         }
@@ -194,7 +212,9 @@ internal static class GameSynchroMeterPrefabSetupUtility
         SetObjectReference(serializedSection, "valueText", labels.transform.Find("ValueText").GetComponent<TMP_Text>());
         SetObjectReference(serializedSection, "progressBackgroundImage", progress.transform.Find("ProgressBackground").GetComponent<Image>());
         SetObjectReference(serializedSection, "progressFillImage", progress.transform.Find("ProgressBackground/ProgressFill").GetComponent<Image>());
+        SetObjectReference(serializedSection, "progressionText", progress.transform.Find("ProgressionText").GetComponent<TMP_Text>());
         SetString(serializedSection, "idleRankLabel", "SYNCHRO");
+        SetString(serializedSection, "progressionTextFormat", GameHudSynchroMeterSettings.DefaultProgressionTextFormat);
         serializedSection.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(section);
     }
@@ -255,10 +275,17 @@ internal static class GameSynchroMeterPrefabSetupUtility
     /// <param name="parent">Label parent.</param>
     /// <param name="font">Preferred font.</param>
     /// <param name="text">Initial text.</param>
+    /// <param name="minimumFontSize">Minimum automatic font size.</param>
     /// <param name="maximumFontSize">Maximum automatic font size.</param>
     /// <param name="alignment">Text alignment.</param>
     /// <returns>Configured TMP label.</returns>
-    private static TMP_Text CreateText(string name, RectTransform parent, TMP_FontAsset font, string text, float maximumFontSize, TextAlignmentOptions alignment)
+    private static TMP_Text CreateText(string name,
+                                       RectTransform parent,
+                                       TMP_FontAsset font,
+                                       string text,
+                                       float minimumFontSize,
+                                       float maximumFontSize,
+                                       TextAlignmentOptions alignment)
     {
         GameObject textObject = CreateUiObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
         textObject.transform.SetParent(parent, false);
@@ -268,7 +295,7 @@ internal static class GameSynchroMeterPrefabSetupUtility
         label.color = Color.white;
         label.alignment = alignment;
         label.enableAutoSizing = true;
-        label.fontSizeMin = 14f;
+        label.fontSizeMin = minimumFontSize;
         label.fontSizeMax = maximumFontSize;
         label.raycastTarget = false;
         label.fontStyle = FontStyles.Bold;

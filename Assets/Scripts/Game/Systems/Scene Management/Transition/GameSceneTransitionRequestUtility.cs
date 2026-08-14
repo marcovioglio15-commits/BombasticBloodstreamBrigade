@@ -87,6 +87,26 @@ public static class GameSceneTransitionRequestUtility
             TransitionId = new FixedString64Bytes(transitionId)
         });
     }
+
+    /// <summary>
+    /// Adds one request only when an equivalent command is not already pending. This keeps every producer on the
+    /// authoritative buffer while preventing repeated UI submits or overlapping gameplay signals from duplicating
+    /// the same pending scene operation.
+    /// </summary>
+    /// <param name="requestBuffer">Scene Manager request buffer receiving the command.</param>
+    /// <param name="request">Request whose complete routing payload is compared against pending commands.</param>
+    /// <returns>True when the request was appended; false when an equivalent request was already pending.</returns>
+    public static bool TryAddUnique(DynamicBuffer<GameSceneTransitionRequest> requestBuffer,
+                                    GameSceneTransitionRequest request)
+    {
+        // Compare the complete routing payload so intentional requests to different targets remain independent.
+        for (int requestIndex = 0; requestIndex < requestBuffer.Length; requestIndex++)
+            if (AreEquivalent(requestBuffer[requestIndex], request))
+                return false;
+
+        requestBuffer.Add(request);
+        return true;
+    }
     #endregion
 
     #region Private Methods
@@ -119,9 +139,24 @@ public static class GameSceneTransitionRequestUtility
 
         Entity managerEntity = query.GetSingletonEntity();
         DynamicBuffer<GameSceneTransitionRequest> requestBuffer = entityManager.GetBuffer<GameSceneTransitionRequest>(managerEntity);
-        requestBuffer.Add(request);
+        TryAddUnique(requestBuffer, request);
         query.Dispose();
         return true;
+    }
+
+    /// <summary>
+    /// Compares the complete scene-routing payload used to identify duplicate pending commands.
+    /// </summary>
+    /// <param name="left">First request to compare.</param>
+    /// <param name="right">Second request to compare.</param>
+    /// <returns>True when both requests describe the same scene operation.</returns>
+    private static bool AreEquivalent(GameSceneTransitionRequest left, GameSceneTransitionRequest right)
+    {
+        return left.RequestType == right.RequestType &&
+               left.Purpose == right.Purpose &&
+               left.TargetSceneId.Equals(right.TargetSceneId) &&
+               left.TransitionId.Equals(right.TransitionId) &&
+               left.ReloadPersistentPlayer == right.ReloadPersistentPlayer;
     }
     #endregion
 

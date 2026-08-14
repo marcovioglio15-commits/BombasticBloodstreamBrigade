@@ -42,6 +42,7 @@ public sealed class MainMenuController : MonoBehaviour
     private Selectable selectionBeforeLock;
     private Selectable fallbackSelectionAfterUnlock;
     private bool navigationLocked;
+    private bool terminalCommandSubmitted;
     #endregion
 
     #endregion
@@ -62,6 +63,13 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        terminalCommandSubmitted = false;
+        navigationLocked = false;
+        SetMenuButtonsInteractable(true);
+
+        if (selectionController != null)
+            selectionController.enabled = true;
+
         RegisterButtons();
         SelectDefaultButton();
         Time.timeScale = 1f;
@@ -140,6 +148,9 @@ public sealed class MainMenuController : MonoBehaviour
     /// <param name="locked">True to suspend menu navigation, false to restore it.</param>
     public void SetNavigationLocked(bool locked)
     {
+        if (terminalCommandSubmitted && !locked)
+            return;
+
         if (navigationLocked == locked)
             return;
 
@@ -166,10 +177,16 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void HandlePlayPressed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         Time.timeScale = 1f;
 
         if (GameSceneTransitionRequestUtility.EnqueueLoadDefaultGameplay())
+        {
+            LockTerminalCommands();
             return;
+        }
 
         Debug.LogWarning("[MainMenuController] Unable to enqueue gameplay loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
     }
@@ -179,6 +196,10 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void HandleEnemySpawnerToolPressed()
     {
+        if (navigationLocked ||
+            GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         if (enemySpawnerToolPanel == null)
         {
             Debug.LogWarning("[MainMenuController] Enemy spawner runtime tool panel is not assigned.");
@@ -196,6 +217,10 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void HandleSettingsPressed()
     {
+        if (navigationLocked ||
+            GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         if (settingsMenu == null)
         {
             Debug.LogWarning("[MainMenuController] Settings menu is not assigned.");
@@ -257,6 +282,10 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void HandleQuitPressed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        LockTerminalCommands();
         AppUtils.QuitGame();
     }
     #endregion
@@ -279,6 +308,25 @@ public sealed class MainMenuController : MonoBehaviour
 
         if (quitButton != null)
             quitButton.interactable = interactable;
+    }
+
+    /// <summary>
+    /// Locks every authored command immediately after a terminal action is accepted so pointer, keyboard, and
+    /// controller submits cannot enqueue or invoke the same operation again while the scene is still visible.
+    /// </summary>
+    private void LockTerminalCommands()
+    {
+        terminalCommandSubmitted = true;
+        navigationLocked = true;
+        SetMenuButtonsInteractable(false);
+
+        if (selectionController != null)
+            selectionController.enabled = false;
+
+        EventSystem resolvedEventSystem = ResolveEventSystem();
+
+        if (resolvedEventSystem != null)
+            resolvedEventSystem.SetSelectedGameObject(null);
     }
 
     /// <summary>

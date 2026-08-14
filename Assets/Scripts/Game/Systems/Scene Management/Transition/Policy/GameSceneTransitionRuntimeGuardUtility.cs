@@ -59,6 +59,17 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
+    /// Resolves whether one terminal UI command must be rejected because its controller already submitted an action
+    /// or the authoritative Scene Manager is processing another transition.
+    /// </summary>
+    /// <param name="commandSubmitted">True after the local controller has accepted a terminal command.</param>
+    /// <returns>True while terminal UI commands must remain blocked.</returns>
+    public static bool ShouldBlockTerminalUiCommand(bool commandSubmitted)
+    {
+        return commandSubmitted || IsDefaultWorldTransitioning();
+    }
+
+    /// <summary>
     /// Resolves whether default-world scene replacement must block gameplay simulation.
     /// </summary>
     /// <returns>True until the transition fully releases scene-streaming and physics ownership.</returns>

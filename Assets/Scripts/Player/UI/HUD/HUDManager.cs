@@ -345,12 +345,14 @@ public sealed class HUDManager : MonoBehaviour
                left.RunTimerDirection == right.RunTimerDirection &&
                Mathf.Approximately(left.RunTimerInitialSeconds, right.RunTimerInitialSeconds) &&
                left.SynchroMeterEnabled == right.SynchroMeterEnabled &&
+               left.SynchroVisualMode == right.SynchroVisualMode &&
                left.SynchroBackgroundTint.Equals(right.SynchroBackgroundTint) &&
                left.SynchroCoverTint.Equals(right.SynchroCoverTint) &&
                left.SynchroPrimaryWaveTint.Equals(right.SynchroPrimaryWaveTint) &&
                left.SynchroSecondaryWaveTint.Equals(right.SynchroSecondaryWaveTint) &&
                left.SynchroRankTextColor.Equals(right.SynchroRankTextColor) &&
                left.SynchroValueTextColor.Equals(right.SynchroValueTextColor) &&
+               left.SynchroProgressionTextColor.Equals(right.SynchroProgressionTextColor) &&
                left.SynchroProgressFillTint.Equals(right.SynchroProgressFillTint) &&
                left.SynchroProgressBackgroundTint.Equals(right.SynchroProgressBackgroundTint) &&
                left.SynchroShowBackground == right.SynchroShowBackground &&
@@ -358,6 +360,7 @@ public sealed class HUDManager : MonoBehaviour
                left.SynchroShowRankText == right.SynchroShowRankText &&
                left.SynchroShowValueText == right.SynchroShowValueText &&
                left.SynchroShowProgressBar == right.SynchroShowProgressBar &&
+               left.SynchroProgressionTextFormat.Equals(right.SynchroProgressionTextFormat) &&
                Mathf.Approximately(left.SynchroWaveScrollCyclesPerSecond, right.SynchroWaveScrollCyclesPerSecond) &&
                Mathf.Approximately(left.SynchroLowestRankPhaseOffsetNormalized, right.SynchroLowestRankPhaseOffsetNormalized) &&
                Mathf.Approximately(left.SynchroHighestRankPhaseOffsetNormalized, right.SynchroHighestRankPhaseOffsetNormalized) &&

@@ -75,6 +75,7 @@ public sealed class GameplayMenuController : MonoBehaviour
     private bool pauseMenuVisible;
     private bool endingMenuVisible;
     private bool settingsMenuVisible;
+    private bool terminalCommandSubmitted;
     private MenuSelectionController selectionController;
     #endregion
 
@@ -97,6 +98,14 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        terminalCommandSubmitted = false;
+        GameplayMenuEcsBindingUtility.SetTerminalButtonsInteractable(resumeButton, pauseSettingsButton,
+                                                                     pauseRestartButton, pauseMainMenuButton, pauseQuitButton,
+                                                                     endingPlayAgainButton, endingMainMenuButton, endingQuitButton, true);
+
+        if (selectionController != null)
+            selectionController.enabled = true;
+
         RegisterButtons();
         RegisterRuntimeEvents();
         RefreshPauseActionBinding();
@@ -311,6 +320,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// <param name="context">Input callback context for the performed cancel action.</param>
     private void HandlePausePerformed(InputAction.CallbackContext context)
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         if (IsMilestoneSelectionActive())
         {
             SuppressPauseMenuForMilestoneSelection();
@@ -390,6 +402,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void ShowPauseMenu()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         if (IsMilestoneSelectionActive())
             return;
 
@@ -401,7 +416,9 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-        SelectDefaultButton(resumeButton, pauseSettingsButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
+        GameplayMenuEcsBindingUtility.SelectDefaultButton(selectionController, eventSystemOverride,
+                                                          resumeButton, pauseSettingsButton, pauseRestartButton,
+                                                          pauseMainMenuButton, pauseQuitButton);
     }
 
     /// <summary>
@@ -455,7 +472,8 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-        SelectDefaultButton(endingPlayAgainButton, endingMainMenuButton, endingQuitButton);
+        GameplayMenuEcsBindingUtility.SelectDefaultButton(selectionController, eventSystemOverride,
+                                                          endingPlayAgainButton, endingMainMenuButton, endingQuitButton);
     }
 
     /// <summary>
@@ -482,6 +500,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleResumePressed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         ResumeGameplay();
     }
 
@@ -490,7 +511,11 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleRestartPressed()
     {
-        ReloadActiveScene();
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        if (ReloadActiveScene())
+            LockTerminalCommands();
     }
 
     /// <summary>
@@ -498,6 +523,10 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleSettingsPressed()
     {
+        if (settingsMenuVisible ||
+            GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         if (settingsMenu == null)
         {
             Debug.LogWarning("[GameplayMenuController] Settings menu is not assigned.");
@@ -518,6 +547,9 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleSettingsClosed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
         settingsMenuVisible = false;
         SetPauseButtonsInteractable(true);
 
@@ -525,7 +557,13 @@ public sealed class GameplayMenuController : MonoBehaviour
             selectionController.enabled = true;
 
         if (pauseMenuVisible)
-            SelectDefaultButton(pauseSettingsButton, resumeButton, pauseRestartButton, pauseMainMenuButton, pauseQuitButton);
+            GameplayMenuEcsBindingUtility.SelectDefaultButton(selectionController,
+                                                              eventSystemOverride,
+                                                              pauseSettingsButton,
+                                                              resumeButton,
+                                                              pauseRestartButton,
+                                                              pauseMainMenuButton,
+                                                              pauseQuitButton);
     }
 
     /// <summary>
@@ -533,7 +571,11 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleMainMenuPressed()
     {
-        LoadMainMenuScene();
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        if (LoadMainMenuScene())
+            LockTerminalCommands();
     }
 
     /// <summary>
@@ -541,6 +583,10 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleQuitPressed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        LockTerminalCommands();
         Time.timeScale = 1f;
         AppUtils.QuitGame();
     }
@@ -550,7 +596,11 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandlePlayAgainPressed()
     {
-        ReloadActiveScene();
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        if (ReloadActiveScene())
+            LockTerminalCommands();
     }
 
     /// <summary>
@@ -558,7 +608,11 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleEndingMainMenuPressed()
     {
-        LoadMainMenuScene();
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        if (LoadMainMenuScene())
+            LockTerminalCommands();
     }
 
     /// <summary>
@@ -566,6 +620,10 @@ public sealed class GameplayMenuController : MonoBehaviour
     /// </summary>
     private void HandleEndingQuitPressed()
     {
+        if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
+            return;
+
+        LockTerminalCommands();
         Time.timeScale = 1f;
         AppUtils.QuitGame();
     }
@@ -585,78 +643,55 @@ public sealed class GameplayMenuController : MonoBehaviour
                                                                   pauseQuitButton,
                                                                   interactable);
     }
+
+    /// <summary>
+    /// Commits one terminal menu command and clears selection before asynchronous scene work begins.
+    /// </summary>
+    private void LockTerminalCommands()
+    {
+        GameplayMenuEcsBindingUtility.LockTerminalCommands(ref terminalCommandSubmitted,
+                                                           ref settingsMenuVisible,
+                                                           selectionController,
+                                                           eventSystemOverride,
+                                                           resumeButton,
+                                                           pauseSettingsButton,
+                                                           pauseRestartButton,
+                                                           pauseMainMenuButton,
+                                                           pauseQuitButton,
+                                                           endingPlayAgainButton,
+                                                           endingMainMenuButton,
+                                                           endingQuitButton);
+    }
     #endregion
 
     #region Scene Flow
     /// <summary>
-    /// Restarts the active procedural run when available, otherwise requests a legacy active-scene restart.
+    /// Restarts the active procedural run when available, otherwise requests the active managed scene restart.
     /// </summary>
-    private void ReloadActiveScene()
+    /// <returns>True when the authoritative runtime accepted or already owns the restart request.</returns>
+    private bool ReloadActiveScene()
     {
         if (GameProceduralLevelRunRequestUtility.TryRestartActiveRun())
-            return;
+            return true;
 
         if (GameSceneTransitionRequestUtility.EnqueueRestartActiveScene())
-            return;
+            return true;
 
         Debug.LogWarning("[GameplayMenuController] Unable to enqueue gameplay restart. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
+        return false;
     }
 
     /// <summary>
     /// Requests the configured main menu through the ECS Scene Manager.
     /// </summary>
-    private void LoadMainMenuScene()
+    /// <returns>True when the authoritative Scene Manager accepted or already owns the main-menu request.</returns>
+    private bool LoadMainMenuScene()
     {
         if (GameSceneTransitionRequestUtility.EnqueueLoadMainMenu())
-            return;
+            return true;
 
         Debug.LogWarning("[GameplayMenuController] Unable to enqueue main-menu loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
-    }
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Selects the first non-null button from the provided authored button order.
-    /// </summary>
-    /// <param name="preferredButtons">Ordered button candidates for UI selection.</param>
-    private void SelectDefaultButton(params Button[] preferredButtons)
-    {
-        if (selectionController != null)
-        {
-            for (int buttonIndex = 0; buttonIndex < preferredButtons.Length; buttonIndex++)
-            {
-                Button candidateButton = preferredButtons[buttonIndex];
-
-                if (candidateButton == null)
-                    continue;
-
-                selectionController.SelectSelectable(candidateButton, rememberAsDefault : true);
-                return;
-            }
-
-            return;
-        }
-
-        EventSystem resolvedEventSystem = eventSystemOverride != null
-            ? eventSystemOverride
-            : EventSystem.current;
-
-        if (resolvedEventSystem == null)
-            return;
-
-        for (int buttonIndex = 0; buttonIndex < preferredButtons.Length; buttonIndex++)
-        {
-            Button candidateButton = preferredButtons[buttonIndex];
-
-            if (candidateButton == null)
-                continue;
-
-            Canvas.ForceUpdateCanvases();
-            resolvedEventSystem.SetSelectedGameObject(null);
-            candidateButton.Select();
-            resolvedEventSystem.SetSelectedGameObject(candidateButton.gameObject);
-            return;
-        }
+        return false;
     }
     #endregion
 

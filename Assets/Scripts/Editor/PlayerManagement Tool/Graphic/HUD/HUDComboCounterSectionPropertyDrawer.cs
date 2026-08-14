@@ -38,6 +38,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
         SerializedProperty valueTextProperty = property.FindPropertyRelative("valueText");
         SerializedProperty progressFillProperty = property.FindPropertyRelative("progressFillImage");
         SerializedProperty progressBackgroundProperty = property.FindPropertyRelative("progressBackgroundImage");
+        SerializedProperty progressionTextProperty = property.FindPropertyRelative("progressionText");
+        SerializedProperty visualModeProperty = property.FindPropertyRelative("visualMode");
         SerializedProperty showBackgroundProperty = property.FindPropertyRelative("showBackground");
         SerializedProperty showCoverProperty = property.FindPropertyRelative("showCover");
         SerializedProperty showRankTextProperty = property.FindPropertyRelative("showRankText");
@@ -50,7 +52,9 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
             primaryLeadingProperty == null ||
             primaryTrailingProperty == null ||
             secondaryLeadingProperty == null ||
-            secondaryTrailingProperty == null)
+            secondaryTrailingProperty == null ||
+            progressionTextProperty == null ||
+            visualModeProperty == null)
         {
             root.Add(new HelpBox("Synchro Meter section fields are missing.", HelpBoxMessageType.Warning));
             return root;
@@ -70,6 +74,7 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
         root.Add(CreateBoundField(valueTextProperty, "Value Text"));
         root.Add(CreateBoundField(progressFillProperty, "Progress Fill"));
         root.Add(CreateBoundField(progressBackgroundProperty, "Progress Background"));
+        root.Add(CreateBoundField(progressionTextProperty, "Progression Text"));
 
         Foldout fallbackFoldout = new Foldout
         {
@@ -95,6 +100,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
                                                                                   valueTextProperty,
                                                                                   progressFillProperty,
                                                                                   progressBackgroundProperty,
+                                                                                  progressionTextProperty,
+                                                                                  visualModeProperty,
                                                                                   showBackgroundProperty,
                                                                                   showCoverProperty,
                                                                                   showRankTextProperty,
@@ -113,6 +120,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
                         valueTextProperty,
                         progressFillProperty,
                         progressBackgroundProperty,
+                        progressionTextProperty,
+                        visualModeProperty,
                         showBackgroundProperty,
                         showCoverProperty,
                         showRankTextProperty,
@@ -133,12 +142,15 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
     {
         string[] fieldNames =
         {
+            "visualMode",
+            "progressionTextFormat",
             "backgroundTint",
             "coverTint",
             "primaryWaveTint",
             "secondaryWaveTint",
             "rankTextColor",
             "valueTextColor",
+            "progressionTextColor",
             "progressFillTint",
             "progressBackgroundTint",
             "showBackground",
@@ -207,6 +219,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
     /// <param name="valueTextProperty">Serialized value text.</param>
     /// <param name="progressFillProperty">Serialized progression fill image.</param>
     /// <param name="progressBackgroundProperty">Serialized progression track image.</param>
+    /// <param name="progressionTextProperty">Serialized optional progression TMP label.</param>
+    /// <param name="visualModeProperty">Serialized fallback visual-mode selection.</param>
     /// <param name="showBackgroundProperty">Serialized background visibility toggle.</param>
     /// <param name="showCoverProperty">Serialized cover visibility toggle.</param>
     /// <param name="showRankTextProperty">Serialized rank-text visibility toggle.</param>
@@ -225,6 +239,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
                                         SerializedProperty valueTextProperty,
                                         SerializedProperty progressFillProperty,
                                         SerializedProperty progressBackgroundProperty,
+                                        SerializedProperty progressionTextProperty,
+                                        SerializedProperty visualModeProperty,
                                         SerializedProperty showBackgroundProperty,
                                         SerializedProperty showCoverProperty,
                                         SerializedProperty showRankTextProperty,
@@ -236,6 +252,8 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
             return;
 
         List<string> warningLines = new List<string>();
+        bool usesProgressionText = visualModeProperty != null &&
+                                   visualModeProperty.enumValueIndex == (int)GameHudSynchroMeterVisualMode.ProgressionText;
 
         if (rootObjectProperty.objectReferenceValue == null)
             warningLines.Add("Assign the Synchro Meter root object used for visibility and fading.");
@@ -255,15 +273,19 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
         if (showCoverProperty.boolValue && coverImageProperty.objectReferenceValue == null)
             warningLines.Add("Show Cover is enabled, but no scanline cover image is assigned.");
 
-        if (showRankTextProperty.boolValue && rankTextProperty.objectReferenceValue == null)
+        if (!usesProgressionText && showRankTextProperty.boolValue && rankTextProperty.objectReferenceValue == null)
             warningLines.Add("Show Rank Text is enabled, but no TMP rank label is assigned.");
 
-        if (showValueTextProperty.boolValue && valueTextProperty.objectReferenceValue == null)
+        if (!usesProgressionText && showValueTextProperty.boolValue && valueTextProperty.objectReferenceValue == null)
             warningLines.Add("Show Value Text is enabled, but no TMP value label is assigned.");
 
-        if (showProgressBarProperty.boolValue &&
+        if (!usesProgressionText &&
+            showProgressBarProperty.boolValue &&
             (progressFillProperty.objectReferenceValue == null || progressBackgroundProperty.objectReferenceValue == null))
             warningLines.Add("Show Progress Bar is enabled, but its fill or background image is not assigned.");
+
+        if (usesProgressionText && progressionTextProperty.objectReferenceValue == null)
+            warningLines.Add("Progression Text mode is selected, but no TMP progression label is assigned.");
 
         warningBox.text = string.Join("\n", warningLines);
         warningBox.style.display = warningLines.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;

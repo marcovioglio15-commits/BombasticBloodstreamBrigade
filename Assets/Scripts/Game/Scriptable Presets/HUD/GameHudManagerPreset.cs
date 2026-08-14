@@ -320,16 +320,33 @@ public enum GameHudSynchroSingleRankConvergenceMode : byte
 }
 
 /// <summary>
+/// Selects the authored Synchro Meter overlay composition without changing its ECS-authoritative wave behavior.
+/// </summary>
+public enum GameHudSynchroMeterVisualMode : byte
+{
+    Standard = 0,
+    ProgressionText = 1
+}
+
+/// <summary>
 /// Stores Synchro Meter wave animation, theme, text, and visibility behavior.
 /// </summary>
 [Serializable]
 public sealed class GameHudSynchroMeterSettings
 {
+    #region Constants
+    public const string ProgressionPercentageToken = "[ProgressionPercentage]";
+    public const string DefaultProgressionTextFormat = "Synchro Meter : [ProgressionPercentage]%";
+    #endregion
+
     #region Fields
 
     #region Serialized Fields
     [Tooltip("Enables the Synchro Meter and its ECS-driven presentation updates.")]
     [SerializeField] private bool isEnabled = true;
+
+    [Tooltip("Selects the standard rank, value, and progress-bar overlays or a single progression label below the waves.")]
+    [SerializeField] private GameHudSynchroMeterVisualMode visualMode;
 
     [Tooltip("Tint applied to the oscilloscope background image.")]
     [SerializeField] private Color backgroundTint = Color.white;
@@ -349,6 +366,9 @@ public sealed class GameHudSynchroMeterSettings
     [Tooltip("Color applied to the current numeric synchro value.")]
     [SerializeField] private Color valueTextColor = Color.white;
 
+    [Tooltip("Color applied to the optional progression label shown at the authored progress-bar position.")]
+    [SerializeField] private Color progressionTextColor = Color.white;
+
     [Tooltip("Tint applied to the progression fill shown below the wave display.")]
     [SerializeField] private Color progressFillTint = new Color(0f, 0.85f, 1f, 1f);
 
@@ -359,7 +379,7 @@ public sealed class GameHudSynchroMeterSettings
     [SerializeField] private bool showBackground = true;
 
     [Tooltip("Shows the scanline cover layer when its image is assigned.")]
-    [SerializeField] private bool showCover = true;
+    [SerializeField] private bool showCover;
 
     [Tooltip("Shows the current rank label over the wave display.")]
     [SerializeField] private bool showRankText = true;
@@ -369,6 +389,9 @@ public sealed class GameHudSynchroMeterSettings
 
     [Tooltip("Shows rank progression below the wave display using the authoritative normalized combo progress.")]
     [SerializeField] private bool showProgressBar = true;
+
+    [Tooltip("Text shown by Progression Text mode. Use [ProgressionPercentage] wherever the current numeric percentage must appear; add % explicitly when required.")]
+    [SerializeField] private string progressionTextFormat = DefaultProgressionTextFormat;
 
     [Header("Wave Motion")]
     [Tooltip("Number of complete wave-image tile cycles scrolled per second. Both waves share this rate so their relative phase remains stable.")]
@@ -442,12 +465,14 @@ public sealed class GameHudSynchroMeterSettings
 
     #region Properties
     public bool IsEnabled => isEnabled;
+    public GameHudSynchroMeterVisualMode VisualMode => visualMode;
     public Color BackgroundTint => backgroundTint;
     public Color CoverTint => coverTint;
     public Color PrimaryWaveTint => primaryWaveTint;
     public Color SecondaryWaveTint => secondaryWaveTint;
     public Color RankTextColor => rankTextColor;
     public Color ValueTextColor => valueTextColor;
+    public Color ProgressionTextColor => progressionTextColor;
     public Color ProgressFillTint => progressFillTint;
     public Color ProgressBackgroundTint => progressBackgroundTint;
     public bool ShowBackground => showBackground;
@@ -455,6 +480,7 @@ public sealed class GameHudSynchroMeterSettings
     public bool ShowRankText => showRankText;
     public bool ShowValueText => showValueText;
     public bool ShowProgressBar => showProgressBar;
+    public string ProgressionTextFormat => progressionTextFormat;
     public float WaveScrollCyclesPerSecond => waveScrollCyclesPerSecond;
     public float LowestRankPhaseOffsetNormalized => lowestRankPhaseOffsetNormalized;
     public float HighestRankPhaseOffsetNormalized => highestRankPhaseOffsetNormalized;

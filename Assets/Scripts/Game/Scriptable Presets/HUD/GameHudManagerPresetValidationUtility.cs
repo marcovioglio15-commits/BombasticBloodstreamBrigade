@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Text;
+using Unity.Collections;
 
 /// <summary>
 /// Produces non-mutating validation warnings for GameHudManagerPreset assets.
@@ -115,6 +117,18 @@ public static class GameHudManagerPresetValidationUtility
         ValidateNonNegative(settings.FadeInDuration, "Synchro Fade In Duration", warnings);
         ValidateNonNegative(settings.FadeOutDuration, "Synchro Fade Out Duration", warnings);
 
+        switch (settings.VisualMode)
+        {
+            case GameHudSynchroMeterVisualMode.Standard:
+                break;
+            case GameHudSynchroMeterVisualMode.ProgressionText:
+                ValidateSynchroProgressionTextFormat(settings.ProgressionTextFormat, warnings);
+                break;
+            default:
+                warnings.Add("Synchro Visual Mode is unsupported. Runtime will use the standard overlay composition.");
+                break;
+        }
+
         if (settings.HighestRankPhaseOffsetNormalized > settings.LowestRankPhaseOffsetNormalized)
             warnings.Add("Synchro Highest Rank Phase Offset exceeds the Lowest Rank value, so higher ranks will diverge instead of converging.");
 
@@ -137,6 +151,29 @@ public static class GameHudManagerPresetValidationUtility
 
         if (string.IsNullOrWhiteSpace(settings.IdleRankLabel))
             warnings.Add("Synchro Idle Rank Label is empty. Runtime fallback will display SYNCHRO.");
+    }
+
+    /// <summary>
+    /// Validates the optional progression-label format without changing the authored text.
+    /// </summary>
+    /// <param name="format">Authored label format inspected for token and ECS storage compatibility.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidateSynchroProgressionTextFormat(string format, List<string> warnings)
+    {
+        if (string.IsNullOrWhiteSpace(format))
+        {
+            warnings.Add("Synchro Progression Text Format is empty. Runtime will use the default format.");
+            return;
+        }
+
+        if (Encoding.UTF8.GetByteCount(format) > FixedString512Bytes.UTF8MaxLengthInBytes)
+            warnings.Add("Synchro Progression Text Format exceeds ECS text capacity. Runtime will use the default format.");
+
+        if (format.IndexOf(GameHudSynchroMeterSettings.ProgressionPercentageToken,
+                           System.StringComparison.Ordinal) < 0)
+        {
+            warnings.Add("Synchro Progression Text Format does not contain [ProgressionPercentage], so its label will remain static.");
+        }
     }
 
     /// <summary>

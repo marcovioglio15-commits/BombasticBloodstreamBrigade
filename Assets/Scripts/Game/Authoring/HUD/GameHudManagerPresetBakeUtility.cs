@@ -1,3 +1,4 @@
+using System.Text;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -58,19 +59,22 @@ public static class GameHudManagerPresetBakeUtility
             RunTimerInitialSeconds = math.max(0f, runTimerSettings != null ? runTimerSettings.InitialSeconds : DefaultRunTimerInitialSeconds),
             RunTimerHideWhenPlayerMissing = ToByte(runTimerSettings == null || runTimerSettings.HideWhenPlayerMissing),
             SynchroMeterEnabled = ToByte(synchroMeterSettings == null || synchroMeterSettings.IsEnabled),
+            SynchroVisualMode = synchroMeterSettings != null ? synchroMeterSettings.VisualMode : GameHudSynchroMeterVisualMode.Standard,
             SynchroBackgroundTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.BackgroundTint : Color.white),
             SynchroCoverTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.CoverTint : Color.white),
             SynchroPrimaryWaveTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.PrimaryWaveTint : Color.white),
             SynchroSecondaryWaveTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.SecondaryWaveTint : Color.white),
             SynchroRankTextColor = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.RankTextColor : Color.white),
             SynchroValueTextColor = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.ValueTextColor : Color.white),
+            SynchroProgressionTextColor = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.ProgressionTextColor : Color.white),
             SynchroProgressFillTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.ProgressFillTint : new Color(0f, 0.85f, 1f, 1f)),
             SynchroProgressBackgroundTint = ToFloat4(synchroMeterSettings != null ? synchroMeterSettings.ProgressBackgroundTint : new Color(0f, 0f, 0f, 0.65f)),
             SynchroShowBackground = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowBackground),
-            SynchroShowCover = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowCover),
+            SynchroShowCover = ToByte(synchroMeterSettings != null && synchroMeterSettings.ShowCover),
             SynchroShowRankText = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowRankText),
             SynchroShowValueText = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowValueText),
             SynchroShowProgressBar = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowProgressBar),
+            SynchroProgressionTextFormat = BuildProgressionTextFormat(synchroMeterSettings != null ? synchroMeterSettings.ProgressionTextFormat : null),
             SynchroWaveScrollCyclesPerSecond = synchroMeterSettings != null ? synchroMeterSettings.WaveScrollCyclesPerSecond : 0.12f,
             SynchroLowestRankPhaseOffsetNormalized = synchroMeterSettings != null ? synchroMeterSettings.LowestRankPhaseOffsetNormalized : 0.25f,
             SynchroHighestRankPhaseOffsetNormalized = synchroMeterSettings != null ? synchroMeterSettings.HighestRankPhaseOffsetNormalized : 0f,
@@ -142,6 +146,22 @@ public static class GameHudManagerPresetBakeUtility
             return fallback;
 
         return value;
+    }
+
+    /// <summary>
+    /// Stores the optional progression-label format in ECS while falling back safely when serialized text is empty or
+    /// exceeds the fixed-string capacity reported by preset validation.
+    /// </summary>
+    /// <param name="value">Authored progression-label format.</param>
+    /// <returns>Validated fixed-string format used by the managed Synchro Meter presentation.</returns>
+    private static FixedString512Bytes BuildProgressionTextFormat(string value)
+    {
+        string resolvedValue = ResolveString(value, GameHudSynchroMeterSettings.DefaultProgressionTextFormat);
+
+        if (Encoding.UTF8.GetByteCount(resolvedValue) > FixedString512Bytes.UTF8MaxLengthInBytes)
+            resolvedValue = GameHudSynchroMeterSettings.DefaultProgressionTextFormat;
+
+        return new FixedString512Bytes(resolvedValue);
     }
     #endregion
 

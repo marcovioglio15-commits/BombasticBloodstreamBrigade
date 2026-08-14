@@ -62,7 +62,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b939683fdd79b3545b96e365d78e45cb, type: 3}
-  m_Name: 
+  m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::HUDComboCounterSection
   isEnabled: 1
   rootObject: {fileID: 7477472897622985331}
@@ -77,16 +77,20 @@ MonoBehaviour:
   valueText: {fileID: 5823091762835989168}
   progressFillImage: {fileID: 1182747983640044676}
   progressBackgroundImage: {fileID: 8593177989240558463}
+  progressionText: {fileID: 1738684619296030671}
+  visualMode: 0
+  progressionTextFormat: 'Synchro Meter : [ProgressionPercentage]%'
   backgroundTint: {r: 1, g: 1, b: 1, a: 1}
   coverTint: {r: 1, g: 1, b: 1, a: 1}
   primaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
   secondaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
   rankTextColor: {r: 1, g: 1, b: 1, a: 1}
   valueTextColor: {r: 1, g: 1, b: 1, a: 1}
+  progressionTextColor: {r: 1, g: 1, b: 1, a: 1}
   progressFillTint: {r: 0, g: 0.85, b: 1, a: 1}
   progressBackgroundTint: {r: 0, g: 0, b: 0, a: 0.65}
   showBackground: 1
-  showCover: 1
+  showCover: 0
   showRankText: 1
   showValueText: 1
   showProgressBar: 1
@@ -94,6 +98,14 @@ MonoBehaviour:
   lowestRankPhaseOffsetNormalized: 0.25
   highestRankPhaseOffsetNormalized: 0
   phaseOffsetResponseExponent: 1
+  singleRankAccelerateWavesWithProgress: 1
+  singleRankMaximumWaveScrollCyclesPerSecond: 0.3
+  singleRankConvergenceMode: 0
+  singleRankInitialPhaseOffsetNormalized: 0.25
+  singleRankFinalPhaseOffsetNormalized: 0
+  singleRankConvergenceStartProgressPercent: 0
+  singleRankConvergenceEndProgressPercent: 100
+  singleRankConvergenceStepCount: 5
   phaseTransitionDuration: 0.3
   useUnscaledTime: 1
   progressSmoothingSeconds: 0.08
@@ -211,6 +223,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1738684619296030671 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2993880082358599157, guid: 8b44899916d3a574caeafbd8386c2c0a, type: 3}
+  m_PrefabInstance: {fileID: 3579634246300123706}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &2334454265397004043 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1281502417366058289, guid: 8b44899916d3a574caeafbd8386c2c0a, type: 3}

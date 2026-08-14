@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
@@ -161,6 +162,148 @@ internal static class GameplayMenuEcsBindingUtility
 
         if (pauseQuitButton != null)
             pauseQuitButton.interactable = interactable;
+    }
+
+    /// <summary>
+    /// Sets every pause and ending command to one consistent interaction state during terminal scene flow.
+    /// </summary>
+    /// <param name="resumeButton">Button that resumes gameplay from the pause menu.</param>
+    /// <param name="pauseSettingsButton">Button that opens settings from pause.</param>
+    /// <param name="pauseRestartButton">Button that restarts from pause.</param>
+    /// <param name="pauseMainMenuButton">Button that returns to the main menu from pause.</param>
+    /// <param name="pauseQuitButton">Button that exits from pause.</param>
+    /// <param name="endingPlayAgainButton">Button that restarts from the ending menu.</param>
+    /// <param name="endingMainMenuButton">Button that returns to the main menu from the ending menu.</param>
+    /// <param name="endingQuitButton">Button that exits from the ending menu.</param>
+    /// <param name="interactable">True while commands may be submitted; false after one terminal action is accepted.</param>
+    public static void SetTerminalButtonsInteractable(Button resumeButton,
+                                                      Button pauseSettingsButton,
+                                                      Button pauseRestartButton,
+                                                      Button pauseMainMenuButton,
+                                                      Button pauseQuitButton,
+                                                      Button endingPlayAgainButton,
+                                                      Button endingMainMenuButton,
+                                                      Button endingQuitButton,
+                                                      bool interactable)
+    {
+        SetPauseButtonsInteractable(resumeButton,
+                                    pauseSettingsButton,
+                                    pauseRestartButton,
+                                    pauseMainMenuButton,
+                                    pauseQuitButton,
+                                    interactable);
+
+        if (endingPlayAgainButton != null)
+            endingPlayAgainButton.interactable = interactable;
+
+        if (endingMainMenuButton != null)
+            endingMainMenuButton.interactable = interactable;
+
+        if (endingQuitButton != null)
+            endingQuitButton.interactable = interactable;
+    }
+
+    /// <summary>
+    /// Commits one terminal menu command, disables every related button, and clears navigation focus before
+    /// asynchronous scene work begins.
+    /// </summary>
+    /// <param name="terminalCommandSubmitted">Mutable gate set after the first accepted terminal action.</param>
+    /// <param name="settingsMenuVisible">Mutable Settings overlay flag cleared when terminal flow takes ownership.</param>
+    /// <param name="selectionController">Optional selection controller disabled while the command is pending.</param>
+    /// <param name="eventSystemOverride">Optional EventSystem used to clear current focus.</param>
+    /// <param name="resumeButton">Button that resumes gameplay from the pause menu.</param>
+    /// <param name="pauseSettingsButton">Button that opens settings from pause.</param>
+    /// <param name="pauseRestartButton">Button that restarts from pause.</param>
+    /// <param name="pauseMainMenuButton">Button that returns to the main menu from pause.</param>
+    /// <param name="pauseQuitButton">Button that exits from pause.</param>
+    /// <param name="endingPlayAgainButton">Button that restarts from the ending menu.</param>
+    /// <param name="endingMainMenuButton">Button that returns to the main menu from the ending menu.</param>
+    /// <param name="endingQuitButton">Button that exits from the ending menu.</param>
+    public static void LockTerminalCommands(ref bool terminalCommandSubmitted,
+                                            ref bool settingsMenuVisible,
+                                            MenuSelectionController selectionController,
+                                            EventSystem eventSystemOverride,
+                                            Button resumeButton,
+                                            Button pauseSettingsButton,
+                                            Button pauseRestartButton,
+                                            Button pauseMainMenuButton,
+                                            Button pauseQuitButton,
+                                            Button endingPlayAgainButton,
+                                            Button endingMainMenuButton,
+                                            Button endingQuitButton)
+    {
+        terminalCommandSubmitted = true;
+        settingsMenuVisible = false;
+        SetTerminalButtonsInteractable(resumeButton,
+                                       pauseSettingsButton,
+                                       pauseRestartButton,
+                                       pauseMainMenuButton,
+                                       pauseQuitButton,
+                                       endingPlayAgainButton,
+                                       endingMainMenuButton,
+                                       endingQuitButton,
+                                       false);
+
+        if (selectionController != null)
+            selectionController.enabled = false;
+
+        EventSystem resolvedEventSystem = eventSystemOverride != null
+            ? eventSystemOverride
+            : EventSystem.current;
+
+        if (resolvedEventSystem != null)
+            resolvedEventSystem.SetSelectedGameObject(null);
+    }
+
+    /// <summary>
+    /// Selects the first authored button available in the requested order through the local selection controller or
+    /// the active EventSystem fallback.
+    /// </summary>
+    /// <param name="selectionController">Optional menu selection helper.</param>
+    /// <param name="eventSystemOverride">Optional authored EventSystem override.</param>
+    /// <param name="preferredButtons">Ordered button candidates for UI selection.</param>
+    public static void SelectDefaultButton(MenuSelectionController selectionController,
+                                           EventSystem eventSystemOverride,
+                                           params Button[] preferredButtons)
+    {
+        if (selectionController != null)
+        {
+            // Select the first authored candidate through the controller so its fallback state stays synchronized.
+            for (int buttonIndex = 0; buttonIndex < preferredButtons.Length; buttonIndex++)
+            {
+                Button candidateButton = preferredButtons[buttonIndex];
+
+                if (candidateButton == null)
+                    continue;
+
+                selectionController.SelectSelectable(candidateButton, rememberAsDefault : true);
+                return;
+            }
+
+            return;
+        }
+
+        EventSystem resolvedEventSystem = eventSystemOverride != null
+            ? eventSystemOverride
+            : EventSystem.current;
+
+        if (resolvedEventSystem == null)
+            return;
+
+        // Apply direct EventSystem selection only when no shared selection controller is present.
+        for (int buttonIndex = 0; buttonIndex < preferredButtons.Length; buttonIndex++)
+        {
+            Button candidateButton = preferredButtons[buttonIndex];
+
+            if (candidateButton == null)
+                continue;
+
+            Canvas.ForceUpdateCanvases();
+            resolvedEventSystem.SetSelectedGameObject(null);
+            candidateButton.Select();
+            resolvedEventSystem.SetSelectedGameObject(candidateButton.gameObject);
+            return;
+        }
     }
 
     /// <summary>

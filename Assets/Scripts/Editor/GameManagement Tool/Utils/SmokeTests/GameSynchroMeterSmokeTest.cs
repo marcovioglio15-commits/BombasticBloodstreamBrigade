@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TMPro;
 using Unity.Mathematics;
 using UnityEditor;
@@ -65,6 +66,9 @@ public static class GameSynchroMeterSmokeTest
             SetInteger(serializedPreset, "synchroMeterSettings.singleRankConvergenceStepCount", 4);
             SetFloat(serializedPreset, "synchroMeterSettings.phaseTransitionDuration", 0.42f);
             SetFloat(serializedPreset, "synchroMeterSettings.progressSmoothingSeconds", 0.16f);
+            SetEnum(serializedPreset, "synchroMeterSettings.visualMode", (int)GameHudSynchroMeterVisualMode.ProgressionText);
+            SetString(serializedPreset, "synchroMeterSettings.progressionTextFormat", "SYNC [ProgressionPercentage] percent");
+            SetColor(serializedPreset, "synchroMeterSettings.progressionTextColor", new Color(0.9f, 0.7f, 0.3f, 1f));
             SetColor(serializedPreset, "synchroMeterSettings.progressFillTint", new Color(0.2f, 0.4f, 0.8f, 0.9f));
             SetColor(serializedPreset, "synchroMeterSettings.progressBackgroundTint", new Color(0.1f, 0.15f, 0.2f, 0.7f));
             SetBool(serializedPreset, "synchroMeterSettings.showCover", false);
@@ -87,6 +91,9 @@ public static class GameSynchroMeterSmokeTest
                 config.SynchroSingleRankConvergenceStepCount != 4 ||
                 Mathf.Abs(config.SynchroPhaseTransitionDuration - 0.42f) > PrecisionEpsilon ||
                 Mathf.Abs(config.SynchroProgressSmoothingSeconds - 0.16f) > PrecisionEpsilon ||
+                config.SynchroVisualMode != GameHudSynchroMeterVisualMode.ProgressionText ||
+                !config.SynchroProgressionTextFormat.Equals(new Unity.Collections.FixedString512Bytes("SYNC [ProgressionPercentage] percent")) ||
+                math.distance(config.SynchroProgressionTextColor, new float4(0.9f, 0.7f, 0.3f, 1f)) > PrecisionEpsilon ||
                 math.distance(config.SynchroProgressFillTint, new float4(0.2f, 0.4f, 0.8f, 0.9f)) > PrecisionEpsilon ||
                 math.distance(config.SynchroProgressBackgroundTint, new float4(0.1f, 0.15f, 0.2f, 0.7f)) > PrecisionEpsilon ||
                 config.SynchroShowCover != 0 ||
@@ -97,12 +104,16 @@ public static class GameSynchroMeterSmokeTest
             }
 
             SetFloat(serializedPreset, "synchroMeterSettings.lowestRankPhaseOffsetNormalized", -0.2f);
+            SetString(serializedPreset, "synchroMeterSettings.progressionTextFormat", "Static label");
             serializedPreset.ApplyModifiedPropertiesWithoutUndo();
             List<string> warnings = new List<string>();
             GameHudManagerPresetValidationUtility.CollectWarnings(preset, warnings);
 
             if (warnings.Count <= 0)
                 throw new Exception("Synchro Meter validation did not report an invalid normalized phase.");
+
+            if (!warnings.Exists(warning => warning.Contains(GameHudSynchroMeterSettings.ProgressionPercentageToken)))
+                throw new Exception("Synchro Meter validation did not report a missing progression token.");
         }
         finally
         {
@@ -138,6 +149,10 @@ public static class GameSynchroMeterSmokeTest
         float wrappedScroll = HUDSynchroMeterWaveUtility.AdvanceScroll(0.95f, 0.1f, 1f);
         float initializedProgress = HUDSynchroMeterPresentationUtility.AdvanceProgress(float.MinValue, 0.65f, 0.5f, 0.1f);
         float smoothedProgress = HUDSynchroMeterPresentationUtility.AdvanceProgress(0.1f, 1f, 1f, 0.2f);
+        StringBuilder progressionTextBuilder = new StringBuilder(64);
+        HUDSynchroMeterPresentationUtility.PopulateProgressionText(progressionTextBuilder,
+                                                                  "SYNC [ProgressionPercentage]%",
+                                                                  73);
 
         if (Mathf.Abs(firstRankOffset - 0.4f) > PrecisionEpsilon ||
             Mathf.Abs(middleRankOffset - 0.2f) > PrecisionEpsilon ||
@@ -147,7 +162,8 @@ public static class GameSynchroMeterSmokeTest
             Mathf.Abs(acceleratedScroll - 0.3f) > PrecisionEpsilon ||
             Mathf.Abs(wrappedScroll - 0.05f) > PrecisionEpsilon ||
             Mathf.Abs(initializedProgress - 0.65f) > PrecisionEpsilon ||
-            Mathf.Abs(smoothedProgress - 0.3f) > PrecisionEpsilon)
+            Mathf.Abs(smoothedProgress - 0.3f) > PrecisionEpsilon ||
+            !string.Equals(progressionTextBuilder.ToString(), "SYNC 73%", StringComparison.Ordinal))
         {
             throw new Exception("Synchro Meter phase convergence or seamless scroll wrapping is not deterministic.");
         }
@@ -237,11 +253,14 @@ public static class GameSynchroMeterSmokeTest
         TMP_Text valueText = GetReference<TMP_Text>(serializedSection, "valueText");
         Image progressFill = GetReference<Image>(serializedSection, "progressFillImage");
         Image progressBackground = GetReference<Image>(serializedSection, "progressBackgroundImage");
+        TMP_Text progressionText = GetReference<TMP_Text>(serializedSection, "progressionText");
+        SerializedProperty showCoverProperty = serializedSection.FindProperty("showCover");
 
         if (viewport == null ||
             viewport.GetComponent<RectMask2D>() == null ||
             background == null ||
-            cover == null ||
+            showCoverProperty == null ||
+            (showCoverProperty.boolValue && cover == null) ||
             primaryLeading == null ||
             primaryTrailing == null ||
             secondaryLeading == null ||
@@ -249,7 +268,8 @@ public static class GameSynchroMeterSmokeTest
             rankText == null ||
             valueText == null ||
             progressFill == null ||
-            progressBackground == null)
+            progressBackground == null ||
+            progressionText == null)
         {
             throw new Exception("Synchro Meter " + context + " has incomplete authored bindings.");
         }
@@ -362,6 +382,22 @@ public static class GameSynchroMeterSmokeTest
             throw new Exception("Missing serialized Synchro Meter property: " + propertyPath);
 
         property.colorValue = value;
+    }
+
+    /// <summary>
+    /// Assigns one string field through its complete serialized property path.
+    /// </summary>
+    /// <param name="serializedObject">Serialized object owning the field.</param>
+    /// <param name="propertyPath">Complete private field path.</param>
+    /// <param name="value">Text assigned to the field.</param>
+    private static void SetString(SerializedObject serializedObject, string propertyPath, string value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyPath);
+
+        if (property == null)
+            throw new Exception("Missing serialized Synchro Meter property: " + propertyPath);
+
+        property.stringValue = value;
     }
 
     /// <summary>

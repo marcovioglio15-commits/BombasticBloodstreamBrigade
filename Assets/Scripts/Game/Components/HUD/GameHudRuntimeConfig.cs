@@ -30,12 +30,14 @@ public struct GameHudRuntimeConfig : IComponentData
     public float RunTimerInitialSeconds;
     public byte RunTimerHideWhenPlayerMissing;
     public byte SynchroMeterEnabled;
+    public GameHudSynchroMeterVisualMode SynchroVisualMode;
     public float4 SynchroBackgroundTint;
     public float4 SynchroCoverTint;
     public float4 SynchroPrimaryWaveTint;
     public float4 SynchroSecondaryWaveTint;
     public float4 SynchroRankTextColor;
     public float4 SynchroValueTextColor;
+    public float4 SynchroProgressionTextColor;
     public float4 SynchroProgressFillTint;
     public float4 SynchroProgressBackgroundTint;
     public byte SynchroShowBackground;
@@ -43,6 +45,7 @@ public struct GameHudRuntimeConfig : IComponentData
     public byte SynchroShowRankText;
     public byte SynchroShowValueText;
     public byte SynchroShowProgressBar;
+    public FixedString512Bytes SynchroProgressionTextFormat;
     public float SynchroWaveScrollCyclesPerSecond;
     public float SynchroLowestRankPhaseOffsetNormalized;
     public float SynchroHighestRankPhaseOffsetNormalized;

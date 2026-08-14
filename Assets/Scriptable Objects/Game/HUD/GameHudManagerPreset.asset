@@ -42,19 +42,22 @@ MonoBehaviour:
     hideWhenPlayerMissing: 1
   synchroMeterSettings:
     isEnabled: 1
+    visualMode: 0
     backgroundTint: {r: 1, g: 1, b: 1, a: 1}
     coverTint: {r: 1, g: 1, b: 1, a: 1}
     primaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
     secondaryWaveTint: {r: 1, g: 1, b: 1, a: 1}
     rankTextColor: {r: 1, g: 1, b: 1, a: 1}
     valueTextColor: {r: 1, g: 1, b: 1, a: 1}
+    progressionTextColor: {r: 1, g: 1, b: 1, a: 1}
     progressFillTint: {r: 0, g: 0.85, b: 1, a: 1}
     progressBackgroundTint: {r: 0, g: 0, b: 0, a: 0.65}
     showBackground: 1
-    showCover: 1
+    showCover: 0
     showRankText: 1
     showValueText: 1
     showProgressBar: 0
+    progressionTextFormat: 'Synchro Meter : [ProgressionPercentage]%'
     waveScrollCyclesPerSecond: 0.1
     lowestRankPhaseOffsetNormalized: 0.25
     highestRankPhaseOffsetNormalized: 0

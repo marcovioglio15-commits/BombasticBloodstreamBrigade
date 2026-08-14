@@ -27,6 +27,13 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         section.Add(activationFoldout);
 
         VisualElement meterOptionsRoot = CreateConditionalOptionsRoot();
+        Foldout presentationModeFoldout = CreateFoldout("Presentation Mode", "Selects the overlay composition rendered around the authored waves.");
+        PropertyField visualModeField = AddProperty(presentationModeFoldout, serializedObject, "synchroMeterSettings.visualMode", "Visual Mode");
+        VisualElement progressionTextModeRoot = CreateConditionalOptionsRoot();
+        AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextFormat", "Progression Text Format");
+        AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextColor", "Progression Text Color");
+        presentationModeFoldout.Add(progressionTextModeRoot);
+        meterOptionsRoot.Add(presentationModeFoldout);
         BuildLayersAndTheme(meterOptionsRoot,
                             serializedObject,
                             out PropertyField showBackgroundField,
@@ -38,7 +45,9 @@ internal static class GameHudManagerSynchroMeterPanelUtility
                             out VisualElement coverThemeRoot,
                             out VisualElement rankTextThemeRoot,
                             out VisualElement valueTextThemeRoot,
-                            out VisualElement progressThemeRoot);
+                            out VisualElement progressThemeRoot,
+                            out VisualElement standardLayersRoot,
+                            out VisualElement standardThemeRoot);
 
         HelpBox topologyBox = new HelpBox(string.Empty, HelpBoxMessageType.Info);
         meterOptionsRoot.Add(topologyBox);
@@ -64,11 +73,13 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         AddProperty(transitionsFoldout, serializedObject, "synchroMeterSettings.fadeOutDuration", "Fade Out Duration");
         meterOptionsRoot.Add(transitionsFoldout);
 
+        VisualElement standardTextOptionsRoot = CreateConditionalOptionsRoot();
         VisualElement rankTextOptionsRoot = CreateConditionalOptionsRoot();
         Foldout textFoldout = CreateFoldout("Text", "Fallback label used before authoritative combo text is available.");
         AddProperty(textFoldout, serializedObject, "synchroMeterSettings.idleRankLabel", "Idle Rank Label");
         rankTextOptionsRoot.Add(textFoldout);
-        meterOptionsRoot.Add(rankTextOptionsRoot);
+        standardTextOptionsRoot.Add(rankTextOptionsRoot);
+        meterOptionsRoot.Add(standardTextOptionsRoot);
         section.Add(meterOptionsRoot);
 
         TrackConditionalVisibility(showBackgroundField, backgroundThemeRoot, serializedObject, "synchroMeterSettings.showBackground", true);
@@ -77,7 +88,13 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         TrackConditionalVisibility(showRankTextField, rankTextOptionsRoot, serializedObject, "synchroMeterSettings.showRankText", true);
         TrackConditionalVisibility(showValueTextField, valueTextThemeRoot, serializedObject, "synchroMeterSettings.showValueText", true);
         TrackConditionalVisibility(showProgressBarField, progressThemeRoot, serializedObject, "synchroMeterSettings.showProgressBar", true);
-        TrackConditionalVisibility(showProgressBarField, progressOptionsRoot, serializedObject, "synchroMeterSettings.showProgressBar", true);
+        TrackProgressionVisibility(visualModeField, showProgressBarField, progressOptionsRoot, serializedObject);
+        TrackVisualModeVisibility(visualModeField,
+                                  progressionTextModeRoot,
+                                  standardLayersRoot,
+                                  standardThemeRoot,
+                                  standardTextOptionsRoot,
+                                  serializedObject);
         TrackConditionalVisibility(enabledField, meterOptionsRoot, serializedObject, "synchroMeterSettings.isEnabled", true);
         TrackComboTopology(section, rankedWaveOptionsRoot, singleRankWaveOptionsRoot, topologyBox);
     }
@@ -99,6 +116,8 @@ internal static class GameHudManagerSynchroMeterPanelUtility
     /// <param name="rankTextThemeRoot">Outputs rank-label-only theme options.</param>
     /// <param name="valueTextThemeRoot">Outputs value-label-only theme options.</param>
     /// <param name="progressThemeRoot">Outputs progression-only theme options.</param>
+    /// <param name="standardLayersRoot">Outputs rank, value, and progress-bar controls used by Standard mode.</param>
+    /// <param name="standardThemeRoot">Outputs rank, value, and progress-bar theme controls used by Standard mode.</param>
     private static void BuildLayersAndTheme(VisualElement parent,
                                             SerializedObject serializedObject,
                                             out PropertyField showBackgroundField,
@@ -110,14 +129,18 @@ internal static class GameHudManagerSynchroMeterPanelUtility
                                             out VisualElement coverThemeRoot,
                                             out VisualElement rankTextThemeRoot,
                                             out VisualElement valueTextThemeRoot,
-                                            out VisualElement progressThemeRoot)
+                                            out VisualElement progressThemeRoot,
+                                            out VisualElement standardLayersRoot,
+                                            out VisualElement standardThemeRoot)
     {
         Foldout layersFoldout = CreateFoldout("Layers", "Optional authored layers and text overlays shown by the meter.");
         showBackgroundField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showBackground", "Show Background");
         showCoverField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showCover", "Show Cover");
-        showRankTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showRankText", "Show Rank Text");
-        showValueTextField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showValueText", "Show Value Text");
-        showProgressBarField = AddProperty(layersFoldout, serializedObject, "synchroMeterSettings.showProgressBar", "Show Progress Bar");
+        standardLayersRoot = CreateConditionalOptionsRoot();
+        showRankTextField = AddProperty(standardLayersRoot, serializedObject, "synchroMeterSettings.showRankText", "Show Rank Text");
+        showValueTextField = AddProperty(standardLayersRoot, serializedObject, "synchroMeterSettings.showValueText", "Show Value Text");
+        showProgressBarField = AddProperty(standardLayersRoot, serializedObject, "synchroMeterSettings.showProgressBar", "Show Progress Bar");
+        layersFoldout.Add(standardLayersRoot);
         parent.Add(layersFoldout);
 
         Foldout themeFoldout = CreateFoldout("Theme", "Tints applied to authored background, cover, waves, text, and progression layers.");
@@ -129,16 +152,18 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         themeFoldout.Add(coverThemeRoot);
         AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.primaryWaveTint", "Primary Wave Tint");
         AddProperty(themeFoldout, serializedObject, "synchroMeterSettings.secondaryWaveTint", "Secondary Wave Tint");
+        standardThemeRoot = CreateConditionalOptionsRoot();
         rankTextThemeRoot = CreateConditionalOptionsRoot();
         AddProperty(rankTextThemeRoot, serializedObject, "synchroMeterSettings.rankTextColor", "Rank Text Color");
-        themeFoldout.Add(rankTextThemeRoot);
+        standardThemeRoot.Add(rankTextThemeRoot);
         valueTextThemeRoot = CreateConditionalOptionsRoot();
         AddProperty(valueTextThemeRoot, serializedObject, "synchroMeterSettings.valueTextColor", "Value Text Color");
-        themeFoldout.Add(valueTextThemeRoot);
+        standardThemeRoot.Add(valueTextThemeRoot);
         progressThemeRoot = CreateConditionalOptionsRoot();
         AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressFillTint", "Progress Fill Tint");
         AddProperty(progressThemeRoot, serializedObject, "synchroMeterSettings.progressBackgroundTint", "Progress Background Tint");
-        themeFoldout.Add(progressThemeRoot);
+        standardThemeRoot.Add(progressThemeRoot);
+        themeFoldout.Add(standardThemeRoot);
         parent.Add(themeFoldout);
     }
 
@@ -187,6 +212,72 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.phaseTransitionDuration", "Phase Transition Duration");
         AddProperty(wavesFoldout, serializedObject, "synchroMeterSettings.useUnscaledTime", "Use Unscaled Time");
         parent.Add(wavesFoldout);
+    }
+
+    /// <summary>
+    /// Shows only controls that affect the selected Synchro Meter overlay composition while preserving inactive
+    /// serialized values for later mode changes.
+    /// </summary>
+    /// <param name="visualModeField">Serialized visual-mode field emitting property changes.</param>
+    /// <param name="progressionTextModeRoot">Progression Text format and color controls.</param>
+    /// <param name="standardLayersRoot">Standard rank, value, and progress-bar layer controls.</param>
+    /// <param name="standardThemeRoot">Standard rank, value, and progress-bar theme controls.</param>
+    /// <param name="standardTextOptionsRoot">Standard idle-rank label controls.</param>
+    /// <param name="serializedObject">Serialized HUD Manager preset being edited.</param>
+    private static void TrackVisualModeVisibility(PropertyField visualModeField,
+                                                  VisualElement progressionTextModeRoot,
+                                                  VisualElement standardLayersRoot,
+                                                  VisualElement standardThemeRoot,
+                                                  VisualElement standardTextOptionsRoot,
+                                                  SerializedObject serializedObject)
+    {
+        Action refresh = () =>
+        {
+            SerializedProperty modeProperty = serializedObject.FindProperty("synchroMeterSettings.visualMode");
+            bool usesProgressionText = modeProperty != null &&
+                                       modeProperty.enumValueIndex == (int)GameHudSynchroMeterVisualMode.ProgressionText;
+            progressionTextModeRoot.style.display = usesProgressionText ? DisplayStyle.Flex : DisplayStyle.None;
+            standardLayersRoot.style.display = usesProgressionText ? DisplayStyle.None : DisplayStyle.Flex;
+            standardThemeRoot.style.display = usesProgressionText ? DisplayStyle.None : DisplayStyle.Flex;
+            standardTextOptionsRoot.style.display = usesProgressionText ? DisplayStyle.None : DisplayStyle.Flex;
+        };
+        refresh.Invoke();
+
+        if (visualModeField != null)
+            visualModeField.RegisterCallback<SerializedPropertyChangeEvent>(_ => refresh.Invoke());
+    }
+
+    /// <summary>
+    /// Keeps smoothing controls visible whenever either the standard progress bar or Progression Text mode consumes
+    /// the smoothed normalized value.
+    /// </summary>
+    /// <param name="visualModeField">Serialized visual-mode field emitting property changes.</param>
+    /// <param name="showProgressBarField">Serialized standard progress-bar toggle emitting property changes.</param>
+    /// <param name="progressOptionsRoot">Progression smoothing controls whose visibility is updated.</param>
+    /// <param name="serializedObject">Serialized HUD Manager preset being edited.</param>
+    private static void TrackProgressionVisibility(PropertyField visualModeField,
+                                                   PropertyField showProgressBarField,
+                                                   VisualElement progressOptionsRoot,
+                                                   SerializedObject serializedObject)
+    {
+        Action refresh = () =>
+        {
+            SerializedProperty modeProperty = serializedObject.FindProperty("synchroMeterSettings.visualMode");
+            SerializedProperty showProgressProperty = serializedObject.FindProperty("synchroMeterSettings.showProgressBar");
+            bool usesProgressionText = modeProperty != null &&
+                                       modeProperty.enumValueIndex == (int)GameHudSynchroMeterVisualMode.ProgressionText;
+            bool showsStandardProgress = showProgressProperty == null || showProgressProperty.boolValue;
+            progressOptionsRoot.style.display = usesProgressionText || showsStandardProgress
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+        };
+        refresh.Invoke();
+
+        if (visualModeField != null)
+            visualModeField.RegisterCallback<SerializedPropertyChangeEvent>(_ => refresh.Invoke());
+
+        if (showProgressBarField != null)
+            showProgressBarField.RegisterCallback<SerializedPropertyChangeEvent>(_ => refresh.Invoke());
     }
 
     /// <summary>

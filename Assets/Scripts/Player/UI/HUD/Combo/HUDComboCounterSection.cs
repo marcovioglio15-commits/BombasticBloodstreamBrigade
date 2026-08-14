@@ -1,5 +1,5 @@
+using System.Text;
 using TMPro;
-using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 using UnityEngine.UI;
@@ -59,6 +59,16 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [Tooltip("Track image rendered behind normalized synchro progression.")]
     [SerializeField] private Image progressBackgroundImage;
 
+    [Tooltip("Authored TMP label shown at the progress-bar position when Progression Text mode is selected.")]
+    [SerializeField] private TMP_Text progressionText;
+
+    [Header("Presentation Mode")]
+    [Tooltip("Fallback overlay composition used before the baked HUD Manager preset becomes available.")]
+    [SerializeField] private GameHudSynchroMeterVisualMode visualMode;
+
+    [Tooltip("Fallback tokenized label format used by Progression Text mode.")]
+    [SerializeField] private string progressionTextFormat = GameHudSynchroMeterSettings.DefaultProgressionTextFormat;
+
     [Header("Theme Fallback")]
     [Tooltip("Fallback tint applied to the oscilloscope background image.")]
     [SerializeField] private Color backgroundTint = Color.white;
@@ -78,6 +88,9 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [Tooltip("Fallback color applied to the current numeric value.")]
     [SerializeField] private Color valueTextColor = Color.white;
 
+    [Tooltip("Fallback color applied to the optional progression label below the waves.")]
+    [SerializeField] private Color progressionTextColor = Color.white;
+
     [Tooltip("Fallback tint applied to the progression fill below the wave display.")]
     [SerializeField] private Color progressFillTint = new Color(0f, 0.85f, 1f, 1f);
 
@@ -89,7 +102,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [SerializeField] private bool showBackground = true;
 
     [Tooltip("Shows the scanline cover layer when its image is assigned.")]
-    [SerializeField] private bool showCover = true;
+    [SerializeField] private bool showCover;
 
     [Tooltip("Shows the current rank label over the wave display.")]
     [SerializeField] private bool showRankText = true;
@@ -168,10 +181,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [SerializeField] private string idleRankLabel = "SYNCHRO";
     #endregion
 
-    private int displayedValue = int.MinValue;
-    private int displayedMaximumValue = int.MinValue;
-    private PlayerComboSingleRankValueDisplayMode displayedValueMode = (PlayerComboSingleRankValueDisplayMode)byte.MaxValue;
-    private string displayedRankLabel = string.Empty;
+    private HUDComboTextPresentationState textPresentationState;
     private float scrollPhaseNormalized;
     private float currentWaveScrollCyclesPerSecond;
     private float currentWaveOffsetNormalized;
@@ -184,6 +194,8 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     private CanvasGroup rootCanvasGroup;
     private float displayedProgressNormalized = float.MinValue;
     private float targetProgressNormalized;
+    private readonly StringBuilder progressionTextBuilder = new StringBuilder(512);
+    private int displayedProgressPercentage = int.MinValue;
     #endregion
 
     #region Methods
@@ -196,12 +208,14 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     public void ApplySettings(in GameHudRuntimeConfig config)
     {
         isEnabled = config.SynchroMeterEnabled != 0;
+        visualMode = config.SynchroVisualMode;
         backgroundTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroBackgroundTint);
         coverTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroCoverTint);
         primaryWaveTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroPrimaryWaveTint);
         secondaryWaveTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroSecondaryWaveTint);
         rankTextColor = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroRankTextColor);
         valueTextColor = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroValueTextColor);
+        progressionTextColor = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroProgressionTextColor);
         progressFillTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroProgressFillTint);
         progressBackgroundTint = HUDSynchroMeterPresentationUtility.ToColor(config.SynchroProgressBackgroundTint);
         showBackground = config.SynchroShowBackground != 0;
@@ -209,6 +223,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         showRankText = config.SynchroShowRankText != 0;
         showValueText = config.SynchroShowValueText != 0;
         showProgressBar = config.SynchroShowProgressBar != 0;
+        progressionTextFormat = config.SynchroProgressionTextFormat.ToString();
         waveScrollCyclesPerSecond = config.SynchroWaveScrollCyclesPerSecond;
         lowestRankPhaseOffsetNormalized = config.SynchroLowestRankPhaseOffsetNormalized;
         highestRankPhaseOffsetNormalized = config.SynchroHighestRankPhaseOffsetNormalized;
@@ -355,13 +370,17 @@ public sealed class HUDComboCounterSection : MonoBehaviour
             currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.SanitizeNonNegative(waveScrollCyclesPerSecond, 0.12f);
         }
 
-        if (shouldBeVisible)
-            ApplyVisibleText(comboCounterState.CurrentValue,
-                             comboCounterState.CurrentRankId,
-                             runtimeComboConfig.SingleRankMaximumComboValue,
-                             runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression
-                                 ? runtimeComboConfig.SingleRankValueDisplayMode
-                                 : PlayerComboSingleRankValueDisplayMode.CurrentValue);
+        if (shouldBeVisible && visualMode != GameHudSynchroMeterVisualMode.ProgressionText)
+            HUDComboCounterRuntimePresentationUtility.ApplyVisibleText(rankText,
+                                                                      valueText,
+                                                                      idleRankLabel,
+                                                                      comboCounterState.CurrentValue,
+                                                                      comboCounterState.CurrentRankId,
+                                                                      runtimeComboConfig.SingleRankMaximumComboValue,
+                                                                      runtimeComboConfig.Mode == PlayerComboCounterMode.SingleRankProgression
+                                                                          ? runtimeComboConfig.SingleRankValueDisplayMode
+                                                                          : PlayerComboSingleRankValueDisplayMode.CurrentValue,
+                                                                      ref textPresentationState);
 
         RequestVisibility(shouldBeVisible, false);
         AdvancePresentation(ResolveDeltaTime());
@@ -370,53 +389,20 @@ public sealed class HUDComboCounterSection : MonoBehaviour
 
     #region Presentation
     /// <summary>
-    /// Applies the current rank identifier and numeric value while avoiding unchanged TMP assignments.
-    /// </summary>
-    /// <param name="value">Current authoritative combo value presented as synchro intensity.</param>
-    /// <param name="rankId">Current authoritative combo-rank identifier.</param>
-    /// <param name="maximumValue">Maximum value shown by Current And Maximum mode.</param>
-    /// <param name="valueDisplayMode">Single-rank numeric label format.</param>
-    private void ApplyVisibleText(int value,
-                                  FixedString64Bytes rankId,
-                                  int maximumValue,
-                                  PlayerComboSingleRankValueDisplayMode valueDisplayMode)
-    {
-        string resolvedRankLabel = rankId.Length > 0 ? rankId.ToString() : ResolveIdleRankLabel();
-
-        if (rankText != null && !string.Equals(displayedRankLabel, resolvedRankLabel, System.StringComparison.Ordinal))
-        {
-            rankText.SetText(resolvedRankLabel);
-            displayedRankLabel = resolvedRankLabel;
-        }
-
-        if (valueText != null &&
-            (displayedValue != value ||
-             displayedMaximumValue != maximumValue ||
-             displayedValueMode != valueDisplayMode))
-        {
-            switch (valueDisplayMode)
-            {
-                case PlayerComboSingleRankValueDisplayMode.CurrentAndMaximum:
-                    valueText.SetText("{0}/{1}", value, maximumValue);
-                    break;
-
-                default:
-                    valueText.SetText("{0}", value);
-                    break;
-            }
-
-            displayedValue = value;
-            displayedMaximumValue = maximumValue;
-            displayedValueMode = valueDisplayMode;
-        }
-    }
-
-    /// <summary>
     /// Applies the visible fallback state used when player absence is configured not to hide the meter.
     /// </summary>
     private void ApplyFallbackVisibleState()
     {
-        ApplyVisibleText(0, default, 0, PlayerComboSingleRankValueDisplayMode.CurrentValue);
+        if (visualMode != GameHudSynchroMeterVisualMode.ProgressionText)
+            HUDComboCounterRuntimePresentationUtility.ApplyVisibleText(rankText,
+                                                                      valueText,
+                                                                      idleRankLabel,
+                                                                      0,
+                                                                      default,
+                                                                      0,
+                                                                      PlayerComboSingleRankValueDisplayMode.CurrentValue,
+                                                                      ref textPresentationState);
+
         targetWaveOffsetNormalized = HUDSynchroMeterWaveUtility.SanitizeNormalizedPhase(lowestRankPhaseOffsetNormalized, 0.25f);
         currentWaveScrollCyclesPerSecond = HUDSynchroMeterWaveUtility.SanitizeNonNegative(waveScrollCyclesPerSecond, 0.12f);
     }
@@ -478,6 +464,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(secondaryWaveTrailingImage, secondaryWaveTint);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(rankText, rankTextColor);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(valueText, valueTextColor);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressionText, progressionTextColor);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressFillImage, progressFillTint);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressBackgroundImage, progressBackgroundTint);
     }
@@ -499,8 +486,27 @@ public sealed class HUDComboCounterSection : MonoBehaviour
 
         displayedProgressNormalized = nextProgress;
 
-        if (progressFillImage != null)
+        if (visualMode != GameHudSynchroMeterVisualMode.ProgressionText &&
+            showProgressBar &&
+            progressFillImage != null)
+        {
             progressFillImage.fillAmount = displayedProgressNormalized;
+            return;
+        }
+
+        if (visualMode != GameHudSynchroMeterVisualMode.ProgressionText)
+            return;
+
+        int progressionPercentage = Mathf.RoundToInt(displayedProgressNormalized * 100f);
+
+        if (progressionPercentage == displayedProgressPercentage)
+            return;
+
+        displayedProgressPercentage = progressionPercentage;
+        HUDSynchroMeterPresentationUtility.ApplyProgressionText(progressionText,
+                                                               progressionTextBuilder,
+                                                               progressionTextFormat,
+                                                               progressionPercentage);
     }
     #endregion
 
@@ -586,6 +592,8 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     /// <param name="visible">True when the authored meter hierarchy must remain renderable.</param>
     private void SetVisualPresence(bool visible)
     {
+        bool usesProgressionText = visualMode == GameHudSynchroMeterVisualMode.ProgressionText;
+
         if (rootObject != null)
             rootObject.SetActive(visible);
 
@@ -595,10 +603,11 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         HUDSynchroMeterPresentationUtility.SetGraphicEnabled(primaryWaveTrailingImage, visible);
         HUDSynchroMeterPresentationUtility.SetGraphicEnabled(secondaryWaveLeadingImage, visible);
         HUDSynchroMeterPresentationUtility.SetGraphicEnabled(secondaryWaveTrailingImage, visible);
-        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(rankText, visible && showRankText);
-        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(valueText, visible && showValueText);
-        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressFillImage, visible && showProgressBar);
-        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressBackgroundImage, visible && showProgressBar);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(rankText, visible && !usesProgressionText && showRankText);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(valueText, visible && !usesProgressionText && showValueText);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressFillImage, visible && !usesProgressionText && showProgressBar);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressBackgroundImage, visible && !usesProgressionText && showProgressBar);
+        HUDSynchroMeterPresentationUtility.SetGraphicEnabled(progressionText, visible && usesProgressionText);
     }
 
     /// <summary>
@@ -625,6 +634,7 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(valueText, clampedAlpha);
         HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(progressFillImage, clampedAlpha);
         HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(progressBackgroundImage, clampedAlpha);
+        HUDSynchroMeterPresentationUtility.ApplyGraphicAlpha(progressionText, clampedAlpha);
     }
     #endregion
 
@@ -653,25 +663,14 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves the authored idle label with a stable Synchro fallback.
-    /// </summary>
-    /// <returns>Non-empty idle rank label.</returns>
-    private string ResolveIdleRankLabel()
-    {
-        return string.IsNullOrWhiteSpace(idleRankLabel) ? "SYNCHRO" : idleRankLabel;
-    }
-
-    /// <summary>
     /// Invalidates cached TMP values so the next visible update reapplies authoritative content.
     /// </summary>
     private void ResetCachedPresentationState()
     {
-        displayedValue = int.MinValue;
-        displayedMaximumValue = int.MinValue;
-        displayedValueMode = (PlayerComboSingleRankValueDisplayMode)byte.MaxValue;
-        displayedRankLabel = string.Empty;
+        textPresentationState.Reset();
         displayedProgressNormalized = float.MinValue;
         targetProgressNormalized = 0f;
+        displayedProgressPercentage = int.MinValue;
     }
 
     #endregion

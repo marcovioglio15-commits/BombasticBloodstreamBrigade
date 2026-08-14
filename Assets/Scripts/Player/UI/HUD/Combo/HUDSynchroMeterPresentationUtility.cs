@@ -1,3 +1,6 @@
+using System;
+using System.Text;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,6 +39,64 @@ public static class HUDSynchroMeterPresentationUtility
         return Mathf.MoveTowards(Mathf.Clamp01(currentProgress),
                                  safeTarget,
                                  HUDSynchroMeterWaveUtility.SanitizeNonNegative(deltaTime, 0f) / safeDuration);
+    }
+
+    /// <summary>
+    /// Rebuilds a progression label into a reusable buffer, replacing every supported token with the supplied numeric
+    /// percentage and preserving all surrounding authored text without per-update string allocations.
+    /// </summary>
+    /// <param name="textBuilder">Reusable destination buffer cleared before content is appended.</param>
+    /// <param name="format">Authored format containing zero or more [ProgressionPercentage] tokens.</param>
+    /// <param name="progressionPercentage">Numeric percentage written without an implicit percent sign.</param>
+    public static void PopulateProgressionText(StringBuilder textBuilder,
+                                               string format,
+                                               int progressionPercentage)
+    {
+        if (textBuilder == null)
+            return;
+
+        textBuilder.Clear();
+        string resolvedFormat = string.IsNullOrWhiteSpace(format)
+            ? GameHudSynchroMeterSettings.DefaultProgressionTextFormat
+            : format;
+        string token = GameHudSynchroMeterSettings.ProgressionPercentageToken;
+        int searchIndex = 0;
+        int safePercentage = Mathf.Clamp(progressionPercentage, 0, 100);
+
+        // Append unchanged text spans and numeric replacements without allocating substrings.
+        while (searchIndex < resolvedFormat.Length)
+        {
+            int tokenIndex = resolvedFormat.IndexOf(token, searchIndex, StringComparison.Ordinal);
+
+            if (tokenIndex < 0)
+            {
+                textBuilder.Append(resolvedFormat, searchIndex, resolvedFormat.Length - searchIndex);
+                return;
+            }
+
+            textBuilder.Append(resolvedFormat, searchIndex, tokenIndex - searchIndex);
+            textBuilder.Append(safePercentage);
+            searchIndex = tokenIndex + token.Length;
+        }
+    }
+
+    /// <summary>
+    /// Applies one tokenized progression value to an authored TMP label through a reusable text buffer.
+    /// </summary>
+    /// <param name="progressionText">Authored label receiving the formatted percentage.</param>
+    /// <param name="textBuilder">Reusable buffer that avoids transient formatted strings.</param>
+    /// <param name="format">Authored progression-label format.</param>
+    /// <param name="progressionPercentage">Numeric percentage written into every supported token.</param>
+    public static void ApplyProgressionText(TMP_Text progressionText,
+                                            StringBuilder textBuilder,
+                                            string format,
+                                            int progressionPercentage)
+    {
+        if (progressionText == null || textBuilder == null)
+            return;
+
+        PopulateProgressionText(textBuilder, format, progressionPercentage);
+        progressionText.SetText(textBuilder);
     }
 
     /// <summary>
