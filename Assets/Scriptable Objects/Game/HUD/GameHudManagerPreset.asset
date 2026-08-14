@@ -54,13 +54,13 @@ MonoBehaviour:
     showCover: 1
     showRankText: 1
     showValueText: 1
-    showProgressBar: 1
-    waveScrollCyclesPerSecond: 0.12
+    showProgressBar: 0
+    waveScrollCyclesPerSecond: 0.1
     lowestRankPhaseOffsetNormalized: 0.25
     highestRankPhaseOffsetNormalized: 0
     phaseOffsetResponseExponent: 1
     singleRankAccelerateWavesWithProgress: 1
-    singleRankMaximumWaveScrollCyclesPerSecond: 0.3
+    singleRankMaximumWaveScrollCyclesPerSecond: 0.5
     singleRankConvergenceMode: 0
     singleRankInitialPhaseOffsetNormalized: 0.25
     singleRankFinalPhaseOffsetNormalized: 0
@@ -71,8 +71,8 @@ MonoBehaviour:
     useUnscaledTime: 1
     progressSmoothingSeconds: 0.08
     hideWhenPlayerMissing: 1
-    hideWhenZeroValue: 1
-    hideWhenNoActiveRank: 1
+    hideWhenZeroValue: 0
+    hideWhenNoActiveRank: 0
     fadeInDuration: 0.18
     fadeOutDuration: 0.18
     idleRankLabel: SYNCHRO

@@ -7514,6 +7514,18 @@ PrefabInstance:
       propertyPath: coverImage
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2821026060292732036, guid: da38ba479a72f1c4b8a9f23bdefebe3f, type: 3}
+      propertyPath: hideWhenZeroValue
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2821026060292732036, guid: da38ba479a72f1c4b8a9f23bdefebe3f, type: 3}
+      propertyPath: hideWhenNoActiveRank
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2821026060292732036, guid: da38ba479a72f1c4b8a9f23bdefebe3f, type: 3}
+      propertyPath: hideWhenPlayerMissing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3624529751200338551, guid: da38ba479a72f1c4b8a9f23bdefebe3f, type: 3}
       propertyPath: m_Pivot.x
       value: 0
