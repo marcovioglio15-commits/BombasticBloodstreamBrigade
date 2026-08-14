@@ -173,6 +173,11 @@ MonoBehaviour:
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: comboCounter.singleRankProgression.valueDisplayMode
+    addScaling: 0
+    formula: 
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   gamePhasesDefinition:
   - phaseID: Phase0
     startsAtLevel: 0
@@ -431,54 +436,22 @@ MonoBehaviour:
         - formula: '[InfinitePenetration]=true'
       passivePowerUpUnlocks: []
     singleRankProgression:
-      rankId: SYNCHRO
-      maximumComboValue: 1500
+      rankId: SYNCHRO RATE
+      maximumComboValue: 1000
       pointsDecayPerSecond: 0
       valueDisplayMode: 1
       formulaDistributionMode: 1
       linearBonusRangeMode: 1
-      showMeterOnlyAfterFirstMilestone: 1
+      showMeterOnlyAfterFirstMilestone: 0
       startLinearBonusesAtFirstMilestone: 1
       bonusMilestones:
-      - milestoneId: D
+      - milestoneId: SYNCHRO RATE
         isEnabled: 1
-        requiredProgressPercent: 6
+        requiredProgressPercent: 0
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
-          - formula: '[GatheringRadius]=[GatheringRadius]*1.2'
-        passivePowerUpUnlocks: []
-      - milestoneId: C
-        isEnabled: 1
-        requiredProgressPercent: 17
-        bonuses:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas:
-          - formula: '[MovementSpeed]=[MovementSpeed]*1.2'
-        passivePowerUpUnlocks: []
-      - milestoneId: B
-        isEnabled: 1
-        requiredProgressPercent: 33
-        bonuses:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas:
-          - formula: '[ShotRange]=[ShotRange]*1.2'
-        passivePowerUpUnlocks: []
-      - milestoneId: A
-        isEnabled: 1
-        requiredProgressPercent: 66
-        bonuses:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas:
-          - formula: '[FireRate]=[FireRate]*1.2'
-        passivePowerUpUnlocks: []
-      - milestoneId: S
-        isEnabled: 1
-        requiredProgressPercent: 100
-        bonuses:
-          applyFormulasOnlyOnActiveTrigger: 0
-          formulas:
-          - formula: '[InfinitePenetration]=true'
+          - formula: '[Luck]=[Luck]+50'
         passivePowerUpUnlocks: []
   legacyExperienceRequiredPerLevel: 100
   levelCap: 100
