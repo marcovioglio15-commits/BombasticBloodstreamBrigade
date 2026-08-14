@@ -39,6 +39,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - ManagedScene
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 231f2d11e6deb854e8e91c2aba8a48ef
+    m_Address: SCN_MAIN_METRO_START
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - ManagedScene
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 27d9e1327f828944794adba3410c0657
     m_Address: SCN_LGTEST_METRO_BOSS
     m_ReadOnly: 0
