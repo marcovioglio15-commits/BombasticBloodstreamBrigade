@@ -69,6 +69,15 @@ public sealed class HUDComboCounterSection : MonoBehaviour
     [Tooltip("Fallback tokenized label format used by Progression Text mode.")]
     [SerializeField] private string progressionTextFormat = GameHudSynchroMeterSettings.DefaultProgressionTextFormat;
 
+    [Tooltip("Fallback font size in pixels used by the optional progression label.")]
+    [SerializeField] private float progressionTextFontSize = GameHudSynchroMeterSettings.DefaultProgressionTextFontSize;
+
+    [Tooltip("Fallback horizontal alignment used by the optional progression label.")]
+    [SerializeField] private GameHudSynchroMeterTextAlignment progressionTextAlignment = GameHudSynchroMeterTextAlignment.Center;
+
+    [Tooltip("Fallback vertical distance in pixels between the wave reticle and the optional progression label.")]
+    [SerializeField] private float progressionTextWaveDistance = GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance;
+
     [Header("Theme Fallback")]
     [Tooltip("Fallback tint applied to the oscilloscope background image.")]
     [SerializeField] private Color backgroundTint = Color.white;
@@ -224,6 +233,9 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         showValueText = config.SynchroShowValueText != 0;
         showProgressBar = config.SynchroShowProgressBar != 0;
         progressionTextFormat = config.SynchroProgressionTextFormat.ToString();
+        progressionTextFontSize = config.SynchroProgressionTextFontSize;
+        progressionTextAlignment = config.SynchroProgressionTextAlignment;
+        progressionTextWaveDistance = config.SynchroProgressionTextWaveDistance;
         waveScrollCyclesPerSecond = config.SynchroWaveScrollCyclesPerSecond;
         lowestRankPhaseOffsetNormalized = config.SynchroLowestRankPhaseOffsetNormalized;
         highestRankPhaseOffsetNormalized = config.SynchroHighestRankPhaseOffsetNormalized;
@@ -467,6 +479,10 @@ public sealed class HUDComboCounterSection : MonoBehaviour
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressionText, progressionTextColor);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressFillImage, progressFillTint);
         HUDSynchroMeterPresentationUtility.ApplyGraphicColor(progressBackgroundImage, progressBackgroundTint);
+        HUDSynchroMeterPresentationUtility.ApplyProgressionTextLayout(progressionText,
+                                                                     progressionTextFontSize,
+                                                                     progressionTextAlignment,
+                                                                     progressionTextWaveDistance);
     }
 
     /// <summary>

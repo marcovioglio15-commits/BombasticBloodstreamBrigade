@@ -123,6 +123,7 @@ public static class GameHudManagerPresetValidationUtility
                 break;
             case GameHudSynchroMeterVisualMode.ProgressionText:
                 ValidateSynchroProgressionTextFormat(settings.ProgressionTextFormat, warnings);
+                ValidateSynchroProgressionTextLayout(settings, warnings);
                 break;
             default:
                 warnings.Add("Synchro Visual Mode is unsupported. Runtime will use the standard overlay composition.");
@@ -173,6 +174,29 @@ public static class GameHudManagerPresetValidationUtility
                            System.StringComparison.Ordinal) < 0)
         {
             warnings.Add("Synchro Progression Text Format does not contain [ProgressionPercentage], so its label will remain static.");
+        }
+    }
+
+    /// <summary>
+    /// Validates progression-label size, alignment, and wave spacing without modifying the preset.
+    /// </summary>
+    /// <param name="settings">Synchro Meter settings supplying progression-label layout values.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidateSynchroProgressionTextLayout(GameHudSynchroMeterSettings settings,
+                                                             List<string> warnings)
+    {
+        ValidatePositive(settings.ProgressionTextFontSize, "Synchro Progression Text Font Size", warnings);
+        ValidateNonNegative(settings.ProgressionTextWaveDistance, "Synchro Progression Text Wave Distance", warnings);
+
+        switch (settings.ProgressionTextAlignment)
+        {
+            case GameHudSynchroMeterTextAlignment.Left:
+            case GameHudSynchroMeterTextAlignment.Center:
+            case GameHudSynchroMeterTextAlignment.Right:
+                break;
+            default:
+                warnings.Add("Synchro Progression Text Alignment is unsupported. Runtime will use centered alignment.");
+                break;
         }
     }
 

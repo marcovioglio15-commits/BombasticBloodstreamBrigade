@@ -69,6 +69,9 @@ public static class GameSynchroMeterSmokeTest
             SetEnum(serializedPreset, "synchroMeterSettings.visualMode", (int)GameHudSynchroMeterVisualMode.ProgressionText);
             SetString(serializedPreset, "synchroMeterSettings.progressionTextFormat", "SYNC [ProgressionPercentage] percent");
             SetColor(serializedPreset, "synchroMeterSettings.progressionTextColor", new Color(0.9f, 0.7f, 0.3f, 1f));
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextFontSize", 19f);
+            SetEnum(serializedPreset, "synchroMeterSettings.progressionTextAlignment", (int)GameHudSynchroMeterTextAlignment.Right);
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextWaveDistance", 13f);
             SetColor(serializedPreset, "synchroMeterSettings.progressFillTint", new Color(0.2f, 0.4f, 0.8f, 0.9f));
             SetColor(serializedPreset, "synchroMeterSettings.progressBackgroundTint", new Color(0.1f, 0.15f, 0.2f, 0.7f));
             SetBool(serializedPreset, "synchroMeterSettings.showCover", false);
@@ -94,6 +97,9 @@ public static class GameSynchroMeterSmokeTest
                 config.SynchroVisualMode != GameHudSynchroMeterVisualMode.ProgressionText ||
                 !config.SynchroProgressionTextFormat.Equals(new Unity.Collections.FixedString512Bytes("SYNC [ProgressionPercentage] percent")) ||
                 math.distance(config.SynchroProgressionTextColor, new float4(0.9f, 0.7f, 0.3f, 1f)) > PrecisionEpsilon ||
+                Mathf.Abs(config.SynchroProgressionTextFontSize - 19f) > PrecisionEpsilon ||
+                config.SynchroProgressionTextAlignment != GameHudSynchroMeterTextAlignment.Right ||
+                Mathf.Abs(config.SynchroProgressionTextWaveDistance - 13f) > PrecisionEpsilon ||
                 math.distance(config.SynchroProgressFillTint, new float4(0.2f, 0.4f, 0.8f, 0.9f)) > PrecisionEpsilon ||
                 math.distance(config.SynchroProgressBackgroundTint, new float4(0.1f, 0.15f, 0.2f, 0.7f)) > PrecisionEpsilon ||
                 config.SynchroShowCover != 0 ||
@@ -105,6 +111,8 @@ public static class GameSynchroMeterSmokeTest
 
             SetFloat(serializedPreset, "synchroMeterSettings.lowestRankPhaseOffsetNormalized", -0.2f);
             SetString(serializedPreset, "synchroMeterSettings.progressionTextFormat", "Static label");
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextFontSize", 0f);
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextWaveDistance", -1f);
             serializedPreset.ApplyModifiedPropertiesWithoutUndo();
             List<string> warnings = new List<string>();
             GameHudManagerPresetValidationUtility.CollectWarnings(preset, warnings);
@@ -114,6 +122,12 @@ public static class GameSynchroMeterSmokeTest
 
             if (!warnings.Exists(warning => warning.Contains(GameHudSynchroMeterSettings.ProgressionPercentageToken)))
                 throw new Exception("Synchro Meter validation did not report a missing progression token.");
+
+            if (!warnings.Exists(warning => warning.Contains("Progression Text Font Size")) ||
+                !warnings.Exists(warning => warning.Contains("Progression Text Wave Distance")))
+            {
+                throw new Exception("Synchro Meter validation did not report invalid progression text layout values.");
+            }
         }
         finally
         {
@@ -229,6 +243,97 @@ public static class GameSynchroMeterSmokeTest
 
         if (sectionProperty == null || sectionProperty.objectReferenceValue != section)
             throw new Exception("HUDManager does not reference the authored Synchro Meter section.");
+
+        ValidateScenePresentation(section);
+    }
+
+    /// <summary>
+    /// Verifies the selected preset is reflected in place and cleanup restores authored Scene values.
+    /// </summary>
+    /// <param name="section">Authored Scene section receiving the editor presentation.</param>
+    private static void ValidateScenePresentation(HUDComboCounterSection section)
+    {
+        object presentationOwner = new object();
+        GameHudManagerPreset preset = ScriptableObject.CreateInstance<GameHudManagerPreset>();
+        SerializedObject serializedSection = new SerializedObject(section);
+        TMP_Text progressionText = GetReference<TMP_Text>(serializedSection, "progressionText");
+        TMP_Text rankText = GetReference<TMP_Text>(serializedSection, "rankText");
+        TMP_Text valueText = GetReference<TMP_Text>(serializedSection, "valueText");
+        Image progressFill = GetReference<Image>(serializedSection, "progressFillImage");
+        Image progressBackground = GetReference<Image>(serializedSection, "progressBackgroundImage");
+
+        if (progressionText == null ||
+            rankText == null ||
+            valueText == null ||
+            progressFill == null ||
+            progressBackground == null)
+        {
+            throw new Exception("Synchro Meter editor presentation test requires complete authored bindings.");
+        }
+
+        int initialSectionCount = Resources.FindObjectsOfTypeAll<HUDComboCounterSection>().Length;
+        bool originalProgressionEnabled = progressionText.enabled;
+        bool originalRankEnabled = rankText.enabled;
+        bool originalValueEnabled = valueText.enabled;
+        bool originalProgressFillEnabled = progressFill.enabled;
+        bool originalProgressBackgroundEnabled = progressBackground.enabled;
+        string originalContent = progressionText.text;
+        float originalFontSize = progressionText.fontSize;
+        bool originalAutoSizing = progressionText.enableAutoSizing;
+        TextAlignmentOptions originalAlignment = progressionText.alignment;
+        Vector2 originalPosition = progressionText.rectTransform.anchoredPosition;
+
+        try
+        {
+            SerializedObject serializedPreset = new SerializedObject(preset);
+            SetEnum(serializedPreset, "synchroMeterSettings.visualMode", (int)GameHudSynchroMeterVisualMode.ProgressionText);
+            SetString(serializedPreset, "synchroMeterSettings.progressionTextFormat", "EDITOR [ProgressionPercentage]%");
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextFontSize", 21f);
+            SetEnum(serializedPreset, "synchroMeterSettings.progressionTextAlignment", (int)GameHudSynchroMeterTextAlignment.Right);
+            SetFloat(serializedPreset, "synchroMeterSettings.progressionTextWaveDistance", 15f);
+            SetBool(serializedPreset, "synchroMeterSettings.showCover", false);
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+            GameHudManagerSynchroMeterScenePreviewUtility.Refresh(presentationOwner, preset);
+
+            if (!progressionText.enabled ||
+                rankText.enabled ||
+                valueText.enabled ||
+                progressFill.enabled ||
+                progressBackground.enabled)
+            {
+                throw new Exception("Synchro Meter editor presentation did not apply Progression Text visibility in place.");
+            }
+
+            if (!string.Equals(progressionText.text, "EDITOR 0%", StringComparison.Ordinal) ||
+                Mathf.Abs(progressionText.fontSize - 21f) > PrecisionEpsilon ||
+                progressionText.alignment != TextAlignmentOptions.Right ||
+                Mathf.Abs(progressionText.rectTransform.anchoredPosition.y + 8f) > PrecisionEpsilon)
+            {
+                throw new Exception("Synchro Meter editor presentation did not apply text content, size, alignment, or wave distance.");
+            }
+
+            if (Resources.FindObjectsOfTypeAll<HUDComboCounterSection>().Length != initialSectionCount)
+                throw new Exception("Synchro Meter editor presentation created an unexpected Scene clone.");
+        }
+        finally
+        {
+            GameHudManagerSynchroMeterScenePreviewUtility.Clear(presentationOwner);
+            UnityEngine.Object.DestroyImmediate(preset);
+        }
+
+        if (progressionText.enabled != originalProgressionEnabled ||
+            rankText.enabled != originalRankEnabled ||
+            valueText.enabled != originalValueEnabled ||
+            progressFill.enabled != originalProgressFillEnabled ||
+            progressBackground.enabled != originalProgressBackgroundEnabled ||
+            !string.Equals(progressionText.text, originalContent, StringComparison.Ordinal) ||
+            Mathf.Abs(progressionText.fontSize - originalFontSize) > PrecisionEpsilon ||
+            progressionText.enableAutoSizing != originalAutoSizing ||
+            progressionText.alignment != originalAlignment ||
+            Vector2.Distance(progressionText.rectTransform.anchoredPosition, originalPosition) > PrecisionEpsilon)
+        {
+            throw new Exception("Synchro Meter editor presentation cleanup did not restore authored UI values.");
+        }
     }
 
     /// <summary>

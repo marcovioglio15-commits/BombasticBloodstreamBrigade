@@ -80,6 +80,9 @@ MonoBehaviour:
   progressionText: {fileID: 1738684619296030671}
   visualMode: 0
   progressionTextFormat: 'Synchro Meter : [ProgressionPercentage]%'
+  progressionTextFontSize: 14
+  progressionTextAlignment: 1
+  progressionTextWaveDistance: 7
   backgroundTint: {r: 1, g: 1, b: 1, a: 1}
   coverTint: {r: 1, g: 1, b: 1, a: 1}
   primaryWaveTint: {r: 1, g: 1, b: 1, a: 1}

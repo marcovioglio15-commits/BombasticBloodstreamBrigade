@@ -329,6 +329,16 @@ public enum GameHudSynchroMeterVisualMode : byte
 }
 
 /// <summary>
+/// Selects the horizontal alignment of the optional Synchro Meter progression label.
+/// </summary>
+public enum GameHudSynchroMeterTextAlignment : byte
+{
+    Left = 0,
+    Center = 1,
+    Right = 2
+}
+
+/// <summary>
 /// Stores Synchro Meter wave animation, theme, text, and visibility behavior.
 /// </summary>
 [Serializable]
@@ -337,6 +347,8 @@ public sealed class GameHudSynchroMeterSettings
     #region Constants
     public const string ProgressionPercentageToken = "[ProgressionPercentage]";
     public const string DefaultProgressionTextFormat = "Synchro Meter : [ProgressionPercentage]%";
+    public const float DefaultProgressionTextFontSize = 14f;
+    public const float DefaultProgressionTextWaveDistance = 7f;
     #endregion
 
     #region Fields
@@ -392,6 +404,15 @@ public sealed class GameHudSynchroMeterSettings
 
     [Tooltip("Text shown by Progression Text mode. Use [ProgressionPercentage] wherever the current numeric percentage must appear; add % explicitly when required.")]
     [SerializeField] private string progressionTextFormat = DefaultProgressionTextFormat;
+
+    [Tooltip("Font size in pixels used by the optional progression label.")]
+    [SerializeField] private float progressionTextFontSize = DefaultProgressionTextFontSize;
+
+    [Tooltip("Horizontal alignment used by the optional progression label across its authored progress-bar width.")]
+    [SerializeField] private GameHudSynchroMeterTextAlignment progressionTextAlignment = GameHudSynchroMeterTextAlignment.Center;
+
+    [Tooltip("Vertical distance in pixels between the bottom of the wave reticle and the top of the optional progression label.")]
+    [SerializeField] private float progressionTextWaveDistance = DefaultProgressionTextWaveDistance;
 
     [Header("Wave Motion")]
     [Tooltip("Number of complete wave-image tile cycles scrolled per second. Both waves share this rate so their relative phase remains stable.")]
@@ -481,6 +502,9 @@ public sealed class GameHudSynchroMeterSettings
     public bool ShowValueText => showValueText;
     public bool ShowProgressBar => showProgressBar;
     public string ProgressionTextFormat => progressionTextFormat;
+    public float ProgressionTextFontSize => progressionTextFontSize;
+    public GameHudSynchroMeterTextAlignment ProgressionTextAlignment => progressionTextAlignment;
+    public float ProgressionTextWaveDistance => progressionTextWaveDistance;
     public float WaveScrollCyclesPerSecond => waveScrollCyclesPerSecond;
     public float LowestRankPhaseOffsetNormalized => lowestRankPhaseOffsetNormalized;
     public float HighestRankPhaseOffsetNormalized => highestRankPhaseOffsetNormalized;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -30,6 +31,7 @@ public sealed class GameHudManagerPresetsPanel
     private DetailsSectionType activeSection = DetailsSectionType.Metadata;
     private GameHudManagerPreset selectedPreset;
     private SerializedObject presetSerializedObject;
+    private bool presentationCallbacksRegistered;
     #endregion
 
     #region Properties
@@ -59,6 +61,8 @@ public sealed class GameHudManagerPresetsPanel
         root = new VisualElement();
         root.style.flexGrow = 1f;
         root.style.flexDirection = FlexDirection.Column;
+        root.RegisterCallback<AttachToPanelEvent>(HandleRootAttached);
+        root.RegisterCallback<DetachFromPanelEvent>(HandleRootDetached);
         library = GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         activeSection = ManagementToolStateUtility.LoadEnumValue(ActiveSectionStateKey, DetailsSectionType.Metadata);
         BuildUI();
@@ -85,6 +89,8 @@ public sealed class GameHudManagerPresetsPanel
             else
                 SelectPreset(previousSelection);
         }
+
+        GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
     }
     #endregion
 
@@ -401,6 +407,7 @@ public sealed class GameHudManagerPresetsPanel
 
         if (selectedPreset == null)
         {
+            GameHudManagerSynchroMeterScenePreviewUtility.Clear(this);
             detailsRoot.Add(new Label("Select or create a HUD manager preset to edit."));
             return;
         }
@@ -413,6 +420,7 @@ public sealed class GameHudManagerPresetsPanel
         detailsRoot.Add(sectionButtonsRoot);
         detailsRoot.Add(sectionContentRoot);
         BuildActiveSection();
+        GameHudManagerSynchroMeterScenePreviewUtility.Refresh(this, selectedPreset);
     }
 
     /// <summary>
@@ -626,8 +634,53 @@ public sealed class GameHudManagerPresetsPanel
         if (activeSection == DetailsSectionType.Validation && !string.IsNullOrWhiteSpace(changedPropertyPath))
             BuildActiveSection();
 
+        if (!string.IsNullOrWhiteSpace(changedPropertyPath) &&
+            changedPropertyPath.StartsWith("synchroMeterSettings.", StringComparison.Ordinal))
+            GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
+
         if (listView != null)
             listView.Rebuild();
+    }
+
+    /// <summary>
+    /// Registers undo tracking and reflects the selected preset in loaded Scenes when this panel becomes visible.
+    /// </summary>
+    /// <param name="evt">UI Toolkit event reporting attachment to an editor panel.</param>
+    private void HandleRootAttached(AttachToPanelEvent evt)
+    {
+        if (!presentationCallbacksRegistered)
+        {
+            Undo.undoRedoPerformed += HandleUndoRedoPerformed;
+            presentationCallbacksRegistered = true;
+        }
+
+        GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
+    }
+
+    /// <summary>
+    /// Releases undo tracking and restores authored Scene presentation when this panel is hidden.
+    /// </summary>
+    /// <param name="evt">UI Toolkit event reporting detachment from an editor panel.</param>
+    private void HandleRootDetached(DetachFromPanelEvent evt)
+    {
+        if (presentationCallbacksRegistered)
+        {
+            Undo.undoRedoPerformed -= HandleUndoRedoPerformed;
+            presentationCallbacksRegistered = false;
+        }
+
+        GameHudManagerSynchroMeterScenePreviewUtility.Clear(this);
+    }
+
+    /// <summary>
+    /// Refreshes serialized state and the in-place Scene presentation after one HUD preset undo or redo.
+    /// </summary>
+    private void HandleUndoRedoPerformed()
+    {
+        if (presetSerializedObject != null)
+            presetSerializedObject.UpdateIfRequiredOrScript();
+
+        GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
     }
 
     #endregion

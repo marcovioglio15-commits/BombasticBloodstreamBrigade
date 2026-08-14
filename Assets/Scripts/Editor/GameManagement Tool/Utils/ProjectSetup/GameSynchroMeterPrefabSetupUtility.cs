@@ -117,6 +117,8 @@ internal static class GameSynchroMeterPrefabSetupUtility
                                                   8f,
                                                   14f,
                                                   TextAlignmentOptions.Center);
+            progressionText.enableAutoSizing = false;
+            progressionText.fontSize = GameHudSynchroMeterSettings.DefaultProgressionTextFontSize;
             SetRect(progressionText.rectTransform,
                     new Vector2(0.5f, 0.5f),
                     new Vector2(0.5f, 0.5f),
@@ -215,6 +217,9 @@ internal static class GameSynchroMeterPrefabSetupUtility
         SetObjectReference(serializedSection, "progressionText", progress.transform.Find("ProgressionText").GetComponent<TMP_Text>());
         SetString(serializedSection, "idleRankLabel", "SYNCHRO");
         SetString(serializedSection, "progressionTextFormat", GameHudSynchroMeterSettings.DefaultProgressionTextFormat);
+        SetFloat(serializedSection, "progressionTextFontSize", GameHudSynchroMeterSettings.DefaultProgressionTextFontSize);
+        SetEnum(serializedSection, "progressionTextAlignment", (int)GameHudSynchroMeterTextAlignment.Center);
+        SetFloat(serializedSection, "progressionTextWaveDistance", GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance);
         serializedSection.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(section);
     }
@@ -431,6 +436,34 @@ internal static class GameSynchroMeterPrefabSetupUtility
 
         if (property != null)
             property.stringValue = value;
+    }
+
+    /// <summary>
+    /// Assigns one floating-point value when the serialized runtime field exists.
+    /// </summary>
+    /// <param name="serializedObject">Serialized section receiving the value.</param>
+    /// <param name="propertyName">Private serialized field name.</param>
+    /// <param name="value">Floating-point value assigned to the field.</param>
+    private static void SetFloat(SerializedObject serializedObject, string propertyName, float value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property != null)
+            property.floatValue = value;
+    }
+
+    /// <summary>
+    /// Assigns one enum index when the serialized runtime field exists.
+    /// </summary>
+    /// <param name="serializedObject">Serialized section receiving the enum.</param>
+    /// <param name="propertyName">Private serialized field name.</param>
+    /// <param name="value">Enum index assigned to the field.</param>
+    private static void SetEnum(SerializedObject serializedObject, string propertyName, int value)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property != null)
+            property.enumValueIndex = value;
     }
     #endregion
 

@@ -46,6 +46,9 @@ public struct GameHudRuntimeConfig : IComponentData
     public byte SynchroShowValueText;
     public byte SynchroShowProgressBar;
     public FixedString512Bytes SynchroProgressionTextFormat;
+    public float SynchroProgressionTextFontSize;
+    public GameHudSynchroMeterTextAlignment SynchroProgressionTextAlignment;
+    public float SynchroProgressionTextWaveDistance;
     public float SynchroWaveScrollCyclesPerSecond;
     public float SynchroLowestRankPhaseOffsetNormalized;
     public float SynchroHighestRankPhaseOffsetNormalized;

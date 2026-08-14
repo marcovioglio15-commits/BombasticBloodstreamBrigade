@@ -100,6 +100,38 @@ public static class HUDSynchroMeterPresentationUtility
     }
 
     /// <summary>
+    /// Applies the configured font size, horizontal alignment, and distance from the authored wave reticle to one
+    /// progression label without changing its prefab hierarchy.
+    /// </summary>
+    /// <param name="progressionText">Authored progression label receiving layout values.</param>
+    /// <param name="fontSize">Requested font size in pixels.</param>
+    /// <param name="alignment">Requested horizontal text alignment.</param>
+    /// <param name="waveDistance">Requested distance in pixels between the reticle and label.</param>
+    public static void ApplyProgressionTextLayout(TMP_Text progressionText,
+                                                  float fontSize,
+                                                  GameHudSynchroMeterTextAlignment alignment,
+                                                  float waveDistance)
+    {
+        if (progressionText == null)
+            return;
+
+        float safeFontSize = math.isfinite(fontSize) && fontSize > 0f
+            ? fontSize
+            : GameHudSynchroMeterSettings.DefaultProgressionTextFontSize;
+        float safeWaveDistance = math.isfinite(waveDistance) && waveDistance >= 0f
+            ? waveDistance
+            : GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance;
+        RectTransform textTransform = progressionText.rectTransform;
+        Vector2 anchoredPosition = textTransform.anchoredPosition;
+
+        progressionText.enableAutoSizing = false;
+        progressionText.fontSize = safeFontSize;
+        progressionText.alignment = ResolveProgressionTextAlignment(alignment);
+        anchoredPosition.y = GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance - safeWaveDistance;
+        textTransform.anchoredPosition = anchoredPosition;
+    }
+
+    /// <summary>
     /// Assigns one Graphic color when its authored reference is available.
     /// </summary>
     /// <param name="graphic">Graphic receiving the configured color.</param>
@@ -144,6 +176,26 @@ public static class HUDSynchroMeterPresentationUtility
     public static Color ToColor(float4 color)
     {
         return new Color(color.x, color.y, color.z, color.w);
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Converts the compact ECS alignment setting to a vertically centered TMP alignment.
+    /// </summary>
+    /// <param name="alignment">Compact Synchro Meter alignment setting.</param>
+    /// <returns>Equivalent TMP alignment with centered vertical placement.</returns>
+    private static TextAlignmentOptions ResolveProgressionTextAlignment(GameHudSynchroMeterTextAlignment alignment)
+    {
+        switch (alignment)
+        {
+            case GameHudSynchroMeterTextAlignment.Left:
+                return TextAlignmentOptions.Left;
+            case GameHudSynchroMeterTextAlignment.Right:
+                return TextAlignmentOptions.Right;
+            default:
+                return TextAlignmentOptions.Center;
+        }
     }
     #endregion
 

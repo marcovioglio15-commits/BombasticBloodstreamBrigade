@@ -144,6 +144,9 @@ public sealed class HUDComboCounterSectionPropertyDrawer : PropertyDrawer
         {
             "visualMode",
             "progressionTextFormat",
+            "progressionTextFontSize",
+            "progressionTextAlignment",
+            "progressionTextWaveDistance",
             "backgroundTint",
             "coverTint",
             "primaryWaveTint",

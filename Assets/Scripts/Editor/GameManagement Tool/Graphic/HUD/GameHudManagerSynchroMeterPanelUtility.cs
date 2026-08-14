@@ -32,6 +32,9 @@ internal static class GameHudManagerSynchroMeterPanelUtility
         VisualElement progressionTextModeRoot = CreateConditionalOptionsRoot();
         AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextFormat", "Progression Text Format");
         AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextColor", "Progression Text Color");
+        AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextFontSize", "Progression Text Font Size");
+        AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextAlignment", "Progression Text Alignment");
+        AddProperty(progressionTextModeRoot, serializedObject, "synchroMeterSettings.progressionTextWaveDistance", "Distance From Waves");
         presentationModeFoldout.Add(progressionTextModeRoot);
         meterOptionsRoot.Add(presentationModeFoldout);
         BuildLayersAndTheme(meterOptionsRoot,

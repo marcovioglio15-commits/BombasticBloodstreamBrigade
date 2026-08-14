@@ -75,6 +75,13 @@ public static class GameHudManagerPresetBakeUtility
             SynchroShowValueText = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowValueText),
             SynchroShowProgressBar = ToByte(synchroMeterSettings == null || synchroMeterSettings.ShowProgressBar),
             SynchroProgressionTextFormat = BuildProgressionTextFormat(synchroMeterSettings != null ? synchroMeterSettings.ProgressionTextFormat : null),
+            SynchroProgressionTextFontSize = ResolvePositive(synchroMeterSettings != null ? synchroMeterSettings.ProgressionTextFontSize : GameHudSynchroMeterSettings.DefaultProgressionTextFontSize,
+                                                            GameHudSynchroMeterSettings.DefaultProgressionTextFontSize),
+            SynchroProgressionTextAlignment = synchroMeterSettings != null
+                ? synchroMeterSettings.ProgressionTextAlignment
+                : GameHudSynchroMeterTextAlignment.Center,
+            SynchroProgressionTextWaveDistance = ResolveNonNegative(synchroMeterSettings != null ? synchroMeterSettings.ProgressionTextWaveDistance : GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance,
+                                                                   GameHudSynchroMeterSettings.DefaultProgressionTextWaveDistance),
             SynchroWaveScrollCyclesPerSecond = synchroMeterSettings != null ? synchroMeterSettings.WaveScrollCyclesPerSecond : 0.12f,
             SynchroLowestRankPhaseOffsetNormalized = synchroMeterSettings != null ? synchroMeterSettings.LowestRankPhaseOffsetNormalized : 0.25f,
             SynchroHighestRankPhaseOffsetNormalized = synchroMeterSettings != null ? synchroMeterSettings.HighestRankPhaseOffsetNormalized : 0f,
@@ -146,6 +153,28 @@ public static class GameHudManagerPresetBakeUtility
             return fallback;
 
         return value;
+    }
+
+    /// <summary>
+    /// Resolves a positive runtime value without mutating its authored preset source.
+    /// </summary>
+    /// <param name="value">Authored value inspected for runtime compatibility.</param>
+    /// <param name="fallback">Positive fallback used when the authored value is invalid.</param>
+    /// <returns>Authored value when positive, otherwise the supplied fallback.</returns>
+    private static float ResolvePositive(float value, float fallback)
+    {
+        return math.isfinite(value) && value > 0f ? value : fallback;
+    }
+
+    /// <summary>
+    /// Resolves a non-negative runtime value without mutating its authored preset source.
+    /// </summary>
+    /// <param name="value">Authored value inspected for runtime compatibility.</param>
+    /// <param name="fallback">Non-negative fallback used when the authored value is invalid.</param>
+    /// <returns>Authored value when non-negative, otherwise the supplied fallback.</returns>
+    private static float ResolveNonNegative(float value, float fallback)
+    {
+        return math.isfinite(value) && value >= 0f ? value : fallback;
     }
 
     /// <summary>

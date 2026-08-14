@@ -361,6 +361,9 @@ public sealed class HUDManager : MonoBehaviour
                left.SynchroShowValueText == right.SynchroShowValueText &&
                left.SynchroShowProgressBar == right.SynchroShowProgressBar &&
                left.SynchroProgressionTextFormat.Equals(right.SynchroProgressionTextFormat) &&
+               Mathf.Approximately(left.SynchroProgressionTextFontSize, right.SynchroProgressionTextFontSize) &&
+               left.SynchroProgressionTextAlignment == right.SynchroProgressionTextAlignment &&
+               Mathf.Approximately(left.SynchroProgressionTextWaveDistance, right.SynchroProgressionTextWaveDistance) &&
                Mathf.Approximately(left.SynchroWaveScrollCyclesPerSecond, right.SynchroWaveScrollCyclesPerSecond) &&
                Mathf.Approximately(left.SynchroLowestRankPhaseOffsetNormalized, right.SynchroLowestRankPhaseOffsetNormalized) &&
                Mathf.Approximately(left.SynchroHighestRankPhaseOffsetNormalized, right.SynchroHighestRankPhaseOffsetNormalized) &&
