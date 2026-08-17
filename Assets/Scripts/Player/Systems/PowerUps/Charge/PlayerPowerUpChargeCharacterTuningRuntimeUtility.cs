@@ -1,6 +1,7 @@
 using System;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 
 /// <summary>
 /// Reconciles Character Tuning applications owned by runtime-scoped active power-ups and by currently owned passive power-ups.
@@ -10,6 +11,8 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     #region Constants
     private const uint PassiveSignatureSeed = 2166136261u;
     private const uint PassiveSignaturePrime = 16777619u;
+    private const string ProjectileSizeStatName = "BulletSizeMultiplier";
+    private const float MinimumProjectileSizeMultiplier = 0.01f;
     #endregion
 
     #region Methods
@@ -28,6 +31,8 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// <param name="progressionConfig">Runtime progression config used to resynchronize dependent progression state.</param>
     /// <param name="chargeCharacterTuningState">Mutable slot-ownership state for temporary Character Tuning.</param>
     /// <param name="baseStats">Mutable snapshot buffer storing baseline values for stats touched by temporary runtime-scoped overrides.</param>
+    /// <param name="projectileSizeMultipliers">Mutable per-power-up projectile-size provenance rebuilt with the tuning overlays.</param>
+    /// <param name="passiveToolsState">Mutable passive snapshot receiving the combined embedded projectile-size multiplier.</param>
     /// <param name="playerExperience">Mutable runtime experience component synchronized after reconciliation.</param>
     /// <param name="playerLevel">Mutable runtime level component synchronized after reconciliation.</param>
     /// <param name="playerExperienceCollection">Mutable runtime pickup-radius component synchronized after reconciliation.</param>
@@ -43,6 +48,8 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                                                       DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                       ref PlayerChargeCharacterTuningState chargeCharacterTuningState,
                                                       DynamicBuffer<PlayerChargeCharacterTuningBaseStatElement> baseStats,
+                                                      DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizeMultipliers,
+                                                      ref PlayerPassiveToolsState passiveToolsState,
                                                       ref PlayerExperience playerExperience,
                                                       ref PlayerLevel playerLevel,
                                                       ref PlayerExperienceCollection playerExperienceCollection)
@@ -63,6 +70,11 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         {
             if (baseStats.IsCreated && baseStats.Length > 0)
                 baseStats.Clear();
+
+            if (projectileSizeMultipliers.IsCreated && projectileSizeMultipliers.Length > 0)
+                projectileSizeMultipliers.Clear();
+
+            passiveToolsState.ProjectileSizePowerUpMultiplier = 1f;
 
             return false;
         }
@@ -106,20 +118,31 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             CaptureMissingPassiveBaseStats(unlockCatalog, characterTuningFormulas, scalableStats, baseStats);
 
         bool anyScalableStatChanged = RestoreBaseStats(baseStats, scalableStats);
+        float projectileSizePowerUpMultiplier = 1f;
+
+        if (projectileSizeMultipliers.IsCreated)
+            projectileSizeMultipliers.Clear();
+
         chargeCharacterTuningState.PrimaryIsApplied = primaryCanBeApplied ? (byte)1 : (byte)0;
         chargeCharacterTuningState.SecondaryIsApplied = secondaryCanBeApplied ? (byte)1 : (byte)0;
         chargeCharacterTuningState.PrimaryOwnershipSignature = primaryOwnershipSignature;
         chargeCharacterTuningState.SecondaryOwnershipSignature = secondaryOwnershipSignature;
         chargeCharacterTuningState.PassiveOwnershipSignature = passiveOwnershipSignature;
 
-        if (ApplyOwnedPassiveCharacterTuning(unlockCatalog, characterTuningFormulas, scalableStats))
+        if (ApplyOwnedPassiveCharacterTuning(unlockCatalog,
+                                             characterTuningFormulas,
+                                             scalableStats,
+                                             projectileSizeMultipliers,
+                                             ref projectileSizePowerUpMultiplier))
             anyScalableStatChanged = true;
 
         if (ApplyScopedCharacterTuning(unlockCatalog,
                                        primaryCatalogIndex,
                                        primaryCanBeApplied,
                                        characterTuningFormulas,
-                                       scalableStats))
+                                       scalableStats,
+                                       projectileSizeMultipliers,
+                                       ref projectileSizePowerUpMultiplier))
         {
             anyScalableStatChanged = true;
         }
@@ -128,7 +151,9 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                                        secondaryCatalogIndex,
                                        secondaryCanBeApplied,
                                        characterTuningFormulas,
-                                       scalableStats))
+                                       scalableStats,
+                                       projectileSizeMultipliers,
+                                       ref projectileSizePowerUpMultiplier))
         {
             anyScalableStatChanged = true;
         }
@@ -143,6 +168,9 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                                  characterTuningFormulas);
         else
             baseStats.Clear();
+
+        passiveToolsState.ProjectileSizePowerUpMultiplier = math.max(MinimumProjectileSizeMultiplier,
+                                                                      projectileSizePowerUpMultiplier);
 
         if (!anyScalableStatChanged)
             return false;
@@ -455,10 +483,14 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// <param name="unlockCatalog">Runtime unlock catalog scanned for owned passive Character Tuning entries.</param>
     /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
     /// <param name="scalableStats">Mutable scalable-stat buffer receiving passive Character Tuning overlays.</param>
+    /// <param name="projectileSizeMultipliers">Mutable per-source projectile-size multiplier buffer.</param>
+    /// <param name="totalProjectileSizeMultiplier">Mutable product of every applied size-tuning source.</param>
     /// <returns>True when at least one passive Character Tuning formula changed runtime scalable stats.</returns>
     private static bool ApplyOwnedPassiveCharacterTuning(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                          DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
-                                                         DynamicBuffer<PlayerScalableStatElement> scalableStats)
+                                                         DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                                         DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizeMultipliers,
+                                                         ref float totalProjectileSizeMultiplier)
     {
         if (!unlockCatalog.IsCreated || unlockCatalog.Length <= 0)
             return false;
@@ -473,6 +505,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                 continue;
 
             int applicationCount = Math.Max(0, catalogEntry.CurrentUnlockCount);
+            float sizeBefore = ResolveProjectileSizeMultiplier(scalableStats);
 
             for (int applicationIndex = 0; applicationIndex < applicationCount; applicationIndex++)
             {
@@ -486,6 +519,12 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
 
                 anyChanged = anyChanged || appliedFormulaCount > 0;
             }
+
+            TrackProjectileSizeSource(in catalogEntry,
+                                      sizeBefore,
+                                      ResolveProjectileSizeMultiplier(scalableStats),
+                                      projectileSizeMultipliers,
+                                      ref totalProjectileSizeMultiplier);
         }
 
         return anyChanged;
@@ -499,12 +538,16 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// <param name="canBeApplied">True when the runtime-scoped Character Tuning is currently active.</param>
     /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
     /// <param name="scalableStats">Mutable scalable-stat buffer receiving the scoped runtime overlay.</param>
+    /// <param name="projectileSizeMultipliers">Mutable per-source projectile-size multiplier buffer.</param>
+    /// <param name="totalProjectileSizeMultiplier">Mutable product of every applied size-tuning source.</param>
     /// <returns>True when at least one formula changed runtime scalable stats.</returns>
     private static bool ApplyScopedCharacterTuning(DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                    int catalogIndex,
                                                    bool canBeApplied,
                                                    DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
-                                                   DynamicBuffer<PlayerScalableStatElement> scalableStats)
+                                                   DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                                   DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizeMultipliers,
+                                                   ref float totalProjectileSizeMultiplier)
     {
         if (!canBeApplied)
             return false;
@@ -515,6 +558,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         ref PlayerPowerUpUnlockCatalogElement catalogEntry = ref unlockCatalog.ElementAt(catalogIndex);
         bool anyChanged = false;
         int applicationCount = ResolveScopedApplicationCount(in catalogEntry);
+        float sizeBefore = ResolveProjectileSizeMultiplier(scalableStats);
 
         for (int applicationIndex = 0; applicationIndex < applicationCount; applicationIndex++)
         {
@@ -529,7 +573,65 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
             anyChanged = anyChanged || appliedFormulaCount > 0;
         }
 
+        TrackProjectileSizeSource(in catalogEntry,
+                                  sizeBefore,
+                                  ResolveProjectileSizeMultiplier(scalableStats),
+                                  projectileSizeMultipliers,
+                                  ref totalProjectileSizeMultiplier);
+
         return anyChanged;
+    }
+
+    /// <summary>
+    /// Records one exact size ratio after a power-up's formulas have been evaluated against the current scalable-stat context.
+    /// </summary>
+    /// <param name="catalogEntry">Power-up source whose formula range was applied.</param>
+    /// <param name="sizeBefore">Projectile-size stat before this source.</param>
+    /// <param name="sizeAfter">Projectile-size stat after this source.</param>
+    /// <param name="projectileSizeMultipliers">Mutable source buffer receiving non-neutral ratios.</param>
+    /// <param name="totalProjectileSizeMultiplier">Mutable combined ratio updated in place.</param>
+    private static void TrackProjectileSizeSource(in PlayerPowerUpUnlockCatalogElement catalogEntry,
+                                                  float sizeBefore,
+                                                  float sizeAfter,
+                                                  DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizeMultipliers,
+                                                  ref float totalProjectileSizeMultiplier)
+    {
+        float sourceMultiplier = math.max(MinimumProjectileSizeMultiplier, sizeAfter) /
+                                 math.max(MinimumProjectileSizeMultiplier, sizeBefore);
+
+        if (math.abs(sourceMultiplier - 1f) <= 0.000001f)
+            return;
+
+        totalProjectileSizeMultiplier *= sourceMultiplier;
+
+        if (!projectileSizeMultipliers.IsCreated || catalogEntry.PowerUpId.Length <= 0)
+            return;
+
+        projectileSizeMultipliers.Add(new PlayerProjectileSizePowerUpMultiplierElement
+        {
+            PowerUpId = catalogEntry.PowerUpId,
+            Multiplier = sourceMultiplier
+        });
+    }
+
+    /// <summary>
+    /// Resolves the current numeric projectile-size scalable stat used before and after each source formula range.
+    /// </summary>
+    /// <param name="scalableStats">Current runtime scalable-stat buffer.</param>
+    /// <returns>Positive projectile-size multiplier, or one when the stat is unavailable or non-numeric.</returns>
+    private static float ResolveProjectileSizeMultiplier(DynamicBuffer<PlayerScalableStatElement> scalableStats)
+    {
+        int scalableStatIndex = PlayerPowerUpCharacterTuningRuntimeUtility.FindScalableStatIndex(scalableStats,
+                                                                                                 ProjectileSizeStatName);
+
+        if (scalableStatIndex < 0)
+            return 1f;
+
+        PlayerScalableStatElement scalableStat = scalableStats[scalableStatIndex];
+        PlayerFormulaValue value = PlayerScalableStatValueUtility.ResolveRuntimeValue(in scalableStat);
+        return value.Type == PlayerFormulaValueType.Number
+            ? math.max(MinimumProjectileSizeMultiplier, value.NumberValue)
+            : 1f;
     }
 
     /// <summary>

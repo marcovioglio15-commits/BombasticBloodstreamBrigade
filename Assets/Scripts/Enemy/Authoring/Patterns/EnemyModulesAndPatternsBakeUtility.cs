@@ -61,7 +61,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
     /// <param name="sharedPreset">Shared preset used to resolve module definitions.</param>
     /// <param name="binding">Module binding being compiled.</param>
     /// <param name="result">Mutable compiled result.</param>
-    /// <returns>True when a legal core movement module was applied.</returns>
+    /// <returns>True when a valid core movement module was applied.</returns>
     internal static bool TryApplyCoreMovementModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                     EnemyPatternModuleBinding binding,
                                                     ref EnemyCompiledPatternBakeResult result)
@@ -104,7 +104,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
     /// <param name="activationRange">Player distance that activates the interaction.</param>
     /// <param name="releaseDistanceBuffer">Extra release buffer added after activation.</param>
     /// <param name="patternConfig">Mutable compiled pattern config.</param>
-    /// <returns>True when a legal short-range interaction module was applied.</returns>
+    /// <returns>True when a valid short-range interaction module was applied.</returns>
     internal static bool TryApplyShortRangeInteractionModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                              EnemyPatternModuleBinding binding,
                                                              float activationRange,
@@ -180,7 +180,7 @@ internal static class EnemyModulesAndPatternsBakeUtility
     /// <param name="maximumActivationSpeed">Maximum enemy speed allowed by speed gating.</param>
     /// <param name="recentlyDamagedWindowSeconds">Recent damage window used by damage gating.</param>
     /// <param name="result">Mutable compiled result.</param>
-    /// <returns>True when a legal weapon interaction module was applied.</returns>
+    /// <returns>True when a valid weapon interaction module was applied.</returns>
     internal static bool TryAddWeaponInteractionModule(EnemyModulesAndPatternsPreset sharedPreset,
                                                        EnemyPatternModuleBinding binding,
                                                        bool useMinimumRange,
@@ -580,16 +580,16 @@ internal static class EnemyModulesAndPatternsBakeUtility
     }
 
     /// <summary>
-    /// Resolves legal Weapon Interaction activation gate flags authored by the shared pattern assembly.
+    /// Resolves valid Weapon Interaction activation gate flags authored by the shared pattern assembly.
     /// </summary>
     /// <param name="gates">Authored gate flags.</param>
     /// <returns>Sanitized gate flags.</returns>
     internal static EnemyWeaponInteractionActivationGate ResolveWeaponActivationGates(EnemyWeaponInteractionActivationGate gates)
     {
-        EnemyWeaponInteractionActivationGate legalMask = EnemyWeaponInteractionActivationGate.RequireBelowSpeed |
+        EnemyWeaponInteractionActivationGate validMask = EnemyWeaponInteractionActivationGate.RequireBelowSpeed |
                                                          EnemyWeaponInteractionActivationGate.RequireRecentlyDamaged |
                                                          EnemyWeaponInteractionActivationGate.RequireWandererWait;
-        return gates & legalMask;
+        return gates & validMask;
     }
 
     /// <summary>

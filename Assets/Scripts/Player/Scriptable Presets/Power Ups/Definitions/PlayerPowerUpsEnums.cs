@@ -33,7 +33,8 @@ public enum ActiveToolKind
     OrbitalProjections = 8,
     ImpactFrame = 9,
     GhostTrail = 10,
-    DropAttraction = 11
+    DropAttraction = 11,
+    ReturningProjectile = 12
 }
 
 /// <summary>
@@ -99,7 +100,45 @@ public enum PassiveToolKind
     Custom = 7,
     BulletTime = 8,
     LaserBeam = 9,
-    DropAttraction = 10
+    DropAttraction = 10,
+    ReturningProjectiles = 11
+}
+
+/// <summary>
+/// Selects how a returning projectile reaches its owner after the outbound phase ends.
+/// </summary>
+public enum ProjectileReturnPathMode
+{
+    RetraceOutboundPath = 0,
+    SeekPlayer = 1
+}
+
+/// <summary>
+/// Selects the local axis used by flight spin and turnaround rotation.
+/// </summary>
+public enum ProjectileReturnRotationAxis
+{
+    Vertical = 0,
+    Horizontal = 1
+}
+
+/// <summary>
+/// Selects whether enemy impacts may terminate outbound travel after natural penetration is exhausted.
+/// </summary>
+public enum ProjectileOutboundHitPolicy
+{
+    NaturalPenetration = 0,
+    CompleteOutboundTravel = 1,
+    LimitedAdditionalHits = 2
+}
+
+/// <summary>
+/// Selects whether return travel ignores penetration limits or consumes an additional hit budget.
+/// </summary>
+public enum ProjectileReturnHitPolicy
+{
+    CompleteReturn = 0,
+    LimitedAdditionalHits = 1
 }
 
 /// <summary>

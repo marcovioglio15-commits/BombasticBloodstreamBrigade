@@ -161,7 +161,7 @@ public static class GameSceneUrpCameraStackUtility
     /// <returns>True when the stack and overlay camera are valid.</returns>
     private static bool CanEditBaseStack(UniversalAdditionalCameraData baseCameraData, Camera overlayCamera)
     {
-        // Only base cameras own stacks that can legally render overlays.
+        // Only base cameras own stacks that can validly render overlays.
         if (baseCameraData == null || baseCameraData.renderType != CameraRenderType.Base)
             return false;
 
@@ -172,7 +172,7 @@ public static class GameSceneUrpCameraStackUtility
     /// Checks whether a camera is configured as a URP overlay camera.
     /// </summary>
     /// <param name="overlayCamera">Camera being inspected.</param>
-    /// <returns>True when the camera can legally live in a base camera stack.</returns>
+    /// <returns>True when the camera can validly live in a base camera stack.</returns>
     private static bool IsValidOverlayCamera(Camera overlayCamera)
     {
         // A valid stack entry must be a live camera with URP overlay metadata.

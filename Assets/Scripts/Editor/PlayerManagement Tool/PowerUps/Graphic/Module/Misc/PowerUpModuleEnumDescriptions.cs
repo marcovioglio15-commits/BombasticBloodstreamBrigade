@@ -41,7 +41,8 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.Stackable,
         PowerUpModuleKind.LaserBeam,
         PowerUpModuleKind.SwitchWeapon,
-        PowerUpModuleKind.AttractDrops
+        PowerUpModuleKind.AttractDrops,
+        PowerUpModuleKind.ReturningProjectiles
     };
     #endregion
 
@@ -155,6 +156,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with the mountable mesh identified by a Weapon Id while the owning passive or toggleable active power-up is in effect.";
             case PowerUpModuleKind.AttractDrops:
                 return "Attracts enemy drops inside a player-centered radius. Passives apply continuously, standard actives emit one request per activation, and toggleable Resource Gates apply while active.";
+            case PowerUpModuleKind.ReturningProjectiles:
+                return "Turns projectile despawn into a configurable retrace or player-seeking return phase, with isolated hit, rotation, scale, prefab, split, bounce, orbit, and active-shot rules.";
             default:
                 return "No description available.";
         }
@@ -265,6 +268,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.AttractDrops:
                 relativePropertyPath = "dropAttraction";
                 payloadLabel = "Drop Attraction Payload";
+                return true;
+            case PowerUpModuleKind.ReturningProjectiles:
+                relativePropertyPath = "returningProjectiles";
+                payloadLabel = "Returning Projectiles Payload";
                 return true;
             default:
                 relativePropertyPath = string.Empty;

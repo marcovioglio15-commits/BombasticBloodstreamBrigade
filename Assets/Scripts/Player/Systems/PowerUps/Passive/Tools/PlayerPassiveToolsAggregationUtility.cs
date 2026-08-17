@@ -95,8 +95,12 @@ public static class PlayerPassiveToolsAggregationUtility
     /// <param name="passiveToolsState">Aggregate snapshot reset in place.</param>
     public static void ResetToDefault(ref PlayerPassiveToolsState passiveToolsState)
     {
+        float projectileSizePowerUpMultiplier = passiveToolsState.ProjectileSizePowerUpMultiplier;
         passiveToolsState = default;
         passiveToolsState.ProjectileSizeMultiplier = 1f;
+        passiveToolsState.ProjectileSizePowerUpMultiplier = projectileSizePowerUpMultiplier > 0f
+            ? projectileSizePowerUpMultiplier
+            : 1f;
         passiveToolsState.ProjectileDamageMultiplier = 1f;
         passiveToolsState.ProjectileSpeedMultiplier = 1f;
         passiveToolsState.ProjectileLifetimeSecondsMultiplier = 1f;
@@ -145,6 +149,12 @@ public static class PlayerPassiveToolsAggregationUtility
                 passiveToolConfig.DropAttraction.ConsumeUnusableDrops != 0
                     ? (byte)1
                     : (byte)0;
+        }
+
+        if (passiveToolConfig.HasReturningProjectiles != 0)
+        {
+            passiveToolsState.HasReturningProjectiles = 1;
+            passiveToolsState.ReturningProjectiles = passiveToolConfig.ReturningProjectiles;
         }
 
         if (passiveToolConfig.HasProjectileSize != 0)

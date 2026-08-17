@@ -558,7 +558,7 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal short-range dash distance source enum value.
+    /// Resolves one valid short-range dash distance source enum value.
     /// </summary>
     /// <param name="distanceSource">Authored distance source candidate.</param>
     /// <returns>Sanitized short-range dash distance source.</returns>
@@ -576,7 +576,7 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal short-range dash mirror mode enum value.
+    /// Resolves one valid short-range dash mirror mode enum value.
     /// </summary>
     /// <param name="mirrorMode">Authored mirror mode candidate.</param>
     /// <returns>Sanitized short-range dash mirror mode.</returns>
@@ -660,7 +660,7 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Power-Up Stealer trigger enum value.
+    /// Resolves one valid Power-Up Stealer trigger enum value.
     /// </summary>
     /// <param name="triggerMode">Authored trigger mode.</param>
     /// <returns>Supported trigger mode.</returns>
@@ -679,7 +679,7 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Power-Up Stealer target enum value.
+    /// Resolves one valid Power-Up Stealer target enum value.
     /// </summary>
     /// <param name="targetKind">Authored target kind.</param>
     /// <returns>Supported target kind.</returns>
@@ -698,7 +698,7 @@ public static class EnemyAdvancedPatternBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Power-Up Stealer within-category selection enum value.
+    /// Resolves one valid Power-Up Stealer within-category selection enum value.
     /// </summary>
     /// <param name="selectionMode">Authored within-category selection mode.</param>
     /// <returns>Supported selection mode.</returns>

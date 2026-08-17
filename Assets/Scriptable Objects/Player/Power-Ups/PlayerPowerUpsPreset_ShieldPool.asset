@@ -616,6 +616,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -1052,6 +1086,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -1488,6 +1556,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -1924,6 +2026,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -2360,6 +2496,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -2796,6 +2966,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -3232,6 +3436,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -3668,6 +3906,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -4104,6 +4376,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -4540,6 +4846,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -4976,6 +5316,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -5412,6 +5786,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -5848,6 +6256,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -6284,6 +6726,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -6720,6 +7196,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -7156,6 +7666,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -7592,6 +8136,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -8028,6 +8606,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 2
         directionMode: 0
@@ -8464,6 +9076,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 2
         directionMode: 0
@@ -8900,6 +9546,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -9363,6 +10043,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -9800,6 +10514,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -10236,6 +10984,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -10673,6 +11455,40 @@ MonoBehaviour:
         speedPercentChangePerBounce: -5
         minimumSpeedMultiplierAfterBounce: 0.1
         maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnDelaySeconds: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
       projectileSplit:
         triggerMode: 0
         directionMode: 0
@@ -11122,6 +11938,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -11558,6 +12408,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -11994,6 +12878,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -12430,6 +13348,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -12867,6 +13819,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -13316,6 +14302,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -13752,6 +14772,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -14188,6 +15242,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -14628,6 +15716,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -15068,6 +16190,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -15517,6 +16673,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -15953,6 +17143,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -16389,6 +17613,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -16825,6 +18083,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -17262,6 +18554,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -17711,6 +19037,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -18147,6 +19507,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -18583,6 +19977,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -19032,6 +20460,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -19468,6 +20930,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -19904,6 +21400,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -20353,6 +21883,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -20789,6 +22353,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -21225,6 +22823,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -21674,6 +23306,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -22110,6 +23776,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -22546,6 +24246,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -22992,6 +24726,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -23428,6 +25196,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -23865,6 +25667,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -24321,6 +26157,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -24764,6 +26634,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -25218,6 +27122,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -25661,6 +27599,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -26109,6 +28081,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -26545,6 +28551,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -26994,6 +29034,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -27443,6 +29517,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -27880,6 +29988,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -28329,6 +30471,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -28778,6 +30954,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: -5
           minimumSpeedMultiplierAfterBounce: 0.1
           maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 2
           directionMode: 0
@@ -29228,6 +31438,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -29676,6 +31920,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -30121,6 +32399,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -30556,6 +32868,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -31001,6 +33347,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -31436,6 +33816,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -31871,6 +34285,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -32316,6 +34764,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -32751,6 +35233,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -33196,6 +35712,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -33631,6 +36181,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -34076,6 +36660,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -34511,6 +37129,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -34956,6 +37608,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -35391,6 +38077,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -35836,6 +38556,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -36271,6 +39025,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -36716,6 +39504,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -37151,6 +39973,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -37597,6 +40453,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -38043,6 +40933,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -38488,6 +41412,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -38923,6 +41881,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -39377,6 +42369,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -39831,6 +42857,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -40312,6 +43372,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -40766,6 +43860,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0
@@ -41209,6 +44337,40 @@ MonoBehaviour:
           speedPercentChangePerBounce: 0
           minimumSpeedMultiplierAfterBounce: 0
           maximumSpeedMultiplierAfterBounce: 0
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnDelaySeconds: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
           directionMode: 0

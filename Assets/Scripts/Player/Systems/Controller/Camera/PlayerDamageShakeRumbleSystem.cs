@@ -71,9 +71,18 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
                                         shakeState.ValueRO.FireRumbleImpulseRemainingSeconds,
                                         out float fireLowFrequency,
                                         out float fireHighFrequency);
-                // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping shakes would clip.
-                targetLowFrequency = math.saturate(damageLowFrequency * damageRumbleMultiplier + fireLowFrequency * fireRumbleMultiplier);
-                targetHighFrequency = math.saturate(damageHighFrequency * damageRumbleMultiplier + fireHighFrequency * fireRumbleMultiplier);
+                ResolveFireMotorSpeeds(in cameraConfig.ValueRO.FireShake,
+                                        shakeState.ValueRO.ReturnRumbleEnvelope,
+                                        shakeState.ValueRO.ReturnRumbleImpulseRemainingSeconds,
+                                        out float returnLowFrequency,
+                                        out float returnHighFrequency);
+                float returnMultiplier = math.max(0f, shakeState.ValueRO.ReturnRumbleMultiplier);
+
+                // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping channels would clip.
+                targetLowFrequency = math.saturate(damageLowFrequency * damageRumbleMultiplier +
+                                                   (fireLowFrequency + returnLowFrequency * returnMultiplier) * fireRumbleMultiplier);
+                targetHighFrequency = math.saturate(damageHighFrequency * damageRumbleMultiplier +
+                                                    (fireHighFrequency + returnHighFrequency * returnMultiplier) * fireRumbleMultiplier);
                 break;
             }
         }
@@ -122,14 +131,16 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     /// <returns>True when the motors must be forced to rest for the current frame.</returns>
     private readonly bool ShouldSilenceRumble(bool isSceneTransitioning)
     {
+        if (isSceneTransitioning)
+            return true;
+
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
             return true;
 
         if (PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery))
             return false;
 
-        // A hard time-scale pause freezes gameplay, but a transition-owned pause must still settle the motors to rest.
-        return PlayerGameplayPauseUtility.IsTimeScaleHardPaused() && !isSceneTransitioning;
+        return PlayerGameplayPauseUtility.IsTimeScaleHardPaused();
     }
     #endregion
 

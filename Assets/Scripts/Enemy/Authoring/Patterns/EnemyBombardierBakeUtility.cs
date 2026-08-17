@@ -114,7 +114,7 @@ internal static class EnemyBombardierBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Bombardier targeting mode enum value.
+    /// Resolves one valid Bombardier targeting mode enum value.
     /// </summary>
     /// <param name="targetingMode">Authored targeting mode.</param>
     /// <returns>Supported targeting mode.</returns>
@@ -134,7 +134,7 @@ internal static class EnemyBombardierBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Bombardier launch pattern enum value.
+    /// Resolves one valid Bombardier launch pattern enum value.
     /// </summary>
     /// <param name="launchPattern">Authored launch pattern.</param>
     /// <returns>Supported launch pattern.</returns>
@@ -152,7 +152,7 @@ internal static class EnemyBombardierBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Bombardier trajectory solver enum value.
+    /// Resolves one valid Bombardier trajectory solver enum value.
     /// </summary>
     /// <param name="trajectoryMode">Authored trajectory mode.</param>
     /// <returns>Supported trajectory mode.</returns>

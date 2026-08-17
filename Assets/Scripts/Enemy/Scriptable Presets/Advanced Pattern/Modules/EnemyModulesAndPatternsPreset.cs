@@ -424,7 +424,7 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     }
 
     /// <summary>
-    /// Validates one catalog subsection, enforcing unique module IDs and legal module-kind values for that subsection.
+    /// Validates one catalog subsection, enforcing unique module IDs and valid module-kind values for that subsection.
     /// </summary>
     /// <param name="definitions">Definition list to validate.</param>
     /// <param name="section">Catalog section that owns the list.</param>
@@ -503,11 +503,11 @@ public sealed class EnemyModulesAndPatternsPreset : ScriptableObject
     }
 
     /// <summary>
-    /// Resolves the legal module kind for one catalog section.
+    /// Resolves the valid module kind for one catalog section.
     /// </summary>
     /// <param name="section">Catalog section being validated.</param>
     /// <param name="candidateKind">Authored module kind candidate.</param>
-    /// <returns>A legal module kind for the requested section.</returns>
+    /// <returns>A valid module kind for the requested section.</returns>
     private static EnemyPatternModuleKind ResolveCatalogModuleKind(EnemyPatternModuleCatalogSection section,
                                                                    EnemyPatternModuleKind candidateKind)
     {

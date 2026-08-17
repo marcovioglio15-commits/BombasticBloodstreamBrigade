@@ -35,6 +35,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdLaserBeam = "Module_LaserBeam";
     internal const string ModuleIdSwitchWeapon = "Module_SwitchWeapon";
     internal const string ModuleIdAttractDrops = "Module_AttractDrops";
+    internal const string ModuleIdReturningProjectiles = PlayerReturningProjectilesPresetDefaultsUtility.ModuleId;
 
     internal const string ActivePowerUpIdShotgun = "ActiveShotgun";
     internal const string ActivePowerUpIdChargeShot = "ActiveChargeShot";
@@ -42,12 +43,14 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ActivePowerUpIdBasicDash = "ActiveBasicDash";
     internal const string ActivePowerUpIdPortableHealthPack = "ActivePortableHealthPack";
     internal const string ActivePowerUpIdBulletTime = "ActiveBulletTime";
+    internal const string ActivePowerUpIdBoomerang = PlayerReturningProjectilesPresetDefaultsUtility.BoomerangPowerUpId;
 
     internal const string PassivePowerUpIdElementalTrail = "PassiveElementalTrail";
     internal const string PassivePowerUpIdEnemiesExplodeOnDeath = "PassiveEnemiesExplodeOnDeath";
     internal const string PassivePowerUpIdOrbitalProjectiles = "PassiveOrbitalProjectiles";
     internal const string PassivePowerUpIdBouncingProjectiles = "PassiveBouncingProjectiles";
     internal const string PassivePowerUpIdSplittingProjectiles = "PassiveSplittingProjectiles";
+    internal const string PassivePowerUpIdTwoStepTreatment = PlayerReturningProjectilesPresetDefaultsUtility.TwoStepTreatmentPowerUpId;
     #endregion
 
     #region Methods
@@ -185,6 +188,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdLaserBeam, "Laser Beam", PowerUpModuleKind.LaserBeam, PowerUpModuleStage.Hook, "Overrides base projectile spawning with one or more continuous liquid beam lanes."));
         definitions.Add(CreateModuleDefinition(ModuleIdSwitchWeapon, "Switch Weapon", PowerUpModuleKind.SwitchWeapon, PowerUpModuleStage.Hook, "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with the mountable mesh identified by a defined Weapon Id while the owning power-up is equipped."));
         definitions.Add(CreateModuleDefinition(ModuleIdAttractDrops, "Attract Drops", PowerUpModuleKind.AttractDrops, PowerUpModuleStage.Execute, "Attracts enemy drops inside a configurable player-centered radius and can optionally consume rewards that cannot currently be used."));
+        definitions.Add(CreateModuleDefinition(ModuleIdReturningProjectiles, "Returning Projectiles", PowerUpModuleKind.ReturningProjectiles, PowerUpModuleStage.Execute, "Converts projectile termination into retraced or player-seeking return travel with configurable hit and interaction rules."));
         return definitions;
     }
 
@@ -298,6 +302,8 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                 CreateBinding(ModuleIdGateResource, PowerUpModuleStage.Gate, CreateResourceGatePayload(100f, 80f, 20f, 0f, PowerUpChargeType.EnemiesDestroyed, 8f)),
                                                 CreateBinding(ModuleIdTimeDilationEnemies, PowerUpModuleStage.Execute, null)));
 
+        definitions.Add(CreateDefaultBoomerang(defaultDropPools));
+
         return definitions;
     }
 
@@ -356,7 +362,51 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                 CreateBinding(ModuleIdTriggerEvent, PowerUpModuleStage.Hook, CreateTriggerEventPayload(PowerUpTriggerEventType.OnProjectileDespawned)),
                                                 CreateBinding(ModuleIdProjectileSplit, PowerUpModuleStage.Hook, null)));
 
+        definitions.Add(CreateDefaultTwoStepTreatment(defaultDropPools));
+
         return definitions;
+    }
+
+    /// <summary>
+    /// Creates the baseline non-toggleable energy active that emits one player-seeking returning projectile.
+    /// </summary>
+    /// <param name="defaultDropPools">Drop-pool identifiers copied into the common power-up data.</param>
+    /// <returns>Configured Boomerang modular definition.</returns>
+    public static ModularPowerUpDefinition CreateDefaultBoomerang(List<string> defaultDropPools)
+    {
+        return CreatePowerUpDefinition(ActivePowerUpIdBoomerang,
+                                       "Boomerang",
+                                       "Throws one player-seeking returning projectile that pierces every enemy until it rejoins the player.",
+                                       defaultDropPools,
+                                       2,
+                                       150,
+                                       false,
+                                       CreateBinding(ModuleIdTriggerPress, PowerUpModuleStage.Trigger, null),
+                                       CreateBinding(ModuleIdGateResource, PowerUpModuleStage.Gate, CreateResourceGatePayload(100f, 35f, 25f, 0f, PowerUpChargeType.Time, 0.6f)),
+                                       CreateBinding(ModuleIdReturningProjectiles, PowerUpModuleStage.Execute, CreateReturningProjectilesPayload(ProjectileReturnPathMode.SeekPlayer,
+                                                                                                                                            ProjectileReturnHitPolicy.CompleteReturn,
+                                                                                                                                            true,
+                                                                                                                                            false)));
+    }
+
+    /// <summary>
+    /// Creates the baseline passive that makes normal projectiles retrace their complete outbound path.
+    /// </summary>
+    /// <param name="defaultDropPools">Drop-pool identifiers copied into the common power-up data.</param>
+    /// <returns>Configured Two-Step Treatment modular definition.</returns>
+    public static ModularPowerUpDefinition CreateDefaultTwoStepTreatment(List<string> defaultDropPools)
+    {
+        return CreatePowerUpDefinition(PassivePowerUpIdTwoStepTreatment,
+                                       "Two-Step Treatment",
+                                       "Normal player projectiles retrace their outbound route after reaching their terminal point.",
+                                       defaultDropPools,
+                                       2,
+                                       155,
+                                       false,
+                                       CreateBinding(ModuleIdReturningProjectiles, PowerUpModuleStage.Execute, CreateReturningProjectilesPayload(ProjectileReturnPathMode.RetraceOutboundPath,
+                                                                                                                                            ProjectileReturnHitPolicy.LimitedAdditionalHits,
+                                                                                                                                            true,
+                                                                                                                                            false)));
     }
 
     private static PowerUpModuleData CreateDefaultPayloadForModuleKind(PowerUpModuleKind moduleKind)
@@ -449,6 +499,12 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
             case PowerUpModuleKind.AttractDrops:
                 payload.DropAttraction.Configure(18f, false);
                 break;
+            case PowerUpModuleKind.ReturningProjectiles:
+                payload = CreateReturningProjectilesPayload(ProjectileReturnPathMode.RetraceOutboundPath,
+                                                            ProjectileReturnHitPolicy.LimitedAdditionalHits,
+                                                            true,
+                                                            false);
+                break;
             default:
                 break;
         }
@@ -530,6 +586,57 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                        chargeType,
                                        chargePerTrigger,
                                        cooldownSeconds);
+        payload.Validate();
+        return payload;
+    }
+
+    /// <summary>
+    /// Creates a validated Returning Projectiles payload used by defaults and the two baseline power-ups.
+    /// </summary>
+    /// <param name="pathMode">Return path strategy.</param>
+    /// <param name="hitPolicy">Return hit policy.</param>
+    /// <param name="spinDuringFlight">Whether the projectile continuously spins.</param>
+    /// <param name="allowConcurrentActiveProjectiles">Whether a non-toggleable active can overlap live projectiles.</param>
+    /// <returns>Validated modular payload containing Returning Projectiles data.</returns>
+    private static PowerUpModuleData CreateReturningProjectilesPayload(ProjectileReturnPathMode pathMode,
+                                                                       ProjectileReturnHitPolicy hitPolicy,
+                                                                       bool spinDuringFlight,
+                                                                       bool allowConcurrentActiveProjectiles)
+    {
+        PowerUpModuleData payload = new PowerUpModuleData();
+        payload.ReturningProjectiles.Configure(null,
+                                               true,
+                                               true,
+                                               true,
+                                               true,
+                                               pathMode,
+                                               1.25f,
+                                               1f,
+                                               1f,
+                                               ProjectileOutboundHitPolicy.NaturalPenetration,
+                                               1,
+                                               0f,
+                                               0.5f,
+                                               0.5f,
+                                               1f,
+                                               1f,
+                                               spinDuringFlight,
+                                               540f,
+                                               ProjectileReturnRotationAxis.Vertical,
+                                               720f,
+                                               ProjectileReturnRotationAxis.Vertical,
+                                               hitPolicy,
+                                               1,
+                                               0.25f,
+                                               0.2f,
+                                               true,
+                                               true,
+                                               true,
+                                               true,
+                                               true,
+                                               true,
+                                               false,
+                                               allowConcurrentActiveProjectiles);
         payload.Validate();
         return payload;
     }

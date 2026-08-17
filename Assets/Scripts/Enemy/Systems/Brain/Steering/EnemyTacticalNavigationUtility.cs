@@ -72,7 +72,7 @@ internal static class EnemyTacticalNavigationUtility
 
             UpdateStuckState(ref runtimeState, position, Velocities[enemyIndex], desiredSpeed);
 
-            // Direct approach remains a legal pressure candidate so tactical steering does not become evasive-only.
+            // Direct approach remains a valid pressure candidate so tactical steering does not become evasive-only.
             TryScoreCandidate(index,
                               enemyIndex,
                               ApproachResults[index],

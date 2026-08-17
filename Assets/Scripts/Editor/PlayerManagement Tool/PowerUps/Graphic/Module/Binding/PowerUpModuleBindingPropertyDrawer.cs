@@ -324,12 +324,36 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
 
         AddOverridePayloadWarnings(overrideContainer, overridePayloadProperty, moduleDefaultPayloadProperty, moduleKind);
         bool showActiveTriggerCharacterTuningOption = ShouldShowActiveTriggerCharacterTuningOption(bindingProperty, moduleKind);
+        bool showActiveProjectileConcurrencyOption = ShouldShowActiveProjectileConcurrencyOption(bindingProperty, moduleKind);
         PowerUpModuleDefinitionPropertyDrawer.BuildPayloadEditor(overrideContainer,
                                                                  payloadProperty,
                                                                  moduleKind,
                                                                  payloadLabel,
                                                                  showActiveTriggerCharacterTuningOption,
-                                                                 showToggleDurationOption);
+                                                                 showToggleDurationOption,
+                                                                 showActiveProjectileConcurrencyOption);
+    }
+
+    /// <summary>
+    /// Resolves whether a Returning Projectiles binding belongs to a non-toggleable active power-up.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized module binding currently being drawn.</param>
+    /// <param name="moduleKind">Resolved module kind for the selected binding.</param>
+    /// <returns>True when concurrent live-projectile control affects the owning active.</returns>
+    private static bool ShouldShowActiveProjectileConcurrencyOption(SerializedProperty bindingProperty,
+                                                                    PowerUpModuleKind moduleKind)
+    {
+        if (moduleKind != PowerUpModuleKind.ReturningProjectiles ||
+            bindingProperty == null ||
+            !IsBindingEnabled(bindingProperty))
+        {
+            return false;
+        }
+
+        if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
+            return false;
+
+        return IsNonToggleableActive(powerUpProperty, false, false);
     }
 
     private static bool TryResolveModuleInfo(SerializedObject serializedObject,
@@ -404,7 +428,7 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
             return false;
 
-        return IsNonToggleableActiveWithoutHoldCharge(powerUpProperty);
+        return IsNonToggleableActive(powerUpProperty, true, true);
     }
 
     /// <summary>
@@ -507,11 +531,15 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
     }
 
     /// <summary>
-    /// Checks the owning active composition for the exact runtime context that supports trigger-scoped Character Tuning.
+    /// Checks whether the owning active composition is non-toggleable and satisfies the requested trigger constraints.
     /// </summary>
     /// <param name="powerUpProperty">Serialized active power-up definition that owns the binding.</param>
-    /// <returns>True when the active has a triggerable tool, is not toggleable, and has no Trigger Hold Charge module.</returns>
-    private static bool IsNonToggleableActiveWithoutHoldCharge(SerializedProperty powerUpProperty)
+    /// <param name="rejectHoldCharge">Whether Trigger Hold Charge makes the context unsupported.</param>
+    /// <param name="requireTriggerableTool">Whether the active must contain a module that emits an immediate effect.</param>
+    /// <returns>True when the active is non-toggleable and satisfies the requested constraints.</returns>
+    private static bool IsNonToggleableActive(SerializedProperty powerUpProperty,
+                                              bool rejectHoldCharge,
+                                              bool requireTriggerableTool)
     {
         if (powerUpProperty == null)
             return false;
@@ -563,15 +591,16 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                 case PowerUpModuleKind.TimeDilationEnemies:
                 case PowerUpModuleKind.Heal:
                 case PowerUpModuleKind.AttractDrops:
+                case PowerUpModuleKind.ReturningProjectiles:
                     hasTriggerableTool = true;
                     break;
             }
 
-            if (hasHoldCharge || hasToggleableGate)
+            if ((rejectHoldCharge && hasHoldCharge) || hasToggleableGate)
                 return false;
         }
 
-        return hasTriggerableTool;
+        return !requireTriggerableTool || hasTriggerableTool;
     }
 
     /// <summary>

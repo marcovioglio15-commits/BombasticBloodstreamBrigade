@@ -37,6 +37,10 @@ public struct PlayerPowerUpsState : IComponentData
     public int SecondaryEquipOrder;
     public int NextEquipOrder;
     public int PendingCheatPresetIndex;
+    public int PrimaryReturningProjectileCount;
+    public int SecondaryReturningProjectileCount;
+    public uint PrimaryReturningProjectileGeneration;
+    public uint SecondaryReturningProjectileGeneration;
     public uint LastObservedGlobalKillCount;
     public uint LastObservedRoomClearCount;
     public float3 LastValidMovementDirection;
@@ -143,6 +147,17 @@ public struct PlayerChargeCharacterTuningBaseStatElement : IBufferElementData
 }
 
 /// <summary>
+/// Stores the projectile-size multiplier contributed by one runtime-scoped power-up source.
+/// Returning Projectiles uses this provenance to retain same-power-up tuning while filtering external Tiny/Mega effects.
+/// </summary>
+[InternalBufferCapacity(4)]
+public struct PlayerProjectileSizePowerUpMultiplierElement : IBufferElementData
+{
+    public FixedString64Bytes PowerUpId;
+    public float Multiplier;
+}
+
+/// <summary>
 /// Tier metadata pointing to a contiguous range inside the flattened tier-entry buffer.
 /// </summary>
 [InternalBufferCapacity(0)]
@@ -233,6 +248,7 @@ public struct PlayerMilestoneTimeScaleResumeState : IComponentData
 public struct PlayerPassiveToolsState
 {
     public float ProjectileSizeMultiplier;
+    public float ProjectileSizePowerUpMultiplier;
     public float ProjectileDamageMultiplier;
     public float ProjectileSpeedMultiplier;
     public float ProjectileLifetimeSecondsMultiplier;
@@ -263,6 +279,8 @@ public struct PlayerPassiveToolsState
     public FixedString64Bytes WeaponId;
     public byte HasDropAttraction;
     public DropAttractionPowerUpConfig DropAttraction;
+    public byte HasReturningProjectiles;
+    public ReturningProjectilesConfig ReturningProjectiles;
 }
 
 /// <summary>

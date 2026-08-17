@@ -40,6 +40,8 @@ public static class ProjectilePoolUtility
             return;
 
         NativeArray<Entity> spawnedProjectiles = new NativeArray<Entity>(count, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
+        bool supportsReturningProjectiles = entityManager.HasComponent<PlayerControllerConfig>(shooterEntity) ||
+                                            entityManager.HasComponent<PlayerPowerUpsState>(shooterEntity);
 
         try
         {
@@ -48,7 +50,7 @@ public static class ProjectilePoolUtility
             for (int index = 0; index < spawnedProjectiles.Length; index++)
             {
                 Entity projectileEntity = spawnedProjectiles[index];
-                EnsureProjectileComponents(entityManager, projectileEntity);
+                EnsureProjectileComponents(entityManager, projectileEntity, supportsReturningProjectiles);
                 EnsureProjectileBaseScale(entityManager, projectileEntity);
                 SetProjectileParked(entityManager, projectileEntity);
                 entityManager.SetComponentEnabled<ProjectileActive>(projectileEntity, false);
@@ -59,7 +61,8 @@ public static class ProjectilePoolUtility
             for (int index = 0; index < spawnedProjectiles.Length; index++)
                 projectilePool.Add(new ProjectilePoolElement
                 {
-                    ProjectileEntity = spawnedProjectiles[index]
+                    ProjectileEntity = spawnedProjectiles[index],
+                    PrefabEntity = projectilePrefab
                 });
         }
         finally
@@ -76,7 +79,10 @@ public static class ProjectilePoolUtility
     /// </summary>
     /// <param name="entityManager">The EntityManager used to query and add components.</param>
     /// <param name="projectileEntity">The entity representing the projectile to check and update.</param>
-    public static void EnsureProjectileComponents(EntityManager entityManager, Entity projectileEntity)
+    /// <param name="supportsReturningProjectiles">Whether player-only return state and path storage are required.</param>
+    public static void EnsureProjectileComponents(EntityManager entityManager,
+                                                  Entity projectileEntity,
+                                                  bool supportsReturningProjectiles)
     {
         if (!entityManager.HasComponent<LocalTransform>(projectileEntity))
             entityManager.AddComponentData(projectileEntity, LocalTransform.Identity);
@@ -119,6 +125,15 @@ public static class ProjectilePoolUtility
 
         if (!entityManager.HasComponent<ProjectileOffscreenWarningState>(projectileEntity))
             entityManager.AddComponentData(projectileEntity, default(ProjectileOffscreenWarningState));
+
+        if (supportsReturningProjectiles)
+        {
+            if (!entityManager.HasComponent<ProjectileReturnState>(projectileEntity))
+                entityManager.AddComponentData(projectileEntity, default(ProjectileReturnState));
+
+            if (!entityManager.HasBuffer<ProjectileReturnPathPoint>(projectileEntity))
+                entityManager.AddBuffer<ProjectileReturnPathPoint>(projectileEntity);
+        }
     }
 
     /// <summary>
@@ -182,12 +197,14 @@ public static class ProjectilePoolUtility
     /// </summary>
     /// <param name="projectileEntity">Projectile entity to despawn and return.</param>
     /// <param name="shooterEntity">Shooter entity that owns the projectile pool buffer.</param>
+    /// <param name="prefabEntity">Prefab partition that produced the projectile.</param>
     /// <param name="projectileTransform">Current projectile transform that will be parked.</param>
     /// <param name="poolLookup">Lookup used to access shooter projectile pools.</param>
     /// <param name="projectileActiveLookup">Lookup used to disable the projectile active component.</param>
 
     public static void DespawnToPool(Entity projectileEntity,
                                      Entity shooterEntity,
+                                     Entity prefabEntity,
                                      ref LocalTransform projectileTransform,
                                      ref BufferLookup<ProjectilePoolElement> poolLookup,
                                      ref ComponentLookup<ProjectileActive> projectileActiveLookup)
@@ -201,7 +218,8 @@ public static class ProjectilePoolUtility
         DynamicBuffer<ProjectilePoolElement> shooterPool = poolLookup[shooterEntity];
         shooterPool.Add(new ProjectilePoolElement
         {
-            ProjectileEntity = projectileEntity
+            ProjectileEntity = projectileEntity,
+            PrefabEntity = prefabEntity
         });
     }
     #endregion

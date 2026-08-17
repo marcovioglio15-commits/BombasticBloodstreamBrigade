@@ -139,6 +139,46 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe projectile return path mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped return path mode.</returns>
+    public static ProjectileReturnPathMode ResolveProjectileReturnPathMode(float value)
+    {
+        return (ProjectileReturnPathMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe projectile return rotation axis from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped return rotation axis.</returns>
+    public static ProjectileReturnRotationAxis ResolveProjectileReturnRotationAxis(float value)
+    {
+        return (ProjectileReturnRotationAxis)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe projectile outbound hit policy from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped outbound hit policy.</returns>
+    public static ProjectileOutboundHitPolicy ResolveProjectileOutboundHitPolicy(float value)
+    {
+        return (ProjectileOutboundHitPolicy)ResolveEnumIndex(value, 2);
+    }
+
+    /// <summary>
+    /// Resolves a safe projectile return hit policy from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped return hit policy.</returns>
+    public static ProjectileReturnHitPolicy ResolveProjectileReturnHitPolicy(float value)
+    {
+        return (ProjectileReturnHitPolicy)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe ProjectileKnockbackDirectionMode from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>

@@ -33,7 +33,8 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasLaserBeam != 0 ||
                config.HasOrbitalProjections != 0 ||
                config.HasDropAttraction != 0 ||
-               config.HasWeaponSwitch != 0;
+               config.HasWeaponSwitch != 0 ||
+               config.HasReturningProjectiles != 0;
     }
 
     /// <summary>
@@ -43,6 +44,9 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
     /// <returns>Representative passive tool kind for the authored payload mix.</returns>
     public static PassiveToolKind ResolvePassiveToolKind(in PlayerPassiveToolConfig config)
     {
+        if (config.HasReturningProjectiles != 0)
+            return PassiveToolKind.ReturningProjectiles;
+
         if (config.HasElementalTrail != 0)
             return PassiveToolKind.ElementalTrail;
 

@@ -30,6 +30,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerChargeCharacterTuningState>();
         state.RequireForUpdate<PlayerChargeCharacterTuningBaseStatElement>();
+        state.RequireForUpdate<PlayerProjectileSizePowerUpMultiplierElement>();
         state.RequireForUpdate<PlayerPowerUpUnlockCatalogElement>();
         state.RequireForUpdate<PlayerPowerUpCharacterTuningFormulaElement>();
         state.RequireForUpdate<PlayerInputState>();
@@ -128,6 +129,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         ComponentLookup<PlayerExperienceCollection> playerExperienceCollectionLookup = SystemAPI.GetComponentLookup<PlayerExperienceCollection>(false);
         ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup = SystemAPI.GetComponentLookup<PlayerRuntimeScalingState>(false);
         BufferLookup<PlayerChargeCharacterTuningBaseStatElement> chargeCharacterTuningBaseStatsLookup = SystemAPI.GetBufferLookup<PlayerChargeCharacterTuningBaseStatElement>(false);
+        BufferLookup<PlayerProjectileSizePowerUpMultiplierElement> projectileSizePowerUpMultipliersLookup = SystemAPI.GetBufferLookup<PlayerProjectileSizePowerUpMultiplierElement>(false);
         BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeControllerScalingElement>(true);
         BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
@@ -221,6 +223,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!chargeCharacterTuningBaseStatsLookup.HasBuffer(entity))
                 continue;
 
+            if (!projectileSizePowerUpMultipliersLookup.HasBuffer(entity))
+                continue;
+
             if (!unlockCatalogLookup.HasBuffer(entity))
                 continue;
 
@@ -256,6 +261,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             PlayerLevel playerLevel = playerLevelLookup[entity];
             PlayerExperienceCollection playerExperienceCollection = playerExperienceCollectionLookup[entity];
             DynamicBuffer<PlayerChargeCharacterTuningBaseStatElement> chargeCharacterTuningBaseStats = chargeCharacterTuningBaseStatsLookup[entity];
+            DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizePowerUpMultipliers = projectileSizePowerUpMultipliersLookup[entity];
             DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlots = runtimeAppliedElementSlotsLookup[entity];
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[entity];
             DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas = characterTuningFormulaLookup[entity];
@@ -316,6 +322,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                                runtimeGamePhases,
                                                                                                                                                ref chargeCharacterTuningState,
                                                                                                                                                chargeCharacterTuningBaseStats,
+                                                                                                                                               projectileSizePowerUpMultipliers,
+                                                                                                                                               ref passiveToolsState,
                                                                                                                                                ref playerExperience,
                                                                                                                                                ref playerLevel,
                                                                                                                                                ref playerExperienceCollection);
@@ -380,6 +388,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in primarySlotConfig,
                                                                 in secondarySlotConfig,
                                                                 0,
+                                                                powerUpsState.ValueRO.PrimaryReturningProjectileCount,
                                                                 primaryPressed,
                                                                 primaryPressedThisFrame,
                                                                 primaryReleasedThisFrame,
@@ -448,6 +457,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                                  runtimeGamePhases,
                                                                                                                                                  ref chargeCharacterTuningState,
                                                                                                                                                  chargeCharacterTuningBaseStats,
+                                                                                                                                                 projectileSizePowerUpMultipliers,
+                                                                                                                                                 ref passiveToolsState,
                                                                                                                                                  ref playerExperience,
                                                                                                                                                  ref playerLevel,
                                                                                                                                                  ref playerExperienceCollection);
@@ -512,6 +523,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in secondarySlotConfig,
                                                                 in primarySlotConfig,
                                                                 1,
+                                                                powerUpsState.ValueRO.SecondaryReturningProjectileCount,
                                                                 secondaryPressed,
                                                                 secondaryPressedThisFrame,
                                                                 secondaryReleasedThisFrame,
@@ -578,6 +590,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                        runtimeGamePhases,
                                                                                                                                        ref chargeCharacterTuningState,
                                                                                                                                        chargeCharacterTuningBaseStats,
+                                                                                                                                       projectileSizePowerUpMultipliers,
+                                                                                                                                       ref passiveToolsState,
                                                                                                                                        ref playerExperience,
                                                                                                                                        ref playerLevel,
                                                                                                                                        ref playerExperienceCollection);

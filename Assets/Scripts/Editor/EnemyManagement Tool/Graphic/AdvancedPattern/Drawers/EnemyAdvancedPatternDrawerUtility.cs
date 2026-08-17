@@ -323,7 +323,7 @@ public static class EnemyAdvancedPatternDrawerUtility
     }
 
     /// <summary>
-    /// Returns whether one module kind is legal inside the requested shared catalog section.
+    /// Returns whether one module kind is valid inside the requested shared catalog section.
     /// </summary>
     /// <param name="moduleKind">Candidate module kind.</param>
     /// <param name="section">Target shared catalog section.</param>

@@ -14,6 +14,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// Processes the per-frame runtime for one charge-shot slot, including stored charge, release execution, and optional released-state gain or decay.
     /// </summary>
     /// <param name="slotConfig">Slot configuration compiled for a charge-shot active.</param>
+    /// <param name="slotIndex">Stable active slot index carried by spawned projectile requests.</param>
     /// <param name="isPressed">True while the bound slot input remains held.</param>
     /// <param name="pressedThisFrame">True when the bound slot input was pressed during the current frame.</param>
     /// <param name="releasedThisFrame">True when the bound slot input was released during the current frame.</param>
@@ -56,6 +57,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="audioRequests">Optional audio request buffer used when a Game Audio singleton exists.</param>
     /// <param name="canEnqueueAudioRequests">True when audioRequests points to a valid buffer.</param>
     public static void ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
+                                             byte slotIndex,
                                              bool isPressed,
                                              bool pressedThisFrame,
                                              bool releasedThisFrame,
@@ -211,6 +213,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                     PlayerGhostTrailRuntimeUtility.Activate(ref ghostTrailState, in slotConfig.GhostTrail, false);
 
                 PlayerPowerUpActivationExecutionUtility.ExecuteChargeShot(in slotConfig,
+                                                                          slotIndex,
                                                                           in localTransform,
                                                                           in lookState,
                                                                           in runtimeShootingConfig,

@@ -1030,6 +1030,7 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             AddBuffer<PlayerLaserBeamPulseHitElement>(entity);
             AddComponent(entity, new PlayerChargeCharacterTuningState());
             AddBuffer<PlayerChargeCharacterTuningBaseStatElement>(entity);
+            AddBuffer<PlayerProjectileSizePowerUpMultiplierElement>(entity);
             IReadOnlyList<ElementalVfxByElementData> elementalEnemyVfxAssignments = PlayerAuthoringVisualPresetResolverUtility.ResolveElementalEnemyVfxAssignments(authoring.MasterPreset,
                                                                                                                                                                   powerUpsPreset);
             PlayerElementalVfxConfig elementalVfxConfig = PlayerPowerUpBakeSharedUtility.BuildElementalVfxConfig(authoring,

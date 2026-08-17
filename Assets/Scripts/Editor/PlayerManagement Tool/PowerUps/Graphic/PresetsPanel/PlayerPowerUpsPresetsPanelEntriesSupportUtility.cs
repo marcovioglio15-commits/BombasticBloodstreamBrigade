@@ -454,6 +454,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.Stackable:
                 case PowerUpModuleKind.SwitchWeapon:
                 case PowerUpModuleKind.AttractDrops:
+                case PowerUpModuleKind.ReturningProjectiles:
                     return true;
                 default:
                     return false;
@@ -479,6 +480,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             case PowerUpModuleKind.Stackable:
             case PowerUpModuleKind.SwitchWeapon:
             case PowerUpModuleKind.AttractDrops:
+            case PowerUpModuleKind.ReturningProjectiles:
                 return true;
             default:
                 return false;
@@ -513,6 +515,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasBounce = moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles);
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
+        bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
         bool hasIgnoredPassiveOnlyModules = hasTrail || hasOrbit || hasBounce || hasSplit || hasTriggerEvent;
         int primaryExecuteKindCount = 0;
 
@@ -537,6 +540,9 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (hasOrbitalProjections)
             primaryExecuteKindCount += 1;
 
+        if (primaryExecuteKindCount == 0 && hasReturningProjectiles)
+            primaryExecuteKindCount += 1;
+
         if (primaryExecuteKindCount == 0 && hasDropAttraction)
             primaryExecuteKindCount += 1;
 
@@ -546,7 +552,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             warningLines.Add("No active execute module selected. Only Character Tuning acquisition effects will apply.");
 
         if (primaryExecuteKindCount > 1)
-            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections > AttractDrops. ImpactFrame, GhostTrail, and AttractDrops also run as activation side effects when paired with another active tool.");
+            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections > ReturningProjectiles > AttractDrops. ReturningProjectiles also modifies compatible projectile execute modules. ImpactFrame, GhostTrail, and AttractDrops run as activation side effects when paired with another active tool.");
 
         if (hasDeathExplosion && !hasSpawnObject)
             warningLines.Add("DeathExplosion is ignored unless SpawnObject is also bound.");
@@ -586,9 +592,10 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasCharacterTuning = moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
+        bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
-        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction;
+        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction || hasReturningProjectiles;
         List<string> ignoredActiveModules = new List<string>();
 
         if (!hasPassiveRuntimeConsumer)
@@ -705,8 +712,9 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasGateResource = moduleKinds.Contains(PowerUpModuleKind.GateResource);
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
+        bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
-        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasDropAttraction;
+        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasDropAttraction || hasReturningProjectiles;
 
         if (!hasAnyPassiveRuntimeConsumer)
             warningLines.Add("No passive runtime module found. This passive power up compiles as undefined.");

@@ -119,6 +119,7 @@ public static class PlayerProjectileRequestUtility
             Range = range,
             Lifetime = lifetime,
             ScaleMultiplier = scale,
+            ProjectileSizePowerUpMultiplier = math.max(0.01f, passiveToolsState.ProjectileSizePowerUpMultiplier),
             Knockback = values.Knockback,
             InheritPlayerSpeed = runtimeShootingConfig.ProjectilesInheritPlayerSpeed,
             IgnoreInheritedPlayerVelocityX = passiveToolsState.HasShotgun != 0 ? passiveToolsState.Shotgun.IgnoreInheritedPlayerVelocityX : (byte)0,
@@ -179,6 +180,10 @@ public static class PlayerProjectileRequestUtility
     /// <param name="penetrationMode">Penetration mode assigned to emitted requests.</param>
     /// <param name="maxPenetrations">Maximum penetrations assigned to emitted requests.</param>
     /// <param name="isSplitChild">Flag propagated to emitted requests.</param>
+    /// <param name="spawnSource">Source category used by returning-projectile interaction filters.</param>
+    /// <param name="activeSlotIndex">Owning active slot, or 255 when the request is not slot-owned.</param>
+    /// <param name="hasReturningProjectilesOverride">Whether the explicit return config must override passive filtering.</param>
+    /// <param name="returningProjectilesOverride">Explicit return config carried by the request.</param>
     public static void AddSpreadRequests(ref DynamicBuffer<ShootRequest> shootRequests,
                                          int projectileCount,
                                          float coneAngleDegrees,
@@ -187,7 +192,11 @@ public static class PlayerProjectileRequestUtility
                                          in PlayerProjectileRequestTemplate template,
                                          ProjectilePenetrationMode penetrationMode,
                                          int maxPenetrations,
-                                         byte isSplitChild)
+                                         byte isSplitChild,
+                                         ProjectileSpawnSource spawnSource = ProjectileSpawnSource.BaseShot,
+                                         byte activeSlotIndex = byte.MaxValue,
+                                         byte hasReturningProjectilesOverride = 0,
+                                         ReturningProjectilesConfig returningProjectilesOverride = default)
     {
         if (projectileCount <= 1)
         {
@@ -199,7 +208,11 @@ public static class PlayerProjectileRequestUtility
                             maxPenetrations,
                             isSplitChild,
                             0,
-                            1);
+                            1,
+                            spawnSource,
+                            activeSlotIndex,
+                            hasReturningProjectilesOverride,
+                            returningProjectilesOverride);
             return;
         }
 
@@ -223,7 +236,11 @@ public static class PlayerProjectileRequestUtility
                             maxPenetrations,
                             isSplitChild,
                             projectileIndex,
-                            projectileCount);
+                            projectileCount,
+                            spawnSource,
+                            activeSlotIndex,
+                            hasReturningProjectilesOverride,
+                            returningProjectilesOverride);
         }
     }
 
@@ -239,6 +256,10 @@ public static class PlayerProjectileRequestUtility
     /// <param name="isSplitChild">Flag propagated to the entry.</param>
     /// <param name="orbitLayerIndex">Stable orbital layer index used by Perfect Circle trajectories.</param>
     /// <param name="orbitLayerCount">Total number of orbital layers emitted by the current request group.</param>
+    /// <param name="spawnSource">Source category used by returning-projectile interaction filters.</param>
+    /// <param name="activeSlotIndex">Owning active slot, or 255 when the request is not slot-owned.</param>
+    /// <param name="hasReturningProjectilesOverride">Whether the explicit return config must override passive filtering.</param>
+    /// <param name="returningProjectilesOverride">Explicit return config carried by the request.</param>
     public static void AddShootRequest(ref DynamicBuffer<ShootRequest> shootRequests,
                                        float3 position,
                                        float3 direction,
@@ -247,7 +268,11 @@ public static class PlayerProjectileRequestUtility
                                        int maxPenetrations,
                                        byte isSplitChild,
                                        int orbitLayerIndex = 0,
-                                       int orbitLayerCount = 1)
+                                       int orbitLayerCount = 1,
+                                       ProjectileSpawnSource spawnSource = ProjectileSpawnSource.BaseShot,
+                                       byte activeSlotIndex = byte.MaxValue,
+                                       byte hasReturningProjectilesOverride = 0,
+                                       ReturningProjectilesConfig returningProjectilesOverride = default)
     {
         int safeOrbitLayerCount = math.max(1, orbitLayerCount);
         shootRequests.Add(new ShootRequest
@@ -260,6 +285,9 @@ public static class PlayerProjectileRequestUtility
             Lifetime = template.Lifetime,
             Damage = math.max(0f, template.Damage),
             ProjectileScaleMultiplier = math.max(0.01f, template.ScaleMultiplier),
+            ProjectileSizePowerUpMultiplier = template.ProjectileSizePowerUpMultiplier > 0f
+                ? template.ProjectileSizePowerUpMultiplier
+                : 1f,
             PenetrationMode = penetrationMode,
             MaxPenetrations = math.max(0, maxPenetrations),
             KnockbackEnabled = template.Knockback.Enabled,
@@ -271,8 +299,12 @@ public static class PlayerProjectileRequestUtility
             IgnoreInheritedPlayerVelocityX = template.IgnoreInheritedPlayerVelocityX,
             IgnoreInheritedPlayerVelocityZ = template.IgnoreInheritedPlayerVelocityZ,
             IsSplitChild = isSplitChild,
+            SpawnSource = spawnSource,
+            ActiveSlotIndex = activeSlotIndex,
+            HasReturningProjectilesOverride = hasReturningProjectilesOverride,
             OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
             OrbitLayerCount = safeOrbitLayerCount,
+            ReturningProjectilesOverride = returningProjectilesOverride,
             ElementalPayloadOverride = template.ElementalPayloadOverride
         });
     }
@@ -308,6 +340,7 @@ public struct PlayerProjectileRequestTemplate
     public float Range;
     public float Lifetime;
     public float ScaleMultiplier;
+    public float ProjectileSizePowerUpMultiplier;
     public ProjectileKnockbackSettingsBlob Knockback;
     public byte InheritPlayerSpeed;
     public byte IgnoreInheritedPlayerVelocityX;

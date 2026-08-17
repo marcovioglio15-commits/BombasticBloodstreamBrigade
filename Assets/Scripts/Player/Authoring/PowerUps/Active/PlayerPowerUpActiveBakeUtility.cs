@@ -241,6 +241,8 @@ public static class PlayerPowerUpActiveBakeUtility
         float dropAttractionRadius = 0f;
         bool consumeUnusableDrops = false;
         bool hasActiveWeaponSwitch = false;
+        bool hasReturningProjectiles = false;
+        ReturningProjectilesConfig returningProjectilesConfig = default;
         FixedString64Bytes activeWeaponId = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
@@ -505,6 +507,14 @@ public static class PlayerPowerUpActiveBakeUtility
                     hasActiveWeaponSwitch = true;
                     activeWeaponId = PlayerWeaponVisualBakeUtility.BuildWeaponIdFixedString(payload.SwitchWeapon.WeaponId);
                     break;
+                case PowerUpModuleKind.ReturningProjectiles:
+                    if (payload.ReturningProjectiles == null)
+                        break;
+
+                    hasReturningProjectiles = true;
+                    returningProjectilesConfig = PlayerPowerUpReturningProjectileBakeUtility.BuildConfig(payload.ReturningProjectiles,
+                                                                                                            resolveDynamicPrefabEntity);
+                    break;
             }
         }
 
@@ -539,9 +549,13 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasOrbitalProjections,
                                                                                               hasDropAttraction);
 
+            if (resolvedToolKind == ActiveToolKind.Custom && hasReturningProjectiles)
+                resolvedToolKind = ActiveToolKind.ReturningProjectile;
+
             if (resolvedToolKind == ActiveToolKind.ChargeShot ||
                 resolvedToolKind == ActiveToolKind.Shotgun ||
-                hasOrbitalProjections)
+                hasOrbitalProjections ||
+                hasReturningProjectiles)
             {
                 PlayerPowerUpPassiveBakeUtility.BuildPassiveToolConfigFromModularPowerUp(authoring,
                                                                                          preset,
@@ -550,6 +564,18 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                          out triggeredProjectilePassiveTool,
                                                                                          resolveOrbitalProjectionPrefabBindingIndex);
             }
+        }
+
+        if (hasReturningProjectiles)
+        {
+            PlayerPassiveToolConfig samePowerUpModules = isToggleable
+                ? togglePassiveTool
+                : triggeredProjectilePassiveTool;
+            PlayerPowerUpReturningProjectileBakeUtility.ApplySamePowerUpModuleProvenance(ref returningProjectilesConfig,
+                                                                                          powerUp.CommonData.PowerUpId,
+                                                                                          samePowerUpModules.HasSplittingProjectiles != 0,
+                                                                                          samePowerUpModules.HasBouncingProjectiles != 0,
+                                                                                          samePowerUpModules.HasPerfectCircle != 0);
         }
 
         if (resolvedToolKind == ActiveToolKind.Custom)
@@ -698,6 +724,8 @@ public static class PlayerPowerUpActiveBakeUtility
             AttractionRadius = math.max(0f, dropAttractionRadius),
             ConsumeUnusableDrops = consumeUnusableDrops ? (byte)1 : (byte)0
         };
+        slotConfig.HasReturningProjectiles = hasReturningProjectiles ? (byte)1 : (byte)0;
+        slotConfig.ReturningProjectiles = returningProjectilesConfig;
     }
 
     /// <summary>

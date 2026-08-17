@@ -91,7 +91,7 @@ internal static class EnemyDropItemsBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal drop-items payload kind authored in the editor.
+    /// Resolves one valid drop-items payload kind authored in the editor.
     /// </summary>
     /// <param name="payloadKind">Authored payload kind candidate.</param>
     /// <returns>Sanitized payload kind used by bake.</returns>
@@ -110,7 +110,7 @@ internal static class EnemyDropItemsBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Extra Combo Points metric authored in the editor.
+    /// Resolves one valid Extra Combo Points metric authored in the editor.
     /// </summary>
     /// <param name="metric">Authored metric candidate.</param>
     /// <returns>Sanitized metric used by bake/runtime.</returns>
@@ -131,7 +131,7 @@ internal static class EnemyDropItemsBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Extra Combo Points condition-combine mode authored in the editor.
+    /// Resolves one valid Extra Combo Points condition-combine mode authored in the editor.
     /// </summary>
     /// <param name="combineMode">Authored combine mode candidate.</param>
     /// <returns>Sanitized combine mode used by bake/runtime.</returns>
@@ -150,7 +150,7 @@ internal static class EnemyDropItemsBakeUtility
     }
 
     /// <summary>
-    /// Resolves one legal Drop Items module combine mode authored in shared pattern assemblies.
+    /// Resolves one valid Drop Items module combine mode authored in shared pattern assemblies.
     /// </summary>
     /// <param name="combineMode">Authored combine mode candidate.</param>
     /// <returns>Sanitized combine mode used by bake/runtime.</returns>

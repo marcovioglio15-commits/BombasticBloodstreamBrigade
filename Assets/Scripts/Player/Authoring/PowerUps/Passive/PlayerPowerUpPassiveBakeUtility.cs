@@ -231,6 +231,8 @@ public static class PlayerPowerUpPassiveBakeUtility
         float dropAttractionRadius = 0f;
         bool consumeUnusableDrops = false;
         bool hasWeaponSwitch = false;
+        bool hasReturningProjectiles = false;
+        ReturningProjectilesConfig returningProjectilesConfig = default;
         // Neutral default: only used when hasWeaponSwitch stays false, in which case downstream consumption is gated off.
         FixedString64Bytes weaponId = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
@@ -549,6 +551,14 @@ public static class PlayerPowerUpPassiveBakeUtility
                     hasWeaponSwitch = true;
                     weaponId = PlayerWeaponVisualBakeUtility.BuildWeaponIdFixedString(payload.SwitchWeapon.WeaponId);
                     break;
+                case PowerUpModuleKind.ReturningProjectiles:
+                    if (payload.ReturningProjectiles == null)
+                        break;
+
+                    hasReturningProjectiles = true;
+                    returningProjectilesConfig = PlayerPowerUpReturningProjectileBakeUtility.BuildConfig(payload.ReturningProjectiles,
+                                                                                                            resolveDynamicPrefabEntity);
+                    break;
             }
         }
 
@@ -561,6 +571,15 @@ public static class PlayerPowerUpPassiveBakeUtility
             splitConfig.TriggerMode = PlayerPowerUpPassiveConfigBuildUtility.ResolveSplitTriggerMode(hasTriggerEvent,
                                                                                                      triggerEventType,
                                                                                                      splitConfig.TriggerMode);
+
+        if (hasReturningProjectiles)
+        {
+            PlayerPowerUpReturningProjectileBakeUtility.ApplySamePowerUpModuleProvenance(ref returningProjectilesConfig,
+                                                                                          powerUp.CommonData.PowerUpId,
+                                                                                          hasSplit,
+                                                                                          hasBounce,
+                                                                                          hasOrbit);
+        }
 
         float trailAttachedVfxScaleMultiplier = authoring != null ? math.max(0.01f, authoring.ElementalTrailAttachedVfxScaleMultiplier) : 1f;
         PlayerPassiveToolConfig config = new PlayerPassiveToolConfig
@@ -581,12 +600,14 @@ public static class PlayerPowerUpPassiveBakeUtility
             HasOrbitalProjections = hasOrbitalProjections ? (byte)1 : (byte)0,
             HasDropAttraction = hasDropAttraction ? (byte)1 : (byte)0,
             HasWeaponSwitch = hasWeaponSwitch ? (byte)1 : (byte)0,
+            HasReturningProjectiles = hasReturningProjectiles ? (byte)1 : (byte)0,
             WeaponId = weaponId,
             DropAttraction = new DropAttractionPowerUpConfig
             {
                 AttractionRadius = math.max(0f, dropAttractionRadius),
                 ConsumeUnusableDrops = consumeUnusableDrops ? (byte)1 : (byte)0
             },
+            ReturningProjectiles = returningProjectilesConfig,
             ProjectileSize = new ProjectileSizePassiveConfig
             {
                 SizeMultiplier = math.max(0.01f, projectileSizeMultiplier),

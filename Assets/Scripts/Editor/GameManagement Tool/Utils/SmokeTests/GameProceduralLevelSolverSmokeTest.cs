@@ -140,7 +140,7 @@ public static class GameProceduralLevelSolverSmokeTest
     }
 
     /// <summary>
-    /// Verifies all-Optional rooms connect at least one exit and retry every legal subset within one solver attempt.
+    /// Verifies all-Optional rooms connect at least one exit and retry every valid subset within one solver attempt.
     /// </summary>
     private static void ValidateOptionalExitPlanBacktracking()
     {

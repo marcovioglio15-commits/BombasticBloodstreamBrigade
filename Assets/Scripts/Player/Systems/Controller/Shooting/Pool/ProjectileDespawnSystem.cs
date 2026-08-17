@@ -42,35 +42,48 @@ public partial struct ProjectileDespawnSystem : ISystem
         ComponentLookup<ProjectileElementalPayload> projectileElementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(true);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
+        ComponentLookup<ProjectileReturnState> projectileReturnStateLookup = SystemAPI.GetComponentLookup<ProjectileReturnState>(false);
+        ComponentLookup<ProjectilePerfectCircleState> perfectCircleStateLookup = SystemAPI.GetComponentLookup<ProjectilePerfectCircleState>(false);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         ComponentLookup<PlayerProjectileDeathVfxConfig> projectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
         ComponentLookup<EnemyProjectileDeathVfxConfig> enemyProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyProjectileDeathVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
+        BufferLookup<ProjectileReturnPathPoint> returnPathLookup = SystemAPI.GetBufferLookup<ProjectileReturnPathPoint>(false);
 
-        foreach ((RefRO<Projectile> projectile,
+        foreach ((RefRW<Projectile> projectile,
                   RefRO<ProjectileRuntimeState> runtimeState,
                   RefRW<LocalTransform> projectileTransform,
                   RefRO<ProjectileOwner> owner,
-                  Entity projectileEntity) in SystemAPI.Query<RefRO<Projectile>, RefRO<ProjectileRuntimeState>, RefRW<LocalTransform>, RefRO<ProjectileOwner>>()
+                  Entity projectileEntity) in SystemAPI.Query<RefRW<Projectile>, RefRO<ProjectileRuntimeState>, RefRW<LocalTransform>, RefRO<ProjectileOwner>>()
                                                       .WithAll<ProjectileActive>()
                                                       .WithEntityAccess())
         {
             bool reachedRange = projectile.ValueRO.MaxRange > 0f && runtimeState.ValueRO.TraveledDistance >= projectile.ValueRO.MaxRange;
             bool reachedLifetime = projectile.ValueRO.MaxLifetime > 0f && runtimeState.ValueRO.ElapsedLifetime >= projectile.ValueRO.MaxLifetime;
+            ProjectileReturnState returnState = projectileReturnStateLookup.HasComponent(projectileEntity)
+                ? projectileReturnStateLookup[projectileEntity]
+                : default;
+            bool completedReturn = returnState.Enabled != 0 && returnState.Phase == ProjectileReturnPhase.Completed;
+            bool isOutboundReturnProjectile = returnState.Enabled != 0 && returnState.Phase == ProjectileReturnPhase.Outbound;
+            bool waitingForOutboundPrerequisites = isOutboundReturnProjectile &&
+                                                   returnState.OutboundHitCapacityExhausted != 0;
+            bool naturalHitCapacityExhausted = isOutboundReturnProjectile &&
+                                               (returnState.OutboundHitCapacityExhausted != 0 ||
+                                                returnState.OutboundNaturalHitCapacityExhausted != 0);
 
-            if (!reachedRange && !reachedLifetime)
+            if (!reachedRange && !reachedLifetime && !completedReturn && !waitingForOutboundPrerequisites)
                 continue;
 
+            // Despawn-triggered split children originate at the natural outbound terminal point, even when the parent returns afterward.
             if (projectileSplitStateLookup.HasComponent(projectileEntity))
             {
                 ProjectileSplitState projectileSplitState = projectileSplitStateLookup[projectileEntity];
 
                 if (ProjectileSplitUtility.ShouldSplitOnDespawn(in projectileSplitState))
                 {
-                    ProjectileElementalPayload projectileElementalPayload = default(ProjectileElementalPayload);
-
-                    if (projectileElementalPayloadLookup.HasComponent(projectileEntity))
-                        projectileElementalPayload = projectileElementalPayloadLookup[projectileEntity];
-
+                    ProjectileElementalPayload projectileElementalPayload = projectileElementalPayloadLookup.HasComponent(projectileEntity)
+                        ? projectileElementalPayloadLookup[projectileEntity]
+                        : default;
                     float currentScaleMultiplier = ResolveCurrentScaleMultiplier(projectileEntity,
                                                                                  projectileTransform.ValueRO.Scale,
                                                                                  in projectileBaseScaleLookup);
@@ -80,23 +93,66 @@ public partial struct ProjectileDespawnSystem : ISystem
                                                                    currentScaleMultiplier,
                                                                    in projectileElementalPayload,
                                                                    in owner.ValueRO,
+                                                                   in returnState,
                                                                    ref shootRequestLookup);
                     projectileSplitState.CanSplit = 0;
                     projectileSplitStateLookup[projectileEntity] = projectileSplitState;
                 }
             }
 
-            ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.RangeOrLifetime,
-                                                        projectileEntity,
-                                                        owner.ValueRO.ShooterEntity,
-                                                        in projectileTransform.ValueRO,
-                                                        in projectileContactStateLookup,
-                                                        in projectileDeathVfxConfigLookup,
-                                                        in enemyProjectileDeathVfxConfigLookup,
-                                                        ref vfxRequestLookup);
+            if (returnState.Enabled != 0 && !completedReturn)
+            {
+                if (returnState.Phase != ProjectileReturnPhase.Outbound)
+                    continue;
+
+                if (!returnPathLookup.HasBuffer(projectileEntity))
+                    continue;
+
+                ProjectilePerfectCircleState perfectCircleState = perfectCircleStateLookup.HasComponent(projectileEntity)
+                    ? perfectCircleStateLookup[projectileEntity]
+                    : default;
+                if (!ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState,
+                                                                    in perfectCircleState))
+                {
+                    continue;
+                }
+
+                Projectile projectileData = projectile.ValueRO;
+                LocalTransform returningTransform = projectileTransform.ValueRO;
+                DynamicBuffer<ProjectileReturnPathPoint> returnPath = returnPathLookup[projectileEntity];
+                ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
+                                                            ref projectileData,
+                                                            ref perfectCircleState,
+                                                            ref returningTransform,
+                                                            returnPath,
+                                                            naturalHitCapacityExhausted);
+                projectileReturnStateLookup[projectileEntity] = returnState;
+                perfectCircleStateLookup[projectileEntity] = perfectCircleState;
+                projectileTransform.ValueRW = returningTransform;
+                projectile.ValueRW = projectileData;
+                continue;
+            }
+
+            if (ProjectileReturnVfxPolicyUtility.AllowsDeathVfx(owner.ValueRO.PoolPrefabEntity,
+                                                                returnState.Enabled != 0,
+                                                                in returnState.Config))
+                ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.RangeOrLifetime,
+                                                            projectileEntity,
+                                                            owner.ValueRO.ShooterEntity,
+                                                            in projectileTransform.ValueRO,
+                                                            in projectileContactStateLookup,
+                                                            in projectileDeathVfxConfigLookup,
+                                                            in enemyProjectileDeathVfxConfigLookup,
+                                                            ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
+            ProjectileReturnRuntimeUtility.ReleaseConcurrency(owner.ValueRO.ShooterEntity,
+                                                              ref returnState,
+                                                              ref powerUpsStateLookup);
+            if (projectileReturnStateLookup.HasComponent(projectileEntity))
+                projectileReturnStateLookup[projectileEntity] = returnState;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,
                                                 owner.ValueRO.ShooterEntity,
+                                                owner.ValueRO.PoolPrefabEntity,
                                                 ref parkedTransform,
                                                 ref poolLookup,
                                                 ref projectileActiveLookup);

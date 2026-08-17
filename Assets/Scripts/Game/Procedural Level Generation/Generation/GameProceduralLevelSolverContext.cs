@@ -323,7 +323,7 @@ internal sealed class GameProceduralLevelSolverContext
     }
 
     /// <summary>
-    /// Backtracks every legal source exit and Boss entrance pair until all frontier branches converge.
+    /// Backtracks every valid source exit and Boss entrance pair until all frontier branches converge.
     /// </summary>
     /// <param name="frontier">Current deepest Regular or Start nodes.</param>
     /// <param name="sourceIndex">Frontier source currently being assigned.</param>
@@ -364,7 +364,7 @@ internal sealed class GameProceduralLevelSolverContext
 
         GameProceduralLevelSolverSearchUtility.Shuffle(candidates, ref random);
 
-        // Explore every legal source portal so random ordering never hides a compatible Boss route.
+        // Explore every valid source portal so random ordering never hides a compatible Boss route.
         for (int index = 0; index < candidates.Count; index++)
         {
             if (TryAssignBossPortal(frontier,
@@ -431,7 +431,7 @@ internal sealed class GameProceduralLevelSolverContext
 
     #region Exit Planning Methods
     /// <summary>
-    /// Enumerates legal Required and Optional exit plans before assigning a new graph layer.
+    /// Enumerates valid Required and Optional exit plans before assigning a new graph layer.
     /// </summary>
     /// <param name="frontier">Current source nodes.</param>
     /// <param name="nextDepth">Depth assigned to every target node.</param>

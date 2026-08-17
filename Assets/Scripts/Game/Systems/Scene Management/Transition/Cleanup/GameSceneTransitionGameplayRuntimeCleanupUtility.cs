@@ -19,6 +19,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
     {
         DestroyNonPrefabEntitiesWith<Projectile>(entityManager);
         ResetProjectilePoolsAfterCleanup(entityManager);
+        ResetReturningProjectileRuntimeAfterCleanup(entityManager);
         DestroyNonPrefabEntitiesWith<EnemyData>(entityManager);
         DestroyEntitiesWith<EnemyPoolState>(entityManager);
         DestroyExperienceDrops(entityManager, preserveRoomClearAttraction);
@@ -138,6 +139,57 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
         {
             if (shooterEntities.IsCreated)
                 shooterEntities.Dispose();
+
+            query.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Invalidates active-slot projectile ownership and return haptics after transition cleanup removes projectiles
+    /// without routing them through ordinary pooling systems. This covers procedural room boundaries, scene reloads,
+    /// and run-boundary cleanup while allowing the persistent player entity to fire again immediately afterward.
+    /// </summary>
+    /// <param name="entityManager">Entity manager owning any player state that survives the transition.</param>
+    private static void ResetReturningProjectileRuntimeAfterCleanup(EntityManager entityManager)
+    {
+        EntityQuery query = entityManager.CreateEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[]
+            {
+                ComponentType.ReadWrite<PlayerPowerUpsState>()
+            },
+            Options = EntityQueryOptions.IncludeDisabledEntities
+        });
+        NativeArray<Entity> playerEntities = default;
+
+        try
+        {
+            playerEntities = query.ToEntityArray(Allocator.Temp);
+
+            // Reset every surviving player independently from pool initialization so partial transition states are safe.
+            for (int playerIndex = 0; playerIndex < playerEntities.Length; playerIndex++)
+            {
+                Entity playerEntity = playerEntities[playerIndex];
+
+                if (!entityManager.Exists(playerEntity))
+                    continue;
+
+                PlayerPowerUpsState powerUpsState = entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+                PlayerPowerUpLoadoutRuntimeUtility.ResetReturningProjectileConcurrency(ref powerUpsState);
+                entityManager.SetComponentData(playerEntity, powerUpsState);
+
+                if (!entityManager.HasComponent<PlayerCameraShakeState>(playerEntity))
+                    continue;
+
+                PlayerCameraShakeState shakeState = entityManager.GetComponentData<PlayerCameraShakeState>(playerEntity);
+                PlayerCameraShakeRuntimeUtility.ClearReturnFeedback(ref shakeState);
+                entityManager.SetComponentData(playerEntity, shakeState);
+            }
+        }
+        finally
+        {
+            if (playerEntities.IsCreated)
+                playerEntities.Dispose();
 
             query.Dispose();
         }

@@ -47,7 +47,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
             .Build();
 
         projectileQuery = SystemAPI.QueryBuilder()
-            .WithAll<Projectile, ProjectileOwner, ProjectileSplitState, ProjectileElementalPayload, LocalTransform, ProjectileActive>()
+            .WithAll<Projectile, ProjectileOwner, ProjectileSplitState, ProjectileElementalPayload, ProjectileReturnState, LocalTransform, ProjectileActive>()
             .Build();
 
         state.RequireForUpdate(enemyQuery);
@@ -90,6 +90,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
         NativeArray<ProjectileOwner> projectileOwnerArray = projectileQuery.ToComponentDataArray<ProjectileOwner>(frameAllocator);
         NativeArray<ProjectileSplitState> projectileSplitArray = projectileQuery.ToComponentDataArray<ProjectileSplitState>(frameAllocator);
         NativeArray<ProjectileElementalPayload> projectileElementalArray = projectileQuery.ToComponentDataArray<ProjectileElementalPayload>(frameAllocator);
+        NativeArray<ProjectileReturnState> projectileReturnArray = projectileQuery.ToComponentDataArray<ProjectileReturnState>(frameAllocator);
         NativeArray<LocalTransform> projectileTransforms = projectileQuery.ToComponentDataArray<LocalTransform>(frameAllocator);
         int projectileWriteIndex = 0;
         ComponentLookup<PlayerControllerConfig> playerControllerLookup = SystemAPI.GetComponentLookup<PlayerControllerConfig>(true);
@@ -108,6 +109,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
                 projectileOwnerArray[projectileWriteIndex] = projectileOwnerArray[readIndex];
                 projectileSplitArray[projectileWriteIndex] = projectileSplitArray[readIndex];
                 projectileElementalArray[projectileWriteIndex] = projectileElementalArray[readIndex];
+                projectileReturnArray[projectileWriteIndex] = projectileReturnArray[readIndex];
                 projectileTransforms[projectileWriteIndex] = projectileTransforms[readIndex];
             }
 
@@ -185,10 +187,14 @@ public partial struct EnemyProjectileHitSystem : ISystem
         BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup = SystemAPI.GetBufferLookup<ProjectileHitHistoryElement>(false);
         ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup = SystemAPI.GetComponentLookup<ProjectileBaseScale>(true);
         ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(false);
+        ComponentLookup<ProjectileReturnState> projectileReturnStateLookup = SystemAPI.GetComponentLookup<ProjectileReturnState>(false);
+        ComponentLookup<ProjectilePerfectCircleState> perfectCircleStateLookup = SystemAPI.GetComponentLookup<ProjectilePerfectCircleState>(false);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         ComponentLookup<EnemyElementalVfxAnchor> elementalVfxAnchorLookup = SystemAPI.GetComponentLookup<EnemyElementalVfxAnchor>(true);
         ComponentLookup<PlayerElementalVfxConfig> elementalVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerElementalVfxConfig>(true);
         ComponentLookup<EnemyHitVfxConfig> enemyHitVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyHitVfxConfig>(true);
         ComponentLookup<EnemySpawnInactivityLock> spawnInactivityLockLookup = SystemAPI.GetComponentLookup<EnemySpawnInactivityLock>(true);
+        BufferLookup<ProjectileReturnPathPoint> projectileReturnPathLookup = SystemAPI.GetBufferLookup<ProjectileReturnPathPoint>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         NativeStream.Reader projectileHitReader = projectileHitStream.AsReader();
@@ -201,7 +207,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
             int hitCount = projectileHitReader.BeginForEachIndex(projectileIndex);
             Entity projectileEntity = projectileEntities[projectileIndex];
             Projectile projectileData = projectileDataArray[projectileIndex];
-            bool needsHitHistory = projectileData.PenetrationMode != ProjectilePenetrationMode.None;
+            bool needsHitHistory = projectileData.PenetrationMode != ProjectilePenetrationMode.None ||
+                                   projectileReturnArray[projectileIndex].Enabled != 0;
             bool canTrackProjectileHits = needsHitHistory && projectileHitHistoryLookup.HasBuffer(projectileEntity);
             DynamicBuffer<ProjectileHitHistoryElement> projectileHitHistory = default;
 
@@ -221,6 +228,29 @@ public partial struct EnemyProjectileHitSystem : ISystem
             ProjectileOwner projectileOwner = projectileOwnerArray[projectileIndex];
             ProjectileSplitState splitState = projectileSplitArray[projectileIndex];
             ProjectileElementalPayload elementalPayload = projectileElementalArray[projectileIndex];
+            ProjectileReturnState returnState = projectileReturnArray[projectileIndex];
+
+            bool isNonDamagingReturnTransition = returnState.Enabled != 0 &&
+                                                   returnState.Phase != ProjectileReturnPhase.Outbound &&
+                                                   returnState.Phase != ProjectileReturnPhase.Returning;
+            bool isWaitingForOutboundPrerequisites = returnState.Enabled != 0 &&
+                                                       returnState.Phase == ProjectileReturnPhase.Outbound &&
+                                                       returnState.OutboundHitCapacityExhausted != 0;
+
+            if (isNonDamagingReturnTransition || isWaitingForOutboundPrerequisites)
+            {
+                // Delay/turn phases are non-damaging, while exhausted outbound shots wait for bounce or orbit prerequisites.
+                for (int hitIndex = 0; hitIndex < hitCount; hitIndex++)
+                    projectileHitReader.Read<int>();
+
+                projectileHitReader.EndForEachIndex();
+
+                if (canTrackProjectileHits)
+                    projectileHitHistory.Clear();
+
+                continue;
+            }
+
             LocalTransform projectileTransform = projectileTransforms[projectileIndex];
             float currentScaleMultiplier = ResolveCurrentScaleMultiplier(projectileEntities[projectileIndex],
                                                                         projectileTransform.Scale,
@@ -228,7 +258,10 @@ public partial struct EnemyProjectileHitSystem : ISystem
             bool hasValidHit = false;
             bool canProjectileContinue = false;
             bool enemyKilledByProjectile = false;
-            bool canEnqueueShooterVfxRequests = vfxRequestLookup.HasBuffer(projectileOwner.ShooterEntity);
+            bool canEnqueueShooterVfxRequests = vfxRequestLookup.HasBuffer(projectileOwner.ShooterEntity) &&
+                                                ProjectileReturnVfxPolicyUtility.AllowsHitVfx(projectileOwner.PoolPrefabEntity,
+                                                                                             returnState.Enabled != 0,
+                                                                                             in returnState.Config);
             DynamicBuffer<PlayerPowerUpVfxSpawnRequest> shooterVfxRequests = default;
 
             if (canEnqueueShooterVfxRequests)
@@ -470,9 +503,20 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
             bool shouldSplitOnHitEvent = ProjectileSplitUtility.ShouldSplitOnHitEvent(in splitState, enemyKilledByProjectile);
 
+            if (!canProjectileContinue)
+                canProjectileContinue = ProjectileReturnRuntimeUtility.TryExtendOutboundAfterNaturalHitCapacity(ref returnState,
+                                                                                                                 ref projectileData);
+
+            if (!canProjectileContinue)
+                canProjectileContinue = ProjectileReturnRuntimeUtility.TryActivateAdditionalReturnHits(ref returnState,
+                                                                                                        ref projectileData);
+
             if (canProjectileContinue)
             {
                 entityManager.SetComponentData(projectileEntities[projectileIndex], projectileData);
+
+                if (returnState.Enabled != 0)
+                    projectileReturnStateLookup[projectileEntity] = returnState;
 
                 if (shouldSplitOnHitEvent)
                 {
@@ -483,11 +527,56 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                                                    currentScaleMultiplier,
                                                                    in elementalPayload,
                                                                    in projectileOwner,
+                                                                   in returnState,
                                                                    ref shootRequestLookup);
                     splitState.CanSplit = 0;
                     entityManager.SetComponentData(projectileEntities[projectileIndex], splitState);
                 }
 
+                continue;
+            }
+
+            if (returnState.Enabled != 0 &&
+                returnState.Phase == ProjectileReturnPhase.Outbound &&
+                perfectCircleStateLookup.HasComponent(projectileEntity) &&
+                projectileReturnPathLookup.HasBuffer(projectileEntity))
+            {
+                bool shouldSplitAtOutboundTerminal = shouldSplitOnHitEvent || ProjectileSplitUtility.ShouldSplitOnDespawn(in splitState);
+
+                if (shouldSplitAtOutboundTerminal)
+                {
+                    ProjectileSplitUtility.TryEnqueueSplitRequests(in projectileData,
+                                                                   in splitState,
+                                                                   in projectileTransform,
+                                                                   currentScaleMultiplier,
+                                                                   in elementalPayload,
+                                                                   in projectileOwner,
+                                                                   in returnState,
+                                                                   ref shootRequestLookup);
+                    splitState.CanSplit = 0;
+                    entityManager.SetComponentData(projectileEntity, splitState);
+                }
+
+                ProjectilePerfectCircleState perfectCircleState = perfectCircleStateLookup[projectileEntity];
+                if (!ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState,
+                                                                    in perfectCircleState))
+                {
+                    returnState.OutboundHitCapacityExhausted = 1;
+                    entityManager.SetComponentData(projectileEntity, projectileData);
+                    projectileReturnStateLookup[projectileEntity] = returnState;
+                    continue;
+                }
+
+                ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
+                                                            ref projectileData,
+                                                            ref perfectCircleState,
+                                                            ref projectileTransform,
+                                                            projectileReturnPathLookup[projectileEntity],
+                                                            true);
+                entityManager.SetComponentData(projectileEntity, projectileData);
+                entityManager.SetComponentData(projectileEntity, projectileTransform);
+                projectileReturnStateLookup[projectileEntity] = returnState;
+                perfectCircleStateLookup[projectileEntity] = perfectCircleState;
                 continue;
             }
 
@@ -502,12 +591,19 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                                                currentScaleMultiplier,
                                                                in elementalPayload,
                                                                in projectileOwner,
+                                                               in returnState,
                                                                ref shootRequestLookup);
                 splitState.CanSplit = 0;
                 entityManager.SetComponentData(projectileEntities[projectileIndex], splitState);
             }
 
-            DespawnProjectile(entityManager, projectileEntities[projectileIndex], projectileOwner, ref projectilePoolLookup);
+            DespawnProjectile(entityManager,
+                              projectileEntities[projectileIndex],
+                              projectileOwner,
+                              ref returnState,
+                              ref projectileReturnStateLookup,
+                              ref powerUpsStateLookup,
+                              ref projectilePoolLookup);
         }
 
         ComponentLookup<EnemyDespawnRequest> despawnLookup = SystemAPI.GetComponentLookup<EnemyDespawnRequest>(true);
@@ -845,6 +941,9 @@ public partial struct EnemyProjectileHitSystem : ISystem
     private static void DespawnProjectile(EntityManager entityManager,
                                           Entity projectileEntity,
                                           ProjectileOwner projectileOwner,
+                                          ref ProjectileReturnState returnState,
+                                          ref ComponentLookup<ProjectileReturnState> returnStateLookup,
+                                          ref ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
                                           ref BufferLookup<ProjectilePoolElement> projectilePoolLookup)
     {
         if (!entityManager.Exists(projectileEntity))
@@ -854,6 +953,12 @@ public partial struct EnemyProjectileHitSystem : ISystem
         entityManager.SetComponentEnabled<ProjectileActive>(projectileEntity, false);
 
         Entity shooterEntity = projectileOwner.ShooterEntity;
+        ProjectileReturnRuntimeUtility.ReleaseConcurrency(shooterEntity,
+                                                          ref returnState,
+                                                          ref powerUpsStateLookup);
+
+        if (returnStateLookup.HasComponent(projectileEntity))
+            returnStateLookup[projectileEntity] = returnState;
 
         if (!projectilePoolLookup.HasBuffer(shooterEntity))
             return;
@@ -861,7 +966,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
         DynamicBuffer<ProjectilePoolElement> shooterPool = projectilePoolLookup[shooterEntity];
         shooterPool.Add(new ProjectilePoolElement
         {
-            ProjectileEntity = projectileEntity
+            ProjectileEntity = projectileEntity,
+            PrefabEntity = projectileOwner.PoolPrefabEntity
         });
     }
     #endregion

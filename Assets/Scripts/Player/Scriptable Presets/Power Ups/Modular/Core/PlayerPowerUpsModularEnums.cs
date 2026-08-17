@@ -39,7 +39,8 @@ public enum PowerUpModuleKind
     ImpactFrame = 21,
     SwitchWeapon = 22,
     GhostTrail = 23,
-    AttractDrops = 24
+    AttractDrops = 24,
+    ReturningProjectiles = 25
 }
 
 public enum PowerUpTriggerEventType
@@ -99,6 +100,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.ImpactFrame:
             case PowerUpModuleKind.GhostTrail:
             case PowerUpModuleKind.AttractDrops:
+            case PowerUpModuleKind.ReturningProjectiles:
                 return PowerUpModuleStage.Execute;
             case PowerUpModuleKind.CharacterTuning:
             case PowerUpModuleKind.Stackable:

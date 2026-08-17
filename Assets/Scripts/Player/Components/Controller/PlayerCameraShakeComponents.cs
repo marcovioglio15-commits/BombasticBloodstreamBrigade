@@ -3,13 +3,13 @@ using Unity.Mathematics;
 
 #region Components
 /// <summary>
-/// Stores the runtime trauma and damage-detection baselines for both camera-shake channels (damage on hit and fire
-/// on primary-shot spawn), together with the per-frame combined shake output. Trauma and output are evolved once
+/// Stores runtime trauma and damage-detection baselines for damage, firing, and return-start camera-shake channels,
+/// together with the per-frame combined shake output. Trauma and output are evolved once
 /// per frame by <see cref="PlayerCameraFollowSystem"/> (the single owner). The resulting offset/roll/FOV delta are
 /// consumed by the player camera systems when they write the camera transform and the FOV, so room-fixed and follow
-/// cameras stay in sync without recomputing or double-counting trauma. The two channels keep independent trauma and
-/// rumble magnitudes so fire-rate stacking does not interfere with damage feedback and the gamepad rumble is the sum
-/// of both envelopes. The Continuous motion mode uses perlin noise; the SingleImpulse motion mode keeps a clean
+/// cameras stay in sync without recomputing or double-counting trauma. Damage, firing, and return feedback keep
+/// independent envelopes so rapid pulses do not overwrite one another, while gamepad output remains separately mixed.
+/// The Continuous motion mode uses perlin noise; the SingleImpulse motion mode keeps a clean
 /// per-channel direction sample chosen at trauma onset so the offset feels like a clear push instead of an oscillation.
 /// </summary>
 public struct PlayerCameraShakeState : IComponentData
@@ -58,6 +58,37 @@ public struct PlayerCameraShakeState : IComponentData
     public float FireRumbleImpulseRemainingSeconds;
     #endregion
 
+    #region Return Camera Shake State
+    // Largest return-start camera multiplier enqueued during the current simulation frame. Presentation consumes it once.
+    public float ReturnCameraShakeRequestMultiplier;
+
+    // Independent normalized trauma envelope for camera-only feedback when a projectile starts return travel.
+    public float ReturnCameraShakeTrauma;
+
+    // Module strength retained for the lifetime of the current return camera-shake envelope.
+    public float ReturnCameraShakeMultiplier;
+
+    // Stable per-pulse direction used when firing camera shake is configured as SingleImpulse.
+    public float3 ReturnCameraShakeImpulseDirection;
+
+    // Stable per-pulse roll sign used when firing camera shake is configured as SingleImpulse.
+    public float ReturnCameraShakeImpulseRollSign;
+    #endregion
+
+    #region Return Rumble State
+    // Largest return-start multiplier enqueued during the current simulation frame. Presentation consumes it once.
+    public float ReturnRumbleRequestMultiplier;
+
+    // Normalized haptic-only envelope used when the firing rumble is configured for Continuous motion.
+    public float ReturnRumbleEnvelope;
+
+    // Authored module strength retained while the current haptic-only return envelope remains active.
+    public float ReturnRumbleMultiplier;
+
+    // Seconds remaining on the haptic-only return burst when firing rumble uses SingleImpulse motion.
+    public float ReturnRumbleImpulseRemainingSeconds;
+    #endregion
+
     #region Frame Output
     // Smooth envelope magnitude in the [0..1] range resolved from the remaining damage trauma this frame, before any
     // noise modulation. Drives the connected-gamepad rumble so the haptic ramps down cleanly instead of buzzing
@@ -69,13 +100,16 @@ public struct PlayerCameraShakeState : IComponentData
     // own motor amplitudes before driving the gamepad.
     public float FireShakeMagnitude;
 
-    // World-space shake offset added to the camera position this frame (sum of damage and fire channels).
+    // Smooth return-start camera envelope after its module multiplier, kept separate from firing rumble resolution.
+    public float ReturnCameraShakeMagnitude;
+
+    // World-space shake offset added to the camera position this frame (sum of damage, fire, and return channels).
     public float3 PositionOffset;
 
-    // View-axis roll in radians layered on top of the base camera rotation this frame (sum of damage and fire channels).
+    // View-axis roll in radians layered on top of the base camera rotation this frame (sum of damage, fire, and return channels).
     public float RollRadians;
 
-    // Field-of-view delta in degrees applied on top of the base camera FOV this frame (sum of damage and fire channels).
+    // Field-of-view delta in degrees applied on top of the base camera FOV this frame (sum of damage, fire, and return channels).
     public float FovDelta;
 
     // Offset applied last frame; removed before smoothing so the shake never feeds back into the follow spring.

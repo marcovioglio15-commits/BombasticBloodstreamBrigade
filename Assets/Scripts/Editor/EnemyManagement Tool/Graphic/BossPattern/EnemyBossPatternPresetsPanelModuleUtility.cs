@@ -305,11 +305,11 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     /// <summary>
     /// Builds selector options while preserving invalid serialized values as explicit selectable states.
     /// </summary>
-    /// <param name="validOptions">Legal source-catalog options.</param>
+    /// <param name="validOptions">valid source-catalog options.</param>
     /// <param name="moduleId">Current serialized module ID.</param>
     /// <param name="selectedIndex">Output selected popup index.</param>
     /// <param name="selectedIsValid">Output flag indicating whether the selected option resolves to the source catalog.</param>
-    /// <returns>Popup options including a leading invalid state when the serialized module ID is not currently legal.</returns>
+    /// <returns>Popup options including a leading invalid state when the serialized module ID is not currently valid.</returns>
     private static List<EnemyBossPatternModuleOption> BuildSelectorOptions(List<EnemyBossPatternModuleOption> validOptions,
                                                                            string moduleId,
                                                                            out int selectedIndex,
@@ -348,7 +348,7 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     }
 
     /// <summary>
-    /// Resolves the selected module index without hiding invalid serialized values behind a legal fallback.
+    /// Resolves the selected module index without hiding invalid serialized values behind a valid fallback.
     /// </summary>
     /// <param name="options">Module options used by the selector.</param>
     /// <param name="moduleId">Current serialized module ID.</param>
@@ -365,7 +365,7 @@ internal static class EnemyBossPatternPresetsPanelModuleUtility
     }
 
     /// <summary>
-    /// Resolves the first legal module ID in one source catalog section.
+    /// Resolves the first valid module ID in one source catalog section.
     /// </summary>
     /// <param name="sourcePreset">Source module catalog.</param>
     /// <param name="section">Requested catalog section.</param>

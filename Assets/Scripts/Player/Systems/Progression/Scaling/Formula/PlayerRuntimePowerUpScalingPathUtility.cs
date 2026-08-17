@@ -210,6 +210,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                                                 ref activeSlotConfig.DropAttraction))
             return;
 
+        if (PlayerRuntimeReturningProjectileScalingUtility.TryApplyValue(payloadPath,
+                                                                         resolvedValue,
+                                                                         ref activeSlotConfig.ReturningProjectiles))
+        {
+            return;
+        }
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -486,6 +493,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                                                 resolvedValue,
                                                                                 ref passiveToolConfig.DropAttraction))
             return;
+
+        if (PlayerRuntimeReturningProjectileScalingUtility.TryApplyValue(payloadPath,
+                                                                         resolvedValue,
+                                                                         ref passiveToolConfig.ReturningProjectiles))
+        {
+            return;
+        }
 
         switch (payloadPath)
         {
@@ -1000,6 +1014,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                                                        ref activeSlotConfig.DropAttraction))
             return;
 
+        if (PlayerRuntimeReturningProjectileScalingUtility.TryApplyBooleanValue(payloadPath,
+                                                                                resolvedValue,
+                                                                                ref activeSlotConfig.ReturningProjectiles))
+        {
+            return;
+        }
+
         switch (payloadPath)
         {
             case "stealProtected":
@@ -1082,6 +1103,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                                                        resolvedValue,
                                                                                        ref passiveToolConfig.DropAttraction))
             return;
+
+        if (PlayerRuntimeReturningProjectileScalingUtility.TryApplyBooleanValue(payloadPath,
+                                                                                resolvedValue,
+                                                                                ref passiveToolConfig.ReturningProjectiles))
+        {
+            return;
+        }
 
         switch (payloadPath)
         {

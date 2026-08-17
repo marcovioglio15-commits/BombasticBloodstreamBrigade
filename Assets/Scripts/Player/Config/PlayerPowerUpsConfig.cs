@@ -70,6 +70,8 @@ public struct PlayerPowerUpSlotConfig
     public PortableHealthPackPowerUpConfig PortableHealthPack;
     public byte HasDropAttraction;
     public DropAttractionPowerUpConfig DropAttraction;
+    public byte HasReturningProjectiles;
+    public ReturningProjectilesConfig ReturningProjectiles;
     public PlayerPassiveToolConfig TriggeredProjectilePassiveTool;
     public PlayerPassiveToolConfig TogglePassiveTool;
 
@@ -318,6 +320,51 @@ public struct DropAttractionPowerUpConfig
 }
 
 /// <summary>
+/// Stores the baked projectile-return behavior shared by active, passive, and toggleable module contexts.
+/// </summary>
+public struct ReturningProjectilesConfig
+{
+    public Entity ReplacementProjectilePrefabEntity;
+    public float ReplacementProjectilePlanarRadius;
+    public FixedString64Bytes OwningPowerUpId;
+    public byte KeepProjectileVfx;
+    public byte KeepMuzzleFlashVfx;
+    public byte KeepHitVfx;
+    public byte KeepDeathVfx;
+    public ProjectileReturnPathMode ReturnPathMode;
+    public float ReturnSpeedMultiplier;
+    public float OutboundRangeMultiplier;
+    public float OutboundLifetimeMultiplier;
+    public ProjectileOutboundHitPolicy OutboundHitPolicy;
+    public int AdditionalOutboundHits;
+    public float ReturnDelaySeconds;
+    public float ReturnRumbleMultiplier;
+    public float ReturnCameraShakeMultiplier;
+    public float OutboundSizeMultiplier;
+    public float ReturnSizeMultiplier;
+    public byte SpinDuringFlight;
+    public float SpinSpeedDegreesPerSecond;
+    public ProjectileReturnRotationAxis SpinAxis;
+    public float TurnaroundRotationSpeedDegreesPerSecond;
+    public ProjectileReturnRotationAxis TurnaroundAxis;
+    public ProjectileReturnHitPolicy ReturnHitPolicy;
+    public int AdditionalReturnHits;
+    public float PathSampleDistance;
+    public float ReturnCompletionDistance;
+    public byte AllowOtherPowerUpInteractions;
+    public byte EnableProjectileSplitting;
+    public byte ApplyToSplitProjectiles;
+    public byte CompleteBouncesBeforeReturn;
+    public byte CompleteOrbitalPathBeforeReturn;
+    public byte ApplyTinyMegaProjectileScaling;
+    public byte ApplyToActivePowerUpProjectiles;
+    public byte AllowConcurrentActiveProjectiles;
+    public byte SamePowerUpHasProjectileSplit;
+    public byte SamePowerUpHasBouncingProjectiles;
+    public byte SamePowerUpHasOrbitalProjectiles;
+}
+
+/// <summary>
 /// Runtime trigger mode used by passive heal payloads.
 /// </summary>
 public enum PassiveHealTriggerMode
@@ -432,8 +479,10 @@ public struct PlayerPassiveToolConfig
     public byte HasOrbitalProjections;
     public byte HasWeaponSwitch;
     public byte HasDropAttraction;
+    public byte HasReturningProjectiles;
     public FixedString64Bytes WeaponId;
     public DropAttractionPowerUpConfig DropAttraction;
+    public ReturningProjectilesConfig ReturningProjectiles;
     public ProjectileSizePassiveConfig ProjectileSize;
     public ShotgunPowerUpConfig Shotgun;
     public ElementalProjectilesPassiveConfig ElementalProjectiles;

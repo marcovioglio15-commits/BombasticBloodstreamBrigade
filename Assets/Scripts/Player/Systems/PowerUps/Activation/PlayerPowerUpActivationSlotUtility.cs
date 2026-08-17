@@ -16,6 +16,7 @@ public static class PlayerPowerUpActivationSlotUtility
     /// <param name="slotConfig">Compiled active slot configuration being processed.</param>
     /// <param name="otherSlotConfig">Compiled peer slot configuration used by interruption rules.</param>
     /// <param name="slotIndex">Stable active slot index used by slot-specific state.</param>
+    /// <param name="activeReturningProjectileCount">Live returning projectiles currently registered to this slot.</param>
     /// <param name="isPressed">Whether the bound input is currently held.</param>
     /// <param name="pressedThisFrame">Whether the bound input started this frame.</param>
     /// <param name="releasedThisFrame">Whether the bound input ended this frame.</param>
@@ -66,6 +67,7 @@ public static class PlayerPowerUpActivationSlotUtility
     public static void ProcessSlotInput(in PlayerPowerUpSlotConfig slotConfig,
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
                                         byte slotIndex,
+                                        int activeReturningProjectileCount,
                                         bool isPressed,
                                         bool pressedThisFrame,
                                         bool releasedThisFrame,
@@ -117,9 +119,17 @@ public static class PlayerPowerUpActivationSlotUtility
         if (slotConfig.IsDefined == 0)
             return;
 
+        if (slotConfig.HasReturningProjectiles != 0 &&
+            slotConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0 &&
+            activeReturningProjectileCount > 0)
+        {
+            return;
+        }
+
         if (slotConfig.ToolKind == ActiveToolKind.ChargeShot)
         {
             PlayerPowerUpChargeAndToggleActivationUtility.ProcessChargeShotSlot(in slotConfig,
+                                                                                slotIndex,
                                                                                 isPressed,
                                                                                 pressedThisFrame,
                                                                                 releasedThisFrame,
@@ -297,6 +307,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                       canEnqueueAudioRequests);
 
         PlayerPowerUpActivationExecutionUtility.ExecuteTool(in slotConfig,
+                                                            slotIndex,
                                                             in localTransform,
                                                             in lookState,
                                                             in movementState,
@@ -442,6 +453,9 @@ public static class PlayerPowerUpActivationSlotUtility
                     return false;
 
                 return true;
+            case ActiveToolKind.ReturningProjectile:
+                return slotConfig.HasReturningProjectiles != 0 &&
+                       runtimeShootingConfig.Values.ShootSpeed > 0f;
             case ActiveToolKind.PortableHealthPack:
                 if (slotConfig.PortableHealthPack.HealAmount <= 0f)
                     return false;

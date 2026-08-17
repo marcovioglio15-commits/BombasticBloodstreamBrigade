@@ -10,7 +10,7 @@ internal static class GameProceduralLevelSolverExitPlanUtility
 
     #region Public Methods
     /// <summary>
-    /// Visits every legal exit subset until one plan can be assigned by the owning solver context.
+    /// Visits every valid exit subset until one plan can be assigned by the owning solver context.
     /// </summary>
     /// <param name="frontier">Current source-node IDs.</param>
     /// <param name="nodeStates">Mutable solver states used to resolve available physical exits.</param>

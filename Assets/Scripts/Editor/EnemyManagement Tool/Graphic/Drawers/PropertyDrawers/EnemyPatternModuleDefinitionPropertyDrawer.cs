@@ -169,7 +169,7 @@ public sealed class EnemyPatternModuleDefinitionPropertyDrawer : PropertyDrawer
     }
 
     /// <summary>
-    /// Builds the list of legal module kinds for one shared catalog section.
+    /// Builds the list of valid module kinds for one shared catalog section.
     /// </summary>
     /// <param name="catalogSection">Target shared catalog section.</param>
     /// <returns>The ordered list of selectable module kinds.</returns>

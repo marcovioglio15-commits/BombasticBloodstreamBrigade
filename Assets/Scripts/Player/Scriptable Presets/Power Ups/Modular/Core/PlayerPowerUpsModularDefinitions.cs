@@ -79,6 +79,11 @@ public sealed class PowerUpModuleData
     [Tooltip("Bounce settings used by BouncingProjectiles modules.")]
     [SerializeField] private BouncingProjectilesPassiveToolData projectileBounceOnWalls = new BouncingProjectilesPassiveToolData();
 
+    [Header("Execute - Returning Projectiles")]
+    [Tooltip("Return trajectory and projectile interaction settings used by ReturningProjectiles modules.")]
+    [SerializeField]
+    private PowerUpReturningProjectilesModuleData returningProjectiles = new PowerUpReturningProjectilesModuleData();
+
     [Header("Hook - Projectile Split")]
     [Tooltip("Split settings used by ProjectileSplit modules.")]
     [FormerlySerializedAs("projectileSplitOnDeath")]
@@ -245,6 +250,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpReturningProjectilesModuleData ReturningProjectiles
+    {
+        get
+        {
+            return returningProjectiles;
+        }
+    }
+
     public SplittingProjectilesPassiveToolData ProjectileSplit
     {
         get
@@ -350,6 +363,9 @@ public sealed class PowerUpModuleData
         if (projectileBounceOnWalls == null)
             projectileBounceOnWalls = new BouncingProjectilesPassiveToolData();
 
+        if (returningProjectiles == null)
+            returningProjectiles = new PowerUpReturningProjectilesModuleData();
+
         if (projectileSplit == null)
             projectileSplit = new SplittingProjectilesPassiveToolData();
 
@@ -383,6 +399,7 @@ public sealed class PowerUpModuleData
         projectileOrbitOverride.Validate();
         orbitalProjections.Validate();
         projectileBounceOnWalls.Validate();
+        returningProjectiles.Validate();
         projectileSplit.Validate();
         laserBeam.Validate();
         switchWeapon.Validate();

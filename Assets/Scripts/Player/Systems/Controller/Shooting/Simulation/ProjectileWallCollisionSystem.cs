@@ -4,7 +4,7 @@ using Unity.Physics;
 using Unity.Transforms;
 
 /// <summary>
-/// Despawns active projectiles when they hit wall colliders on the configured wall layer.
+/// Resolves wall contacts for active projectiles, including bounce, outbound return transition, split, and terminal pooling.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(ProjectileSimulationSystem))]
@@ -19,6 +19,10 @@ public partial struct ProjectileWallCollisionSystem : ISystem
     #region Methods
 
     #region Lifecycle
+    /// <summary>
+    /// Configures the component and physics-world requirements used by wall resolution.
+    /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<Projectile>();
@@ -29,6 +33,10 @@ public partial struct ProjectileWallCollisionSystem : ISystem
         state.RequireForUpdate<PhysicsWorldSingleton>();
     }
 
+    /// <summary>
+    /// Resolves swept projectile contacts against configured wall layers after projectile movement.
+    /// </summary>
+    /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
         if (PlayerGameplayPauseUtility.IsPlayerCombatHardPauseActive())
@@ -64,20 +72,29 @@ public partial struct ProjectileWallCollisionSystem : ISystem
         ComponentLookup<ProjectileElementalPayload> projectileElementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(true);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<ProjectileContactState> projectileContactStateLookup = SystemAPI.GetComponentLookup<ProjectileContactState>(true);
+        ComponentLookup<ProjectileReturnState> projectileReturnStateLookup = SystemAPI.GetComponentLookup<ProjectileReturnState>(false);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         ComponentLookup<PlayerProjectileDeathVfxConfig> projectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileDeathVfxConfig>(true);
         ComponentLookup<EnemyProjectileDeathVfxConfig> enemyProjectileDeathVfxConfigLookup = SystemAPI.GetComponentLookup<EnemyProjectileDeathVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> vfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
+        BufferLookup<ProjectileReturnPathPoint> returnPathLookup = SystemAPI.GetBufferLookup<ProjectileReturnPathPoint>(false);
 
         foreach ((RefRW<Projectile> projectile,
                   RefRO<ProjectileOwner> owner,
-                  RefRO<ProjectilePerfectCircleState> perfectCircleState,
+                  RefRW<ProjectilePerfectCircleState> perfectCircleState,
                   RefRW<LocalTransform> projectileTransform,
-                  Entity projectileEntity) in SystemAPI.Query<RefRW<Projectile>, RefRO<ProjectileOwner>, RefRO<ProjectilePerfectCircleState>, RefRW<LocalTransform>>()
+                  Entity projectileEntity) in SystemAPI.Query<RefRW<Projectile>, RefRO<ProjectileOwner>, RefRW<ProjectilePerfectCircleState>, RefRW<LocalTransform>>()
                                                        .WithAll<ProjectileActive>()
                                                        .WithEntityAccess())
         {
             Projectile projectileData = projectile.ValueRO;
             ProjectileOwner projectileOwner = owner.ValueRO;
+            ProjectileReturnState returnState = projectileReturnStateLookup.HasComponent(projectileEntity)
+                ? projectileReturnStateLookup[projectileEntity]
+                : default;
+
+            if (returnState.Enabled != 0 && returnState.Phase != ProjectileReturnPhase.Outbound)
+                continue;
             float projectileDeltaTime = ProjectileKinematicsUtility.ResolveOwnerScaledDeltaTime(in projectileOwner,
                                                                                                 in enemyDataLookup,
                                                                                                 deltaTime,
@@ -96,7 +113,10 @@ public partial struct ProjectileWallCollisionSystem : ISystem
             float3 endPosition = projectileTransform.ValueRO.Position;
             float3 startPosition = endPosition - displacement;
             float projectileScale = math.max(0.01f, projectileTransform.ValueRO.Scale);
-            float collisionRadius = math.max(0.005f, BaseProjectileCollisionRadius * projectileScale);
+            float prefabPlanarRadius = returnState.Enabled != 0
+                ? math.max(BaseProjectileCollisionRadius, returnState.Config.ReplacementProjectilePlanarRadius)
+                : BaseProjectileCollisionRadius;
+            float collisionRadius = math.max(0.005f, prefabPlanarRadius * projectileScale);
             bool hitWall = WorldWallCollisionUtility.TryResolveBlockedDisplacement(physicsWorldSingleton,
                                                                                    startPosition,
                                                                                    displacement,
@@ -108,34 +128,56 @@ public partial struct ProjectileWallCollisionSystem : ISystem
             if (!hitWall)
                 continue;
 
+            // Enemy-hit continuation never bypasses room physics; every wall resolves a real contact before bounce or return.
             float3 resolvedPosition = startPosition + allowedDisplacement;
             LocalTransform resolvedTransform = projectileTransform.ValueRO;
             resolvedTransform.Position = resolvedPosition;
             projectileTransform.ValueRW = resolvedTransform;
 
+            if (returnState.Enabled != 0 &&
+                returnState.Config.ReturnPathMode == ProjectileReturnPathMode.RetraceOutboundPath &&
+                returnPathLookup.HasBuffer(projectileEntity))
+            {
+                ProjectileReturnRuntimeUtility.RecordOutboundPoint(returnPathLookup[projectileEntity],
+                                                                   resolvedPosition,
+                                                                   math.max(0.01f, returnState.Config.PathSampleDistance),
+                                                                   true);
+            }
+
             if (projectileBounceStateLookup.HasComponent(projectileEntity))
             {
                 ProjectileBounceState projectileBounceState = projectileBounceStateLookup[projectileEntity];
+                bool consumesBounceBeforeReturn = returnState.Enabled == 0 ||
+                                                  ProjectileReturnPowerUpInteractionUtility.CompletesBouncesBeforeReturn(in returnState.Config);
 
-                if (TryApplyBounce(ref projectileData, ref projectileBounceState, wallNormal))
+                if (consumesBounceBeforeReturn &&
+                    TryApplyBounce(ref projectileData, ref projectileBounceState, wallNormal))
                 {
+                    ProjectileReturnRuntimeUtility.AlignFlightRotation(ref resolvedTransform,
+                                                                        ref returnState,
+                                                                        projectileData.Velocity,
+                                                                        0f);
                     projectile.ValueRW = projectileData;
+                    projectileTransform.ValueRW = resolvedTransform;
                     projectileBounceStateLookup[projectileEntity] = projectileBounceState;
+
+                    if (projectileReturnStateLookup.HasComponent(projectileEntity))
+                        projectileReturnStateLookup[projectileEntity] = returnState;
+
                     continue;
                 }
             }
 
+            // A terminal wall remains the authored despawn point for Projectile Split even when the source projectile returns.
             if (projectileSplitStateLookup.HasComponent(projectileEntity))
             {
                 ProjectileSplitState projectileSplitState = projectileSplitStateLookup[projectileEntity];
 
                 if (ProjectileSplitUtility.ShouldSplitOnDespawn(in projectileSplitState))
                 {
-                    ProjectileElementalPayload projectileElementalPayload = default(ProjectileElementalPayload);
-
-                    if (projectileElementalPayloadLookup.HasComponent(projectileEntity))
-                        projectileElementalPayload = projectileElementalPayloadLookup[projectileEntity];
-
+                    ProjectileElementalPayload projectileElementalPayload = projectileElementalPayloadLookup.HasComponent(projectileEntity)
+                        ? projectileElementalPayloadLookup[projectileEntity]
+                        : default;
                     float currentScaleMultiplier = ResolveCurrentScaleMultiplier(projectileEntity,
                                                                                  projectileTransform.ValueRO.Scale,
                                                                                  in projectileBaseScaleLookup);
@@ -145,23 +187,61 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                                    currentScaleMultiplier,
                                                                    in projectileElementalPayload,
                                                                    in projectileOwner,
+                                                                   in returnState,
                                                                    ref shootRequestLookup);
                     projectileSplitState.CanSplit = 0;
                     projectileSplitStateLookup[projectileEntity] = projectileSplitState;
                 }
             }
 
-            ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.TerminalWallHit,
-                                                        projectileEntity,
-                                                        projectileOwner.ShooterEntity,
-                                                        in projectileTransform.ValueRO,
-                                                        in projectileContactStateLookup,
-                                                        in projectileDeathVfxConfigLookup,
-                                                        in enemyProjectileDeathVfxConfigLookup,
-                                                        ref vfxRequestLookup);
+            if (returnState.Enabled != 0 && returnPathLookup.HasBuffer(projectileEntity))
+            {
+                ProjectilePerfectCircleState mutablePerfectCircleState = perfectCircleState.ValueRO;
+
+                // Keep orbital projectiles alive at the contact point until a compatible full-orbit prerequisite completes.
+                if (!ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState,
+                                                                    in mutablePerfectCircleState))
+                {
+                    continue;
+                }
+
+                LocalTransform returningTransform = projectileTransform.ValueRO;
+                ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
+                                                            ref projectileData,
+                                                            ref mutablePerfectCircleState,
+                                                            ref returningTransform,
+                                                            returnPathLookup[projectileEntity],
+                                                            returnState.OutboundHitCapacityExhausted != 0 ||
+                                                            returnState.OutboundNaturalHitCapacityExhausted != 0);
+                projectile.ValueRW = projectileData;
+                perfectCircleState.ValueRW = mutablePerfectCircleState;
+                projectileTransform.ValueRW = returningTransform;
+                projectileReturnStateLookup[projectileEntity] = returnState;
+                continue;
+            }
+
+            if (ProjectileReturnVfxPolicyUtility.AllowsDeathVfx(projectileOwner.PoolPrefabEntity,
+                                                                returnState.Enabled != 0,
+                                                                in returnState.Config))
+                ProjectileDeathVfxRuntimeUtility.TryEnqueue(ProjectileDeathVfxOccasion.TerminalWallHit,
+                                                            projectileEntity,
+                                                            projectileOwner.ShooterEntity,
+                                                            in projectileTransform.ValueRO,
+                                                            in projectileContactStateLookup,
+                                                            in projectileDeathVfxConfigLookup,
+                                                            in enemyProjectileDeathVfxConfigLookup,
+                                                            ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
+            ProjectileReturnRuntimeUtility.ReleaseConcurrency(projectileOwner.ShooterEntity,
+                                                              ref returnState,
+                                                              ref powerUpsStateLookup);
+
+            if (projectileReturnStateLookup.HasComponent(projectileEntity))
+                projectileReturnStateLookup[projectileEntity] = returnState;
+
             ProjectilePoolUtility.DespawnToPool(projectileEntity,
                                                 projectileOwner.ShooterEntity,
+                                                projectileOwner.PoolPrefabEntity,
                                                 ref parkedTransform,
                                                 ref poolLookup,
                                                 ref projectileActiveLookup);
@@ -171,6 +251,13 @@ public partial struct ProjectileWallCollisionSystem : ISystem
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Reflects projectile velocity and consumes one configured bounce when the contact normal is usable.
+    /// </summary>
+    /// <param name="projectile">Mutable projectile velocity.</param>
+    /// <param name="bounceState">Mutable bounce budget and speed scaling.</param>
+    /// <param name="wallNormal">Resolved wall contact normal.</param>
+    /// <returns>True when a bounce was applied.</returns>
     private static bool TryApplyBounce(ref Projectile projectile, ref ProjectileBounceState bounceState, float3 wallNormal)
     {
         if (bounceState.RemainingBounces <= 0)
@@ -202,6 +289,13 @@ public partial struct ProjectileWallCollisionSystem : ISystem
         return true;
     }
 
+    /// <summary>
+    /// Resolves current projectile scale relative to its prefab-specific cached base scale.
+    /// </summary>
+    /// <param name="projectileEntity">Projectile entity to inspect.</param>
+    /// <param name="currentScale">Current transform scale.</param>
+    /// <param name="projectileBaseScaleLookup">Read-only cached base-scale lookup.</param>
+    /// <returns>Positive current scale multiplier.</returns>
     private static float ResolveCurrentScaleMultiplier(Entity projectileEntity,
                                                        float currentScale,
                                                        in ComponentLookup<ProjectileBaseScale> projectileBaseScaleLookup)

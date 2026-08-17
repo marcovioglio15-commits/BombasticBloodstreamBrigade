@@ -60,6 +60,7 @@ public struct ShootRequest : IBufferElementData
     public float Lifetime;
     public float Damage;
     public float ProjectileScaleMultiplier;
+    public float ProjectileSizePowerUpMultiplier;
     public ProjectilePenetrationMode PenetrationMode;
     public int MaxPenetrations;
     public byte KnockbackEnabled;
@@ -71,8 +72,12 @@ public struct ShootRequest : IBufferElementData
     public byte IgnoreInheritedPlayerVelocityX;
     public byte IgnoreInheritedPlayerVelocityZ;
     public byte IsSplitChild;
+    public ProjectileSpawnSource SpawnSource;
+    public byte ActiveSlotIndex;
+    public byte HasReturningProjectilesOverride;
     public int OrbitLayerIndex;
     public int OrbitLayerCount;
+    public ReturningProjectilesConfig ReturningProjectilesOverride;
     public ProjectileElementalPayload ElementalPayloadOverride;
 }
 
@@ -80,6 +85,30 @@ public struct ShootRequest : IBufferElementData
 public struct ProjectilePoolElement : IBufferElementData
 {
     public Entity ProjectileEntity;
+    public Entity PrefabEntity;
+}
+
+/// <summary>
+/// Identifies which firing path emitted a projectile so passive return modules can filter active and split shots.
+/// </summary>
+public enum ProjectileSpawnSource : byte
+{
+    BaseShot = 0,
+    ActivePowerUp = 1,
+    SplitProjectile = 2
+}
+
+/// <summary>
+/// Identifies the current stage of an enabled returning projectile.
+/// </summary>
+public enum ProjectileReturnPhase : byte
+{
+    Disabled = 0,
+    Outbound = 1,
+    Turning = 2,
+    Returning = 3,
+    Completed = 4,
+    Delaying = 5
 }
 
 /// <summary>
@@ -133,6 +162,41 @@ public struct ProjectileContactState : IComponentData
 public struct ProjectileOwner : IComponentData
 {
     public Entity ShooterEntity;
+    public Entity PoolPrefabEntity;
+}
+
+/// <summary>
+/// Stores runtime return state without adding managed objects or per-projectile allocations.
+/// </summary>
+public struct ProjectileReturnState : IComponentData
+{
+    public byte Enabled;
+    public ProjectileReturnPhase Phase;
+    public byte ConcurrencyRegistered;
+    public byte OutboundHitCapacityExhausted;
+    public byte OutboundNaturalHitCapacityExhausted;
+    public byte ReturnFeedbackPending;
+    public uint ConcurrencyGeneration;
+    public ReturningProjectilesConfig Config;
+    public float OutboundSpeed;
+    public float OriginalDamage;
+    public ProjectilePenetrationMode OriginalPenetrationMode;
+    public int AdditionalOutboundHitsRemaining;
+    public int AdditionalReturnHitsRemaining;
+    public float ReturnDelayRemainingSeconds;
+    public float TurnaroundDegrees;
+    public float3 LastTravelDirection;
+    public float AppliedProjectileSizePowerUpMultiplier;
+    public int ReturnPathIndex;
+}
+
+/// <summary>
+/// Stores sampled outbound positions used by exact path retracing, including orbit and wall-bounce segments.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct ProjectileReturnPathPoint : IBufferElementData
+{
+    public float3 Position;
 }
 
 /// <summary>

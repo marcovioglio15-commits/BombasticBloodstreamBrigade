@@ -97,6 +97,7 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
                     DespawnProjectile(entityManager,
                                       projectileEntity,
                                       shooterEntity,
+                                      projectileOwner.ValueRO.PoolPrefabEntity,
                                       ref projectilePoolLookup);
                     ApplyProjectionHealthCost(ref instance,
                                               projectionTransform.ValueRO.Position,
@@ -164,10 +165,12 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
     /// <param name="entityManager">Entity manager used to mutate projectile components.</param>
     /// <param name="projectileEntity">Projectile entity being blocked.</param>
     /// <param name="shooterEntity">Shooter entity that owns the projectile pool.</param>
+    /// <param name="poolPrefabEntity">Prefab partition that created the projectile.</param>
     /// <param name="projectilePoolLookup">Projectile pool lookup used to requeue the projectile.</param>
     private static void DespawnProjectile(EntityManager entityManager,
                                           Entity projectileEntity,
                                           Entity shooterEntity,
+                                          Entity poolPrefabEntity,
                                           ref BufferLookup<ProjectilePoolElement> projectilePoolLookup)
     {
         ProjectilePoolUtility.SetProjectileParked(entityManager, projectileEntity);
@@ -179,7 +182,8 @@ public partial struct PlayerOrbitalProjectionInterceptionSystem : ISystem
         DynamicBuffer<ProjectilePoolElement> shooterPool = projectilePoolLookup[shooterEntity];
         shooterPool.Add(new ProjectilePoolElement
         {
-            ProjectileEntity = projectileEntity
+            ProjectileEntity = projectileEntity,
+            PrefabEntity = poolPrefabEntity
         });
     }
     #endregion

@@ -8,7 +8,7 @@ internal static class EnemyBossPatternCandidateCompilationUtility
     #region Internal Methods
     /// <summary>
     /// Determines whether one authored candidate contributes to the compiled boss candidate sequence and its visual-settings key space.
-    /// Null-module candidates remain legal without an enabled module source because they intentionally clear their slot.
+    /// Null-module candidates remain valid without an enabled module source because they intentionally clear their slot.
     /// </summary>
     /// <param name="eligibility">Selection eligibility authored for the candidate.</param>
     /// <param name="moduleMode">Whether the candidate applies a module or intentionally clears its slot.</param>

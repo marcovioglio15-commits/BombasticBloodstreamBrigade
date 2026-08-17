@@ -26,15 +26,14 @@ public partial struct ProjectileSpawnSystem : ISystem
 
     #region Constants
     private const float MinimumProjectileScale = 0.0001f;
-    private const float MinimumVfxScale = 0.01f;
-    private const float MinimumVfxLifetimeSeconds = 0.05f;
-    private const float VisualShootingPulseDuration = 0.12f;
     #endregion
 
     #region Fields
     private EntityQuery shootersWithRequestsQuery;
     #endregion
 
+
+    #region Methods
 
     #region Lifecycle
     /// <summary>
@@ -65,13 +64,18 @@ public partial struct ProjectileSpawnSystem : ISystem
         EntityManager entityManager = state.EntityManager;
         Allocator frameAllocator = state.WorldUpdateAllocator;
         NativeList<PoolExpansionRequest> expansionRequests = new NativeList<PoolExpansionRequest>(frameAllocator);
+        BufferLookup<PlayerPassiveToolsStateElement> preExpansionPassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
 
         // Two-phase flow: collect requests first, then apply structural pool growth outside query iteration.
-        CollectPoolExpansionRequests(ref state, entityManager, ref expansionRequests);
+        CollectPoolExpansionRequests(ref state,
+                                     entityManager,
+                                     in preExpansionPassiveToolsLookup,
+                                     ref expansionRequests);
         ExecutePoolExpansionRequests(entityManager, in expansionRequests);
 
         // Refresh lookups after structural changes performed during pool expansion.
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
+        BufferLookup<PlayerProjectileSizePowerUpMultiplierElement> projectileSizePowerUpMultipliersLookup = SystemAPI.GetBufferLookup<PlayerProjectileSizePowerUpMultiplierElement>(true);
         ComponentLookup<PlayerShootingState> shootingStateLookup = SystemAPI.GetComponentLookup<PlayerShootingState>(false);
         ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(false);
         ComponentLookup<LocalTransform> projectileTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(false);
@@ -86,16 +90,20 @@ public partial struct ProjectileSpawnSystem : ISystem
         ComponentLookup<ProjectileBounceState> bounceLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(false);
         ComponentLookup<ProjectileSplitState> splitLookup = SystemAPI.GetComponentLookup<ProjectileSplitState>(false);
         ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup = SystemAPI.GetComponentLookup<ProjectileElementalPayload>(false);
+        ComponentLookup<ProjectileReturnState> returnStateLookup = SystemAPI.GetComponentLookup<ProjectileReturnState>(false);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         ComponentLookup<ProjectileActive> projectileActiveLookup = SystemAPI.GetComponentLookup<ProjectileActive>(false);
         ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerProjectileAttachedVfxConfig>(true);
         ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerMuzzleFlashVfxConfig>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
         BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup = SystemAPI.GetBufferLookup<ProjectileHitHistoryElement>(false);
+        BufferLookup<ProjectileReturnPathPoint> returnPathLookup = SystemAPI.GetBufferLookup<ProjectileReturnPathPoint>(false);
 
         ProcessShootRequests(ref state,
                              entityManager,
                              (float)SystemAPI.Time.ElapsedTime,
                              in passiveToolsLookup,
+                             in projectileSizePowerUpMultipliersLookup,
                              ref shootingStateLookup,
                              ref cameraShakeStateLookup,
                              ref projectileTransformLookup,
@@ -110,21 +118,29 @@ public partial struct ProjectileSpawnSystem : ISystem
                              ref bounceLookup,
                              ref splitLookup,
                              ref elementalPayloadLookup,
+                             ref returnStateLookup,
+                             ref powerUpsStateLookup,
                              ref projectileActiveLookup,
                              in projectileAttachedVfxConfigLookup,
                              in muzzleFlashVfxConfigLookup,
                              ref powerUpVfxRequestLookup,
-                             ref projectileHitHistoryLookup);
+                             ref projectileHitHistoryLookup,
+                             ref returnPathLookup);
     }
+    #endregion
 
+    #region Pool Expansion
     /// <summary>
     /// Collects pool expansion requests without applying structural changes during entity iteration.
     /// </summary>
+    /// <param name="state">Current ECS system state used by the shooter query.</param>
     /// <param name="entityManager">EntityManager used to inspect shooter state and buffers.</param>
+    /// <param name="passiveToolsLookup">Read-only aggregated passive state used to select replacement prefabs.</param>
     /// <param name="expansionRequests">Mutable list that receives expansion requests.</param>
 
     private void CollectPoolExpansionRequests(ref SystemState state,
                                               EntityManager entityManager,
+                                              in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
                                               ref NativeList<PoolExpansionRequest> expansionRequests)
     {
         foreach ((DynamicBuffer<ShootRequest> shootRequests,
@@ -148,19 +164,61 @@ public partial struct ProjectileSpawnSystem : ISystem
                 continue;
             }
 
-            int missingProjectiles = shootRequests.Length - projectilePool.Length;
-
-            if (missingProjectiles <= 0)
-                continue;
-
+            PlayerPassiveToolsState passiveToolsState;
+            ResolvePassiveToolsState(shooterEntity, in passiveToolsLookup, out passiveToolsState);
             int expandBatch = math.max(1, poolStateValue.ValueRO.ExpandBatch);
-            int expandCount = math.max(expandBatch, missingProjectiles);
-            expansionRequests.Add(new PoolExpansionRequest
+
+            // Partition demand by prefab so replacement projectiles never consume an incompatible pooled entity.
+            for (int requestIndex = 0; requestIndex < shootRequests.Length; requestIndex++)
             {
-                ShooterEntity = shooterEntity,
-                ProjectilePrefab = prefabEntity,
-                ExpandCount = expandCount
-            });
+                Entity requestPrefab = ProjectileSpawnPoolSelectionUtility.ResolveProjectilePrefab(in shootRequests.ElementAt(requestIndex),
+                                                                                                    in passiveToolsState,
+                                                                                                    prefabEntity,
+                                                                                                    entityManager);
+                bool alreadyCounted = false;
+
+                for (int previousIndex = 0; previousIndex < requestIndex; previousIndex++)
+                {
+                    Entity previousPrefab = ProjectileSpawnPoolSelectionUtility.ResolveProjectilePrefab(in shootRequests.ElementAt(previousIndex),
+                                                                                                          in passiveToolsState,
+                                                                                                          prefabEntity,
+                                                                                                          entityManager);
+
+                    if (previousPrefab == requestPrefab)
+                    {
+                        alreadyCounted = true;
+                        break;
+                    }
+                }
+
+                if (alreadyCounted)
+                    continue;
+
+                int demand = 0;
+
+                for (int candidateIndex = requestIndex; candidateIndex < shootRequests.Length; candidateIndex++)
+                {
+                    Entity candidatePrefab = ProjectileSpawnPoolSelectionUtility.ResolveProjectilePrefab(in shootRequests.ElementAt(candidateIndex),
+                                                                                                           in passiveToolsState,
+                                                                                                           prefabEntity,
+                                                                                                           entityManager);
+
+                    if (candidatePrefab == requestPrefab)
+                        demand++;
+                }
+
+                int missingProjectiles = demand - ProjectileSpawnPoolSelectionUtility.CountAvailable(projectilePool, requestPrefab);
+
+                if (missingProjectiles <= 0)
+                    continue;
+
+                expansionRequests.Add(new PoolExpansionRequest
+                {
+                    ShooterEntity = shooterEntity,
+                    ProjectilePrefab = requestPrefab,
+                    ExpandCount = math.max(expandBatch, missingProjectiles)
+                });
+            }
         }
     }
 
@@ -197,17 +255,45 @@ public partial struct ProjectileSpawnSystem : ISystem
                                              expansionRequest.ExpandCount);
         }
     }
+    #endregion
 
+    #region Request Processing
     /// <summary>
     /// Spawns projectiles for all pending shoot requests using already initialized pooled entities.
     /// </summary>
+    /// <param name="state">Current ECS system state used by the shooter query.</param>
     /// <param name="entityManager">EntityManager used for component read/write operations.</param>
+    /// <param name="elapsedTime">Current world time used by visual shooting pulses.</param>
     /// <param name="passiveToolsLookup">Read-only lookup for passive tool runtime state.</param>
+    /// <param name="projectileSizePowerUpMultipliersLookup">Read-only per-power-up projectile-size provenance lookup.</param>
+    /// <param name="shootingStateLookup">Mutable shooter animation-pulse lookup.</param>
+    /// <param name="cameraShakeStateLookup">Mutable player fire-shake lookup.</param>
+    /// <param name="projectileTransformLookup">Mutable pooled projectile transform lookup.</param>
+    /// <param name="projectileLookup">Mutable projectile behavior lookup.</param>
+    /// <param name="projectileRuntimeLookup">Mutable projectile range and lifetime lookup.</param>
+    /// <param name="projectileContactStateLookup">Mutable contact-state lookup reset on reuse.</param>
+    /// <param name="projectileOwnerLookup">Mutable owner and pool-partition lookup.</param>
+    /// <param name="enemyProjectileOffscreenWarningLookup">Read-only enemy warning configuration lookup.</param>
+    /// <param name="projectileOffscreenWarningLookup">Mutable projectile warning-state lookup.</param>
+    /// <param name="projectileBaseScaleLookup">Read-only cached prefab scale lookup.</param>
+    /// <param name="perfectCircleLookup">Mutable orbital trajectory lookup.</param>
+    /// <param name="bounceLookup">Mutable bounce-state lookup.</param>
+    /// <param name="splitLookup">Mutable split-state lookup.</param>
+    /// <param name="elementalPayloadLookup">Mutable elemental payload lookup.</param>
+    /// <param name="returnStateLookup">Mutable optional return-state lookup.</param>
+    /// <param name="powerUpsStateLookup">Mutable active concurrency state lookup.</param>
+    /// <param name="projectileActiveLookup">Mutable enableable projectile activity lookup.</param>
+    /// <param name="projectileAttachedVfxConfigLookup">Read-only projectile-attached VFX lookup.</param>
+    /// <param name="muzzleFlashVfxConfigLookup">Read-only muzzle-flash VFX lookup.</param>
+    /// <param name="powerUpVfxRequestLookup">Mutable player VFX request-buffer lookup.</param>
+    /// <param name="projectileHitHistoryLookup">Mutable per-projectile overlap history lookup.</param>
+    /// <param name="returnPathLookup">Mutable optional outbound path-buffer lookup.</param>
 
     private void ProcessShootRequests(ref SystemState state,
                                       EntityManager entityManager,
                                       float elapsedTime,
                                       in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
+                                      in BufferLookup<PlayerProjectileSizePowerUpMultiplierElement> projectileSizePowerUpMultipliersLookup,
                                       ref ComponentLookup<PlayerShootingState> shootingStateLookup,
                                       ref ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup,
                                       ref ComponentLookup<LocalTransform> projectileTransformLookup,
@@ -222,11 +308,14 @@ public partial struct ProjectileSpawnSystem : ISystem
                                       ref ComponentLookup<ProjectileBounceState> bounceLookup,
                                       ref ComponentLookup<ProjectileSplitState> splitLookup,
                                       ref ComponentLookup<ProjectileElementalPayload> elementalPayloadLookup,
+                                      ref ComponentLookup<ProjectileReturnState> returnStateLookup,
+                                      ref ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup,
                                       ref ComponentLookup<ProjectileActive> projectileActiveLookup,
                                       in ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup,
                                       in ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup,
                                       ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup,
-                                      ref BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup)
+                                      ref BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup,
+                                      ref BufferLookup<ProjectileReturnPathPoint> returnPathLookup)
     {
         foreach ((DynamicBuffer<ShootRequest> shootRequests,
                   DynamicBuffer<ProjectilePoolElement> projectilePool,
@@ -255,6 +344,9 @@ public partial struct ProjectileSpawnSystem : ISystem
             ResolvePassiveToolsState(shooterEntity,
                                      in passiveToolsLookup,
                                      out passiveToolsState);
+            DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizePowerUpMultipliers = projectileSizePowerUpMultipliersLookup.HasBuffer(shooterEntity)
+                ? projectileSizePowerUpMultipliersLookup[shooterEntity]
+                : default;
             int requestsCount = shooterShootRequests.Length;
             int spawnedProjectileCount = 0;
 
@@ -262,21 +354,26 @@ public partial struct ProjectileSpawnSystem : ISystem
             float3 muzzleFlashOrigin = float3.zero;
             quaternion muzzleFlashRotation = quaternion.identity;
             bool spawnedPrimaryShot = false;
+            bool allowsMuzzleFlashVfx = false;
 
             for (int requestIndex = 0; requestIndex < requestsCount; requestIndex++)
             {
-                if (shooterProjectilePool.Length == 0)
-                    break;
+                ShootRequest request = shooterShootRequests[requestIndex];
+                Entity requestPrefab = ProjectileSpawnPoolSelectionUtility.ResolveProjectilePrefab(in request,
+                                                                                                    in passiveToolsState,
+                                                                                                    prefabEntity,
+                                                                                                    entityManager);
 
-                // The pool works as a stack so acquire is O(1) without shifting buffer contents.
-                int lastIndex = shooterProjectilePool.Length - 1;
-                Entity projectileEntity = shooterProjectilePool[lastIndex].ProjectileEntity;
-                shooterProjectilePool.RemoveAt(lastIndex);
+                if (!ProjectileSpawnPoolSelectionUtility.TryAcquire(shooterProjectilePool,
+                                                                    requestPrefab,
+                                                                    out Entity projectileEntity))
+                {
+                    continue;
+                }
 
                 if (!entityManager.Exists(projectileEntity))
                     continue;
 
-                ShootRequest request = shooterShootRequests[requestIndex];
                 float3 direction = math.normalizesafe(request.Direction, new float3(0f, 0f, 1f));
                 float speed = math.max(0f, request.Speed);
 
@@ -292,7 +389,23 @@ public partial struct ProjectileSpawnSystem : ISystem
 
                 float baseScale = ResolveProjectileBaseScale(projectileEntity, projectileTransform.Scale, in projectileBaseScaleLookup);
 
-                float scaleMultiplier = math.max(0.01f, request.ProjectileScaleMultiplier);
+                bool hasReturningProjectiles = ProjectileSpawnPoolSelectionUtility.TryResolveReturningProjectiles(in request,
+                                                                                                                   in passiveToolsState,
+                                                                                                                   out ReturningProjectilesConfig returningProjectilesConfig);
+                float embeddedPowerUpSizeMultiplier = request.ProjectileSizePowerUpMultiplier > 0f
+                    ? request.ProjectileSizePowerUpMultiplier
+                    : 1f;
+                float appliedPowerUpSizeMultiplier = hasReturningProjectiles
+                    ? ProjectileReturnPowerUpInteractionUtility.ResolveProjectileSizePowerUpMultiplier(in returningProjectilesConfig,
+                                                                                                        embeddedPowerUpSizeMultiplier,
+                                                                                                        projectileSizePowerUpMultipliers)
+                    : embeddedPowerUpSizeMultiplier;
+                float scaleMultiplier = math.max(0.01f,
+                                                 request.ProjectileScaleMultiplier /
+                                                 embeddedPowerUpSizeMultiplier *
+                                                 appliedPowerUpSizeMultiplier) *
+                                        (hasReturningProjectiles ? math.max(0.01f, returningProjectilesConfig.OutboundSizeMultiplier) : 1f);
+                request.ProjectileSizePowerUpMultiplier = appliedPowerUpSizeMultiplier;
                 projectileTransform.Scale = baseScale * scaleMultiplier;
                 projectileTransformLookup[projectileEntity] = projectileTransform;
 
@@ -301,8 +414,12 @@ public partial struct ProjectileSpawnSystem : ISystem
                     Velocity = direction * speed,
                     Damage = math.max(0f, request.Damage),
                     ExplosionRadius = math.max(0f, request.ExplosionRadius),
-                    MaxRange = request.Range,
-                    MaxLifetime = request.Lifetime,
+                    MaxRange = request.Range * (hasReturningProjectiles
+                        ? math.max(0.01f, returningProjectilesConfig.OutboundRangeMultiplier)
+                        : 1f),
+                    MaxLifetime = request.Lifetime * (hasReturningProjectiles
+                        ? math.max(0.01f, returningProjectilesConfig.OutboundLifetimeMultiplier)
+                        : 1f),
                     PenetrationMode = request.PenetrationMode,
                     RemainingPenetrations = math.max(0, request.MaxPenetrations),
                     KnockbackEnabled = request.KnockbackEnabled,
@@ -324,75 +441,107 @@ public partial struct ProjectileSpawnSystem : ISystem
                 projectileContactStateLookup[projectileEntity] = default;
                 projectileOwnerLookup[projectileEntity] = new ProjectileOwner
                 {
-                    ShooterEntity = shooterEntity
+                    ShooterEntity = shooterEntity,
+                    PoolPrefabEntity = requestPrefab
                 };
-                ConfigureProjectileOffscreenWarning(projectileEntity,
-                                                   shooterEntity,
-                                                   in enemyProjectileOffscreenWarningLookup,
-                                                   ref projectileOffscreenWarningLookup);
-                ResetProjectileHitHistory(projectileEntity, ref projectileHitHistoryLookup);
-
-                ProjectilePerfectCircleState perfectCircleState = BuildPerfectCircleState(in passiveToolsState.PerfectCircle,
-                                                                                          requestIndex,
+                ProjectileSpawnInitializationUtility.ConfigureProjectileOffscreenWarning(projectileEntity,
                                                                                           shooterEntity,
-                                                                                          request.Position,
-                                                                                          direction,
-                                                                                          projectileData.Velocity,
-                                                                                          request.OrbitLayerIndex,
-                                                                                          request.OrbitLayerCount,
-                                                                                          passiveToolsState.HasPerfectCircle != 0);
+                                                                                          in enemyProjectileOffscreenWarningLookup,
+                                                                                          ref projectileOffscreenWarningLookup);
+                ProjectileSpawnInitializationUtility.ResetProjectileHitHistory(projectileEntity, ref projectileHitHistoryLookup);
+
+                ProjectilePerfectCircleState perfectCircleState = ProjectileSpawnInitializationUtility.BuildPerfectCircleState(in passiveToolsState.PerfectCircle,
+                                                                                                                                 requestIndex,
+                                                                                                                                 shooterEntity,
+                                                                                                                                 request.Position,
+                                                                                                                                 direction,
+                                                                                                                                 projectileData.Velocity,
+                                                                                                                                 request.OrbitLayerIndex,
+                                                                                                                                 request.OrbitLayerCount,
+                                                                                                                                 passiveToolsState.HasPerfectCircle != 0);
                 perfectCircleLookup[projectileEntity] = perfectCircleState;
 
-                ProjectileBounceState bounceState = BuildBounceState(in passiveToolsState.BouncingProjectiles, passiveToolsState.HasBouncingProjectiles != 0);
+                ProjectileBounceState bounceState = ProjectileSpawnInitializationUtility.BuildBounceState(in passiveToolsState.BouncingProjectiles,
+                                                                                                           passiveToolsState.HasBouncingProjectiles != 0);
                 bounceLookup[projectileEntity] = bounceState;
 
-                ProjectileSplitState splitState = BuildSplitState(in passiveToolsState.SplittingProjectiles, passiveToolsState.HasSplittingProjectiles != 0, request.IsSplitChild != 0);
+                ProjectileSplitState splitState = ProjectileSpawnInitializationUtility.BuildSplitState(in passiveToolsState.SplittingProjectiles,
+                                                                                                        passiveToolsState.HasSplittingProjectiles != 0,
+                                                                                                        request.IsSplitChild != 0,
+                                                                                                        hasReturningProjectiles,
+                                                                                                        in returningProjectilesConfig);
                 splitLookup[projectileEntity] = splitState;
 
-                ProjectileElementalPayload elementalPayload = ResolveElementalPayload(in request,
-                                                                                      in passiveToolsState.ElementalProjectiles,
-                                                                                      passiveToolsState.HasElementalProjectiles != 0);
+                ProjectileElementalPayload elementalPayload = ProjectileSpawnInitializationUtility.ResolveElementalPayload(in request,
+                                                                                                                            in passiveToolsState.ElementalProjectiles,
+                                                                                                                            passiveToolsState.HasElementalProjectiles != 0);
                 elementalPayloadLookup[projectileEntity] = elementalPayload;
+                ProjectileReturnRuntimeUtility.InitializeSpawnedProjectile(projectileEntity,
+                                                                           shooterEntity,
+                                                                           in request,
+                                                                           in returningProjectilesConfig,
+                                                                           hasReturningProjectiles,
+                                                                           speed,
+                                                                           projectileData.Damage,
+                                                                           request.Position,
+                                                                           ref returnStateLookup,
+                                                                           ref powerUpsStateLookup,
+                                                                           ref returnPathLookup);
 
                 projectileActiveLookup.SetComponentEnabled(projectileEntity, true);
-                TryEnqueueProjectileAttachedVfx(shooterEntity,
-                                                projectileEntity,
-                                                in projectileTransform,
-                                                scaleMultiplier,
-                                                in projectileAttachedVfxConfigLookup,
-                                                ref powerUpVfxRequestLookup);
+                if (ProjectileReturnVfxPolicyUtility.AllowsProjectileVfx(requestPrefab,
+                                                                         hasReturningProjectiles,
+                                                                         in returningProjectilesConfig))
+                    ProjectileSpawnInitializationUtility.TryEnqueueProjectileAttachedVfx(shooterEntity,
+                                                                                         projectileEntity,
+                                                                                         in projectileTransform,
+                                                                                         scaleMultiplier,
+                                                                                         in projectileAttachedVfxConfigLookup,
+                                                                                         ref powerUpVfxRequestLookup);
 
                 // Cache the first spawned primary (non-split) shot pose so a single muzzle flash represents the whole volley.
                 // Split-child projectiles spawn from despawn/hit points, not the muzzle, so they must not retrigger the flash.
-                if (request.IsSplitChild == 0 && !spawnedPrimaryShot)
+                if (request.IsSplitChild == 0)
                 {
-                    muzzleFlashOrigin = projectileTransform.Position;
-                    muzzleFlashRotation = projectileTransform.Rotation;
-                    spawnedPrimaryShot = true;
+                    if (!spawnedPrimaryShot)
+                    {
+                        muzzleFlashOrigin = projectileTransform.Position;
+                        muzzleFlashRotation = projectileTransform.Rotation;
+                        spawnedPrimaryShot = true;
+                    }
+
+                    allowsMuzzleFlashVfx |= ProjectileReturnVfxPolicyUtility.AllowsMuzzleFlashVfx(requestPrefab,
+                                                                                                   hasReturningProjectiles,
+                                                                                                   in returningProjectilesConfig);
                 }
 
                 spawnedProjectileCount++;
             }
 
             if (spawnedProjectileCount > 0)
-                RegisterShooterShotPulse(shooterEntity, elapsedTime, ref shootingStateLookup);
+                ProjectileSpawnInitializationUtility.RegisterShooterShotPulse(shooterEntity,
+                                                                              elapsedTime,
+                                                                              ref shootingStateLookup);
 
             // Only primary shots originate from the weapon muzzle, so split-child spawns never retrigger the flash.
             if (spawnedPrimaryShot)
             {
-                TryEnqueueMuzzleFlashVfx(shooterEntity,
-                                         muzzleFlashOrigin,
-                                         muzzleFlashRotation,
-                                         in muzzleFlashVfxConfigLookup,
-                                         ref powerUpVfxRequestLookup);
+                if (allowsMuzzleFlashVfx)
+                    ProjectileSpawnInitializationUtility.TryEnqueueMuzzleFlashVfx(shooterEntity,
+                                                                                  muzzleFlashOrigin,
+                                                                                  muzzleFlashRotation,
+                                                                                  in muzzleFlashVfxConfigLookup,
+                                                                                  ref powerUpVfxRequestLookup);
                 // Same primary-shot gate keeps split-child spawns from retriggering the Fire Shake camera feedback.
-                EnqueueFireShakeRequest(shooterEntity, ref cameraShakeStateLookup);
+                ProjectileSpawnInitializationUtility.EnqueueFireShakeRequest(shooterEntity, ref cameraShakeStateLookup);
             }
 
             shooterShootRequests.Clear();
         }
     }
+    #endregion
 
+    #region Helpers
     /// <summary>
     /// Checks whether a shooter can be processed for pool expansion and request spawning.
     /// </summary>
@@ -452,6 +601,12 @@ public partial struct ProjectileSpawnSystem : ISystem
         return math.max(MinimumProjectileScale, transformScale);
     }
 
+    /// <summary>
+    /// Reads the latest aggregated passive snapshot for one shooter without adding components or buffers.
+    /// </summary>
+    /// <param name="shooterEntity">Shooter whose passive state is required.</param>
+    /// <param name="passiveToolsLookup">Read-only passive-state buffer lookup.</param>
+    /// <param name="passiveToolsState">Resolved passive snapshot or default.</param>
     private static void ResolvePassiveToolsState(Entity shooterEntity,
                                                  in BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup,
                                                  out PlayerPassiveToolsState passiveToolsState)
@@ -461,288 +616,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                   out passiveToolsState);
     }
 
-    /// <summary>
-    /// Resets and enables projectile offscreen-warning state when the shooter has an enemy warning config.
-    /// </summary>
-    /// <param name="projectileEntity">Pooled projectile being reactivated.</param>
-    /// <param name="shooterEntity">Shooter that owns the projectile spawn request.</param>
-    /// <param name="enemyProjectileOffscreenWarningLookup">Read-only enemy warning config lookup.</param>
-    /// <param name="projectileOffscreenWarningLookup">Mutable projectile warning-state lookup.</param>
-    private static void ConfigureProjectileOffscreenWarning(Entity projectileEntity,
-                                                           Entity shooterEntity,
-                                                           in ComponentLookup<EnemyProjectileOffscreenWarningConfig> enemyProjectileOffscreenWarningLookup,
-                                                           ref ComponentLookup<ProjectileOffscreenWarningState> projectileOffscreenWarningLookup)
-    {
-        if (!projectileOffscreenWarningLookup.HasComponent(projectileEntity))
-            return;
-
-        ProjectileOffscreenWarningState warningState = default;
-
-        if (enemyProjectileOffscreenWarningLookup.HasComponent(shooterEntity) &&
-            enemyProjectileOffscreenWarningLookup[shooterEntity].Enabled != 0)
-        {
-            warningState.Enabled = 1;
-        }
-
-        projectileOffscreenWarningLookup[projectileEntity] = warningState;
-    }
-
-    /// <summary>
-    /// Clears per-projectile enemy hit memory before a pooled projectile is reused for a new shot.
-    /// </summary>
-    /// <param name="projectileEntity">Projectile entity being reactivated from the pool.</param>
-    /// <param name="projectileHitHistoryLookup">Lookup used to resolve the projectile hit-history buffer.</param>
-    private static void ResetProjectileHitHistory(Entity projectileEntity,
-                                                  ref BufferLookup<ProjectileHitHistoryElement> projectileHitHistoryLookup)
-    {
-        if (!projectileHitHistoryLookup.HasBuffer(projectileEntity))
-            return;
-
-        DynamicBuffer<ProjectileHitHistoryElement> hitHistory = projectileHitHistoryLookup[projectileEntity];
-        hitHistory.Clear();
-    }
-
-    /// <summary>
-    /// Marks the shooter's camera shake state as having pulsed a fire request this frame. The camera follow system
-    /// consumes the flag when it evolves the fire-shake trauma, so a single per-volley call here lands as exactly one
-    /// unit of added trauma even if multiple primary shots fire in the same frame. Shooters without the player camera
-    /// shake state (enemies, autonomous spawners) are silently skipped so this hook stays generic to the spawn flow.
-    /// </summary>
-    /// <param name="shooterEntity">Shooter entity that emitted at least one primary projectile this frame.</param>
-    /// <param name="cameraShakeStateLookup">Mutable lookup used to flag the pending fire request.</param>
-    private static void EnqueueFireShakeRequest(Entity shooterEntity,
-                                                 ref ComponentLookup<PlayerCameraShakeState> cameraShakeStateLookup)
-    {
-        if (!cameraShakeStateLookup.HasComponent(shooterEntity))
-            return;
-
-        PlayerCameraShakeState shakeState = cameraShakeStateLookup[shooterEntity];
-        shakeState.FireRequestPending = 1;
-        cameraShakeStateLookup[shooterEntity] = shakeState;
-    }
-
-    /// <summary>
-    /// Records a real projectile spawn as a shoot pulse so managed animation sync can trigger one-shot firing clips.
-    /// </summary>
-    /// <param name="shooterEntity">Shooter entity whose animation state should be pulsed.</param>
-    /// <param name="elapsedTime">Current elapsed world time used to hold the shooting visual state briefly.</param>
-    /// <param name="shootingStateLookup">Mutable lookup used to update shooter shooting state.</param>
-    private static void RegisterShooterShotPulse(Entity shooterEntity,
-                                                 float elapsedTime,
-                                                 ref ComponentLookup<PlayerShootingState> shootingStateLookup)
-    {
-        if (!shootingStateLookup.HasComponent(shooterEntity))
-            return;
-
-        PlayerShootingState shootingState = shootingStateLookup[shooterEntity];
-        shootingState.ShotPulseVersion = shootingState.ShotPulseVersion == uint.MaxValue
-            ? 1u
-            : shootingState.ShotPulseVersion + 1u;
-        shootingState.VisualShootingActive = 1;
-        shootingState.VisualShootingUntilTime = math.max(shootingState.VisualShootingUntilTime,
-                                                         elapsedTime + VisualShootingPulseDuration);
-        shootingStateLookup[shooterEntity] = shootingState;
-    }
-
-    private static ProjectilePerfectCircleState BuildPerfectCircleState(in PerfectCirclePassiveConfig perfectCircleConfig,
-                                                                        int requestIndex,
-                                                                        Entity shooterEntity,
-                                                                        float3 spawnPosition,
-                                                                        float3 direction,
-                                                                        float3 entryVelocity,
-                                                                        int orbitLayerIndex,
-                                                                        int orbitLayerCount,
-                                                                        bool isEnabled)
-    {
-        if (!isEnabled)
-            return default;
-
-        int safeOrbitLayerCount = math.max(1, orbitLayerCount);
-        float seed = requestIndex + shooterEntity.Index * 13f;
-        float angleRadians = math.radians(math.max(0f, perfectCircleConfig.GoldenAngleDegrees) * seed);
-        float3 radialDirection = direction;
-
-        if (math.lengthsq(radialDirection) <= 1e-6f)
-            radialDirection = new float3(math.cos(angleRadians), 0f, math.sin(angleRadians));
-
-        radialDirection = math.normalizesafe(radialDirection, new float3(0f, 0f, 1f));
-
-        return new ProjectilePerfectCircleState
-        {
-            Enabled = 1,
-            HasEnteredOrbit = 0,
-            CompletedFullOrbit = 0,
-            HasOrbitPlaneHeight = 0,
-            EntryOrigin = spawnPosition,
-            OrbitAngle = angleRadians,
-            OrbitBlendProgress = 0f,
-            CurrentRadius = 0f,
-            AccumulatedOrbitRadians = 0f,
-            RadialDirection = radialDirection,
-            EntryVelocity = entryVelocity,
-            OrbitPlaneHeight = 0f,
-            OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
-            OrbitLayerCount = safeOrbitLayerCount
-        };
-    }
-
-    private static ProjectileBounceState BuildBounceState(in BouncingProjectilesPassiveConfig bouncingProjectilesConfig, bool isEnabled)
-    {
-        if (!isEnabled || bouncingProjectilesConfig.MaxBounces <= 0)
-            return default;
-
-        float minimumSpeedMultiplier = math.max(0f, bouncingProjectilesConfig.MinimumSpeedMultiplierAfterBounce);
-        float maximumSpeedMultiplier = math.max(minimumSpeedMultiplier, bouncingProjectilesConfig.MaximumSpeedMultiplierAfterBounce);
-
-        return new ProjectileBounceState
-        {
-            RemainingBounces = math.max(0, bouncingProjectilesConfig.MaxBounces),
-            SpeedPercentChangePerBounce = bouncingProjectilesConfig.SpeedPercentChangePerBounce,
-            MinimumSpeedMultiplierAfterBounce = minimumSpeedMultiplier,
-            MaximumSpeedMultiplierAfterBounce = maximumSpeedMultiplier,
-            CurrentSpeedMultiplier = 1f
-        };
-    }
-
-    private static ProjectileSplitState BuildSplitState(in SplittingProjectilesPassiveConfig splittingProjectilesConfig, bool isEnabled, bool isSplitChild)
-    {
-        if (!isEnabled || isSplitChild)
-            return default;
-
-        return new ProjectileSplitState
-        {
-            CanSplit = 1,
-            TriggerMode = splittingProjectilesConfig.TriggerMode,
-            DirectionMode = splittingProjectilesConfig.DirectionMode,
-            SplitProjectileCount = math.max(1, splittingProjectilesConfig.SplitProjectileCount),
-            SplitOffsetDegrees = splittingProjectilesConfig.SplitOffsetDegrees,
-            CustomAnglesDegrees = splittingProjectilesConfig.CustomAnglesDegrees,
-            SplitDamageMultiplier = math.max(0f, splittingProjectilesConfig.SplitDamageMultiplier),
-            SplitSizeMultiplier = math.max(0f, splittingProjectilesConfig.SplitSizeMultiplier),
-            SplitSpeedMultiplier = math.max(0f, splittingProjectilesConfig.SplitSpeedMultiplier),
-            SplitLifetimeMultiplier = math.max(0f, splittingProjectilesConfig.SplitLifetimeMultiplier)
-        };
-    }
-
-    private static ProjectileElementalPayload ResolveElementalPayload(in ShootRequest request,
-                                                                      in ElementalProjectilesPassiveConfig passiveElementalProjectilesConfig,
-                                                                      bool hasPassiveElementalPayload)
-    {
-        ProjectileElementalPayload resolvedPayload = BuildElementalPayloadFromRequest(in request);
-        ProjectileElementalPayload passivePayload = BuildElementalPayloadFromPassive(in passiveElementalProjectilesConfig, hasPassiveElementalPayload);
-        ProjectileElementalPayloadUtility.MergePayload(ref resolvedPayload, in passivePayload);
-        return resolvedPayload;
-    }
-
-    private static ProjectileElementalPayload BuildElementalPayloadFromRequest(in ShootRequest request)
-    {
-        return request.ElementalPayloadOverride;
-    }
-
-    private static ProjectileElementalPayload BuildElementalPayloadFromPassive(in ElementalProjectilesPassiveConfig elementalProjectilesConfig, bool isEnabled)
-    {
-        if (!isEnabled || elementalProjectilesConfig.StacksPerHit <= 0f)
-            return default;
-
-        return ProjectileElementalPayloadUtility.BuildSingle(in elementalProjectilesConfig.Effect,
-                                                             math.max(0f, elementalProjectilesConfig.StacksPerHit));
-    }
-
-    /// <summary>
-    /// Queues an attached managed VFX request for a newly activated projectile when the shooter visual preset provides one.
-    /// </summary>
-    /// <param name="shooterEntity">Player entity that owns the projectile and VFX request buffer.</param>
-    /// <param name="projectileEntity">Projectile entity followed by the VFX until despawn.</param>
-    /// <param name="projectileTransform">Initial projectile transform used for request placement.</param>
-    /// <param name="projectileScaleMultiplier">Projectile size multiplier already applied to the spawned projectile transform.</param>
-    /// <param name="projectileAttachedVfxConfigLookup">Read-only lookup for optional projectile VFX config.</param>
-    /// <param name="powerUpVfxRequestLookup">Writable lookup for player-owned VFX request buffers.</param>
-    private static void TryEnqueueProjectileAttachedVfx(Entity shooterEntity,
-                                                        Entity projectileEntity,
-                                                        in LocalTransform projectileTransform,
-                                                        float projectileScaleMultiplier,
-                                                        in ComponentLookup<PlayerProjectileAttachedVfxConfig> projectileAttachedVfxConfigLookup,
-                                                        ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup)
-    {
-        if (!projectileAttachedVfxConfigLookup.HasComponent(shooterEntity))
-            return;
-
-        if (!powerUpVfxRequestLookup.HasBuffer(shooterEntity))
-            return;
-
-        PlayerProjectileAttachedVfxConfig config = projectileAttachedVfxConfigLookup[shooterEntity];
-
-        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
-            return;
-
-        quaternion rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(projectileTransform.Rotation);
-        float resolvedProjectileScaleMultiplier = math.max(MinimumVfxScale, projectileScaleMultiplier);
-        float3 scaledSpawnOffset = config.SpawnOffset * resolvedProjectileScaleMultiplier;
-        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestLookup[shooterEntity];
-        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
-        {
-            PrefabEntity = config.PrefabEntity,
-            SourcePrefab = config.SourcePrefab,
-            Position = projectileTransform.Position + math.rotate(rotation, scaledSpawnOffset),
-            Rotation = rotation,
-            UniformScale = math.max(MinimumVfxScale, config.UniformScale * resolvedProjectileScaleMultiplier),
-            ParticleSimulationSpeedMultiplier = 1f,
-            LifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, config.LifetimeSeconds),
-            FollowTargetEntity = projectileEntity,
-            FollowPositionOffset = scaledSpawnOffset,
-            FollowValidationEntity = Entity.Null,
-            FollowValidationSpawnVersion = 0u,
-            Velocity = float3.zero,
-            KeepAliveWhileFollowTargetValid = 1,
-            FollowMuzzlePose = 1
-        });
-    }
-
-    /// <summary>
-    /// Queues one muzzle-flash VFX request at the shot origin once per volley when the shooter visual preset provides one.
-    /// The request follows the muzzle pose for its short authored lifetime so the flash stays attached to the weapon while the player moves.
-    /// </summary>
-    /// <param name="shooterEntity">Player entity that owns the muzzle-flash config and VFX request buffer.</param>
-    /// <param name="muzzleOrigin">World-space projectile origin captured from the first spawned shot.</param>
-    /// <param name="muzzleRotation">World-space shot rotation captured from the first spawned shot.</param>
-    /// <param name="muzzleFlashVfxConfigLookup">Read-only lookup for the optional muzzle-flash VFX config.</param>
-    /// <param name="powerUpVfxRequestLookup">Writable lookup for player-owned VFX request buffers.</param>
-    private static void TryEnqueueMuzzleFlashVfx(Entity shooterEntity,
-                                                 float3 muzzleOrigin,
-                                                 quaternion muzzleRotation,
-                                                 in ComponentLookup<PlayerMuzzleFlashVfxConfig> muzzleFlashVfxConfigLookup,
-                                                 ref BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestLookup)
-    {
-        if (!muzzleFlashVfxConfigLookup.HasComponent(shooterEntity))
-            return;
-
-        if (!powerUpVfxRequestLookup.HasBuffer(shooterEntity))
-            return;
-
-        PlayerMuzzleFlashVfxConfig config = muzzleFlashVfxConfigLookup[shooterEntity];
-
-        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
-            return;
-
-        quaternion rotation = PlayerMuzzleVfxPoseUtility.ResolveWorldUpRotation(muzzleRotation);
-        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestLookup[shooterEntity];
-        vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
-        {
-            PrefabEntity = config.PrefabEntity,
-            SourcePrefab = config.SourcePrefab,
-            Position = muzzleOrigin + math.rotate(rotation, config.SpawnOffset),
-            Rotation = rotation,
-            UniformScale = math.max(MinimumVfxScale, config.UniformScale),
-            ParticleSimulationSpeedMultiplier = 1f,
-            LifetimeSeconds = math.max(MinimumVfxLifetimeSeconds, config.LifetimeSeconds),
-            FollowTargetEntity = shooterEntity,
-            FollowPositionOffset = config.SpawnOffset,
-            FollowValidationEntity = Entity.Null,
-            FollowValidationSpawnVersion = 0u,
-            Velocity = float3.zero,
-            FollowMuzzlePose = 1
-        });
-    }
+    #endregion
 
     #endregion
 

@@ -2,11 +2,10 @@ using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Centralizes the trauma model, multi-axis sampling, FOV-zoom output and transform layering used by the damage-driven
-/// and fire-driven camera shakes. <see cref="PlayerCameraFollowSystem"/> owns the single per-frame trauma update for
-/// both channels; every camera system applies the resulting offset/roll/FOV through the same feedback-safe helpers.
-/// The two channels evolve independent trauma envelopes and their outputs are summed into the final per-frame transform
-/// write so a fire-burst never cancels a hit recoil and vice-versa. Two motion modes are supported per channel:
+/// Centralizes the trauma model, multi-axis sampling, FOV-zoom output and transform layering used by damage, firing,
+/// and return-start camera shakes. <see cref="PlayerCameraFollowSystem"/> owns the single per-frame trauma update;
+/// every camera system applies the resulting offset/roll/FOV through the same feedback-safe helpers. Each channel
+/// evolves independently and their outputs are summed so one pulse never cancels another. Two motion modes are supported:
 /// Continuous samples a decorrelated perlin field so the shake oscillates, SingleImpulse picks a stable direction at
 /// trauma onset so each hit reads as a clean tactile jolt instead of a vibration.
 /// </summary>
@@ -43,13 +42,11 @@ internal static class PlayerCameraShakeRuntimeUtility
     // hash. Keeping the palette discrete (sign in {-1, 0, 1}) yields a clean jolt without drifting.
     private const float ImpulseDirectionHashPhase = 0.49283f;
     #endregion
-
     #region Methods
-
     #region Public Methods
     /// <summary>
-    /// Advances both shake channels once per frame: detects a fresh accepted hit on the damage channel and consumes
-    /// any pending fire pulse on the fire channel, evolves the two independent trauma envelopes, then resolves the
+    /// Advances camera feedback once per frame: detects fresh damage, firing, and return-start pulses, evolves their
+    /// independent trauma envelopes, then resolves the
     /// summed world-space offset, roll and FOV delta for this frame. The previous frame's applied output is carried
     /// into the previous-applied slots first so the camera systems can remove it before re-applying, avoiding feedback.
     /// </summary>
@@ -99,11 +96,13 @@ internal static class PlayerCameraShakeRuntimeUtility
             state.FireImpulseDirection = float3.zero;
             state.FireImpulseRollSign = 0f;
             state.FireRumbleImpulseRemainingSeconds = 0f;
+            ClearReturnFeedback(ref state);
             return;
         }
 
         EvolveDamageTrauma(ref state, in damageConfig, currentDamageDeadline, currentSurvivability, deltaTime, noiseTime);
         EvolveFireTrauma(ref state, in fireConfig, deltaTime, noiseTime);
+        EvolveReturnRumble(ref state, in fireConfig, deltaTime);
 
         // Resolve each channel through its own noise seeds (Continuous) or stable impulse direction (SingleImpulse).
         ResolveDamageChannelOutput(state.Trauma,
@@ -137,6 +136,13 @@ internal static class PlayerCameraShakeRuntimeUtility
         state.PositionOffset = damageOffset + fireOffset;
         state.RollRadians = damageRoll + fireRoll;
         state.FovDelta = damageFov + fireFov;
+        PlayerReturnCameraShakeRuntimeUtility.UpdateState(ref state,
+                                                          in fireConfig,
+                                                          deltaTime,
+                                                          noiseTime,
+                                                          cameraRight,
+                                                          cameraUp,
+                                                          cameraForward);
     }
 
     /// <summary>
@@ -352,6 +358,75 @@ internal static class PlayerCameraShakeRuntimeUtility
         state.FireTrauma = math.max(0f, state.FireTrauma - clampedDelta / decayDuration);
         state.FireRumbleImpulseRemainingSeconds = math.max(0f, state.FireRumbleImpulseRemainingSeconds - clampedDelta);
     }
+
+    /// <summary>
+    /// Evolves a haptic-only return pulse through the firing-rumble envelope without adding camera trauma.
+    /// </summary>
+    /// <param name="state">Mutable player shake state carrying return requests and their current envelope.</param>
+    /// <param name="config">Resolved firing config whose rumble shape and motor amplitudes are reused proportionally.</param>
+    /// <param name="deltaTime">Presentation delta used to decay continuous and single-impulse feedback.</param>
+    private static void EvolveReturnRumble(ref PlayerCameraShakeState state,
+                                           in CameraFireShakeBlob config,
+                                           float deltaTime)
+    {
+        float requestedMultiplier = math.max(0f, state.ReturnRumbleRequestMultiplier);
+        state.ReturnRumbleRequestMultiplier = 0f;
+
+        if (config.Enabled == 0 || config.RumbleEnabled == 0)
+        {
+            ClearReturnRumble(ref state);
+            return;
+        }
+
+        // Coalesce simultaneous returning projectiles into one bounded envelope while retaining the strongest request.
+        if (requestedMultiplier > 0f)
+        {
+            float currentMultiplier = config.RumbleMotionMode == CameraShakeRumbleMotionMode.SingleImpulse
+                ? state.ReturnRumbleImpulseRemainingSeconds > 0f ? state.ReturnRumbleMultiplier : 0f
+                : state.ReturnRumbleEnvelope * state.ReturnRumbleMultiplier;
+            state.ReturnRumbleEnvelope = 1f;
+            state.ReturnRumbleMultiplier = math.max(currentMultiplier, requestedMultiplier);
+
+            if (config.RumbleMotionMode == CameraShakeRumbleMotionMode.SingleImpulse)
+            {
+                state.ReturnRumbleImpulseRemainingSeconds = math.max(state.ReturnRumbleImpulseRemainingSeconds,
+                                                                      math.max(0f, config.RumbleImpulseDurationSeconds));
+            }
+        }
+
+        float clampedDelta = math.max(0f, deltaTime);
+        float decayDuration = math.max(MinimumDurationSeconds, config.DurationSeconds);
+        state.ReturnRumbleEnvelope = math.max(0f, state.ReturnRumbleEnvelope - clampedDelta / decayDuration);
+        state.ReturnRumbleImpulseRemainingSeconds = math.max(0f,
+                                                              state.ReturnRumbleImpulseRemainingSeconds - clampedDelta);
+
+        if (state.ReturnRumbleEnvelope <= 0f && state.ReturnRumbleImpulseRemainingSeconds <= 0f)
+            state.ReturnRumbleMultiplier = 0f;
+    }
+    #endregion
+
+    #region Return Feedback Reset
+    /// <summary>
+    /// Clears return-start camera and haptic values during initialization and gameplay-runtime cleanup.
+    /// </summary>
+    /// <param name="state">Mutable player shake state whose return feedback channels must be reset.</param>
+    public static void ClearReturnFeedback(ref PlayerCameraShakeState state)
+    {
+        PlayerReturnCameraShakeRuntimeUtility.Clear(ref state);
+        ClearReturnRumble(ref state);
+    }
+
+    /// <summary>
+    /// Clears only the haptic return channel when firing rumble is unavailable, preserving camera-only feedback.
+    /// </summary>
+    /// <param name="state">Mutable player shake state whose return haptic values must be reset.</param>
+    private static void ClearReturnRumble(ref PlayerCameraShakeState state)
+    {
+        state.ReturnRumbleRequestMultiplier = 0f;
+        state.ReturnRumbleEnvelope = 0f;
+        state.ReturnRumbleMultiplier = 0f;
+        state.ReturnRumbleImpulseRemainingSeconds = 0f;
+    }
     #endregion
 
     #region Private Methods - Channel Output
@@ -435,7 +510,7 @@ internal static class PlayerCameraShakeRuntimeUtility
     /// <param name="positionOffset">Resolved position offset for the fire channel this frame.</param>
     /// <param name="rollRadians">Resolved view-axis roll in radians for the fire channel this frame.</param>
     /// <param name="fovDelta">Resolved FOV delta in degrees for the fire channel this frame.</param>
-    private static void ResolveFireChannelOutput(float trauma,
+    internal static void ResolveFireChannelOutput(float trauma,
                                                   in CameraFireShakeBlob config,
                                                   float3 impulseDirection,
                                                   float impulseRollSign,
@@ -550,7 +625,7 @@ internal static class PlayerCameraShakeRuntimeUtility
     /// <param name="falloff">Envelope shape selected on the preset.</param>
     /// <param name="trauma">Current trauma in the [0..1] range.</param>
     /// <returns>Shake magnitude in the [0..1] range.</returns>
-    private static float ResolveEnvelope(CameraShakeFalloff falloff, float trauma)
+    internal static float ResolveEnvelope(CameraShakeFalloff falloff, float trauma)
     {
         float clampedTrauma = math.saturate(trauma);
 
@@ -588,7 +663,7 @@ internal static class PlayerCameraShakeRuntimeUtility
     /// <param name="seedRoll">Channel seed for the roll hash.</param>
     /// <param name="direction">Resolved sign palette per axis in {-1, 0, 1} stored as float3.</param>
     /// <param name="rollSign">Resolved roll sign in {-1, 0, 1}.</param>
-    private static void SampleImpulseDirection(float noiseTime,
+    internal static void SampleImpulseDirection(float noiseTime,
                                                 float seedX,
                                                 float seedY,
                                                 float seedZ,

@@ -31,12 +31,14 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="payloadLabel">Optional label used by the generic payload fallback.</param>
     /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
     /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
+    /// <param name="showActiveProjectileConcurrencyOption">True when the payload belongs to a non-toggleable active that can own live projectile instances.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
                                           string payloadLabel,
                                           bool showActiveTriggerCharacterTuningOption = false,
-                                          bool showToggleDurationOption = false)
+                                          bool showToggleDurationOption = false,
+                                          bool showActiveProjectileConcurrencyOption = false)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -72,6 +74,11 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 return;
             case PowerUpModuleKind.AttractDrops:
                 PowerUpDropAttractionPayloadDrawerUtility.Build(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.ReturningProjectiles:
+                PowerUpReturningProjectilesPayloadDrawerUtility.Build(payloadContainer,
+                                                                      payloadProperty,
+                                                                      showActiveProjectileConcurrencyOption);
                 return;
             case PowerUpModuleKind.StateSuppressShooting:
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);
