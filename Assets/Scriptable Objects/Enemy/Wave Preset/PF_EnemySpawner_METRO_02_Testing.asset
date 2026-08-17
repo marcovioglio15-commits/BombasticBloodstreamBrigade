@@ -320,7 +320,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 9c25150a7f1546d88f0c8d454dd1686c
-    waveLabel: Wave 1 Parallel
+    waveLabel: Wave 2 Parallel
     sequenceStepIndex: 1
     referenceWaveId: 
     previewInScene: 0
@@ -399,7 +399,7 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 78a635443650498f9710669ed61554a3
-    waveLabel: Wave 1 Parallel
+    waveLabel: Wave 3 Parallel
     sequenceStepIndex: 2
     referenceWaveId: 
     previewInScene: 0
