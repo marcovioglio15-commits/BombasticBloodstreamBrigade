@@ -140,9 +140,9 @@ public static class PlayerLaserBeamUtility
         if (laneCount <= 1)
             return normalizedBaseDirection;
 
-        float halfCone = coneAngleDegrees * 0.5f;
-        float step = coneAngleDegrees / math.max(1, laneCount - 1);
-        float angleDegrees = -halfCone + step * laneIndex;
+        float angleDegrees = PlayerProjectileConePatternUtility.ResolveDirectionAngleDegrees(laneIndex,
+                                                                                              laneCount,
+                                                                                              coneAngleDegrees);
         quaternion rotationOffset = quaternion.AxisAngle(new float3(0f, 1f, 0f), math.radians(angleDegrees));
         float3 spreadDirection = math.rotate(rotationOffset, normalizedBaseDirection);
 

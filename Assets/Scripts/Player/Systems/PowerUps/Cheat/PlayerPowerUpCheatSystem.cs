@@ -200,6 +200,7 @@ public partial struct PlayerPowerUpCheatSystem : ISystem
             ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
             equippedPassiveTool.PowerUpId = cheatPresetPassive.PowerUpId;
             equippedPassiveTool.Tool = cheatPresetPassive.Tool;
+            equippedPassiveTool.ConditionalApplicationState = default;
         }
     }
     #endregion

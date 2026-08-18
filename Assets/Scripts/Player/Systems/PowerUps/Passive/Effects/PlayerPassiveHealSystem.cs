@@ -82,61 +82,18 @@ public partial struct PlayerPassiveHealSystem : ISystem
             {
                 float missingHealth = math.max(0f, maxHealth - currentHealth);
 
-                if (TryApplyPassiveHealOverTime(in healConfig, missingHealth, ref healOverTimeState.ValueRW))
+                if (PlayerPowerUpHealingRuntimeUtility.TryApply(healConfig.HealAmount,
+                                                                missingHealth,
+                                                                healConfig.DurationSeconds,
+                                                                healConfig.TickIntervalSeconds,
+                                                                healConfig.StackPolicy,
+                                                                ref healOverTimeState.ValueRW))
                     cooldownRemaining = math.max(0f, healConfig.CooldownSeconds);
             }
 
             passiveHealState.ValueRW.CooldownRemaining = cooldownRemaining;
             passiveHealState.ValueRW.PreviousObservedHealth = currentHealth;
         }
-    }
-    #endregion
-
-    #region Helpers
-    private static bool TryApplyPassiveHealOverTime(in PassiveHealConfig healConfig,
-                                                    float currentMissingHealth,
-                                                    ref PlayerHealOverTimeState healOverTimeState)
-    {
-        float clampedRequestedHeal = math.max(0f, healConfig.HealAmount);
-        float clampedMissingHealth = math.max(0f, currentMissingHealth);
-        float totalHeal = math.min(clampedRequestedHeal, clampedMissingHealth);
-
-        if (totalHeal <= 0f)
-            return false;
-
-        float durationSeconds = math.max(0.05f, healConfig.DurationSeconds);
-        float tickIntervalSeconds = math.max(0.01f, healConfig.TickIntervalSeconds);
-        float healPerSecond = totalHeal / durationSeconds;
-        bool hasActiveHot = healOverTimeState.IsActive != 0;
-
-        switch (healConfig.StackPolicy)
-        {
-            case PowerUpHealStackPolicy.IgnoreIfActive:
-                if (hasActiveHot)
-                    return false;
-
-                break;
-            case PowerUpHealStackPolicy.Additive:
-                if (hasActiveHot)
-                {
-                    healOverTimeState.RemainingTotalHeal += totalHeal;
-                    healOverTimeState.RemainingDuration = math.max(healOverTimeState.RemainingDuration, durationSeconds);
-                    healOverTimeState.TickIntervalSeconds = math.min(healOverTimeState.TickIntervalSeconds, tickIntervalSeconds);
-                    healOverTimeState.HealPerSecond += healPerSecond;
-                    healOverTimeState.IsActive = 1;
-                    return true;
-                }
-
-                break;
-        }
-
-        healOverTimeState.IsActive = 1;
-        healOverTimeState.HealPerSecond = healPerSecond;
-        healOverTimeState.RemainingTotalHeal = totalHeal;
-        healOverTimeState.RemainingDuration = durationSeconds;
-        healOverTimeState.TickIntervalSeconds = tickIntervalSeconds;
-        healOverTimeState.TickTimer = 0f;
-        return true;
     }
     #endregion
 

@@ -72,6 +72,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             byte secondaryIsActive = powerUpsState.ValueRO.SecondaryIsActive;
             float primaryMaintenanceTickTimer = powerUpsState.ValueRO.PrimaryMaintenanceTickTimer;
             float secondaryMaintenanceTickTimer = powerUpsState.ValueRO.SecondaryMaintenanceTickTimer;
+            PowerUpConditionalApplicationRuntimeState primaryConditionalApplication = powerUpsState.ValueRO.PrimaryConditionalApplication;
+            PowerUpConditionalApplicationRuntimeState secondaryConditionalApplication = powerUpsState.ValueRO.SecondaryConditionalApplication;
             float toggleBulletTimeSlowPercent = 0f;
             float toggleBulletTimePlayerProjectileSlowPercent = 0f;
             float toggleBulletTimeTransitionTimeSeconds = 0f;
@@ -84,6 +86,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref primaryCooldownRemaining,
                                      ref primaryIsActive,
                                      ref primaryMaintenanceTickTimer,
+                                     ref primaryConditionalApplication,
                                      ref aggregatedPassiveToolsState,
                                      ref isShootingSuppressed,
                                      ref healthLookup,
@@ -104,6 +107,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                      ref secondaryCooldownRemaining,
                                      ref secondaryIsActive,
                                      ref secondaryMaintenanceTickTimer,
+                                     ref secondaryConditionalApplication,
                                      ref aggregatedPassiveToolsState,
                                      ref isShootingSuppressed,
                                      ref healthLookup,
@@ -130,6 +134,8 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             powerUpsState.ValueRW.SecondaryIsActive = secondaryIsActive;
             powerUpsState.ValueRW.PrimaryMaintenanceTickTimer = primaryMaintenanceTickTimer;
             powerUpsState.ValueRW.SecondaryMaintenanceTickTimer = secondaryMaintenanceTickTimer;
+            powerUpsState.ValueRW.PrimaryConditionalApplication = primaryConditionalApplication;
+            powerUpsState.ValueRW.SecondaryConditionalApplication = secondaryConditionalApplication;
             powerUpsState.ValueRW.IsShootingSuppressed = isShootingSuppressed;
 
             if (toggleBulletTimeSlowPercent <= 0f && currentBulletTimeState.ToggleSlowPercent > 0f)
@@ -161,6 +167,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
     /// <param name="cooldownRemaining">Mutable slot timer used as toggle startup lock while active.</param>
     /// <param name="isActive">Mutable toggle-active flag for the slot.</param>
     /// <param name="maintenanceTickTimer">Mutable accumulated maintenance timer.</param>
+    /// <param name="conditionalApplicationState">Mutable slot state retaining finite toggle lifetime alongside optional shot-condition state.</param>
     /// <param name="passiveToolsState">Aggregated passive state updated with the slot payload when active.</param>
     /// <param name="isShootingSuppressed">Mutable shared shooting suppression flag for the current player frame.</param>
     /// <param name="healthLookup">Health lookup used for non-energy maintenance costs.</param>
@@ -181,6 +188,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
                                                  ref float cooldownRemaining,
                                                  ref byte isActive,
                                                  ref float maintenanceTickTimer,
+                                                 ref PowerUpConditionalApplicationRuntimeState conditionalApplicationState,
                                                  ref PlayerPassiveToolsState passiveToolsState,
                                                  ref byte isShootingSuppressed,
                                                  ref ComponentLookup<PlayerHealth> healthLookup,
@@ -200,6 +208,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         {
             isActive = 0;
             maintenanceTickTimer = 0f;
+            conditionalApplicationState.ToggleActiveElapsedSeconds = 0f;
             StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
             return;
         }
@@ -208,6 +217,7 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         {
             isActive = 0;
             maintenanceTickTimer = 0f;
+            conditionalApplicationState.ToggleActiveElapsedSeconds = 0f;
             StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
             return;
         }
@@ -215,6 +225,18 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
         if (isActive == 0)
         {
             maintenanceTickTimer = 0f;
+            conditionalApplicationState.ToggleActiveElapsedSeconds = 0f;
+            return;
+        }
+
+        if (PlayerPowerUpToggleLifetimeUtility.Tick(slotConfig.MaximumToggleActiveDurationSeconds,
+                                                    deltaTime,
+                                                    ref conditionalApplicationState))
+        {
+            isActive = 0;
+            maintenanceTickTimer = 0f;
+            conditionalApplicationState.ToggleActiveElapsedSeconds = 0f;
+            StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
             return;
         }
 
@@ -238,10 +260,19 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
 
         StopMatchedGhostTrailIfDeactivated(in slotConfig, slotIndex, wasActive, isActive, ref ghostTrailState);
 
-        if (isActive == 0 || slotConfig.TogglePassiveTool.IsDefined == 0)
+        if (isActive == 0)
+        {
+            conditionalApplicationState.ToggleActiveElapsedSeconds = 0f;
+            return;
+        }
+
+        if (slotConfig.TogglePassiveTool.IsDefined == 0)
             return;
 
         PlayerPassiveToolConfig togglePassiveTool = slotConfig.TogglePassiveTool;
+
+        if (togglePassiveTool.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.None)
+            return;
 
         if (togglePassiveTool.HasBulletTime != 0 &&
             (togglePassiveTool.BulletTime.EnemySlowPercent > 0f ||
@@ -275,7 +306,9 @@ public partial struct PlayerPowerUpTogglePassiveSystem : ISystem
             togglePassiveTool.BulletTime = default;
         }
 
-        PlayerPassiveToolsAggregationUtility.AccumulatePassiveTool(ref passiveToolsState, in togglePassiveTool);
+        PlayerPassiveToolsAggregationUtility.AccumulateActiveTogglePassiveTool(ref passiveToolsState,
+                                                                                in togglePassiveTool,
+                                                                                slotIndex);
     }
 
     /// <summary>

@@ -455,6 +455,8 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.SwitchWeapon:
                 case PowerUpModuleKind.AttractDrops:
                 case PowerUpModuleKind.ReturningProjectiles:
+                case PowerUpModuleKind.DelayedShootApplication:
+                case PowerUpModuleKind.SuddenStrike:
                     return true;
                 default:
                     return false;
@@ -481,6 +483,14 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
             case PowerUpModuleKind.SwitchWeapon:
             case PowerUpModuleKind.AttractDrops:
             case PowerUpModuleKind.ReturningProjectiles:
+            case PowerUpModuleKind.DelayedShootApplication:
+            case PowerUpModuleKind.SuddenStrike:
+            case PowerUpModuleKind.SelfPreservationInstinct:
+            case PowerUpModuleKind.TriggerHoldCharge:
+            case PowerUpModuleKind.SpawnObject:
+            case PowerUpModuleKind.Dash:
+            case PowerUpModuleKind.ImpactFrame:
+            case PowerUpModuleKind.GhostTrail:
                 return true;
             default:
                 return false;
@@ -516,6 +526,9 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasSplit = moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit);
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
         bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
+        bool hasDelayedShootApplication = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication);
+        bool hasSuddenStrike = moduleKinds.Contains(PowerUpModuleKind.SuddenStrike);
+        bool hasSelfPreservationInstinct = moduleKinds.Contains(PowerUpModuleKind.SelfPreservationInstinct);
         bool hasIgnoredPassiveOnlyModules = hasTrail || hasOrbit || hasBounce || hasSplit || hasTriggerEvent;
         int primaryExecuteKindCount = 0;
 
@@ -566,6 +579,12 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (hasIgnoredPassiveOnlyModules)
             warningLines.Add("Passive-compatible modules are ignored in Active runtime unless GateResource Is Toggleable is enabled.");
 
+        if (hasDelayedShootApplication || hasSuddenStrike)
+            warningLines.Add("Delayed Shoot Application and Sudden Strike require a toggleable Resource Gate when used in Active Power Ups.");
+
+        if (hasSelfPreservationInstinct)
+            warningLines.Add("Self-Preservation Instinct is supported only in Passive Power Ups.");
+
         if (warningLines.Count <= 0)
             return string.Empty;
 
@@ -593,18 +612,20 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasLaserBeam = moduleKinds.Contains(PowerUpModuleKind.LaserBeam);
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
         bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
+        bool hasDelayedShootApplication = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication);
+        bool hasSuddenStrike = moduleKinds.Contains(PowerUpModuleKind.SuddenStrike);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
-        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction || hasReturningProjectiles;
+        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction || hasReturningProjectiles || hasDelayedShootApplication || hasSuddenStrike;
         List<string> ignoredActiveModules = new List<string>();
 
         if (!hasPassiveRuntimeConsumer)
             warningLines.Add("GateResource Is Toggleable requires at least one passive-compatible runtime module. This active power up compiles as undefined.");
 
-        if (moduleKinds.Contains(PowerUpModuleKind.TriggerHoldCharge))
+        if (moduleKinds.Contains(PowerUpModuleKind.TriggerHoldCharge) && !hasSuddenStrike)
             ignoredActiveModules.Add(PowerUpModuleEnumDescriptions.FormatModuleKindOption(PowerUpModuleKind.TriggerHoldCharge));
 
-        if (moduleKinds.Contains(PowerUpModuleKind.SpawnObject))
+        if (moduleKinds.Contains(PowerUpModuleKind.SpawnObject) && !hasSuddenStrike)
             ignoredActiveModules.Add(PowerUpModuleEnumDescriptions.FormatModuleKindOption(PowerUpModuleKind.SpawnObject));
 
         if (moduleKinds.Contains(PowerUpModuleKind.Dash))
@@ -621,6 +642,8 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
 
         if (hasTriggerEvent && !hasExplosion && !hasSplit && !hasHeal && !hasBulletTime)
             warningLines.Add("TriggerEvent has no toggleable-passive consumer without DeathExplosion, ProjectileSplit, Heal, or TimeDilationEnemies.");
+
+        AppendConditionalApplicationWarnings(moduleKinds, true, warningLines);
 
         if (warningLines.Count <= 0)
             return string.Empty;
@@ -714,7 +737,10 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasDropAttraction = moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
         bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
-        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasDropAttraction || hasReturningProjectiles;
+        bool hasConditionalApplication = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.SuddenStrike) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.SelfPreservationInstinct);
+        bool hasAnyPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasDropAttraction || hasReturningProjectiles || hasConditionalApplication;
 
         if (!hasAnyPassiveRuntimeConsumer)
             warningLines.Add("No passive runtime module found. This passive power up compiles as undefined.");
@@ -725,10 +751,107 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (hasGateResource && !hasHeal && !hasBulletTime)
             warningLines.Add("GateResource in Passive currently only contributes cooldown data to Heal and TimeDilationEnemies modules.");
 
+        AppendConditionalApplicationWarnings(moduleKinds, false, warningLines);
+
         if (warningLines.Count <= 0)
             return string.Empty;
 
         return string.Join("\n", warningLines);
+    }
+
+    /// <summary>
+    /// Appends composition warnings shared by passive and toggleable-active conditional application modules.
+    /// </summary>
+    /// <param name="moduleKinds">Enabled module kinds in the inspected power-up.</param>
+    /// <param name="isToggleableActive">True when the composition belongs to a toggleable active.</param>
+    /// <param name="warningLines">Mutable warning collection receiving compatibility diagnostics.</param>
+    private static void AppendConditionalApplicationWarnings(HashSet<PowerUpModuleKind> moduleKinds,
+                                                             bool isToggleableActive,
+                                                             List<string> warningLines)
+    {
+        if (moduleKinds == null || warningLines == null)
+            return;
+
+        bool hasDelayed = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication);
+        bool hasSudden = moduleKinds.Contains(PowerUpModuleKind.SuddenStrike);
+        bool hasSelfPreservation = moduleKinds.Contains(PowerUpModuleKind.SelfPreservationInstinct);
+        int conditionalModuleCount = (hasDelayed ? 1 : 0) + (hasSudden ? 1 : 0) + (hasSelfPreservation ? 1 : 0);
+        bool hasHoldCharge = moduleKinds.Contains(PowerUpModuleKind.TriggerHoldCharge);
+        bool hasResourceGate = moduleKinds.Contains(PowerUpModuleKind.GateResource);
+        bool hasDiscreteProjectileEffect = moduleKinds.Contains(PowerUpModuleKind.ProjectilesPatternCone) ||
+                                           moduleKinds.Contains(PowerUpModuleKind.OrbitalProjectiles) ||
+                                           moduleKinds.Contains(PowerUpModuleKind.BouncingProjectiles) ||
+                                           moduleKinds.Contains(PowerUpModuleKind.ProjectileSplit) ||
+                                           moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles) ||
+                                           moduleKinds.Contains(PowerUpModuleKind.CharacterTuning);
+        bool hasSpawnObject = moduleKinds.Contains(PowerUpModuleKind.SpawnObject);
+        bool hasShotIncompatibleEffect = moduleKinds.Contains(PowerUpModuleKind.Dash) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.Heal) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.DeathExplosion) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.SpawnTrailSegment) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.AreaTickApplyElement) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.TriggerEvent) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.OrbitalProjections) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.ImpactFrame) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.GhostTrail) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.AttractDrops) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.SwitchWeapon) ||
+                                         moduleKinds.Contains(PowerUpModuleKind.StateSuppressShooting);
+        bool hasSelfPreservationIncompatibleEffect = hasDiscreteProjectileEffect ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.DeathExplosion) ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.SpawnTrailSegment) ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.AreaTickApplyElement) ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.LaserBeam) ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.SwitchWeapon) ||
+                                                     moduleKinds.Contains(PowerUpModuleKind.StateSuppressShooting);
+        bool hasAutomaticActiveEffect = hasSpawnObject ||
+                                        moduleKinds.Contains(PowerUpModuleKind.Dash) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.TimeDilationEnemies) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.ImpactFrame) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.GhostTrail) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.Heal) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.OrbitalProjections) ||
+                                        moduleKinds.Contains(PowerUpModuleKind.AttractDrops);
+
+        if (conditionalModuleCount > 1)
+            warningLines.Add("Use only one conditional application module per power-up.");
+
+        if (hasDelayed && !hasDiscreteProjectileEffect)
+            warningLines.Add("Delayed Shoot Application requires at least one projectile module or Character Tuning payload to apply to qualified shots.");
+
+        if (hasDelayed && (hasHoldCharge || hasSpawnObject))
+            warningLines.Add("Delayed Shoot Application does not support Trigger Hold Charge or Spawn Object. Use Sudden Strike for that composition.");
+
+        if (hasSudden && !hasHoldCharge)
+            warningLines.Add("Sudden Strike requires Trigger Hold Charge.");
+
+        if (hasHoldCharge && !hasSudden)
+            warningLines.Add("Trigger Hold Charge is supported in a Passive or toggleable Active only when Sudden Strike is also present.");
+
+        if ((hasDelayed || hasSudden) && hasShotIncompatibleEffect)
+            warningLines.Add("Delayed Shoot Application and Sudden Strike accept per-shot projectile effects and Character Tuning; Sudden Strike also accepts Trigger Hold Charge by itself or with Spawn Object. Event-driven, timed, movement, presentation, trail, attraction, and weapon effects require another composition.");
+
+        if ((hasDelayed || hasSudden) && hasResourceGate && !isToggleableActive)
+            warningLines.Add("Resource Gate is valid with these shot conditions only when it makes an Active Power Up toggleable.");
+
+        if (hasSelfPreservation && isToggleableActive)
+            warningLines.Add("Self-Preservation Instinct is supported only in Passive Power Ups.");
+
+        if (hasSelfPreservation && (hasResourceGate || hasHoldCharge))
+            warningLines.Add("Self-Preservation Instinct cannot be combined with Resource Gate or Trigger Hold Charge.");
+
+        if (hasSelfPreservation && !hasAutomaticActiveEffect)
+            warningLines.Add("Self-Preservation Instinct requires at least one active-effect module such as Time Dilation Enemies, Heal, Spawn Object, Dash, Impact Frame, Ghost Trail, Orbital Projections, or Attract Drops.");
+
+        if (hasSelfPreservation && hasSelfPreservationIncompatibleEffect)
+            warningLines.Add("Self-Preservation Instinct accepts only automatic active-effect modules; projectile, laser, weapon-switch, trail, and shooting-suppression modules are not executed by its health trigger.");
+
+        if ((hasDelayed || hasSudden) && moduleKinds.Contains(PowerUpModuleKind.LaserBeam))
+            warningLines.Add("Conditional shot application supports discrete projectiles only; Laser Beam is continuous and is not applied by Delayed Shoot Application or Sudden Strike.");
+
+        if (hasSelfPreservation && moduleKinds.Contains(PowerUpModuleKind.CharacterTuning))
+            warningLines.Add("Self-Preservation Instinct does not execute Character Tuning. Use an automatic active-effect payload instead.");
     }
     #endregion
 

@@ -788,7 +788,7 @@ public sealed class PlayerPowerUpsPresetsPanel
             return;
         }
 
-        scheduleTarget.schedule.Execute(RefreshPresetSerializedChangeDependents);
+        scheduleTarget.schedule.Execute(RefreshPresetSerializedChangeDependents).StartingIn(120);
     }
 
     /// <summary>
@@ -801,26 +801,10 @@ public sealed class PlayerPowerUpsPresetsPanel
         if (selectedPreset == null)
             return;
 
-        if (activeSection == SectionType.Metadata || !RefreshSelectedPresetListItem())
+        if (activeSection == SectionType.Metadata)
             RefreshPresetList();
 
         PlayerManagementSelectionContext.NotifyPowerUpsPresetContentChanged();
-    }
-
-    /// <summary>
-    /// Rebinds the visible preset-list rows without rebuilding the whole filtered collection after non-metadata edits.
-    /// </summary>
-    /// <returns>True when the selected preset is still present in the current filtered list.</returns>
-    private bool RefreshSelectedPresetListItem()
-    {
-        if (listView == null || selectedPreset == null)
-            return false;
-
-        if (!filteredPresets.Contains(selectedPreset))
-            return false;
-
-        listView.RefreshItems();
-        return true;
     }
 
     /// <summary>

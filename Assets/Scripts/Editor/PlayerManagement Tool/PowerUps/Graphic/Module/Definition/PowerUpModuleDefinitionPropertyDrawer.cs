@@ -194,13 +194,15 @@ public sealed class PowerUpModuleDefinitionPropertyDrawer : PropertyDrawer
     /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
     /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
     /// <param name="showActiveProjectileConcurrencyOption">True when the owning active can expose concurrent projectile control.</param>
+    /// <param name="hasOwningResourceGate">True when active-only payload controls may reuse Resource Gate costs.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
                                           string payloadLabel,
                                           bool showActiveTriggerCharacterTuningOption = false,
                                           bool showToggleDurationOption = false,
-                                          bool showActiveProjectileConcurrencyOption = false)
+                                          bool showActiveProjectileConcurrencyOption = false,
+                                          bool hasOwningResourceGate = false)
     {
         PowerUpModuleDefinitionPayloadDrawerUtility.BuildPayloadEditor(payloadContainer,
                                                                       payloadProperty,
@@ -208,7 +210,8 @@ public sealed class PowerUpModuleDefinitionPropertyDrawer : PropertyDrawer
                                                                       payloadLabel,
                                                                       showActiveTriggerCharacterTuningOption,
                                                                       showToggleDurationOption,
-                                                                      showActiveProjectileConcurrencyOption);
+                                                                      showActiveProjectileConcurrencyOption,
+                                                                      hasOwningResourceGate);
     }
 
     /// <summary>

@@ -40,7 +40,28 @@ public enum PowerUpModuleKind
     SwitchWeapon = 22,
     GhostTrail = 23,
     AttractDrops = 24,
-    ReturningProjectiles = 25
+    ReturningProjectiles = 25,
+    DelayedShootApplication = 26,
+    SuddenStrike = 27,
+    SelfPreservationInstinct = 28
+}
+
+/// <summary>
+/// Selects the condition that accumulates automatic charge for a Sudden Strike power-up.
+/// </summary>
+public enum SuddenStrikeChargeConditionMode : byte
+{
+    Stationary = 0,
+    NotShooting = 1
+}
+
+/// <summary>
+/// Selects how a Self-Preservation Instinct health threshold is interpreted.
+/// </summary>
+public enum SelfPreservationHealthThresholdMode : byte
+{
+    MaximumHealthPercent = 0,
+    CurrentHealthValue = 1
 }
 
 public enum PowerUpTriggerEventType
@@ -85,6 +106,9 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.TriggerPress:
             case PowerUpModuleKind.TriggerRelease:
             case PowerUpModuleKind.TriggerHoldCharge:
+            case PowerUpModuleKind.DelayedShootApplication:
+            case PowerUpModuleKind.SuddenStrike:
+            case PowerUpModuleKind.SelfPreservationInstinct:
                 return PowerUpModuleStage.Trigger;
             case PowerUpModuleKind.TriggerEvent:
                 return PowerUpModuleStage.Hook;

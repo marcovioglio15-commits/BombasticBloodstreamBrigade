@@ -59,9 +59,21 @@ public sealed class PowerUpReturningProjectilesModuleData
     private int additionalOutboundHits = 1;
 
     [Header("Return Transition")]
+    [Tooltip("Selects whether return starts automatically after Return Delay or waits for an additional tap of the owning active power-up input. Activation Tap is applied only by Active power-ups.")]
+    [SerializeField]
+    private ProjectileReturnStartMode returnStartMode = ProjectileReturnStartMode.AutomaticDelay;
+
     [Tooltip("Seconds the projectile remains positionally stationary at its outbound endpoint before turnaround or direct return begins. Set to zero to disable the delay.")]
     [SerializeField]
     private float returnDelaySeconds;
+
+    [Tooltip("Allows the additional activation tap to recall active projectiles before they reach their outbound range or lifetime limit. Used only by Activation Tap mode.")]
+    [SerializeField]
+    private bool allowEarlyActivationRecall;
+
+    [Tooltip("Requires and consumes the Resource Gate activation cost again when the additional recall tap is accepted. Used only by Activation Tap mode when the owning Active contains Resource Gate.")]
+    [SerializeField]
+    private bool reapplyResourceGateCostOnRecall;
 
     [Tooltip("Additional return-start controller vibration as a multiplier of the configured firing rumble. Set to zero to disable this haptic pulse without affecting camera shake.")]
     [SerializeField]
@@ -109,6 +121,19 @@ public sealed class PowerUpReturningProjectilesModuleData
     [Tooltip("Enemy hits allowed during return after the projectile's natural penetration capacity has been exhausted. Used only by Limited Additional Hits.")]
     [SerializeField]
     private int additionalReturnHits = 1;
+
+    [Header("Repeated Contact Damage")]
+    [Tooltip("Enables a separate flat-damage tick while an enemy remains inside the projectile collision radius. The initial projectile hit keeps its normal damage and payload behavior.")]
+    [SerializeField]
+    private bool enableRepeatedContactDamage;
+
+    [Tooltip("Flat damage applied by each repeated contact tick. These ticks do not consume penetration or reactivate split and elemental hit payloads.")]
+    [SerializeField]
+    private float repeatedContactDamage = 1f;
+
+    [Tooltip("Seconds required between repeated damage ticks against the same enemy while contact remains uninterrupted.")]
+    [SerializeField]
+    private float repeatedContactDamageIntervalSeconds = 0.5f;
 
     [Header("Trajectory Precision")]
     [Tooltip("Minimum world-space distance between recorded outbound path points. Smaller values improve retrace precision and increase buffer usage.")]
@@ -167,7 +192,10 @@ public sealed class PowerUpReturningProjectilesModuleData
     public float OutboundLifetimeMultiplier => outboundLifetimeMultiplier;
     public ProjectileOutboundHitPolicy OutboundHitPolicy => outboundHitPolicy;
     public int AdditionalOutboundHits => additionalOutboundHits;
+    public ProjectileReturnStartMode ReturnStartMode => returnStartMode;
     public float ReturnDelaySeconds => returnDelaySeconds;
+    public bool AllowEarlyActivationRecall => allowEarlyActivationRecall;
+    public bool ReapplyResourceGateCostOnRecall => reapplyResourceGateCostOnRecall;
     public float ReturnRumbleMultiplier => returnRumbleMultiplier;
     public float ReturnCameraShakeMultiplier => returnCameraShakeMultiplier;
     public float OutboundSizeMultiplier => outboundSizeMultiplier;
@@ -179,6 +207,9 @@ public sealed class PowerUpReturningProjectilesModuleData
     public ProjectileReturnRotationAxis TurnaroundAxis => turnaroundAxis;
     public ProjectileReturnHitPolicy ReturnHitPolicy => returnHitPolicy;
     public int AdditionalReturnHits => additionalReturnHits;
+    public bool EnableRepeatedContactDamage => enableRepeatedContactDamage;
+    public float RepeatedContactDamage => repeatedContactDamage;
+    public float RepeatedContactDamageIntervalSeconds => repeatedContactDamageIntervalSeconds;
     public float PathSampleDistance => pathSampleDistance;
     public float ReturnCompletionDistance => returnCompletionDistance;
     public bool AllowOtherPowerUpInteractions => allowOtherPowerUpInteractions;
@@ -208,7 +239,10 @@ public sealed class PowerUpReturningProjectilesModuleData
     /// <param name="outboundLifetimeMultiplierValue">Outbound maximum-lifetime multiplier.</param>
     /// <param name="outboundHitPolicyValue">Enemy-impact termination policy used during outbound travel.</param>
     /// <param name="additionalOutboundHitsValue">Additional outbound hit budget used after natural penetration is exhausted.</param>
+    /// <param name="returnStartModeValue">Automatic-delay or additional-active-tap return trigger.</param>
     /// <param name="returnDelaySecondsValue">Stationary delay before turnaround or return.</param>
+    /// <param name="allowEarlyActivationRecallValue">Whether the additional active tap may recall outbound projectiles early.</param>
+    /// <param name="reapplyResourceGateCostOnRecallValue">Whether an accepted recall tap pays the Resource Gate activation cost again.</param>
     /// <param name="returnRumbleMultiplierValue">Return-start rumble multiplier relative to firing rumble.</param>
     /// <param name="returnCameraShakeMultiplierValue">Return-start camera-shake multiplier relative to firing shake.</param>
     /// <param name="outboundSizeMultiplierValue">Outbound scale multiplier.</param>
@@ -220,6 +254,9 @@ public sealed class PowerUpReturningProjectilesModuleData
     /// <param name="turnaroundAxisValue">Turnaround rotation axis.</param>
     /// <param name="returnHitPolicyValue">Return hit policy.</param>
     /// <param name="additionalReturnHitsValue">Additional return hit budget.</param>
+    /// <param name="enableRepeatedContactDamageValue">Whether uninterrupted projectile contacts apply separate periodic damage.</param>
+    /// <param name="repeatedContactDamageValue">Flat damage applied by each repeated contact tick.</param>
+    /// <param name="repeatedContactDamageIntervalSecondsValue">Seconds between repeated ticks against the same enemy.</param>
     /// <param name="pathSampleDistanceValue">Path sampling distance.</param>
     /// <param name="returnCompletionDistanceValue">Return completion distance.</param>
     /// <param name="allowOtherPowerUpInteractionsValue">Whether interaction policies may include modules owned by other power-ups.</param>
@@ -241,7 +278,10 @@ public sealed class PowerUpReturningProjectilesModuleData
                           float outboundLifetimeMultiplierValue,
                           ProjectileOutboundHitPolicy outboundHitPolicyValue,
                           int additionalOutboundHitsValue,
+                          ProjectileReturnStartMode returnStartModeValue,
                           float returnDelaySecondsValue,
+                          bool allowEarlyActivationRecallValue,
+                          bool reapplyResourceGateCostOnRecallValue,
                           float returnRumbleMultiplierValue,
                           float returnCameraShakeMultiplierValue,
                           float outboundSizeMultiplierValue,
@@ -253,6 +293,9 @@ public sealed class PowerUpReturningProjectilesModuleData
                           ProjectileReturnRotationAxis turnaroundAxisValue,
                           ProjectileReturnHitPolicy returnHitPolicyValue,
                           int additionalReturnHitsValue,
+                          bool enableRepeatedContactDamageValue,
+                          float repeatedContactDamageValue,
+                          float repeatedContactDamageIntervalSecondsValue,
                           float pathSampleDistanceValue,
                           float returnCompletionDistanceValue,
                           bool allowOtherPowerUpInteractionsValue,
@@ -275,7 +318,10 @@ public sealed class PowerUpReturningProjectilesModuleData
         outboundLifetimeMultiplier = outboundLifetimeMultiplierValue;
         outboundHitPolicy = outboundHitPolicyValue;
         additionalOutboundHits = additionalOutboundHitsValue;
+        returnStartMode = returnStartModeValue;
         returnDelaySeconds = returnDelaySecondsValue;
+        allowEarlyActivationRecall = allowEarlyActivationRecallValue;
+        reapplyResourceGateCostOnRecall = reapplyResourceGateCostOnRecallValue;
         returnRumbleMultiplier = returnRumbleMultiplierValue;
         returnCameraShakeMultiplier = returnCameraShakeMultiplierValue;
         outboundSizeMultiplier = outboundSizeMultiplierValue;
@@ -287,6 +333,9 @@ public sealed class PowerUpReturningProjectilesModuleData
         turnaroundAxis = turnaroundAxisValue;
         returnHitPolicy = returnHitPolicyValue;
         additionalReturnHits = additionalReturnHitsValue;
+        enableRepeatedContactDamage = enableRepeatedContactDamageValue;
+        repeatedContactDamage = repeatedContactDamageValue;
+        repeatedContactDamageIntervalSeconds = repeatedContactDamageIntervalSecondsValue;
         pathSampleDistance = pathSampleDistanceValue;
         returnCompletionDistance = returnCompletionDistanceValue;
         allowOtherPowerUpInteractions = allowOtherPowerUpInteractionsValue;

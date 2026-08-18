@@ -45,7 +45,7 @@ public sealed class PowerUpHoldChargeModuleData
     [SerializeField] private bool ignoreInheritedPlayerVelocityZ;
 
     [Header("Charged Laser Beam")]
-    [Tooltip("When enabled, a fully charged release fires a standalone Laser Beam instead of projectile requests. This beam ignores passive tools and other power-up hooks.")]
+    [Tooltip("When enabled, a normal fully charged release fires a standalone Laser Beam instead of projectile requests. With Sudden Strike, the beam fires alongside the qualifying base shot. It ignores unrelated passive tools and power-up hooks.")]
     [SerializeField] private bool useChargedLaserBeam;
 
     [Tooltip("Seconds for which the standalone charged Laser Beam remains active after a fully charged release.")]
@@ -397,6 +397,10 @@ public sealed class PowerUpResourceGateModuleData
 
     [Tooltip("When enabled, the toggleable power-up can recharge energy during the startup interval defined by Cooldown Seconds.")]
     [SerializeField] private bool allowRechargeDuringToggleStartupLock;
+
+    [Tooltip("Maximum seconds a toggleable power-up may remain active before it switches off automatically. Zero keeps the toggle active until input, interruption, or resource failure deactivates it.")]
+    [SerializeField]
+    private float maximumToggleActiveDurationSeconds;
     #endregion
 
     #endregion
@@ -497,6 +501,14 @@ public sealed class PowerUpResourceGateModuleData
             return allowRechargeDuringToggleStartupLock;
         }
     }
+
+    public float MaximumToggleActiveDurationSeconds
+    {
+        get
+        {
+            return maximumToggleActiveDurationSeconds;
+        }
+    }
     #endregion
 
     #region Methods
@@ -562,6 +574,51 @@ public sealed class PowerUpResourceGateModuleData
                           float maintenanceTicksPerSecondValue,
                           bool allowRechargeDuringToggleStartupLockValue)
     {
+        Configure(activationResourceValue,
+                  maintenanceResourceValue,
+                  maximumEnergyValue,
+                  activationCostValue,
+                  maintenanceCostPerSecondValue,
+                  minimumActivationEnergyPercentValue,
+                  chargeTypeValue,
+                  chargePerTriggerValue,
+                  cooldownSecondsValue,
+                  isToggleableValue,
+                  maintenanceTicksPerSecondValue,
+                  allowRechargeDuringToggleStartupLockValue,
+                  0f);
+    }
+
+    /// <summary>
+    /// Assigns resource, toggle-maintenance, and optional finite-lifetime settings without mutating invalid authored values.
+    /// </summary>
+    /// <param name="activationResourceValue">Resource charged when activation succeeds.</param>
+    /// <param name="maintenanceResourceValue">Resource charged while the toggle remains active.</param>
+    /// <param name="maximumEnergyValue">Maximum internal energy capacity.</param>
+    /// <param name="activationCostValue">Resource amount charged on activation.</param>
+    /// <param name="maintenanceCostPerSecondValue">Resource amount charged per active second.</param>
+    /// <param name="minimumActivationEnergyPercentValue">Minimum energy percentage required for activation.</param>
+    /// <param name="chargeTypeValue">Runtime event used to recharge energy.</param>
+    /// <param name="chargePerTriggerValue">Energy restored by each recharge trigger.</param>
+    /// <param name="cooldownSecondsValue">Cooldown or toggle startup-lock duration.</param>
+    /// <param name="isToggleableValue">Whether activation switches persistent compatible effects on and off.</param>
+    /// <param name="maintenanceTicksPerSecondValue">Number of maintenance payments attempted per second.</param>
+    /// <param name="allowRechargeDuringToggleStartupLockValue">Whether recharge remains enabled during the startup lock.</param>
+    /// <param name="maximumToggleActiveDurationSecondsValue">Maximum active lifetime, or zero for no time limit.</param>
+    public void Configure(PowerUpResourceType activationResourceValue,
+                          PowerUpResourceType maintenanceResourceValue,
+                          float maximumEnergyValue,
+                          float activationCostValue,
+                          float maintenanceCostPerSecondValue,
+                          float minimumActivationEnergyPercentValue,
+                          PowerUpChargeType chargeTypeValue,
+                          float chargePerTriggerValue,
+                          float cooldownSecondsValue,
+                          bool isToggleableValue,
+                          float maintenanceTicksPerSecondValue,
+                          bool allowRechargeDuringToggleStartupLockValue,
+                          float maximumToggleActiveDurationSecondsValue)
+    {
         activationResource = activationResourceValue;
         maintenanceResource = maintenanceResourceValue;
         maximumEnergy = maximumEnergyValue;
@@ -574,6 +631,7 @@ public sealed class PowerUpResourceGateModuleData
         chargePerTrigger = chargePerTriggerValue;
         cooldownSeconds = cooldownSecondsValue;
         allowRechargeDuringToggleStartupLock = allowRechargeDuringToggleStartupLockValue;
+        maximumToggleActiveDurationSeconds = maximumToggleActiveDurationSecondsValue;
     }
     #endregion
 

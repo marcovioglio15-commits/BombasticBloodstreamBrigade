@@ -17,6 +17,21 @@ public sealed class PowerUpModuleData
     [Tooltip("Event trigger settings used by TriggerEvent modules.")]
     [SerializeField] private PowerUpTriggerEventModuleData triggerEvent = new PowerUpTriggerEventModuleData();
 
+    [Header("Trigger - Delayed Shoot Application")]
+    [Tooltip("Discrete shot-cadence settings used by DelayedShootApplication modules.")]
+    [SerializeField]
+    private PowerUpDelayedShootApplicationModuleData delayedShootApplication = new PowerUpDelayedShootApplicationModuleData();
+
+    [Header("Trigger - Sudden Strike")]
+    [Tooltip("Automatic charge-condition settings used by SuddenStrike modules.")]
+    [SerializeField]
+    private PowerUpSuddenStrikeModuleData suddenStrike = new PowerUpSuddenStrikeModuleData();
+
+    [Header("Trigger - Self-Preservation Instinct")]
+    [Tooltip("Health-threshold settings used by SelfPreservationInstinct modules.")]
+    [SerializeField]
+    private PowerUpSelfPreservationInstinctModuleData selfPreservationInstinct = new PowerUpSelfPreservationInstinctModuleData();
+
     [Header("Gate - Resource")]
     [Tooltip("Resource-gate settings used by GateResource modules.")]
     [SerializeField] private PowerUpResourceGateModuleData resourceGate = new PowerUpResourceGateModuleData();
@@ -135,6 +150,30 @@ public sealed class PowerUpModuleData
         get
         {
             return triggerEvent;
+        }
+    }
+
+    public PowerUpDelayedShootApplicationModuleData DelayedShootApplication
+    {
+        get
+        {
+            return delayedShootApplication;
+        }
+    }
+
+    public PowerUpSuddenStrikeModuleData SuddenStrike
+    {
+        get
+        {
+            return suddenStrike;
+        }
+    }
+
+    public PowerUpSelfPreservationInstinctModuleData SelfPreservationInstinct
+    {
+        get
+        {
+            return selfPreservationInstinct;
         }
     }
 
@@ -321,6 +360,15 @@ public sealed class PowerUpModuleData
         if (triggerEvent == null)
             triggerEvent = new PowerUpTriggerEventModuleData();
 
+        if (delayedShootApplication == null)
+            delayedShootApplication = new PowerUpDelayedShootApplicationModuleData();
+
+        if (suddenStrike == null)
+            suddenStrike = new PowerUpSuddenStrikeModuleData();
+
+        if (selfPreservationInstinct == null)
+            selfPreservationInstinct = new PowerUpSelfPreservationInstinctModuleData();
+
         if (suppressShooting == null)
             suppressShooting = new PowerUpSuppressShootingModuleData();
 
@@ -386,6 +434,9 @@ public sealed class PowerUpModuleData
 
         holdCharge.Validate();
         resourceGate.Validate();
+        delayedShootApplication.Validate();
+        suddenStrike.Validate();
+        selfPreservationInstinct.Validate();
         projectilePatternCone.Validate();
         characterTuning.Validate();
         bomb.Validate();

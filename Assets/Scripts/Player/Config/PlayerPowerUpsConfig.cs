@@ -46,6 +46,7 @@ public struct PlayerPowerUpSlotConfig
     public float ActivationCost;
     public float MaintenanceCostPerSecond;
     public float MaintenanceTicksPerSecond;
+    public float MaximumToggleActiveDurationSeconds;
     public float ChargePerTrigger;
     public float CooldownSeconds;
     public PowerUpActivationInputMode ActivationInputMode;
@@ -337,7 +338,10 @@ public struct ReturningProjectilesConfig
     public float OutboundLifetimeMultiplier;
     public ProjectileOutboundHitPolicy OutboundHitPolicy;
     public int AdditionalOutboundHits;
+    public ProjectileReturnStartMode ReturnStartMode;
     public float ReturnDelaySeconds;
+    public byte AllowEarlyActivationRecall;
+    public byte ReapplyResourceGateCostOnRecall;
     public float ReturnRumbleMultiplier;
     public float ReturnCameraShakeMultiplier;
     public float OutboundSizeMultiplier;
@@ -349,6 +353,9 @@ public struct ReturningProjectilesConfig
     public ProjectileReturnRotationAxis TurnaroundAxis;
     public ProjectileReturnHitPolicy ReturnHitPolicy;
     public int AdditionalReturnHits;
+    public byte EnableRepeatedContactDamage;
+    public float RepeatedContactDamage;
+    public float RepeatedContactDamageIntervalSeconds;
     public float PathSampleDistance;
     public float ReturnCompletionDistance;
     public byte AllowOtherPowerUpInteractions;
@@ -408,6 +415,47 @@ public struct PassiveBulletTimeConfig
     public float EnemySlowPercent;
     public float PlayerProjectileSlowPercent;
     public float TransitionTimeSeconds;
+}
+
+/// <summary>
+/// Identifies how one passive-compatible power-up defers or automatically executes its sibling effects.
+/// </summary>
+public enum PowerUpConditionalApplicationMode : byte
+{
+    None = 0,
+    DelayedShootApplication = 1,
+    SuddenStrike = 2,
+    SelfPreservationInstinct = 3,
+    InvalidComposition = 4
+}
+
+/// <summary>
+/// Stores baked conditional application settings plus active-only payloads not represented by standard passive fields.
+/// </summary>
+public struct PowerUpConditionalApplicationConfig
+{
+    public PowerUpConditionalApplicationMode Mode;
+    public int DelayedShotInterval;
+    public SuddenStrikeChargeConditionMode SuddenStrikeConditionMode;
+    public byte CountRotationAsMovement;
+    public float StationarySpeedTolerance;
+    public float StationaryRotationToleranceDegrees;
+    public byte ApplyChargeMovementSlow;
+    public float MovementSlowRecoverySeconds;
+    public ChargeShotPowerUpConfig HoldCharge;
+    public SelfPreservationHealthThresholdMode HealthThresholdMode;
+    public float HealthThreshold;
+    public byte HasSpawnObject;
+    public Entity SpawnObjectPrefabEntity;
+    public BombPowerUpConfig SpawnObject;
+    public byte HasDash;
+    public DashPowerUpConfig Dash;
+    public byte HasHeal;
+    public PortableHealthPackPowerUpConfig Heal;
+    public byte HasImpactFrame;
+    public ImpactFramePowerUpConfig ImpactFrame;
+    public byte HasGhostTrail;
+    public GhostTrailPowerUpConfig GhostTrail;
 }
 
 /// <summary>
@@ -495,6 +543,7 @@ public struct PlayerPassiveToolConfig
     public PassiveBulletTimeConfig BulletTime;
     public LaserBeamPassiveConfig LaserBeam;
     public FixedList4096Bytes<OrbitalProjectionConfig> OrbitalProjections;
+    public PowerUpConditionalApplicationConfig ConditionalApplication;
 }
 
 /// <summary>
@@ -546,6 +595,7 @@ public struct EquippedPassiveToolElement : IBufferElementData
 {
     public FixedString64Bytes PowerUpId;
     public PlayerPassiveToolConfig Tool;
+    public PowerUpConditionalApplicationRuntimeState ConditionalApplicationState;
 }
 
 /// <summary>

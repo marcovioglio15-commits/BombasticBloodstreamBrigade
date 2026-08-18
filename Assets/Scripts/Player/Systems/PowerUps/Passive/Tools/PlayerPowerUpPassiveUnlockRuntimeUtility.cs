@@ -482,6 +482,7 @@ internal static class PlayerPowerUpPassiveUnlockRuntimeUtility
         ref EquippedPassiveToolElement equippedPassiveTool = ref equippedPassiveTools.ElementAt(passiveIndex);
         equippedPassiveTool.PowerUpId = powerUpId;
         equippedPassiveTool.Tool = passiveToolConfig;
+        equippedPassiveTool.ConditionalApplicationState = default;
     }
 
     /// <summary>

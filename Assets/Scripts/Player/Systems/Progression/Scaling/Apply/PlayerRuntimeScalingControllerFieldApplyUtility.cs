@@ -275,6 +275,9 @@ internal static class PlayerRuntimeScalingControllerFieldApplyUtility
                 runtimeShooting.Values.Damage = math.max(0f, resolvedValue);
                 return;
             case PlayerRuntimeControllerFieldId.ShootingAppliedElement:
+                if (!runtimeAppliedElementSlots.IsCreated)
+                    return;
+
                 PlayerElementBulletSettingsUtility.SetAppliedElementAt(runtimeAppliedElementSlots,
                                                                       0,
                                                                       PlayerRuntimeScalingEnumUtility.ResolvePlayerProjectileAppliedElement(resolvedValue));

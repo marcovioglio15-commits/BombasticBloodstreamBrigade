@@ -356,6 +356,34 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         duplicateButton.tooltip = "Duplicate this module binding.";
         actionsRow.Add(duplicateButton);
 
+        Button copyPayloadButton = new Button(() =>
+        {
+            PowerUpModulePayloadClipboardUtility.CopyBindingPayload(powerUpProperty, bindingIndex);
+        });
+        copyPayloadButton.text = "Copy Payload";
+        copyPayloadButton.tooltip = "Copy this binding's effective payload. Module defaults are used when its override is disabled.";
+        copyPayloadButton.style.marginLeft = 4f;
+        actionsRow.Add(copyPayloadButton);
+
+        Button pastePayloadButton = new Button(() =>
+        {
+            ScheduleBindingMutation(cardsContainer, () =>
+            {
+                if (!PowerUpModulePayloadClipboardUtility.PasteBindingPayload(powerUpProperty, bindingIndex))
+                    return;
+
+                powerUpProperty.serializedObject.Update();
+                RebuildBindingsCards(powerUpProperty, cardsContainer, countLabel);
+            });
+        });
+        pastePayloadButton.text = "Paste Payload";
+        pastePayloadButton.tooltip = "Paste the copied payload into this binding and enable its override. This is enabled only for the same module kind.";
+        pastePayloadButton.style.marginLeft = 4f;
+        actionsRow.Add(pastePayloadButton);
+        PowerUpModulePayloadClipboardUtility.TrackPasteAvailability(pastePayloadButton,
+                                                                     () => PowerUpModulePayloadClipboardUtility.ResolveBindingKind(powerUpProperty,
+                                                                                                                                   bindingIndex));
+
         Button moveUpButton = new Button(() =>
         {
             ScheduleBindingMutation(cardsContainer, () =>

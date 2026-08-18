@@ -56,6 +56,9 @@ public static class PlayerRuntimeScalingControllerElementFieldUtility
     {
         if (fieldId == PlayerRuntimeControllerFieldId.ShootingAppliedElementDynamicSlot)
         {
+            if (!runtimeAppliedElements.IsCreated)
+                return true;
+
             PlayerProjectileAppliedElement appliedElement = PlayerRuntimeScalingEnumUtility.ResolvePlayerProjectileAppliedElement(resolvedValue);
             PlayerElementBulletSettingsUtility.SetAppliedElementAt(runtimeAppliedElements, slotIndex, appliedElement);
             return true;

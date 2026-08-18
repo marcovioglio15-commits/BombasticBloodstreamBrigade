@@ -38,6 +38,14 @@ public partial struct PlayerShootingIntentSystem : ISystem
         state.RequireForUpdate<PlayerRuntimeShootingAppliedElementSlot>();
         state.RequireForUpdate<ShooterProjectilePrefab>();
         state.RequireForUpdate<ShootRequest>();
+        state.RequireForUpdate<EquippedPassiveToolElement>();
+        state.RequireForUpdate<PlayerPowerUpsConfigElement>();
+        state.RequireForUpdate<PlayerBombSpawnRequest>();
+        state.RequireForUpdate<PlayerLaserBeamState>();
+        state.RequireForUpdate<PlayerPowerUpUnlockCatalogElement>();
+        state.RequireForUpdate<PlayerPowerUpCharacterTuningFormulaElement>();
+        state.RequireForUpdate<PlayerScalableStatElement>();
+        state.RequireForUpdate<PlayerRuntimeControllerScalingElement>();
     }
 
     /// <summary>
@@ -52,8 +60,21 @@ public partial struct PlayerShootingIntentSystem : ISystem
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
-        ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true);
+        BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
+        BufferLookup<EquippedPassiveToolElement> equippedPassiveToolsLookup = SystemAPI.GetBufferLookup<EquippedPassiveToolElement>(false);
+        BufferLookup<PlayerBombSpawnRequest> bombRequestsLookup = SystemAPI.GetBufferLookup<PlayerBombSpawnRequest>(false);
+        BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(true);
+        BufferLookup<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulasLookup = SystemAPI.GetBufferLookup<PlayerPowerUpCharacterTuningFormulaElement>(true);
+        BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
+        BufferLookup<PlayerRuntimeControllerScalingElement> controllerScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimeControllerScalingElement>(true);
+        BufferLookup<PlayerRoomRewardTemporaryModifierElement> temporaryModifiersLookup = SystemAPI.GetBufferLookup<PlayerRoomRewardTemporaryModifierElement>(true);
+        BufferLookup<PlayerRuntimeComboRankElement> runtimeComboRanksLookup = SystemAPI.GetBufferLookup<PlayerRuntimeComboRankElement>(true);
+        ComponentLookup<PlayerRoomRewardTemporaryState> temporaryStateLookup = SystemAPI.GetComponentLookup<PlayerRoomRewardTemporaryState>(true);
+        ComponentLookup<PlayerRuntimeComboCounterConfig> runtimeComboConfigLookup = SystemAPI.GetComponentLookup<PlayerRuntimeComboCounterConfig>(true);
+        ComponentLookup<PlayerComboCounterState> comboStateLookup = SystemAPI.GetComponentLookup<PlayerComboCounterState>(true);
+        ComponentLookup<PlayerLaserBeamState> laserBeamStateLookup = SystemAPI.GetComponentLookup<PlayerLaserBeamState>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
@@ -75,7 +96,11 @@ public partial struct PlayerShootingIntentSystem : ISystem
                                                    RefRW<PlayerShootingState>,
                                                    DynamicBuffer<ShootRequest>>().WithEntityAccess())
         {
+            if (!powerUpsStateLookup.HasComponent(entity))
+                continue;
+
             DynamicBuffer<ShootRequest> mutableShootRequests = shootRequests;
+            PlayerPowerUpsState powerUpsState = powerUpsStateLookup[entity];
 
             // if shooting is disabled in the config, skip processing shooting logic for this player
             PlayerRuntimeShootingConfig shootingConfig = runtimeShootingConfig.ValueRO;
@@ -84,31 +109,7 @@ public partial struct PlayerShootingIntentSystem : ISystem
             ResolvePassiveToolsState(entity,
                                      in passiveToolsLookup,
                                      out passiveToolsState);
-            ElementalEffectConfig unusedElementalEffect = default;
-            bool isShootingSuppressed = false;
-
-            if (powerUpsStateLookup.HasComponent(entity))
-                isShootingSuppressed = powerUpsStateLookup[entity].IsShootingSuppressed != 0;
-
-            PlayerProjectileRequestTemplate projectileTemplate = PlayerProjectileRequestUtility.BuildProjectileTemplate(in shootingConfig,
-                                                                                                                         appliedElementSlots,
-                                                                                                                         in passiveToolsState,
-                                                                                                                         1f,
-                                                                                                                         1f,
-                                                                                                                         1f,
-                                                                                                                         1f,
-                                                                                                                         1f,
-                                                                                                                         false,
-                                                                                                                         in unusedElementalEffect,
-                                                                                                                         0f);
-            bool hasPassiveShotgunPayload = passiveToolsState.HasShotgun != 0;
-            int passiveShotgunProjectileCount = hasPassiveShotgunPayload ? math.max(1, passiveToolsState.Shotgun.ProjectileCount) : 1;
-            float passiveShotgunConeAngle = hasPassiveShotgunPayload ? math.max(0f, passiveToolsState.Shotgun.ConeAngleDegrees) : 0f;
-            PlayerProjectileRequestUtility.ResolvePenetrationSettings(in values,
-                                                                      ProjectilePenetrationMode.None,
-                                                                      0,
-                                                                      out ProjectilePenetrationMode basePenetrationMode,
-                                                                      out int baseMaxPenetrations);
+            bool isShootingSuppressed = powerUpsState.IsShootingSuppressed != 0;
             bool isShootPressed = inputState.ValueRO.Shoot > 0.5f;
             bool usesAutomaticLatch = shootingConfig.TriggerMode == ShootingTriggerMode.AutomaticToggle;
 
@@ -127,7 +128,7 @@ public partial struct PlayerShootingIntentSystem : ISystem
             }
 
             // if rate of fire or shoot speed is zero or negative, treat as shooting disabled and skip shooting logic
-            if (values.RateOfFire <= 0f || projectileTemplate.Speed <= 0f)
+            if (values.RateOfFire <= 0f || values.ShootSpeed <= 0f)
             {
                 shootingState.ValueRW.PreviousShootPressed = isShootPressed ? (byte)1 : (byte)0;
                 RefreshVisualShootingState(ref shootingState.ValueRW, false, elapsedTime);
@@ -189,33 +190,132 @@ public partial struct PlayerShootingIntentSystem : ISystem
             if (shotsToFire <= 0)
                 continue;
 
+            if (!powerUpsConfigLookup.HasBuffer(entity) ||
+                !equippedPassiveToolsLookup.HasBuffer(entity) ||
+                !bombRequestsLookup.HasBuffer(entity) ||
+                !unlockCatalogLookup.HasBuffer(entity) ||
+                !characterTuningFormulasLookup.HasBuffer(entity) ||
+                !scalableStatsLookup.HasBuffer(entity) ||
+                !controllerScalingLookup.HasBuffer(entity) ||
+                !laserBeamStateLookup.HasComponent(entity))
+                continue;
+
             // compute the shoot direction based on the player's look direction,
             // falling back to their forward direction if the look direction is zero
             float3 shootDirection = PlayerProjectileRequestUtility.ResolveShootDirection(in lookState.ValueRO, in localTransform.ValueRO);
-            float3 spawnPosition = PlayerProjectileRequestUtility.ResolveShootSpawnPosition(entity,
-                                                                                           in localTransform.ValueRO,
-                                                                                           in shootingConfig,
-                                                                                           in muzzleLookup,
-                                                                                           in transformLookup,
-                                                                                           in localToWorldLookup);
+            PlayerPowerUpsConfig powerUpsConfig;
+            PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigLookup[entity], out powerUpsConfig);
+            DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup[entity];
+            DynamicBuffer<PlayerBombSpawnRequest> bombRequests = bombRequestsLookup[entity];
+            DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog = unlockCatalogLookup[entity];
+            DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas = characterTuningFormulasLookup[entity];
+            DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
+            DynamicBuffer<PlayerRuntimeControllerScalingElement> controllerScaling = controllerScalingLookup[entity];
+            DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers = temporaryModifiersLookup.HasBuffer(entity)
+                ? temporaryModifiersLookup[entity]
+                : default;
+            DynamicBuffer<PlayerRuntimeComboRankElement> runtimeComboRanks = runtimeComboRanksLookup.HasBuffer(entity)
+                ? runtimeComboRanksLookup[entity]
+                : default;
+            PlayerRoomRewardTemporaryState temporaryState = temporaryStateLookup.HasComponent(entity)
+                ? temporaryStateLookup[entity]
+                : default;
+            PlayerRuntimeComboCounterConfig runtimeComboConfig = runtimeComboConfigLookup.HasComponent(entity)
+                ? runtimeComboConfigLookup[entity]
+                : default;
+            PlayerComboCounterState comboState = comboStateLookup.HasComponent(entity)
+                ? comboStateLookup[entity]
+                : default;
+            PlayerConditionalCharacterTuningContext conditionalCharacterTuningContext = new PlayerConditionalCharacterTuningContext(unlockCatalog,
+                                                                                                                                    characterTuningFormulas,
+                                                                                                                                    scalableStats,
+                                                                                                                                    controllerScaling,
+                                                                                                                                    temporaryModifiers,
+                                                                                                                                    in temporaryState,
+                                                                                                                                    runtimeComboRanks,
+                                                                                                                                    in runtimeComboConfig,
+                                                                                                                                    in comboState);
+            PlayerLaserBeamState laserBeamState = laserBeamStateLookup[entity];
+            ElementalEffectConfig unusedElementalEffect = default;
 
             // enqueue the appropriate number of shoot requests with the resolved spawn position,
             // shoot direction, and shooting parameters from the config
             for (int shotIndex = 0; shotIndex < shotsToFire; shotIndex++)
             {
+                PlayerPassiveToolsState shotPassiveToolsState = passiveToolsState;
+                PlayerRuntimeShootingConfig shotShootingConfig = shootingConfig;
+                bool conditionalShotContextInitialized = false;
+                PlayerConditionalShotEffectRuntimeUtility.AccumulateQualifiedEffects(equippedPassiveTools,
+                                                                                     in powerUpsConfig,
+                                                                                     ref powerUpsState,
+                                                                                     in localTransform.ValueRO,
+                                                                                     in lookState.ValueRO,
+                                                                                     in shootingConfig,
+                                                                                     in conditionalCharacterTuningContext,
+                                                                                     ref conditionalShotContextInitialized,
+                                                                                     ref shotShootingConfig,
+                                                                                     appliedElementSlots,
+                                                                                     entity,
+                                                                                     bombRequests,
+                                                                                     ref laserBeamState,
+                                                                                     ref shotPassiveToolsState);
+                float3 spawnPosition = PlayerProjectileRequestUtility.ResolveShootSpawnPosition(entity,
+                                                                                               in localTransform.ValueRO,
+                                                                                               in shotShootingConfig,
+                                                                                               in muzzleLookup,
+                                                                                               in transformLookup,
+                                                                                               in localToWorldLookup);
+                bool hasPassiveShotgunPayload = shotPassiveToolsState.HasShotgun != 0;
+                int passiveShotgunProjectileCount = hasPassiveShotgunPayload
+                    ? math.max(1, shotPassiveToolsState.Shotgun.ProjectileCount)
+                    : 1;
+                float passiveShotgunConeAngle = hasPassiveShotgunPayload
+                    ? math.max(0f, shotPassiveToolsState.Shotgun.ConeAngleDegrees)
+                    : 0f;
+                PlayerProjectileRequestUtility.ResolvePenetrationSettings(in shotShootingConfig.Values,
+                                                                          hasPassiveShotgunPayload
+                                                                              ? shotPassiveToolsState.Shotgun.PenetrationMode
+                                                                              : ProjectilePenetrationMode.None,
+                                                                          hasPassiveShotgunPayload
+                                                                              ? shotPassiveToolsState.Shotgun.MaxPenetrations
+                                                                              : 0,
+                                                                          out ProjectilePenetrationMode penetrationMode,
+                                                                          out int maxPenetrations);
+                PlayerProjectileRequestTemplate projectileTemplate = PlayerProjectileRequestUtility.BuildProjectileTemplate(in shotShootingConfig,
+                                                                                                                             appliedElementSlots,
+                                                                                                                             in shotPassiveToolsState,
+                                                                                                                             1f,
+                                                                                                                             1f,
+                                                                                                                             1f,
+                                                                                                                             1f,
+                                                                                                                             1f,
+                                                                                                                             false,
+                                                                                                                             in unusedElementalEffect,
+                                                                                                                             0f);
+                ProjectileShotModifierConfig shotModifiers = PlayerProjectileRequestUtility.BuildShotModifierConfig(in shotPassiveToolsState);
                 PlayerProjectileRequestUtility.AddSpreadRequests(ref mutableShootRequests,
                                                                  passiveShotgunProjectileCount,
                                                                  passiveShotgunConeAngle,
                                                                  spawnPosition,
                                                                  shootDirection,
                                                                  in projectileTemplate,
-                                                                 basePenetrationMode,
-                                                                 baseMaxPenetrations,
-                                                                 0);
+                                                                 penetrationMode,
+                                                                 maxPenetrations,
+                                                                 0,
+                                                                 ProjectileSpawnSource.BaseShot,
+                                                                 shotPassiveToolsState.HasReturningProjectilesActiveSlotOwner != 0
+                                                                     ? shotPassiveToolsState.ReturningProjectilesActiveSlotIndex
+                                                                     : byte.MaxValue,
+                                                                 shotPassiveToolsState.HasReturningProjectiles,
+                                                                 shotPassiveToolsState.ReturningProjectiles,
+                                                                 shotModifiers);
 
                 if (canEnqueueAudioRequests)
                     GameAudioEventRequestUtility.EnqueuePositioned(audioRequests, GameAudioEventId.PlayerShootProjectile, spawnPosition);
             }
+
+            powerUpsStateLookup[entity] = powerUpsState;
+            laserBeamStateLookup[entity] = laserBeamState;
         }
     }
 

@@ -17,9 +17,11 @@ public static class PlayerPowerUpReturningProjectileBakeUtility
     /// </summary>
     /// <param name="payload">Serialized module payload to convert.</param>
     /// <param name="resolveDynamicPrefabEntity">Optional prefab-to-entity resolver supplied by the player baker.</param>
+    /// <param name="allowActivationRecall">Whether active-only recall input settings may enter runtime configuration.</param>
     /// <returns>Unmanaged runtime configuration, or default when the payload is missing.</returns>
     public static ReturningProjectilesConfig BuildConfig(PowerUpReturningProjectilesModuleData payload,
-                                                         Func<GameObject, Entity> resolveDynamicPrefabEntity)
+                                                          Func<GameObject, Entity> resolveDynamicPrefabEntity,
+                                                          bool allowActivationRecall)
     {
         if (payload == null)
             return default;
@@ -41,7 +43,12 @@ public static class PlayerPowerUpReturningProjectileBakeUtility
             OutboundLifetimeMultiplier = math.max(0.01f, payload.OutboundLifetimeMultiplier),
             OutboundHitPolicy = payload.OutboundHitPolicy,
             AdditionalOutboundHits = math.max(1, payload.AdditionalOutboundHits),
+            ReturnStartMode = allowActivationRecall
+                ? payload.ReturnStartMode
+                : ProjectileReturnStartMode.AutomaticDelay,
             ReturnDelaySeconds = math.max(0f, payload.ReturnDelaySeconds),
+            AllowEarlyActivationRecall = allowActivationRecall && payload.AllowEarlyActivationRecall ? (byte)1 : (byte)0,
+            ReapplyResourceGateCostOnRecall = allowActivationRecall && payload.ReapplyResourceGateCostOnRecall ? (byte)1 : (byte)0,
             ReturnRumbleMultiplier = math.max(0f, payload.ReturnRumbleMultiplier),
             ReturnCameraShakeMultiplier = math.max(0f, payload.ReturnCameraShakeMultiplier),
             OutboundSizeMultiplier = math.max(0.01f, payload.OutboundSizeMultiplier),
@@ -53,6 +60,9 @@ public static class PlayerPowerUpReturningProjectileBakeUtility
             TurnaroundAxis = payload.TurnaroundAxis,
             ReturnHitPolicy = payload.ReturnHitPolicy,
             AdditionalReturnHits = math.max(1, payload.AdditionalReturnHits),
+            EnableRepeatedContactDamage = payload.EnableRepeatedContactDamage ? (byte)1 : (byte)0,
+            RepeatedContactDamage = math.max(0f, payload.RepeatedContactDamage),
+            RepeatedContactDamageIntervalSeconds = math.max(0.01f, payload.RepeatedContactDamageIntervalSeconds),
             PathSampleDistance = math.max(0.01f, payload.PathSampleDistance),
             ReturnCompletionDistance = math.max(0.01f, payload.ReturnCompletionDistance),
             AllowOtherPowerUpInteractions = payload.AllowOtherPowerUpInteractions ? (byte)1 : (byte)0,

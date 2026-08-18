@@ -114,6 +114,15 @@ public enum ProjectileReturnPathMode
 }
 
 /// <summary>
+/// Selects whether an active returning projectile starts its return after a timed delay or a second activation tap.
+/// </summary>
+public enum ProjectileReturnStartMode
+{
+    AutomaticDelay = 0,
+    ActivationTap = 1
+}
+
+/// <summary>
 /// Selects the local axis used by flight spin and turnaround rotation.
 /// </summary>
 public enum ProjectileReturnRotationAxis

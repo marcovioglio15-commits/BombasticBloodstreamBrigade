@@ -48,6 +48,8 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         powerUpsState.SecondaryIsCharging = 0;
         powerUpsState.PrimaryIsActive = 0;
         powerUpsState.SecondaryIsActive = 0;
+        powerUpsState.PrimaryConditionalApplication = default;
+        powerUpsState.SecondaryConditionalApplication = default;
         ResetReturningProjectileConcurrency(ref powerUpsState);
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;
@@ -342,9 +344,12 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         SwapValues(ref powerUpsState.PrimaryMaintenanceTickTimer, ref powerUpsState.SecondaryMaintenanceTickTimer);
         SwapValues(ref powerUpsState.PrimaryIsCharging, ref powerUpsState.SecondaryIsCharging);
         SwapValues(ref powerUpsState.PrimaryIsActive, ref powerUpsState.SecondaryIsActive);
+        SwapValues(ref powerUpsState.PrimaryConditionalApplication, ref powerUpsState.SecondaryConditionalApplication);
         SwapValues(ref powerUpsState.PrimaryEquipOrder, ref powerUpsState.SecondaryEquipOrder);
         SwapValues(ref powerUpsState.PrimaryReturningProjectileCount, ref powerUpsState.SecondaryReturningProjectileCount);
+        SwapValues(ref powerUpsState.PrimaryReturningProjectileRecallReadyCount, ref powerUpsState.SecondaryReturningProjectileRecallReadyCount);
         SwapValues(ref powerUpsState.PrimaryReturningProjectileGeneration, ref powerUpsState.SecondaryReturningProjectileGeneration);
+        SwapValues(ref powerUpsState.PrimaryReturningProjectileRecallVersion, ref powerUpsState.SecondaryReturningProjectileRecallVersion);
     }
     #endregion
 
@@ -558,7 +563,10 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 powerUpsState.PrimaryMaintenanceTickTimer = 0f;
                 powerUpsState.PrimaryIsCharging = 0;
                 powerUpsState.PrimaryIsActive = 0;
+                powerUpsState.PrimaryConditionalApplication = default;
                 powerUpsState.PrimaryReturningProjectileCount = 0;
+                powerUpsState.PrimaryReturningProjectileRecallReadyCount = 0;
+                powerUpsState.PrimaryReturningProjectileRecallVersion = 0u;
                 powerUpsState.PrimaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.PrimaryReturningProjectileGeneration,
                                                                                                             powerUpsState.SecondaryReturningProjectileGeneration);
                 powerUpsState.PrimaryEquipOrder = ResolveRestoredEquipOrder(ref powerUpsState, restoredEquipOrder);
@@ -571,7 +579,10 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                 powerUpsState.SecondaryMaintenanceTickTimer = 0f;
                 powerUpsState.SecondaryIsCharging = 0;
                 powerUpsState.SecondaryIsActive = 0;
+                powerUpsState.SecondaryConditionalApplication = default;
                 powerUpsState.SecondaryReturningProjectileCount = 0;
+                powerUpsState.SecondaryReturningProjectileRecallReadyCount = 0;
+                powerUpsState.SecondaryReturningProjectileRecallVersion = 0u;
                 powerUpsState.SecondaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.SecondaryReturningProjectileGeneration,
                                                                                                               powerUpsState.PrimaryReturningProjectileGeneration);
                 powerUpsState.SecondaryEquipOrder = ResolveRestoredEquipOrder(ref powerUpsState, restoredEquipOrder);
@@ -592,7 +603,10 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         powerUpsState.PrimaryMaintenanceTickTimer = 0f;
         powerUpsState.PrimaryIsCharging = 0;
         powerUpsState.PrimaryIsActive = 0;
+        powerUpsState.PrimaryConditionalApplication = default;
         powerUpsState.PrimaryReturningProjectileCount = 0;
+        powerUpsState.PrimaryReturningProjectileRecallReadyCount = 0;
+        powerUpsState.PrimaryReturningProjectileRecallVersion = 0u;
         powerUpsState.PrimaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.PrimaryReturningProjectileGeneration,
                                                                                                     powerUpsState.SecondaryReturningProjectileGeneration);
     }
@@ -610,7 +624,10 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
         powerUpsState.SecondaryMaintenanceTickTimer = 0f;
         powerUpsState.SecondaryIsCharging = 0;
         powerUpsState.SecondaryIsActive = 0;
+        powerUpsState.SecondaryConditionalApplication = default;
         powerUpsState.SecondaryReturningProjectileCount = 0;
+        powerUpsState.SecondaryReturningProjectileRecallReadyCount = 0;
+        powerUpsState.SecondaryReturningProjectileRecallVersion = 0u;
         powerUpsState.SecondaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.SecondaryReturningProjectileGeneration,
                                                                                                       powerUpsState.PrimaryReturningProjectileGeneration);
     }
@@ -639,6 +656,10 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     {
         powerUpsState.PrimaryReturningProjectileCount = 0;
         powerUpsState.SecondaryReturningProjectileCount = 0;
+        powerUpsState.PrimaryReturningProjectileRecallReadyCount = 0;
+        powerUpsState.SecondaryReturningProjectileRecallReadyCount = 0;
+        powerUpsState.PrimaryReturningProjectileRecallVersion = 0u;
+        powerUpsState.SecondaryReturningProjectileRecallVersion = 0u;
         powerUpsState.PrimaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.PrimaryReturningProjectileGeneration,
                                                                                                     powerUpsState.SecondaryReturningProjectileGeneration);
         powerUpsState.SecondaryReturningProjectileGeneration = AdvanceReturningProjectileGeneration(powerUpsState.SecondaryReturningProjectileGeneration,

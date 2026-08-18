@@ -359,6 +359,31 @@ public partial struct ProjectileSpawnSystem : ISystem
             for (int requestIndex = 0; requestIndex < requestsCount; requestIndex++)
             {
                 ShootRequest request = shooterShootRequests[requestIndex];
+                bool hasResolvedShotModifiers = request.ShotModifiers.HasResolvedModifiers != 0;
+                bool hasPerfectCircle = hasResolvedShotModifiers
+                    ? request.ShotModifiers.HasPerfectCircle != 0
+                    : passiveToolsState.HasPerfectCircle != 0;
+                PerfectCirclePassiveConfig perfectCircleConfig = hasResolvedShotModifiers
+                    ? request.ShotModifiers.PerfectCircle
+                    : passiveToolsState.PerfectCircle;
+                bool hasBouncingProjectiles = hasResolvedShotModifiers
+                    ? request.ShotModifiers.HasBouncingProjectiles != 0
+                    : passiveToolsState.HasBouncingProjectiles != 0;
+                BouncingProjectilesPassiveConfig bouncingProjectilesConfig = hasResolvedShotModifiers
+                    ? request.ShotModifiers.BouncingProjectiles
+                    : passiveToolsState.BouncingProjectiles;
+                bool hasSplittingProjectiles = hasResolvedShotModifiers
+                    ? request.ShotModifiers.HasSplittingProjectiles != 0
+                    : passiveToolsState.HasSplittingProjectiles != 0;
+                SplittingProjectilesPassiveConfig splittingProjectilesConfig = hasResolvedShotModifiers
+                    ? request.ShotModifiers.SplittingProjectiles
+                    : passiveToolsState.SplittingProjectiles;
+                bool hasElementalProjectiles = hasResolvedShotModifiers
+                    ? request.ShotModifiers.HasElementalProjectiles != 0
+                    : passiveToolsState.HasElementalProjectiles != 0;
+                ElementalProjectilesPassiveConfig elementalProjectilesConfig = hasResolvedShotModifiers
+                    ? request.ShotModifiers.ElementalProjectiles
+                    : passiveToolsState.ElementalProjectiles;
                 Entity requestPrefab = ProjectileSpawnPoolSelectionUtility.ResolveProjectilePrefab(in request,
                                                                                                     in passiveToolsState,
                                                                                                     prefabEntity,
@@ -377,8 +402,8 @@ public partial struct ProjectileSpawnSystem : ISystem
                 float3 direction = math.normalizesafe(request.Direction, new float3(0f, 0f, 1f));
                 float speed = math.max(0f, request.Speed);
 
-                if (passiveToolsState.HasPerfectCircle != 0)
-                    speed = math.max(0f, passiveToolsState.PerfectCircle.RadialEntrySpeed);
+                if (hasPerfectCircle)
+                    speed = math.max(0f, perfectCircleConfig.RadialEntrySpeed);
 
                 if (!projectileTransformLookup.HasComponent(projectileEntity))
                     continue;
@@ -450,7 +475,7 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                                                           ref projectileOffscreenWarningLookup);
                 ProjectileSpawnInitializationUtility.ResetProjectileHitHistory(projectileEntity, ref projectileHitHistoryLookup);
 
-                ProjectilePerfectCircleState perfectCircleState = ProjectileSpawnInitializationUtility.BuildPerfectCircleState(in passiveToolsState.PerfectCircle,
+                ProjectilePerfectCircleState perfectCircleState = ProjectileSpawnInitializationUtility.BuildPerfectCircleState(in perfectCircleConfig,
                                                                                                                                  requestIndex,
                                                                                                                                  shooterEntity,
                                                                                                                                  request.Position,
@@ -458,23 +483,23 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                                                                                                  projectileData.Velocity,
                                                                                                                                  request.OrbitLayerIndex,
                                                                                                                                  request.OrbitLayerCount,
-                                                                                                                                 passiveToolsState.HasPerfectCircle != 0);
+                                                                                                                                 hasPerfectCircle);
                 perfectCircleLookup[projectileEntity] = perfectCircleState;
 
-                ProjectileBounceState bounceState = ProjectileSpawnInitializationUtility.BuildBounceState(in passiveToolsState.BouncingProjectiles,
-                                                                                                           passiveToolsState.HasBouncingProjectiles != 0);
+                ProjectileBounceState bounceState = ProjectileSpawnInitializationUtility.BuildBounceState(in bouncingProjectilesConfig,
+                                                                                                            hasBouncingProjectiles);
                 bounceLookup[projectileEntity] = bounceState;
 
-                ProjectileSplitState splitState = ProjectileSpawnInitializationUtility.BuildSplitState(in passiveToolsState.SplittingProjectiles,
-                                                                                                        passiveToolsState.HasSplittingProjectiles != 0,
+                ProjectileSplitState splitState = ProjectileSpawnInitializationUtility.BuildSplitState(in splittingProjectilesConfig,
+                                                                                                         hasSplittingProjectiles,
                                                                                                         request.IsSplitChild != 0,
                                                                                                         hasReturningProjectiles,
                                                                                                         in returningProjectilesConfig);
                 splitLookup[projectileEntity] = splitState;
 
                 ProjectileElementalPayload elementalPayload = ProjectileSpawnInitializationUtility.ResolveElementalPayload(in request,
-                                                                                                                            in passiveToolsState.ElementalProjectiles,
-                                                                                                                            passiveToolsState.HasElementalProjectiles != 0);
+                                                                                                                             in elementalProjectilesConfig,
+                                                                                                                             hasElementalProjectiles);
                 elementalPayloadLookup[projectileEntity] = elementalPayload;
                 ProjectileReturnRuntimeUtility.InitializeSpawnedProjectile(projectileEntity,
                                                                            shooterEntity,

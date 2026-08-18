@@ -13,6 +13,11 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
     internal const string OtherInteractionOptionsContainerName = "returning-projectiles-other-interaction-options";
     internal const string ProjectileVfxOptionsContainerName = "returning-projectiles-projectile-vfx-options";
     internal const string AdditionalOutboundHitsContainerName = "returning-projectiles-additional-outbound-hits";
+    internal const string AutomaticReturnDelayContainerName = "returning-projectiles-automatic-delay";
+    internal const string ActivationRecallOptionsContainerName = "returning-projectiles-activation-recall-options";
+    internal const string ActivationRecallResourceGateContainerName = "returning-projectiles-activation-recall-resource-gate";
+    internal const string ReturnTransitionContainerName = "returning-projectiles-return-transition";
+    internal const string RepeatedContactDamageSettingsContainerName = "returning-projectiles-repeated-contact-damage-settings";
     #endregion
 
     #region Methods
@@ -24,9 +29,11 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
     /// <param name="payloadContainer">Container receiving the module controls.</param>
     /// <param name="payloadProperty">Serialized Returning Projectiles payload.</param>
     /// <param name="showActiveProjectileConcurrencyOption">Whether the active-only overlap setting is relevant.</param>
+    /// <param name="hasOwningResourceGate">Whether the owning Active can reapply Resource Gate recall costs.</param>
     public static void Build(VisualElement payloadContainer,
                              SerializedProperty payloadProperty,
-                             bool showActiveProjectileConcurrencyOption)
+                             bool showActiveProjectileConcurrencyOption,
+                             bool hasOwningResourceGate = false)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -35,12 +42,14 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         Foldout rotationFoldout = CreateFoldout("Rotation", true);
         Foldout outboundHitFoldout = CreateFoldout("Outbound Hits", true);
         Foldout returnHitFoldout = CreateFoldout("Return Hits", true);
+        Foldout repeatedContactDamageFoldout = CreateFoldout("Repeated Contact Damage", true);
         Foldout precisionFoldout = CreateFoldout("Trajectory Precision", false);
         Foldout interactionFoldout = CreateFoldout("Power-Up Interactions", true);
         payloadContainer.Add(projectileFoldout);
         payloadContainer.Add(rotationFoldout);
         payloadContainer.Add(outboundHitFoldout);
         payloadContainer.Add(returnHitFoldout);
+        payloadContainer.Add(repeatedContactDamageFoldout);
         payloadContainer.Add(precisionFoldout);
         payloadContainer.Add(interactionFoldout);
 
@@ -59,9 +68,49 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         AddField(projectileFoldout, payloadProperty, "returnSpeedMultiplier", "Return Speed Multiplier");
         AddField(projectileFoldout, payloadProperty, "outboundRangeMultiplier", "Outbound Range Multiplier");
         AddField(projectileFoldout, payloadProperty, "outboundLifetimeMultiplier", "Outbound Lifetime Multiplier");
-        AddField(projectileFoldout, payloadProperty, "returnDelaySeconds", "Return Delay (Seconds)");
-        AddField(projectileFoldout, payloadProperty, "returnRumbleMultiplier", "Return Rumble Multiplier");
-        AddField(projectileFoldout, payloadProperty, "returnCameraShakeMultiplier", "Return Camera Shake Multiplier");
+        SerializedProperty returnStartModeProperty = payloadProperty.FindPropertyRelative("returnStartMode");
+        SerializedProperty returnDelaySecondsProperty = payloadProperty.FindPropertyRelative("returnDelaySeconds");
+        VisualElement returnTransitionContainer = new VisualElement();
+        returnTransitionContainer.name = ReturnTransitionContainerName;
+        VisualElement automaticReturnDelayContainer = new VisualElement();
+        automaticReturnDelayContainer.name = AutomaticReturnDelayContainerName;
+        automaticReturnDelayContainer.style.marginLeft = 12f;
+        VisualElement activationRecallOptionsContainer = new VisualElement();
+        activationRecallOptionsContainer.name = ActivationRecallOptionsContainerName;
+        activationRecallOptionsContainer.style.marginLeft = 12f;
+        VisualElement activationRecallResourceGateContainer = new VisualElement();
+        activationRecallResourceGateContainer.name = ActivationRecallResourceGateContainerName;
+        projectileFoldout.Add(returnTransitionContainer);
+
+        if (showActiveProjectileConcurrencyOption)
+        {
+            PowerUpModuleDefinitionPayloadDrawerUtility.AddField(returnTransitionContainer, returnStartModeProperty, "Return Start Mode");
+            AddField(activationRecallOptionsContainer, payloadProperty, "allowEarlyActivationRecall", "Allow Early Activation Recall");
+
+            if (hasOwningResourceGate)
+            {
+                AddField(activationRecallResourceGateContainer,
+                         payloadProperty,
+                         "reapplyResourceGateCostOnRecall",
+                         "Reapply Resource Gate Cost on Recall");
+            }
+        }
+        else
+        {
+            Label returnTransitionLabel = new Label("Return Transition");
+            returnTransitionLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            returnTransitionContainer.Add(returnTransitionLabel);
+        }
+
+        returnTransitionContainer.Add(automaticReturnDelayContainer);
+        returnTransitionContainer.Add(activationRecallOptionsContainer);
+        activationRecallOptionsContainer.Add(activationRecallResourceGateContainer);
+
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(automaticReturnDelayContainer,
+                                                             returnDelaySecondsProperty,
+                                                             "Return Delay (Seconds)");
+        AddField(returnTransitionContainer, payloadProperty, "returnRumbleMultiplier", "Return Rumble Multiplier");
+        AddField(returnTransitionContainer, payloadProperty, "returnCameraShakeMultiplier", "Return Camera Shake Multiplier");
         AddField(projectileFoldout, payloadProperty, "outboundSizeMultiplier", "Outbound Size Multiplier");
         AddField(projectileFoldout, payloadProperty, "returnSizeMultiplier", "Return Size Multiplier");
 
@@ -88,6 +137,20 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         VisualElement additionalHitsContainer = new VisualElement();
         returnHitFoldout.Add(additionalHitsContainer);
         AddField(additionalHitsContainer, payloadProperty, "additionalReturnHits", "Additional Return Hits");
+
+        SerializedProperty enableRepeatedContactDamageProperty = AddField(repeatedContactDamageFoldout,
+                                                                           payloadProperty,
+                                                                           "enableRepeatedContactDamage",
+                                                                           "Enable Repeated Contact Damage");
+        VisualElement repeatedContactDamageSettingsContainer = new VisualElement();
+        repeatedContactDamageSettingsContainer.name = RepeatedContactDamageSettingsContainerName;
+        repeatedContactDamageSettingsContainer.style.marginLeft = 12f;
+        repeatedContactDamageFoldout.Add(repeatedContactDamageSettingsContainer);
+        AddField(repeatedContactDamageSettingsContainer, payloadProperty, "repeatedContactDamage", "Damage Per Tick");
+        AddField(repeatedContactDamageSettingsContainer,
+                 payloadProperty,
+                 "repeatedContactDamageIntervalSeconds",
+                 "Tick Interval Seconds");
 
         VisualElement pathSamplingContainer = new VisualElement();
         precisionFoldout.Add(pathSamplingContainer);
@@ -124,7 +187,12 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         payloadContainer.TrackPropertyValue(returnPathModeProperty, changeEvent => RefreshConditionalUi());
         payloadContainer.TrackPropertyValue(replacementProjectilePrefabProperty, changeEvent => RefreshConditionalUi());
         payloadContainer.TrackPropertyValue(allowOtherInteractionsProperty, changeEvent => RefreshConditionalUi());
-        payloadContainer.TrackSerializedObjectValue(payloadProperty.serializedObject, serializedObject => RefreshWarnings());
+        payloadContainer.TrackPropertyValue(enableRepeatedContactDamageProperty, changeEvent => RefreshConditionalUi());
+
+        if (showActiveProjectileConcurrencyOption)
+            payloadContainer.TrackPropertyValue(returnStartModeProperty, changeEvent => RefreshConditionalUi());
+
+        payloadContainer.RegisterCallback<SerializedPropertyChangeEvent>(changeEvent => RefreshWarnings());
 
         void RefreshConditionalUi()
         {
@@ -145,6 +213,16 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
             otherInteractionOptionsContainer.style.display = allowOtherInteractionsProperty.boolValue
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
+            bool waitsForActivationRecall = showActiveProjectileConcurrencyOption &&
+                                            returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.ActivationTap;
+            automaticReturnDelayContainer.style.display = waitsForActivationRecall ? DisplayStyle.None : DisplayStyle.Flex;
+            activationRecallOptionsContainer.style.display = waitsForActivationRecall ? DisplayStyle.Flex : DisplayStyle.None;
+            activationRecallResourceGateContainer.style.display = waitsForActivationRecall && hasOwningResourceGate
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            repeatedContactDamageSettingsContainer.style.display = enableRepeatedContactDamageProperty.boolValue
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
             RefreshWarnings();
         }
 
@@ -162,7 +240,23 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
             AddPositiveWarning(payloadProperty, "returnSpeedMultiplier", "Return Speed Multiplier", warnings);
             AddPositiveWarning(payloadProperty, "outboundRangeMultiplier", "Outbound Range Multiplier", warnings);
             AddPositiveWarning(payloadProperty, "outboundLifetimeMultiplier", "Outbound Lifetime Multiplier", warnings);
-            AddNonNegativeWarning(payloadProperty, "returnDelaySeconds", "Return Delay", warnings);
+            if (!showActiveProjectileConcurrencyOption ||
+                returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.AutomaticDelay)
+            {
+                AddNonNegativeWarning(payloadProperty, "returnDelaySeconds", "Return Delay", warnings);
+            }
+
+            SerializedProperty reapplyResourceGateCostProperty = payloadProperty.FindPropertyRelative("reapplyResourceGateCostOnRecall");
+
+            if (showActiveProjectileConcurrencyOption &&
+                returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.ActivationTap &&
+                !hasOwningResourceGate &&
+                reapplyResourceGateCostProperty != null &&
+                reapplyResourceGateCostProperty.boolValue)
+            {
+                warnings.Add("Reapply Resource Gate Cost on Recall is ignored because this Active does not contain Resource Gate.");
+            }
+
             AddNonNegativeWarning(payloadProperty, "returnRumbleMultiplier", "Return Rumble Multiplier", warnings);
             AddNonNegativeWarning(payloadProperty, "returnCameraShakeMultiplier", "Return Camera Shake Multiplier", warnings);
             AddPositiveWarning(payloadProperty, "outboundSizeMultiplier", "Outbound Size Multiplier", warnings);
@@ -179,6 +273,23 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
 
             if (returnHitPolicyProperty.enumValueIndex == (int)ProjectileReturnHitPolicy.LimitedAdditionalHits)
                 AddPositiveIntegerWarning(payloadProperty, "additionalReturnHits", "Additional Return Hits", warnings);
+
+            if (enableRepeatedContactDamageProperty.boolValue)
+            {
+                AddPositiveWarning(payloadProperty, "repeatedContactDamage", "Repeated Contact Damage", warnings);
+                AddPositiveWarning(payloadProperty,
+                                   "repeatedContactDamageIntervalSeconds",
+                                   "Repeated Contact Damage Tick Interval",
+                                   warnings);
+                SerializedProperty repeatedContactDamageIntervalProperty = payloadProperty.FindPropertyRelative("repeatedContactDamageIntervalSeconds");
+
+                if (repeatedContactDamageIntervalProperty != null &&
+                    repeatedContactDamageIntervalProperty.floatValue > 0f &&
+                    repeatedContactDamageIntervalProperty.floatValue < 0.03f)
+                {
+                    warnings.Add("Repeated Contact Damage Tick Interval below 0.03 can create dense overlap damage pulses with large projectile counts.");
+                }
+            }
 
             if (returnPathModeProperty.enumValueIndex == (int)ProjectileReturnPathMode.RetraceOutboundPath)
                 AddPositiveWarning(payloadProperty, "pathSampleDistance", "Path Sample Distance", warnings);

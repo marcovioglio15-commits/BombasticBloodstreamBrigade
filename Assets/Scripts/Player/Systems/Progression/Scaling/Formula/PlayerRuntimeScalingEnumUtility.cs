@@ -149,6 +149,16 @@ internal static class PlayerRuntimeScalingEnumUtility
     }
 
     /// <summary>
+    /// Resolves a safe projectile return start mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped return start mode.</returns>
+    public static ProjectileReturnStartMode ResolveProjectileReturnStartMode(float value)
+    {
+        return (ProjectileReturnStartMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
     /// Resolves a safe projectile return rotation axis from one numeric Add Scaling result.
     /// </summary>
     /// <param name="value">Resolved numeric formula result.</param>
@@ -256,6 +266,26 @@ internal static class PlayerRuntimeScalingEnumUtility
     public static PowerUpChargeType ResolvePowerUpChargeType(float value)
     {
         return (PowerUpChargeType)ResolveEnumIndex(value, 5);
+    }
+
+    /// <summary>
+    /// Resolves a safe Sudden Strike automatic-charge condition from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped condition mode.</returns>
+    public static SuddenStrikeChargeConditionMode ResolveSuddenStrikeChargeConditionMode(float value)
+    {
+        return (SuddenStrikeChargeConditionMode)ResolveEnumIndex(value, 1);
+    }
+
+    /// <summary>
+    /// Resolves a safe Self-Preservation health-threshold mode from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped threshold mode.</returns>
+    public static SelfPreservationHealthThresholdMode ResolveSelfPreservationHealthThresholdMode(float value)
+    {
+        return (SelfPreservationHealthThresholdMode)ResolveEnumIndex(value, 1);
     }
 
     /// <summary>

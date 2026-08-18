@@ -127,8 +127,52 @@ public static class PlayerPassiveToolsAggregationUtility
     /// </summary>
     /// <param name="passiveToolsState">Aggregated passive state updated in place.</param>
     /// <param name="passiveToolConfig">Passive-tool payload being merged.</param>
-
     public static void AccumulatePassiveTool(ref PlayerPassiveToolsState passiveToolsState, in PlayerPassiveToolConfig passiveToolConfig)
+    {
+        if (passiveToolConfig.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.None)
+            return;
+
+        AccumulatePassiveToolEffects(ref passiveToolsState, in passiveToolConfig, false, 0);
+    }
+
+    /// <summary>
+    /// Merges one enabled toggle Active payload and preserves its owning slot for input-driven projectile recall.
+    /// </summary>
+    /// <param name="passiveToolsState">Aggregated passive state updated in place.</param>
+    /// <param name="passiveToolConfig">Toggle Active payload being merged.</param>
+    /// <param name="activeSlotIndex">Stable primary or secondary slot that owns any returning projectiles.</param>
+    public static void AccumulateActiveTogglePassiveTool(ref PlayerPassiveToolsState passiveToolsState,
+                                                         in PlayerPassiveToolConfig passiveToolConfig,
+                                                         byte activeSlotIndex)
+    {
+        if (passiveToolConfig.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.None)
+            return;
+
+        AccumulatePassiveToolEffects(ref passiveToolsState, in passiveToolConfig, true, activeSlotIndex);
+    }
+
+    /// <summary>
+    /// Merges the sibling effects of one conditional passive after its cadence or charge condition has qualified the current shot.
+    /// </summary>
+    /// <param name="passiveToolsState">Per-shot passive snapshot updated in place.</param>
+    /// <param name="passiveToolConfig">Conditional passive payload whose sibling effects are now eligible.</param>
+    public static void AccumulateConditionalPassiveTool(ref PlayerPassiveToolsState passiveToolsState,
+                                                        in PlayerPassiveToolConfig passiveToolConfig)
+    {
+        AccumulatePassiveToolEffects(ref passiveToolsState, in passiveToolConfig, false, 0);
+    }
+
+    /// <summary>
+    /// Merges one passive payload after the caller has resolved its lifetime or conditional application gate.
+    /// </summary>
+    /// <param name="passiveToolsState">Aggregated or per-shot passive state updated in place.</param>
+    /// <param name="passiveToolConfig">Passive effects to merge.</param>
+    /// <param name="hasActiveSlotOwner">Whether returning projectiles originate from a toggle Active slot.</param>
+    /// <param name="activeSlotIndex">Stable slot used when hasActiveSlotOwner is true.</param>
+    private static void AccumulatePassiveToolEffects(ref PlayerPassiveToolsState passiveToolsState,
+                                                     in PlayerPassiveToolConfig passiveToolConfig,
+                                                     bool hasActiveSlotOwner,
+                                                     byte activeSlotIndex)
     {
         if (passiveToolConfig.IsDefined == 0)
             return;
@@ -155,6 +199,8 @@ public static class PlayerPassiveToolsAggregationUtility
         {
             passiveToolsState.HasReturningProjectiles = 1;
             passiveToolsState.ReturningProjectiles = passiveToolConfig.ReturningProjectiles;
+            passiveToolsState.HasReturningProjectilesActiveSlotOwner = hasActiveSlotOwner ? (byte)1 : (byte)0;
+            passiveToolsState.ReturningProjectilesActiveSlotIndex = activeSlotIndex;
         }
 
         if (passiveToolConfig.HasProjectileSize != 0)

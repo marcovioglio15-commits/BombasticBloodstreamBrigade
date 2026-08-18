@@ -48,6 +48,7 @@ public static class PlayerPowerUpCatalogBakeUtility
 
             equippedElement.PowerUpId = passiveToolIndex < equippedPassiveToolIds.Count ? equippedPassiveToolIds[passiveToolIndex] : default;
             equippedElement.Tool = passiveToolConfig;
+            equippedElement.ConditionalApplicationState = default;
         }
     }
 
@@ -250,7 +251,17 @@ public static class PlayerPowerUpCatalogBakeUtility
 
             unlockCatalogEntry.PowerUpId = new FixedString64Bytes(powerUpId);
             unlockCatalogEntry.DisplayName = new FixedString64Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.DisplayName) ? powerUpId : powerUp.CommonData.DisplayName.Trim());
-            unlockCatalogEntry.Description = new FixedString128Bytes(string.IsNullOrWhiteSpace(powerUp.CommonData.Description) ? string.Empty : powerUp.CommonData.Description.Trim());
+            string description = string.IsNullOrWhiteSpace(powerUp.CommonData.Description)
+                ? string.Empty
+                : powerUp.CommonData.Description.Trim();
+            CopyError descriptionCopyError = unlockCatalogEntry.Description.CopyFromTruncated(description);
+
+            if (descriptionCopyError == CopyError.Truncation)
+            {
+                Debug.LogWarning($"Power-up '{powerUp.CommonData.PowerUpId}' description exceeds the 4093-byte runtime catalog capacity. " +
+                                 "Shorten the description to preserve its complete milestone presentation.",
+                                 authoring);
+            }
             unlockCatalogEntry.UnlockKind = unlockKind;
             unlockCatalogEntry.StealProtected = powerUp.StealProtected ? (byte)1 : (byte)0;
             unlockCatalogEntry.IsUnlocked = 0;

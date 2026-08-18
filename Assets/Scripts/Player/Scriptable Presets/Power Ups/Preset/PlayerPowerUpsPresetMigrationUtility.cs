@@ -109,8 +109,54 @@ internal static class PlayerPowerUpsPresetMigrationUtility
                                                                                              "Keeps Base Gun visible and replaces the configured optional attachment with the mountable mesh identified by a defined Weapon Id while the owning power-up is equipped."));
         }
 
+        EnsureConditionalModuleDefinition(moduleDefinitions,
+                                          validModuleIds,
+                                          PlayerPowerUpsPresetDefaultsUtility.ModuleIdDelayedShootApplication,
+                                          "Delayed Shoot Application",
+                                          PowerUpModuleKind.DelayedShootApplication,
+                                          "Applies sibling discrete-projectile modules only to every configured base shot.");
+        EnsureConditionalModuleDefinition(moduleDefinitions,
+                                          validModuleIds,
+                                          PlayerPowerUpsPresetDefaultsUtility.ModuleIdSuddenStrike,
+                                          "Sudden Strike",
+                                          PowerUpModuleKind.SuddenStrike,
+                                          "Charges automatically while its condition is satisfied, then applies sibling projectile or object-spawn effects to the next base shot.");
+        EnsureConditionalModuleDefinition(moduleDefinitions,
+                                          validModuleIds,
+                                          PlayerPowerUpsPresetDefaultsUtility.ModuleIdSelfPreservationInstinct,
+                                          "Self-Preservation Instinct",
+                                          PowerUpModuleKind.SelfPreservationInstinct,
+                                          "Executes sibling active-effect modules when player health crosses the configured threshold from above.");
+
         ApplyUnifiedBindings(preset.ActivePowerUpsMutable, moduleDefinitions);
         ApplyUnifiedBindings(preset.PassivePowerUpsMutable, moduleDefinitions);
+    }
+
+    /// <summary>
+    /// Appends one built-in conditional module definition when an existing preset predates that catalog entry.
+    /// </summary>
+    /// <param name="moduleDefinitions">Mutable module catalog receiving the missing definition.</param>
+    /// <param name="validModuleIds">Known stable module identifiers collected before the append pass.</param>
+    /// <param name="moduleId">Stable identifier of the conditional module.</param>
+    /// <param name="displayName">Visible module name.</param>
+    /// <param name="moduleKind">Runtime behavior implemented by the module.</param>
+    /// <param name="notes">Concise module-catalog description.</param>
+    private static void EnsureConditionalModuleDefinition(List<PowerUpModuleDefinition> moduleDefinitions,
+                                                          HashSet<string> validModuleIds,
+                                                          string moduleId,
+                                                          string displayName,
+                                                          PowerUpModuleKind moduleKind,
+                                                          string notes)
+    {
+        if (moduleDefinitions == null || validModuleIds == null || validModuleIds.Contains(moduleId))
+            return;
+
+        moduleDefinitions.Add(PlayerPowerUpsPresetDefaultsUtility.CreateModuleDefinition(moduleId,
+                                                                                          displayName,
+                                                                                          moduleKind,
+                                                                                          PowerUpModuleStage.Trigger,
+                                                                                          notes));
+        validModuleIds.Add(moduleId);
     }
 
     public static void MigrateLoadoutIds(PlayerPowerUpsPreset preset)

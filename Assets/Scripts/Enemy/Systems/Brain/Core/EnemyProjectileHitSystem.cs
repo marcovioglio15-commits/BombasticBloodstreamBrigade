@@ -237,20 +237,6 @@ public partial struct EnemyProjectileHitSystem : ISystem
                                                        returnState.Phase == ProjectileReturnPhase.Outbound &&
                                                        returnState.OutboundHitCapacityExhausted != 0;
 
-            if (isNonDamagingReturnTransition || isWaitingForOutboundPrerequisites)
-            {
-                // Delay/turn phases are non-damaging, while exhausted outbound shots wait for bounce or orbit prerequisites.
-                for (int hitIndex = 0; hitIndex < hitCount; hitIndex++)
-                    projectileHitReader.Read<int>();
-
-                projectileHitReader.EndForEachIndex();
-
-                if (canTrackProjectileHits)
-                    projectileHitHistory.Clear();
-
-                continue;
-            }
-
             LocalTransform projectileTransform = projectileTransforms[projectileIndex];
             float currentScaleMultiplier = ResolveCurrentScaleMultiplier(projectileEntities[projectileIndex],
                                                                         projectileTransform.Scale,
@@ -284,16 +270,33 @@ public partial struct EnemyProjectileHitSystem : ISystem
             }
 
             projectileHitReader.EndForEachIndex();
-            PruneProjectileHitHistoryToCurrentOverlaps(canTrackProjectileHits,
-                                                       currentOverlapEnemyIndices,
-                                                       enemyEntities,
-                                                       ref projectileHitHistory);
+            if (canTrackProjectileHits)
+            {
+                ProjectileRepeatedContactDamageUtility.PruneToCurrentOverlaps(currentOverlapEnemyIndices,
+                                                                               enemyEntities,
+                                                                               ref projectileHitHistory);
+
+                if (isNonDamagingReturnTransition || isWaitingForOutboundPrerequisites)
+                    ProjectileRepeatedContactDamageUtility.ReleaseOrdinaryHitLocks(ref projectileHitHistory);
+
+                ProjectileRepeatedContactDamageUtility.ApplyDueTicks(in returnState.Config,
+                                                                      elapsedTime,
+                                                                      isNonDamagingReturnTransition || isWaitingForOutboundPrerequisites,
+                                                                      currentOverlapEnemyIndices,
+                                                                      enemyEntities,
+                                                                      ref projectedEnemyHealth,
+                                                                      ref projectileHitHistory);
+            }
+
+            if (isNonDamagingReturnTransition || isWaitingForOutboundPrerequisites)
+                continue;
 
             for (int overlapIndex = 0; overlapIndex < currentOverlapEnemyIndices.Length; overlapIndex++)
             {
                 int enemyIndex = currentOverlapEnemyIndices[overlapIndex];
 
-                if (canTrackProjectileHits && HasProjectileAlreadyHitEnemy(projectileHitHistory, enemyEntities[enemyIndex]))
+                if (canTrackProjectileHits &&
+                    ProjectileRepeatedContactDamageUtility.HasTrackedContact(projectileHitHistory, enemyEntities[enemyIndex]))
                     continue;
 
                 if (HasHitCandidate(hitCandidates, enemyIndex))
@@ -319,9 +322,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
                         hasValidHit = true;
                         enemyKilledByProjectile = enemyKilledByProjectile || enemyKilled;
-                        RegisterProjectileEnemyHit(canTrackProjectileHits,
-                                                   enemyEntities[enemyIndex],
-                                                   ref projectileHitHistory);
+                        ProjectileRepeatedContactDamageUtility.RegisterInitialHit(canTrackProjectileHits,
+                                                                                   enemyEntities[enemyIndex],
+                                                                                   elapsedTime,
+                                                                                   in returnState.Config,
+                                                                                   ref projectileHitHistory);
                         ApplyHitPayloads(enemyIndex,
                                          projectileOwner.ShooterEntity,
                                          in projectileData,
@@ -359,9 +364,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
                         hasValidHit = true;
                         appliedHitCount++;
                         enemyKilledByProjectile = enemyKilledByProjectile || enemyKilled;
-                        RegisterProjectileEnemyHit(canTrackProjectileHits,
-                                                   enemyEntities[enemyIndex],
-                                                   ref projectileHitHistory);
+                        ProjectileRepeatedContactDamageUtility.RegisterInitialHit(canTrackProjectileHits,
+                                                                                   enemyEntities[enemyIndex],
+                                                                                   elapsedTime,
+                                                                                   in returnState.Config,
+                                                                                   ref projectileHitHistory);
                         ApplyHitPayloads(enemyIndex,
                                          projectileOwner.ShooterEntity,
                                          in projectileData,
@@ -408,9 +415,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
                         }
 
                         enemyKilledByProjectile = enemyKilledByProjectile || enemyKilled;
-                        RegisterProjectileEnemyHit(canTrackProjectileHits,
-                                                   enemyEntities[enemyIndex],
-                                                   ref projectileHitHistory);
+                        ProjectileRepeatedContactDamageUtility.RegisterInitialHit(canTrackProjectileHits,
+                                                                                   enemyEntities[enemyIndex],
+                                                                                   elapsedTime,
+                                                                                   in returnState.Config,
+                                                                                   ref projectileHitHistory);
                         ApplyHitPayloads(enemyIndex,
                                          projectileOwner.ShooterEntity,
                                          in projectileData,
@@ -460,9 +469,11 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
                         hasValidHit = true;
                         enemyKilledByProjectile = enemyKilledByProjectile || enemyKilled;
-                        RegisterProjectileEnemyHit(canTrackProjectileHits,
-                                                   enemyEntities[enemyIndex],
-                                                   ref projectileHitHistory);
+                        ProjectileRepeatedContactDamageUtility.RegisterInitialHit(canTrackProjectileHits,
+                                                                                   enemyEntities[enemyIndex],
+                                                                                   elapsedTime,
+                                                                                   in returnState.Config,
+                                                                                   ref projectileHitHistory);
                         ApplyHitPayloads(enemyIndex,
                                          projectileOwner.ShooterEntity,
                                          in projectileData,
@@ -570,9 +581,13 @@ public partial struct EnemyProjectileHitSystem : ISystem
                 ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
                                                             ref projectileData,
                                                             ref perfectCircleState,
-                                                            ref projectileTransform,
-                                                            projectileReturnPathLookup[projectileEntity],
-                                                            true);
+                                                             ref projectileTransform,
+                                                             projectileReturnPathLookup[projectileEntity],
+                                                             true,
+                                                             false);
+                ProjectileActivationRecallRuntimeUtility.RegisterReady(projectileOwner.ShooterEntity,
+                                                                        ref returnState,
+                                                                        ref powerUpsStateLookup);
                 entityManager.SetComponentData(projectileEntity, projectileData);
                 entityManager.SetComponentData(projectileEntity, projectileTransform);
                 projectileReturnStateLookup[projectileEntity] = returnState;
@@ -702,60 +717,6 @@ public partial struct EnemyProjectileHitSystem : ISystem
     }
 
     /// <summary>
-    /// Removes contact-hit records for enemies that are no longer overlapped by the projectile this frame.
-    /// </summary>
-    /// <param name="canTrackProjectileHits">True when the projectile owns a mutable contact-hit buffer.</param>
-    /// <param name="currentOverlapEnemyIndices">Current projectile overlap list resolved from spatial collision.</param>
-    /// <param name="enemyEntities">Stable enemy entity snapshot used to translate overlap indices.</param>
-    /// <param name="hitHistory">Mutable projectile contact-hit buffer.</param>
-    private static void PruneProjectileHitHistoryToCurrentOverlaps(bool canTrackProjectileHits,
-                                                                   NativeList<int> currentOverlapEnemyIndices,
-                                                                   NativeArray<Entity> enemyEntities,
-                                                                   ref DynamicBuffer<ProjectileHitHistoryElement> hitHistory)
-    {
-        if (!canTrackProjectileHits)
-            return;
-
-        for (int historyIndex = hitHistory.Length - 1; historyIndex >= 0; historyIndex--)
-        {
-            Entity trackedEnemyEntity = hitHistory[historyIndex].EnemyEntity;
-
-            if (HasCurrentOverlapEnemyEntity(currentOverlapEnemyIndices, enemyEntities, trackedEnemyEntity))
-                continue;
-
-            hitHistory.RemoveAt(historyIndex);
-        }
-    }
-
-    /// <summary>
-    /// Checks whether the current overlap list contains the provided enemy entity.
-    /// </summary>
-    /// <param name="currentOverlapEnemyIndices">Current projectile overlap list.</param>
-    /// <param name="enemyEntities">Stable enemy entity snapshot used to translate overlap indices.</param>
-    /// <param name="enemyEntity">Enemy entity to search for.</param>
-    /// <returns>True when the enemy is still overlapped this frame.</returns>
-    private static bool HasCurrentOverlapEnemyEntity(NativeList<int> currentOverlapEnemyIndices,
-                                                     NativeArray<Entity> enemyEntities,
-                                                     Entity enemyEntity)
-    {
-        if (enemyEntity == Entity.Null)
-            return false;
-
-        for (int overlapIndex = 0; overlapIndex < currentOverlapEnemyIndices.Length; overlapIndex++)
-        {
-            int enemyIndex = currentOverlapEnemyIndices[overlapIndex];
-
-            if (enemyIndex < 0 || enemyIndex >= enemyEntities.Length)
-                continue;
-
-            if (enemyEntities[enemyIndex] == enemyEntity)
-                return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
     /// Checks whether a projectile candidate list already contains the enemy index emitted by the spatial hash.
     /// </summary>
     /// <param name="hitCandidates">Current projectile hit candidate list.</param>
@@ -791,49 +752,6 @@ public partial struct EnemyProjectileHitSystem : ISystem
         enemyKilled = enemyHealth.Current <= 0f;
         projectedEnemyHealth[enemyIndex] = enemyHealth;
         return true;
-    }
-
-    /// <summary>
-    /// Checks whether one projectile has already applied a hit during the current overlap contact.
-    /// </summary>
-    /// <param name="hitHistory">Projectile contact-hit buffer for the currently processed projectile.</param>
-    /// <param name="enemyEntity">Enemy entity candidate being tested.</param>
-    /// <returns>True when the enemy already exists in the current projectile contact history.</returns>
-    private static bool HasProjectileAlreadyHitEnemy(DynamicBuffer<ProjectileHitHistoryElement> hitHistory,
-                                                     Entity enemyEntity)
-    {
-        for (int historyIndex = 0; historyIndex < hitHistory.Length; historyIndex++)
-        {
-            if (hitHistory[historyIndex].EnemyEntity == enemyEntity)
-                return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Adds one enemy to a projectile contact-hit history after a successful hit application.
-    /// </summary>
-    /// <param name="canTrackProjectileHits">True when the projectile owns a mutable history buffer.</param>
-    /// <param name="enemyEntity">Enemy entity that was just hit.</param>
-    /// <param name="hitHistory">Mutable projectile contact-hit buffer.</param>
-    private static void RegisterProjectileEnemyHit(bool canTrackProjectileHits,
-                                                   Entity enemyEntity,
-                                                   ref DynamicBuffer<ProjectileHitHistoryElement> hitHistory)
-    {
-        if (!canTrackProjectileHits)
-            return;
-
-        if (enemyEntity == Entity.Null)
-            return;
-
-        if (HasProjectileAlreadyHitEnemy(hitHistory, enemyEntity))
-            return;
-
-        hitHistory.Add(new ProjectileHitHistoryElement
-        {
-            EnemyEntity = enemyEntity
-        });
     }
 
     private static float ApplyDamageBasedHit(ref NativeArray<EnemyHealth> projectedEnemyHealth,
@@ -953,9 +871,9 @@ public partial struct EnemyProjectileHitSystem : ISystem
         entityManager.SetComponentEnabled<ProjectileActive>(projectileEntity, false);
 
         Entity shooterEntity = projectileOwner.ShooterEntity;
-        ProjectileReturnRuntimeUtility.ReleaseConcurrency(shooterEntity,
-                                                          ref returnState,
-                                                          ref powerUpsStateLookup);
+        ProjectileActivationRecallRuntimeUtility.ReleaseOwnership(shooterEntity,
+                                                                   ref returnState,
+                                                                   ref powerUpsStateLookup);
 
         if (returnStateLookup.HasComponent(projectileEntity))
             returnStateLookup[projectileEntity] = returnState;

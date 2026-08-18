@@ -42,7 +42,10 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.LaserBeam,
         PowerUpModuleKind.SwitchWeapon,
         PowerUpModuleKind.AttractDrops,
-        PowerUpModuleKind.ReturningProjectiles
+        PowerUpModuleKind.ReturningProjectiles,
+        PowerUpModuleKind.DelayedShootApplication,
+        PowerUpModuleKind.SuddenStrike,
+        PowerUpModuleKind.SelfPreservationInstinct
     };
     #endregion
 
@@ -158,6 +161,12 @@ public static class PowerUpModuleEnumDescriptions
                 return "Attracts enemy drops inside a player-centered radius. Passives apply continuously, standard actives emit one request per activation, and toggleable Resource Gates apply while active.";
             case PowerUpModuleKind.ReturningProjectiles:
                 return "Turns projectile despawn into a configurable retrace or player-seeking return phase, with isolated hit, rotation, scale, prefab, split, bounce, orbit, and active-shot rules.";
+            case PowerUpModuleKind.DelayedShootApplication:
+                return "Applies sibling discrete-projectile modules only to every configured base shot. Supported only by passives and toggleable actives.";
+            case PowerUpModuleKind.SuddenStrike:
+                return "Charges a sibling Trigger Hold Charge automatically while stationary or not shooting, then applies its full-charge payload and any sibling projectile or object-spawn effects to the next base shot.";
+            case PowerUpModuleKind.SelfPreservationInstinct:
+                return "Executes sibling active-effect modules when health crosses an authored percentage or direct-value threshold from above. Supported only by passives.";
             default:
                 return "No description available.";
         }
@@ -272,6 +281,18 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.ReturningProjectiles:
                 relativePropertyPath = "returningProjectiles";
                 payloadLabel = "Returning Projectiles Payload";
+                return true;
+            case PowerUpModuleKind.DelayedShootApplication:
+                relativePropertyPath = "delayedShootApplication";
+                payloadLabel = "Delayed Shoot Application Payload";
+                return true;
+            case PowerUpModuleKind.SuddenStrike:
+                relativePropertyPath = "suddenStrike";
+                payloadLabel = "Sudden Strike Payload";
+                return true;
+            case PowerUpModuleKind.SelfPreservationInstinct:
+                relativePropertyPath = "selfPreservationInstinct";
+                payloadLabel = "Self-Preservation Instinct Payload";
                 return true;
             default:
                 relativePropertyPath = string.Empty;

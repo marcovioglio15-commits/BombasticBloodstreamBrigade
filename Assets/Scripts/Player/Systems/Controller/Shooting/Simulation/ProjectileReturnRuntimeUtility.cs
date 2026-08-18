@@ -79,11 +79,11 @@ public static class ProjectileReturnRuntimeUtility
             ReturnPathIndex = -1
         };
 
-        if (request.SpawnSource == ProjectileSpawnSource.ActivePowerUp &&
-            request.ActiveSlotIndex != NoActiveSlot &&
+        if (request.ActiveSlotIndex != NoActiveSlot &&
             powerUpsStateLookup.HasComponent(shooterEntity))
         {
             PlayerPowerUpsState powerUpsState = powerUpsStateLookup[shooterEntity];
+            returnState.ActiveSlotIndex = request.ActiveSlotIndex;
 
             switch (request.ActiveSlotIndex)
             {
@@ -97,6 +97,7 @@ public static class ProjectileReturnRuntimeUtility
 
                     powerUpsState.PrimaryReturningProjectileCount++;
                     returnState.ConcurrencyGeneration = powerUpsState.PrimaryReturningProjectileGeneration;
+                    returnState.LastObservedActivationRecallVersion = powerUpsState.PrimaryReturningProjectileRecallVersion;
                     returnState.ConcurrencyRegistered = 1;
                     break;
                 case 1:
@@ -109,6 +110,7 @@ public static class ProjectileReturnRuntimeUtility
 
                     powerUpsState.SecondaryReturningProjectileCount++;
                     returnState.ConcurrencyGeneration = powerUpsState.SecondaryReturningProjectileGeneration;
+                    returnState.LastObservedActivationRecallVersion = powerUpsState.SecondaryReturningProjectileRecallVersion;
                     returnState.ConcurrencyRegistered = 1;
                     break;
             }
@@ -128,12 +130,14 @@ public static class ProjectileReturnRuntimeUtility
     /// <param name="projectileTransform">Mutable projectile transform receiving return scale.</param>
     /// <param name="returnPath">Mutable recorded path receiving the exact outbound endpoint.</param>
     /// <param name="naturalCapacityExhausted">Whether an enemy impact already consumed the last natural hit.</param>
+    /// <param name="activationRecallRequested">Whether an accepted active input must bypass endpoint waiting.</param>
     public static void BeginReturn(ref ProjectileReturnState returnState,
                                    ref Projectile projectile,
                                    ref ProjectilePerfectCircleState perfectCircleState,
                                    ref LocalTransform projectileTransform,
                                    DynamicBuffer<ProjectileReturnPathPoint> returnPath,
-                                   bool naturalCapacityExhausted)
+                                   bool naturalCapacityExhausted,
+                                   bool activationRecallRequested)
     {
         if (returnState.Enabled == 0 || returnState.Phase != ProjectileReturnPhase.Outbound)
             return;
@@ -158,7 +162,9 @@ public static class ProjectileReturnRuntimeUtility
         returnState.ReturnFeedbackPending = 0;
         returnState.OutboundSpeed = math.max(0.01f, math.length(projectile.Velocity));
         returnState.ReturnDelayRemainingSeconds = math.max(0f, returnState.Config.ReturnDelaySeconds);
-        returnState.Phase = returnState.ReturnDelayRemainingSeconds > 0f
+        bool waitsForActivationRecall = returnState.Config.ReturnStartMode == ProjectileReturnStartMode.ActivationTap &&
+                                        !activationRecallRequested;
+        returnState.Phase = waitsForActivationRecall || returnState.ReturnDelayRemainingSeconds > 0f
             ? ProjectileReturnPhase.Delaying
             : ResolvePostDelayPhase(in returnState.Config);
 
@@ -240,29 +246,6 @@ public static class ProjectileReturnRuntimeUtility
         return true;
     }
 
-    /// <summary>
-    /// Releases the active-slot live-projectile registration exactly once before final pooling.
-    /// </summary>
-    /// <param name="shooterEntity">Shooter that owns the active slot.</param>
-    /// <param name="returnState">Mutable return state whose registration is cleared.</param>
-    /// <param name="powerUpsStateLookup">Mutable player power-up state lookup.</param>
-    public static void ReleaseConcurrency(Entity shooterEntity,
-                                          ref ProjectileReturnState returnState,
-                                          ref ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup)
-    {
-        if (returnState.ConcurrencyRegistered == 0 || !powerUpsStateLookup.HasComponent(shooterEntity))
-            return;
-
-        PlayerPowerUpsState powerUpsState = powerUpsStateLookup[shooterEntity];
-
-        if (returnState.ConcurrencyGeneration == powerUpsState.PrimaryReturningProjectileGeneration)
-            powerUpsState.PrimaryReturningProjectileCount = math.max(0, powerUpsState.PrimaryReturningProjectileCount - 1);
-        else if (returnState.ConcurrencyGeneration == powerUpsState.SecondaryReturningProjectileGeneration)
-            powerUpsState.SecondaryReturningProjectileCount = math.max(0, powerUpsState.SecondaryReturningProjectileCount - 1);
-
-        powerUpsStateLookup[shooterEntity] = powerUpsState;
-        returnState.ConcurrencyRegistered = 0;
-    }
     #endregion
 
     #region Transition Rules
@@ -390,6 +373,16 @@ public static class ProjectileReturnRuntimeUtility
         if (returnState.Phase == ProjectileReturnPhase.Delaying)
         {
             projectile.Velocity = float3.zero;
+
+            if (returnState.Config.ReturnStartMode == ProjectileReturnStartMode.ActivationTap)
+            {
+                AlignFlightRotation(ref projectileTransform,
+                                    ref returnState,
+                                    float3.zero,
+                                    deltaTime);
+                return;
+            }
+
             returnState.ReturnDelayRemainingSeconds = math.max(0f,
                                                                returnState.ReturnDelayRemainingSeconds - math.max(0f, deltaTime));
             AlignFlightRotation(ref projectileTransform,
@@ -485,13 +478,13 @@ public static class ProjectileReturnRuntimeUtility
     }
     #endregion
 
-    #region Private Methods
+    #region Transition Helpers
     /// <summary>
     /// Resolves whether a projectile starts with a visual 180-degree turn or can immediately travel backward.
     /// </summary>
     /// <param name="config">Return configuration containing continuous-spin settings.</param>
     /// <returns>Turning when continuous spin is unavailable; otherwise Returning.</returns>
-    private static ProjectileReturnPhase ResolvePostDelayPhase(in ReturningProjectilesConfig config)
+    internal static ProjectileReturnPhase ResolvePostDelayPhase(in ReturningProjectilesConfig config)
     {
         return config.SpinDuringFlight != 0 && config.SpinSpeedDegreesPerSecond > 0f
             ? ProjectileReturnPhase.Returning
@@ -502,7 +495,7 @@ public static class ProjectileReturnRuntimeUtility
     /// Enters return travel and marks its optional camera and haptic pulse for one-time owner delivery.
     /// </summary>
     /// <param name="returnState">Mutable projectile state entering return travel.</param>
-    private static void MarkReturnTravelStarted(ref ProjectileReturnState returnState)
+    internal static void MarkReturnTravelStarted(ref ProjectileReturnState returnState)
     {
         returnState.Phase = ProjectileReturnPhase.Returning;
         returnState.ReturnFeedbackPending = returnState.Config.ReturnCameraShakeMultiplier > 0f ||

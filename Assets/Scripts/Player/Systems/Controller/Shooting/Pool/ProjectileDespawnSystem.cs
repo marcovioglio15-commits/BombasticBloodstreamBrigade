@@ -123,9 +123,13 @@ public partial struct ProjectileDespawnSystem : ISystem
                 ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
                                                             ref projectileData,
                                                             ref perfectCircleState,
-                                                            ref returningTransform,
-                                                            returnPath,
-                                                            naturalHitCapacityExhausted);
+                                                             ref returningTransform,
+                                                             returnPath,
+                                                             naturalHitCapacityExhausted,
+                                                             false);
+                ProjectileActivationRecallRuntimeUtility.RegisterReady(owner.ValueRO.ShooterEntity,
+                                                                        ref returnState,
+                                                                        ref powerUpsStateLookup);
                 projectileReturnStateLookup[projectileEntity] = returnState;
                 perfectCircleStateLookup[projectileEntity] = perfectCircleState;
                 projectileTransform.ValueRW = returningTransform;
@@ -145,9 +149,9 @@ public partial struct ProjectileDespawnSystem : ISystem
                                                             in enemyProjectileDeathVfxConfigLookup,
                                                             ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
-            ProjectileReturnRuntimeUtility.ReleaseConcurrency(owner.ValueRO.ShooterEntity,
-                                                              ref returnState,
-                                                              ref powerUpsStateLookup);
+            ProjectileActivationRecallRuntimeUtility.ReleaseOwnership(owner.ValueRO.ShooterEntity,
+                                                                       ref returnState,
+                                                                       ref powerUpsStateLookup);
             if (projectileReturnStateLookup.HasComponent(projectileEntity))
                 projectileReturnStateLookup[projectileEntity] = returnState;
             ProjectilePoolUtility.DespawnToPool(projectileEntity,

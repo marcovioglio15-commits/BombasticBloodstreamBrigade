@@ -36,6 +36,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdSwitchWeapon = "Module_SwitchWeapon";
     internal const string ModuleIdAttractDrops = "Module_AttractDrops";
     internal const string ModuleIdReturningProjectiles = PlayerReturningProjectilesPresetDefaultsUtility.ModuleId;
+    internal const string ModuleIdDelayedShootApplication = "Module_DelayedShootApplication";
+    internal const string ModuleIdSuddenStrike = "Module_SuddenStrike";
+    internal const string ModuleIdSelfPreservationInstinct = "Module_SelfPreservationInstinct";
 
     internal const string ActivePowerUpIdShotgun = "ActiveShotgun";
     internal const string ActivePowerUpIdChargeShot = "ActiveChargeShot";
@@ -189,6 +192,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdSwitchWeapon, "Switch Weapon", PowerUpModuleKind.SwitchWeapon, PowerUpModuleStage.Hook, "Keeps Base Gun visible and replaces the Player Visual Preset optional attachment with the mountable mesh identified by a defined Weapon Id while the owning power-up is equipped."));
         definitions.Add(CreateModuleDefinition(ModuleIdAttractDrops, "Attract Drops", PowerUpModuleKind.AttractDrops, PowerUpModuleStage.Execute, "Attracts enemy drops inside a configurable player-centered radius and can optionally consume rewards that cannot currently be used."));
         definitions.Add(CreateModuleDefinition(ModuleIdReturningProjectiles, "Returning Projectiles", PowerUpModuleKind.ReturningProjectiles, PowerUpModuleStage.Execute, "Converts projectile termination into retraced or player-seeking return travel with configurable hit and interaction rules."));
+        definitions.Add(CreateModuleDefinition(ModuleIdDelayedShootApplication, "Delayed Shoot Application", PowerUpModuleKind.DelayedShootApplication, PowerUpModuleStage.Trigger, "Applies sibling discrete-projectile modules only to every configured base shot."));
+        definitions.Add(CreateModuleDefinition(ModuleIdSuddenStrike, "Sudden Strike", PowerUpModuleKind.SuddenStrike, PowerUpModuleStage.Trigger, "Charges a sibling Trigger Hold Charge automatically while its condition is satisfied, then applies its full-charge payload and any sibling projectile or object-spawn effects to the next base shot."));
+        definitions.Add(CreateModuleDefinition(ModuleIdSelfPreservationInstinct, "Self-Preservation Instinct", PowerUpModuleKind.SelfPreservationInstinct, PowerUpModuleStage.Trigger, "Executes sibling active-effect modules when player health crosses the configured threshold from above."));
         return definitions;
     }
 
@@ -423,6 +429,20 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
             case PowerUpModuleKind.TriggerEvent:
                 payload.TriggerEvent.Configure(PowerUpTriggerEventType.OnEnemyKilled);
                 break;
+            case PowerUpModuleKind.DelayedShootApplication:
+                payload.DelayedShootApplication.Configure(3);
+                break;
+            case PowerUpModuleKind.SuddenStrike:
+                payload.SuddenStrike.Configure(SuddenStrikeChargeConditionMode.Stationary,
+                                               false,
+                                               0.05f,
+                                               1f,
+                                               false,
+                                               0.25f);
+                break;
+            case PowerUpModuleKind.SelfPreservationInstinct:
+                payload.SelfPreservationInstinct.Configure(SelfPreservationHealthThresholdMode.MaximumHealthPercent, 25f);
+                break;
             case PowerUpModuleKind.GateResource:
                 payload.ResourceGate.Configure(PowerUpResourceType.Energy,
                                                PowerUpResourceType.Energy,
@@ -615,7 +635,10 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                1f,
                                                ProjectileOutboundHitPolicy.NaturalPenetration,
                                                1,
+                                               ProjectileReturnStartMode.AutomaticDelay,
                                                0f,
+                                               false,
+                                               false,
                                                0.5f,
                                                0.5f,
                                                1f,
@@ -627,6 +650,9 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                ProjectileReturnRotationAxis.Vertical,
                                                hitPolicy,
                                                1,
+                                               false,
+                                               1f,
+                                               0.5f,
                                                0.25f,
                                                0.2f,
                                                true,

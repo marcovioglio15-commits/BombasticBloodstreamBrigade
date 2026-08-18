@@ -55,6 +55,9 @@ public static class PowerUpModuleDefinitionVisualizationUtility
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, laserDurationSecondsProperty, "Laser Duration Seconds");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, ignoreInheritedPlayerVelocityXProperty, "Ignore Inherited Velocity X");
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(payloadContainer, ignoreInheritedPlayerVelocityZProperty, "Ignore Inherited Velocity Z");
+        HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        warningBox.style.display = DisplayStyle.None;
+        payloadContainer.Add(warningBox);
 
         Label chartLabel = new Label("Cone Pattern Preview");
         chartLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
@@ -67,14 +70,39 @@ public static class PowerUpModuleDefinitionVisualizationUtility
         payloadContainer.TrackPropertyValue(projectileCountProperty, changedProperty =>
         {
             UpdateProjectilePatternConePieChart(pieChart, changedProperty, coneAngleDegreesProperty);
+            RefreshWarnings();
         });
 
         payloadContainer.TrackPropertyValue(coneAngleDegreesProperty, changedProperty =>
         {
             UpdateProjectilePatternConePieChart(pieChart, projectileCountProperty, changedProperty);
+            RefreshWarnings();
         });
 
+        payloadContainer.TrackPropertyValue(laserDurationSecondsProperty, changedProperty => RefreshWarnings());
+
         UpdateProjectilePatternConePieChart(pieChart, projectileCountProperty, coneAngleDegreesProperty);
+        RefreshWarnings();
+
+        void RefreshWarnings()
+        {
+            List<string> warnings = new List<string>();
+
+            if (projectileCountProperty.intValue <= 0)
+                warnings.Add("Projectile Count must be greater than zero.");
+
+            if (coneAngleDegreesProperty.floatValue < 0f ||
+                coneAngleDegreesProperty.floatValue > PlayerProjectileConePatternUtility.FullCircleDegrees)
+            {
+                warnings.Add("Cone Angle Degrees must remain within 0-360 degrees.");
+            }
+
+            if (laserDurationSecondsProperty.floatValue < 0f)
+                warnings.Add("Laser Duration Seconds cannot be negative.");
+
+            warningBox.text = string.Join("\n", warnings);
+            warningBox.style.display = warnings.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+        }
     }
 
     /// <summary>
@@ -208,7 +236,7 @@ public static class PowerUpModuleDefinitionVisualizationUtility
             return;
 
         int projectileCount = Mathf.Max(1, projectileCountProperty.intValue);
-        float coneAngleDegrees = Mathf.Max(0f, coneAngleDegreesProperty.floatValue);
+        float coneAngleDegrees = PlayerProjectileConePatternUtility.ResolveConeAngleDegrees(coneAngleDegreesProperty.floatValue);
         float halfCone = coneAngleDegrees * 0.5f;
         List<PieChartElement.PieSlice> slices = new List<PieChartElement.PieSlice>();
         List<float> directionMarkers = new List<float>();
@@ -222,8 +250,20 @@ public static class PowerUpModuleDefinitionVisualizationUtility
             Color = ConeBackgroundColor
         });
 
-        if (coneAngleDegrees > 0f)
+        if (coneAngleDegrees >= PlayerProjectileConePatternUtility.FullCircleDegrees)
+        {
+            slices.Add(new PieChartElement.PieSlice
+            {
+                StartAngle = 0f,
+                EndAngle = PlayerProjectileConePatternUtility.FullCircleDegrees,
+                MidAngle = PlayerProjectileConePatternUtility.FullCircleDegrees * 0.5f,
+                Color = ConeFillColor
+            });
+        }
+        else if (coneAngleDegrees > 0f)
+        {
             AddNormalizedSlice(slices, NormalizeAngle(-halfCone), NormalizeAngle(halfCone), ConeFillColor);
+        }
 
         if (projectileCount <= 1)
         {
@@ -239,11 +279,11 @@ public static class PowerUpModuleDefinitionVisualizationUtility
         }
         else
         {
-            float stepDegrees = projectileCount > 1 ? coneAngleDegrees / (projectileCount - 1) : 0f;
-
             for (int projectileIndex = 0; projectileIndex < projectileCount; projectileIndex++)
             {
-                float angle = -halfCone + stepDegrees * projectileIndex;
+                float angle = PlayerProjectileConePatternUtility.ResolveDirectionAngleDegrees(projectileIndex,
+                                                                                                projectileCount,
+                                                                                                coneAngleDegrees);
                 float normalizedAngle = NormalizeAngle(angle);
                 directionMarkers.Add(normalizedAngle);
                 labels.Add(new PieChartElement.LabelDescriptor

@@ -87,6 +87,7 @@ public partial struct ProjectileSimulationSystem : ISystem
             EnemyDataLookup = SystemAPI.GetComponentLookup<EnemyData>(true),
             PassiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true),
             PlayerWorldTransformLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true),
+            PowerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(true),
             BounceStateLookup = SystemAPI.GetComponentLookup<ProjectileBounceState>(true),
             ReturnFeedbackWriter = returnFeedbackRequests.AsParallelWriter()
         };
@@ -133,6 +134,7 @@ public partial struct ProjectileSimulationSystem : ISystem
         [ReadOnly] public ComponentLookup<EnemyData> EnemyDataLookup;
         [ReadOnly] public BufferLookup<PlayerPassiveToolsStateElement> PassiveToolsLookup;
         [ReadOnly] public ComponentLookup<LocalToWorld> PlayerWorldTransformLookup;
+        [ReadOnly] public ComponentLookup<PlayerPowerUpsState> PowerUpsStateLookup;
         [ReadOnly] public ComponentLookup<ProjectileBounceState> BounceStateLookup;
         public NativeQueue<ReturnFeedbackRequest>.ParallelWriter ReturnFeedbackWriter;
         #endregion
@@ -164,6 +166,15 @@ public partial struct ProjectileSimulationSystem : ISystem
                                                                                                 DeltaTime,
                                                                                                 EnemyTimeScale,
                                                                                                 PlayerProjectileTimeScale);
+
+            // Observe versioned active recall input before phase dispatch so early and endpoint recalls share one transition path.
+            ProjectileActivationRecallRuntimeUtility.TryConsume(ref returnState,
+                                                                 ref projectile,
+                                                                 ref perfectCircleState,
+                                                                 ref projectileTransform,
+                                                                 returnPath,
+                                                                 in owner,
+                                                                 in PowerUpsStateLookup);
 
             // Return phases bypass outbound lifetime accumulation and wall-oriented facing updates.
             if (returnState.Enabled != 0 && returnState.Phase != ProjectileReturnPhase.Outbound)

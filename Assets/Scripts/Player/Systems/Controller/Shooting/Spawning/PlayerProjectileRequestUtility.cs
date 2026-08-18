@@ -184,6 +184,7 @@ public static class PlayerProjectileRequestUtility
     /// <param name="activeSlotIndex">Owning active slot, or 255 when the request is not slot-owned.</param>
     /// <param name="hasReturningProjectilesOverride">Whether the explicit return config must override passive filtering.</param>
     /// <param name="returningProjectilesOverride">Explicit return config carried by the request.</param>
+    /// <param name="shotModifiers">Per-shot hook snapshot used when conditional effects differ between consecutive volleys.</param>
     public static void AddSpreadRequests(ref DynamicBuffer<ShootRequest> shootRequests,
                                          int projectileCount,
                                          float coneAngleDegrees,
@@ -196,7 +197,8 @@ public static class PlayerProjectileRequestUtility
                                          ProjectileSpawnSource spawnSource = ProjectileSpawnSource.BaseShot,
                                          byte activeSlotIndex = byte.MaxValue,
                                          byte hasReturningProjectilesOverride = 0,
-                                         ReturningProjectilesConfig returningProjectilesOverride = default)
+                                         ReturningProjectilesConfig returningProjectilesOverride = default,
+                                         ProjectileShotModifierConfig shotModifiers = default)
     {
         if (projectileCount <= 1)
         {
@@ -212,16 +214,16 @@ public static class PlayerProjectileRequestUtility
                             spawnSource,
                             activeSlotIndex,
                             hasReturningProjectilesOverride,
-                            returningProjectilesOverride);
+                            returningProjectilesOverride,
+                            shotModifiers);
             return;
         }
 
-        float halfCone = coneAngleDegrees * 0.5f;
-        float step = coneAngleDegrees / (projectileCount - 1);
-
         for (int projectileIndex = 0; projectileIndex < projectileCount; projectileIndex++)
         {
-            float angle = -halfCone + step * projectileIndex;
+            float angle = PlayerProjectileConePatternUtility.ResolveDirectionAngleDegrees(projectileIndex,
+                                                                                            projectileCount,
+                                                                                            coneAngleDegrees);
             quaternion rotationOffset = quaternion.AxisAngle(new float3(0f, 1f, 0f), math.radians(angle));
             float3 spreadDirection = math.rotate(rotationOffset, shootDirection);
 
@@ -240,7 +242,8 @@ public static class PlayerProjectileRequestUtility
                             spawnSource,
                             activeSlotIndex,
                             hasReturningProjectilesOverride,
-                            returningProjectilesOverride);
+                            returningProjectilesOverride,
+                            shotModifiers);
         }
     }
 
@@ -260,6 +263,7 @@ public static class PlayerProjectileRequestUtility
     /// <param name="activeSlotIndex">Owning active slot, or 255 when the request is not slot-owned.</param>
     /// <param name="hasReturningProjectilesOverride">Whether the explicit return config must override passive filtering.</param>
     /// <param name="returningProjectilesOverride">Explicit return config carried by the request.</param>
+    /// <param name="shotModifiers">Per-shot hook snapshot used when conditional effects differ between consecutive volleys.</param>
     public static void AddShootRequest(ref DynamicBuffer<ShootRequest> shootRequests,
                                        float3 position,
                                        float3 direction,
@@ -272,7 +276,8 @@ public static class PlayerProjectileRequestUtility
                                        ProjectileSpawnSource spawnSource = ProjectileSpawnSource.BaseShot,
                                        byte activeSlotIndex = byte.MaxValue,
                                        byte hasReturningProjectilesOverride = 0,
-                                       ReturningProjectilesConfig returningProjectilesOverride = default)
+                                       ReturningProjectilesConfig returningProjectilesOverride = default,
+                                       ProjectileShotModifierConfig shotModifiers = default)
     {
         int safeOrbitLayerCount = math.max(1, orbitLayerCount);
         shootRequests.Add(new ShootRequest
@@ -305,8 +310,30 @@ public static class PlayerProjectileRequestUtility
             OrbitLayerIndex = math.clamp(orbitLayerIndex, 0, safeOrbitLayerCount - 1),
             OrbitLayerCount = safeOrbitLayerCount,
             ReturningProjectilesOverride = returningProjectilesOverride,
-            ElementalPayloadOverride = template.ElementalPayloadOverride
+            ElementalPayloadOverride = template.ElementalPayloadOverride,
+            ShotModifiers = shotModifiers
         });
+    }
+
+    /// <summary>
+    /// Captures per-shot projectile hooks so consecutive conditional volleys do not depend on the shared aggregate at spawn time.
+    /// </summary>
+    /// <param name="passiveToolsState">Resolved passive state for exactly one base-shot volley.</param>
+    /// <returns>Compact modifier snapshot copied into each request in the volley.</returns>
+    public static ProjectileShotModifierConfig BuildShotModifierConfig(in PlayerPassiveToolsState passiveToolsState)
+    {
+        return new ProjectileShotModifierConfig
+        {
+            HasResolvedModifiers = 1,
+            HasPerfectCircle = passiveToolsState.HasPerfectCircle,
+            PerfectCircle = passiveToolsState.PerfectCircle,
+            HasBouncingProjectiles = passiveToolsState.HasBouncingProjectiles,
+            BouncingProjectiles = passiveToolsState.BouncingProjectiles,
+            HasSplittingProjectiles = passiveToolsState.HasSplittingProjectiles,
+            SplittingProjectiles = passiveToolsState.SplittingProjectiles,
+            HasElementalProjectiles = passiveToolsState.HasElementalProjectiles,
+            ElementalProjectiles = passiveToolsState.ElementalProjectiles
+        };
     }
 
     /// <summary>

@@ -39,6 +39,9 @@ public static class PlayerRuntimeReturningProjectileScalingUtility
             case "returningProjectiles.additionalOutboundHits":
                 config.AdditionalOutboundHits = math.max(1, (int)math.round(resolvedValue));
                 return true;
+            case "returningProjectiles.returnStartMode":
+                config.ReturnStartMode = PlayerRuntimeScalingEnumUtility.ResolveProjectileReturnStartMode(resolvedValue);
+                return true;
             case "returningProjectiles.returnDelaySeconds":
                 config.ReturnDelaySeconds = math.max(0f, resolvedValue);
                 return true;
@@ -71,6 +74,12 @@ public static class PlayerRuntimeReturningProjectileScalingUtility
                 return true;
             case "returningProjectiles.additionalReturnHits":
                 config.AdditionalReturnHits = math.max(1, (int)math.round(resolvedValue));
+                return true;
+            case "returningProjectiles.repeatedContactDamage":
+                config.RepeatedContactDamage = math.max(0f, resolvedValue);
+                return true;
+            case "returningProjectiles.repeatedContactDamageIntervalSeconds":
+                config.RepeatedContactDamageIntervalSeconds = math.max(0.01f, resolvedValue);
                 return true;
             case "returningProjectiles.pathSampleDistance":
                 config.PathSampleDistance = math.max(0.01f, resolvedValue);
@@ -138,6 +147,15 @@ public static class PlayerRuntimeReturningProjectileScalingUtility
                 return true;
             case "returningProjectiles.allowConcurrentActiveProjectiles":
                 config.AllowConcurrentActiveProjectiles = byteValue;
+                return true;
+            case "returningProjectiles.allowEarlyActivationRecall":
+                config.AllowEarlyActivationRecall = byteValue;
+                return true;
+            case "returningProjectiles.reapplyResourceGateCostOnRecall":
+                config.ReapplyResourceGateCostOnRecall = byteValue;
+                return true;
+            case "returningProjectiles.enableRepeatedContactDamage":
+                config.EnableRepeatedContactDamage = byteValue;
                 return true;
             default:
                 return false;

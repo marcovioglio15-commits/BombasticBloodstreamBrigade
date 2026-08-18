@@ -1,4 +1,3 @@
-using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 
@@ -23,6 +22,7 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
         state.RequireForUpdate<PlayerPowerUpsConfigElement>();
         state.RequireForUpdate<PlayerPowerUpsState>();
         state.RequireForUpdate<PlayerMovementModifiers>();
+        state.RequireForUpdate<EquippedPassiveToolElement>();
     }
     #endregion
 
@@ -35,8 +35,10 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
     {
         foreach ((DynamicBuffer<PlayerPowerUpsConfigElement> powerUpsConfigBuffer,
                   RefRO<PlayerPowerUpsState> powerUpsState,
+                  DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools,
                   RefRW<PlayerMovementModifiers> movementModifiers) in SystemAPI.Query<DynamicBuffer<PlayerPowerUpsConfigElement>,
                                                                                        RefRO<PlayerPowerUpsState>,
+                                                                                       DynamicBuffer<EquippedPassiveToolElement>,
                                                                                        RefRW<PlayerMovementModifiers>>())
         {
             PlayerPowerUpsConfig powerUpsConfig;
@@ -49,6 +51,18 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
                                                                 powerUpsState.ValueRO.SecondaryCharge,
                                                                 powerUpsState.ValueRO.SecondaryIsCharging);
             float slowPercent = math.max(primarySlowPercent, secondarySlowPercent);
+            slowPercent = math.max(slowPercent,
+                                   PlayerConditionalPowerUpRuntimeUtility.ResolveMovementSlowPercent(in powerUpsState.ValueRO.PrimaryConditionalApplication));
+            slowPercent = math.max(slowPercent,
+                                   PlayerConditionalPowerUpRuntimeUtility.ResolveMovementSlowPercent(in powerUpsState.ValueRO.SecondaryConditionalApplication));
+
+            // Fold equipped passive Sudden Strike recovery state into the strongest movement penalty.
+            for (int passiveIndex = 0; passiveIndex < equippedPassiveTools.Length; passiveIndex++)
+            {
+                EquippedPassiveToolElement passive = equippedPassiveTools[passiveIndex];
+                slowPercent = math.max(slowPercent,
+                                       PlayerConditionalPowerUpRuntimeUtility.ResolveMovementSlowPercent(in passive.ConditionalApplicationState));
+            }
 
             if (slowPercent <= 0f)
                 continue;
@@ -95,35 +109,9 @@ public partial struct PlayerPowerUpChargeMovementSlowSystem : ISystem
             return 0f;
 
         float normalizedCharge = math.saturate(math.max(0f, charge) / maximumCharge);
-        float curveValue = SampleNormalizedSlowCurve(in slotConfig.ChargeShot.PlayerSlowCurveSamples, normalizedCharge);
+        float curveValue = PlayerConditionalPowerUpRuntimeUtility.SampleNormalizedSlowCurve(in slotConfig.ChargeShot.PlayerSlowCurveSamples,
+                                                                                             normalizedCharge);
         return maximumSlowPercent * curveValue;
-    }
-
-    /// <summary>
-    /// Samples the fixed normalized slow curve used by the charge-shot movement penalty.
-    /// </summary>
-    /// <param name="samples">Fixed normalized curve samples baked from the authoring AnimationCurve.</param>
-    /// <param name="normalizedCharge">Current charge progress in the 0-1 range.</param>
-    /// <returns>Normalized curve output in the 0-1 range.</returns>
-    private static float SampleNormalizedSlowCurve(in FixedList128Bytes<float> samples,
-                                                   float normalizedCharge)
-    {
-        float clampedCharge = math.saturate(normalizedCharge);
-        int sampleCount = samples.Length;
-
-        if (sampleCount <= 0)
-            return clampedCharge;
-
-        if (sampleCount == 1)
-            return math.saturate(samples[0]);
-
-        float scaledSampleIndex = clampedCharge * (sampleCount - 1);
-        int lowerSampleIndex = math.clamp((int)math.floor(scaledSampleIndex), 0, sampleCount - 1);
-        int upperSampleIndex = math.min(lowerSampleIndex + 1, sampleCount - 1);
-        float interpolation = math.saturate(scaledSampleIndex - lowerSampleIndex);
-        float lowerSample = math.saturate(samples[lowerSampleIndex]);
-        float upperSample = math.saturate(samples[upperSampleIndex]);
-        return math.lerp(lowerSample, upperSample, interpolation);
     }
     #endregion
 

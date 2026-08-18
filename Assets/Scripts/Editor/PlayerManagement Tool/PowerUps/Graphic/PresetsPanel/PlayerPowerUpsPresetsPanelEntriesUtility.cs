@@ -418,18 +418,50 @@ public static class PlayerPowerUpsPresetsPanelEntriesUtility
         powerUpField.BindProperty(powerUpProperty);
         powerUpField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
         {
-            if (evt == null)
+            if (evt == null ||
+                !RequiresCardPresentationRefresh(powerUpProperty, evt.changedProperty))
                 return;
 
-            Dictionary<string, PowerUpModuleCatalogEntry> updatedModuleCatalogById = PowerUpModuleCatalogUtility.BuildCatalogById(powerUpProperty.serializedObject);
             PlayerPowerUpsPresetsPanelEntriesSupportUtility.UpdatePowerUpCardPresentation(powerUpProperty,
                                                                                           powerUpIndex,
                                                                                           isActiveSection,
                                                                                           foldout,
                                                                                           coverageWarningBox,
-                                                                                          updatedModuleCatalogById);
+                                                                                          moduleCatalogById);
         });
         contentContainer.Add(powerUpField);
+    }
+
+    /// <summary>
+    /// Filters nested property events to the small set that can alter a power-up card title or composition warning.
+    /// </summary>
+    /// <param name="powerUpProperty">Serialized power-up represented by the card.</param>
+    /// <param name="changedProperty">Property reported by the nested UI event.</param>
+    /// <returns>True when the card presentation must be recomputed.</returns>
+    private static bool RequiresCardPresentationRefresh(SerializedProperty powerUpProperty,
+                                                        SerializedProperty changedProperty)
+    {
+        if (powerUpProperty == null || changedProperty == null)
+            return false;
+
+        string relativePath = changedProperty.propertyPath;
+        string powerUpPath = powerUpProperty.propertyPath + ".";
+
+        if (relativePath.StartsWith(powerUpPath, StringComparison.Ordinal))
+            relativePath = relativePath.Substring(powerUpPath.Length);
+
+        if (relativePath == "commonData.powerUpId" ||
+            relativePath == "commonData.displayName" ||
+            relativePath == "stealProtected")
+            return true;
+
+        if (!relativePath.StartsWith("moduleBindings.", StringComparison.Ordinal))
+            return false;
+
+        return relativePath.EndsWith(".moduleId", StringComparison.Ordinal) ||
+               relativePath.EndsWith(".isEnabled", StringComparison.Ordinal) ||
+               relativePath.EndsWith(".useOverridePayload", StringComparison.Ordinal) ||
+               relativePath.EndsWith(".resourceGate.isToggleable", StringComparison.Ordinal);
     }
     #endregion
 

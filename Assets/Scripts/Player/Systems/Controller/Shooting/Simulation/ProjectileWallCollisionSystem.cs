@@ -210,9 +210,13 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                             ref projectileData,
                                                             ref mutablePerfectCircleState,
                                                             ref returningTransform,
-                                                            returnPathLookup[projectileEntity],
-                                                            returnState.OutboundHitCapacityExhausted != 0 ||
-                                                            returnState.OutboundNaturalHitCapacityExhausted != 0);
+                                                             returnPathLookup[projectileEntity],
+                                                             returnState.OutboundHitCapacityExhausted != 0 ||
+                                                             returnState.OutboundNaturalHitCapacityExhausted != 0,
+                                                             false);
+                ProjectileActivationRecallRuntimeUtility.RegisterReady(projectileOwner.ShooterEntity,
+                                                                        ref returnState,
+                                                                        ref powerUpsStateLookup);
                 projectile.ValueRW = projectileData;
                 perfectCircleState.ValueRW = mutablePerfectCircleState;
                 projectileTransform.ValueRW = returningTransform;
@@ -232,9 +236,9 @@ public partial struct ProjectileWallCollisionSystem : ISystem
                                                             in enemyProjectileDeathVfxConfigLookup,
                                                             ref vfxRequestLookup);
             LocalTransform parkedTransform = projectileTransform.ValueRO;
-            ProjectileReturnRuntimeUtility.ReleaseConcurrency(projectileOwner.ShooterEntity,
-                                                              ref returnState,
-                                                              ref powerUpsStateLookup);
+            ProjectileActivationRecallRuntimeUtility.ReleaseOwnership(projectileOwner.ShooterEntity,
+                                                                       ref returnState,
+                                                                       ref powerUpsStateLookup);
 
             if (projectileReturnStateLookup.HasComponent(projectileEntity))
                 projectileReturnStateLookup[projectileEntity] = returnState;

@@ -325,13 +325,15 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         AddOverridePayloadWarnings(overrideContainer, overridePayloadProperty, moduleDefaultPayloadProperty, moduleKind);
         bool showActiveTriggerCharacterTuningOption = ShouldShowActiveTriggerCharacterTuningOption(bindingProperty, moduleKind);
         bool showActiveProjectileConcurrencyOption = ShouldShowActiveProjectileConcurrencyOption(bindingProperty, moduleKind);
+        bool hasOwningResourceGate = showActiveProjectileConcurrencyOption && HasEnabledOwningResourceGate(bindingProperty);
         PowerUpModuleDefinitionPropertyDrawer.BuildPayloadEditor(overrideContainer,
                                                                  payloadProperty,
                                                                  moduleKind,
                                                                  payloadLabel,
                                                                  showActiveTriggerCharacterTuningOption,
                                                                  showToggleDurationOption,
-                                                                 showActiveProjectileConcurrencyOption);
+                                                                 showActiveProjectileConcurrencyOption,
+                                                                 hasOwningResourceGate);
     }
 
     /// <summary>
@@ -354,6 +356,47 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
             return false;
 
         return IsNonToggleableActive(powerUpProperty, false, false);
+    }
+
+    /// <summary>
+    /// Reports whether the active that owns one binding contains an enabled Resource Gate module.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized binding used to resolve the owning active and module catalog.</param>
+    /// <returns>True when an enabled Resource Gate binding belongs to the same Active power-up.</returns>
+    private static bool HasEnabledOwningResourceGate(SerializedProperty bindingProperty)
+    {
+        if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
+            return false;
+
+        SerializedProperty bindingsProperty = powerUpProperty.FindPropertyRelative("moduleBindings");
+
+        if (bindingsProperty == null)
+            return false;
+
+        for (int index = 0; index < bindingsProperty.arraySize; index++)
+        {
+            SerializedProperty candidateBinding = bindingsProperty.GetArrayElementAtIndex(index);
+
+            if (candidateBinding == null || !IsBindingEnabled(candidateBinding))
+                continue;
+
+            string moduleId = ModularPowerUpBindingDrawerUtility.ResolveBindingModuleId(candidateBinding);
+
+            if (!TryResolveModuleInfo(bindingProperty.serializedObject,
+                                      moduleId,
+                                      out PowerUpModuleKind moduleKind,
+                                      out PowerUpModuleStage _,
+                                      out string _,
+                                      out SerializedProperty _))
+            {
+                continue;
+            }
+
+            if (moduleKind == PowerUpModuleKind.GateResource)
+                return true;
+        }
+
+        return false;
     }
 
     private static bool TryResolveModuleInfo(SerializedObject serializedObject,

@@ -366,7 +366,9 @@ public static class ProjectileSplitUtility
             IgnoreInheritedPlayerVelocityZ = ignoreInheritedPlayerVelocityZ,
             IsSplitChild = 1,
             SpawnSource = ProjectileSpawnSource.SplitProjectile,
-            ActiveSlotIndex = ProjectileReturnRuntimeUtility.NoActiveSlot,
+            ActiveSlotIndex = returnState.ConcurrencyRegistered != 0
+                ? returnState.ActiveSlotIndex
+                : ProjectileReturnRuntimeUtility.NoActiveSlot,
             HasReturningProjectilesOverride = returnState.Enabled != 0 &&
                                                 ProjectileReturnPowerUpInteractionUtility.AllowsSplitChildren(in returnState.Config)
                 ? (byte)1

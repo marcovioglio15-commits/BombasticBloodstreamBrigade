@@ -17,6 +17,8 @@ public static class PlayerPowerUpActivationSlotUtility
     /// <param name="otherSlotConfig">Compiled peer slot configuration used by interruption rules.</param>
     /// <param name="slotIndex">Stable active slot index used by slot-specific state.</param>
     /// <param name="activeReturningProjectileCount">Live returning projectiles currently registered to this slot.</param>
+    /// <param name="returningProjectileRecallReadyCount">Mutable count of projectiles waiting at an outbound endpoint.</param>
+    /// <param name="returningProjectileRecallVersion">Mutable version advanced by each accepted recall tap.</param>
     /// <param name="isPressed">Whether the bound input is currently held.</param>
     /// <param name="pressedThisFrame">Whether the bound input started this frame.</param>
     /// <param name="releasedThisFrame">Whether the bound input ended this frame.</param>
@@ -68,6 +70,8 @@ public static class PlayerPowerUpActivationSlotUtility
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
                                         byte slotIndex,
                                         int activeReturningProjectileCount,
+                                        ref int returningProjectileRecallReadyCount,
+                                        ref uint returningProjectileRecallVersion,
                                         bool isPressed,
                                         bool pressedThisFrame,
                                         bool releasedThisFrame,
@@ -118,6 +122,23 @@ public static class PlayerPowerUpActivationSlotUtility
     {
         if (slotConfig.IsDefined == 0)
             return;
+
+        if (PlayerReturningProjectileRecallActivationUtility.TryProcess(in slotConfig,
+                                                                        activeReturningProjectileCount,
+                                                                        pressedThisFrame,
+                                                                        ref returningProjectileRecallReadyCount,
+                                                                        ref returningProjectileRecallVersion,
+                                                                        ref slotEnergy,
+                                                                        playerEntity,
+                                                                        ref healthLookup,
+                                                                        ref updatedHealth,
+                                                                        ref healthChanged,
+                                                                        ref shieldLookup,
+                                                                        ref updatedShield,
+                                                                        ref shieldChanged))
+        {
+            return;
+        }
 
         if (slotConfig.HasReturningProjectiles != 0 &&
             slotConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0 &&
@@ -600,45 +621,12 @@ public static class PlayerPowerUpActivationSlotUtility
                                           float currentMissingHealth,
                                           ref PlayerHealOverTimeState healOverTimeState)
     {
-        float clampedRequestedHeal = math.max(0f, requestedHealAmount);
-        float clampedMissingHealth = math.max(0f, currentMissingHealth);
-        float totalHeal = math.min(clampedRequestedHeal, clampedMissingHealth);
-
-        if (totalHeal <= 0f)
-            return;
-
-        float durationSeconds = math.max(0.05f, slotConfig.PortableHealthPack.DurationSeconds);
-        float tickIntervalSeconds = math.max(0.01f, slotConfig.PortableHealthPack.TickIntervalSeconds);
-        float healPerSecond = totalHeal / durationSeconds;
-        bool hasActiveHot = healOverTimeState.IsActive != 0;
-
-        switch (slotConfig.PortableHealthPack.StackPolicy)
-        {
-            case PowerUpHealStackPolicy.IgnoreIfActive:
-                if (hasActiveHot)
-                    return;
-
-                break;
-            case PowerUpHealStackPolicy.Additive:
-                if (hasActiveHot)
-                {
-                    healOverTimeState.RemainingTotalHeal += totalHeal;
-                    healOverTimeState.RemainingDuration = math.max(healOverTimeState.RemainingDuration, durationSeconds);
-                    healOverTimeState.TickIntervalSeconds = math.min(healOverTimeState.TickIntervalSeconds, tickIntervalSeconds);
-                    healOverTimeState.HealPerSecond += healPerSecond;
-                    healOverTimeState.IsActive = 1;
-                    return;
-                }
-
-                break;
-        }
-
-        healOverTimeState.IsActive = 1;
-        healOverTimeState.HealPerSecond = healPerSecond;
-        healOverTimeState.RemainingTotalHeal = totalHeal;
-        healOverTimeState.RemainingDuration = durationSeconds;
-        healOverTimeState.TickIntervalSeconds = tickIntervalSeconds;
-        healOverTimeState.TickTimer = 0f;
+        PlayerPowerUpHealingRuntimeUtility.TryApply(requestedHealAmount,
+                                                    currentMissingHealth,
+                                                    slotConfig.PortableHealthPack.DurationSeconds,
+                                                    slotConfig.PortableHealthPack.TickIntervalSeconds,
+                                                    slotConfig.PortableHealthPack.StackPolicy,
+                                                    ref healOverTimeState);
     }
 
     #endregion

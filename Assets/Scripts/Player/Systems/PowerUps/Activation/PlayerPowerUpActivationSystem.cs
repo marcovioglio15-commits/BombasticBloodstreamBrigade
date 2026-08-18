@@ -293,6 +293,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             float secondaryCharge = powerUpsState.ValueRO.SecondaryCharge;
             float primaryMaintenanceTickTimer = powerUpsState.ValueRO.PrimaryMaintenanceTickTimer;
             float secondaryMaintenanceTickTimer = powerUpsState.ValueRO.SecondaryMaintenanceTickTimer;
+            int primaryReturningProjectileRecallReadyCount = powerUpsState.ValueRO.PrimaryReturningProjectileRecallReadyCount;
+            int secondaryReturningProjectileRecallReadyCount = powerUpsState.ValueRO.SecondaryReturningProjectileRecallReadyCount;
+            uint primaryReturningProjectileRecallVersion = powerUpsState.ValueRO.PrimaryReturningProjectileRecallVersion;
+            uint secondaryReturningProjectileRecallVersion = powerUpsState.ValueRO.SecondaryReturningProjectileRecallVersion;
             byte primaryIsCharging = powerUpsState.ValueRO.PrimaryIsCharging;
             byte secondaryIsCharging = powerUpsState.ValueRO.SecondaryIsCharging;
             byte primaryIsActive = powerUpsState.ValueRO.PrimaryIsActive;
@@ -389,6 +393,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 in secondarySlotConfig,
                                                                 0,
                                                                 powerUpsState.ValueRO.PrimaryReturningProjectileCount,
+                                                                ref primaryReturningProjectileRecallReadyCount,
+                                                                ref primaryReturningProjectileRecallVersion,
                                                                 primaryPressed,
                                                                 primaryPressedThisFrame,
                                                                 primaryReleasedThisFrame,
@@ -524,6 +530,8 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 in primarySlotConfig,
                                                                 1,
                                                                 powerUpsState.ValueRO.SecondaryReturningProjectileCount,
+                                                                ref secondaryReturningProjectileRecallReadyCount,
+                                                                ref secondaryReturningProjectileRecallVersion,
                                                                 secondaryPressed,
                                                                 secondaryPressedThisFrame,
                                                                 secondaryReleasedThisFrame,
@@ -667,6 +675,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             powerUpsState.ValueRW.SecondaryCharge = secondaryCharge;
             powerUpsState.ValueRW.PrimaryMaintenanceTickTimer = primaryMaintenanceTickTimer;
             powerUpsState.ValueRW.SecondaryMaintenanceTickTimer = secondaryMaintenanceTickTimer;
+            powerUpsState.ValueRW.PrimaryReturningProjectileRecallReadyCount = primaryReturningProjectileRecallReadyCount;
+            powerUpsState.ValueRW.SecondaryReturningProjectileRecallReadyCount = secondaryReturningProjectileRecallReadyCount;
+            powerUpsState.ValueRW.PrimaryReturningProjectileRecallVersion = primaryReturningProjectileRecallVersion;
+            powerUpsState.ValueRW.SecondaryReturningProjectileRecallVersion = secondaryReturningProjectileRecallVersion;
             powerUpsState.ValueRW.PrimaryIsCharging = primaryIsCharging;
             powerUpsState.ValueRW.SecondaryIsCharging = secondaryIsCharging;
             powerUpsState.ValueRW.PrimaryIsActive = primaryIsActive;

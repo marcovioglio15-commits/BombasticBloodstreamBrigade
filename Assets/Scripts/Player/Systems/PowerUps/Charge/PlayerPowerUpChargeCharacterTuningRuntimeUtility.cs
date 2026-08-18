@@ -657,6 +657,13 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
         if (catalogEntry.CharacterTuningFormulaCount <= 0)
             return false;
 
+        switch (catalogEntry.PassiveToolConfig.ConditionalApplication.Mode)
+        {
+            case PowerUpConditionalApplicationMode.DelayedShootApplication:
+            case PowerUpConditionalApplicationMode.SuddenStrike:
+                return false;
+        }
+
         return catalogEntry.CurrentUnlockCount > 0;
     }
 

@@ -34,7 +34,8 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
                config.HasOrbitalProjections != 0 ||
                config.HasDropAttraction != 0 ||
                config.HasWeaponSwitch != 0 ||
-               config.HasReturningProjectiles != 0;
+               config.HasReturningProjectiles != 0 ||
+               config.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.None;
     }
 
     /// <summary>
@@ -44,6 +45,9 @@ public static class PlayerPowerUpPassiveConfigBuildUtility
     /// <returns>Representative passive tool kind for the authored payload mix.</returns>
     public static PassiveToolKind ResolvePassiveToolKind(in PlayerPassiveToolConfig config)
     {
+        if (config.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.None)
+            return PassiveToolKind.Custom;
+
         if (config.HasReturningProjectiles != 0)
             return PassiveToolKind.ReturningProjectiles;
 

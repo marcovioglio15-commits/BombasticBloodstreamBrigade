@@ -47,6 +47,8 @@ public static class PlayerReturningProjectilesSmokeTest
         PlayerReturningProjectileInteractionSmokeTest.Run();
         ValidatePoolStoragePartitioning();
         ValidateReturnTransition();
+        PlayerReturningProjectileRecallSmokeTest.Run();
+        PlayerReturningProjectileContactDamageSmokeTest.Run();
         PlayerReturnCameraShakeRuntimeSmokeTest.Run();
         GameSceneTransitionGameplayRuntimeCleanupSmokeTest.Run();
         Debug.Log("[PlayerReturningProjectilesSmokeTest] Baseline content and all Returning Projectiles checks passed.");
@@ -84,19 +86,24 @@ public static class PlayerReturningProjectilesSmokeTest
             activeConfig.HasReturningProjectiles == 0 ||
             activeConfig.ReturningProjectiles.ReturnPathMode != ProjectileReturnPathMode.SeekPlayer ||
             activeConfig.ReturningProjectiles.ReturnHitPolicy != ProjectileReturnHitPolicy.CompleteReturn ||
-            activeConfig.ReturningProjectiles.ApplyTinyMegaProjectileScaling == 0 ||
             activeConfig.ReturningProjectiles.OwningPowerUpId.ToString() != PlayerReturningProjectilesPresetDefaultsUtility.BoomerangPowerUpId ||
             activeConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles != 0 ||
             activeConfig.Toggleable != 0 ||
             activeConfig.ActivationResource != PowerUpResourceType.Energy)
         {
-            throw new InvalidOperationException("Boomerang did not bake as a non-concurrent energy active with seeking infinite return.");
+            throw new InvalidOperationException($"Boomerang baseline mismatch: Defined={activeConfig.IsDefined}, Tool={activeConfig.ToolKind}, " +
+                                                $"HasReturning={activeConfig.HasReturningProjectiles}, Path={activeConfig.ReturningProjectiles.ReturnPathMode}, " +
+                                                $"HitPolicy={activeConfig.ReturningProjectiles.ReturnHitPolicy}, StartMode={activeConfig.ReturningProjectiles.ReturnStartMode}, " +
+                                                $"PowerUpId={activeConfig.ReturningProjectiles.OwningPowerUpId}, " +
+                                                $"Concurrent={activeConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles}, " +
+                                                $"Toggleable={activeConfig.Toggleable}, Resource={activeConfig.ActivationResource}.");
         }
 
         if (passiveConfig.IsDefined == 0 ||
             passiveConfig.ToolKind != PassiveToolKind.ReturningProjectiles ||
             passiveConfig.HasReturningProjectiles == 0 ||
             passiveConfig.ReturningProjectiles.ReturnPathMode != ProjectileReturnPathMode.RetraceOutboundPath ||
+            passiveConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.AutomaticDelay ||
             passiveConfig.ReturningProjectiles.KeepProjectileVfx == 0 ||
             passiveConfig.ReturningProjectiles.AllowOtherPowerUpInteractions == 0 ||
             passiveConfig.ReturningProjectiles.EnableProjectileSplitting == 0 ||
@@ -176,7 +183,10 @@ public static class PlayerReturningProjectilesSmokeTest
                 "outboundLifetimeMultiplier",
                 "outboundHitPolicy",
                 "additionalOutboundHits",
+                "returnStartMode",
                 "returnDelaySeconds",
+                "allowEarlyActivationRecall",
+                "reapplyResourceGateCostOnRecall",
                 "returnRumbleMultiplier",
                 "returnCameraShakeMultiplier",
                 "outboundSizeMultiplier",
@@ -188,6 +198,9 @@ public static class PlayerReturningProjectilesSmokeTest
                 "turnaroundAxis",
                 "returnHitPolicy",
                 "additionalReturnHits",
+                "enableRepeatedContactDamage",
+                "repeatedContactDamage",
+                "repeatedContactDamageIntervalSeconds",
                 "pathSampleDistance",
                 "returnCompletionDistance",
                 "allowOtherPowerUpInteractions",
@@ -206,6 +219,8 @@ public static class PlayerReturningProjectilesSmokeTest
                     throw new InvalidOperationException("Returning Projectiles field is not exposed through Add Scaling: " + scalableFields[index]);
             }
 
+            PlayerReturningProjectileRecallSmokeTest.ValidateAuthoringUi(payload, serializedPreset);
+
             // Cross-power-up options must disappear as a group while same-power-up composition remains baked separately.
             payload.FindPropertyRelative("allowOtherPowerUpInteractions").boolValue = false;
             serializedPreset.ApplyModifiedPropertiesWithoutUndo();
@@ -214,6 +229,7 @@ public static class PlayerReturningProjectilesSmokeTest
             VisualElement externalOptions = payloadContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.OtherInteractionOptionsContainerName);
             VisualElement projectileVfxOptions = payloadContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.ProjectileVfxOptionsContainerName);
             VisualElement additionalOutboundHits = payloadContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.AdditionalOutboundHitsContainerName);
+            VisualElement repeatedContactDamageSettings = payloadContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.RepeatedContactDamageSettingsContainerName);
 
             if (externalOptions == null || externalOptions.style.display.value != DisplayStyle.None)
                 throw new InvalidOperationException("Returning Projectiles external interaction options remained visible after their master toggle was disabled.");
@@ -224,6 +240,9 @@ public static class PlayerReturningProjectilesSmokeTest
             if (additionalOutboundHits == null || additionalOutboundHits.style.display.value != DisplayStyle.None)
                 throw new InvalidOperationException("Returning Projectiles displayed its additional outbound hit budget for a non-limited policy.");
 
+            if (repeatedContactDamageSettings == null || repeatedContactDamageSettings.style.display.value != DisplayStyle.None)
+                throw new InvalidOperationException("Returning Projectiles displayed repeated contact damage settings while their toggle was disabled.");
+
             // The additional hit budget becomes relevant only for the limited outbound policy.
             payload.FindPropertyRelative("outboundHitPolicy").enumValueIndex = (int)ProjectileOutboundHitPolicy.LimitedAdditionalHits;
             serializedPreset.ApplyModifiedPropertiesWithoutUndo();
@@ -233,6 +252,16 @@ public static class PlayerReturningProjectilesSmokeTest
 
             if (additionalOutboundHits == null || additionalOutboundHits.style.display.value != DisplayStyle.Flex)
                 throw new InvalidOperationException("Returning Projectiles hid its additional outbound hit budget for the limited policy.");
+
+            // Damage amount and cadence become relevant only after their explicit runtime toggle is enabled.
+            payload.FindPropertyRelative("enableRepeatedContactDamage").boolValue = true;
+            serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+            VisualElement repeatedDamagePayloadContainer = new VisualElement();
+            PowerUpReturningProjectilesPayloadDrawerUtility.Build(repeatedDamagePayloadContainer, payload, false);
+            repeatedContactDamageSettings = repeatedDamagePayloadContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.RepeatedContactDamageSettingsContainerName);
+
+            if (repeatedContactDamageSettings == null || repeatedContactDamageSettings.style.display.value != DisplayStyle.Flex)
+                throw new InvalidOperationException("Returning Projectiles hid repeated contact damage settings after their toggle was enabled.");
         }
         finally
         {
@@ -299,6 +328,11 @@ public static class PlayerReturningProjectilesSmokeTest
                                                            0.4f,
                                                            ref activeConfig,
                                                            ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.returnStartMode",
+                                                           PlayerPowerUpUnlockKind.Active,
+                                                           (float)ProjectileReturnStartMode.ActivationTap,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
         PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.returnRumbleMultiplier",
                                                            PlayerPowerUpUnlockKind.Active,
                                                            0.65f,
@@ -312,8 +346,33 @@ public static class PlayerReturningProjectilesSmokeTest
         PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.allowConcurrentActiveProjectiles",
                                                                   PlayerPowerUpUnlockKind.Active,
                                                                   true,
+                                                                   ref activeConfig,
+                                                                   ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.allowEarlyActivationRecall",
+                                                                  PlayerPowerUpUnlockKind.Active,
+                                                                  true,
                                                                   ref activeConfig,
                                                                   ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.reapplyResourceGateCostOnRecall",
+                                                                  PlayerPowerUpUnlockKind.Active,
+                                                                  true,
+                                                                  ref activeConfig,
+                                                                  ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.enableRepeatedContactDamage",
+                                                                  PlayerPowerUpUnlockKind.Active,
+                                                                  true,
+                                                                  ref activeConfig,
+                                                                  ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.repeatedContactDamage",
+                                                           PlayerPowerUpUnlockKind.Active,
+                                                           6f,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.repeatedContactDamageIntervalSeconds",
+                                                           PlayerPowerUpUnlockKind.Active,
+                                                           0.3f,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
         PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.allowOtherPowerUpInteractions",
                                                                   PlayerPowerUpUnlockKind.Active,
                                                                   false,
@@ -366,10 +425,16 @@ public static class PlayerReturningProjectilesSmokeTest
             math.abs(activeConfig.ReturningProjectiles.OutboundLifetimeMultiplier - 1.5f) > PrecisionEpsilon ||
             activeConfig.ReturningProjectiles.OutboundHitPolicy != ProjectileOutboundHitPolicy.LimitedAdditionalHits ||
             activeConfig.ReturningProjectiles.AdditionalOutboundHits != 4 ||
+            activeConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.ActivationTap ||
             math.abs(activeConfig.ReturningProjectiles.ReturnDelaySeconds - 0.4f) > PrecisionEpsilon ||
             math.abs(activeConfig.ReturningProjectiles.ReturnRumbleMultiplier - 0.65f) > PrecisionEpsilon ||
             math.abs(activeConfig.ReturningProjectiles.ReturnCameraShakeMultiplier - 0.8f) > PrecisionEpsilon ||
             activeConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0 ||
+            activeConfig.ReturningProjectiles.AllowEarlyActivationRecall == 0 ||
+            activeConfig.ReturningProjectiles.ReapplyResourceGateCostOnRecall == 0 ||
+            activeConfig.ReturningProjectiles.EnableRepeatedContactDamage == 0 ||
+            math.abs(activeConfig.ReturningProjectiles.RepeatedContactDamage - 6f) > PrecisionEpsilon ||
+            math.abs(activeConfig.ReturningProjectiles.RepeatedContactDamageIntervalSeconds - 0.3f) > PrecisionEpsilon ||
             activeConfig.ReturningProjectiles.KeepProjectileVfx != 0 ||
             activeConfig.ReturningProjectiles.KeepMuzzleFlashVfx != 0 ||
             activeConfig.ReturningProjectiles.KeepHitVfx != 0 ||
@@ -624,9 +689,10 @@ public static class PlayerReturningProjectilesSmokeTest
             ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
                                                         ref projectile,
                                                         ref perfectCircleState,
-                                                        ref transform,
-                                                        path,
-                                                        true);
+                                                         ref transform,
+                                                         path,
+                                                         true,
+                                                         false);
 
             if (returnState.Phase != ProjectileReturnPhase.Delaying ||
                 math.abs(returnState.OutboundSpeed - 7f) > PrecisionEpsilon ||
@@ -724,9 +790,10 @@ public static class PlayerReturningProjectilesSmokeTest
             ProjectileReturnRuntimeUtility.BeginReturn(ref returnState,
                                                         ref projectile,
                                                         ref perfectCircleState,
-                                                        ref transform,
-                                                        path,
-                                                        false);
+                                                         ref transform,
+                                                         path,
+                                                         false,
+                                                         false);
 
             if (projectile.PenetrationMode != ProjectilePenetrationMode.DamageBased ||
                 projectile.RemainingPenetrations != 3 ||

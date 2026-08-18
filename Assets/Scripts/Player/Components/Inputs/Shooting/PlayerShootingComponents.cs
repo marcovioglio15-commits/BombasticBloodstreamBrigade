@@ -79,6 +79,23 @@ public struct ShootRequest : IBufferElementData
     public int OrbitLayerCount;
     public ReturningProjectilesConfig ReturningProjectilesOverride;
     public ProjectileElementalPayload ElementalPayloadOverride;
+    public ProjectileShotModifierConfig ShotModifiers;
+}
+
+/// <summary>
+/// Carries the fully resolved per-volley projectile hooks needed when conditional passives differ between consecutive shots.
+/// </summary>
+public struct ProjectileShotModifierConfig
+{
+    public byte HasResolvedModifiers;
+    public byte HasPerfectCircle;
+    public PerfectCirclePassiveConfig PerfectCircle;
+    public byte HasBouncingProjectiles;
+    public BouncingProjectilesPassiveConfig BouncingProjectiles;
+    public byte HasSplittingProjectiles;
+    public SplittingProjectilesPassiveConfig SplittingProjectiles;
+    public byte HasElementalProjectiles;
+    public ElementalProjectilesPassiveConfig ElementalProjectiles;
 }
 
 [InternalBufferCapacity(0)]
@@ -176,7 +193,10 @@ public struct ProjectileReturnState : IComponentData
     public byte OutboundHitCapacityExhausted;
     public byte OutboundNaturalHitCapacityExhausted;
     public byte ReturnFeedbackPending;
+    public byte ActivationRecallReadyRegistered;
+    public byte ActiveSlotIndex;
     public uint ConcurrencyGeneration;
+    public uint LastObservedActivationRecallVersion;
     public ReturningProjectilesConfig Config;
     public float OutboundSpeed;
     public float OriginalDamage;
@@ -215,6 +235,8 @@ public struct ProjectileOffscreenWarningState : IComponentData
 public struct ProjectileHitHistoryElement : IBufferElementData
 {
     public Entity EnemyEntity;
+    public float NextRepeatedContactDamageTime;
+    public byte BlocksOrdinaryHit;
 }
 
 /// <summary>

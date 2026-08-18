@@ -20,6 +20,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               ref bool isToggleable,
                                               ref float maintenanceTicksPerSecond,
                                               ref bool allowRechargeDuringToggleStartupLock,
+                                              ref float maximumToggleActiveDurationSeconds,
                                               ref float maximumEnergy,
                                               ref float activationCost,
                                               ref float maintenanceCostPerSecond,
@@ -62,6 +63,13 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
         maintenanceCostPerSecond += math.max(0f, resourceGateData.MaintenanceCostPerSecond);
         minimumActivationEnergyPercent = math.max(minimumActivationEnergyPercent,
                                                   math.clamp(resourceGateData.MinimumActivationEnergyPercent, 0f, 100f));
+
+        if (resourceGateData.IsToggleable && resourceGateData.MaximumToggleActiveDurationSeconds > 0f)
+        {
+            maximumToggleActiveDurationSeconds = maximumToggleActiveDurationSeconds > 0f
+                ? math.min(maximumToggleActiveDurationSeconds, resourceGateData.MaximumToggleActiveDurationSeconds)
+                : resourceGateData.MaximumToggleActiveDurationSeconds;
+        }
 
         if (chargeType == PowerUpChargeType.Time && resourceGateData.ChargeType != PowerUpChargeType.Time)
             chargeType = resourceGateData.ChargeType;
@@ -311,6 +319,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               PowerUpResourceType maintenanceResource,
                                               PowerUpChargeType chargeType,
                                               bool isToggleable,
+                                              float maximumToggleActiveDurationSeconds,
                                               float maximumEnergy,
                                               float activationCost,
                                               float maintenanceCostPerSecond,
@@ -437,6 +446,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             CooldownSeconds = cooldownSeconds,
             ActivationInputMode = activationInputMode,
             Toggleable = isToggleable ? (byte)1 : (byte)0,
+            MaximumToggleActiveDurationSeconds = isToggleable ? math.max(0f, maximumToggleActiveDurationSeconds) : 0f,
             ApplyCharacterTuningOnActiveTrigger = ResolveActiveTriggerCharacterTuningFlag(applyCharacterTuningOnActiveTrigger,
                                                                                           isToggleable,
                                                                                           hasHoldCharge,

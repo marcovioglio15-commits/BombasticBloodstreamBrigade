@@ -9,19 +9,24 @@ public sealed class PowerUpProjectilePatternConeModuleData
 
     #region Serialized Fields
     [Tooltip("Projectile count spawned by this cone pattern.")]
-    [SerializeField] private int projectileCount = 6;
+    [SerializeField]
+    private int projectileCount = 6;
 
-    [Tooltip("Total cone angle in degrees.")]
-    [SerializeField] private float coneAngleDegrees = 45f;
+    [Tooltip("Total cone angle in degrees from 0 through 360. A 360-degree cone distributes every projectile evenly around the full circle without duplicating its endpoints.")]
+    [SerializeField]
+    private float coneAngleDegrees = 45f;
 
     [Tooltip("Seconds for which a Laser Beam triggered by this active cone pattern remains active.")]
-    [SerializeField] private float laserDurationSeconds = 0.35f;
+    [SerializeField]
+    private float laserDurationSeconds = 0.35f;
 
     [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world X axis for projectiles emitted by this module.")]
-    [SerializeField] private bool ignoreInheritedPlayerVelocityX;
+    [SerializeField]
+    private bool ignoreInheritedPlayerVelocityX;
 
     [Tooltip("When projectile speed inheritance is enabled, ignore inherited player velocity on the world Z axis for projectiles emitted by this module.")]
-    [SerializeField] private bool ignoreInheritedPlayerVelocityZ;
+    [SerializeField]
+    private bool ignoreInheritedPlayerVelocityZ;
     #endregion
 
     #endregion

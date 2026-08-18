@@ -140,6 +140,7 @@ public static class PlayerPowerUpActiveBakeUtility
         PowerUpResourceType maintenanceResource = PowerUpResourceType.None;
         PowerUpChargeType chargeType = PowerUpChargeType.Time;
         bool isToggleable = false;
+        float maximumToggleActiveDurationSeconds = 0f;
         float maximumEnergy = 0f;
         float activationCost = 0f;
         float maintenanceCostPerSecond = 0f;
@@ -154,6 +155,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool interruptOtherSlotChargingOnly = true;
         bool hasShotgun = false;
         bool hasHoldCharge = false;
+        bool hasConditionalShotApplication = false;
         float holdChargeRequired = 0f;
         float holdChargeMaximum = 0f;
         float holdChargeRatePerSecond = 0f;
@@ -277,6 +279,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                     ref isToggleable,
                                                                                     ref maintenanceTicksPerSecond,
                                                                                     ref allowRechargeDuringToggleStartupLock,
+                                                                                    ref maximumToggleActiveDurationSeconds,
                                                                                     ref maximumEnergy,
                                                                                     ref activationCost,
                                                                                     ref maintenanceCostPerSecond,
@@ -341,6 +344,10 @@ public static class PlayerPowerUpActiveBakeUtility
                     break;
                 case PowerUpModuleKind.TriggerRelease:
                     hasTriggerRelease = true;
+                    break;
+                case PowerUpModuleKind.DelayedShootApplication:
+                case PowerUpModuleKind.SuddenStrike:
+                    hasConditionalShotApplication = true;
                     break;
                 case PowerUpModuleKind.StateSuppressShooting:
                     PowerUpSuppressShootingModuleData suppressShootingData = payload.SuppressShooting;
@@ -513,7 +520,8 @@ public static class PlayerPowerUpActiveBakeUtility
 
                     hasReturningProjectiles = true;
                     returningProjectilesConfig = PlayerPowerUpReturningProjectileBakeUtility.BuildConfig(payload.ReturningProjectiles,
-                                                                                                            resolveDynamicPrefabEntity);
+                                                                                                            resolveDynamicPrefabEntity,
+                                                                                                            true);
                     break;
             }
         }
@@ -529,9 +537,13 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                      powerUp,
                                                                                      resolveDynamicPrefabEntity,
                                                                                      out togglePassiveTool,
-                                                                                     resolveOrbitalProjectionPrefabBindingIndex);
+                                                                                     resolveOrbitalProjectionPrefabBindingIndex,
+                                                                                     false);
 
-            if (togglePassiveTool.IsDefined == 0 && !hasCharacterTuning && !hasGhostTrail)
+            if (togglePassiveTool.IsDefined == 0 &&
+                !hasCharacterTuning &&
+                !hasGhostTrail &&
+                !hasConditionalShotApplication)
                 return;
 
             resolvedToolKind = ActiveToolKind.PassiveToggle;
@@ -562,7 +574,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                          powerUp,
                                                                                          resolveDynamicPrefabEntity,
                                                                                          out triggeredProjectilePassiveTool,
-                                                                                         resolveOrbitalProjectionPrefabBindingIndex);
+                                                                                         resolveOrbitalProjectionPrefabBindingIndex,
+                                                                                         false);
             }
         }
 
@@ -627,6 +640,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        maintenanceResource,
                                                                        chargeType,
                                                                        isToggleable,
+                                                                       maximumToggleActiveDurationSeconds,
                                                                        maximumEnergy,
                                                                        activationCost,
                                                                        maintenanceCostPerSecond,
@@ -718,6 +732,27 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        activeWeaponId,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
+
+        if (slotConfig.Toggleable != 0)
+        {
+            PlayerPassiveToolConfig conditionalTogglePassiveTool = slotConfig.TogglePassiveTool;
+            PowerUpConditionalApplicationConfig conditionalApplication;
+            PlayerPowerUpConditionalApplicationBakeUtility.Build(preset,
+                                                                  powerUp,
+                                                                  in slotConfig,
+                                                                  false,
+                                                                  true,
+                                                                  out conditionalApplication);
+            conditionalTogglePassiveTool.ConditionalApplication = conditionalApplication;
+
+            if (conditionalApplication.Mode != PowerUpConditionalApplicationMode.None)
+            {
+                conditionalTogglePassiveTool.IsDefined = 1;
+                conditionalTogglePassiveTool.ToolKind = PassiveToolKind.Custom;
+            }
+
+            slotConfig.TogglePassiveTool = conditionalTogglePassiveTool;
+        }
         slotConfig.HasDropAttraction = hasDropAttraction ? (byte)1 : (byte)0;
         slotConfig.DropAttraction = new DropAttractionPowerUpConfig
         {

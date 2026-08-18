@@ -67,7 +67,14 @@ public static class PlayerPowerUpActivationExecutionUtility
         switch (slotConfig.ToolKind)
         {
             case ActiveToolKind.Bomb:
-                ExecuteBomb(in slotConfig, in localTransform, in lookState, playerEntity, bombRequests);
+                ExecuteSpawnObject(slotConfig.BombPrefabEntity,
+                                   in slotConfig.Bomb,
+                                   slotConfig.HasImpactFrame,
+                                   in slotConfig.ImpactFrame,
+                                   in localTransform,
+                                   in lookState,
+                                   playerEntity,
+                                   bombRequests);
                 break;
             case ActiveToolKind.Dash:
                 PlayerPowerUpDashActivationUtility.ExecuteDash(in slotConfig,
@@ -185,15 +192,15 @@ public static class PlayerPowerUpActivationExecutionUtility
 
         if (slotConfig.ChargeShot.UseChargedLaserBeam != 0)
         {
-            ExecuteIndependentChargedLaser(in slotConfig,
-                                           in runtimeShootingConfig,
-                                           appliedElementSlots,
-                                           ref laserBeamState,
-                                           resolvedSizeMultiplier,
-                                           resolvedDamageMultiplier,
-                                           resolvedSpeedMultiplier,
-                                           resolvedRangeMultiplier,
-                                           resolvedLifetimeMultiplier);
+            ExecuteStandaloneChargedLaser(in slotConfig.ChargeShot,
+                                          in runtimeShootingConfig,
+                                          appliedElementSlots,
+                                          ref laserBeamState,
+                                          resolvedSizeMultiplier,
+                                          resolvedDamageMultiplier,
+                                          resolvedSpeedMultiplier,
+                                          resolvedRangeMultiplier,
+                                          resolvedLifetimeMultiplier);
             return;
         }
 
@@ -279,7 +286,7 @@ public static class PlayerPowerUpActivationExecutionUtility
     /// <summary>
     /// Fires the hold-charge-owned Laser Beam using a neutral passive snapshot so equipped passives and other power-up hooks do not leak into the shot.
     /// </summary>
-    /// <param name="slotConfig">Active slot that owns the charge-shot payload.</param>
+    /// <param name="chargeShotConfig">Charge-shot payload that owns the standalone beam.</param>
     /// <param name="runtimeShootingConfig">Current shooting config used as the base projectile template source.</param>
     /// <param name="appliedElementSlots">Runtime default elemental slots used only when the charge shot has no override payload.</param>
     /// <param name="laserBeamState">Mutable Laser Beam state receiving the timed active snapshot.</param>
@@ -288,23 +295,23 @@ public static class PlayerPowerUpActivationExecutionUtility
     /// <param name="resolvedSpeedMultiplier">Charge-scaled speed multiplier.</param>
     /// <param name="resolvedRangeMultiplier">Charge-scaled range multiplier.</param>
     /// <param name="resolvedLifetimeMultiplier">Charge-scaled lifetime multiplier.</param>
-    private static void ExecuteIndependentChargedLaser(in PlayerPowerUpSlotConfig slotConfig,
-                                                       in PlayerRuntimeShootingConfig runtimeShootingConfig,
-                                                       DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
-                                                       ref PlayerLaserBeamState laserBeamState,
-                                                       float resolvedSizeMultiplier,
-                                                       float resolvedDamageMultiplier,
-                                                       float resolvedSpeedMultiplier,
-                                                       float resolvedRangeMultiplier,
-                                                       float resolvedLifetimeMultiplier)
+    public static void ExecuteStandaloneChargedLaser(in ChargeShotPowerUpConfig chargeShotConfig,
+                                                     in PlayerRuntimeShootingConfig runtimeShootingConfig,
+                                                     DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> appliedElementSlots,
+                                                     ref PlayerLaserBeamState laserBeamState,
+                                                     float resolvedSizeMultiplier,
+                                                     float resolvedDamageMultiplier,
+                                                     float resolvedSpeedMultiplier,
+                                                     float resolvedRangeMultiplier,
+                                                     float resolvedLifetimeMultiplier)
     {
         PlayerPassiveToolsState chargedLaserPassiveToolsState;
-        PlayerPassiveToolsAggregationUtility.CreateStandaloneLaserBeamState(in slotConfig.ChargeShot.ChargedLaserBeam,
+        PlayerPassiveToolsAggregationUtility.CreateStandaloneLaserBeamState(in chargeShotConfig.ChargedLaserBeam,
                                                                             out chargedLaserPassiveToolsState);
 
         ResolvePenetrationSettings(in runtimeShootingConfig.Values,
-                                   slotConfig.ChargeShot.PenetrationMode,
-                                   slotConfig.ChargeShot.MaxPenetrations,
+                                   chargeShotConfig.PenetrationMode,
+                                   chargeShotConfig.MaxPenetrations,
                                    out ProjectilePenetrationMode laserPenetrationMode,
                                    out int laserMaxPenetrations);
 
@@ -316,15 +323,15 @@ public static class PlayerPowerUpActivationExecutionUtility
                                                                                                                        resolvedSpeedMultiplier,
                                                                                                                        resolvedRangeMultiplier,
                                                                                                                        resolvedLifetimeMultiplier,
-                                                                                                                       slotConfig.ChargeShot.HasElementalPayload != 0,
-                                                                                                                       in slotConfig.ChargeShot.ElementalEffect,
-                                                                                                                       slotConfig.ChargeShot.ElementalStacksPerHit);
+                                                                                                                       chargeShotConfig.HasElementalPayload != 0,
+                                                                                                                       in chargeShotConfig.ElementalEffect,
+                                                                                                                       chargeShotConfig.ElementalStacksPerHit);
         PlayerProjectileRequestUtility.ApplyInheritedVelocityAxisOverrides(ref chargedLaserTemplate,
-                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityX,
-                                                                           slotConfig.ChargeShot.IgnoreInheritedPlayerVelocityZ);
+                                                                           chargeShotConfig.IgnoreInheritedPlayerVelocityX,
+                                                                           chargeShotConfig.IgnoreInheritedPlayerVelocityZ);
 
         PlayerLaserBeamStateUtility.ActivateTriggeredActiveLaser(ref laserBeamState,
-                                                                 slotConfig.ChargeShot.ChargedLaserDurationSeconds,
+                                                                 chargeShotConfig.ChargedLaserDurationSeconds,
                                                                  laserPenetrationMode,
                                                                  laserMaxPenetrations,
                                                                  in chargedLaserTemplate,
@@ -345,57 +352,63 @@ public static class PlayerPowerUpActivationExecutionUtility
     /// <summary>
     /// Queues one bomb spawn request using authored spawn orientation and a selectable velocity direction.
     /// </summary>
-    /// <param name="slotConfig">Runtime active slot configuration that contains Bomb payload values.</param>
+    /// <param name="spawnObjectPrefabEntity">Baked prefab entity instantiated by the spawn request.</param>
+    /// <param name="spawnObjectConfig">Baked movement, fuse, damage, and visual settings for the spawned object.</param>
+    /// <param name="hasImpactFrame">Non-zero when the spawned object's detonation should request an impact frame.</param>
+    /// <param name="impactFrame">Baked impact-frame configuration forwarded to the spawn request.</param>
     /// <param name="localTransform">Current player transform used as the spawn origin and forward fallback.</param>
     /// <param name="lookState">Current player look state used when Spawn Offset Orientation is PlayerLookDirection.</param>
     /// <param name="playerEntity">Player entity that owns the spawned bomb and VFX requests.</param>
     /// <param name="bombRequests">Mutable buffer that receives the bomb spawn request.</param>
-    private static void ExecuteBomb(in PlayerPowerUpSlotConfig slotConfig,
-                                    in LocalTransform localTransform,
-                                    in PlayerLookState lookState,
-                                    Entity playerEntity,
-                                    DynamicBuffer<PlayerBombSpawnRequest> bombRequests)
+    public static void ExecuteSpawnObject(Entity spawnObjectPrefabEntity,
+                                          in BombPowerUpConfig spawnObjectConfig,
+                                          byte hasImpactFrame,
+                                          in ImpactFramePowerUpConfig impactFrame,
+                                          in LocalTransform localTransform,
+                                          in PlayerLookState lookState,
+                                          Entity playerEntity,
+                                          DynamicBuffer<PlayerBombSpawnRequest> bombRequests)
     {
-        float3 bombDirection = ResolveBombActivationDirection(in slotConfig.Bomb, in localTransform, in lookState);
+        float3 bombDirection = ResolveBombActivationDirection(in spawnObjectConfig, in localTransform, in lookState);
         quaternion spawnOffsetRotation = quaternion.LookRotationSafe(bombDirection, new float3(0f, 1f, 0f));
-        float3 worldSpawnOffset = math.rotate(spawnOffsetRotation, slotConfig.Bomb.SpawnOffset);
+        float3 worldSpawnOffset = math.rotate(spawnOffsetRotation, spawnObjectConfig.SpawnOffset);
         float3 spawnPosition = localTransform.Position + worldSpawnOffset;
-        float deploySpeed = math.max(0f, slotConfig.Bomb.DeploySpeed);
-        float3 velocityDirection = ResolveBombVelocityDirection(in slotConfig.Bomb, worldSpawnOffset, bombDirection);
+        float deploySpeed = math.max(0f, spawnObjectConfig.DeploySpeed);
+        float3 velocityDirection = ResolveBombVelocityDirection(in spawnObjectConfig, worldSpawnOffset, bombDirection);
         float3 initialVelocity = velocityDirection * deploySpeed;
         float3 rotationDirection = deploySpeed > 0f ? velocityDirection : bombDirection;
-        byte enableDamagePayload = slotConfig.Bomb.EnableDamagePayload;
-        float radius = enableDamagePayload != 0 ? math.max(0.1f, slotConfig.Bomb.Radius) : 0f;
-        float damage = enableDamagePayload != 0 ? math.max(0f, slotConfig.Bomb.Damage) : 0f;
-        byte affectAll = enableDamagePayload != 0 ? slotConfig.Bomb.AffectAllEnemiesInRadius : (byte)0;
-        Entity explosionVfxPrefabEntity = enableDamagePayload != 0 ? slotConfig.Bomb.ExplosionVfxPrefabEntity : Entity.Null;
-        byte scaleVfxToRadius = enableDamagePayload != 0 ? slotConfig.Bomb.ScaleVfxToRadius : (byte)0;
-        float vfxScaleMultiplier = enableDamagePayload != 0 ? math.max(0.01f, slotConfig.Bomb.VfxScaleMultiplier) : 1f;
-        byte hasImpactFrame = slotConfig.HasImpactFrame != 0 &&
-                              PlayerImpactFrameRuntimeUtility.CanActivate(in slotConfig.ImpactFrame)
+        byte enableDamagePayload = spawnObjectConfig.EnableDamagePayload;
+        float radius = enableDamagePayload != 0 ? math.max(0.1f, spawnObjectConfig.Radius) : 0f;
+        float damage = enableDamagePayload != 0 ? math.max(0f, spawnObjectConfig.Damage) : 0f;
+        byte affectAll = enableDamagePayload != 0 ? spawnObjectConfig.AffectAllEnemiesInRadius : (byte)0;
+        Entity explosionVfxPrefabEntity = enableDamagePayload != 0 ? spawnObjectConfig.ExplosionVfxPrefabEntity : Entity.Null;
+        byte scaleVfxToRadius = enableDamagePayload != 0 ? spawnObjectConfig.ScaleVfxToRadius : (byte)0;
+        float vfxScaleMultiplier = enableDamagePayload != 0 ? math.max(0.01f, spawnObjectConfig.VfxScaleMultiplier) : 1f;
+        byte emitImpactFrame = hasImpactFrame != 0 &&
+                               PlayerImpactFrameRuntimeUtility.CanActivate(in impactFrame)
             ? (byte)1
             : (byte)0;
 
         bombRequests.Add(new PlayerBombSpawnRequest
         {
             OwnerEntity = playerEntity,
-            BombPrefabEntity = slotConfig.BombPrefabEntity,
+            BombPrefabEntity = spawnObjectPrefabEntity,
             Position = spawnPosition,
             Rotation = quaternion.LookRotationSafe(rotationDirection, new float3(0f, 1f, 0f)),
             Velocity = initialVelocity,
-            CollisionRadius = math.max(0.01f, slotConfig.Bomb.CollisionRadius),
-            BounceOnWalls = slotConfig.Bomb.BounceOnWalls,
-            BounceDamping = math.clamp(slotConfig.Bomb.BounceDamping, 0f, 1f),
-            LinearDampingPerSecond = math.max(0f, slotConfig.Bomb.LinearDampingPerSecond),
-            FuseSeconds = math.max(0.05f, slotConfig.Bomb.FuseSeconds),
+            CollisionRadius = math.max(0.01f, spawnObjectConfig.CollisionRadius),
+            BounceOnWalls = spawnObjectConfig.BounceOnWalls,
+            BounceDamping = math.clamp(spawnObjectConfig.BounceDamping, 0f, 1f),
+            LinearDampingPerSecond = math.max(0f, spawnObjectConfig.LinearDampingPerSecond),
+            FuseSeconds = math.max(0.05f, spawnObjectConfig.FuseSeconds),
             Radius = radius,
             Damage = damage,
             AffectAllEnemiesInRadius = affectAll,
             ExplosionVfxPrefabEntity = explosionVfxPrefabEntity,
             ScaleVfxToRadius = scaleVfxToRadius,
             VfxScaleMultiplier = vfxScaleMultiplier,
-            ImpactFrame = slotConfig.ImpactFrame,
-            HasImpactFrame = hasImpactFrame
+            ImpactFrame = impactFrame,
+            HasImpactFrame = emitImpactFrame
         });
     }
 

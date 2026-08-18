@@ -168,7 +168,8 @@ public static class PlayerPowerUpPassiveBakeUtility
                                                                 ModularPowerUpDefinition powerUp,
                                                                 Func<GameObject, Entity> resolveDynamicPrefabEntity,
                                                                 out PlayerPassiveToolConfig passiveToolConfig,
-                                                                Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null)
+                                                                Func<GameObject, int> resolveOrbitalProjectionPrefabBindingIndex = null,
+                                                                bool compileConditionalApplication = true)
     {
         passiveToolConfig = default;
 
@@ -557,7 +558,8 @@ public static class PlayerPowerUpPassiveBakeUtility
 
                     hasReturningProjectiles = true;
                     returningProjectilesConfig = PlayerPowerUpReturningProjectileBakeUtility.BuildConfig(payload.ReturningProjectiles,
-                                                                                                            resolveDynamicPrefabEntity);
+                                                                                                            resolveDynamicPrefabEntity,
+                                                                                                            false);
                     break;
             }
         }
@@ -681,6 +683,24 @@ public static class PlayerPowerUpPassiveBakeUtility
             LaserBeam = laserBeamConfig,
             OrbitalProjections = orbitalProjectionConfigs
         };
+
+        if (compileConditionalApplication)
+        {
+            PlayerPowerUpActiveBakeUtility.BuildSlotConfigFromModularPowerUp(authoring,
+                                                                             preset,
+                                                                             powerUp,
+                                                                             resolveDynamicPrefabEntity,
+                                                                             out PlayerPowerUpSlotConfig sourceSlotConfig,
+                                                                             resolveOrbitalProjectionPrefabBindingIndex);
+            PowerUpConditionalApplicationConfig conditionalApplication;
+            PlayerPowerUpConditionalApplicationBakeUtility.Build(preset,
+                                                                  powerUp,
+                                                                  in sourceSlotConfig,
+                                                                  true,
+                                                                  false,
+                                                                  out conditionalApplication);
+            config.ConditionalApplication = conditionalApplication;
+        }
 
         if (!PlayerPowerUpPassiveConfigBuildUtility.HasAnyPayload(in config))
             return;

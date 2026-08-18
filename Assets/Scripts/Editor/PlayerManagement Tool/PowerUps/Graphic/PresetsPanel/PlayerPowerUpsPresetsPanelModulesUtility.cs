@@ -300,6 +300,30 @@ public static class PlayerPowerUpsPresetsPanelModulesUtility
         duplicateButton.tooltip = "Duplicate this module definition.";
         actionsRow.Add(duplicateButton);
 
+        Button copyPayloadButton = new Button(() =>
+        {
+            PowerUpModulePayloadClipboardUtility.CopyDefinitionPayload(panel.selectedPreset, moduleIndex);
+        });
+        copyPayloadButton.text = "Copy Payload";
+        copyPayloadButton.tooltip = "Copy this module's payload without copying its identity or catalog metadata.";
+        copyPayloadButton.style.marginLeft = 4f;
+        actionsRow.Add(copyPayloadButton);
+
+        Button pastePayloadButton = new Button(() =>
+        {
+            if (!PowerUpModulePayloadClipboardUtility.PasteDefinitionPayload(panel.selectedPreset, moduleIndex))
+                return;
+
+            panel.presetSerializedObject.Update();
+            panel.ScheduleActiveSectionRebuild();
+        });
+        pastePayloadButton.text = "Paste Payload";
+        pastePayloadButton.tooltip = "Paste the copied payload. This is enabled only when the copied module kind matches.";
+        pastePayloadButton.style.marginLeft = 4f;
+        actionsRow.Add(pastePayloadButton);
+        PowerUpModulePayloadClipboardUtility.TrackPasteAvailability(pastePayloadButton,
+                                                                     () => ResolveModuleDefinitionKind(moduleProperty));
+
         Button moveUpButton = new Button(() =>
         {
             panel.ScheduleDeferredStructuralAction(() =>

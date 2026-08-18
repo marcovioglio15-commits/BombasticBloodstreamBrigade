@@ -11,7 +11,7 @@ public static class PlayerRuntimePowerUpScalingPathUtility
 {
     #region Constants
     private const string PassiveLaserBeamPayloadPrefix = "laserBeam.";
-    private const string HoldChargeChargedLaserBeamPayloadPrefix = "holdCharge.chargedLaserBeam.";
+    internal const string HoldChargeChargedLaserBeamPayloadPrefix = "holdCharge.chargedLaserBeam.";
     private const string ElementalAreaTickEffectPrefix = "elementalAreaTick.effectData.";
     private const string OrbitalProjectionEntryPrefix = "orbitalProjections.projections.Array.data[";
     private const int MaximumFixedString64Utf8Bytes = 61;
@@ -236,6 +236,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "resourceGate.maintenanceTicksPerSecond":
                 activeSlotConfig.MaintenanceTicksPerSecond = math.max(0f, resolvedValue);
+                return;
+            case "resourceGate.maximumToggleActiveDurationSeconds":
+                activeSlotConfig.MaximumToggleActiveDurationSeconds = math.max(0f, resolvedValue);
                 return;
             case "resourceGate.chargePerTrigger":
                 activeSlotConfig.ChargePerTrigger = math.max(0f, resolvedValue);
@@ -468,6 +471,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                           float resolvedValue,
                                           ref PlayerPassiveToolConfig passiveToolConfig)
     {
+        if (PlayerRuntimePowerUpConditionalScalingApplyUtility.TryApplyValue(payloadPath,
+                                                                             resolvedValue,
+                                                                             ref passiveToolConfig.ConditionalApplication))
+        {
+            return;
+        }
+
         if (TryApplyLaserBeamValue(payloadPath,
                                    PassiveLaserBeamPayloadPrefix,
                                    resolvedValue,
@@ -702,10 +712,10 @@ public static class PlayerRuntimePowerUpScalingPathUtility
     /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
     /// <param name="laserBeamConfig">Mutable Laser Beam config being rebuilt from immutable baseline data.</param>
     /// <returns>True when the path matched a Laser Beam field and was applied.</returns>
-    private static bool TryApplyLaserBeamValue(string payloadPath,
-                                               string prefix,
-                                               float resolvedValue,
-                                               ref LaserBeamPassiveConfig laserBeamConfig)
+    internal static bool TryApplyLaserBeamValue(string payloadPath,
+                                                string prefix,
+                                                float resolvedValue,
+                                                ref LaserBeamPassiveConfig laserBeamConfig)
     {
         if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
             return false;
@@ -850,10 +860,10 @@ public static class PlayerRuntimePowerUpScalingPathUtility
     /// <param name="resolvedValue">Formula result already evaluated against scalable-stat runtime values.</param>
     /// <param name="laserBeamConfig">Mutable Laser Beam config being rebuilt from immutable baseline data.</param>
     /// <returns>True when the path matched a Laser Beam boolean field and was applied.</returns>
-    private static bool TryApplyLaserBeamBooleanValue(string payloadPath,
-                                                      string prefix,
-                                                      bool resolvedValue,
-                                                      ref LaserBeamPassiveConfig laserBeamConfig)
+    internal static bool TryApplyLaserBeamBooleanValue(string payloadPath,
+                                                       string prefix,
+                                                       bool resolvedValue,
+                                                       ref LaserBeamPassiveConfig laserBeamConfig)
     {
         if (string.IsNullOrWhiteSpace(payloadPath) || string.IsNullOrWhiteSpace(prefix))
             return false;
@@ -1078,6 +1088,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                  bool resolvedValue,
                                                  ref PlayerPassiveToolConfig passiveToolConfig)
     {
+        if (PlayerRuntimePowerUpConditionalScalingApplyUtility.TryApplyBooleanValue(payloadPath,
+                                                                                    resolvedValue,
+                                                                                    ref passiveToolConfig.ConditionalApplication))
+        {
+            return;
+        }
+
         if (TryApplyLaserBeamBooleanValue(payloadPath,
                                           PassiveLaserBeamPayloadPrefix,
                                           resolvedValue,

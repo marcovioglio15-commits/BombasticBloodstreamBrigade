@@ -39,11 +39,32 @@ public struct PlayerPowerUpsState : IComponentData
     public int PendingCheatPresetIndex;
     public int PrimaryReturningProjectileCount;
     public int SecondaryReturningProjectileCount;
+    public int PrimaryReturningProjectileRecallReadyCount;
+    public int SecondaryReturningProjectileRecallReadyCount;
     public uint PrimaryReturningProjectileGeneration;
     public uint SecondaryReturningProjectileGeneration;
+    public uint PrimaryReturningProjectileRecallVersion;
+    public uint SecondaryReturningProjectileRecallVersion;
     public uint LastObservedGlobalKillCount;
     public uint LastObservedRoomClearCount;
     public float3 LastValidMovementDirection;
+    public PowerUpConditionalApplicationRuntimeState PrimaryConditionalApplication;
+    public PowerUpConditionalApplicationRuntimeState SecondaryConditionalApplication;
+}
+
+/// <summary>
+/// Stores mutable cadence, automatic-charge, recovery, and threshold-edge state for one conditional power-up instance.
+/// </summary>
+public struct PowerUpConditionalApplicationRuntimeState
+{
+    public int ShotCounter;
+    public float Charge;
+    public float MovementSlowPercent;
+    public float ToggleActiveElapsedSeconds;
+    public uint LastObservedShotPulseVersion;
+    public byte Initialized;
+    public byte Armed;
+    public byte HealthConditionWasMet;
 }
 
 /// <summary>
@@ -98,7 +119,7 @@ public struct PlayerPowerUpUnlockCatalogElement : IBufferElementData
 {
     public FixedString64Bytes PowerUpId;
     public FixedString64Bytes DisplayName;
-    public FixedString128Bytes Description;
+    public FixedString4096Bytes Description;
     public PlayerPowerUpUnlockKind UnlockKind;
     public byte StealProtected;
     public byte IsUnlocked;
@@ -215,7 +236,7 @@ public struct PlayerMilestonePowerUpSelectionOfferElement : IBufferElementData
     public int CatalogIndex;
     public FixedString64Bytes PowerUpId;
     public FixedString64Bytes DisplayName;
-    public FixedString128Bytes Description;
+    public FixedString4096Bytes Description;
     public PlayerPowerUpUnlockKind UnlockKind;
 }
 
@@ -281,6 +302,8 @@ public struct PlayerPassiveToolsState
     public DropAttractionPowerUpConfig DropAttraction;
     public byte HasReturningProjectiles;
     public ReturningProjectilesConfig ReturningProjectiles;
+    public byte HasReturningProjectilesActiveSlotOwner;
+    public byte ReturningProjectilesActiveSlotIndex;
 }
 
 /// <summary>

@@ -32,13 +32,15 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="showActiveTriggerCharacterTuningOption">True when binding context supports active-trigger-scoped Character Tuning.</param>
     /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
     /// <param name="showActiveProjectileConcurrencyOption">True when the payload belongs to a non-toggleable active that can own live projectile instances.</param>
+    /// <param name="hasOwningResourceGate">True when active-only payload controls may reuse Resource Gate costs.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
                                           string payloadLabel,
                                           bool showActiveTriggerCharacterTuningOption = false,
                                           bool showToggleDurationOption = false,
-                                          bool showActiveProjectileConcurrencyOption = false)
+                                          bool showActiveProjectileConcurrencyOption = false,
+                                          bool hasOwningResourceGate = false)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -47,6 +49,15 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         {
             case PowerUpModuleKind.TriggerHoldCharge:
                 BuildHoldChargePayloadUi(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.DelayedShootApplication:
+                PowerUpConditionalApplicationPayloadDrawerUtility.BuildDelayedShootApplication(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.SuddenStrike:
+                PowerUpConditionalApplicationPayloadDrawerUtility.BuildSuddenStrike(payloadContainer, payloadProperty);
+                return;
+            case PowerUpModuleKind.SelfPreservationInstinct:
+                PowerUpConditionalApplicationPayloadDrawerUtility.BuildSelfPreservationInstinct(payloadContainer, payloadProperty);
                 return;
             case PowerUpModuleKind.GateResource:
                 BuildResourceGatePayloadUi(payloadContainer, payloadProperty);
@@ -78,7 +89,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             case PowerUpModuleKind.ReturningProjectiles:
                 PowerUpReturningProjectilesPayloadDrawerUtility.Build(payloadContainer,
                                                                       payloadProperty,
-                                                                      showActiveProjectileConcurrencyOption);
+                                                                      showActiveProjectileConcurrencyOption,
+                                                                      hasOwningResourceGate);
                 return;
             case PowerUpModuleKind.StateSuppressShooting:
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);
@@ -609,6 +621,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty chargePerTriggerProperty = resourceGatePayloadProperty.FindPropertyRelative("chargePerTrigger");
         SerializedProperty cooldownSecondsProperty = resourceGatePayloadProperty.FindPropertyRelative("cooldownSeconds");
         SerializedProperty allowRechargeDuringToggleStartupLockProperty = resourceGatePayloadProperty.FindPropertyRelative("allowRechargeDuringToggleStartupLock");
+        SerializedProperty maximumToggleActiveDurationSecondsProperty = resourceGatePayloadProperty.FindPropertyRelative("maximumToggleActiveDurationSeconds");
 
         if (activationResourceProperty == null ||
             maintenanceResourceProperty == null ||
@@ -621,7 +634,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
             chargeTypeProperty == null ||
             chargePerTriggerProperty == null ||
             cooldownSecondsProperty == null ||
-            allowRechargeDuringToggleStartupLockProperty == null)
+            allowRechargeDuringToggleStartupLockProperty == null ||
+            maximumToggleActiveDurationSecondsProperty == null)
         {
             HelpBox errorBox = new HelpBox("Resource gate payload fields are missing.", HelpBoxMessageType.Warning);
             payloadContainer.Add(errorBox);
@@ -647,6 +661,23 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         toggleableContainer.Add(toggleableHelpBox);
         AddField(toggleableContainer, maintenanceTicksPerSecondProperty, "Maintenance Ticks Per Second");
         AddField(toggleableContainer, allowRechargeDuringToggleStartupLockProperty, "Allow Recharge During Startup Lock");
+        VisualElement maximumToggleActiveDurationSecondsField = AddField(toggleableContainer,
+                                                                          maximumToggleActiveDurationSecondsProperty,
+                                                                          "Maximum Active Duration Seconds");
+        HelpBox maximumToggleActiveDurationWarning = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        maximumToggleActiveDurationWarning.style.display = DisplayStyle.None;
+        toggleableContainer.Add(maximumToggleActiveDurationWarning);
+
+        Action refreshMaximumDurationWarning = () =>
+        {
+            bool invalidDuration = maximumToggleActiveDurationSecondsProperty.floatValue < 0f;
+            maximumToggleActiveDurationWarning.text = invalidDuration
+                ? "Maximum Active Duration Seconds cannot be negative. Use zero for an unlimited toggle lifetime."
+                : string.Empty;
+            maximumToggleActiveDurationWarning.style.display = invalidDuration ? DisplayStyle.Flex : DisplayStyle.None;
+        };
+        RegisterRefreshCallback(maximumToggleActiveDurationSecondsField, refreshMaximumDurationWarning);
+        refreshMaximumDurationWarning();
 
         UpdateBooleanContainerVisibility(isToggleableProperty, toggleableContainer);
         payloadContainer.TrackPropertyValue(isToggleableProperty, changedProperty =>

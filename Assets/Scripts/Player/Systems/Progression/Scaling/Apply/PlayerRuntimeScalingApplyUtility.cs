@@ -160,13 +160,14 @@ internal static class PlayerRuntimeScalingApplyUtility
         PlayerElementBulletSettingsUtility.CopyBaseAppliedElementsToRuntime(baseAppliedElementSlots, runtimeAppliedElementSlots);
         runtimeHealth = PlayerRuntimeScalingControllerFieldApplyUtility.CopyHealth(in baseHealth);
         runtimeDeathAnimation = PlayerRuntimeScalingDeathAnimationApplyUtility.CopyDeathAnimation(in baseDeathAnimation);
-        ApplyControllerScaling(controllerScaling,
-                               ref runtimeMovement,
-                               ref runtimeLook,
-                               ref runtimeCamera,
-                               ref runtimeShooting,
-                               runtimeAppliedElementSlots,
-                               ref runtimeHealth);
+        PlayerRuntimeScalingControllerApplyUtility.Apply(controllerScaling,
+                                                         variableContext,
+                                                         ref runtimeMovement,
+                                                         ref runtimeLook,
+                                                         ref runtimeCamera,
+                                                         ref runtimeShooting,
+                                                         runtimeAppliedElementSlots,
+                                                         ref runtimeHealth);
         PlayerRuntimeScalingDeathAnimationApplyUtility.ApplyScaling(deathAnimationScaling,
                                                                     variableContext,
                                                                     ref runtimeDeathAnimation);
@@ -229,64 +230,6 @@ internal static class PlayerRuntimeScalingApplyUtility
         PlayerExperiencePickupRadiusRuntimeUtility.SyncRuntimeComponent(ref playerExperienceCollection,
                                                                         progressionConfig,
                                                                         scalableStats);
-    }
-    #endregion
-
-    #region Controller Scaling
-    private static void ApplyControllerScaling(DynamicBuffer<PlayerRuntimeControllerScalingElement> controllerScaling,
-                                               ref PlayerRuntimeMovementConfig runtimeMovement,
-                                               ref PlayerRuntimeLookConfig runtimeLook,
-                                               ref PlayerRuntimeCameraConfig runtimeCamera,
-                                               ref PlayerRuntimeShootingConfig runtimeShooting,
-                                               DynamicBuffer<PlayerRuntimeShootingAppliedElementSlot> runtimeAppliedElementSlots,
-                                               ref PlayerRuntimeHealthStatisticsConfig runtimeHealth)
-    {
-        if (!controllerScaling.IsCreated)
-            return;
-
-        for (int scalingIndex = 0; scalingIndex < controllerScaling.Length; scalingIndex++)
-        {
-            PlayerRuntimeControllerScalingElement scalingElement = controllerScaling[scalingIndex];
-
-            if ((PlayerFormulaValueType)scalingElement.ValueType == PlayerFormulaValueType.Boolean)
-            {
-                if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateBooleanValue(scalingElement.Formula.ToString(),
-                                                                                          scalingElement.BaseBooleanValue != 0,
-                                                                                          variableContext,
-                                                                                          out bool resolvedBoolean))
-                {
-                    continue;
-                }
-
-                PlayerRuntimeScalingControllerFieldApplyUtility.ApplyBooleanValue(scalingElement.FieldId,
-                                                                                  resolvedBoolean,
-                                                                                  ref runtimeMovement,
-                                                                                  ref runtimeLook,
-                                                                                  ref runtimeCamera,
-                                                                                  ref runtimeShooting,
-                                                                                  ref runtimeHealth);
-                continue;
-            }
-
-            if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(scalingElement.Formula.ToString(),
-                                                                                      scalingElement.BaseValue,
-                                                                                      scalingElement.IsInteger != 0,
-                                                                                      variableContext,
-                                                                                      out float resolvedValue))
-            {
-                continue;
-            }
-
-            PlayerRuntimeScalingControllerFieldApplyUtility.ApplyValue(scalingElement.FieldId,
-                                                                       scalingElement.SlotIndex,
-                                                                       resolvedValue,
-                                                                       ref runtimeMovement,
-                                                                       ref runtimeLook,
-                                                                       ref runtimeCamera,
-                                                                       ref runtimeShooting,
-                                                                       runtimeAppliedElementSlots,
-                                                                       ref runtimeHealth);
-        }
     }
     #endregion
 
