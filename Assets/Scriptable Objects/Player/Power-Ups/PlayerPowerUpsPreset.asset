@@ -178,6 +178,11 @@ MonoBehaviour:
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: activePowerUps.Array.data[9|powerUpId:ActiveBoomerang].moduleBindings.Array.data[2|moduleId:Module_ReturningProjectiles].overridePayload.returningProjectiles.repeatedContactDamage
+    addScaling: 1
+    formula: '[Damage]'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
   secondaryToolActionId: 348a94c1-2df4-48f8-82f6-83416ff0bd17
   swapSlotsActionId: 177203f0-5426-45f1-860f-94c110fbb1cd
@@ -33530,7 +33535,7 @@ MonoBehaviour:
           tickIntervalSeconds: 0
           stackPolicy: 0
         dropAttraction:
-          attractionRadius: 18
+          attractionRadius: 30
           consumeUnusableDrops: 0
         deathExplosion:
           triggerMode: 0
@@ -34168,7 +34173,7 @@ MonoBehaviour:
       displayName: Boomerang
       description: Throws one player-seeking returning projectile that pierces every
         enemy until it rejoins the player.
-      icon: {fileID: 0}
+      icon: {fileID: 21300000, guid: 915a0e430349fcd4da2cd89f8fbcbf5f, type: 3}
       dropPools:
       - Milestone
       dropTier: 2
@@ -35524,7 +35529,7 @@ MonoBehaviour:
           keepHitVfx: 0
           keepDeathVfx: 0
           returnPathMode: 1
-          returnSpeedMultiplier: 0.5
+          returnSpeedMultiplier: 0.85
           outboundRangeMultiplier: 1.5
           outboundLifetimeMultiplier: 1.5
           outboundHitPolicy: 1
@@ -35535,8 +35540,8 @@ MonoBehaviour:
           reapplyResourceGateCostOnRecall: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
-          outboundSizeMultiplier: 4.5
-          returnSizeMultiplier: 4.5
+          outboundSizeMultiplier: 3.5
+          returnSizeMultiplier: 3.5
           spinDuringFlight: 1
           spinSpeedDegreesPerSecond: 1080
           spinAxis: 0
@@ -35544,7 +35549,7 @@ MonoBehaviour:
           turnaroundAxis: 0
           returnHitPolicy: 0
           additionalReturnHits: 1
-          enableRepeatedContactDamage: 0
+          enableRepeatedContactDamage: 1
           repeatedContactDamage: 1
           repeatedContactDamageIntervalSeconds: 0.5
           pathSampleDistance: 0.25
@@ -54326,23 +54331,23 @@ MonoBehaviour:
           keepHitVfx: 1
           keepDeathVfx: 1
           returnPathMode: 0
-          returnSpeedMultiplier: 1.25
+          returnSpeedMultiplier: 1
           outboundRangeMultiplier: 1
           outboundLifetimeMultiplier: 1
           outboundHitPolicy: 0
           additionalOutboundHits: 1
           returnStartMode: 0
-          returnDelaySeconds: 0.08
+          returnDelaySeconds: 0.1
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
-          returnRumbleMultiplier: 0.5
-          returnCameraShakeMultiplier: 0.5
+          returnRumbleMultiplier: 0
+          returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 1
           returnSizeMultiplier: 1
           spinDuringFlight: 0
           spinSpeedDegreesPerSecond: 540
           spinAxis: 0
-          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundRotationSpeedDegreesPerSecond: 1440
           turnaroundAxis: 1
           returnHitPolicy: 1
           additionalReturnHits: 1
@@ -54355,9 +54360,9 @@ MonoBehaviour:
           enableProjectileSplitting: 1
           applyToSplitProjectiles: 1
           completeBouncesBeforeReturn: 1
-          completeOrbitalPathBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 0
           applyTinyMegaProjectileScaling: 1
-          applyToActivePowerUpProjectiles: 0
+          applyToActivePowerUpProjectiles: 1
           allowConcurrentActiveProjectiles: 0
         projectileSplit:
           triggerMode: 0
@@ -54528,7 +54533,7 @@ MonoBehaviour:
         triggerEvent:
           eventType: 0
         delayedShootApplication:
-          shotInterval: 3
+          shotInterval: 8
         suddenStrike:
           conditionMode: 0
           countRotationAsMovement: 0
@@ -55879,16 +55884,16 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
-          requiredCharge: 50
-          maximumCharge: 50
-          chargeRatePerSecond: 25
+          requiredCharge: 3
+          maximumCharge: 3
+          chargeRatePerSecond: 1
           chargeAnimationClipSlot: 1
           releaseAnimationClipSlot: 1
           decayAfterRelease: 0
           decayAfterReleasePercentPerSecond: 25
           passiveChargeGainWhileReleased: 0
           passiveChargeGainPercentPerSecond: 10
-          laserDurationSeconds: 0.5
+          laserDurationSeconds: 0
           ignoreInheritedPlayerVelocityX: 0
           ignoreInheritedPlayerVelocityZ: 0
           useChargedLaserBeam: 0
@@ -56454,8 +56459,7 @@ MonoBehaviour:
           applyFormulasOnlyOnActiveTrigger: 1
           formulas:
           - formula: '[InfinitePenetration]=true'
-          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
-          - formula: '[ShotRange]=[ShotRange]+999'
+          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*1.5'
           - formula: '[LaserWidth]=[LaserWidth_Big]'
         bomb:
           bombPrefab: {fileID: 0}
@@ -56587,952 +56591,6 @@ MonoBehaviour:
               screenTearFrequency: 0
               paletteFlashIntensity: 0
               paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
-        ghostTrail:
-          durationSeconds: 0
-          matchToggleActivationDuration: 0
-          easeInUnscaledSeconds: 0
-          easeOutUnscaledSeconds: 0
-          easingMode: 0
-          emissionIntervalSeconds: 0
-          snapshotLifetimeSeconds: 0
-          captureScope: 0
-          movementDistanceThreshold: 0
-          rotationAngleThresholdDegrees: 0
-          maximumActiveSnapshots: 0
-          tint: {x: 0, y: 0, z: 0, w: 0}
-          screenFeedbackEnabled: 0
-          screenFeedback:
-            presentationScope: 0
-            timeSlowdownPercent: 0
-            cameraFeedback:
-              enabled: 0
-              motionMode: 0
-              axisRightEnabled: 0
-              axisUpEnabled: 0
-              axisForwardEnabled: 0
-              positionalAmplitude: 0
-              forwardAmplitude: 0
-              rotationalAmplitude: 0
-              frequency: 0
-              zoomEnabled: 0
-              zoomFovDelta: 0
-            overlayIntensity: 0
-            filterTint: {r: 0, g: 0, b: 0, a: 0}
-            desaturationAmount: 0
-            vignetteIntensity: 0
-            vignetteSoftness: 0
-            vignetteExtent: 0
-            vignetteTint: {x: 0, y: 0, z: 0, w: 0}
-            radialVignetteIntensity: 0
-            radialVignetteRadius: 0
-            radialVignetteSoftness: 0
-            radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
-            chromaticAberration: 0
-            scanlineIntensity: 0
-            scanlineFrequency: 0
-            flashIntensity: 0
-            radialDistortion: 0
-            shockwaveIntensity: 0
-            shockwaveRadius: 0
-            shockwaveThickness: 0
-            zoomPunchIntensity: 0
-            invertIntensity: 0
-            posterizeIntensity: 0
-            posterizeSteps: 0
-            edgeInkIntensity: 0
-            screenTearIntensity: 0
-            screenTearFrequency: 0
-            paletteFlashIntensity: 0
-            paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        dropAttraction:
-          attractionRadius: 0
-          consumeUnusableDrops: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 0
-          spawnAnimationSeconds: 0
-          despawnAnimationSeconds: 0
-          projections: []
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        returningProjectiles:
-          replacementProjectilePrefab: {fileID: 0}
-          keepProjectileVfx: 0
-          keepMuzzleFlashVfx: 0
-          keepHitVfx: 0
-          keepDeathVfx: 0
-          returnPathMode: 0
-          returnSpeedMultiplier: 0
-          outboundRangeMultiplier: 0
-          outboundLifetimeMultiplier: 0
-          outboundHitPolicy: 0
-          additionalOutboundHits: 0
-          returnStartMode: 0
-          returnDelaySeconds: 0
-          allowEarlyActivationRecall: 0
-          reapplyResourceGateCostOnRecall: 0
-          returnRumbleMultiplier: 0
-          returnCameraShakeMultiplier: 0
-          outboundSizeMultiplier: 0
-          returnSizeMultiplier: 0
-          spinDuringFlight: 0
-          spinSpeedDegreesPerSecond: 0
-          spinAxis: 0
-          turnaroundRotationSpeedDegreesPerSecond: 0
-          turnaroundAxis: 0
-          returnHitPolicy: 0
-          additionalReturnHits: 0
-          enableRepeatedContactDamage: 0
-          repeatedContactDamage: 0
-          repeatedContactDamageIntervalSeconds: 0
-          pathSampleDistance: 0
-          returnCompletionDistance: 0
-          allowOtherPowerUpInteractions: 0
-          enableProjectileSplitting: 0
-          applyToSplitProjectiles: 0
-          completeBouncesBeforeReturn: 0
-          completeOrbitalPathBeforeReturn: 0
-          applyTinyMegaProjectileScaling: 0
-          applyToActivePowerUpProjectiles: 0
-          allowConcurrentActiveProjectiles: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        switchWeapon:
-          weaponId: 
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    - bindingId: c42e7a986df84a6b98a39f3d334d9275
-      moduleId: Module_Dash
-      stage: 4
-      isEnabled: 0
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 50
-          maximumCharge: 50
-          chargeRatePerSecond: 25
-          chargeAnimationClipSlot: 1
-          releaseAnimationClipSlot: 1
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 25
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 10
-          laserDurationSeconds: 0.5
-          ignoreInheritedPlayerVelocityX: 0
-          ignoreInheritedPlayerVelocityZ: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0.7
-          chargedLaserBeam:
-            damageMultiplier: 5
-            continuousDamagePerSecondMultiplier: 0.1
-            virtualProjectileSpeedMultiplier: 1
-            damageTickIntervalSeconds: 0.5
-            maximumContinuousActiveSeconds: 2.75
-            cooldownSeconds: 0.15
-            maximumBounceSegments: 2
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 1
-            firingRotationSpeedMultiplier: 1
-            visualPresetId: 0
-            bodyProfile: 2
-            sourceShape: 0
-            terminalCapShape: 1
-            bodyWidthMultiplier: 5
-            collisionWidthMultiplier: 1
-            sourceScaleMultiplier: 2
-            terminalCapScaleMultiplier: 2
-            contactFlareScaleMultiplier: 1.2
-            bodyOpacity: 1
-            coreWidthMultiplier: 0.5
-            coreBrightness: 1.52
-            rimBrightness: 1
-            flowScrollSpeed: 14
-            flowPulseFrequency: 6
-            stormTwistSpeed: 14
-            stormTickPostTravelHoldSeconds: 0.25
-            stormIdleIntensity: 0
-            stormBurstIntensity: 1
-            sourceOffset: 0.08
-            sourceDischargeIntensity: 1.2
-            stormShellWidthMultiplier: 1.12
-            stormShellSeparation: 0.05
-            stormRingFrequency: 1
-            stormRingThickness: 0.1
-            stormTickTravelSpeed: 1.5
-            stormTickDamageLengthTolerance: 0.18
-            terminalCapIntensity: 1.12
-            contactFlareIntensity: 1.28
-            wobbleAmplitude: 1
-            bubbleDriftSpeed: 1.8
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 100
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        delayedShootApplication:
-          shotInterval: 0
-        suddenStrike:
-          conditionMode: 0
-          countRotationAsMovement: 0
-          stationarySpeedTolerance: 0
-          stationaryRotationToleranceDegrees: 0
-          applyChargeMovementSlow: 0
-          movementSlowRecoverySeconds: 0
-        selfPreservationInstinct:
-          thresholdMode: 0
-          healthThreshold: 0
-        resourceGate:
-          activationResource: 0
-          maintenanceResource: 0
-          maximumEnergy: 0
-          activationCost: 0
-          maintenanceCostPerSecond: 0
-          isToggleable: 0
-          maintenanceTicksPerSecond: 0
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 0
-          cooldownSeconds: 0
-          allowRechargeDuringToggleStartupLock: 0
-          maximumToggleActiveDurationSeconds: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-          ignoreInheritedPlayerVelocityX: 0
-          ignoreInheritedPlayerVelocityZ: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 1
-          formulas:
-          - formula: '[InfinitePenetration]=true'
-          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
-          - formula: '[ShotRange]=[ShotRange]+999'
-          - formula: '[LaserWidth]=[LaserWidth_Big]'
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 1
-          directionMode: 3
-          duration: 0.18
-          speedTransitionInSeconds: 0.06
-          speedTransitionOutSeconds: 0.08
-          wallBounceIntensity: 0.65
-          grantsInvulnerability: 1
-          invulnerabilityExtraTime: 0.1
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          playerProjectileSlowPercent: 0
-          transitionTimeSeconds: 0
-        impactFrame:
-          durationMode: 0
-          durationFrames: 0
-          referenceFrameRate: 0
-          maximumUnscaledDurationSeconds: 0
-          easeInUnscaledSeconds: 0
-          easeOutUnscaledSeconds: 0
-          easingMode: 0
-          timeSlowdownPercent: 0
-          refreshOnShorterRequest: 0
-          presentationScope: 0
-          cameraFeedback:
-            enabled: 0
-            motionMode: 0
-            axisRightEnabled: 0
-            axisUpEnabled: 0
-            axisForwardEnabled: 0
-            positionalAmplitude: 0
-            forwardAmplitude: 0
-            rotationalAmplitude: 0
-            frequency: 0
-            zoomEnabled: 0
-            zoomFovDelta: 0
-          overlayIntensity: 0
-          filterTint: {r: 0, g: 0, b: 0, a: 0}
-          desaturationAmount: 0
-          vignetteIntensity: 0
-          vignetteSoftness: 0
-          vignetteExtent: 0
-          vignetteTint: {x: 0, y: 0, z: 0, w: 0}
-          radialVignetteIntensity: 0
-          radialVignetteRadius: 0
-          radialVignetteSoftness: 0
-          radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
-          chromaticAberration: 0
-          scanlineIntensity: 0
-          scanlineFrequency: 0
-          flashIntensity: 0
-          radialDistortion: 0
-          shockwaveIntensity: 0
-          shockwaveRadius: 0
-          shockwaveThickness: 0
-          zoomPunchIntensity: 0
-          invertIntensity: 0
-          posterizeIntensity: 0
-          posterizeSteps: 0
-          edgeInkIntensity: 0
-          screenTearIntensity: 0
-          screenTearFrequency: 0
-          paletteFlashIntensity: 0
-          paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
-          buildIn:
-            enabled: 0
-            releaseUnscaledSeconds: 0
-            easingMode: 0
-            effect:
-              presentationScope: 0
-              timeSlowdownPercent: 0
-              cameraFeedback:
-                enabled: 0
-                motionMode: 0
-                axisRightEnabled: 0
-                axisUpEnabled: 0
-                axisForwardEnabled: 0
-                positionalAmplitude: 0
-                forwardAmplitude: 0
-                rotationalAmplitude: 0
-                frequency: 0
-                zoomEnabled: 0
-                zoomFovDelta: 0
-              overlayIntensity: 0
-              filterTint: {r: 0, g: 0, b: 0, a: 0}
-              desaturationAmount: 0
-              vignetteIntensity: 0
-              vignetteSoftness: 0
-              vignetteExtent: 0
-              vignetteTint: {x: 0, y: 0, z: 0, w: 0}
-              radialVignetteIntensity: 0
-              radialVignetteRadius: 0
-              radialVignetteSoftness: 0
-              radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
-              chromaticAberration: 0
-              scanlineIntensity: 0
-              scanlineFrequency: 0
-              flashIntensity: 0
-              radialDistortion: 0
-              shockwaveIntensity: 0
-              shockwaveRadius: 0
-              shockwaveThickness: 0
-              zoomPunchIntensity: 0
-              invertIntensity: 0
-              posterizeIntensity: 0
-              posterizeSteps: 0
-              edgeInkIntensity: 0
-              screenTearIntensity: 0
-              screenTearFrequency: 0
-              paletteFlashIntensity: 0
-              paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
-        ghostTrail:
-          durationSeconds: 0
-          matchToggleActivationDuration: 0
-          easeInUnscaledSeconds: 0
-          easeOutUnscaledSeconds: 0
-          easingMode: 0
-          emissionIntervalSeconds: 0
-          snapshotLifetimeSeconds: 0
-          captureScope: 0
-          movementDistanceThreshold: 0
-          rotationAngleThresholdDegrees: 0
-          maximumActiveSnapshots: 0
-          tint: {x: 0, y: 0, z: 0, w: 0}
-          screenFeedbackEnabled: 0
-          screenFeedback:
-            presentationScope: 0
-            timeSlowdownPercent: 0
-            cameraFeedback:
-              enabled: 0
-              motionMode: 0
-              axisRightEnabled: 0
-              axisUpEnabled: 0
-              axisForwardEnabled: 0
-              positionalAmplitude: 0
-              forwardAmplitude: 0
-              rotationalAmplitude: 0
-              frequency: 0
-              zoomEnabled: 0
-              zoomFovDelta: 0
-            overlayIntensity: 0
-            filterTint: {r: 0, g: 0, b: 0, a: 0}
-            desaturationAmount: 0
-            vignetteIntensity: 0
-            vignetteSoftness: 0
-            vignetteExtent: 0
-            vignetteTint: {x: 0, y: 0, z: 0, w: 0}
-            radialVignetteIntensity: 0
-            radialVignetteRadius: 0
-            radialVignetteSoftness: 0
-            radialVignetteTint: {r: 0, g: 0, b: 0, a: 0}
-            chromaticAberration: 0
-            scanlineIntensity: 0
-            scanlineFrequency: 0
-            flashIntensity: 0
-            radialDistortion: 0
-            shockwaveIntensity: 0
-            shockwaveRadius: 0
-            shockwaveThickness: 0
-            zoomPunchIntensity: 0
-            invertIntensity: 0
-            posterizeIntensity: 0
-            posterizeSteps: 0
-            edgeInkIntensity: 0
-            screenTearIntensity: 0
-            screenTearFrequency: 0
-            paletteFlashIntensity: 0
-            paletteFlashTint: {r: 0, g: 0, b: 0, a: 0}
-        healMissingHealth:
-          applyMode: 0
-          healAmount: 0
-          durationSeconds: 0
-          tickIntervalSeconds: 0
-          stackPolicy: 0
-        dropAttraction:
-          attractionRadius: 0
-          consumeUnusableDrops: 0
-        deathExplosion:
-          triggerMode: 0
-          cooldownSeconds: 0
-          radius: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          triggerOffset: {x: 0, y: 0, z: 0}
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        projectileOrbitOverride:
-          pathMode: 0
-          radialEntrySpeed: 0
-          orbitalSpeed: 0
-          orbitRadiusMin: 0
-          orbitRadiusMax: 0
-          orbitPulseFrequency: 0
-          orbitEntryRatio: 0
-          orbitBlendDuration: 0
-          heightOffset: 0
-          goldenAngleDegrees: 0
-          spiralStartRadius: 0
-          spiralMaximumRadius: 0
-          spiralAngularSpeedDegreesPerSecond: 0
-          spiralGrowthMultiplier: 0
-          spiralTurnsBeforeDespawn: 0
-          spiralClockwise: 0
-        orbitalProjections:
-          acquisitionPolicy: 0
-          useCategoryIdAsExclusionFilter: 0
-          activeDurationSeconds: 0
-          spawnAnimationSeconds: 0
-          despawnAnimationSeconds: 0
-          projections: []
-        projectileBounceOnWalls:
-          maxBounces: 0
-          speedPercentChangePerBounce: 0
-          minimumSpeedMultiplierAfterBounce: 0
-          maximumSpeedMultiplierAfterBounce: 0
-        returningProjectiles:
-          replacementProjectilePrefab: {fileID: 0}
-          keepProjectileVfx: 0
-          keepMuzzleFlashVfx: 0
-          keepHitVfx: 0
-          keepDeathVfx: 0
-          returnPathMode: 0
-          returnSpeedMultiplier: 0
-          outboundRangeMultiplier: 0
-          outboundLifetimeMultiplier: 0
-          outboundHitPolicy: 0
-          additionalOutboundHits: 0
-          returnStartMode: 0
-          returnDelaySeconds: 0
-          allowEarlyActivationRecall: 0
-          reapplyResourceGateCostOnRecall: 0
-          returnRumbleMultiplier: 0
-          returnCameraShakeMultiplier: 0
-          outboundSizeMultiplier: 0
-          returnSizeMultiplier: 0
-          spinDuringFlight: 0
-          spinSpeedDegreesPerSecond: 0
-          spinAxis: 0
-          turnaroundRotationSpeedDegreesPerSecond: 0
-          turnaroundAxis: 0
-          returnHitPolicy: 0
-          additionalReturnHits: 0
-          enableRepeatedContactDamage: 0
-          repeatedContactDamage: 0
-          repeatedContactDamageIntervalSeconds: 0
-          pathSampleDistance: 0
-          returnCompletionDistance: 0
-          allowOtherPowerUpInteractions: 0
-          enableProjectileSplitting: 0
-          applyToSplitProjectiles: 0
-          completeBouncesBeforeReturn: 0
-          completeOrbitalPathBeforeReturn: 0
-          applyTinyMegaProjectileScaling: 0
-          applyToActivePowerUpProjectiles: 0
-          allowConcurrentActiveProjectiles: 0
-        projectileSplit:
-          triggerMode: 0
-          directionMode: 0
-          splitProjectileCount: 0
-          splitOffsetDegrees: 0
-          customAnglesDegrees: []
-          splitDamagePercentFromOriginal: 0
-          splitSizePercentFromOriginal: 0
-          splitSpeedPercentFromOriginal: 0
-          splitLifetimePercentFromOriginal: 0
-        laserBeam:
-          damageMultiplier: 0
-          continuousDamagePerSecondMultiplier: 0
-          virtualProjectileSpeedMultiplier: 0
-          damageTickIntervalSeconds: 0
-          maximumContinuousActiveSeconds: 0
-          cooldownSeconds: 0
-          maximumBounceSegments: 0
-          applyPlayerHandlingNerfWhileFiring: 0
-          firingMoveSpeedMultiplier: 0
-          firingRotationSpeedMultiplier: 0
-          visualPresetId: 0
-          bodyProfile: 0
-          sourceShape: 0
-          terminalCapShape: 0
-          bodyWidthMultiplier: 0
-          collisionWidthMultiplier: 0
-          sourceScaleMultiplier: 0
-          terminalCapScaleMultiplier: 0
-          contactFlareScaleMultiplier: 0
-          bodyOpacity: 0
-          coreWidthMultiplier: 0
-          coreBrightness: 0
-          rimBrightness: 0
-          flowScrollSpeed: 0
-          flowPulseFrequency: 0
-          stormTwistSpeed: 0
-          stormTickPostTravelHoldSeconds: 0
-          stormIdleIntensity: 0
-          stormBurstIntensity: 0
-          sourceOffset: 0
-          sourceDischargeIntensity: 0
-          stormShellWidthMultiplier: 0
-          stormShellSeparation: 0
-          stormRingFrequency: 0
-          stormRingThickness: 0
-          stormTickTravelSpeed: 0
-          stormTickDamageLengthTolerance: 0
-          terminalCapIntensity: 0
-          contactFlareIntensity: 0
-          wobbleAmplitude: 0
-          bubbleDriftSpeed: 0
-        switchWeapon:
-          weaponId: 
-        trailSpawn:
-          trailSegmentLifetimeSeconds: 0
-          trailSpawnDistance: 0
-          trailSpawnIntervalSeconds: 0
-          trailRadius: 0
-          maxActiveSegmentsPerPlayer: 0
-          trailAttachedVfxOffset: {x: 0, y: 0, z: 0}
-        elementalAreaTick:
-          effectData:
-            elementType: 0
-            effectKind: 0
-            procMode: 0
-            reapplyMode: 0
-            procThresholdStacks: 0
-            maximumStacks: 0
-            stackDecayPerSecond: 0
-            consumeStacksOnProc: 0
-            dotDamagePerTick: 0
-            dotTickInterval: 0
-            dotDurationSeconds: 0
-            impedimentSlowPercentPerStack: 0
-            impedimentProcSlowPercent: 0
-            impedimentMaxSlowPercent: 0
-            impedimentDurationSeconds: 0
-          stacksPerTick: 0
-          applyIntervalSeconds: 0
-        stackable:
-          maxAcquisitions: 0
-    - bindingId: cebd221ff05c4551b5830be0bd1618e9
-      moduleId: Module_ImpactFrame
-      stage: 4
-      isEnabled: 0
-      useOverridePayload: 1
-      overridePayload:
-        holdCharge:
-          requiredCharge: 50
-          maximumCharge: 50
-          chargeRatePerSecond: 25
-          chargeAnimationClipSlot: 1
-          releaseAnimationClipSlot: 1
-          decayAfterRelease: 0
-          decayAfterReleasePercentPerSecond: 25
-          passiveChargeGainWhileReleased: 0
-          passiveChargeGainPercentPerSecond: 10
-          laserDurationSeconds: 0.5
-          ignoreInheritedPlayerVelocityX: 0
-          ignoreInheritedPlayerVelocityZ: 0
-          useChargedLaserBeam: 0
-          chargedLaserDurationSeconds: 0.7
-          chargedLaserBeam:
-            damageMultiplier: 5
-            continuousDamagePerSecondMultiplier: 0.1
-            virtualProjectileSpeedMultiplier: 1
-            damageTickIntervalSeconds: 0.5
-            maximumContinuousActiveSeconds: 2.75
-            cooldownSeconds: 0.15
-            maximumBounceSegments: 2
-            applyPlayerHandlingNerfWhileFiring: 0
-            firingMoveSpeedMultiplier: 1
-            firingRotationSpeedMultiplier: 1
-            visualPresetId: 0
-            bodyProfile: 2
-            sourceShape: 0
-            terminalCapShape: 1
-            bodyWidthMultiplier: 5
-            collisionWidthMultiplier: 1
-            sourceScaleMultiplier: 2
-            terminalCapScaleMultiplier: 2
-            contactFlareScaleMultiplier: 1.2
-            bodyOpacity: 1
-            coreWidthMultiplier: 0.5
-            coreBrightness: 1.52
-            rimBrightness: 1
-            flowScrollSpeed: 14
-            flowPulseFrequency: 6
-            stormTwistSpeed: 14
-            stormTickPostTravelHoldSeconds: 0.25
-            stormIdleIntensity: 0
-            stormBurstIntensity: 1
-            sourceOffset: 0.08
-            sourceDischargeIntensity: 1.2
-            stormShellWidthMultiplier: 1.12
-            stormShellSeparation: 0.05
-            stormRingFrequency: 1
-            stormRingThickness: 0.1
-            stormTickTravelSpeed: 1.5
-            stormTickDamageLengthTolerance: 0.18
-            terminalCapIntensity: 1.12
-            contactFlareIntensity: 1.28
-            wobbleAmplitude: 1
-            bubbleDriftSpeed: 1.8
-          slowPlayerWhileCharging: 0
-          maximumPlayerSlowPercent: 100
-          playerSlowCurve:
-            serializedVersion: 2
-            m_Curve: []
-            m_PreInfinity: 0
-            m_PostInfinity: 0
-            m_RotationOrder: 0
-        triggerEvent:
-          eventType: 0
-        delayedShootApplication:
-          shotInterval: 0
-        suddenStrike:
-          conditionMode: 0
-          countRotationAsMovement: 0
-          stationarySpeedTolerance: 0
-          stationaryRotationToleranceDegrees: 0
-          applyChargeMovementSlow: 0
-          movementSlowRecoverySeconds: 0
-        selfPreservationInstinct:
-          thresholdMode: 0
-          healthThreshold: 0
-        resourceGate:
-          activationResource: 0
-          maintenanceResource: 0
-          maximumEnergy: 0
-          activationCost: 0
-          maintenanceCostPerSecond: 0
-          isToggleable: 0
-          maintenanceTicksPerSecond: 0
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 0
-          cooldownSeconds: 0
-          allowRechargeDuringToggleStartupLock: 0
-          maximumToggleActiveDurationSeconds: 0
-        suppressShooting:
-          suppressBaseShootingWhileActive: 0
-          interruptOtherSlotOnEnter: 0
-          interruptOtherSlotChargingOnly: 0
-        projectilePatternCone:
-          projectileCount: 0
-          coneAngleDegrees: 0
-          laserDurationSeconds: 0
-          ignoreInheritedPlayerVelocityX: 0
-          ignoreInheritedPlayerVelocityZ: 0
-        characterTuning:
-          applyFormulasOnlyOnActiveTrigger: 1
-          formulas:
-          - formula: '[InfinitePenetration]=true'
-          - formula: '[BulletSizeMultiplier]=[BulletSizeMultiplier]*3'
-          - formula: '[ShotRange]=[ShotRange]+999'
-          - formula: '[LaserWidth]=[LaserWidth_Big]'
-        bomb:
-          bombPrefab: {fileID: 0}
-          spawnOffset: {x: 0, y: 0, z: 0}
-          spawnOffsetOrientation: 0
-          deploySpeed: 0
-          velocityDirection: 0
-          collisionRadius: 0
-          bounceOnWalls: 0
-          bounceDamping: 0
-          linearDampingPerSecond: 0
-          fuseSeconds: 0
-          radius: 0
-          enableDamagePayload: 0
-          damage: 0
-          affectAllEnemiesInRadius: 0
-          explosionVfxPrefab: {fileID: 0}
-          scaleVfxToRadius: 0
-          vfxScaleMultiplier: 0
-        dash:
-          distance: 1
-          directionMode: 3
-          duration: 0.18
-          speedTransitionInSeconds: 0.06
-          speedTransitionOutSeconds: 0.08
-          wallBounceIntensity: 0.65
-          grantsInvulnerability: 1
-          invulnerabilityExtraTime: 0.1
-        bulletTime:
-          duration: 0
-          enemySlowPercent: 0
-          playerProjectileSlowPercent: 0
-          transitionTimeSeconds: 0
-        impactFrame:
-          durationMode: 2
-          durationFrames: 120
-          referenceFrameRate: 60
-          maximumUnscaledDurationSeconds: 0.2
-          easeInUnscaledSeconds: 0.1
-          easeOutUnscaledSeconds: 0.1
-          easingMode: 1
-          timeSlowdownPercent: 95
-          refreshOnShorterRequest: 0
-          presentationScope: 0
-          cameraFeedback:
-            enabled: 0
-            motionMode: 1
-            axisRightEnabled: 1
-            axisUpEnabled: 1
-            axisForwardEnabled: 0
-            positionalAmplitude: 0.35
-            forwardAmplitude: 0.12
-            rotationalAmplitude: 1.25
-            frequency: 18
-            zoomEnabled: 0
-            zoomFovDelta: -2
-          overlayIntensity: 1
-          filterTint: {r: 0, g: 0, b: 0, a: 0}
-          desaturationAmount: 1
-          vignetteIntensity: 0
-          vignetteSoftness: 1
-          vignetteExtent: 0.35
-          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
-          radialVignetteIntensity: 0
-          radialVignetteRadius: 0.55
-          radialVignetteSoftness: 0.12
-          radialVignetteTint: {r: 0.004405493, g: 0.40973026, b: 0.9339623, a: 0.8}
-          chromaticAberration: 0.05
-          scanlineIntensity: 0.18
-          scanlineFrequency: 320
-          flashIntensity: 0
-          radialDistortion: 1
-          shockwaveIntensity: 1
-          shockwaveRadius: 0.65
-          shockwaveThickness: 0.12
-          zoomPunchIntensity: 0.18
-          invertIntensity: 0
-          posterizeIntensity: 0
-          posterizeSteps: 3
-          edgeInkIntensity: 0.2
-          screenTearIntensity: 0
-          screenTearFrequency: 24
-          paletteFlashIntensity: 0.25
-          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
-          buildIn:
-            enabled: 1
-            releaseUnscaledSeconds: 0.1
-            easingMode: 1
-            effect:
-              presentationScope: 0
-              timeSlowdownPercent: 0
-              cameraFeedback:
-                enabled: 1
-                motionMode: 0
-                axisRightEnabled: 0
-                axisUpEnabled: 0
-                axisForwardEnabled: 1
-                positionalAmplitude: 0.35
-                forwardAmplitude: 15
-                rotationalAmplitude: 0
-                frequency: 0
-                zoomEnabled: 0
-                zoomFovDelta: -10
-              overlayIntensity: 1
-              filterTint: {r: 0.1760413, g: 0.42517477, b: 0.8679245, a: 0}
-              desaturationAmount: 0
-              vignetteIntensity: 0.8
-              vignetteSoftness: 0.6
-              vignetteExtent: 0.07
-              vignetteTint: {x: 0.1764706, y: 0.42352945, z: 0.86666673, w: 0.84313726}
-              radialVignetteIntensity: 0
-              radialVignetteRadius: 1
-              radialVignetteSoftness: 0.05
-              radialVignetteTint: {r: 0.033018887, g: 0.57357216, b: 1, a: 0.7176471}
-              chromaticAberration: 0
-              scanlineIntensity: 0
-              scanlineFrequency: 320
-              flashIntensity: 0
-              radialDistortion: 0
-              shockwaveIntensity: 0
-              shockwaveRadius: 0.65
-              shockwaveThickness: 0.12
-              zoomPunchIntensity: 0
-              invertIntensity: 0
-              posterizeIntensity: 0
-              posterizeSteps: 6
-              edgeInkIntensity: 0
-              screenTearIntensity: 0
-              screenTearFrequency: 24
-              paletteFlashIntensity: 0
-              paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
         ghostTrail:
           durationSeconds: 0
           matchToggleActivationDuration: 0
@@ -59692,14 +58750,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     stealProtected: 0
-  primaryActivePowerUpId: ActiveBoomerang
-  secondaryActivePowerUpId: Active_MassCollector
-  equippedPassivePowerUpIds:
-  - PassiveCrossShot
-  - PassiveSplittingProjectiles
-  - PassiveBouncingProjectiles
-  - Passive_MegaProjectiles
-  - PassiveTwoStepTreatment
+  primaryActivePowerUpId: 
+  secondaryActivePowerUpId: 
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT
