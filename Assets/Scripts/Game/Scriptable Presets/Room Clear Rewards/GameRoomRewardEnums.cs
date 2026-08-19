@@ -37,7 +37,7 @@ public enum GameRoomRewardResource : byte
 }
 
 /// <summary>
-/// Identifies the eight -facing reward categories produced by the three module axes.
+/// Identifies the eight reward categories produced by the three module axes.
 /// </summary>
 public enum GameRoomRewardModuleCategory : byte
 {
@@ -71,4 +71,83 @@ public enum GameRoomRewardPresentationMode : byte
 {
     ColoredText = 0,
     Sprite = 1
+}
+
+/// <summary>
+/// Identifies how much value detail reward logs expose.
+/// </summary>
+public enum GameRoomRewardValueDisplayMode : byte
+{
+    Detailed = 0,
+    Simplified = 1
+}
+
+/// <summary>
+/// Identifies the portal reward log layout and placement policy.
+/// </summary>
+public enum GameRoomRewardPortalLogLayoutMode : byte
+{
+    Scrolling = 0,
+    StaticRows = 1
+}
+
+/// <summary>
+/// Identifies one stable scene-object slot shared by portal anchors and baked presentation effects.
+/// </summary>
+public enum GameRoomPortalLinkedObjectSlot : byte
+{
+    None = 0,
+    Object01 = 1,
+    Object02 = 2,
+    Object03 = 3,
+    Object04 = 4,
+    Object05 = 5,
+    Object06 = 6,
+    Object07 = 7,
+    Object08 = 8,
+    Object09 = 9,
+    Object10 = 10,
+    Object11 = 11,
+    Object12 = 12,
+    Object13 = 13,
+    Object14 = 14,
+    Object15 = 15,
+    Object16 = 16
+}
+
+/// <summary>
+/// Identifies the local Transform channels controlled by one portal activation animation.
+/// </summary>
+public enum GameRoomPortalTransformAnimationMode : byte
+{
+    Position = 0,
+    Rotation = 1,
+    Scale = 2,
+    PositionAndRotation = 3,
+    PositionAndScale = 4,
+    RotationAndScale = 5,
+    PositionRotationAndScale = 6
+}
+
+/// <summary>
+/// Identifies how an enabled portal Transform animation advances after reaching its duration.
+/// </summary>
+public enum GameRoomPortalTransformAnimationPlayback : byte
+{
+    Once = 0,
+    Loop = 1,
+    PingPong = 2
+}
+
+/// <summary>
+/// Identifies the allocation-free interpolation curve used by portal Transform animations.
+/// </summary>
+public enum GameRoomPortalTransformAnimationEase : byte
+{
+    Linear = 0,
+    EaseIn = 1,
+    EaseOut = 2,
+    EaseInOut = 3,
+    SmoothStep = 4,
+    SmootherStep = 5
 }

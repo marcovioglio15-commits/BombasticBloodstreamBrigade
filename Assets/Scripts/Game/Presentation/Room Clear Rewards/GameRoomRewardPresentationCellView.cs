@@ -99,6 +99,23 @@ public sealed class GameRoomRewardPresentationCellView : MonoBehaviour
     }
 
     /// <summary>
+    /// Measures visible text and sprite content for adaptive static portal panel sizing.
+    /// </summary>
+    /// <returns>Preferred local content width and height.</returns>
+    public Vector2 GetPreferredContentSize()
+    {
+        Vector2 preferredSize = GetPreferredTextSize();
+
+        if (rewardImage == null || !rewardImage.enabled)
+            return preferredSize;
+
+        RectTransform imageTransform = rewardImage.rectTransform;
+        preferredSize.x += imageTransform.rect.width;
+        preferredSize.y = Mathf.Max(preferredSize.y, imageTransform.rect.height);
+        return preferredSize;
+    }
+
+    /// <summary>
     /// Updates the local anchored position of this preauthored cell.
     /// </summary>
     /// <param name="position">Target anchored position.</param>
@@ -106,6 +123,16 @@ public sealed class GameRoomRewardPresentationCellView : MonoBehaviour
     {
         if (cellTransform != null)
             cellTransform.anchoredPosition = position;
+    }
+
+    /// <summary>
+    /// Updates the local width and height reserved by this preauthored cell.
+    /// </summary>
+    /// <param name="size">Target local cell size.</param>
+    public void SetSize(Vector2 size)
+    {
+        if (cellTransform != null)
+            cellTransform.sizeDelta = size;
     }
 
     /// <summary>

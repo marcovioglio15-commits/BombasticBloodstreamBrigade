@@ -997,6 +997,8 @@ GameObject:
   - component: {fileID: 8385034824481170805}
   - component: {fileID: 7511062643097167069}
   - component: {fileID: 3369381684334721834}
+  - component: {fileID: 5726619227286304429}
+  - component: {fileID: 764243819687916591}
   m_Layer: 0
   m_Name: PF_RoomRewardPortalLog
   m_TagString: Untagged
@@ -1079,7 +1081,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3411187220203835127}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af3bd7e580d3cc94b8be286810354282, type: 3}
   m_Name: 
@@ -1098,7 +1100,46 @@ MonoBehaviour:
   - {fileID: 7743015690273256287}
   - {fileID: 6007435422604970160}
   - {fileID: 1505078315331410053}
+  backgroundPanel: {fileID: 764243819687916591}
   faceCamera: 1
+--- !u!222 &5726619227286304429
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3411187220203835127}
+  m_CullTransparentMesh: 1
+--- !u!114 &764243819687916591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3411187220203835127}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
 --- !u!1 &4206552376242193181
 GameObject:
   m_ObjectHideFlags: 0

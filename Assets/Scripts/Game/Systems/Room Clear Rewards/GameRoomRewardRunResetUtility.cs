@@ -10,7 +10,7 @@ public static class GameRoomRewardRunResetUtility
 
     #region Public Methods
     /// <summary>
-    /// Clears grant checkpoints, temporary schedules and pending presentation for every reward-capable player.
+    /// Clears grant checkpoints, temporary schedules, presentation entries and pending portal audio cues.
     /// </summary>
     /// <param name="entityManager">Entity manager owning persistent player entities.</param>
     public static void ResetPlayers(EntityManager entityManager)
@@ -52,6 +52,17 @@ public static class GameRoomRewardRunResetUtility
         }
 
         playerQuery.Dispose();
+
+        EntityQuery portalAudioQuery = entityManager.CreateEntityQuery(
+            ComponentType.ReadWrite<GameRoomPortalAnimationAudioCue>());
+
+        if (portalAudioQuery.CalculateEntityCount() == 1)
+        {
+            entityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(
+                portalAudioQuery.GetSingletonEntity()).Clear();
+        }
+
+        portalAudioQuery.Dispose();
     }
     #endregion
 

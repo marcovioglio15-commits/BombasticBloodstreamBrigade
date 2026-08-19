@@ -71,7 +71,7 @@ internal static class GameRoomRewardEditorElementUtility
     }
 
     /// <summary>
-    /// Resolves a trimmed -facing string while retaining a specific unnamed fallback.
+    /// Resolves a trimmed visible string while retaining a specific unnamed fallback.
     /// </summary>
     /// <param name="property">Serialized string property containing the readable identity.</param>
     /// <param name="fallback">Specific element-kind fallback used when the authored name is empty.</param>
@@ -100,7 +100,7 @@ internal static class GameRoomRewardEditorElementUtility
     /// </summary>
     /// <param name="parent">Visual parent receiving the field.</param>
     /// <param name="property">Serialized integer property updated through Unity's undo-aware serialization.</param>
-    /// <param name="label">-facing field label.</param>
+    /// <param name="label">Visible field label.</param>
     /// <param name="onCommitted">Optional callback invoked only after the authored value actually changes.</param>
     /// <returns>Configured delayed integer field.</returns>
     public static IntegerField AddDelayedIntegerField(VisualElement parent,

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -43,7 +44,7 @@ public sealed class GameRoomRewardPresentationDefinition
     [SerializeField]
     private string spriteCaption;
 
-    [Tooltip("-controlled order used by the presentation mapping tab.")]
+    [Tooltip("Authored order used by the presentation mapping tab.")]
     [SerializeField]
     private int sortOrder;
     #endregion
@@ -138,6 +139,10 @@ public sealed class GameRoomRewardPlayerLogSettings
     [SerializeField]
     private Vector3 worldOffset = new Vector3(0f, 2.2f, 0f);
 
+    [Tooltip("Chooses detailed values or sign-only summaries for player reward rows.")]
+    [SerializeField]
+    private GameRoomRewardValueDisplayMode valueDisplayMode;
+
     [Tooltip("Text size applied to every preauthored player reward log row.")]
     [SerializeField]
     private float fontSize = 3.6f;
@@ -179,6 +184,7 @@ public sealed class GameRoomRewardPlayerLogSettings
 
     #region Properties
     public Vector3 WorldOffset => worldOffset;
+    public GameRoomRewardValueDisplayMode ValueDisplayMode => valueDisplayMode;
     public float FontSize => fontSize;
     public float RowSpacing => rowSpacing;
     public int VisibleRows => visibleRows;
@@ -203,6 +209,14 @@ public sealed class GameRoomRewardPortalLogSettings
     [Tooltip("World-space offset applied to the preauthored portal reward log.")]
     [SerializeField]
     private Vector3 worldOffset = new Vector3(0f, 1.75f, 0f);
+
+    [Tooltip("Chooses the existing scrolling layout or a scene-positioned panel with one reward per row.")]
+    [SerializeField]
+    private GameRoomRewardPortalLogLayoutMode layoutMode;
+
+    [Tooltip("Chooses detailed values or sign-only summaries for destination reward entries.")]
+    [SerializeField]
+    private GameRoomRewardValueDisplayMode valueDisplayMode;
 
     [Tooltip("Text size applied to every preauthored portal log cell.")]
     [SerializeField]
@@ -231,12 +245,44 @@ public sealed class GameRoomRewardPortalLogSettings
     [Tooltip("Optional font override used by every preauthored portal log cell.")]
     [SerializeField]
     private TMP_FontAsset font;
+
+    [Tooltip("Vertical gap in local canvas units between rewards in Static Rows mode.")]
+    [SerializeField]
+    private float staticRowSpacing = 0.35f;
+
+    [Tooltip("Horizontal and vertical local canvas padding added around the Static Rows content.")]
+    [SerializeField]
+    private Vector2 staticPanelPadding = new Vector2(0.8f, 0.6f);
+
+    [Tooltip("Smallest width and height allowed for the adaptive Static Rows background panel.")]
+    [SerializeField]
+    private Vector2 staticMinimumPanelSize = new Vector2(5f, 2f);
+
+    [Tooltip("Optional sprite drawn behind the adaptive Static Rows reward panel.")]
+    [SerializeField]
+    private Sprite staticBackgroundSprite;
+
+    [Tooltip("Color applied to the adaptive Static Rows background panel and its optional sprite.")]
+    [SerializeField]
+    private Color staticBackgroundColor = new Color(0f, 0f, 0f, 0.75f);
+
+    [Tooltip("Transform-only animations started after ECS marks the portal as a traversable exit.")]
+    [SerializeField]
+    private List<GameRoomPortalTransformAnimationDefinition> activationAnimations =
+        new List<GameRoomPortalTransformAnimationDefinition>();
+
+    [Tooltip("Prefab-asset replacements for linked existing 3D scene objects, applied when ECS marks the portal as a traversable exit.")]
+    [SerializeField]
+    private List<GameRoomPortalPrefabReplacementDefinition> activationPrefabReplacements =
+        new List<GameRoomPortalPrefabReplacementDefinition>();
     #endregion
 
     #endregion
 
     #region Properties
     public Vector3 WorldOffset => worldOffset;
+    public GameRoomRewardPortalLogLayoutMode LayoutMode => layoutMode;
+    public GameRoomRewardValueDisplayMode ValueDisplayMode => valueDisplayMode;
     public float FontSize => fontSize;
     public float CellSpacing => cellSpacing;
     public int VisibleCells => visibleCells;
@@ -244,5 +290,32 @@ public sealed class GameRoomRewardPortalLogSettings
     public float InitialPause => initialPause;
     public float LoopPause => loopPause;
     public TMP_FontAsset Font => font;
+    public float StaticRowSpacing => staticRowSpacing;
+    public Vector2 StaticPanelPadding => staticPanelPadding;
+    public Vector2 StaticMinimumPanelSize => staticMinimumPanelSize;
+    public Sprite StaticBackgroundSprite => staticBackgroundSprite;
+    public Color StaticBackgroundColor => staticBackgroundColor;
+    public IReadOnlyList<GameRoomPortalTransformAnimationDefinition> ActivationAnimations =>
+        activationAnimations;
+    public IReadOnlyList<GameRoomPortalPrefabReplacementDefinition> ActivationPrefabReplacements =>
+        activationPrefabReplacements;
+    #endregion
+
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Ensures optional effect collections exist without changing authored values.
+    /// </summary>
+    public void EnsureInitialized()
+    {
+        if (activationAnimations == null)
+            activationAnimations = new List<GameRoomPortalTransformAnimationDefinition>();
+
+        if (activationPrefabReplacements == null)
+            activationPrefabReplacements = new List<GameRoomPortalPrefabReplacementDefinition>();
+    }
+    #endregion
+
     #endregion
 }

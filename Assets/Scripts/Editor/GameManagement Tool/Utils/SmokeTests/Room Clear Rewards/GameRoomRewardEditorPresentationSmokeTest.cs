@@ -34,9 +34,12 @@ public static class GameRoomRewardEditorPresentationSmokeTest
             VisualElement modulesRoot = new VisualElement();
             VisualElement rewardsRoot = new VisualElement();
             VisualElement mappingsRoot = new VisualElement();
+            VisualElement portalRoot = new VisualElement();
             GameRoomRewardModuleEditorUtility.Build(modulesRoot, serializedCopy);
             GameRoomRewardCompositionEditorUtility.BuildRewards(rewardsRoot, serializedCopy);
             GameRoomRewardCompositionEditorUtility.BuildPresentation(mappingsRoot, serializedCopy);
+            AddPortalAnimationFixture(serializedCopy);
+            GameRoomRewardPortalSettingsEditorUtility.Build(portalRoot, serializedCopy);
 
             // Validate every authored collection element owns a specific nested foldout title.
             ValidateNamedFoldouts(modulesRoot,
@@ -58,6 +61,7 @@ public static class GameRoomRewardEditorPresentationSmokeTest
 
             // Representation switches must update conditional groups without replacing the mapping hierarchy.
             ValidateRepresentationSwitch(mappingsRoot);
+            ValidatePortalSelectors(portalRoot);
 
             // Menu-group changes intentionally perform one controlled regrouping and must leave valid named content.
             ValidateRewardRegroup(rewardsRoot, copy.Rewards.Count);
@@ -72,6 +76,41 @@ public static class GameRoomRewardEditorPresentationSmokeTest
     #endregion
 
     #region Validation Methods
+    /// <summary>
+    /// Adds one in-memory animation so enum-slot and channel controls can be inspected without changing assets.
+    /// </summary>
+    /// <param name="serializedPreset">In-memory reward preset serialization context.</param>
+    private static void AddPortalAnimationFixture(SerializedObject serializedPreset)
+    {
+        SerializedProperty settings = serializedPreset.FindProperty("portalLogSettings");
+        SerializedProperty animations = settings.FindPropertyRelative("activationAnimations");
+        animations.arraySize = 1;
+        SerializedProperty animation = animations.GetArrayElementAtIndex(0);
+        animation.FindPropertyRelative("targetSlot").intValue =
+            (int)GameRoomPortalLinkedObjectSlot.Object03;
+        animation.FindPropertyRelative("mode").intValue =
+            (int)GameRoomPortalTransformAnimationMode.PositionAndScale;
+        animation.FindPropertyRelative("duration").floatValue = 0.5f;
+        animation.FindPropertyRelative("scaleMultiplier").vector3Value = Vector3.one;
+        serializedPreset.ApplyModifiedProperties();
+    }
+
+    /// <summary>
+    /// Verifies portal layout, value detail, target slot and Transform channel enums are exposed explicitly.
+    /// </summary>
+    /// <param name="root">Built Portal Log tab root.</param>
+    private static void ValidatePortalSelectors(VisualElement root)
+    {
+        Require(FindEnumField(root, "Layout Mode") != null,
+                "Portal Log layout mode is not exposed as an enum selector.");
+        Require(FindEnumField(root, "Value Display") != null,
+                "Portal Log value display mode is not exposed as an enum selector.");
+        Require(FindDropdownField(root, "Linked Object") != null,
+                "Portal animation linked objects are not exposed as an enum-backed object dropdown.");
+        Require(FindEnumField(root, "Animation Channels") != null,
+                "Portal Transform channels are not exposed as an enum selector.");
+    }
+
     /// <summary>
     /// Verifies one tab contains the expected number of specifically named foldouts and no generic Unity array labels.
     /// </summary>
@@ -197,6 +236,30 @@ public static class GameRoomRewardEditorPresentationSmokeTest
         for (int index = 0; index < root.hierarchy.childCount; index++)
         {
             EnumField childField = FindEnumField(root.hierarchy[index], label);
+
+            if (childField != null)
+                return childField;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Finds the first dropdown field with one exact label.
+    /// </summary>
+    /// <param name="root">Current subtree root.</param>
+    /// <param name="label">Exact field label.</param>
+    /// <returns>Matching dropdown field, or null when unavailable.</returns>
+    private static DropdownField FindDropdownField(VisualElement root, string label)
+    {
+        DropdownField field = root as DropdownField;
+
+        if (field != null && string.Equals(field.label, label, StringComparison.Ordinal))
+            return field;
+
+        for (int index = 0; index < root.hierarchy.childCount; index++)
+        {
+            DropdownField childField = FindDropdownField(root.hierarchy[index], label);
 
             if (childField != null)
                 return childField;

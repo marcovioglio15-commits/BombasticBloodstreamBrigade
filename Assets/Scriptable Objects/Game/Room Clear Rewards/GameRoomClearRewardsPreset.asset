@@ -639,6 +639,7 @@ MonoBehaviour:
     sortOrder: 80
   playerLogSettings:
     worldOffset: {x: 0, y: 2.2, z: 0}
+    valueDisplayMode: 0
     fontSize: 3.6
     rowSpacing: 0.5
     visibleRows: 6
@@ -650,6 +651,8 @@ MonoBehaviour:
     font: {fileID: 0}
   portalLogSettings:
     worldOffset: {x: 0, y: 1.75, z: 0}
+    layoutMode: 0
+    valueDisplayMode: 0
     fontSize: 3.2
     cellSpacing: 2
     visibleCells: 1
@@ -657,3 +660,10 @@ MonoBehaviour:
     initialPause: 0.5
     loopPause: 0.35
     font: {fileID: 0}
+    staticRowSpacing: 0.35
+    staticPanelPadding: {x: 0.8, y: 0.6}
+    staticMinimumPanelSize: {x: 5, y: 2}
+    staticBackgroundSprite: {fileID: 0}
+    staticBackgroundColor: {r: 0, g: 0, b: 0, a: 0.75}
+    activationAnimations: []
+    activationPrefabReplacements: []

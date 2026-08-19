@@ -29,5 +29,6 @@ public enum GameAudioEventId : byte
     ExplosionBomb = 23,
     ExplosionPassive = 24,
     ExplosionEnemy = 25,
-    PlayerDeathJingle = 26
+    PlayerDeathJingle = 26,
+    RoomRewardPortalAnimation = 27
 }

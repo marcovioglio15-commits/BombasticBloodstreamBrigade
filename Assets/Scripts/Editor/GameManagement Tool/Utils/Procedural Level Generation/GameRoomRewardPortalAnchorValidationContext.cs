@@ -124,6 +124,15 @@ internal sealed class GameRoomRewardPortalAnchorValidationContext
             if (anchor.LogView == null)
                 warnings.Add(context + " has no fixed log view and cannot present destination rewards.");
 
+            if (anchor.EffectView == null)
+            {
+                warnings.Add(context + " has no linked-object effect view. Re-run Room Clear Rewards presentation setup.");
+            }
+            else if (!anchor.EffectView.TryValidateLinkedObjects(out string linkedObjectFailure))
+            {
+                warnings.Add(context + " has invalid linked objects: " + linkedObjectFailure);
+            }
+
             List<Vector3> centers;
 
             if (!portalCenters.TryGetValue(anchor.PortalId, out centers))
@@ -147,7 +156,7 @@ internal sealed class GameRoomRewardPortalAnchorValidationContext
                          " meters from the matching Portal ID '" + anchor.PortalId +
                          "' volume center, but runtime accepts at most " +
                          GameRoomPortalRewardLogAnchor.MaximumPositionError.ToString("0.##") +
-                         " meters. Do not move the locator root; use Portal Log World Offset for visual placement and re-synchronize the anchors.");
+                         " meters. Keep the locator root aligned; move only the log child in Static Rows mode or use Portal Log World Offset in Scrolling mode.");
         }
 
         // Every bakeable portal needs one managed presentation locator in the room root.

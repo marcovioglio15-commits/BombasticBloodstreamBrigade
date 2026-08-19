@@ -46,6 +46,10 @@ public static class GameRoomRewardBakeUtility
                 preset,
                 out failureMessage) ||
             !ValidateTileAssignments(preset, proceduralPreset, out failureMessage) ||
+            !GameRoomRewardPortalPresentationBakeUtility.TryValidateStaticCapacity(
+                preset,
+                proceduralPreset,
+                out failureMessage) ||
             !GameRoomRewardPresentationValidationUtility.TryValidate(preset,
                                                                       out failureMessage))
         {
@@ -73,6 +77,7 @@ public static class GameRoomRewardBakeUtility
             RewardCount = preset.Rewards.Count,
             MappingCount = preset.PresentationMappings.Count,
             PlayerLogWorldOffset = playerLog.WorldOffset,
+            PlayerLogValueDisplayMode = playerLog.ValueDisplayMode,
             PlayerLogFontSize = playerLog.FontSize,
             PlayerLogRowSpacing = playerLog.RowSpacing,
             PlayerLogVisibleRows = playerLog.VisibleRows,
@@ -83,18 +88,30 @@ public static class GameRoomRewardBakeUtility
             PlayerLogScrollDistance = playerLog.ScrollDistance,
             PlayerLogFont = playerLog.Font,
             PortalWorldOffset = portal.WorldOffset,
+            PortalLayoutMode = portal.LayoutMode,
+            PortalValueDisplayMode = portal.ValueDisplayMode,
             PortalFontSize = portal.FontSize,
             PortalCellSpacing = portal.CellSpacing,
             PortalVisibleCells = portal.VisibleCells,
             PortalScrollSpeed = portal.ScrollSpeed,
             PortalInitialPause = portal.InitialPause,
             PortalLoopPause = portal.LoopPause,
-            PortalFont = portal.Font
+            PortalFont = portal.Font,
+            PortalStaticRowSpacing = portal.StaticRowSpacing,
+            PortalStaticPanelPadding = portal.StaticPanelPadding,
+            PortalStaticMinimumPanelSize = portal.StaticMinimumPanelSize,
+            PortalStaticBackgroundColor = new float4(portal.StaticBackgroundColor.r,
+                                                     portal.StaticBackgroundColor.g,
+                                                     portal.StaticBackgroundColor.b,
+                                                     portal.StaticBackgroundColor.a),
+            PortalStaticBackgroundSprite = portal.StaticBackgroundSprite,
+            PortalAnimationCount = portal.ActivationAnimations.Count,
+            PortalPrefabReplacementCount = portal.ActivationPrefabReplacements.Count
         };
     }
 
     /// <summary>
-    /// Populates every flattened reward buffer and preserves explicit  order values.
+    /// Populates every flattened reward buffer and preserves explicit authored order values.
     /// </summary>
     /// <param name="preset">Source Room Clear Rewards preset.</param>
     /// <param name="proceduralPreset">Procedural preset containing room tile assignments.</param>
@@ -103,19 +120,25 @@ public static class GameRoomRewardBakeUtility
     /// <param name="moduleBindingBuffer">Output reward-to-module bindings.</param>
     /// <param name="tileBindingBuffer">Output tile-to-reward bindings.</param>
     /// <param name="presentationBuffer">Output target presentation mappings.</param>
+    /// <param name="portalAnimationBuffer">Output portal activation Transform animations.</param>
+    /// <param name="portalReplacementBuffer">Output portal activation prefab replacements.</param>
     public static void PopulateBuffers(GameRoomClearRewardsPreset preset,
                                        GameProceduralLevelPreset proceduralPreset,
                                        DynamicBuffer<GameRoomRewardModuleElement> moduleBuffer,
                                        DynamicBuffer<GameRoomRewardDefinitionElement> rewardBuffer,
                                        DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindingBuffer,
                                        DynamicBuffer<GameRoomRewardTileBindingElement> tileBindingBuffer,
-                                       DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer)
+                                       DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer,
+                                       DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimationBuffer,
+                                       DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer)
     {
         moduleBuffer.Clear();
         rewardBuffer.Clear();
         moduleBindingBuffer.Clear();
         tileBindingBuffer.Clear();
         presentationBuffer.Clear();
+        portalAnimationBuffer.Clear();
+        portalReplacementBuffer.Clear();
 
         Dictionary<string, int> moduleIndices = new Dictionary<string, int>(StringComparer.Ordinal);
         Dictionary<string, int> rewardIndices = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -128,6 +151,9 @@ public static class GameRoomRewardBakeUtility
                         moduleIndices,
                         rewardIndices);
         PopulateTileBindings(proceduralPreset, tileBindingBuffer, rewardIndices);
+        GameRoomRewardPortalPresentationBakeUtility.PopulateBuffers(preset.PortalLogSettings,
+                                                                     portalAnimationBuffer,
+                                                                     portalReplacementBuffer);
     }
     #endregion
 
@@ -317,7 +343,7 @@ public static class GameRoomRewardBakeUtility
     /// </summary>
     /// <param name="preset">Reward preset supplying stat types and presentation mappings.</param>
     /// <param name="technicalId">Runtime modifier identity.</param>
-    /// <param name="displayName">Reusable -facing module name.</param>
+    /// <param name="displayName">Readable reusable module name.</param>
     /// <param name="description">Reusable module description.</param>
     /// <param name="targetDomain">Player data domain modified by the module.</param>
     /// <param name="valueSource">Flat or formula value source.</param>

@@ -46,6 +46,7 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         SynchronizeRoomMetadata();
         Debug.Log("[GameRoomRewardPresentationProjectSetupUtility] Room reward presentation and portal isolation setup completed.");
     }
+
     #endregion
 
     #region Metadata Synchronization
@@ -215,6 +216,10 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         GameObject portalLogTemplate = CreateWorldCanvasObject(PortalLogObjectName,
                                                                null,
                                                                new Vector2(24f, 5f));
+        portalLogTemplate.AddComponent<CanvasRenderer>();
+        Image portalBackground = portalLogTemplate.AddComponent<Image>();
+        portalBackground.raycastTarget = false;
+        portalBackground.enabled = false;
         RectMask2D mask = portalLogTemplate.AddComponent<RectMask2D>();
         mask.padding = Vector4.zero;
         Canvas portalLogCanvas = portalLogTemplate.GetComponent<Canvas>();
@@ -226,13 +231,14 @@ public static class GameRoomRewardPresentationProjectSetupUtility
                         GameRoomPortalRewardLogView.PreauthoredCellCapacity,
                         new Vector2(22f, 4f),
                         TextAlignmentOptions.Center);
-        portalLogView.ConfigureAuthoring(portalLogCanvas, cells);
+        portalLogView.ConfigureAuthoring(portalLogCanvas, cells, portalBackground);
         GameObject portalLogPrefab =
             PrefabUtility.SaveAsPrefabAsset(portalLogTemplate,
                                             PortalLogPrefabPath);
         UnityEngine.Object.DestroyImmediate(portalLogTemplate);
         GameObject anchorTemplate = new GameObject(
             "Room Reward Portal Anchor",
+            typeof(GameRoomPortalRewardEffectView),
             typeof(GameRoomPortalRewardLogAnchor));
         GameObject portalLogViewInstance =
             InstantiateSharedView(portalLogPrefab,
@@ -240,8 +246,12 @@ public static class GameRoomRewardPresentationProjectSetupUtility
                                   PortalLogObjectName);
         GameRoomPortalRewardLogView portalLogViewComponent =
             portalLogViewInstance.GetComponent<GameRoomPortalRewardLogView>();
+        GameRoomPortalRewardEffectView portalEffectView =
+            anchorTemplate.GetComponent<GameRoomPortalRewardEffectView>();
         anchorTemplate.GetComponent<GameRoomPortalRewardLogAnchor>()
-            .ConfigureAuthoring(string.Empty, portalLogViewComponent);
+            .ConfigureAuthoring(string.Empty,
+                                portalLogViewComponent,
+                                portalEffectView);
         portalLogAnchorPrefab =
             PrefabUtility.SaveAsPrefabAsset(anchorTemplate,
                                             PortalLogAnchorPrefabPath);

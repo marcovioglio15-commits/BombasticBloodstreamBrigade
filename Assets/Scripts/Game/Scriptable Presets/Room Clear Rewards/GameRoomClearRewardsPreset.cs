@@ -16,7 +16,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     [SerializeField]
     private string presetId;
 
-    [Tooltip("Designer-facing preset name displayed in Game Management Tool.")]
+    [Tooltip("Preset name displayed in Game Management Tool.")]
     [SerializeField]
     private string presetName = "New Room Clear Rewards Preset";
 
@@ -99,6 +99,8 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
 
         if (portalLogSettings == null)
             portalLogSettings = new GameRoomRewardPortalLogSettings();
+
+        portalLogSettings.EnsureInitialized();
 
         // Initialize valid nested entries while preserving null entries for explicit validation.
         for (int index = 0; index < modules.Count; index++)

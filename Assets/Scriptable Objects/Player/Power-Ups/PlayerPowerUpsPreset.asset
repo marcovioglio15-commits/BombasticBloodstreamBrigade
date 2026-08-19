@@ -59695,7 +59695,11 @@ MonoBehaviour:
   primaryActivePowerUpId: ActiveBoomerang
   secondaryActivePowerUpId: Active_MassCollector
   equippedPassivePowerUpIds:
-  - PassiveSuddenChargedShot
+  - PassiveCrossShot
+  - PassiveSplittingProjectiles
+  - PassiveBouncingProjectiles
+  - Passive_MegaProjectiles
+  - PassiveTwoStepTreatment
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

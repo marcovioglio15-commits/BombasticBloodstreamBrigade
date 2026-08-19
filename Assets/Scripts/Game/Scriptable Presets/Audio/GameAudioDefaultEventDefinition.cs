@@ -142,7 +142,11 @@ public static class GameAudioDefaultEventDefinitions
         new GameAudioDefaultEventDefinition(GameAudioEventId.ExplosionEnemy,
                                             "MISC_SFX_Explosion_Enemy",
                                             "Enemy Explosion",
-                                            "Requested when enemy-kill passive explosion payloads resolve.")
+                                            "Requested when enemy-kill passive explosion payloads resolve."),
+        new GameAudioDefaultEventDefinition(GameAudioEventId.RoomRewardPortalAnimation,
+                                            "MISC_SFX_RoomReward_PortalAnimation",
+                                            "Room Reward Portal Animation",
+                                            "Requested when the selected room reward portal activation animation starts.")
     };
     #endregion
 

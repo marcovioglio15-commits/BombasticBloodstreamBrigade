@@ -168,11 +168,9 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
         try
         {
             List<PortalPresentationSource> sources = CollectPortalSources(roomScene);
-            RemoveOwnedPresentations(roomScene);
-
-            CreatePresentationAnchors(roomScene,
-                                      sources,
-                                      portalAnchorPrefab);
+            SynchronizePresentationAnchors(roomScene,
+                                           sources,
+                                           portalAnchorPrefab);
 
             EditorSceneManager.SaveScene(roomScene);
         }
@@ -184,63 +182,126 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     }
 
     /// <summary>
-    /// Removes legacy presentation containers and setup-owned anchor instances before deterministic rebuilding.
+    /// Synchronizes setup-owned anchors while preserving linked objects and freely authored log placement.
     /// </summary>
-    /// <param name="roomScene">Managed room scene searched for the owned root.</param>
-    private static void RemoveOwnedPresentations(Scene roomScene)
-    {
-        GameObject[] roots = roomScene.GetRootGameObjects();
-
-        for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
-        {
-            GameObject root = roots[rootIndex];
-
-            if (root.GetComponent<GameRoomPortalRewardLogAnchor>() != null ||
-                string.Equals(root.name,
-                              "Room Reward Portal Presentations",
-                              StringComparison.Ordinal))
-            {
-                UnityEngine.Object.DestroyImmediate(root);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Creates one shared prefab instance per portal without an otherwise empty hierarchy container.
-    /// </summary>
-    /// <param name="roomScene">Managed room scene receiving the presentation hierarchy.</param>
-    /// <param name="sources">Portal identities and authored world centers collected from referenced SubScenes.</param>
-    /// <param name="portalAnchorPrefab">Shared anchor and log prefab installed for every portal.</param>
-    private static void CreatePresentationAnchors(
+    /// <param name="roomScene">Managed room scene receiving synchronized anchors.</param>
+    /// <param name="sources">Current authoritative portal identities and centers.</param>
+    /// <param name="portalAnchorPrefab">Shared anchor prefab used only for missing portals.</param>
+    private static void SynchronizePresentationAnchors(
         Scene roomScene,
         IReadOnlyList<PortalPresentationSource> sources,
         GameObject portalAnchorPrefab)
     {
+        GameObject[] roots = roomScene.GetRootGameObjects();
+        Dictionary<string, GameRoomPortalRewardLogAnchor> anchorsByPortalId =
+            new Dictionary<string, GameRoomPortalRewardLogAnchor>(StringComparer.Ordinal);
+        HashSet<string> sourceIds = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int sourceIndex = 0; sourceIndex < sources.Count; sourceIndex++)
+            sourceIds.Add(sources[sourceIndex].PortalId);
+
+        // Remove obsolete containers and retain at most one valid anchor for each current portal identity.
+        for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
+        {
+            GameObject root = roots[rootIndex];
+            GameRoomPortalRewardLogAnchor anchor =
+                root.GetComponent<GameRoomPortalRewardLogAnchor>();
+
+            if (string.Equals(root.name,
+                              "Room Reward Portal Presentations",
+                              StringComparison.Ordinal))
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+                continue;
+            }
+
+            if (anchor == null)
+                continue;
+
+            if (string.IsNullOrWhiteSpace(anchor.PortalId) ||
+                !sourceIds.Contains(anchor.PortalId) ||
+                anchorsByPortalId.ContainsKey(anchor.PortalId))
+            {
+                UnityEngine.Object.DestroyImmediate(root);
+                continue;
+            }
+
+            anchorsByPortalId.Add(anchor.PortalId, anchor);
+        }
+
+        // Reuse valid anchors so scene object links and Static Rows placement survive every setup pass.
         for (int sourceIndex = 0; sourceIndex < sources.Count; sourceIndex++)
         {
             PortalPresentationSource source = sources[sourceIndex];
-            GameObject anchorObject =
-                PrefabUtility.InstantiatePrefab(portalAnchorPrefab,
-                                                roomScene) as GameObject;
 
-            if (anchorObject == null)
-                throw new InvalidOperationException(
-                    "Unity could not instantiate a managed portal reward anchor.");
+            if (!anchorsByPortalId.TryGetValue(source.PortalId,
+                                                out GameRoomPortalRewardLogAnchor anchor))
+            {
+                anchor = CreatePresentationAnchor(roomScene,
+                                                  source,
+                                                  portalAnchorPrefab);
+            }
 
-            anchorObject.name = AnchorNamePrefix + source.PortalId;
-            anchorObject.transform.position = source.WorldCenter;
-            GameRoomPortalRewardLogView view =
-                anchorObject.GetComponentInChildren<GameRoomPortalRewardLogView>(
-                    true);
-
-            if (view == null)
-                throw new InvalidOperationException(
-                    "The shared portal anchor prefab has no log view.");
-
-            anchorObject.GetComponent<GameRoomPortalRewardLogAnchor>()
-                .ConfigureAuthoring(source.PortalId, view);
-            view.Hide();
+            ConfigurePresentationAnchor(anchor, source);
         }
+    }
+
+    /// <summary>
+    /// Creates one shared prefab instance for a missing portal anchor.
+    /// </summary>
+    /// <param name="roomScene">Managed room scene receiving the presentation hierarchy.</param>
+    /// <param name="source">Portal identity and authored world center.</param>
+    /// <param name="portalAnchorPrefab">Shared anchor and log prefab.</param>
+    /// <returns>Created managed portal anchor.</returns>
+    private static GameRoomPortalRewardLogAnchor CreatePresentationAnchor(
+        Scene roomScene,
+        PortalPresentationSource source,
+        GameObject portalAnchorPrefab)
+    {
+        GameObject anchorObject =
+            PrefabUtility.InstantiatePrefab(portalAnchorPrefab,
+                                            roomScene) as GameObject;
+
+        if (anchorObject == null)
+            throw new InvalidOperationException(
+                "Unity could not instantiate a managed portal reward anchor.");
+
+        GameRoomPortalRewardLogAnchor anchor =
+            anchorObject.GetComponent<GameRoomPortalRewardLogAnchor>();
+
+        if (anchor == null)
+            throw new InvalidOperationException(
+                "The shared portal anchor prefab has no anchor component.");
+
+        return anchor;
+    }
+
+    /// <summary>
+    /// Aligns one anchor root and refreshes setup-owned component references without moving its log child.
+    /// </summary>
+    /// <param name="anchor">Existing or newly created managed anchor.</param>
+    /// <param name="source">Authoritative portal identity and center.</param>
+    private static void ConfigurePresentationAnchor(
+        GameRoomPortalRewardLogAnchor anchor,
+        PortalPresentationSource source)
+    {
+        GameObject anchorObject = anchor.gameObject;
+        anchorObject.name = AnchorNamePrefix + source.PortalId;
+        anchorObject.transform.position = source.WorldCenter;
+        GameRoomPortalRewardLogView view =
+            anchorObject.GetComponentInChildren<GameRoomPortalRewardLogView>(true);
+        GameRoomPortalRewardEffectView effectView =
+            anchorObject.GetComponent<GameRoomPortalRewardEffectView>();
+
+        if (effectView == null)
+            effectView = anchorObject.AddComponent<GameRoomPortalRewardEffectView>();
+
+        if (view == null)
+            throw new InvalidOperationException(
+                "The shared portal anchor requires a log view component.");
+
+        anchor.ConfigureAuthoring(source.PortalId, view, effectView);
+        view.Hide();
     }
     #endregion
 

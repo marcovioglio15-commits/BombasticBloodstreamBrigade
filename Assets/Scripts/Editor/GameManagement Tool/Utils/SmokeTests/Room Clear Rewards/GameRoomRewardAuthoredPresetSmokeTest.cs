@@ -16,7 +16,7 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
     private const int ExpectedModuleCount = 12;
     private const int ExpectedRewardCount = 10;
     private const int ExpectedMappingCount = 9;
-    private const int ExpectedAssignedTileCount = 12;
+    private const int ExpectedAssignedTileCount = 26;
     private const int ExpectedOverrideModuleCount = 1;
     private const float ExpectedSurvivorRepairValue = 2f;
     #endregion
@@ -67,7 +67,8 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 "Not every authored procedural room tile owns a valid Room Clear Reward assignment.");
         ValidateOverrideBake(rewardPreset, proceduralPreset);
         Debug.Log(
-            "[GameRoomRewardAuthoredPresetSmokeTest] Metadata, solvability, formulas, override baking, presentation and 12 tile assignments passed.");
+            "[GameRoomRewardAuthoredPresetSmokeTest] Metadata, solvability, formulas, override baking, presentation and " +
+            ExpectedAssignedTileCount + " tile assignments passed.");
     }
     #endregion
 
@@ -90,7 +91,9 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 typeof(GameRoomRewardDefinitionElement),
                 typeof(GameRoomRewardModuleBindingElement),
                 typeof(GameRoomRewardTileBindingElement),
-                typeof(GameRoomRewardPresentationElement));
+                typeof(GameRoomRewardPresentationElement),
+                typeof(GameRoomPortalTransformAnimationElement),
+                typeof(GameRoomPortalPrefabReplacementElement));
             DynamicBuffer<GameRoomRewardModuleElement> moduleBuffer =
                 entityManager.GetBuffer<GameRoomRewardModuleElement>(entity);
             DynamicBuffer<GameRoomRewardDefinitionElement> rewardBuffer =
@@ -101,6 +104,10 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 entityManager.GetBuffer<GameRoomRewardTileBindingElement>(entity);
             DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer =
                 entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity);
+            DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimationBuffer =
+                entityManager.GetBuffer<GameRoomPortalTransformAnimationElement>(entity);
+            DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer =
+                entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(entity);
 
             // Flatten the authored preset through the same path used by the production baker.
             GameRoomRewardBakeUtility.PopulateBuffers(rewardPreset,
@@ -109,7 +116,9 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                                                       rewardBuffer,
                                                       moduleBindingBuffer,
                                                       tileBindingBuffer,
-                                                      presentationBuffer);
+                                                      presentationBuffer,
+                                                      portalAnimationBuffer,
+                                                      portalReplacementBuffer);
             GameRoomRewardConfig config = GameRoomRewardBakeUtility.BuildConfig(rewardPreset);
             GameRoomRewardDefinition firstReward = rewardPreset.Rewards[0];
             GameRoomRewardModuleBinding firstAuthoredBinding = firstReward.Modules[0];
@@ -126,6 +135,10 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                     "The runtime config did not include exactly one binding-local module variant.");
             Require(moduleBuffer.Length == config.ModuleCount,
                     "The flattened module buffer does not match its immutable config count.");
+            Require(portalAnimationBuffer.Length == config.PortalAnimationCount,
+                    "The portal animation buffer does not match its immutable config count.");
+            Require(portalReplacementBuffer.Length == config.PortalPrefabReplacementCount,
+                    "The portal prefab replacement buffer does not match its immutable config count.");
             Require(firstBakedBinding.ModuleIndex >= ExpectedModuleCount,
                     "The override binding still references its reusable source module.");
             Require(overrideModule.TechnicalId.ToString() == firstAuthoredBinding.BindingId,

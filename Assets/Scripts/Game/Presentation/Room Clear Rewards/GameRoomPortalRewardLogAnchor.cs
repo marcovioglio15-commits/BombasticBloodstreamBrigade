@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -27,6 +28,10 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     [Tooltip("Preauthored world-space log controlled by the ECS presentation bridge for this portal.")]
     [SerializeField]
     private GameRoomPortalRewardLogView logView;
+
+    [Tooltip("Preauthored bridge that maps baked portal effects to linked managed scene objects.")]
+    [SerializeField]
+    private GameRoomPortalRewardEffectView effectView;
     #endregion
 
     #region Runtime Fields
@@ -48,6 +53,11 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     public GameRoomPortalRewardLogView LogView => logView;
 
+    /// <summary>
+    /// Gets the managed Transform and prefab-replacement bridge owned by this anchor.
+    /// </summary>
+    public GameRoomPortalRewardEffectView EffectView => effectView;
+
     public static uint Revision => revision;
     #endregion
 
@@ -59,11 +69,48 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     /// <param name="resolvedPortalId">Stable identifier copied from the matching ECS portal authoring.</param>
     /// <param name="resolvedLogView">Preauthored world-space log owned by this anchor.</param>
+    /// <param name="resolvedEffectView">Preauthored linked-object effect bridge owned by this anchor.</param>
     public void ConfigureAuthoring(string resolvedPortalId,
-                                   GameRoomPortalRewardLogView resolvedLogView)
+                                   GameRoomPortalRewardLogView resolvedLogView,
+                                   GameRoomPortalRewardEffectView resolvedEffectView)
     {
         portalId = resolvedPortalId;
         logView = resolvedLogView;
+        effectView = resolvedEffectView;
+    }
+
+    /// <summary>
+    /// Starts baked portal effects once for a new authoritative portal assignment.
+    /// </summary>
+    /// <param name="signature">Generation and edge signature preventing duplicate activation.</param>
+    /// <param name="animations">Baked Transform animation definitions.</param>
+    /// <param name="replacements">Baked prefab replacement definitions.</param>
+    /// <param name="hasAudioCue">True when one resolved animation requests the dedicated audio event.</param>
+    /// <param name="audioDelay">Delay shared with the audio-owning animation.</param>
+    /// <param name="audioPosition">World position used by the positioned audio request.</param>
+    /// <returns>True when a new signature was accepted by the effect bridge.</returns>
+    public bool ActivateEffects(
+        int signature,
+        DynamicBuffer<GameRoomPortalTransformAnimationElement> animations,
+        DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements,
+        out bool hasAudioCue,
+        out float audioDelay,
+        out Vector3 audioPosition)
+    {
+        if (effectView != null)
+        {
+            return effectView.Activate(signature,
+                                       animations,
+                                       replacements,
+                                       out hasAudioCue,
+                                       out audioDelay,
+                                       out audioPosition);
+        }
+
+        hasAudioCue = false;
+        audioDelay = 0f;
+        audioPosition = transform.position;
+        return false;
     }
 
     /// <summary>
@@ -71,13 +118,13 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     /// <param name="resolvedPortalId">Stable ECS portal identifier.</param>
     /// <param name="portalCenter">Current portal center after room-instance placement.</param>
-    /// <param name="view">Closest valid preauthored log when resolution succeeds.</param>
+    /// <param name="resolvedAnchor">Closest valid preauthored anchor when resolution succeeds.</param>
     /// <returns>True when one loaded anchor matches both identity and placed world position.</returns>
     public static bool TryResolve(FixedString64Bytes resolvedPortalId,
                                   float3 portalCenter,
-                                  out GameRoomPortalRewardLogView view)
+                                  out GameRoomPortalRewardLogAnchor resolvedAnchor)
     {
-        view = null;
+        resolvedAnchor = null;
 
         if (resolvedPortalId.Length <= 0)
             return false;
@@ -88,25 +135,25 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         // Match identity first, then position to disambiguate duplicate staged instances of one room template.
         for (int anchorIndex = registeredAnchors.Count - 1; anchorIndex >= 0; anchorIndex--)
         {
-            GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
+            GameRoomPortalRewardLogAnchor candidate = registeredAnchors[anchorIndex];
 
-            if (anchor == null)
+            if (candidate == null)
             {
                 registeredAnchors.RemoveAt(anchorIndex);
                 IncrementRevision();
                 continue;
             }
 
-            if (!anchor.isActiveAndEnabled ||
-                anchor.logView == null ||
-                !string.Equals(anchor.portalId,
+            if (!candidate.isActiveAndEnabled ||
+                candidate.logView == null ||
+                !string.Equals(candidate.portalId,
                                resolvedPortalIdString,
                                StringComparison.Ordinal))
             {
                 continue;
             }
 
-            Vector3 offset = anchor.transform.position -
+            Vector3 offset = candidate.transform.position -
                              new Vector3(portalCenter.x, portalCenter.y, portalCenter.z);
             float distanceSquared = offset.sqrMagnitude;
 
@@ -114,13 +161,13 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
                 continue;
 
             nearestDistanceSquared = distanceSquared;
-            view = anchor.logView;
+            resolvedAnchor = candidate;
         }
 
         if (nearestDistanceSquared <= MaximumPositionError * MaximumPositionError)
             return true;
 
-        view = null;
+        resolvedAnchor = null;
         return false;
     }
 
@@ -134,8 +181,14 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         {
             GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
 
-            if (anchor != null && anchor.logView != null)
+            if (anchor == null)
+                continue;
+
+            if (anchor.logView != null)
                 anchor.logView.Hide();
+
+            if (anchor.effectView != null)
+                anchor.effectView.Deactivate();
         }
     }
     #endregion
@@ -146,6 +199,9 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        if (effectView == null)
+            effectView = GetComponent<GameRoomPortalRewardEffectView>();
+
         if (!registeredAnchors.Contains(this))
         {
             registeredAnchors.Add(this);
@@ -154,6 +210,9 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 
         if (logView != null)
             logView.Hide();
+
+        if (effectView != null)
+            effectView.Deactivate();
     }
 
     /// <summary>
@@ -166,6 +225,9 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 
         if (logView != null)
             logView.Hide();
+
+        if (effectView != null)
+            effectView.Deactivate();
     }
     #endregion
 

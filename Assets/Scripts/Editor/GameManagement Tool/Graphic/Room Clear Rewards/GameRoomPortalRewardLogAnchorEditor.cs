@@ -19,7 +19,40 @@ internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        DrawAlignmentControls(target as GameRoomPortalRewardLogAnchor);
+        GameRoomPortalRewardLogAnchor anchor = target as GameRoomPortalRewardLogAnchor;
+        DrawLinkedObjectValidation(anchor);
+        DrawAlignmentControls(anchor);
+    }
+    #endregion
+
+    #region Linked Objects
+    /// <summary>
+    /// Reports missing effect setup and invalid enum-slot mappings beside the owning portal anchor.
+    /// </summary>
+    /// <param name="anchor">Selected managed portal reward anchor.</param>
+    private static void DrawLinkedObjectValidation(GameRoomPortalRewardLogAnchor anchor)
+    {
+        if (anchor == null)
+            return;
+
+        EditorGUILayout.Space();
+
+        if (anchor.EffectView == null)
+        {
+            EditorGUILayout.HelpBox(
+                "The linked-object effect view is missing. Re-run Room Clear Rewards presentation setup.",
+                MessageType.Warning);
+            return;
+        }
+
+        if (!anchor.EffectView.TryValidateLinkedObjects(out string failureMessage))
+            EditorGUILayout.HelpBox(failureMessage, MessageType.Warning);
+        else
+        {
+            EditorGUILayout.HelpBox(
+                "Linked objects use the same Object01-Object16 enum slots exposed by the Portal Log preset tab.",
+                MessageType.Info);
+        }
     }
     #endregion
 

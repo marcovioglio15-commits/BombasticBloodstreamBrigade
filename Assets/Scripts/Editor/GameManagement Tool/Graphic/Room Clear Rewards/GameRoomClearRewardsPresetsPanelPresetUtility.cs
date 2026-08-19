@@ -233,7 +233,7 @@ internal static class GameRoomClearRewardsPresetsPanelPresetUtility
     /// Adds live library entries that match the current case-insensitive browser filter.
     /// </summary>
     /// <param name="panel">Panel receiving matched presets.</param>
-    /// <param name="searchText">Search text applied to each -facing preset label.</param>
+    /// <param name="searchText">Search text applied to each visible preset label.</param>
     private static void AddMatchingPresets(GameRoomClearRewardsPresetsPanel panel, string searchText)
     {
         for (int index = 0; index < panel.Library.Presets.Count; index++)
@@ -331,7 +331,7 @@ internal static class GameRoomClearRewardsPresetsPanelPresetUtility
     /// <summary>
     /// Checks whether one preset's browser label contains the active search text.
     /// </summary>
-    /// <param name="panel">Panel resolving the -facing preset label.</param>
+    /// <param name="panel">Panel resolving the visible preset label.</param>
     /// <param name="preset">Preset inspected by the filter.</param>
     /// <param name="searchText">Case-insensitive search text.</param>
     /// <returns>True when the preset should remain visible.</returns>

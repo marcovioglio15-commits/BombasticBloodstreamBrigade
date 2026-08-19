@@ -269,7 +269,7 @@ public sealed class GameRoomClearRewardsPresetsPanel
     /// Adds one persisted details-tab action using the shared responsive button rhythm.
     /// </summary>
     /// <param name="parent">Selector row receiving the button.</param>
-    /// <param name="label">-facing tab label.</param>
+    /// <param name="label">Visible tab label.</param>
     /// <param name="tab">Tab selected by the button.</param>
     /// <param name="minimumWidth">Minimum readable width for the button.</param>
     private void AddTabButton(VisualElement parent,
@@ -298,7 +298,7 @@ public sealed class GameRoomClearRewardsPresetsPanel
     /// Resolves the readable browser label for one registered preset.
     /// </summary>
     /// <param name="preset">Preset displayed in the browser.</param>
-    /// <returns>-facing preset name followed by its optional version.</returns>
+    /// <returns>Visible preset name followed by its optional version.</returns>
     internal string GetPresetDisplayName(GameRoomClearRewardsPreset preset)
     {
         if (preset == null)

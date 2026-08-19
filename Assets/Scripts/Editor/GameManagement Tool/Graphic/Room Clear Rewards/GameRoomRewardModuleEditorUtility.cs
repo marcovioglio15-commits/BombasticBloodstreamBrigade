@@ -420,7 +420,7 @@ internal static class GameRoomRewardModuleEditorUtility
     /// </summary>
     /// <param name="root">Parent element.</param>
     /// <param name="property">Serialized property.</param>
-    /// <param name="label">-facing label.</param>
+    /// <param name="label">Visible label.</param>
     private static PropertyField AddBoundField(VisualElement root,
                                                SerializedProperty property,
                                                string label)
@@ -490,7 +490,7 @@ internal static class GameRoomRewardModuleEditorUtility
     }
 
     /// <summary>
-    /// Builds one module foldout title from authored order and -facing identity.
+    /// Builds one module foldout title from authored order and visible identity.
     /// </summary>
     /// <param name="module">Serialized module element.</param>
     /// <returns>Ordered readable title that never exposes a generic array element label.</returns>
@@ -505,7 +505,7 @@ internal static class GameRoomRewardModuleEditorUtility
     /// Resolves a specific module identity for foldout titles and unnamed diagnostics.
     /// </summary>
     /// <param name="module">Serialized module element.</param>
-    /// <returns>-facing module name or a category-qualified fallback.</returns>
+    /// <returns>Visible module name or a category-qualified fallback.</returns>
     private static string ResolveModuleName(SerializedProperty module)
     {
         return GameRoomRewardEditorElementUtility.ResolveReadableName(

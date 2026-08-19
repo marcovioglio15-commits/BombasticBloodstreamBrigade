@@ -1207,7 +1207,7 @@ MonoBehaviour:
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
     dependencyHash: 759af1848dc70f96c4377db5da500fd8
-    cacheStale: 0
+    cacheStale: 1
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09_S.unity
