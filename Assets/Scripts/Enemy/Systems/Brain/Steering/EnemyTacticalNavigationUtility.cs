@@ -350,9 +350,15 @@ internal static class EnemyTacticalNavigationUtility
             float progressScore = math.max(0f, math.dot(candidateDirection, targetDirection));
             float3 navigationVelocity = NavigationVelocityResults[compactIndex];
             float navigationScore = 0f;
+            float navigationDetourStrength = 0f;
 
             if (math.lengthsq(navigationVelocity) > DirectionEpsilon)
-                navigationScore = math.max(0f, math.dot(candidateDirection, math.normalizesafe(navigationVelocity, targetDirection)));
+            {
+                float3 navigationDirection = math.normalizesafe(navigationVelocity, targetDirection);
+                navigationScore = math.max(0f, math.dot(candidateDirection, navigationDirection));
+                float navigationTargetAlignment = math.saturate(math.dot(navigationDirection, targetDirection));
+                navigationDetourStrength = math.saturate((0.96f - navigationTargetAlignment) / 0.96f);
+            }
 
             float3 separationDirection = math.normalizesafe(separationVelocity, float3.zero);
             float separationScore = math.lengthsq(separationDirection) > DirectionEpsilon
@@ -363,8 +369,10 @@ internal static class EnemyTacticalNavigationUtility
             float sideScore = ResolveSideScore(sideSign, config, in runtimeState);
             float stuckBoost = ResolveStuckBoost(candidateDirection, config, in runtimeState);
             float urgency = math.saturate(SeparationUrgencyResults[compactIndex]);
-            float score = progressScore * 1.35f +
-                          navigationScore * math.saturate(config.NavigationInfluence) +
+            float progressWeight = math.lerp(1.35f, 0.42f, navigationDetourStrength);
+            float navigationWeight = math.saturate(config.NavigationInfluence) + navigationDetourStrength * 1.65f;
+            float score = progressScore * progressWeight +
+                          navigationScore * navigationWeight +
                           separationScore * math.saturate(config.CrowdLanePreference) * (0.4f + urgency) +
                           sideScore +
                           stuckBoost -

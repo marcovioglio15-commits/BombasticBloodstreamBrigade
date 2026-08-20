@@ -266,10 +266,10 @@ public sealed class GameRoomRewardPortalLogSettings
     [SerializeField]
     private Color staticBackgroundColor = new Color(0f, 0f, 0f, 0.75f);
 
-    [Tooltip("Transform-only animations started after ECS marks the portal as a traversable exit.")]
+    [Tooltip("Transform or Animator-clip animations started after ECS marks the portal as a traversable exit.")]
     [SerializeField]
-    private List<GameRoomPortalTransformAnimationDefinition> activationAnimations =
-        new List<GameRoomPortalTransformAnimationDefinition>();
+    private List<GameRoomPortalActivationAnimationDefinition> activationAnimations =
+        new List<GameRoomPortalActivationAnimationDefinition>();
 
     [Tooltip("Prefab-asset replacements for linked existing 3D scene objects, applied when ECS marks the portal as a traversable exit.")]
     [SerializeField]
@@ -295,7 +295,7 @@ public sealed class GameRoomRewardPortalLogSettings
     public Vector2 StaticMinimumPanelSize => staticMinimumPanelSize;
     public Sprite StaticBackgroundSprite => staticBackgroundSprite;
     public Color StaticBackgroundColor => staticBackgroundColor;
-    public IReadOnlyList<GameRoomPortalTransformAnimationDefinition> ActivationAnimations =>
+    public IReadOnlyList<GameRoomPortalActivationAnimationDefinition> ActivationAnimations =>
         activationAnimations;
     public IReadOnlyList<GameRoomPortalPrefabReplacementDefinition> ActivationPrefabReplacements =>
         activationPrefabReplacements;
@@ -310,10 +310,24 @@ public sealed class GameRoomRewardPortalLogSettings
     public void EnsureInitialized()
     {
         if (activationAnimations == null)
-            activationAnimations = new List<GameRoomPortalTransformAnimationDefinition>();
+            activationAnimations = new List<GameRoomPortalActivationAnimationDefinition>();
 
         if (activationPrefabReplacements == null)
             activationPrefabReplacements = new List<GameRoomPortalPrefabReplacementDefinition>();
+
+        for (int animationIndex = 0; animationIndex < activationAnimations.Count; animationIndex++)
+        {
+            if (activationAnimations[animationIndex] != null)
+                activationAnimations[animationIndex].EnsureInitialized();
+        }
+
+        for (int replacementIndex = 0;
+             replacementIndex < activationPrefabReplacements.Count;
+             replacementIndex++)
+        {
+            if (activationPrefabReplacements[replacementIndex] != null)
+                activationPrefabReplacements[replacementIndex].EnsureInitialized();
+        }
     }
     #endregion
 

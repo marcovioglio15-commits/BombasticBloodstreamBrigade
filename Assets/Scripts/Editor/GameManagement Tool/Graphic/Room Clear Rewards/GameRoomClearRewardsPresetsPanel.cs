@@ -262,6 +262,7 @@ public sealed class GameRoomClearRewardsPresetsPanel
         AddTabButton(row, "Presentation Mappings", DetailsTab.Presentation, 156f);
         AddTabButton(row, "Player Log", DetailsTab.PlayerLog, 82f);
         AddTabButton(row, "Portal Log", DetailsTab.PortalLog, 108f);
+        AddTabButton(row, "Portal Indicators", DetailsTab.PortalIndicators, 128f);
         return row;
     }
 
@@ -328,7 +329,8 @@ public sealed class GameRoomClearRewardsPresetsPanel
         Rewards = 2,
         Presentation = 3,
         PlayerLog = 4,
-        PortalLog = 5
+        PortalLog = 5,
+        PortalIndicators = 6
     }
     #endregion
 }

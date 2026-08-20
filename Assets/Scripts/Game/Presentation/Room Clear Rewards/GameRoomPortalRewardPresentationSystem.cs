@@ -39,7 +39,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                       typeof(GameRoomRewardModuleBindingElement),
                                       typeof(GameRoomRewardTileBindingElement),
                                       typeof(GameRoomRewardPresentationElement),
-                                      typeof(GameRoomPortalTransformAnimationElement),
+                                      typeof(GameRoomPortalActivationAnimationElement),
                                       typeof(GameRoomPortalPrefabReplacementElement),
                                       typeof(GameRoomPortalAnimationAudioCue),
                                       typeof(GameProceduralLevelRuntimeState),
@@ -139,8 +139,8 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                 EntityManager.GetBuffer<GameRoomRewardModuleElement>(managerEntity, true);
             DynamicBuffer<GameRoomRewardPresentationElement> mappings =
                 EntityManager.GetBuffer<GameRoomRewardPresentationElement>(managerEntity, true);
-            DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimations =
-                EntityManager.GetBuffer<GameRoomPortalTransformAnimationElement>(managerEntity, true);
+            DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimations =
+                EntityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(managerEntity, true);
             DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacements =
                 EntityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity, true);
             DynamicBuffer<GameRoomPortalAnimationAudioCue> audioCues =

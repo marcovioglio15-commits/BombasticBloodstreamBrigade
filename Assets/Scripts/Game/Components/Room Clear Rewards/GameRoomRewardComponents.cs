@@ -42,6 +42,12 @@ public struct GameRoomRewardConfig : IComponentData
     public UnityObjectRef<Sprite> PortalStaticBackgroundSprite;
     public int PortalAnimationCount;
     public int PortalPrefabReplacementCount;
+    public byte PortalIndicatorsEnabled;
+    public float3 PortalIndicatorWorldOffset;
+    public float4 PortalIndicatorColor;
+    public float PortalIndicatorSizePixels;
+    public float PortalIndicatorEdgePaddingPixels;
+    public UnityObjectRef<Sprite> PortalIndicatorSprite;
 }
 
 /// <summary>
@@ -130,12 +136,14 @@ public struct GameRoomRewardPresentationElement : IBufferElementData
 }
 
 /// <summary>
-/// Stores one immutable local-space Transform animation applied by a managed portal anchor.
+/// Stores one immutable Transform or Animator-clip animation applied by a managed portal anchor.
 /// </summary>
 [InternalBufferCapacity(0)]
-public struct GameRoomPortalTransformAnimationElement : IBufferElementData
+public struct GameRoomPortalActivationAnimationElement : IBufferElementData
 {
-    public GameRoomPortalLinkedObjectSlot TargetSlot;
+    public FixedString64Bytes TargetBindingId;
+    public FixedString128Bytes AnimatorPath;
+    public GameRoomPortalActivationAnimationSource Source;
     public GameRoomPortalTransformAnimationMode Mode;
     public GameRoomPortalTransformAnimationPlayback Playback;
     public GameRoomPortalTransformAnimationEase Easing;
@@ -145,6 +153,8 @@ public struct GameRoomPortalTransformAnimationElement : IBufferElementData
     public float3 RotationOffset;
     public float3 ScaleMultiplier;
     public byte PlayAudioEvent;
+    public float AnimatorSpeed;
+    public UnityObjectRef<AnimationClip> AnimatorClip;
 }
 
 /// <summary>
@@ -153,7 +163,7 @@ public struct GameRoomPortalTransformAnimationElement : IBufferElementData
 [InternalBufferCapacity(0)]
 public struct GameRoomPortalPrefabReplacementElement : IBufferElementData
 {
-    public GameRoomPortalLinkedObjectSlot TargetSlot;
+    public FixedString64Bytes TargetBindingId;
     public UnityObjectRef<GameObject> ReplacementPrefab;
 }
 

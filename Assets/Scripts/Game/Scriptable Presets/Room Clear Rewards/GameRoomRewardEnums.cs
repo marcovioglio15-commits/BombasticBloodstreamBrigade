@@ -92,27 +92,12 @@ public enum GameRoomRewardPortalLogLayoutMode : byte
 }
 
 /// <summary>
-/// Identifies one stable scene-object slot shared by portal anchors and baked presentation effects.
+/// Identifies the runtime source used by one portal activation animation.
 /// </summary>
-public enum GameRoomPortalLinkedObjectSlot : byte
+public enum GameRoomPortalActivationAnimationSource : byte
 {
-    None = 0,
-    Object01 = 1,
-    Object02 = 2,
-    Object03 = 3,
-    Object04 = 4,
-    Object05 = 5,
-    Object06 = 6,
-    Object07 = 7,
-    Object08 = 8,
-    Object09 = 9,
-    Object10 = 10,
-    Object11 = 11,
-    Object12 = 12,
-    Object13 = 13,
-    Object14 = 14,
-    Object15 = 15,
-    Object16 = 16
+    Transform = 0,
+    AnimatorClip = 1
 }
 
 /// <summary>

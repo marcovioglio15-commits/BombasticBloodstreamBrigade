@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 
 /// <summary>
@@ -52,6 +53,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
         state.RequireForUpdate(enemyQuery);
         state.RequireForUpdate(projectileQuery);
+        state.RequireForUpdate<PhysicsWorldSingleton>();
     }
 
     /// <summary>
@@ -159,6 +161,14 @@ public partial struct EnemyProjectileHitSystem : ISystem
         }
 
         NativeStream projectileHitStream = new NativeStream(projectileCount, frameAllocator);
+        PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
+        int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
+
+        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
+            worldLayersConfig.WallsLayerMask != 0)
+        {
+            wallsLayerMask = worldLayersConfig.WallsLayerMask;
+        }
 
         EnemyProjectileHitCollectJob hitCollectJob = new EnemyProjectileHitCollectJob
         {
@@ -169,6 +179,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
             CellMap = enemyCellMap,
             InverseCellSize = inverseCellSize,
             MaxEnemyRadius = maxEnemyRadius,
+            PhysicsWorld = physicsWorldSingleton,
+            WallsCollisionFilter = WorldWallCollisionUtility.BuildWallsCollisionFilter(wallsLayerMask),
             HitStreamWriter = projectileHitStream.AsWriter()
         };
 
@@ -903,6 +915,8 @@ public partial struct EnemyProjectileHitSystem : ISystem
         [ReadOnly] public NativeParallelMultiHashMap<int, int> CellMap;
         [ReadOnly] public float InverseCellSize;
         [ReadOnly] public float MaxEnemyRadius;
+        [ReadOnly] public PhysicsWorldSingleton PhysicsWorld;
+        [ReadOnly] public CollisionFilter WallsCollisionFilter;
         public NativeStream.Writer HitStreamWriter;
 
         public void Execute(int index)
@@ -939,6 +953,15 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
                         if (!IsProjectileOverlappingEnemyEllipse(delta, projectileRadius, EnemyRadiusAxes[enemyIndex]))
                             continue;
+
+                        // Reject overlap damage across solid geometry, including split children touching a wall endpoint.
+                        if (WorldWallCollisionUtility.IsLineOfSightBlocked(in PhysicsWorld,
+                                                                          projectilePosition,
+                                                                          EnemyPositions[enemyIndex],
+                                                                          in WallsCollisionFilter))
+                        {
+                            continue;
+                        }
 
                         streamWriter.Write(enemyIndex);
                     }

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Scrolls destination reward summaries through a fixed pool of preauthored world-space portal cells.
+/// Presents destination rewards through scrolling or fully static preauthored world-space cells.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameRoomPortalRewardLogView : MonoBehaviour
@@ -30,7 +30,7 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     [SerializeField]
     private Image backgroundPanel;
 
-    [Tooltip("Keeps the portal log facing the active gameplay camera.")]
+    [Tooltip("Keeps only the Scrolling layout facing the active gameplay camera; Static Rows always preserves its authored rotation.")]
     [SerializeField]
     private bool faceCamera = true;
     #endregion
@@ -327,21 +327,18 @@ public sealed class GameRoomPortalRewardLogView : MonoBehaviour
     }
 
     /// <summary>
-    /// Advances the horizontal scrolling loop and camera-facing pose only while content is visible.
+    /// Advances scrolling placement and billboard rotation only for the scrolling layout.
     /// </summary>
     private void LateUpdate()
     {
-        if (layoutMode == GameRoomRewardPortalLogLayoutMode.Scrolling)
-            transform.position = worldPosition;
+        if (layoutMode != GameRoomRewardPortalLogLayoutMode.Scrolling)
+            return;
 
+        transform.position = worldPosition;
         FaceCamera();
 
-        if (layoutMode != GameRoomRewardPortalLogLayoutMode.Scrolling ||
-            activeCellCount <= 1 ||
-            scrollSpeed <= 0f)
-        {
+        if (activeCellCount <= 1 || scrollSpeed <= 0f)
             return;
-        }
 
         float deltaTime = Mathf.Max(0f, Time.unscaledDeltaTime);
 

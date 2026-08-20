@@ -67,11 +67,11 @@ public static class GameRoomRewardPortalPresentationBakeUtility
     /// Flattens portal animation and prefab replacement lists into immutable ECS buffers.
     /// </summary>
     /// <param name="settings">Validated portal log settings.</param>
-    /// <param name="animationBuffer">Destination Transform animation buffer.</param>
+    /// <param name="animationBuffer">Destination Transform and Animator-clip animation buffer.</param>
     /// <param name="replacementBuffer">Destination prefab replacement buffer.</param>
     public static void PopulateBuffers(
         GameRoomRewardPortalLogSettings settings,
-        DynamicBuffer<GameRoomPortalTransformAnimationElement> animationBuffer,
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> animationBuffer,
         DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacementBuffer)
     {
         animationBuffer.Clear();
@@ -81,15 +81,17 @@ public static class GameRoomRewardPortalPresentationBakeUtility
              animationIndex < settings.ActivationAnimations.Count;
              animationIndex++)
         {
-            GameRoomPortalTransformAnimationDefinition animation =
+            GameRoomPortalActivationAnimationDefinition animation =
                 settings.ActivationAnimations[animationIndex];
 
             if (animation == null)
                 continue;
 
-            animationBuffer.Add(new GameRoomPortalTransformAnimationElement
+            animationBuffer.Add(new GameRoomPortalActivationAnimationElement
             {
-                TargetSlot = animation.TargetSlot,
+                TargetBindingId = animation.TargetBindingId,
+                AnimatorPath = animation.AnimatorPath,
+                Source = animation.Source,
                 Mode = animation.Mode,
                 Playback = animation.Playback,
                 Easing = animation.Easing,
@@ -98,7 +100,9 @@ public static class GameRoomRewardPortalPresentationBakeUtility
                 PositionOffset = animation.PositionOffset,
                 RotationOffset = animation.RotationOffset,
                 ScaleMultiplier = animation.ScaleMultiplier,
-                PlayAudioEvent = animation.PlayAudioEvent ? (byte)1 : (byte)0
+                PlayAudioEvent = animation.PlayAudioEvent ? (byte)1 : (byte)0,
+                AnimatorSpeed = animation.AnimatorSpeed,
+                AnimatorClip = animation.AnimatorClip
             });
         }
 
@@ -114,7 +118,7 @@ public static class GameRoomRewardPortalPresentationBakeUtility
 
             replacementBuffer.Add(new GameRoomPortalPrefabReplacementElement
             {
-                TargetSlot = replacement.TargetSlot,
+                TargetBindingId = replacement.TargetBindingId,
                 ReplacementPrefab = replacement.ReplacementPrefab
             });
         }

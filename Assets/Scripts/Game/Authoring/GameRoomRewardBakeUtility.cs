@@ -68,6 +68,7 @@ public static class GameRoomRewardBakeUtility
     {
         GameRoomRewardPlayerLogSettings playerLog = preset.PlayerLogSettings;
         GameRoomRewardPortalLogSettings portal = preset.PortalLogSettings;
+        GameRoomRewardPortalIndicatorSettings portalIndicators = preset.PortalIndicatorSettings;
 
         return new GameRoomRewardConfig
         {
@@ -106,7 +107,16 @@ public static class GameRoomRewardBakeUtility
                                                      portal.StaticBackgroundColor.a),
             PortalStaticBackgroundSprite = portal.StaticBackgroundSprite,
             PortalAnimationCount = portal.ActivationAnimations.Count,
-            PortalPrefabReplacementCount = portal.ActivationPrefabReplacements.Count
+            PortalPrefabReplacementCount = portal.ActivationPrefabReplacements.Count,
+            PortalIndicatorsEnabled = portalIndicators.Enabled ? (byte)1 : (byte)0,
+            PortalIndicatorWorldOffset = portalIndicators.WorldOffset,
+            PortalIndicatorColor = new float4(portalIndicators.IndicatorColor.r,
+                                              portalIndicators.IndicatorColor.g,
+                                              portalIndicators.IndicatorColor.b,
+                                              portalIndicators.IndicatorColor.a),
+            PortalIndicatorSizePixels = portalIndicators.IndicatorSizePixels,
+            PortalIndicatorEdgePaddingPixels = portalIndicators.EdgePaddingPixels,
+            PortalIndicatorSprite = portalIndicators.IndicatorSprite
         };
     }
 
@@ -120,7 +130,7 @@ public static class GameRoomRewardBakeUtility
     /// <param name="moduleBindingBuffer">Output reward-to-module bindings.</param>
     /// <param name="tileBindingBuffer">Output tile-to-reward bindings.</param>
     /// <param name="presentationBuffer">Output target presentation mappings.</param>
-    /// <param name="portalAnimationBuffer">Output portal activation Transform animations.</param>
+    /// <param name="portalAnimationBuffer">Output portal activation Transform and Animator-clip animations.</param>
     /// <param name="portalReplacementBuffer">Output portal activation prefab replacements.</param>
     public static void PopulateBuffers(GameRoomClearRewardsPreset preset,
                                        GameProceduralLevelPreset proceduralPreset,
@@ -129,7 +139,7 @@ public static class GameRoomRewardBakeUtility
                                        DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindingBuffer,
                                        DynamicBuffer<GameRoomRewardTileBindingElement> tileBindingBuffer,
                                        DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer,
-                                       DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimationBuffer,
+                                       DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimationBuffer,
                                        DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer)
     {
         moduleBuffer.Clear();

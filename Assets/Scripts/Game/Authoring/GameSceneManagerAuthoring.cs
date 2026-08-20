@@ -291,7 +291,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(entity);
             entityManager.AddBuffer<GameRoomRewardTileBindingElement>(entity);
             entityManager.AddBuffer<GameRoomRewardPresentationElement>(entity);
-            entityManager.AddBuffer<GameRoomPortalTransformAnimationElement>(entity);
+            entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
             entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
             entityManager.AddBuffer<GameRoomPortalAnimationAudioCue>(entity);
         }
@@ -318,7 +318,7 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
                 entityManager.GetBuffer<GameRoomRewardModuleBindingElement>(entity),
                 entityManager.GetBuffer<GameRoomRewardTileBindingElement>(entity),
                 entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity),
-                entityManager.GetBuffer<GameRoomPortalTransformAnimationElement>(entity),
+                entityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(entity),
                 entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(entity));
         }
     }
@@ -594,7 +594,7 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindingBuffer = AddBuffer<GameRoomRewardModuleBindingElement>(entity);
         DynamicBuffer<GameRoomRewardTileBindingElement> tileBindingBuffer = AddBuffer<GameRoomRewardTileBindingElement>(entity);
         DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer = AddBuffer<GameRoomRewardPresentationElement>(entity);
-        DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimationBuffer = AddBuffer<GameRoomPortalTransformAnimationElement>(entity);
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimationBuffer = AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
         DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer = AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
         AddBuffer<GameRoomPortalAnimationAudioCue>(entity);
         GameRoomRewardBakeUtility.PopulateBuffers(rewardPreset,

@@ -273,11 +273,13 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
             throw new InvalidOperationException(
                 "The shared portal anchor prefab has no anchor component.");
 
+        anchorObject.transform.position = source.WorldCenter;
+
         return anchor;
     }
 
     /// <summary>
-    /// Aligns one anchor root and refreshes setup-owned component references without moving its log child.
+    /// Refreshes setup-owned references without changing an existing anchor's authored scene pose.
     /// </summary>
     /// <param name="anchor">Existing or newly created managed anchor.</param>
     /// <param name="source">Authoritative portal identity and center.</param>
@@ -287,11 +289,12 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     {
         GameObject anchorObject = anchor.gameObject;
         anchorObject.name = AnchorNamePrefix + source.PortalId;
-        anchorObject.transform.position = source.WorldCenter;
         GameRoomPortalRewardLogView view =
             anchorObject.GetComponentInChildren<GameRoomPortalRewardLogView>(true);
         GameRoomPortalRewardEffectView effectView =
             anchorObject.GetComponent<GameRoomPortalRewardEffectView>();
+        GameRoomPortalOffscreenIndicatorView indicatorView =
+            anchorObject.GetComponentInChildren<GameRoomPortalOffscreenIndicatorView>(true);
 
         if (effectView == null)
             effectView = anchorObject.AddComponent<GameRoomPortalRewardEffectView>();
@@ -300,7 +303,10 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
             throw new InvalidOperationException(
                 "The shared portal anchor requires a log view component.");
 
-        anchor.ConfigureAuthoring(source.PortalId, view, effectView);
+        anchor.ConfigureAuthoring(source.PortalId,
+                                  view,
+                                  effectView,
+                                  indicatorView);
         view.Hide();
     }
     #endregion

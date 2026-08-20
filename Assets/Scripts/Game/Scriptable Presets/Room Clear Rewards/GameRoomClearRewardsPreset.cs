@@ -57,6 +57,12 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     [Tooltip("Layout, capacity and timing applied to preauthored destination portal reward logs.")]
     [SerializeField]
     private GameRoomRewardPortalLogSettings portalLogSettings = new GameRoomRewardPortalLogSettings();
+
+    [Header("Portal Indicators")]
+    [Tooltip("Screen-edge indicator presentation applied to open destination portals outside the camera view.")]
+    [SerializeField]
+    private GameRoomRewardPortalIndicatorSettings portalIndicatorSettings =
+        new GameRoomRewardPortalIndicatorSettings();
     #endregion
 
     #endregion
@@ -72,6 +78,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     public IReadOnlyList<GameRoomRewardPresentationDefinition> PresentationMappings => presentationMappings;
     public GameRoomRewardPlayerLogSettings PlayerLogSettings => playerLogSettings;
     public GameRoomRewardPortalLogSettings PortalLogSettings => portalLogSettings;
+    public GameRoomRewardPortalIndicatorSettings PortalIndicatorSettings => portalIndicatorSettings;
     #endregion
 
     #region Methods
@@ -99,6 +106,9 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
 
         if (portalLogSettings == null)
             portalLogSettings = new GameRoomRewardPortalLogSettings();
+
+        if (portalIndicatorSettings == null)
+            portalIndicatorSettings = new GameRoomRewardPortalIndicatorSettings();
 
         portalLogSettings.EnsureInitialized();
 

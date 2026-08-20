@@ -2,17 +2,26 @@ using System;
 using UnityEngine;
 
 /// <summary>
-/// Defines one local-space Transform animation started by an authoritative portal enable transition.
+/// Defines one Transform or Animator-clip animation started by an authoritative portal enable transition.
 /// </summary>
 [Serializable]
-public sealed class GameRoomPortalTransformAnimationDefinition
+public sealed class GameRoomPortalActivationAnimationDefinition
 {
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Scene-object slot resolved by each portal reward anchor when this animation starts.")]
+    [Tooltip("Stable identifier of the freely authored linked scene object animated when this portal opens.")]
     [SerializeField]
-    private GameRoomPortalLinkedObjectSlot targetSlot = GameRoomPortalLinkedObjectSlot.Object01;
+    private string targetBindingId;
+
+    [Tooltip("Former fixed slot retained only to preserve existing serialized associations during automatic migration.")]
+    [HideInInspector]
+    [SerializeField]
+    private int targetSlot;
+
+    [Tooltip("Selects local Transform interpolation or direct playback of a clip found on an Animator below the linked object.")]
+    [SerializeField]
+    private GameRoomPortalActivationAnimationSource source;
 
     [Tooltip("Local Transform channels animated without using an Animator component.")]
     [SerializeField]
@@ -49,12 +58,27 @@ public sealed class GameRoomPortalTransformAnimationDefinition
     [Tooltip("Requests the dedicated portal-animation FMOD event when this animation exits its delay.")]
     [SerializeField]
     private bool playAudioEvent;
+
+    [Tooltip("Animation clip played directly on the selected Animator without requiring a matching controller state.")]
+    [SerializeField]
+    private AnimationClip animatorClip;
+
+    [Tooltip("Relative hierarchy path from the linked object to the Animator that owns the selected clip.")]
+    [SerializeField]
+    private string animatorPath;
+
+    [Tooltip("Positive playback speed multiplier applied to the selected Animator clip.")]
+    [SerializeField]
+    private float animatorSpeed = 1f;
     #endregion
 
     #endregion
 
     #region Properties
-    public GameRoomPortalLinkedObjectSlot TargetSlot => targetSlot;
+    public string TargetBindingId => string.IsNullOrWhiteSpace(targetBindingId)
+        ? GameRoomPortalLinkedObjectBindingIdUtility.FromLegacySlot(targetSlot)
+        : targetBindingId;
+    public GameRoomPortalActivationAnimationSource Source => source;
     public GameRoomPortalTransformAnimationMode Mode => mode;
     public GameRoomPortalTransformAnimationPlayback Playback => playback;
     public GameRoomPortalTransformAnimationEase Easing => easing;
@@ -64,6 +88,25 @@ public sealed class GameRoomPortalTransformAnimationDefinition
     public Vector3 RotationOffset => rotationOffset;
     public Vector3 ScaleMultiplier => scaleMultiplier;
     public bool PlayAudioEvent => playAudioEvent;
+    public AnimationClip AnimatorClip => animatorClip;
+    public string AnimatorPath => animatorPath;
+    public float AnimatorSpeed => animatorSpeed;
+    #endregion
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Migrates the former fixed slot value into a stable freely authored binding identifier.
+    /// </summary>
+    public void EnsureInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(targetBindingId))
+            return;
+
+        targetBindingId = GameRoomPortalLinkedObjectBindingIdUtility.FromLegacySlot(targetSlot);
+    }
+    #endregion
+
     #endregion
 }
 
@@ -76,9 +119,14 @@ public sealed class GameRoomPortalPrefabReplacementDefinition
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Slot of the existing 3D scene GameObject disabled when the portal becomes traversable.")]
+    [Tooltip("Stable identifier of the existing 3D scene GameObject disabled when the portal becomes traversable.")]
     [SerializeField]
-    private GameRoomPortalLinkedObjectSlot targetSlot = GameRoomPortalLinkedObjectSlot.Object01;
+    private string targetBindingId;
+
+    [Tooltip("Former fixed slot retained only to preserve existing serialized associations during automatic migration.")]
+    [HideInInspector]
+    [SerializeField]
+    private int targetSlot;
 
     [Tooltip("Prefab asset instantiated only on activation as a sibling with the 3D scene object's local position, rotation and scale.")]
     [SerializeField]
@@ -88,8 +136,57 @@ public sealed class GameRoomPortalPrefabReplacementDefinition
     #endregion
 
     #region Properties
-    public GameRoomPortalLinkedObjectSlot TargetSlot => targetSlot;
+    public string TargetBindingId => string.IsNullOrWhiteSpace(targetBindingId)
+        ? GameRoomPortalLinkedObjectBindingIdUtility.FromLegacySlot(targetSlot)
+        : targetBindingId;
     public GameObject ReplacementPrefab => replacementPrefab;
+    #endregion
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Migrates the former fixed slot value into a stable freely authored binding identifier.
+    /// </summary>
+    public void EnsureInitialized()
+    {
+        if (!string.IsNullOrWhiteSpace(targetBindingId))
+            return;
+
+        targetBindingId = GameRoomPortalLinkedObjectBindingIdUtility.FromLegacySlot(targetSlot);
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
+/// Converts legacy numeric bindings and generates stable identifiers for freely sized scene-object lists.
+/// </summary>
+public static class GameRoomPortalLinkedObjectBindingIdUtility
+{
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Converts one former enum value without altering existing scene-to-preset associations.
+    /// </summary>
+    /// <param name="legacySlot">Former serialized slot number.</param>
+    /// <returns>Stable migrated identifier, or an empty string when no slot was authored.</returns>
+    public static string FromLegacySlot(int legacySlot)
+    {
+        return legacySlot > 0 ? "Object" + legacySlot.ToString("00") : string.Empty;
+    }
+
+    /// <summary>
+    /// Creates a compact stable identifier for a newly added linked object.
+    /// </summary>
+    /// <returns>Unique identifier suitable for serialization and ECS fixed strings.</returns>
+    public static string Create()
+    {
+        return Guid.NewGuid().ToString("N");
+    }
+    #endregion
+
     #endregion
 }
 

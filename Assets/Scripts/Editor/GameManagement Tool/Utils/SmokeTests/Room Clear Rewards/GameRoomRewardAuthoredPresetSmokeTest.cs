@@ -92,7 +92,7 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 typeof(GameRoomRewardModuleBindingElement),
                 typeof(GameRoomRewardTileBindingElement),
                 typeof(GameRoomRewardPresentationElement),
-                typeof(GameRoomPortalTransformAnimationElement),
+                typeof(GameRoomPortalActivationAnimationElement),
                 typeof(GameRoomPortalPrefabReplacementElement));
             DynamicBuffer<GameRoomRewardModuleElement> moduleBuffer =
                 entityManager.GetBuffer<GameRoomRewardModuleElement>(entity);
@@ -104,8 +104,8 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 entityManager.GetBuffer<GameRoomRewardTileBindingElement>(entity);
             DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer =
                 entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity);
-            DynamicBuffer<GameRoomPortalTransformAnimationElement> portalAnimationBuffer =
-                entityManager.GetBuffer<GameRoomPortalTransformAnimationElement>(entity);
+            DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimationBuffer =
+                entityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(entity);
             DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer =
                 entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(entity);
 
@@ -139,6 +139,12 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                     "The portal animation buffer does not match its immutable config count.");
             Require(portalReplacementBuffer.Length == config.PortalPrefabReplacementCount,
                     "The portal prefab replacement buffer does not match its immutable config count.");
+            Require(config.PortalIndicatorsEnabled ==
+                    (rewardPreset.PortalIndicatorSettings.Enabled ? (byte)1 : (byte)0),
+                    "The open-portal indicator toggle did not propagate into immutable ECS config.");
+            Require(config.PortalIndicatorSprite.Value ==
+                    rewardPreset.PortalIndicatorSettings.IndicatorSprite,
+                    "The open-portal indicator sprite did not propagate into immutable ECS config.");
             Require(firstBakedBinding.ModuleIndex >= ExpectedModuleCount,
                     "The override binding still references its reusable source module.");
             Require(overrideModule.TechnicalId.ToString() == firstAuthoredBinding.BindingId,

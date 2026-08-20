@@ -1206,8 +1206,8 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
-    dependencyHash: 759af1848dc70f96c4377db5da500fd8
-    cacheStale: 1
+    dependencyHash: 6bff7190264642a9a07efc99d0a145d2
+    cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_METRO_09_S.unity
@@ -1227,7 +1227,10 @@ MonoBehaviour:
       side: 3
       capability: 2
       connectionPolicy: 1
-    authoringWarnings: []
+    authoringWarnings:
+    - 'Managed reward anchor ''PF_RoomRewardPortalAnchor (4)'' in ''Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity''
+      has invalid linked objects: Linked object at index 0 requires a slot and scene
+      GameObject.'
   - sceneId: SCN_MAIN_METRO_09_N
     sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
     dependencyHash: 977c50adcb72d95019d3e9de6cc58241
@@ -1298,7 +1301,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_START
     sceneGuid: 231f2d11e6deb854e8e91c2aba8a48ef
-    dependencyHash: 1b3d580d08515b24a634029f508201e8
+    dependencyHash: b63713afcbf168055f89ac2a9c5e175b
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_START.unity

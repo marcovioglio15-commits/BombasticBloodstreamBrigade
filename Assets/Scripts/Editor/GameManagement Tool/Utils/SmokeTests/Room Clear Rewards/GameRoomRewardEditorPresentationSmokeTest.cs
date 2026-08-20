@@ -35,11 +35,15 @@ public static class GameRoomRewardEditorPresentationSmokeTest
             VisualElement rewardsRoot = new VisualElement();
             VisualElement mappingsRoot = new VisualElement();
             VisualElement portalRoot = new VisualElement();
+            VisualElement portalIndicatorRoot = new VisualElement();
             GameRoomRewardModuleEditorUtility.Build(modulesRoot, serializedCopy);
             GameRoomRewardCompositionEditorUtility.BuildRewards(rewardsRoot, serializedCopy);
             GameRoomRewardCompositionEditorUtility.BuildPresentation(mappingsRoot, serializedCopy);
             AddPortalAnimationFixture(serializedCopy);
             GameRoomRewardPortalSettingsEditorUtility.Build(portalRoot, serializedCopy);
+            GameRoomRewardPortalIndicatorSettingsEditorUtility.Build(
+                portalIndicatorRoot,
+                serializedCopy);
 
             // Validate every authored collection element owns a specific nested foldout title.
             ValidateNamedFoldouts(modulesRoot,
@@ -62,6 +66,9 @@ public static class GameRoomRewardEditorPresentationSmokeTest
             // Representation switches must update conditional groups without replacing the mapping hierarchy.
             ValidateRepresentationSwitch(mappingsRoot);
             ValidatePortalSelectors(portalRoot);
+            Require(FindPropertyField(portalIndicatorRoot,
+                                      "Enable Portal Indicators") != null,
+                    "The dedicated Portal Indicators tab does not expose its feature toggle.");
 
             // Menu-group changes intentionally perform one controlled regrouping and must leave valid named content.
             ValidateRewardRegroup(rewardsRoot, copy.Rewards.Count);
@@ -77,7 +84,7 @@ public static class GameRoomRewardEditorPresentationSmokeTest
 
     #region Validation Methods
     /// <summary>
-    /// Adds one in-memory animation so enum-slot and channel controls can be inspected without changing assets.
+    /// Adds one in-memory animation so dynamic binding and channel controls can be inspected without changing assets.
     /// </summary>
     /// <param name="serializedPreset">In-memory reward preset serialization context.</param>
     private static void AddPortalAnimationFixture(SerializedObject serializedPreset)
@@ -86,8 +93,9 @@ public static class GameRoomRewardEditorPresentationSmokeTest
         SerializedProperty animations = settings.FindPropertyRelative("activationAnimations");
         animations.arraySize = 1;
         SerializedProperty animation = animations.GetArrayElementAtIndex(0);
-        animation.FindPropertyRelative("targetSlot").intValue =
-            (int)GameRoomPortalLinkedObjectSlot.Object03;
+        animation.FindPropertyRelative("targetBindingId").stringValue = "SmokeObject";
+        animation.FindPropertyRelative("source").intValue =
+            (int)GameRoomPortalActivationAnimationSource.Transform;
         animation.FindPropertyRelative("mode").intValue =
             (int)GameRoomPortalTransformAnimationMode.PositionAndScale;
         animation.FindPropertyRelative("duration").floatValue = 0.5f;
@@ -96,7 +104,7 @@ public static class GameRoomRewardEditorPresentationSmokeTest
     }
 
     /// <summary>
-    /// Verifies portal layout, value detail, target slot and Transform channel enums are exposed explicitly.
+    /// Verifies portal layout, value detail, dynamic target and animation source controls are exposed explicitly.
     /// </summary>
     /// <param name="root">Built Portal Log tab root.</param>
     private static void ValidatePortalSelectors(VisualElement root)
@@ -106,7 +114,9 @@ public static class GameRoomRewardEditorPresentationSmokeTest
         Require(FindEnumField(root, "Value Display") != null,
                 "Portal Log value display mode is not exposed as an enum selector.");
         Require(FindDropdownField(root, "Linked Object") != null,
-                "Portal animation linked objects are not exposed as an enum-backed object dropdown.");
+                "Portal animation linked objects are not exposed as a dynamic object dropdown.");
+        Require(FindEnumField(root, "Animation Source") != null,
+                "Portal animation source is not exposed as an enum selector.");
         Require(FindEnumField(root, "Animation Channels") != null,
                 "Portal Transform channels are not exposed as an enum selector.");
     }
@@ -260,6 +270,37 @@ public static class GameRoomRewardEditorPresentationSmokeTest
         for (int index = 0; index < root.hierarchy.childCount; index++)
         {
             DropdownField childField = FindDropdownField(root.hierarchy[index], label);
+
+            if (childField != null)
+                return childField;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Finds the first serialized property field with one exact visible label.
+    /// </summary>
+    /// <param name="root">Current subtree root.</param>
+    /// <param name="label">Exact field label.</param>
+    /// <returns>Matching property field, or null when unavailable.</returns>
+    private static UnityEditor.UIElements.PropertyField FindPropertyField(
+        VisualElement root,
+        string label)
+    {
+        UnityEditor.UIElements.PropertyField field =
+            root as UnityEditor.UIElements.PropertyField;
+
+        if (field != null &&
+            string.Equals(field.label, label, StringComparison.Ordinal))
+        {
+            return field;
+        }
+
+        for (int index = 0; index < root.hierarchy.childCount; index++)
+        {
+            UnityEditor.UIElements.PropertyField childField =
+                FindPropertyField(root.hierarchy[index], label);
 
             if (childField != null)
                 return childField;

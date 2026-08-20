@@ -295,6 +295,35 @@ public static class WorldWallCollisionUtility
     }
 
     /// <summary>
+    /// Reports whether solid wall geometry interrupts the segment between two world-space points.
+    /// This query is intended for short impact-visibility checks and uses the same collision categories as movement.
+    /// </summary>
+    /// <param name="physicsWorldSingleton">Physics world containing the immutable wall bodies.</param>
+    /// <param name="startPosition">World-space segment origin.</param>
+    /// <param name="endPosition">World-space segment destination.</param>
+    /// <param name="wallCollisionFilter">Collision identity and wall categories used by the query.</param>
+    /// <returns>True when a wall blocks travel from the origin toward the destination.</returns>
+    public static bool IsLineOfSightBlocked(in PhysicsWorldSingleton physicsWorldSingleton,
+                                            float3 startPosition,
+                                            float3 endPosition,
+                                            in CollisionFilter wallCollisionFilter)
+    {
+        float3 displacement = endPosition - startPosition;
+
+        if (math.lengthsq(displacement) <= MinimumTravelDistance)
+            return false;
+
+        return TryResolveBlockedDisplacement(in physicsWorldSingleton,
+                                             startPosition,
+                                             displacement,
+                                             MinimumSweepRadius,
+                                             in wallCollisionFilter,
+                                             0f,
+                                             out float3 _,
+                                             out float3 _);
+    }
+
+    /// <summary>
     /// This method takes an input velocity and a surface normal, 
     /// and it removes any component of the velocity that is directed into the surface defined by the normal.
     /// </summary>

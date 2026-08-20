@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -34,7 +33,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
         root.Add(title);
         root.Add(new HelpBox(
-            "The portal opens from authoritative ECS state. Static Rows keeps the log child at its authored scene position, while activation effects resolve enum slots on each managed anchor.",
+            "The portal opens from authoritative ECS state. Static Rows preserves the complete authored scene position and rotation, while activation effects resolve freely linked objects on each managed anchor.",
             HelpBoxMessageType.Info));
 
         SerializedProperty layoutMode = settings.FindPropertyRelative("layoutMode");
@@ -113,7 +112,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     {
         VisualElement group = CreateSection("Static Rows Layout");
         group.Add(new HelpBox(
-            "Move the Room Reward Log child directly in the managed room scene. The locator root must remain aligned with the ECS portal center.",
+            "Move and rotate the portal reward anchor or its Room Reward Log child freely in the managed room scene. Static Rows never follows the portal and never faces the camera.",
             HelpBoxMessageType.Info));
         AddProperty(group, settings, "staticRowSpacing", "Row Spacing");
         AddProperty(group, settings, "staticPanelPadding", "Panel Padding");
@@ -146,12 +145,12 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
 
     #region Animation List
     /// <summary>
-    /// Builds named animation foldouts with channel-aware Transform fields and stable list actions.
+    /// Builds named animation foldouts with conditional Transform or Animator-clip controls.
     /// </summary>
     /// <param name="root">Portal tab root.</param>
     /// <param name="serializedPreset">Owning serialization context.</param>
     /// <param name="animations">Serialized animation array.</param>
-    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by stable enum slot.</param>
+    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by dynamic identifier.</param>
     private static void BuildAnimationList(VisualElement root,
                                            SerializedObject serializedPreset,
                                            SerializedProperty animations,
@@ -159,7 +158,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     {
         VisualElement section = CreateSection("Portal Activation Animations");
         section.Add(new HelpBox(
-            "Each enum slot resolves to the corresponding linked object on every portal anchor. Replacements are applied first, so an animation on the same slot targets the replacement instance.",
+            "Each animation resolves a freely added linked object on every portal anchor. Choose Transform interpolation or a clip exposed by an Animator on that object or one of its children. Replacements are applied first.",
             HelpBoxMessageType.Info));
 
         if (animations == null || !animations.isArray)
@@ -175,41 +174,61 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         {
             int capturedIndex = animationIndex;
             SerializedProperty animation = animations.GetArrayElementAtIndex(animationIndex);
-            SerializedProperty targetSlot = animation.FindPropertyRelative("targetSlot");
+            SerializedProperty targetBindingId = animation.FindPropertyRelative("targetBindingId");
+            SerializedProperty source = animation.FindPropertyRelative("source");
             SerializedProperty mode = animation.FindPropertyRelative("mode");
             Foldout foldout = GameRoomRewardEditorElementUtility.CreateFoldout(
                 "PortalAnimation",
                 animationIndex.ToString(),
                 "Animation " + (animationIndex + 1).ToString("00") + " — " +
-                ((GameRoomPortalLinkedObjectSlot)targetSlot.intValue),
-                "Transform-only portal activation animation.");
-            AddLinkedObjectSlotField(foldout,
-                                     targetSlot,
-                                     in linkedObjectCatalog);
-            EnumField modeField = AddEnumField(foldout,
-                                               mode,
-                                               "Animation Channels",
-                                               typeof(GameRoomPortalTransformAnimationMode));
+                GameRoomRewardPortalEffectEditorFieldUtility.ResolveBindingTitle(
+                    targetBindingId.stringValue,
+                    in linkedObjectCatalog),
+                "Transform or Animator-clip portal activation animation.");
+            DropdownField linkedObjectField =
+                GameRoomRewardPortalEffectEditorFieldUtility.AddLinkedObjectField(
+                    foldout,
+                    targetBindingId,
+                    in linkedObjectCatalog);
+            EnumField sourceField = AddEnumField(foldout,
+                                                 source,
+                                                 "Animation Source",
+                                                 typeof(GameRoomPortalActivationAnimationSource));
             AddEnumField(foldout,
                          animation.FindPropertyRelative("playback"),
                          "Playback",
                          typeof(GameRoomPortalTransformAnimationPlayback));
-            AddEnumField(foldout,
+            AddProperty(foldout, animation, "startDelay", "Start Delay");
+            VisualElement transformGroup = new VisualElement();
+            VisualElement animatorGroup = new VisualElement();
+            EnumField modeField = AddEnumField(transformGroup,
+                                               mode,
+                                               "Animation Channels",
+                                               typeof(GameRoomPortalTransformAnimationMode));
+            AddEnumField(transformGroup,
                          animation.FindPropertyRelative("easing"),
                          "Easing",
                          typeof(GameRoomPortalTransformAnimationEase));
-            AddProperty(foldout, animation, "startDelay", "Start Delay");
-            AddProperty(foldout, animation, "duration", "Duration");
+            AddProperty(transformGroup, animation, "duration", "Duration");
             VisualElement positionGroup = new VisualElement();
             VisualElement rotationGroup = new VisualElement();
             VisualElement scaleGroup = new VisualElement();
             AddProperty(positionGroup, animation, "positionOffset", "Position Offset");
             AddProperty(rotationGroup, animation, "rotationOffset", "Rotation Offset");
             AddProperty(scaleGroup, animation, "scaleMultiplier", "Scale Multiplier");
-            foldout.Add(positionGroup);
-            foldout.Add(rotationGroup);
-            foldout.Add(scaleGroup);
+            transformGroup.Add(positionGroup);
+            transformGroup.Add(rotationGroup);
+            transformGroup.Add(scaleGroup);
+            GameRoomRewardPortalEffectEditorFieldUtility.BuildAnimatorClipField(
+                animatorGroup,
+                targetBindingId,
+                animation.FindPropertyRelative("animatorClip"),
+                animation.FindPropertyRelative("animatorPath"));
+            AddProperty(animatorGroup, animation, "animatorSpeed", "Playback Speed");
+            foldout.Add(transformGroup);
+            foldout.Add(animatorGroup);
             AddProperty(foldout, animation, "playAudioEvent", "Play FMOD Event");
+            UpdateAnimationSourceVisibility(source, transformGroup, animatorGroup);
             UpdateAnimationChannelVisibility(mode,
                                              positionGroup,
                                              rotationGroup,
@@ -223,6 +242,22 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
                                                      positionGroup,
                                                      rotationGroup,
                                                      scaleGroup);
+                });
+            }
+
+            if (sourceField != null)
+            {
+                sourceField.RegisterValueChangedCallback(evt =>
+                {
+                    UpdateAnimationSourceVisibility(source, transformGroup, animatorGroup);
+                });
+            }
+
+            if (linkedObjectField != null)
+            {
+                linkedObjectField.RegisterValueChangedCallback(evt =>
+                {
+                    CommitAndRebuild(root, serializedPreset);
                 });
             }
 
@@ -248,9 +283,29 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
 
         Button addButton = new Button(() => AddAnimation(root, serializedPreset, animations));
         addButton.text = "Add Animation";
-        addButton.tooltip = "Adds one Transform-only portal activation animation.";
+        addButton.tooltip = "Adds one Transform or Animator-clip portal activation animation.";
         section.Add(addButton);
         root.Add(section);
+    }
+
+    /// <summary>
+    /// Shows only the controls used by the selected portal animation source.
+    /// </summary>
+    /// <param name="source">Serialized animation source enum.</param>
+    /// <param name="transformGroup">Transform-only controls.</param>
+    /// <param name="animatorGroup">Animator-clip-only controls.</param>
+    private static void UpdateAnimationSourceVisibility(SerializedProperty source,
+                                                        VisualElement transformGroup,
+                                                        VisualElement animatorGroup)
+    {
+        GameRoomPortalActivationAnimationSource animationSource =
+            (GameRoomPortalActivationAnimationSource)source.intValue;
+        GameRoomRewardEditorElementUtility.SetVisible(
+            transformGroup,
+            animationSource == GameRoomPortalActivationAnimationSource.Transform);
+        GameRoomRewardEditorElementUtility.SetVisible(
+            animatorGroup,
+            animationSource == GameRoomPortalActivationAnimationSource.AnimatorClip);
     }
 
     /// <summary>
@@ -290,8 +345,12 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     {
         animations.InsertArrayElementAtIndex(animations.arraySize);
         SerializedProperty animation = animations.GetArrayElementAtIndex(animations.arraySize - 1);
-        animation.FindPropertyRelative("targetSlot").intValue =
-            (int)GameRoomPortalLinkedObjectSlot.Object01;
+        GameRoomPortalLinkedObjectChoiceCatalog catalog =
+            GameRoomPortalLinkedObjectEditorCatalogUtility.Build();
+        animation.FindPropertyRelative("targetBindingId").stringValue =
+            catalog.Identifiers.Count > 0 ? catalog.Identifiers[0] : string.Empty;
+        animation.FindPropertyRelative("source").intValue =
+            (int)GameRoomPortalActivationAnimationSource.Transform;
         animation.FindPropertyRelative("mode").intValue =
             (int)GameRoomPortalTransformAnimationMode.Position;
         animation.FindPropertyRelative("playback").intValue =
@@ -304,18 +363,21 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         animation.FindPropertyRelative("rotationOffset").vector3Value = Vector3.zero;
         animation.FindPropertyRelative("scaleMultiplier").vector3Value = Vector3.one;
         animation.FindPropertyRelative("playAudioEvent").boolValue = false;
+        animation.FindPropertyRelative("animatorClip").objectReferenceValue = null;
+        animation.FindPropertyRelative("animatorPath").stringValue = string.Empty;
+        animation.FindPropertyRelative("animatorSpeed").floatValue = 1f;
         CommitAndRebuild(root, serializedPreset);
     }
     #endregion
 
     #region Replacement List
     /// <summary>
-    /// Builds named prefab replacement foldouts sharing the same linked-object slot enum.
+    /// Builds named prefab replacement foldouts sharing the dynamic linked-object catalog.
     /// </summary>
     /// <param name="root">Portal tab root.</param>
     /// <param name="serializedPreset">Owning serialization context.</param>
     /// <param name="replacements">Serialized prefab replacement array.</param>
-    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by stable enum slot.</param>
+    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by dynamic identifier.</param>
     private static void BuildReplacementList(VisualElement root,
                                              SerializedObject serializedPreset,
                                              SerializedProperty replacements,
@@ -323,7 +385,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     {
         VisualElement section = CreateSection("Portal Activation Prefab Replacements");
         section.Add(new HelpBox(
-            "Each slot identifies an existing 3D GameObject linked on the scene portal anchor. The selected prefab asset is not required in scene and is instantiated only when that portal becomes a traversable exit.",
+            "Each selector identifies an existing 3D GameObject in the freely sized linked-object list. The replacement prefab is instantiated only when that portal becomes a traversable exit.",
             HelpBoxMessageType.Info));
 
         if (replacements == null || !replacements.isArray)
@@ -340,16 +402,19 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         {
             int capturedIndex = replacementIndex;
             SerializedProperty replacement = replacements.GetArrayElementAtIndex(replacementIndex);
-            SerializedProperty targetSlot = replacement.FindPropertyRelative("targetSlot");
+            SerializedProperty targetBindingId = replacement.FindPropertyRelative("targetBindingId");
             Foldout foldout = GameRoomRewardEditorElementUtility.CreateFoldout(
                 "PortalReplacement",
                 replacementIndex.ToString(),
                 "Replacement " + (replacementIndex + 1).ToString("00") + " — " +
-                ((GameRoomPortalLinkedObjectSlot)targetSlot.intValue),
+                GameRoomRewardPortalEffectEditorFieldUtility.ResolveBindingTitle(
+                    targetBindingId.stringValue,
+                    in linkedObjectCatalog),
                 "Prefab asset instantiated at the linked 3D scene object's local pose when the portal opens.");
-            AddLinkedObjectSlotField(foldout,
-                                     targetSlot,
-                                     in linkedObjectCatalog);
+            GameRoomRewardPortalEffectEditorFieldUtility.AddLinkedObjectField(
+                foldout,
+                targetBindingId,
+                in linkedObjectCatalog);
             AddProperty(foldout, replacement, "replacementPrefab", "Replacement Prefab");
             foldout.Add(BuildElementActions(
                 replacementIndex,
@@ -393,63 +458,16 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         replacements.InsertArrayElementAtIndex(replacements.arraySize);
         SerializedProperty replacement =
             replacements.GetArrayElementAtIndex(replacements.arraySize - 1);
-        replacement.FindPropertyRelative("targetSlot").intValue =
-            (int)GameRoomPortalLinkedObjectSlot.Object01;
+        GameRoomPortalLinkedObjectChoiceCatalog catalog =
+            GameRoomPortalLinkedObjectEditorCatalogUtility.Build();
+        replacement.FindPropertyRelative("targetBindingId").stringValue =
+            catalog.Identifiers.Count > 0 ? catalog.Identifiers[0] : string.Empty;
         replacement.FindPropertyRelative("replacementPrefab").objectReferenceValue = null;
         CommitAndRebuild(root, serializedPreset);
     }
     #endregion
 
     #region Shared Controls
-    /// <summary>
-    /// Adds an enum-backed dropdown relabeled with all linked objects found in currently loaded room anchors.
-    /// </summary>
-    /// <param name="parent">Visual parent receiving the selector.</param>
-    /// <param name="property">Serialized linked-object slot enum.</param>
-    /// <param name="catalog">Loaded scene-object labels keyed by stable enum slot.</param>
-    /// <returns>Created linked-object dropdown.</returns>
-    private static DropdownField AddLinkedObjectSlotField(
-        VisualElement parent,
-        SerializedProperty property,
-        in GameRoomPortalLinkedObjectChoiceCatalog catalog)
-    {
-        List<GameRoomPortalLinkedObjectSlot> slots =
-            new List<GameRoomPortalLinkedObjectSlot>(catalog.Slots);
-        List<string> labels = new List<string>(catalog.Labels);
-        GameRoomPortalLinkedObjectSlot currentSlot =
-            (GameRoomPortalLinkedObjectSlot)property.intValue;
-        int selectedIndex = catalog.IndexOf(currentSlot);
-
-        if (selectedIndex < 0)
-        {
-            slots.Add(currentSlot);
-            labels.Add(currentSlot + " — not linked in loaded scenes");
-            selectedIndex = labels.Count - 1;
-        }
-
-        DropdownField field = new DropdownField("Linked Object", labels, selectedIndex);
-        field.tooltip = property.tooltip +
-                        " Labels include linked object names from all currently loaded portal anchors.";
-        field.RegisterValueChangedCallback(evt =>
-        {
-            int nextIndex = field.index;
-
-            if (nextIndex < 0 || nextIndex >= slots.Count)
-                return;
-
-            int nextValue = (int)slots[nextIndex];
-
-            if (property.intValue == nextValue)
-                return;
-
-            property.intValue = nextValue;
-            property.serializedObject.ApplyModifiedProperties();
-            GameManagementDraftSession.MarkDirty();
-        });
-        parent.Add(field);
-        return field;
-    }
-
     /// <summary>
     /// Adds one enum-backed selector and commits changes through the shared draft session.
     /// </summary>

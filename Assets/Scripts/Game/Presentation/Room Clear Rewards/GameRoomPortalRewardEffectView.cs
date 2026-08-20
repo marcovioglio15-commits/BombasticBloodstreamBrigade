@@ -1,101 +1,33 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
-/// Maps one stable portal effect slot to a managed scene object.
-/// </summary>
-[Serializable]
-public sealed class GameRoomPortalLinkedObjectBinding
-{
-    #region Fields
-
-    #region Serialized Fields
-    [Tooltip("Stable enum slot selected by Room Clear Rewards portal animations and prefab replacements.")]
-    [SerializeField]
-    private GameRoomPortalLinkedObjectSlot slot = GameRoomPortalLinkedObjectSlot.Object01;
-
-    [Tooltip("Optional readable name describing this linked object in scene validation and diagnostics.")]
-    [SerializeField]
-    private string displayName;
-
-    [Tooltip("Existing 3D scene GameObject animated or disabled for prefab replacement when this portal becomes traversable.")]
-    [SerializeField]
-    private GameObject targetObject;
-    #endregion
-
-    #endregion
-
-    #region Properties
-    public GameRoomPortalLinkedObjectSlot Slot => slot;
-    public string DisplayName => displayName;
-    public GameObject TargetObject => targetObject;
-    #endregion
-
-    #region Methods
-
-    #region Constructors
-    /// <summary>
-    /// Creates an empty binding for Unity serialization and inspector-authored scene mappings.
-    /// </summary>
-    public GameRoomPortalLinkedObjectBinding()
-    {
-    }
-
-    /// <summary>
-    /// Creates one explicit binding between a stable portal slot and an existing 3D scene object.
-    /// </summary>
-    /// <param name="resolvedSlot">Stable slot consumed by baked activation effects.</param>
-    /// <param name="resolvedDisplayName">Optional readable label shown by editor diagnostics.</param>
-    /// <param name="resolvedTargetObject">Existing 3D scene GameObject controlled by the slot.</param>
-    public GameRoomPortalLinkedObjectBinding(GameRoomPortalLinkedObjectSlot resolvedSlot,
-                                             string resolvedDisplayName,
-                                             GameObject resolvedTargetObject)
-    {
-        slot = resolvedSlot;
-        displayName = resolvedDisplayName;
-        targetObject = resolvedTargetObject;
-    }
-    #endregion
-
-    #endregion
-}
-
-/// <summary>
-/// Applies baked portal activation effects to prelinked managed scene objects without Animator components.
+/// Applies baked portal activation effects to freely linked managed scene objects.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
 {
-    #region Constants
-    private const int SlotCapacity = 17;
-    #endregion
-
     #region Fields
 
     #region Serialized Fields
-    [Tooltip("Scene objects exposed through stable enum slots to the Room Clear Rewards portal settings.")]
+    [Tooltip("Freely sized list of existing scene objects exposed to Room Clear Rewards portal effects.")]
     [SerializeField]
     private GameRoomPortalLinkedObjectBinding[] linkedObjects =
         Array.Empty<GameRoomPortalLinkedObjectBinding>();
     #endregion
 
     #region Runtime Fields
-    private readonly Transform[] linkedTransforms = new Transform[SlotCapacity];
-    private readonly Transform[] activeTransforms = new Transform[SlotCapacity];
-    private readonly GameObject[] replacementInstances = new GameObject[SlotCapacity];
-    private readonly bool[] capturedSlots = new bool[SlotCapacity];
-    private readonly bool[] animatedSlots = new bool[SlotCapacity];
-    private readonly bool[] originalActiveStates = new bool[SlotCapacity];
-    private readonly Vector3[] originalLocalPositions = new Vector3[SlotCapacity];
-    private readonly Quaternion[] originalLocalRotations = new Quaternion[SlotCapacity];
-    private readonly Vector3[] originalLocalScales = new Vector3[SlotCapacity];
-    private readonly Vector3[] animationBaseLocalPositions = new Vector3[SlotCapacity];
-    private readonly Quaternion[] animationBaseLocalRotations = new Quaternion[SlotCapacity];
-    private readonly Vector3[] animationBaseLocalScales = new Vector3[SlotCapacity];
-    private readonly List<RuntimeAnimationState> activeAnimations =
-        new List<RuntimeAnimationState>(8);
+    private readonly Dictionary<string, int> bindingIndices =
+        new Dictionary<string, int>(StringComparer.Ordinal);
+    private readonly List<GameRoomPortalRuntimeBindingState> runtimeBindings =
+        new List<GameRoomPortalRuntimeBindingState>(8);
+    private readonly List<RuntimeTransformAnimationState> transformAnimations =
+        new List<RuntimeTransformAnimationState>(8);
+    private readonly List<GameRoomPortalAnimatorAnimationState> animatorAnimations =
+        new List<GameRoomPortalAnimatorAnimationState>(4);
     private int activationSignature = int.MinValue;
     #endregion
 
@@ -114,26 +46,27 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     /// <summary>
     /// Assigns existing 3D scene-object bindings during explicit prefab, scene or smoke-test authoring.
     /// </summary>
-    /// <param name="resolvedLinkedObjects">Stable slot mappings consumed when this portal becomes traversable.</param>
+    /// <param name="resolvedLinkedObjects">Stable mappings consumed when this portal becomes traversable.</param>
     public void ConfigureAuthoring(GameRoomPortalLinkedObjectBinding[] resolvedLinkedObjects)
     {
         Deactivate();
         linkedObjects = resolvedLinkedObjects ?? Array.Empty<GameRoomPortalLinkedObjectBinding>();
+        EnsureBindingIdentifiers();
         BuildLinkedObjectCache();
     }
 
     /// <summary>
-    /// Applies replacements, captures Transform baselines and starts animations for one new portal assignment.
+    /// Applies replacements and starts Transform or Animator-clip effects for one portal assignment.
     /// </summary>
     /// <param name="signature">Generation and edge signature preventing duplicate activation.</param>
-    /// <param name="animations">Baked Transform animation definitions.</param>
+    /// <param name="animations">Baked portal activation animation definitions.</param>
     /// <param name="replacements">Baked prefab replacement definitions.</param>
     /// <param name="hasAudioCue">True when a valid linked animation requests the dedicated audio event.</param>
     /// <param name="audioDelay">Delay shared with the animation that requests audio.</param>
     /// <param name="audioPosition">World position of the animation target after replacements.</param>
     /// <returns>True when a new signature was accepted and its effects were processed.</returns>
     public bool Activate(int signature,
-                         DynamicBuffer<GameRoomPortalTransformAnimationElement> animations,
+                         DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
                          DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements,
                          out bool hasAudioCue,
                          out float audioDelay,
@@ -155,34 +88,33 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
                              out hasAudioCue,
                              out audioDelay,
                              out audioPosition);
-        enabled = activeAnimations.Count > 0;
+        enabled = transformAnimations.Count > 0 || animatorAnimations.Count > 0;
         return true;
     }
 
     /// <summary>
-    /// Restores linked scene objects and destroys setup-owned replacement instances.
+    /// Restores linked scene objects and destroys runtime animation graphs and replacement instances.
     /// </summary>
     public void Deactivate()
     {
-        activeAnimations.Clear();
+        DestroyAnimatorGraphs();
+        transformAnimations.Clear();
+        animatorAnimations.Clear();
 
-        // Restore every linked object before removing runtime replacement instances.
-        for (int slotIndex = 1; slotIndex < SlotCapacity; slotIndex++)
+        // Restore every linked object before removing its optional runtime replacement.
+        for (int bindingIndex = 0; bindingIndex < runtimeBindings.Count; bindingIndex++)
         {
-            Transform linkedTransform = linkedTransforms[slotIndex];
+            GameRoomPortalRuntimeBindingState binding = runtimeBindings[bindingIndex];
 
-            if (capturedSlots[slotIndex] && linkedTransform != null)
+            if (binding.Captured && binding.OriginalTransform != null)
             {
-                linkedTransform.localPosition = originalLocalPositions[slotIndex];
-                linkedTransform.localRotation = originalLocalRotations[slotIndex];
-                linkedTransform.localScale = originalLocalScales[slotIndex];
-                linkedTransform.gameObject.SetActive(originalActiveStates[slotIndex]);
+                binding.OriginalTransform.localPosition = binding.OriginalLocalPosition;
+                binding.OriginalTransform.localRotation = binding.OriginalLocalRotation;
+                binding.OriginalTransform.localScale = binding.OriginalLocalScale;
+                binding.OriginalTransform.gameObject.SetActive(binding.OriginalActiveState);
             }
 
-            DestroyReplacement(slotIndex);
-            activeTransforms[slotIndex] = linkedTransform;
-            capturedSlots[slotIndex] = false;
-            animatedSlots[slotIndex] = false;
+            DestroyReplacement(binding);
         }
 
         activationSignature = int.MinValue;
@@ -190,14 +122,13 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     }
 
     /// <summary>
-    /// Validates slot uniqueness and scene-object references authored on this anchor.
+    /// Validates identifier uniqueness and scene-object references authored on this anchor.
     /// </summary>
     /// <param name="failureMessage">First actionable linked-object failure.</param>
-    /// <returns>True when every binding has a unique nonempty slot and target.</returns>
+    /// <returns>True when every binding has a unique identifier and a target.</returns>
     public bool TryValidateLinkedObjects(out string failureMessage)
     {
-        HashSet<GameRoomPortalLinkedObjectSlot> slots =
-            new HashSet<GameRoomPortalLinkedObjectSlot>();
+        HashSet<string> identifiers = new HashSet<string>(StringComparer.Ordinal);
 
         if (linkedObjects == null)
         {
@@ -215,15 +146,24 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
                 return false;
             }
 
-            if (binding.Slot == GameRoomPortalLinkedObjectSlot.None || binding.TargetObject == null)
+            if (string.IsNullOrWhiteSpace(binding.BindingId) || binding.TargetObject == null)
             {
-                failureMessage = "Linked object at index " + bindingIndex + " requires a slot and scene GameObject.";
+                failureMessage = "Linked object at index " + bindingIndex +
+                                 " requires a stable identifier and a scene GameObject.";
                 return false;
             }
 
-            if (!slots.Add(binding.Slot))
+            if (System.Text.Encoding.UTF8.GetByteCount(binding.BindingId) > 64)
             {
-                failureMessage = "Linked object slot '" + binding.Slot + "' is assigned more than once.";
+                failureMessage = "Linked object at index " + bindingIndex +
+                                 " has an identifier longer than the 64-byte ECS capacity.";
+                return false;
+            }
+
+            if (!identifiers.Add(binding.BindingId))
+            {
+                failureMessage = "Linked object identifier '" + binding.BindingId +
+                                 "' is assigned more than once.";
                 return false;
             }
         }
@@ -235,45 +175,38 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
 
     #region Unity Methods
     /// <summary>
-    /// Builds the initial slot cache and remains disabled until ECS enables this portal.
+    /// Builds the initial dynamic binding cache and remains disabled until ECS enables this portal.
     /// </summary>
     private void Awake()
     {
+        EnsureBindingIdentifiers();
         BuildLinkedObjectCache();
         enabled = false;
     }
 
     /// <summary>
-    /// Composes all active Transform animation contributions only while at least one animation is running.
+    /// Advances active Transform and Animator-clip animations only while portal effects are running.
     /// </summary>
     private void Update()
     {
-        ResetAnimatedTransforms();
-        bool allAnimationsComplete = true;
         float deltaTime = Mathf.Max(0f, Time.deltaTime);
+        bool transformComplete = UpdateTransformAnimations(deltaTime);
+        bool animatorComplete = UpdateAnimatorAnimations(deltaTime);
 
-        // Advance authored order so overlapping channel contributions remain deterministic.
-        for (int animationIndex = 0; animationIndex < activeAnimations.Count; animationIndex++)
-        {
-            RuntimeAnimationState state = activeAnimations[animationIndex];
-            state.Elapsed += deltaTime;
-            float progress = ResolveProgress(ref state, out bool complete);
-            ApplyAnimation(in state, EvaluateEasing(progress, state.Definition.Easing));
-            activeAnimations[animationIndex] = state;
-
-            if (!complete)
-                allAnimationsComplete = false;
-        }
-
-        if (!allAnimationsComplete)
-            return;
-
-        activeAnimations.Clear();
-        enabled = false;
+        if (transformComplete && animatorComplete)
+            enabled = false;
     }
 
     /// <summary>
-    /// Draws compact slot links so scene-object mappings can be inspected without entering Play Mode.
+    /// Ensures newly added or duplicated Inspector entries receive distinct persistent identifiers.
+    /// </summary>
+    private void OnValidate()
+    {
+        EnsureBindingIdentifiers();
+    }
+
+    /// <summary>
+    /// Draws compact colored links so scene-object mappings remain easy to inspect.
     /// </summary>
     private void OnDrawGizmosSelected()
     {
@@ -287,7 +220,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
             if (binding == null || binding.TargetObject == null)
                 continue;
 
-            float hue = ((int)binding.Slot * 0.117f) % 1f;
+            float hue = Mathf.Abs(binding.BindingId.GetHashCode() % 997) / 997f;
             Gizmos.color = Color.HSVToRGB(hue, 0.7f, 1f);
             Vector3 targetPosition = binding.TargetObject.transform.position;
             Gizmos.DrawLine(transform.position, targetPosition);
@@ -296,14 +229,41 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     }
     #endregion
 
-    #region Activation Setup
+    #region Binding Setup
     /// <summary>
-    /// Rebuilds enum-slot lookup arrays from serialized scene bindings without runtime reflection.
+    /// Assigns stable identifiers and resolves duplicated entries created by Inspector array duplication.
+    /// </summary>
+    private void EnsureBindingIdentifiers()
+    {
+        if (linkedObjects == null)
+            return;
+
+        HashSet<string> identifiers = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int bindingIndex = 0; bindingIndex < linkedObjects.Length; bindingIndex++)
+        {
+            GameRoomPortalLinkedObjectBinding binding = linkedObjects[bindingIndex];
+
+            if (binding == null)
+                continue;
+
+            binding.EnsureInitialized();
+
+            if (!identifiers.Add(binding.BindingId))
+            {
+                binding.RegenerateIdentifier();
+                identifiers.Add(binding.BindingId);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Rebuilds dynamic identifier lookups from the freely sized serialized binding list.
     /// </summary>
     private void BuildLinkedObjectCache()
     {
-        Array.Clear(linkedTransforms, 0, linkedTransforms.Length);
-        Array.Clear(activeTransforms, 0, activeTransforms.Length);
+        bindingIndices.Clear();
+        runtimeBindings.Clear();
 
         if (linkedObjects == null)
             return;
@@ -312,21 +272,16 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         {
             GameRoomPortalLinkedObjectBinding binding = linkedObjects[bindingIndex];
 
-            if (binding == null || binding.TargetObject == null)
-                continue;
-
-            int slotIndex = (int)binding.Slot;
-
-            if (slotIndex <= 0 ||
-                slotIndex >= SlotCapacity ||
-                linkedTransforms[slotIndex] != null)
+            if (binding == null ||
+                binding.TargetObject == null ||
+                string.IsNullOrWhiteSpace(binding.BindingId) ||
+                bindingIndices.ContainsKey(binding.BindingId))
             {
                 continue;
             }
 
-            Transform targetTransform = binding.TargetObject.transform;
-            linkedTransforms[slotIndex] = targetTransform;
-            activeTransforms[slotIndex] = targetTransform;
+            bindingIndices.Add(binding.BindingId, runtimeBindings.Count);
+            runtimeBindings.Add(new GameRoomPortalRuntimeBindingState(binding.TargetObject.transform));
         }
     }
 
@@ -335,21 +290,12 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     /// </summary>
     private void CaptureLinkedObjectState()
     {
-        for (int slotIndex = 1; slotIndex < SlotCapacity; slotIndex++)
-        {
-            Transform target = linkedTransforms[slotIndex];
-
-            if (target == null)
-                continue;
-
-            capturedSlots[slotIndex] = true;
-            originalActiveStates[slotIndex] = target.gameObject.activeSelf;
-            originalLocalPositions[slotIndex] = target.localPosition;
-            originalLocalRotations[slotIndex] = target.localRotation;
-            originalLocalScales[slotIndex] = target.localScale;
-        }
+        for (int bindingIndex = 0; bindingIndex < runtimeBindings.Count; bindingIndex++)
+            runtimeBindings[bindingIndex].Capture();
     }
+    #endregion
 
+    #region Activation Setup
     /// <summary>
     /// Instantiates configured prefabs at linked-object poses and disables their originals before animation lookup.
     /// </summary>
@@ -360,39 +306,37 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         for (int replacementIndex = 0; replacementIndex < replacements.Length; replacementIndex++)
         {
             GameRoomPortalPrefabReplacementElement replacement = replacements[replacementIndex];
-            int slotIndex = (int)replacement.TargetSlot;
 
-            if (slotIndex <= 0 || slotIndex >= SlotCapacity)
+            if (!TryGetBindingIndex(replacement.TargetBindingId, out int bindingIndex))
                 continue;
 
-            Transform target = linkedTransforms[slotIndex];
+            GameRoomPortalRuntimeBindingState binding = runtimeBindings[bindingIndex];
             GameObject prefab = replacement.ReplacementPrefab.Value;
 
-            if (target == null || prefab == null || replacementInstances[slotIndex] != null)
+            if (binding.OriginalTransform == null || prefab == null || binding.ReplacementInstance != null)
                 continue;
 
-            GameObject instance = Instantiate(prefab, target.parent, false);
+            GameObject instance = Instantiate(prefab, binding.OriginalTransform.parent, false);
             Transform instanceTransform = instance.transform;
-            instance.name = target.name + " (Portal Enabled)";
-            instanceTransform.localPosition = target.localPosition;
-            instanceTransform.localRotation = target.localRotation;
-            instanceTransform.localScale = target.localScale;
+            instance.name = binding.OriginalTransform.name + " (Portal Enabled)";
+            instanceTransform.localPosition = binding.OriginalTransform.localPosition;
+            instanceTransform.localRotation = binding.OriginalTransform.localRotation;
+            instanceTransform.localScale = binding.OriginalTransform.localScale;
             instance.SetActive(true);
-            target.gameObject.SetActive(false);
-            replacementInstances[slotIndex] = instance;
-            activeTransforms[slotIndex] = instanceTransform;
+            binding.OriginalTransform.gameObject.SetActive(false);
+            binding.SetReplacement(instance);
         }
     }
 
     /// <summary>
-    /// Copies valid baked animations into reused managed state and resolves the optional synchronized audio cue.
+    /// Resolves valid baked animations and the optional synchronized audio cue.
     /// </summary>
-    /// <param name="animations">Baked animation definitions.</param>
+    /// <param name="animations">Baked activation animation definitions.</param>
     /// <param name="hasAudioCue">True when one valid animation requests audio.</param>
     /// <param name="audioDelay">Authored delay of the audio-owning animation.</param>
     /// <param name="audioPosition">World position of the audio-owning animation target.</param>
     private void BuildAnimationStates(
-        DynamicBuffer<GameRoomPortalTransformAnimationElement> animations,
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
         out bool hasAudioCue,
         out float audioDelay,
         out Vector3 audioPosition)
@@ -403,74 +347,159 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
 
         for (int animationIndex = 0; animationIndex < animations.Length; animationIndex++)
         {
-            GameRoomPortalTransformAnimationElement animation = animations[animationIndex];
-            int slotIndex = (int)animation.TargetSlot;
+            GameRoomPortalActivationAnimationElement animation = animations[animationIndex];
 
-            if (slotIndex <= 0 || slotIndex >= SlotCapacity)
-                continue;
-
-            Transform target = activeTransforms[slotIndex];
-
-            if (target == null)
+            if (!TryGetBindingIndex(animation.TargetBindingId, out int bindingIndex))
             {
-                Debug.LogWarning("[GameRoomPortalRewardEffectView] Portal effect slot '" +
-                                 animation.TargetSlot + "' has no linked scene object on anchor '" +
+                Debug.LogWarning("[GameRoomPortalRewardEffectView] Portal effect binding '" +
+                                 animation.TargetBindingId + "' has no linked scene object on anchor '" +
                                  name + "'.",
                                  this);
                 continue;
             }
 
-            if (!animatedSlots[slotIndex])
+            GameRoomPortalRuntimeBindingState binding = runtimeBindings[bindingIndex];
+            bool animationResolved;
+
+            switch (animation.Source)
             {
-                animatedSlots[slotIndex] = true;
-                animationBaseLocalPositions[slotIndex] = target.localPosition;
-                animationBaseLocalRotations[slotIndex] = target.localRotation;
-                animationBaseLocalScales[slotIndex] = target.localScale;
+                case GameRoomPortalActivationAnimationSource.AnimatorClip:
+                    animationResolved = TryAddAnimatorAnimation(animation, binding);
+                    break;
+                default:
+                    binding.CaptureAnimationBaseline();
+                    transformAnimations.Add(new RuntimeTransformAnimationState(animation,
+                                                                                bindingIndex));
+                    animationResolved = true;
+                    break;
             }
 
-            activeAnimations.Add(new RuntimeAnimationState(animation, slotIndex));
-
-            if (animation.PlayAudioEvent == 0 || hasAudioCue)
+            if (!animationResolved || animation.PlayAudioEvent == 0 || hasAudioCue)
                 continue;
 
             hasAudioCue = true;
             audioDelay = Mathf.Max(0f, animation.StartDelay);
-            audioPosition = target.position;
+            audioPosition = binding.ActiveTransform.position;
         }
+    }
+
+    /// <summary>
+    /// Creates runtime state for one validated direct clip and its exact child Animator.
+    /// </summary>
+    /// <param name="definition">Baked Animator-clip animation definition.</param>
+    /// <param name="binding">Resolved active linked-object binding.</param>
+    /// <returns>True when both the selected clip and exact Animator were resolved.</returns>
+    private bool TryAddAnimatorAnimation(GameRoomPortalActivationAnimationElement definition,
+                                         GameRoomPortalRuntimeBindingState binding)
+    {
+        AnimationClip clip = definition.AnimatorClip.Value;
+        Animator animator = ResolveAnimator(binding.ActiveTransform,
+                                            definition.AnimatorPath.ToString());
+
+        if (clip == null || animator == null)
+        {
+            Debug.LogWarning("[GameRoomPortalRewardEffectView] Animator clip binding '" +
+                             definition.TargetBindingId +
+                             "' cannot resolve its selected clip and child Animator on anchor '" +
+                             name + "'.",
+                             this);
+            return false;
+        }
+
+        animatorAnimations.Add(new GameRoomPortalAnimatorAnimationState(definition,
+                                                                        animator,
+                                                                        clip));
+        return true;
     }
     #endregion
 
     #region Animation Evaluation
     /// <summary>
-    /// Restores captured animation baselines before composing this frame's authored contributions.
+    /// Restores Transform baselines, composes authored contributions and reports Once completion.
     /// </summary>
-    private void ResetAnimatedTransforms()
+    /// <param name="deltaTime">Nonnegative scaled frame duration.</param>
+    /// <returns>True when no Transform animation needs another update.</returns>
+    private bool UpdateTransformAnimations(float deltaTime)
     {
-        for (int slotIndex = 1; slotIndex < SlotCapacity; slotIndex++)
+        if (transformAnimations.Count == 0)
+            return true;
+
+        ResetAnimatedTransforms();
+        bool allComplete = true;
+
+        for (int animationIndex = 0;
+             animationIndex < transformAnimations.Count;
+             animationIndex++)
         {
-            if (!animatedSlots[slotIndex])
-                continue;
+            RuntimeTransformAnimationState state = transformAnimations[animationIndex];
+            state.Elapsed += deltaTime;
+            float progress = ResolveProgress(state.Elapsed,
+                                             state.Definition.StartDelay,
+                                             state.Definition.Duration,
+                                             state.Definition.Playback,
+                                             out bool complete);
+            ApplyTransformAnimation(in state,
+                                    EvaluateEasing(progress, state.Definition.Easing));
+            transformAnimations[animationIndex] = state;
 
-            Transform target = activeTransforms[slotIndex];
-
-            if (target == null)
-                continue;
-
-            target.localPosition = animationBaseLocalPositions[slotIndex];
-            target.localRotation = animationBaseLocalRotations[slotIndex];
-            target.localScale = animationBaseLocalScales[slotIndex];
+            if (!complete)
+                allComplete = false;
         }
+
+        if (allComplete)
+            transformAnimations.Clear();
+
+        return allComplete;
     }
 
     /// <summary>
-    /// Resolves normalized playback progress and completion for one mutable animation state.
+    /// Advances direct Animator clips through manually evaluated playable graphs.
     /// </summary>
-    /// <param name="state">Animation state advanced by the current frame.</param>
-    /// <param name="complete">True only after a Once animation reaches its final target.</param>
-    /// <returns>Normalized progress before easing.</returns>
-    private static float ResolveProgress(ref RuntimeAnimationState state, out bool complete)
+    /// <param name="deltaTime">Nonnegative scaled frame duration.</param>
+    /// <returns>True when no Animator clip needs another update.</returns>
+    private bool UpdateAnimatorAnimations(float deltaTime)
     {
-        float animationTime = state.Elapsed - Mathf.Max(0f, state.Definition.StartDelay);
+        if (animatorAnimations.Count == 0)
+            return true;
+
+        bool allComplete = true;
+
+        for (int animationIndex = 0;
+             animationIndex < animatorAnimations.Count;
+             animationIndex++)
+        {
+            if (!animatorAnimations[animationIndex].Advance(deltaTime))
+                allComplete = false;
+        }
+
+        return allComplete;
+    }
+
+    /// <summary>
+    /// Restores each animated Transform once before composing the current frame.
+    /// </summary>
+    private void ResetAnimatedTransforms()
+    {
+        for (int bindingIndex = 0; bindingIndex < runtimeBindings.Count; bindingIndex++)
+            runtimeBindings[bindingIndex].ResetAnimationBaseline();
+    }
+
+    /// <summary>
+    /// Resolves normalized playback progress and completion for one animation clock.
+    /// </summary>
+    /// <param name="elapsed">Elapsed time since portal activation.</param>
+    /// <param name="delay">Nonnegative delay before playback.</param>
+    /// <param name="duration">Positive duration of one forward pass.</param>
+    /// <param name="playback">Once, looping or alternating playback policy.</param>
+    /// <param name="complete">True only after Once playback reaches its final target.</param>
+    /// <returns>Normalized progress before easing.</returns>
+    private static float ResolveProgress(float elapsed,
+                                         float delay,
+                                         float duration,
+                                         GameRoomPortalTransformAnimationPlayback playback,
+                                         out bool complete)
+    {
+        float animationTime = elapsed - Mathf.Max(0f, delay);
 
         if (animationTime <= 0f)
         {
@@ -478,9 +507,9 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
             return 0f;
         }
 
-        float normalizedTime = animationTime / Mathf.Max(0.0001f, state.Definition.Duration);
+        float normalizedTime = animationTime / Mathf.Max(0.0001f, duration);
 
-        switch (state.Definition.Playback)
+        switch (playback)
         {
             case GameRoomPortalTransformAnimationPlayback.Loop:
                 complete = false;
@@ -495,25 +524,24 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     }
 
     /// <summary>
-    /// Applies one eased local-space contribution after the target baseline has been restored.
+    /// Applies one eased local-space Transform contribution to its resolved binding.
     /// </summary>
-    /// <param name="state">Animation definition and resolved target slot.</param>
+    /// <param name="state">Animation definition and resolved dynamic binding index.</param>
     /// <param name="progress">Eased normalized progress.</param>
-    private void ApplyAnimation(in RuntimeAnimationState state, float progress)
+    private void ApplyTransformAnimation(in RuntimeTransformAnimationState state,
+                                         float progress)
     {
-        Transform target = activeTransforms[state.SlotIndex];
+        Transform target = runtimeBindings[state.BindingIndex].ActiveTransform;
 
         if (target == null)
             return;
 
-        GameRoomPortalTransformAnimationElement definition = state.Definition;
+        GameRoomPortalActivationAnimationElement definition = state.Definition;
 
         if (GameRoomPortalTransformAnimationModeUtility.IncludesPosition(definition.Mode))
-        {
             target.localPosition += Vector3.LerpUnclamped(Vector3.zero,
                                                            definition.PositionOffset,
                                                            progress);
-        }
 
         if (GameRoomPortalTransformAnimationModeUtility.IncludesRotation(definition.Mode))
         {
@@ -565,24 +593,66 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     }
     #endregion
 
-    #region Replacement Cleanup
+    #region Resolution And Cleanup
+    /// <summary>
+    /// Resolves one fixed-string identifier into the current dynamic runtime binding list.
+    /// </summary>
+    /// <param name="bindingId">Baked stable linked-object identifier.</param>
+    /// <param name="bindingIndex">Resolved dynamic list index.</param>
+    /// <returns>True when a valid active binding exists.</returns>
+    private bool TryGetBindingIndex(FixedString64Bytes bindingId, out int bindingIndex)
+    {
+        return bindingIndices.TryGetValue(bindingId.ToString(), out bindingIndex);
+    }
+
+    /// <summary>
+    /// Resolves the exact Animator below an active linked object from its serialized relative path.
+    /// </summary>
+    /// <param name="root">Active original or replacement binding root.</param>
+    /// <param name="relativePath">Relative hierarchy path selected in the editor.</param>
+    /// <returns>Resolved Animator, or null when the hierarchy no longer matches.</returns>
+    private static Animator ResolveAnimator(Transform root, string relativePath)
+    {
+        if (root == null)
+            return null;
+
+        Transform animatorTransform = string.IsNullOrEmpty(relativePath)
+            ? root
+            : root.Find(relativePath);
+        return animatorTransform != null ? animatorTransform.GetComponent<Animator>() : null;
+    }
+
+    /// <summary>
+    /// Destroys every playable graph so Animator controllers can resume during portal reset.
+    /// </summary>
+    private void DestroyAnimatorGraphs()
+    {
+        for (int animationIndex = 0;
+             animationIndex < animatorAnimations.Count;
+             animationIndex++)
+        {
+            animatorAnimations[animationIndex].DestroyGraph();
+        }
+    }
+
     /// <summary>
     /// Destroys one runtime replacement instance through the correct edit or Play Mode path.
     /// </summary>
-    /// <param name="slotIndex">Resolved enum-slot array index.</param>
-    private void DestroyReplacement(int slotIndex)
+    /// <param name="binding">Runtime binding owning the replacement instance.</param>
+    private static void DestroyReplacement(GameRoomPortalRuntimeBindingState binding)
     {
-        GameObject instance = replacementInstances[slotIndex];
-
-        if (instance == null)
+        if (binding.ReplacementInstance == null)
+        {
+            binding.RestoreActiveTransform();
             return;
+        }
 
         if (Application.isPlaying)
-            Destroy(instance);
+            Destroy(binding.ReplacementInstance);
         else
-            DestroyImmediate(instance);
+            DestroyImmediate(binding.ReplacementInstance);
 
-        replacementInstances[slotIndex] = null;
+        binding.RestoreActiveTransform();
     }
     #endregion
 
@@ -590,13 +660,13 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
 
     #region Nested Types
     /// <summary>
-    /// Stores one mutable animation clock beside its immutable baked definition and resolved target slot.
+    /// Stores one mutable Transform clock beside its immutable baked definition and binding index.
     /// </summary>
-    private struct RuntimeAnimationState
+    private struct RuntimeTransformAnimationState
     {
         #region Fields
-        public readonly GameRoomPortalTransformAnimationElement Definition;
-        public readonly int SlotIndex;
+        public readonly GameRoomPortalActivationAnimationElement Definition;
+        public readonly int BindingIndex;
         public float Elapsed;
         #endregion
 
@@ -604,20 +674,21 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
 
         #region Constructors
         /// <summary>
-        /// Creates one stopped runtime animation state for an already resolved linked-object slot.
+        /// Creates one stopped Transform animation state for an already resolved dynamic binding.
         /// </summary>
         /// <param name="definition">Immutable baked animation definition.</param>
-        /// <param name="slotIndex">Resolved linked-object array index.</param>
-        public RuntimeAnimationState(GameRoomPortalTransformAnimationElement definition,
-                                     int slotIndex)
+        /// <param name="bindingIndex">Resolved runtime binding index.</param>
+        public RuntimeTransformAnimationState(GameRoomPortalActivationAnimationElement definition,
+                                              int bindingIndex)
         {
             Definition = definition;
-            SlotIndex = slotIndex;
+            BindingIndex = bindingIndex;
             Elapsed = 0f;
         }
         #endregion
 
         #endregion
     }
+
     #endregion
 }

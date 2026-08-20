@@ -167,7 +167,7 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         AddField(otherInteractionOptionsContainer, payloadProperty, "enableProjectileSplitting", "Enable Projectile Splitting");
         AddField(otherInteractionOptionsContainer, payloadProperty, "applyToSplitProjectiles", "Apply to External Projectile Split Children");
         AddField(otherInteractionOptionsContainer, payloadProperty, "completeBouncesBeforeReturn", "Complete External Bounces Before Return");
-        AddField(otherInteractionOptionsContainer, payloadProperty, "completeOrbitalPathBeforeReturn", "Complete External Orbital Path Before Return");
+        AddField(otherInteractionOptionsContainer, payloadProperty, "completeOrbitalPathBeforeReturn", "Enable and Complete Orbital Path Before Return");
         AddField(otherInteractionOptionsContainer, payloadProperty, "applyTinyMegaProjectileScaling", "Apply Tiny/Mega Projectile Scaling");
 
         if (showActiveProjectileConcurrencyOption)

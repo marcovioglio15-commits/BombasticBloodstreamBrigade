@@ -23,9 +23,10 @@ public static class GameRoomRewardPresentationValidationUtility
     {
         if (preset == null ||
             preset.PlayerLogSettings == null ||
-            preset.PortalLogSettings == null)
+            preset.PortalLogSettings == null ||
+            preset.PortalIndicatorSettings == null)
         {
-            failureMessage = "Player Log and Portal Log settings are required.";
+            failureMessage = "Player Log, Portal Log and Portal Indicator settings are required.";
             return false;
         }
 
@@ -38,7 +39,60 @@ public static class GameRoomRewardPresentationValidationUtility
             return false;
         }
 
+        if (!TryValidatePortalIndicators(preset.PortalIndicatorSettings,
+                                         out failureMessage))
+        {
+            return false;
+        }
+
         return TryValidateMappings(preset, out failureMessage);
+    }
+    #endregion
+
+    #region Portal Indicators
+    /// <summary>
+    /// Validates the optional preauthored open-portal indicator without correcting authored values.
+    /// </summary>
+    /// <param name="settings">Portal indicator settings to inspect.</param>
+    /// <param name="failureMessage">First actionable indicator validation failure.</param>
+    /// <returns>True when disabled or when every enabled indicator value is finite and renderable.</returns>
+    private static bool TryValidatePortalIndicators(
+        GameRoomRewardPortalIndicatorSettings settings,
+        out string failureMessage)
+    {
+        if (!settings.Enabled)
+        {
+            failureMessage = string.Empty;
+            return true;
+        }
+
+        if (settings.IndicatorSprite == null)
+        {
+            failureMessage = "Portal Indicators requires an Indicator Sprite while enabled.";
+            return false;
+        }
+
+        if (!IsFinitePositive(settings.IndicatorSizePixels) ||
+            !IsFiniteNonnegative(settings.EdgePaddingPixels) ||
+            !IsFinite(settings.WorldOffset))
+        {
+            failureMessage = "Portal Indicator size, edge padding or world offset contains unsupported values.";
+            return false;
+        }
+
+        Color color = settings.IndicatorColor;
+
+        if (!IsFiniteNonnegative(color.r) ||
+            !IsFiniteNonnegative(color.g) ||
+            !IsFiniteNonnegative(color.b) ||
+            !IsFiniteNonnegative(color.a))
+        {
+            failureMessage = "Portal Indicator color contains a non-finite or negative channel.";
+            return false;
+        }
+
+        failureMessage = string.Empty;
+        return true;
     }
     #endregion
 
@@ -309,7 +363,7 @@ public static class GameRoomRewardPresentationValidationUtility
              animationIndex < settings.ActivationAnimations.Count;
              animationIndex++)
         {
-            GameRoomPortalTransformAnimationDefinition animation =
+            GameRoomPortalActivationAnimationDefinition animation =
                 settings.ActivationAnimations[animationIndex];
 
             if (animation == null)
@@ -318,20 +372,54 @@ public static class GameRoomRewardPresentationValidationUtility
                 return false;
             }
 
-            if (animation.TargetSlot == GameRoomPortalLinkedObjectSlot.None)
+            if (string.IsNullOrWhiteSpace(animation.TargetBindingId))
             {
-                failureMessage = "Portal activation animation at index " + animationIndex + " has no linked-object slot.";
+                failureMessage = "Portal activation animation at index " + animationIndex + " has no linked object.";
                 return false;
             }
 
-            if (!IsFiniteNonnegative(animation.StartDelay) ||
-                !IsFinitePositive(animation.Duration) ||
-                !IsFinite(animation.PositionOffset) ||
-                !IsFinite(animation.RotationOffset) ||
-                !IsFinite(animation.ScaleMultiplier))
+            if (Encoding.UTF8.GetByteCount(animation.TargetBindingId) > 64)
             {
-                failureMessage = "Portal activation animation at index " + animationIndex + " contains invalid timing or Transform values.";
+                failureMessage = "Portal activation animation at index " + animationIndex +
+                                 " has a linked-object identifier longer than the 64-byte ECS capacity.";
                 return false;
+            }
+
+            if (!IsFiniteNonnegative(animation.StartDelay))
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex + " has an invalid start delay.";
+                return false;
+            }
+
+            switch (animation.Source)
+            {
+                case GameRoomPortalActivationAnimationSource.AnimatorClip:
+                    if (animation.AnimatorClip == null ||
+                        !IsFinitePositive(animation.AnimatorSpeed))
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " requires a selected Animator clip, its child path and a positive playback speed.";
+                        return false;
+                    }
+
+                    if (Encoding.UTF8.GetByteCount(animation.AnimatorPath ?? string.Empty) > 128)
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " has an Animator hierarchy path longer than the 128-byte ECS capacity.";
+                        return false;
+                    }
+                    break;
+                default:
+                    if (!IsFinitePositive(animation.Duration) ||
+                        !IsFinite(animation.PositionOffset) ||
+                        !IsFinite(animation.RotationOffset) ||
+                        !IsFinite(animation.ScaleMultiplier))
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " contains invalid duration or Transform values.";
+                        return false;
+                    }
+                    break;
             }
 
             if (animation.PlayAudioEvent)
@@ -344,8 +432,7 @@ public static class GameRoomRewardPresentationValidationUtility
             return false;
         }
 
-        HashSet<GameRoomPortalLinkedObjectSlot> replacementSlots =
-            new HashSet<GameRoomPortalLinkedObjectSlot>();
+        HashSet<string> replacementBindings = new HashSet<string>(StringComparer.Ordinal);
 
         for (int replacementIndex = 0;
              replacementIndex < settings.ActivationPrefabReplacements.Count;
@@ -360,10 +447,17 @@ public static class GameRoomRewardPresentationValidationUtility
                 return false;
             }
 
-            if (replacement.TargetSlot == GameRoomPortalLinkedObjectSlot.None ||
+            if (string.IsNullOrWhiteSpace(replacement.TargetBindingId) ||
                 replacement.ReplacementPrefab == null)
             {
-                failureMessage = "Portal prefab replacement at index " + replacementIndex + " requires an existing 3D scene-object slot and a replacement prefab asset.";
+                failureMessage = "Portal prefab replacement at index " + replacementIndex + " requires an existing linked 3D scene object and a replacement prefab asset.";
+                return false;
+            }
+
+            if (Encoding.UTF8.GetByteCount(replacement.TargetBindingId) > 64)
+            {
+                failureMessage = "Portal prefab replacement at index " + replacementIndex +
+                                 " has a linked-object identifier longer than the 64-byte ECS capacity.";
                 return false;
             }
 
@@ -373,9 +467,9 @@ public static class GameRoomRewardPresentationValidationUtility
                 return false;
             }
 
-            if (!replacementSlots.Add(replacement.TargetSlot))
+            if (!replacementBindings.Add(replacement.TargetBindingId))
             {
-                failureMessage = "Portal prefab replacement slot '" + replacement.TargetSlot + "' is configured more than once.";
+                failureMessage = "Portal prefab replacement binding '" + replacement.TargetBindingId + "' is configured more than once.";
                 return false;
             }
         }

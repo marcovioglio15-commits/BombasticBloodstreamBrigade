@@ -161,7 +161,7 @@ public sealed class PowerUpReturningProjectilesModuleData
     [SerializeField]
     private bool completeBouncesBeforeReturn = true;
 
-    [Tooltip("Waits for an Orbital Projectiles path to complete before return begins. When external interactions are disabled, this setting still applies to Orbital Projectiles composed inside this power-up.")]
+    [Tooltip("Allows Orbital Projectiles to alter this shot and waits for its path to complete before return begins. Disable it to keep Returning Projectiles independent from orbital trajectories. The external interaction master gate still excludes orbital modules supplied by other power-ups.")]
     [SerializeField]
     private bool completeOrbitalPathBeforeReturn = true;
 
@@ -263,7 +263,7 @@ public sealed class PowerUpReturningProjectilesModuleData
     /// <param name="enableProjectileSplittingValue">Whether compatible Projectile Split modules may generate children.</param>
     /// <param name="applyToSplitProjectilesValue">Whether split children from other power-ups inherit the module.</param>
     /// <param name="completeBouncesBeforeReturnValue">Whether bounces from other power-ups complete first.</param>
-    /// <param name="completeOrbitalPathBeforeReturnValue">Whether orbital paths from other power-ups complete first.</param>
+    /// <param name="completeOrbitalPathBeforeReturnValue">Whether compatible orbital trajectories may alter the shot and complete before return.</param>
     /// <param name="applyTinyMegaProjectileScalingValue">Whether compatible projectile-size Character Tuning applies.</param>
     /// <param name="applyToActivePowerUpProjectilesValue">Whether other active power-up projectile tools inherit the module.</param>
     /// <param name="allowConcurrentActiveProjectilesValue">Whether the owning non-toggleable active can overlap projectiles.</param>

@@ -106,6 +106,18 @@ public static class ProjectileReturnPowerUpInteractionUtility
     /// <returns>True when a full orbital path must complete before return begins.</returns>
     public static bool CompletesOrbitalPathBeforeReturn(in ReturningProjectilesConfig config)
     {
+        return AllowsOrbitalTrajectory(in config);
+    }
+
+    /// <summary>
+    /// Reports whether an orbital trajectory may remain active on a projectile modified by Returning Projectiles.
+    /// The dedicated setting is authoritative for both co-located and external orbital sources, while the external
+    /// master gate prevents unrelated passive orbital modules from altering isolated returning shots.
+    /// </summary>
+    /// <param name="config">Resolved return config containing the orbital policy and baked module provenance.</param>
+    /// <returns>True when the projectile may initialize and simulate an orbital trajectory.</returns>
+    public static bool AllowsOrbitalTrajectory(in ReturningProjectilesConfig config)
+    {
         return config.CompleteOrbitalPathBeforeReturn != 0 &&
                (config.SamePowerUpHasOrbitalProjectiles != 0 || config.AllowOtherPowerUpInteractions != 0);
     }

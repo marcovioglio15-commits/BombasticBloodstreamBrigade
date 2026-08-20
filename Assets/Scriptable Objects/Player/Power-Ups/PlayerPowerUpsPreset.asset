@@ -58752,7 +58752,9 @@ MonoBehaviour:
     stealProtected: 0
   primaryActivePowerUpId: 
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds: []
+  equippedPassivePowerUpIds:
+  - PassiveOrbitalProjectiles
+  - PassiveTwoStepTreatment
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

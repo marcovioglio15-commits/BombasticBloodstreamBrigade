@@ -435,7 +435,7 @@ MonoBehaviour:
     displayName: Room Reward Portal Animation
     description: Requested when the selected room reward portal activation animation
       starts.
-    eventPath: 
+    eventPath: event:/SFX/Activations/MC_SFX_Active_EnergyFull
     volume: 1
     pitch: 1
     spatialize: 1

@@ -89,7 +89,7 @@ public static class GameRoomRewardRuntimeSmokeTest
         entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardTileBindingElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardPresentationElement>(managerEntity);
-        entityManager.AddBuffer<GameRoomPortalTransformAnimationElement>(managerEntity);
+        entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(managerEntity);
         entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity);
         entityManager.AddBuffer<GameRoomPortalAnimationAudioCue>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
@@ -258,17 +258,18 @@ public static class GameRoomRewardRuntimeSmokeTest
                 new GameRoomPortalLinkedObjectBinding[]
                 {
                     new GameRoomPortalLinkedObjectBinding(
-                        GameRoomPortalLinkedObjectSlot.Object01,
+                        "SmokeObject",
                         "Existing 3D Scene Object",
                         sceneObject)
                 });
-            DynamicBuffer<GameRoomPortalTransformAnimationElement> animations =
-                entityManager.GetBuffer<GameRoomPortalTransformAnimationElement>(managerEntity);
+            DynamicBuffer<GameRoomPortalActivationAnimationElement> animations =
+                entityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(managerEntity);
             DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements =
                 entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity);
-            animations.Add(new GameRoomPortalTransformAnimationElement
+            animations.Add(new GameRoomPortalActivationAnimationElement
             {
-                TargetSlot = GameRoomPortalLinkedObjectSlot.Object01,
+                TargetBindingId = "SmokeObject",
+                Source = GameRoomPortalActivationAnimationSource.Transform,
                 Mode = GameRoomPortalTransformAnimationMode.Position,
                 Playback = GameRoomPortalTransformAnimationPlayback.Once,
                 Easing = GameRoomPortalTransformAnimationEase.Linear,
@@ -280,7 +281,7 @@ public static class GameRoomRewardRuntimeSmokeTest
             });
             replacements.Add(new GameRoomPortalPrefabReplacementElement
             {
-                TargetSlot = GameRoomPortalLinkedObjectSlot.Object01,
+                TargetBindingId = "SmokeObject",
                 ReplacementPrefab = replacementPrefab
             });
             bool activated = effectView.Activate(71,

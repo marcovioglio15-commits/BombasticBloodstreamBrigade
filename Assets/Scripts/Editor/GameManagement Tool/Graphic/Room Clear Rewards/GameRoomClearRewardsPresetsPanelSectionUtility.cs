@@ -47,6 +47,10 @@ internal static class GameRoomClearRewardsPresetsPanelSectionUtility
             case GameRoomClearRewardsPresetsPanel.DetailsTab.PortalLog:
                 GameRoomRewardPortalSettingsEditorUtility.Build(root, serializedPreset);
                 break;
+            case GameRoomClearRewardsPresetsPanel.DetailsTab.PortalIndicators:
+                GameRoomRewardPortalIndicatorSettingsEditorUtility.Build(root,
+                                                                         serializedPreset);
+                break;
         }
     }
     #endregion

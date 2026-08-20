@@ -133,30 +133,19 @@ internal sealed class GameRoomRewardPortalAnchorValidationContext
                 warnings.Add(context + " has invalid linked objects: " + linkedObjectFailure);
             }
 
-            List<Vector3> centers;
+            if (anchor.OffscreenIndicatorView == null)
+            {
+                warnings.Add(context +
+                             " has no preauthored open-portal indicator. Refresh the shared Room Clear Rewards portal indicator prefab.");
+            }
 
-            if (!portalCenters.TryGetValue(anchor.PortalId, out centers))
+            if (!portalCenters.ContainsKey(anchor.PortalId))
             {
                 warnings.Add(context + " references Portal ID '" + anchor.PortalId +
                              "', which does not exist in a bakeable SubScene. Re-synchronize anchors after changing a SubScene reference or Portal ID.");
                 continue;
             }
 
-            float nearestDistanceSquared = ResolveNearestDistanceSquared(anchor.transform.position,
-                                                                          centers);
-
-            if (nearestDistanceSquared <=
-                GameRoomPortalRewardLogAnchor.MaximumPositionError *
-                GameRoomPortalRewardLogAnchor.MaximumPositionError)
-            {
-                continue;
-            }
-
-            warnings.Add(context + " is " + Mathf.Sqrt(nearestDistanceSquared).ToString("0.###") +
-                         " meters from the matching Portal ID '" + anchor.PortalId +
-                         "' volume center, but runtime accepts at most " +
-                         GameRoomPortalRewardLogAnchor.MaximumPositionError.ToString("0.##") +
-                         " meters. Keep the locator root aligned; move only the log child in Static Rows mode or use Portal Log World Offset in Scrolling mode.");
         }
 
         // Every bakeable portal needs one managed presentation locator in the room root.
@@ -168,23 +157,6 @@ internal sealed class GameRoomRewardPortalAnchorValidationContext
         }
     }
 
-    /// <summary>
-    /// Finds the closest authoritative center for one identity while tolerating duplicate-ID diagnostics upstream.
-    /// </summary>
-    /// <param name="anchorPosition">Managed locator world position in the source room scene.</param>
-    /// <param name="centers">Authoritative volume centers sharing the locator identity.</param>
-    /// <returns>Smallest squared world-space distance, or positive infinity when no center exists.</returns>
-    private static float ResolveNearestDistanceSquared(Vector3 anchorPosition,
-                                                       IReadOnlyList<Vector3> centers)
-    {
-        float nearestDistanceSquared = float.PositiveInfinity;
-
-        for (int centerIndex = 0; centerIndex < centers.Count; centerIndex++)
-            nearestDistanceSquared = Mathf.Min(nearestDistanceSquared,
-                                               (anchorPosition - centers[centerIndex]).sqrMagnitude);
-
-        return nearestDistanceSquared;
-    }
     #endregion
 
     #endregion

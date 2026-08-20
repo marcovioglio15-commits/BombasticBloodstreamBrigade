@@ -651,8 +651,8 @@ MonoBehaviour:
     font: {fileID: 0}
   portalLogSettings:
     worldOffset: {x: 0, y: 1.75, z: 0}
-    layoutMode: 0
-    valueDisplayMode: 0
+    layoutMode: 1
+    valueDisplayMode: 1
     fontSize: 3.2
     cellSpacing: 2
     visibleCells: 1
@@ -665,5 +665,30 @@ MonoBehaviour:
     staticMinimumPanelSize: {x: 5, y: 2}
     staticBackgroundSprite: {fileID: 0}
     staticBackgroundColor: {r: 0, g: 0, b: 0, a: 0.75}
-    activationAnimations: []
-    activationPrefabReplacements: []
+    activationAnimations:
+    - targetBindingId: AnimatedExitDoor_01
+      targetSlot: 0
+      source: 0
+      mode: 0
+      playback: 0
+      easing: 3
+      startDelay: 0
+      duration: 0.5
+      positionOffset: {x: 0, y: 5, z: 0}
+      rotationOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: {x: 1, y: 1, z: 1}
+      playAudioEvent: 1
+      animatorClip: {fileID: 0}
+      animatorPath: 
+      animatorSpeed: 1
+    activationPrefabReplacements:
+    - targetBindingId: ExitSign_01
+      targetSlot: 1
+      replacementPrefab: {fileID: 3434886789373703975, guid: 7036cb16ae174e140a3c0b618865f5c2, type: 3}
+  portalIndicatorSettings:
+    enabled: 1
+    indicatorSprite: {fileID: 21300000, guid: 7730f1723cf3aa74d895ec5a018c4edf, type: 3}
+    indicatorColor: {r: 1, g: 1, b: 1, a: 1}
+    indicatorSizePixels: 64
+    edgePaddingPixels: 20
+    worldOffset: {x: 0, y: 1.5, z: 0}
