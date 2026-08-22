@@ -110,6 +110,13 @@ internal static class PlayerDroppedPowerUpContainerPayloadUtility
         storedPowerUp.SlotConfig = slotElement.SlotConfig;
         storedPowerUp.StoredEnergy = containerContent.StoredEnergy;
         storedPowerUp.StoredCooldownRemaining = containerContent.StoredCooldownRemaining;
+        storedPowerUp.ReturningProjectileCount = containerContent.ReturningProjectileCount;
+        storedPowerUp.ReturningProjectileRecallReadyCount = containerContent.ReturningProjectileRecallReadyCount;
+        storedPowerUp.ReturningProjectileGeneration = containerContent.ReturningProjectileGeneration;
+        storedPowerUp.ReturningProjectileRecallVersion = containerContent.ReturningProjectileRecallVersion;
+        storedPowerUp.ReturningProjectileResourceRecallVersion = containerContent.ReturningProjectileResourceRecallVersion;
+        storedPowerUp.ReturningProjectileResourceDrainActive = containerContent.ReturningProjectileResourceDrainActive;
+        storedPowerUp.PreserveReturningProjectileOwnership = containerContent.PreserveReturningProjectileOwnership;
         return true;
     }
 
@@ -128,6 +135,13 @@ internal static class PlayerDroppedPowerUpContainerPayloadUtility
         PlayerDroppedPowerUpContainerContent containerContent = droppedContainerContentLookup[containerEntity];
         containerContent.StoredEnergy = storedPowerUp.StoredEnergy;
         containerContent.StoredCooldownRemaining = storedPowerUp.StoredCooldownRemaining;
+        containerContent.ReturningProjectileCount = storedPowerUp.ReturningProjectileCount;
+        containerContent.ReturningProjectileRecallReadyCount = storedPowerUp.ReturningProjectileRecallReadyCount;
+        containerContent.ReturningProjectileGeneration = storedPowerUp.ReturningProjectileGeneration;
+        containerContent.ReturningProjectileRecallVersion = storedPowerUp.ReturningProjectileRecallVersion;
+        containerContent.ReturningProjectileResourceRecallVersion = storedPowerUp.ReturningProjectileResourceRecallVersion;
+        containerContent.ReturningProjectileResourceDrainActive = storedPowerUp.ReturningProjectileResourceDrainActive;
+        containerContent.PreserveReturningProjectileOwnership = storedPowerUp.PreserveReturningProjectileOwnership;
         containerContent.HasStoredPowerUp = storedPowerUp.SlotConfig.IsDefined != 0 ? (byte)1 : (byte)0;
         droppedContainerContentLookup[containerEntity] = containerContent;
 

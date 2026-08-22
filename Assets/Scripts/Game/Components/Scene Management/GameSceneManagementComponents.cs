@@ -21,6 +21,12 @@ public struct GameSceneManagerConfig : IComponentData
     public float PostLoadReadyExtraSeconds;
     public float FadeInSeconds;
     public float4 FadeColor;
+    public GameSceneFadeMode FadeMode;
+    public GameSceneFadeWipeDirection FadeWipeDirection;
+    public GameSceneFadeEasing FadeEasing;
+    public float FadeDirectionalEdgeSoftness;
+    public float FadeDirectionalNoiseStrength;
+    public float FadeDirectionalNoiseScale;
     public byte ShowLoadingProgress;
     public byte ShowLoadingProgressPercentage;
     public byte ShowLoadingProgressStatusText;
@@ -88,6 +94,7 @@ public struct GameSceneTransitionRequest : IBufferElementData
 {
     public GameSceneTransitionRequestType RequestType;
     public GameSceneTransitionPurpose Purpose;
+    public GameSceneFadeWipeDirection PortalWipeDirection;
     public FixedString64Bytes TargetSceneId;
     public FixedString64Bytes TransitionId;
     public byte ReloadPersistentPlayer;
@@ -114,7 +121,14 @@ public struct GameSceneFadePresentationState : IComponentData
 {
     public float Alpha;
     public float4 Color;
+    public GameSceneFadeMode Mode;
+    public GameSceneFadeWipeDirection WipeDirection;
+    public GameSceneFadeEasing Easing;
+    public float DirectionalEdgeSoftness;
+    public float DirectionalNoiseStrength;
+    public float DirectionalNoiseScale;
     public byte Visible;
+    public byte OpaquePresented;
 }
 
 /// <summary>

@@ -86,11 +86,14 @@ crashlytics-build.properties
 # Ignore FMOD Unity integration cache since it is generated locally.
 /[Aa]ssets/Plugins/FMOD/Cache/
 
-# Ignore FMOD Studio project local state. Keep the .fspro, Metadata, source
-# audio assets, and Build banks under version control.
+# Ignore FMOD Studio project local state. The authoring project lives outside
+# Unity Assets while its .fspro, Metadata, source audio and Build banks remain versioned.
 /[Aa]ssets/**/.cache/
 /[Aa]ssets/**/.user/
 /[Aa]ssets/**/.unsaved/
+/FMOD/**/.cache/
+/FMOD/**/.user/
+/FMOD/**/.unsaved/
 *.fspro.user
 *.fspro.lock
 

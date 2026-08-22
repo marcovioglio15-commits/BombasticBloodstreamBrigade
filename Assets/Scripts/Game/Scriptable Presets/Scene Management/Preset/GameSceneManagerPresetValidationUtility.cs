@@ -94,6 +94,24 @@ public static class GameSceneManagerPresetValidationUtility
 
         if (fadeSettings.FadeInSeconds < 0f)
             warnings.Add("Fade In Seconds is negative.");
+
+        if (fadeSettings.FadeColor.a < 0.999f)
+            warnings.Add("Fade Color alpha is below full opacity, so scene resets may remain visible behind complete transition coverage.");
+
+        if (fadeSettings.FadeMode != GameSceneFadeMode.DirectionalGradient)
+            return;
+
+        if (fadeSettings.DirectionalEdgeSoftness < 0.001f ||
+            fadeSettings.DirectionalEdgeSoftness > 0.5f)
+            warnings.Add("Directional Edge Softness must be between 0.001 and 0.5.");
+
+        if (fadeSettings.DirectionalNoiseStrength < 0f ||
+            fadeSettings.DirectionalNoiseStrength > 0.25f)
+            warnings.Add("Directional Noise Strength must be between 0 and 0.25.");
+
+        if (fadeSettings.DirectionalNoiseScale < 0.25f ||
+            fadeSettings.DirectionalNoiseScale > 24f)
+            warnings.Add("Directional Noise Scale must be between 0.25 and 24.");
     }
 
     /// <summary>

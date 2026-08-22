@@ -677,6 +677,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -1166,6 +1168,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -1655,6 +1659,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -2144,6 +2150,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -2633,6 +2641,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -3122,6 +3132,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -3611,6 +3623,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -4100,6 +4114,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -4589,6 +4605,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -5078,6 +5096,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -5567,6 +5587,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -6056,6 +6078,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -6545,6 +6569,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -7034,6 +7060,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -7523,6 +7551,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -8012,6 +8042,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -8501,6 +8533,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -8990,6 +9024,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -9479,6 +9515,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -9968,6 +10006,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -10484,6 +10524,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -10974,6 +11016,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -11463,6 +11507,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -11953,6 +11999,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -12442,6 +12490,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -12932,6 +12982,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -13422,6 +13474,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -13912,6 +13966,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -14402,6 +14458,8 @@ MonoBehaviour:
         returnDelaySeconds: 0
         allowEarlyActivationRecall: 0
         reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
         returnRumbleMultiplier: 0.5
         returnCameraShakeMultiplier: 0.5
         outboundSizeMultiplier: 1
@@ -14905,6 +14963,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -15394,6 +15454,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -15883,6 +15945,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -16372,6 +16436,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -16863,6 +16929,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -17366,6 +17434,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -17855,6 +17925,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -18344,6 +18416,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -18837,6 +18911,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -19330,6 +19406,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -19823,6 +19901,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -20316,6 +20396,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -20818,6 +20900,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -21307,6 +21391,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -21796,6 +21882,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -22285,6 +22373,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -22775,6 +22865,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -23265,6 +23357,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -23755,6 +23849,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -24257,6 +24353,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -24746,6 +24844,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -25235,6 +25335,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -25724,6 +25826,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -26227,6 +26331,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -26716,6 +26822,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -27205,6 +27313,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -27694,6 +27804,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -28183,6 +28295,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -28685,6 +28799,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -29174,6 +29290,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -29663,6 +29781,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -30165,6 +30285,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -30654,6 +30776,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -31143,6 +31267,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -31632,6 +31758,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -32131,6 +32259,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -32620,6 +32750,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -33110,6 +33242,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -33592,6 +33726,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -34061,6 +34197,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -34560,6 +34698,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -34776,7 +34916,7 @@ MonoBehaviour:
           maintenanceResource: 1
           maximumEnergy: 100
           activationCost: 35
-          maintenanceCostPerSecond: 0
+          maintenanceCostPerSecond: 10
           isToggleable: 0
           maintenanceTicksPerSecond: 4
           minimumActivationEnergyPercent: 0
@@ -35049,6 +35189,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -35534,10 +35676,12 @@ MonoBehaviour:
           outboundLifetimeMultiplier: 1.5
           outboundHitPolicy: 1
           additionalOutboundHits: 1
-          returnStartMode: 1
-          returnDelaySeconds: 0.5
+          returnStartMode: 4
+          returnDelaySeconds: 20
           allowEarlyActivationRecall: 1
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 1
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 3.5
@@ -36042,6 +36186,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -36531,6 +36677,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -37033,6 +37181,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -37535,6 +37685,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -38025,6 +38177,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -38529,6 +38683,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -39019,6 +39175,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -39509,6 +39667,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -40011,6 +40171,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -40515,6 +40677,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -41017,6 +41181,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -41515,6 +41681,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -42003,6 +42171,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -42502,6 +42672,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -42990,6 +43162,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -43478,6 +43652,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -43976,6 +44152,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -44464,6 +44642,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -44962,6 +45142,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -45450,6 +45632,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -45949,6 +46133,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -46448,6 +46634,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -46946,6 +47134,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -47434,6 +47624,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -47922,6 +48114,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -48429,6 +48623,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -48936,6 +49132,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -49470,6 +49668,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -49977,6 +50177,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -50473,6 +50675,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -50957,6 +51161,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -51441,6 +51647,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -51923,6 +52131,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -52405,6 +52615,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -52887,6 +53099,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -53369,6 +53583,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -53840,6 +54056,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -54340,6 +54558,8 @@ MonoBehaviour:
           returnDelaySeconds: 0.1
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 1
@@ -54822,6 +55042,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -55291,6 +55513,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -55771,6 +55995,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -56240,6 +56466,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -56712,6 +56940,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -57203,6 +57433,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -57685,6 +57917,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -58154,6 +58388,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0
           returnCameraShakeMultiplier: 0
           outboundSizeMultiplier: 0
@@ -58641,6 +58877,8 @@ MonoBehaviour:
           returnDelaySeconds: 0
           allowEarlyActivationRecall: 0
           reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
           returnRumbleMultiplier: 0.5
           returnCameraShakeMultiplier: 0.5
           outboundSizeMultiplier: 1
@@ -58750,11 +58988,9 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 2
     stealProtected: 0
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveBoomerang
   secondaryActivePowerUpId: 
-  equippedPassivePowerUpIds:
-  - PassiveOrbitalProjectiles
-  - PassiveTwoStepTreatment
+  equippedPassivePowerUpIds: []
   passiveTools:
   - commonData:
       powerUpId: BIG SHOT

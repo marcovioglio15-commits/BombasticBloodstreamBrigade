@@ -90,31 +90,17 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// <param name="signature">Generation and edge signature preventing duplicate activation.</param>
     /// <param name="animations">Baked Transform animation definitions.</param>
     /// <param name="replacements">Baked prefab replacement definitions.</param>
-    /// <param name="hasAudioCue">True when one resolved animation requests the dedicated audio event.</param>
-    /// <param name="audioDelay">Delay shared with the audio-owning animation.</param>
-    /// <param name="audioPosition">World position used by the positioned audio request.</param>
     /// <returns>True when a new signature was accepted by the effect bridge.</returns>
     public bool ActivateEffects(
         int signature,
         DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
-        DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements,
-        out bool hasAudioCue,
-        out float audioDelay,
-        out Vector3 audioPosition)
+        DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements)
     {
         if (effectView != null)
-        {
             return effectView.Activate(signature,
                                        animations,
-                                       replacements,
-                                       out hasAudioCue,
-                                       out audioDelay,
-                                       out audioPosition);
-        }
+                                       replacements);
 
-        hasAudioCue = false;
-        audioDelay = 0f;
-        audioPosition = transform.position;
         return false;
     }
 

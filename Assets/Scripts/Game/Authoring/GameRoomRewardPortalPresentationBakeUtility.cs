@@ -100,7 +100,6 @@ public static class GameRoomRewardPortalPresentationBakeUtility
                 PositionOffset = animation.PositionOffset,
                 RotationOffset = animation.RotationOffset,
                 ScaleMultiplier = animation.ScaleMultiplier,
-                PlayAudioEvent = animation.PlayAudioEvent ? (byte)1 : (byte)0,
                 AnimatorSpeed = animation.AnimatorSpeed,
                 AnimatorClip = animation.AnimatorClip
             });

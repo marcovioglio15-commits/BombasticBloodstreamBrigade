@@ -155,7 +155,19 @@ internal static class PlayerRuntimeScalingEnumUtility
     /// <returns>Clamped return start mode.</returns>
     public static ProjectileReturnStartMode ResolveProjectileReturnStartMode(float value)
     {
-        return (ProjectileReturnStartMode)ResolveEnumIndex(value, 1);
+        return (ProjectileReturnStartMode)ResolveEnumIndex(value,
+                                                           (int)ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain);
+    }
+
+    /// <summary>
+    /// Resolves a safe stolen returning-projectile ownership policy from one numeric Add Scaling result.
+    /// </summary>
+    /// <param name="value">Resolved numeric formula result.</param>
+    /// <returns>Clamped stolen ownership policy.</returns>
+    public static ProjectileStolenOwnershipPolicy ResolveProjectileStolenOwnershipPolicy(float value)
+    {
+        return (ProjectileStolenOwnershipPolicy)ResolveEnumIndex(value,
+                                                                 (int)ProjectileStolenOwnershipPolicy.PreserveAndReconnect);
     }
 
     /// <summary>

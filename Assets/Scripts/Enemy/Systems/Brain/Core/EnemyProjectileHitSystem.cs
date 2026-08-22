@@ -54,6 +54,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
         state.RequireForUpdate(enemyQuery);
         state.RequireForUpdate(projectileQuery);
         state.RequireForUpdate<PhysicsWorldSingleton>();
+        state.RequireForUpdate<PlayerWorldLayersConfig>();
     }
 
     /// <summary>
@@ -162,13 +163,7 @@ public partial struct EnemyProjectileHitSystem : ISystem
 
         NativeStream projectileHitStream = new NativeStream(projectileCount, frameAllocator);
         PhysicsWorldSingleton physicsWorldSingleton = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
-        int wallsLayerMask = WorldWallCollisionUtility.ResolveWallsLayerMask();
-
-        if (SystemAPI.TryGetSingleton<PlayerWorldLayersConfig>(out PlayerWorldLayersConfig worldLayersConfig) &&
-            worldLayersConfig.WallsLayerMask != 0)
-        {
-            wallsLayerMask = worldLayersConfig.WallsLayerMask;
-        }
+        int wallsLayerMask = SystemAPI.GetSingleton<PlayerWorldLayersConfig>().WallsLayerMask;
 
         EnemyProjectileHitCollectJob hitCollectJob = new EnemyProjectileHitCollectJob
         {

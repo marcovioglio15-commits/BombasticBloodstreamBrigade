@@ -154,6 +154,7 @@ public static class GameSceneTransitionRequestUtility
     {
         return left.RequestType == right.RequestType &&
                left.Purpose == right.Purpose &&
+               left.PortalWipeDirection == right.PortalWipeDirection &&
                left.TargetSceneId.Equals(right.TargetSceneId) &&
                left.TransitionId.Equals(right.TransitionId) &&
                left.ReloadPersistentPlayer == right.ReloadPersistentPlayer;

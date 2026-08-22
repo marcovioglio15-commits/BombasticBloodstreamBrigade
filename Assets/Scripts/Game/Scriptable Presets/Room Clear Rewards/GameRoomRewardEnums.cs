@@ -92,6 +92,15 @@ public enum GameRoomRewardPortalLogLayoutMode : byte
 }
 
 /// <summary>
+/// Selects how the shared portal-unlock event is emitted when a cleared room opens its exits.
+/// </summary>
+public enum GameRoomPortalUnlockAudioPlaybackMode : byte
+{
+    OncePerRoom = 0,
+    OncePerPortal = 1
+}
+
+/// <summary>
 /// Identifies the runtime source used by one portal activation animation.
 /// </summary>
 public enum GameRoomPortalActivationAnimationSource : byte

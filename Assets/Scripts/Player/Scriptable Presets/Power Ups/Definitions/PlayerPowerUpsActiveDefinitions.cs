@@ -428,11 +428,13 @@ public sealed class ActiveToolDefinition
     [Tooltip("Amount of ActivationResource consumed when tool is activated.")]
     [SerializeField] private float activationCost = 25f;
 
-    [Tooltip("Resource consumed each second while toggleable tool remains active.")]
-    [SerializeField] private PowerUpResourceType maintenanceResource = PowerUpResourceType.Energy;
+    [Tooltip("Resource consumed each second by toggle maintenance or Returning Projectiles resource-drain return modes.")]
+    [SerializeField]
+    private PowerUpResourceType maintenanceResource = PowerUpResourceType.Energy;
 
-    [Tooltip("Amount consumed per second while toggleable tool remains active.")]
-    [SerializeField] private float maintenanceCostPerSecond;
+    [Tooltip("Amount consumed per second by toggle maintenance or a live resource-draining returning projectile.")]
+    [SerializeField]
+    private float maintenanceCostPerSecond;
 
     [Tooltip("Event type that grants recharge to this tool.")]
     [SerializeField] private PowerUpChargeType chargeType = PowerUpChargeType.EnemiesDestroyed;

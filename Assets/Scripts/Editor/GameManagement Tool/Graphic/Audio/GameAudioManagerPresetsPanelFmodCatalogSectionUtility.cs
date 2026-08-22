@@ -32,7 +32,7 @@ internal static class GameAudioManagerPresetsPanelFmodCatalogSectionUtility
         catalogRoot.style.marginBottom = 8f;
 
         Label titleLabel = new Label("FMOD Event Catalog");
-        titleLabel.tooltip = "FMOD events discovered from Assets/BBB_FMOD/Metadata.";
+        titleLabel.tooltip = "FMOD events discovered from the Studio project configured in the FMOD Unity integration.";
         titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
         catalogRoot.Add(titleLabel);
 

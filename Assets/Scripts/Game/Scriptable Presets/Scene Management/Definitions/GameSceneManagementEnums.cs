@@ -70,6 +70,35 @@ public enum GameSceneTransitionPurpose : byte
 }
 
 /// <summary>
+/// Selects how transition darkness is distributed across the authored full-screen fade surface.
+/// </summary>
+public enum GameSceneFadeMode : byte
+{
+    Uniform = 0,
+    DirectionalGradient = 1
+}
+
+/// <summary>
+/// Selects the screen-space direction followed by a directional transition gradient.
+/// </summary>
+public enum GameSceneFadeWipeDirection : byte
+{
+    LeftToRight = 0,
+    RightToLeft = 1,
+    BottomToTop = 2,
+    TopToBottom = 3
+}
+
+/// <summary>
+/// Selects the interpolation applied to fade and wipe progress.
+/// </summary>
+public enum GameSceneFadeEasing : byte
+{
+    Linear = 0,
+    SmoothStep = 1
+}
+
+/// <summary>
 /// Runtime phase used by the scene transition execution system.
 /// </summary>
 public enum GameSceneTransitionPhase : byte

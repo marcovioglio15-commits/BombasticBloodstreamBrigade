@@ -91,27 +91,37 @@ public static class ProjectileReturnRuntimeUtility
                     if (powerUpsState.PrimaryReturningProjectileGeneration == 0u ||
                         powerUpsState.PrimaryReturningProjectileGeneration == powerUpsState.SecondaryReturningProjectileGeneration)
                     {
-                        powerUpsState.PrimaryReturningProjectileGeneration = PlayerPowerUpLoadoutRuntimeUtility.AdvanceReturningProjectileGeneration(powerUpsState.PrimaryReturningProjectileGeneration,
-                                                                                                                                                     powerUpsState.SecondaryReturningProjectileGeneration);
+                        powerUpsState.PrimaryReturningProjectileGeneration = PlayerReturningProjectileLoadoutRuntimeUtility.AdvanceGeneration(powerUpsState.PrimaryReturningProjectileGeneration,
+                                                                                                                                              powerUpsState.SecondaryReturningProjectileGeneration);
                     }
 
                     powerUpsState.PrimaryReturningProjectileCount++;
                     returnState.ConcurrencyGeneration = powerUpsState.PrimaryReturningProjectileGeneration;
                     returnState.LastObservedActivationRecallVersion = powerUpsState.PrimaryReturningProjectileRecallVersion;
+                    returnState.LastObservedResourceRecallVersion = powerUpsState.PrimaryReturningProjectileResourceRecallVersion;
                     returnState.ConcurrencyRegistered = 1;
+
+                    if (ProjectileReturnStartModeUtility.UsesResourceDrain(config.ReturnStartMode))
+                        powerUpsState.PrimaryReturningProjectileResourceDrainActive = 1;
+
                     break;
                 case 1:
                     if (powerUpsState.SecondaryReturningProjectileGeneration == 0u ||
                         powerUpsState.SecondaryReturningProjectileGeneration == powerUpsState.PrimaryReturningProjectileGeneration)
                     {
-                        powerUpsState.SecondaryReturningProjectileGeneration = PlayerPowerUpLoadoutRuntimeUtility.AdvanceReturningProjectileGeneration(powerUpsState.SecondaryReturningProjectileGeneration,
-                                                                                                                                                       powerUpsState.PrimaryReturningProjectileGeneration);
+                        powerUpsState.SecondaryReturningProjectileGeneration = PlayerReturningProjectileLoadoutRuntimeUtility.AdvanceGeneration(powerUpsState.SecondaryReturningProjectileGeneration,
+                                                                                                                                                powerUpsState.PrimaryReturningProjectileGeneration);
                     }
 
                     powerUpsState.SecondaryReturningProjectileCount++;
                     returnState.ConcurrencyGeneration = powerUpsState.SecondaryReturningProjectileGeneration;
                     returnState.LastObservedActivationRecallVersion = powerUpsState.SecondaryReturningProjectileRecallVersion;
+                    returnState.LastObservedResourceRecallVersion = powerUpsState.SecondaryReturningProjectileResourceRecallVersion;
                     returnState.ConcurrencyRegistered = 1;
+
+                    if (ProjectileReturnStartModeUtility.UsesResourceDrain(config.ReturnStartMode))
+                        powerUpsState.SecondaryReturningProjectileResourceDrainActive = 1;
+
                     break;
             }
 
@@ -162,9 +172,12 @@ public static class ProjectileReturnRuntimeUtility
         returnState.ReturnFeedbackPending = 0;
         returnState.OutboundSpeed = math.max(0.01f, math.length(projectile.Velocity));
         returnState.ReturnDelayRemainingSeconds = math.max(0f, returnState.Config.ReturnDelaySeconds);
-        bool waitsForActivationRecall = returnState.Config.ReturnStartMode == ProjectileReturnStartMode.ActivationTap &&
-                                        !activationRecallRequested;
-        returnState.Phase = waitsForActivationRecall || returnState.ReturnDelayRemainingSeconds > 0f
+        bool waitsForExternalRecall = ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode) &&
+                                      !activationRecallRequested;
+        bool usesAutomaticDelay = ProjectileReturnStartModeUtility.UsesAutomaticDelay(returnState.Config.ReturnStartMode) &&
+                                  returnState.ReturnDelayRemainingSeconds > 0f &&
+                                  !activationRecallRequested;
+        returnState.Phase = waitsForExternalRecall || usesAutomaticDelay
             ? ProjectileReturnPhase.Delaying
             : ResolvePostDelayPhase(in returnState.Config);
 
@@ -374,7 +387,7 @@ public static class ProjectileReturnRuntimeUtility
         {
             projectile.Velocity = float3.zero;
 
-            if (returnState.Config.ReturnStartMode == ProjectileReturnStartMode.ActivationTap)
+            if (ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode))
             {
                 AlignFlightRotation(ref projectileTransform,
                                     ref returnState,

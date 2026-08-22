@@ -14,11 +14,11 @@ internal static class GameRoomRewardPortalEffectEditorFieldUtility
 
     #region Public Methods
     /// <summary>
-    /// Adds a dynamic dropdown containing all linked objects found in currently loaded room anchors.
+    /// Adds a dynamic dropdown containing all known linked objects while preserving unresolved stable identifiers.
     /// </summary>
     /// <param name="parent">Visual parent receiving the selector.</param>
     /// <param name="property">Serialized stable linked-object identifier.</param>
-    /// <param name="catalog">Loaded scene-object labels keyed by dynamic identifier.</param>
+    /// <param name="catalog">Project scene-object labels keyed by dynamic identifier.</param>
     /// <returns>Created linked-object dropdown.</returns>
     public static DropdownField AddLinkedObjectField(
         VisualElement parent,
@@ -34,14 +34,13 @@ internal static class GameRoomRewardPortalEffectEditorFieldUtility
         {
             identifiers.Add(currentIdentifier);
             labels.Add(string.IsNullOrWhiteSpace(currentIdentifier)
-                ? "No linked object available in loaded scenes"
-                : currentIdentifier + " — not linked in loaded scenes");
+                ? "Unassigned"
+                : currentIdentifier);
             selectedIndex = labels.Count - 1;
         }
 
         DropdownField field = new DropdownField("Linked Object", labels, selectedIndex);
-        field.tooltip = property.tooltip +
-                        " Labels include linked object names from all currently loaded portal anchors.";
+        field.tooltip = property.tooltip;
         field.RegisterValueChangedCallback(evt =>
         {
             int nextIndex = field.index;
@@ -87,15 +86,17 @@ internal static class GameRoomRewardPortalEffectEditorFieldUtility
         {
             clips.Add(currentClip);
             paths.Add(pathProperty.stringValue);
-            labels.Add(currentClip.name + " — not exposed by loaded linked objects");
+            labels.Add(currentClip.name +
+                       (string.IsNullOrWhiteSpace(pathProperty.stringValue)
+                           ? string.Empty
+                           : " — " + pathProperty.stringValue));
             selectedIndex = labels.Count - 1;
         }
 
         if (labels.Count == 0)
         {
-            parent.Add(new HelpBox(
-                "The selected linked object has no Animator with controller clips in the currently loaded scenes.",
-                HelpBoxMessageType.Warning));
+            parent.Add(new HelpBox("No Animator clip is currently available for this linked object.",
+                                   HelpBoxMessageType.Warning));
             return;
         }
 
@@ -128,8 +129,8 @@ internal static class GameRoomRewardPortalEffectEditorFieldUtility
     /// Resolves one concise foldout title from the current dynamic linked-object catalog.
     /// </summary>
     /// <param name="bindingId">Serialized stable linked-object identifier.</param>
-    /// <param name="catalog">Loaded dynamic linked-object choices.</param>
-    /// <returns>Readable loaded label or the unresolved serialized identifier.</returns>
+    /// <param name="catalog">Project-wide dynamic linked-object choices.</param>
+    /// <returns>Readable project catalog label or the unresolved serialized identifier.</returns>
     public static string ResolveBindingTitle(
         string bindingId,
         in GameRoomPortalLinkedObjectChoiceCatalog catalog)

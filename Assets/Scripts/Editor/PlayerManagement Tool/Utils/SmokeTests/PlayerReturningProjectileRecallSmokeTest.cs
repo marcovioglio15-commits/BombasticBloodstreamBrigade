@@ -23,6 +23,8 @@ public static class PlayerReturningProjectileRecallSmokeTest
     public static void Run()
     {
         ValidateRecallInputAndResourceCost();
+        ValidateResourceDrainRecall();
+        ValidateStolenOwnershipPolicies();
         ValidateToggleActiveOwnership();
         ValidateEndpointWaitingAndDirectRecall();
     }
@@ -57,6 +59,14 @@ public static class PlayerReturningProjectileRecallSmokeTest
                                  DisplayStyle.None,
                                  "Active Returning Projectiles did not expose contextual recall controls.");
         ValidateReturnTransitionOrder(activeContainer);
+        PopupField<ProjectileReturnStartMode> restrictedModePopup = activeContainer.Q<PopupField<ProjectileReturnStartMode>>();
+
+        if (restrictedModePopup == null ||
+            restrictedModePopup.choices.Count != 2 ||
+            restrictedModePopup.choices.Contains(ProjectileReturnStartMode.ResourceDrain))
+        {
+            throw new InvalidOperationException("Resource-drain modes remained selectable without an owning Resource Gate.");
+        }
 
         // Resource Gate context reveals only the extra repayment option.
         VisualElement gatedActiveContainer = new VisualElement();
@@ -66,6 +76,16 @@ public static class PlayerReturningProjectileRecallSmokeTest
                                  DisplayStyle.Flex,
                                  DisplayStyle.Flex,
                                  "Resource Gate recall repayment remained hidden for an eligible Active.");
+
+        // Resource-drain mode reveals its threshold only for a Resource Gate-bound Active.
+        payloadProperty.FindPropertyRelative("returnStartMode").enumValueIndex = (int)ProjectileReturnStartMode.ResourceDrain;
+        serializedPreset.ApplyModifiedPropertiesWithoutUndo();
+        VisualElement resourceDrainContainer = new VisualElement();
+        PowerUpReturningProjectilesPayloadDrawerUtility.Build(resourceDrainContainer, payloadProperty, true, true);
+        VisualElement resourceDrainOptions = resourceDrainContainer.Q<VisualElement>(PowerUpReturningProjectilesPayloadDrawerUtility.ResourceDrainOptionsContainerName);
+
+        if (resourceDrainOptions == null || resourceDrainOptions.style.display.value != DisplayStyle.Flex)
+            throw new InvalidOperationException("Resource-drain threshold remained hidden for a Resource Gate-bound Active.");
 
         payloadProperty.FindPropertyRelative("returnStartMode").enumValueIndex = (int)ProjectileReturnStartMode.AutomaticDelay;
         serializedPreset.ApplyModifiedPropertiesWithoutUndo();
@@ -178,6 +198,170 @@ public static class PlayerReturningProjectileRecallSmokeTest
 
         if (!consumedInput || recallVersion != 1u || math.abs(energy - 10f) > PrecisionEpsilon)
             throw new InvalidOperationException("Early recall did not wrap its version safely or incorrectly charged a disabled cost.");
+    }
+    #endregion
+
+    #region Resource Drain
+    /// <summary>
+    /// Verifies continuous Resource Gate consumption, threshold recall, version advancement, and all mixed trigger capabilities.
+    /// </summary>
+    private static void ValidateResourceDrainRecall()
+    {
+        PlayerPowerUpSlotConfig slotConfig = new PlayerPowerUpSlotConfig
+        {
+            HasReturningProjectiles = 1,
+            HasResourceGate = 1,
+            MaintenanceResource = PowerUpResourceType.Energy,
+            MaintenanceCostPerSecond = 20f,
+            MaximumEnergy = 100f,
+            ReturningProjectiles = new ReturningProjectilesConfig
+            {
+                ReturnStartMode = ProjectileReturnStartMode.ResourceDrain,
+                ResourceReturnThresholdPercent = 50f
+            }
+        };
+        ComponentLookup<PlayerHealth> healthLookup = default;
+        ComponentLookup<PlayerShield> shieldLookup = default;
+        PlayerHealth updatedHealth = default;
+        PlayerShield updatedShield = default;
+        bool healthChanged = false;
+        bool shieldChanged = false;
+        byte resourceDrainActive = 1;
+        uint resourceRecallVersion = 8u;
+        float energy = 55f;
+
+        if (!PlayerReturningProjectileResourceDrainUtility.ShouldSuspendEnergyRecharge(in slotConfig, 1, 1))
+            throw new InvalidOperationException("Live resource-drain ownership did not suppress conflicting slot-energy recharge.");
+
+        // One quarter second consumes five energy and recalls exactly at the configured fifty-percent floor.
+        PlayerReturningProjectileResourceDrainUtility.Tick(in slotConfig,
+                                                            1,
+                                                            0.25f,
+                                                            ref resourceDrainActive,
+                                                            ref resourceRecallVersion,
+                                                            ref energy,
+                                                            Entity.Null,
+                                                            ref healthLookup,
+                                                            ref updatedHealth,
+                                                            ref healthChanged,
+                                                            ref shieldLookup,
+                                                            ref updatedShield,
+                                                            ref shieldChanged);
+
+        if (math.abs(energy - 50f) > PrecisionEpsilon || resourceRecallVersion != 9u || resourceDrainActive != 0)
+            throw new InvalidOperationException("Resource-drain recall did not stop at its configured energy threshold.");
+
+        // Endpoint waiting retains ownership and therefore consumes the same continuous cost despite having zero velocity.
+        resourceDrainActive = 1;
+        resourceRecallVersion = 12u;
+        energy = 80f;
+        PlayerReturningProjectileResourceDrainUtility.Tick(in slotConfig,
+                                                            1,
+                                                            0.5f,
+                                                            ref resourceDrainActive,
+                                                            ref resourceRecallVersion,
+                                                            ref energy,
+                                                            Entity.Null,
+                                                            ref healthLookup,
+                                                            ref updatedHealth,
+                                                            ref healthChanged,
+                                                            ref shieldLookup,
+                                                            ref updatedShield,
+                                                            ref shieldChanged);
+
+        if (math.abs(energy - 70f) > PrecisionEpsilon || resourceRecallVersion != 12u || resourceDrainActive == 0)
+            throw new InvalidOperationException("Resource drain stopped while the projectile was waiting stationary for recall.");
+
+        if (!ProjectileReturnStartModeUtility.UsesActivationTap(ProjectileReturnStartMode.ActivationTapOrResourceDrain) ||
+            !ProjectileReturnStartModeUtility.UsesResourceDrain(ProjectileReturnStartMode.ActivationTapOrResourceDrain) ||
+            ProjectileReturnStartModeUtility.UsesAutomaticDelay(ProjectileReturnStartMode.ActivationTapOrResourceDrain))
+        {
+            throw new InvalidOperationException("Activation Tap or Resource Drain exposed the wrong trigger capabilities.");
+        }
+
+        ProjectileReturnStartMode allTriggers = ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain;
+
+        if (!ProjectileReturnStartModeUtility.UsesActivationTap(allTriggers) ||
+            !ProjectileReturnStartModeUtility.UsesResourceDrain(allTriggers) ||
+            !ProjectileReturnStartModeUtility.UsesAutomaticDelay(allTriggers))
+        {
+            throw new InvalidOperationException("The mixed timed return mode did not expose all three return triggers.");
+        }
+    }
+    #endregion
+
+    #region Stolen Ownership
+    /// <summary>
+    /// Verifies immediate stolen-projectile despawn and preserved generation reconnection without a duplicate-launch window.
+    /// </summary>
+    private static void ValidateStolenOwnershipPolicies()
+    {
+        PlayerPowerUpsState powerUpsState = new PlayerPowerUpsState
+        {
+            PrimaryReturningProjectileCount = 1,
+            PrimaryReturningProjectileGeneration = 11u,
+            SecondaryReturningProjectileGeneration = 22u
+        };
+        PlayerStoredActivePowerUpData storedPowerUp = new PlayerStoredActivePowerUpData
+        {
+            SlotConfig = new PlayerPowerUpSlotConfig
+            {
+                IsDefined = 1,
+                HasReturningProjectiles = 1,
+                ReturningProjectiles = new ReturningProjectilesConfig
+                {
+                    StolenOwnershipPolicy = ProjectileStolenOwnershipPolicy.PreserveAndReconnect
+                }
+            }
+        };
+        PlayerReturningProjectileLoadoutRuntimeUtility.CaptureSnapshot(0, in powerUpsState, ref storedPowerUp);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ResetSlot(0, ref powerUpsState);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyStolenOwnershipPolicy(0, ref storedPowerUp, ref powerUpsState);
+        ProjectileReturnState returnState = new ProjectileReturnState
+        {
+            Enabled = 1,
+            Phase = ProjectileReturnPhase.Outbound,
+            ConcurrencyRegistered = 1,
+            ConcurrencyGeneration = 11u
+        };
+        Projectile projectile = new Projectile
+        {
+            Velocity = new float3(1f, 0f, 0f)
+        };
+
+        if (!ProjectileActivationRecallRuntimeUtility.ApplyStolenOwnershipPolicy(ref returnState, ref projectile, in powerUpsState) ||
+            returnState.Phase != ProjectileReturnPhase.Outbound ||
+            math.lengthsq(projectile.Velocity) > PrecisionEpsilon)
+        {
+            throw new InvalidOperationException("Preserve and Reconnect did not suspend the stolen live projectile.");
+        }
+
+        PlayerReturningProjectileLoadoutRuntimeUtility.RestoreSnapshot(1, in storedPowerUp, ref powerUpsState);
+
+        if (powerUpsState.SecondaryReturningProjectileGeneration != 11u ||
+            powerUpsState.SecondaryReturningProjectileCount != 1 ||
+            powerUpsState.SecondaryReturningProjectileReconnectPending == 0 ||
+            powerUpsState.PrimaryStolenReturningProjectileGeneration != 0u)
+        {
+            throw new InvalidOperationException("Preserved projectile ownership did not reconnect to the reacquired slot.");
+        }
+
+        if (ProjectileActivationRecallRuntimeUtility.ApplyStolenOwnershipPolicy(ref returnState, ref projectile, in powerUpsState) ||
+            returnState.ActiveSlotIndex != 1)
+        {
+            throw new InvalidOperationException("Reconnected projectile ownership remained suspended or retained its obsolete slot index.");
+        }
+
+        powerUpsState.PrimaryStolenReturningProjectileGeneration = 33u;
+        powerUpsState.PrimaryStolenReturningProjectilePolicy = ProjectileStolenOwnershipPolicy.Despawn;
+        returnState.ConcurrencyGeneration = 33u;
+        returnState.Phase = ProjectileReturnPhase.Outbound;
+
+        if (!ProjectileActivationRecallRuntimeUtility.ApplyStolenOwnershipPolicy(ref returnState, ref projectile, in powerUpsState) ||
+            returnState.Phase != ProjectileReturnPhase.Completed)
+        {
+            throw new InvalidOperationException("Despawn did not terminate a live projectile after its owning active was stolen.");
+        }
     }
     #endregion
 

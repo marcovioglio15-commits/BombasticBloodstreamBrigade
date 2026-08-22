@@ -73,6 +73,7 @@ public struct PlayerPowerUpSlotConfig
     public DropAttractionPowerUpConfig DropAttraction;
     public byte HasReturningProjectiles;
     public ReturningProjectilesConfig ReturningProjectiles;
+    public byte HasResourceGate;
     public PlayerPassiveToolConfig TriggeredProjectilePassiveTool;
     public PlayerPassiveToolConfig TogglePassiveTool;
 
@@ -342,6 +343,8 @@ public struct ReturningProjectilesConfig
     public float ReturnDelaySeconds;
     public byte AllowEarlyActivationRecall;
     public byte ReapplyResourceGateCostOnRecall;
+    public float ResourceReturnThresholdPercent;
+    public ProjectileStolenOwnershipPolicy StolenOwnershipPolicy;
     public float ReturnRumbleMultiplier;
     public float ReturnCameraShakeMultiplier;
     public float OutboundSizeMultiplier;

@@ -251,6 +251,12 @@ public static class GameRoomRewardPresentationValidationUtility
         GameRoomRewardPortalLogSettings settings,
         out string failureMessage)
     {
+        if (!HasSupportedPortalLogEnums(settings))
+        {
+            failureMessage = "Portal Log contains an unsupported layout, value display or unlock-audio enum value.";
+            return false;
+        }
+
         if (!IsFinitePositive(settings.FontSize))
         {
             failureMessage = "Portal Log font size must be a finite positive value.";
@@ -357,8 +363,6 @@ public static class GameRoomRewardPresentationValidationUtility
         GameRoomRewardPortalLogSettings settings,
         out string failureMessage)
     {
-        int audioAnimationCount = 0;
-
         for (int animationIndex = 0;
              animationIndex < settings.ActivationAnimations.Count;
              animationIndex++)
@@ -388,6 +392,13 @@ public static class GameRoomRewardPresentationValidationUtility
             if (!IsFiniteNonnegative(animation.StartDelay))
             {
                 failureMessage = "Portal activation animation at index " + animationIndex + " has an invalid start delay.";
+                return false;
+            }
+
+            if (!HasSupportedPortalAnimationEnums(animation))
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex +
+                                 " contains an unsupported source, channel, playback or easing enum value.";
                 return false;
             }
 
@@ -422,14 +433,6 @@ public static class GameRoomRewardPresentationValidationUtility
                     break;
             }
 
-            if (animation.PlayAudioEvent)
-                audioAnimationCount++;
-        }
-
-        if (audioAnimationCount > 1)
-        {
-            failureMessage = "Only one portal activation animation may request the dedicated FMOD event.";
-            return false;
         }
 
         HashSet<string> replacementBindings = new HashSet<string>(StringComparer.Ordinal);
@@ -476,6 +479,99 @@ public static class GameRoomRewardPresentationValidationUtility
 
         failureMessage = string.Empty;
         return true;
+    }
+
+    /// <summary>
+    /// Validates conditional Portal Log enum values without runtime reflection or value correction.
+    /// </summary>
+    /// <param name="settings">Portal Log settings containing authored enum values.</param>
+    /// <returns>True when every active enum value is supported.</returns>
+    private static bool HasSupportedPortalLogEnums(GameRoomRewardPortalLogSettings settings)
+    {
+        switch (settings.LayoutMode)
+        {
+            case GameRoomRewardPortalLogLayoutMode.Scrolling:
+            case GameRoomRewardPortalLogLayoutMode.StaticRows:
+                break;
+            default:
+                return false;
+        }
+
+        switch (settings.ValueDisplayMode)
+        {
+            case GameRoomRewardValueDisplayMode.Detailed:
+            case GameRoomRewardValueDisplayMode.Simplified:
+                break;
+            default:
+                return false;
+        }
+
+        if (!settings.PlayUnlockAudio)
+            return true;
+
+        switch (settings.UnlockAudioPlaybackMode)
+        {
+            case GameRoomPortalUnlockAudioPlaybackMode.OncePerRoom:
+            case GameRoomPortalUnlockAudioPlaybackMode.OncePerPortal:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Validates every enum consumed by one portal animation before bake flattening.
+    /// </summary>
+    /// <param name="animation">Portal animation definition to inspect.</param>
+    /// <returns>True when source, channel, playback and easing values are supported.</returns>
+    private static bool HasSupportedPortalAnimationEnums(
+        GameRoomPortalActivationAnimationDefinition animation)
+    {
+        switch (animation.Source)
+        {
+            case GameRoomPortalActivationAnimationSource.Transform:
+                switch (animation.Mode)
+                {
+                    case GameRoomPortalTransformAnimationMode.Position:
+                    case GameRoomPortalTransformAnimationMode.Rotation:
+                    case GameRoomPortalTransformAnimationMode.Scale:
+                    case GameRoomPortalTransformAnimationMode.PositionAndRotation:
+                    case GameRoomPortalTransformAnimationMode.PositionAndScale:
+                    case GameRoomPortalTransformAnimationMode.RotationAndScale:
+                    case GameRoomPortalTransformAnimationMode.PositionRotationAndScale:
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            case GameRoomPortalActivationAnimationSource.AnimatorClip:
+                break;
+            default:
+                return false;
+        }
+
+        switch (animation.Playback)
+        {
+            case GameRoomPortalTransformAnimationPlayback.Once:
+            case GameRoomPortalTransformAnimationPlayback.Loop:
+            case GameRoomPortalTransformAnimationPlayback.PingPong:
+                break;
+            default:
+                return false;
+        }
+
+        switch (animation.Easing)
+        {
+            case GameRoomPortalTransformAnimationEase.Linear:
+            case GameRoomPortalTransformAnimationEase.EaseIn:
+            case GameRoomPortalTransformAnimationEase.EaseOut:
+            case GameRoomPortalTransformAnimationEase.EaseInOut:
+            case GameRoomPortalTransformAnimationEase.SmoothStep:
+            case GameRoomPortalTransformAnimationEase.SmootherStep:
+                return true;
+            default:
+                return false;
+        }
     }
     #endregion
 

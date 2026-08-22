@@ -643,6 +643,7 @@ public static class EnemyAdvancedPatternBakeUtility
             ConsumeModuleActivationAttemptOnSpawnOnly = stealerData.ConsumeModuleActivationAttemptOnSpawnOnly ? (byte)1 : (byte)0,
             ActiveTargetBiasPercent = math.clamp(stealerData.ActiveTargetBiasPercent, 0f, 100f),
             AcquisitionStealCooldownSeconds = math.max(0f, stealerData.AcquisitionStealCooldownSeconds),
+            StolenPowerUpIconScaleMultiplier = math.max(0.01f, stealerData.StolenPowerUpIconScaleMultiplier),
             UseMinimumRange = 0,
             MinimumRange = 0f,
             UseMaximumRange = 0,

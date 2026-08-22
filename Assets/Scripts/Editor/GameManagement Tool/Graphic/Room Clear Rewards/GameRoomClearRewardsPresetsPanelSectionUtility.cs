@@ -42,7 +42,7 @@ internal static class GameRoomClearRewardsPresetsPanelSectionUtility
                               serializedPreset,
                               "Player Reward Log",
                               "playerLogSettings",
-                              "Preauthored vertical rows above the player. Runtime code never instantiates UI.");
+                              "Preauthored vertical rows above the player.");
                 break;
             case GameRoomClearRewardsPresetsPanel.DetailsTab.PortalLog:
                 GameRoomRewardPortalSettingsEditorUtility.Build(root, serializedPreset);

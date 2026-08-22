@@ -175,7 +175,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
                     continue;
 
                 PlayerPowerUpsState powerUpsState = entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
-                PlayerPowerUpLoadoutRuntimeUtility.ResetReturningProjectileConcurrency(ref powerUpsState);
+                PlayerReturningProjectileLoadoutRuntimeUtility.ResetConcurrency(ref powerUpsState);
                 entityManager.SetComponentData(playerEntity, powerUpsState);
 
                 if (!entityManager.HasComponent<PlayerCameraShakeState>(playerEntity))

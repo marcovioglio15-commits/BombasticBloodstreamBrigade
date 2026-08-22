@@ -142,6 +142,7 @@ public partial class GameProceduralRoomTraversalSystem : SystemBase
         {
             RequestType = GameSceneTransitionRequestType.LoadScene,
             Purpose = GameSceneTransitionPurpose.ProceduralRoomTraversal,
+            PortalWipeDirection = ResolvePortalWipeDirection(edge.SourceSide),
             TargetSceneId = targetNode.SceneId
         });
     }
@@ -193,6 +194,28 @@ public partial class GameProceduralRoomTraversalSystem : SystemBase
 
         edge = default;
         return false;
+    }
+
+    /// <summary>
+    /// Maps graph travel from one room side to the matching screen-space darkness progression.
+    /// </summary>
+    /// <param name="sourceSide">Logical side of the exit crossed by the player.</param>
+    /// <returns>Direction followed by the transition darkness toward the destination room.</returns>
+    private static GameSceneFadeWipeDirection ResolvePortalWipeDirection(GameRoomPortalSide sourceSide)
+    {
+        switch (sourceSide)
+        {
+            case GameRoomPortalSide.North:
+                return GameSceneFadeWipeDirection.BottomToTop;
+            case GameRoomPortalSide.South:
+                return GameSceneFadeWipeDirection.TopToBottom;
+            case GameRoomPortalSide.East:
+                return GameSceneFadeWipeDirection.LeftToRight;
+            case GameRoomPortalSide.West:
+                return GameSceneFadeWipeDirection.RightToLeft;
+            default:
+                return GameSceneFadeWipeDirection.LeftToRight;
+        }
     }
     #endregion
 

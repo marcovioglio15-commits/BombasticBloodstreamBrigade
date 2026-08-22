@@ -30,6 +30,11 @@ public sealed class EnemyPowerUpStealerModuleData
     [Min(0f)]
     [SerializeField] private float acquisitionStealCooldownSeconds = 3f;
 
+    [Header("Stolen Power-Up Icon")]
+    [Tooltip("Multiplier applied to the Offensive Engagement billboard scale while this enemy displays a stolen power-up icon.")]
+    [SerializeField]
+    private float stolenPowerUpIconScaleMultiplier = 1f;
+
     [Header("Recovery")]
     [Tooltip("When enabled, the stolen power-up is returned after the enemy loses the configured percentage of max health after the steal.")]
     [SerializeField] private bool recoverAfterDamageTakenPercent;
@@ -98,6 +103,14 @@ public sealed class EnemyPowerUpStealerModuleData
         get
         {
             return acquisitionStealCooldownSeconds;
+        }
+    }
+
+    public float StolenPowerUpIconScaleMultiplier
+    {
+        get
+        {
+            return stolenPowerUpIconScaleMultiplier;
         }
     }
 

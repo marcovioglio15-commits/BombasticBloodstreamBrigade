@@ -61,21 +61,11 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     /// <param name="signature">Generation and edge signature preventing duplicate activation.</param>
     /// <param name="animations">Baked portal activation animation definitions.</param>
     /// <param name="replacements">Baked prefab replacement definitions.</param>
-    /// <param name="hasAudioCue">True when a valid linked animation requests the dedicated audio event.</param>
-    /// <param name="audioDelay">Delay shared with the animation that requests audio.</param>
-    /// <param name="audioPosition">World position of the animation target after replacements.</param>
     /// <returns>True when a new signature was accepted and its effects were processed.</returns>
     public bool Activate(int signature,
                          DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
-                         DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements,
-                         out bool hasAudioCue,
-                         out float audioDelay,
-                         out Vector3 audioPosition)
+                         DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements)
     {
-        hasAudioCue = false;
-        audioDelay = 0f;
-        audioPosition = transform.position;
-
         if (activationSignature == signature)
             return false;
 
@@ -84,10 +74,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         BuildLinkedObjectCache();
         CaptureLinkedObjectState();
         ApplyReplacements(replacements);
-        BuildAnimationStates(animations,
-                             out hasAudioCue,
-                             out audioDelay,
-                             out audioPosition);
+        BuildAnimationStates(animations);
         enabled = transformAnimations.Count > 0 || animatorAnimations.Count > 0;
         return true;
     }
@@ -329,22 +316,12 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     }
 
     /// <summary>
-    /// Resolves valid baked animations and the optional synchronized audio cue.
+    /// Resolves valid baked Transform and Animator animation states in authored order.
     /// </summary>
     /// <param name="animations">Baked activation animation definitions.</param>
-    /// <param name="hasAudioCue">True when one valid animation requests audio.</param>
-    /// <param name="audioDelay">Authored delay of the audio-owning animation.</param>
-    /// <param name="audioPosition">World position of the audio-owning animation target.</param>
     private void BuildAnimationStates(
-        DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
-        out bool hasAudioCue,
-        out float audioDelay,
-        out Vector3 audioPosition)
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> animations)
     {
-        hasAudioCue = false;
-        audioDelay = 0f;
-        audioPosition = transform.position;
-
         for (int animationIndex = 0; animationIndex < animations.Length; animationIndex++)
         {
             GameRoomPortalActivationAnimationElement animation = animations[animationIndex];
@@ -359,27 +336,17 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
             }
 
             GameRoomPortalRuntimeBindingState binding = runtimeBindings[bindingIndex];
-            bool animationResolved;
-
             switch (animation.Source)
             {
                 case GameRoomPortalActivationAnimationSource.AnimatorClip:
-                    animationResolved = TryAddAnimatorAnimation(animation, binding);
+                    TryAddAnimatorAnimation(animation, binding);
                     break;
                 default:
                     binding.CaptureAnimationBaseline();
                     transformAnimations.Add(new RuntimeTransformAnimationState(animation,
                                                                                 bindingIndex));
-                    animationResolved = true;
                     break;
             }
-
-            if (!animationResolved || animation.PlayAudioEvent == 0 || hasAudioCue)
-                continue;
-
-            hasAudioCue = true;
-            audioDelay = Mathf.Max(0f, animation.StartDelay);
-            audioPosition = binding.ActiveTransform.position;
         }
     }
 

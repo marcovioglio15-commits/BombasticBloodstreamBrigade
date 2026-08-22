@@ -167,6 +167,18 @@ public partial struct ProjectileSimulationSystem : ISystem
                                                                                                 EnemyTimeScale,
                                                                                                 PlayerProjectileTimeScale);
 
+            if (returnState.Enabled != 0 && PowerUpsStateLookup.HasComponent(owner.ShooterEntity))
+            {
+                PlayerPowerUpsState ownerPowerUpsState = PowerUpsStateLookup[owner.ShooterEntity];
+
+                if (ProjectileActivationRecallRuntimeUtility.ApplyStolenOwnershipPolicy(ref returnState,
+                                                                                        ref projectile,
+                                                                                        in ownerPowerUpsState))
+                {
+                    return;
+                }
+            }
+
             // Observe versioned active recall input before phase dispatch so early and endpoint recalls share one transition path.
             ProjectileActivationRecallRuntimeUtility.TryConsume(ref returnState,
                                                                  ref projectile,

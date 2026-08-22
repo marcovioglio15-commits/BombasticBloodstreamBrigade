@@ -91,7 +91,10 @@ public static class GameRoomRewardRuntimeSmokeTest
         entityManager.AddBuffer<GameRoomRewardPresentationElement>(managerEntity);
         entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(managerEntity);
         entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity);
-        entityManager.AddBuffer<GameRoomPortalAnimationAudioCue>(managerEntity);
+        entityManager.AddComponentData(managerEntity, new GameRoomPortalUnlockAudioRuntimeState
+        {
+            NodeIndex = -1
+        });
         entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
         DynamicBuffer<GameRoomRewardModuleElement> modules =
@@ -276,8 +279,7 @@ public static class GameRoomRewardRuntimeSmokeTest
                 StartDelay = 0.25f,
                 Duration = 0.5f,
                 PositionOffset = Vector3.right,
-                ScaleMultiplier = Vector3.one,
-                PlayAudioEvent = 1
+                ScaleMultiplier = Vector3.one
             });
             replacements.Add(new GameRoomPortalPrefabReplacementElement
             {
@@ -286,24 +288,13 @@ public static class GameRoomRewardRuntimeSmokeTest
             });
             bool activated = effectView.Activate(71,
                                                  animations,
-                                                 replacements,
-                                                 out bool hasAudioCue,
-                                                 out float audioDelay,
-                                                 out Vector3 audioPosition);
+                                                 replacements);
 
             Require(activated && !sceneObject.activeSelf && sceneParent.transform.childCount == 2,
                     "Portal activation did not replace the existing 3D scene object exactly once.");
-            Require(hasAudioCue && Mathf.Approximately(audioDelay, 0.25f),
-                    "Portal activation did not synchronize the dedicated audio cue with animation delay.");
-            Require(Vector3.Distance(audioPosition,
-                                     sceneParent.transform.GetChild(1).position) <= Epsilon,
-                    "Portal animation and audio did not resolve the instantiated replacement object.");
             Require(!effectView.Activate(71,
                                          animations,
-                                         replacements,
-                                         out hasAudioCue,
-                                         out audioDelay,
-                                         out audioPosition),
+                                         replacements),
                     "Portal activation signature did not prevent duplicate replacement instances.");
             effectView.Deactivate();
             Require(sceneObject.activeSelf && sceneParent.transform.childCount == 1,
@@ -562,7 +553,7 @@ public static class GameRoomRewardRuntimeSmokeTest
     /// Seeds stale transactional data, resets the procedural run and verifies every room-reward runtime hook.
     /// </summary>
     /// <param name="entityManager">Fixture entity manager.</param>
-    /// <param name="managerEntity">Reward manager owning pending portal audio cues.</param>
+    /// <param name="managerEntity">Reward manager owning the room-scoped portal audio checkpoint.</param>
     /// <param name="playerEntity">Player whose room-reward state is reset.</param>
     private static void ValidateRunReset(EntityManager entityManager,
                                          Entity managerEntity,
@@ -584,12 +575,13 @@ public static class GameRoomRewardRuntimeSmokeTest
             playerEntity).Add(default);
         entityManager.GetBuffer<PlayerRoomRewardTemporaryResourceElement>(
             playerEntity).Add(default);
-        entityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(managerEntity).Add(
-            new GameRoomPortalAnimationAudioCue
-            {
-                TriggerTime = 99d,
-                Signature = 17
-            });
+        entityManager.SetComponentData(managerEntity,
+                                       new GameRoomPortalUnlockAudioRuntimeState
+                                       {
+                                           GenerationVersion = 5u,
+                                           NodeIndex = 7,
+                                           Dispatched = 1
+                                       });
 
         GameRoomRewardRunResetUtility.ResetPlayers(entityManager);
 
@@ -614,9 +606,12 @@ public static class GameRoomRewardRuntimeSmokeTest
                 entityManager.GetBuffer<PlayerRoomRewardPresentationEvent>(
                     playerEntity).Length == 0,
                 "Run reset retained temporary schedules or presentation entries.");
-        Require(entityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(
-                    managerEntity).Length == 0,
-                "Run reset retained a delayed portal animation audio cue.");
+        GameRoomPortalUnlockAudioRuntimeState audioState =
+            entityManager.GetComponentData<GameRoomPortalUnlockAudioRuntimeState>(managerEntity);
+        Require(audioState.GenerationVersion == 0u &&
+                audioState.NodeIndex == -1 &&
+                audioState.Dispatched == 0,
+                "Run reset retained the portal unlock audio checkpoint.");
         Require(scalingState.Initialized == 0 &&
                 scalingState.LastScalableStatsHash == 0u,
                 "Run reset did not invalidate runtime scaling.");

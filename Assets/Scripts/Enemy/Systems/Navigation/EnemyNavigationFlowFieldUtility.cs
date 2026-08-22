@@ -312,8 +312,19 @@ public static class EnemyNavigationFlowFieldUtility
     // so EnemySteeringSystem can resolve navigation velocity from inside a parallel job. Logic mirrors the DynamicBuffer paths above.
 
     /// <summary>
-    /// NativeArray overload of <see cref="TryResolveNavigationVelocity(float3, float3, float, float, in PhysicsWorldSingleton, int, in EnemyNavigationGridState, DynamicBuffer{EnemyNavigationCellElement}, out float3)"/> usable inside Burst jobs.
+    /// Resolves navigation velocity and direct-path blockage from NativeArray cells inside Burst jobs.
     /// </summary>
+    /// <param name="currentPosition">Current enemy world position.</param>
+    /// <param name="targetPosition">Current player world position.</param>
+    /// <param name="collisionRadius">Current enemy navigation collision radius used for direct-path wall checks.</param>
+    /// <param name="desiredSpeed">Desired movement speed before acceleration integration.</param>
+    /// <param name="physicsWorldSingleton">Physics world used for direct-path wall checks.</param>
+    /// <param name="wallsLayerMask">Layer mask that identifies wall colliders.</param>
+    /// <param name="navigationGridState">Current shared navigation-grid state.</param>
+    /// <param name="navigationCells">Current shared navigation cells array.</param>
+    /// <param name="desiredVelocity">Output navigation-aware desired velocity.</param>
+    /// <param name="requiresDetour">Set when an obstructed direct path requires the flow-field route.</param>
+    /// <returns>True when a valid navigation velocity is produced; otherwise false.</returns>
     public static bool TryResolveNavigationVelocity(float3 currentPosition,
                                                     float3 targetPosition,
                                                     float collisionRadius,
@@ -322,9 +333,11 @@ public static class EnemyNavigationFlowFieldUtility
                                                     int wallsLayerMask,
                                                     in EnemyNavigationGridState navigationGridState,
                                                     NativeArray<EnemyNavigationCellElement> navigationCells,
-                                                    out float3 desiredVelocity)
+                                                    out float3 desiredVelocity,
+                                                    out byte requiresDetour)
     {
         desiredVelocity = float3.zero;
+        requiresDetour = 0;
 
         if (navigationGridState.FlowReady == 0)
             return false;
@@ -369,6 +382,7 @@ public static class EnemyNavigationFlowFieldUtility
             return false;
 
         desiredVelocity = new float3(flowDirection.x, 0f, flowDirection.y) * desiredSpeed;
+        requiresDetour = 1;
         return true;
     }
 

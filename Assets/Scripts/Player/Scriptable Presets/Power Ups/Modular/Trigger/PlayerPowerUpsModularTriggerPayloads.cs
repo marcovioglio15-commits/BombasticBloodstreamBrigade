@@ -365,7 +365,7 @@ public sealed class PowerUpResourceGateModuleData
     [Tooltip("Resource used to pay activation.")]
     [SerializeField] private PowerUpResourceType activationResource = PowerUpResourceType.Energy;
 
-    [Tooltip("Resource used for maintenance while active; currently reserved for future toggle tools.")]
+    [Tooltip("Resource consumed by toggle maintenance and by Returning Projectiles resource-drain return modes while a projectile remains outside.")]
     [SerializeField] private PowerUpResourceType maintenanceResource = PowerUpResourceType.Energy;
 
     [Tooltip("Maximum energy capacity for this active power up.")]
@@ -374,7 +374,7 @@ public sealed class PowerUpResourceGateModuleData
     [Tooltip("Resource amount consumed on activation.")]
     [SerializeField] private float activationCost = 100f;
 
-    [Tooltip("Maintenance cost consumed per second when toggled on.")]
+    [Tooltip("Resource consumed per second by an enabled toggle or a Returning Projectiles resource-drain return mode.")]
     [SerializeField] private float maintenanceCostPerSecond;
 
     [Tooltip("When enabled, this gate turns the power-up into a press-to-toggle active that keeps passive-compatible effects enabled while runtime maintenance is paid.")]

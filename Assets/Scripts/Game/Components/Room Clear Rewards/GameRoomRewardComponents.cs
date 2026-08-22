@@ -42,6 +42,8 @@ public struct GameRoomRewardConfig : IComponentData
     public UnityObjectRef<Sprite> PortalStaticBackgroundSprite;
     public int PortalAnimationCount;
     public int PortalPrefabReplacementCount;
+    public GameRoomPortalUnlockAudioPlaybackMode PortalUnlockAudioPlaybackMode;
+    public byte PortalUnlockAudioEnabled;
     public byte PortalIndicatorsEnabled;
     public float3 PortalIndicatorWorldOffset;
     public float4 PortalIndicatorColor;
@@ -152,7 +154,6 @@ public struct GameRoomPortalActivationAnimationElement : IBufferElementData
     public float3 PositionOffset;
     public float3 RotationOffset;
     public float3 ScaleMultiplier;
-    public byte PlayAudioEvent;
     public float AnimatorSpeed;
     public UnityObjectRef<AnimationClip> AnimatorClip;
 }
@@ -168,17 +169,13 @@ public struct GameRoomPortalPrefabReplacementElement : IBufferElementData
 }
 
 /// <summary>
-/// Stores one pending ECS audio cue synchronized with a delayed managed portal animation.
+/// Stores room-scoped dispatch state for the shared portal-unlock audio event.
 /// </summary>
-[InternalBufferCapacity(0)]
-public struct GameRoomPortalAnimationAudioCue : IBufferElementData
+public struct GameRoomPortalUnlockAudioRuntimeState : IComponentData
 {
-    public double TriggerTime;
-    public float3 Position;
-    public Entity PortalEntity;
     public uint GenerationVersion;
-    public int AssignedEdgeIndex;
-    public int Signature;
+    public int NodeIndex;
+    public byte Dispatched;
 }
 #endregion
 

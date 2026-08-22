@@ -45,6 +45,16 @@ public struct PlayerPowerUpsState : IComponentData
     public uint SecondaryReturningProjectileGeneration;
     public uint PrimaryReturningProjectileRecallVersion;
     public uint SecondaryReturningProjectileRecallVersion;
+    public uint PrimaryReturningProjectileResourceRecallVersion;
+    public uint SecondaryReturningProjectileResourceRecallVersion;
+    public byte PrimaryReturningProjectileResourceDrainActive;
+    public byte SecondaryReturningProjectileResourceDrainActive;
+    public byte PrimaryReturningProjectileReconnectPending;
+    public byte SecondaryReturningProjectileReconnectPending;
+    public uint PrimaryStolenReturningProjectileGeneration;
+    public uint SecondaryStolenReturningProjectileGeneration;
+    public ProjectileStolenOwnershipPolicy PrimaryStolenReturningProjectilePolicy;
+    public ProjectileStolenOwnershipPolicy SecondaryStolenReturningProjectilePolicy;
     public uint LastObservedGlobalKillCount;
     public uint LastObservedRoomClearCount;
     public float3 LastValidMovementDirection;

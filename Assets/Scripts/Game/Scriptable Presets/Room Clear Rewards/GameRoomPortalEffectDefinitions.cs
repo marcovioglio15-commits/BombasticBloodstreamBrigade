@@ -55,10 +55,6 @@ public sealed class GameRoomPortalActivationAnimationDefinition
     [SerializeField]
     private Vector3 scaleMultiplier = Vector3.one;
 
-    [Tooltip("Requests the dedicated portal-animation FMOD event when this animation exits its delay.")]
-    [SerializeField]
-    private bool playAudioEvent;
-
     [Tooltip("Animation clip played directly on the selected Animator without requiring a matching controller state.")]
     [SerializeField]
     private AnimationClip animatorClip;
@@ -87,7 +83,6 @@ public sealed class GameRoomPortalActivationAnimationDefinition
     public Vector3 PositionOffset => positionOffset;
     public Vector3 RotationOffset => rotationOffset;
     public Vector3 ScaleMultiplier => scaleMultiplier;
-    public bool PlayAudioEvent => playAudioEvent;
     public AnimationClip AnimatorClip => animatorClip;
     public string AnimatorPath => animatorPath;
     public float AnimatorSpeed => animatorSpeed;

@@ -182,6 +182,12 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         {
             Alpha = 0f,
             Color = config.FadeColor,
+            Mode = config.FadeMode,
+            WipeDirection = config.FadeWipeDirection,
+            Easing = config.FadeEasing,
+            DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness,
+            DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength,
+            DirectionalNoiseScale = config.FadeDirectionalNoiseScale,
             Visible = 0
         });
         entityManager.SetComponentData(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
@@ -293,7 +299,10 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             entityManager.AddBuffer<GameRoomRewardPresentationElement>(entity);
             entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
             entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
-            entityManager.AddBuffer<GameRoomPortalAnimationAudioCue>(entity);
+            entityManager.AddComponentData(entity, new GameRoomPortalUnlockAudioRuntimeState
+            {
+                NodeIndex = -1
+            });
         }
         else if (rewardPreset != null)
         {
@@ -358,6 +367,12 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         {
             Alpha = 0f,
             Color = config.FadeColor,
+            Mode = config.FadeMode,
+            WipeDirection = config.FadeWipeDirection,
+            Easing = config.FadeEasing,
+            DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness,
+            DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength,
+            DirectionalNoiseScale = config.FadeDirectionalNoiseScale,
             Visible = 0
         });
         AddComponent(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
@@ -596,7 +611,10 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer = AddBuffer<GameRoomRewardPresentationElement>(entity);
         DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimationBuffer = AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
         DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer = AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
-        AddBuffer<GameRoomPortalAnimationAudioCue>(entity);
+        AddComponent(entity, new GameRoomPortalUnlockAudioRuntimeState
+        {
+            NodeIndex = -1
+        });
         GameRoomRewardBakeUtility.PopulateBuffers(rewardPreset,
                                                   proceduralPreset,
                                                   moduleBuffer,

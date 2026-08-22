@@ -74,6 +74,8 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
             TickCooldown(ref secondaryCooldownRemaining, deltaTime);
             RechargeSlot(ref primaryEnergy,
                          in powerUpsConfig.PrimarySlot,
+                         powerUpsState.ValueRO.PrimaryReturningProjectileCount,
+                         powerUpsState.ValueRO.PrimaryReturningProjectileResourceDrainActive,
                          primaryCooldownRemaining,
                          primaryIsActive,
                          deltaTime,
@@ -81,6 +83,8 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
                          roomClearDelta);
             RechargeSlot(ref secondaryEnergy,
                          in powerUpsConfig.SecondarySlot,
+                         powerUpsState.ValueRO.SecondaryReturningProjectileCount,
+                         powerUpsState.ValueRO.SecondaryReturningProjectileResourceDrainActive,
                          secondaryCooldownRemaining,
                          secondaryIsActive,
                          deltaTime,
@@ -131,6 +135,8 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
     /// </summary>
     /// <param name="currentEnergy">Mutable energy currently stored by the slot.</param>
     /// <param name="slotConfig">Resolved runtime slot configuration.</param>
+    /// <param name="activeReturningProjectileCount">Number of live returning projectiles still owned by the slot.</param>
+    /// <param name="returningProjectileResourceDrainActive">Continuous-drain latch shared across outbound and waiting phases.</param>
     /// <param name="cooldownRemaining">Cooldown duration remaining after the current frame tick.</param>
     /// <param name="isActive">Non-zero when the slot is currently active.</param>
     /// <param name="deltaTime">Scaled simulation delta time used by time-based recharge.</param>
@@ -138,6 +144,8 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
     /// <param name="roomClearDelta">New procedural room clears observed since the previous recharge pass.</param>
     private static void RechargeSlot(ref float currentEnergy,
                                      in PlayerPowerUpSlotConfig slotConfig,
+                                     int activeReturningProjectileCount,
+                                     byte returningProjectileResourceDrainActive,
                                      float cooldownRemaining,
                                      byte isActive,
                                      float deltaTime,
@@ -145,6 +153,12 @@ public partial struct PlayerPowerUpRechargeSystem : ISystem
                                      uint roomClearDelta)
     {
         if (slotConfig.IsDefined == 0)
+            return;
+
+        if (PlayerReturningProjectileResourceDrainUtility.ShouldSuspendEnergyRecharge(
+                in slotConfig,
+                activeReturningProjectileCount,
+                returningProjectileResourceDrainActive))
             return;
 
         bool isTogglePassiveSlot = slotConfig.ToolKind == ActiveToolKind.PassiveToggle && slotConfig.Toggleable != 0;

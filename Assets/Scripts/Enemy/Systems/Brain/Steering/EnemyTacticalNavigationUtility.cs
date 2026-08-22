@@ -37,6 +37,7 @@ internal static class EnemyTacticalNavigationUtility
         [ReadOnly] public NativeArray<float3> SeparationResults;
         [ReadOnly] public NativeArray<float> SeparationUrgencyResults;
         [ReadOnly] public NativeArray<float3> NavigationVelocityResults;
+        [ReadOnly] public NativeArray<byte> NavigationDetourResults;
         [ReadOnly] public NativeArray<EnemyTacticalNavigationConfig> TacticalConfigs;
         [ReadOnly] public NativeArray<EnemyNavigationRuntimeState> RuntimeStates;
         [ReadOnly] public float3 PlayerPosition;
@@ -71,6 +72,21 @@ internal static class EnemyTacticalNavigationUtility
             sbyte bestSideSign = 0;
 
             UpdateStuckState(ref runtimeState, position, Velocities[enemyIndex], desiredSpeed);
+
+            // A blocked direct path commits to the shared flow field so local pursuit scoring cannot undo a valid long route.
+            if (NavigationDetourResults[index] != 0)
+            {
+                bestVelocity = EnemyTacticalDetourUtility.ResolveVelocity(
+                    NavigationVelocityResults[index],
+                    separationVelocity,
+                    desiredSpeed,
+                    SeparationUrgencyResults[index]);
+                bestSideSign = EnemyTacticalDetourUtility.ResolveSideSign(targetDirection, bestVelocity);
+                UpdateCommittedState(ref runtimeState, position, bestVelocity, bestSideSign);
+                Results[index] = bestVelocity;
+                RuntimeResults[index] = runtimeState;
+                return;
+            }
 
             // Direct approach remains a valid pressure candidate so tactical steering does not become evasive-only.
             TryScoreCandidate(index,

@@ -665,6 +665,8 @@ MonoBehaviour:
     staticMinimumPanelSize: {x: 5, y: 2}
     staticBackgroundSprite: {fileID: 0}
     staticBackgroundColor: {r: 0, g: 0, b: 0, a: 0.75}
+    playUnlockAudio: 1
+    unlockAudioPlaybackMode: 0
     activationAnimations:
     - targetBindingId: AnimatedExitDoor_01
       targetSlot: 0
@@ -677,8 +679,21 @@ MonoBehaviour:
       positionOffset: {x: 0, y: 5, z: 0}
       rotationOffset: {x: 0, y: 0, z: 0}
       scaleMultiplier: {x: 1, y: 1, z: 1}
-      playAudioEvent: 1
       animatorClip: {fileID: 0}
+      animatorPath: 
+      animatorSpeed: 1
+    - targetBindingId: Train01
+      targetSlot: 0
+      source: 1
+      mode: 0
+      playback: 0
+      easing: 3
+      startDelay: 0
+      duration: 0.5
+      positionOffset: {x: 0, y: 0, z: 0}
+      rotationOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: {x: 1, y: 1, z: 1}
+      animatorClip: {fileID: 7400000, guid: 5ef40297cee01534a879144ee93a09b2, type: 2}
       animatorPath: 
       animatorSpeed: 1
     activationPrefabReplacements:

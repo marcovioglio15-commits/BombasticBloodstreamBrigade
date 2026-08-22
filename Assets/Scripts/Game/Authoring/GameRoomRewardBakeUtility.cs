@@ -108,6 +108,8 @@ public static class GameRoomRewardBakeUtility
             PortalStaticBackgroundSprite = portal.StaticBackgroundSprite,
             PortalAnimationCount = portal.ActivationAnimations.Count,
             PortalPrefabReplacementCount = portal.ActivationPrefabReplacements.Count,
+            PortalUnlockAudioPlaybackMode = portal.UnlockAudioPlaybackMode,
+            PortalUnlockAudioEnabled = portal.PlayUnlockAudio ? (byte)1 : (byte)0,
             PortalIndicatorsEnabled = portalIndicators.Enabled ? (byte)1 : (byte)0,
             PortalIndicatorWorldOffset = portalIndicators.WorldOffset,
             PortalIndicatorColor = new float4(portalIndicators.IndicatorColor.r,

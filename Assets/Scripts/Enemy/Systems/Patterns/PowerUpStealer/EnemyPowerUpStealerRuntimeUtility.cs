@@ -93,7 +93,7 @@ internal static class EnemyPowerUpStealerRuntimeUtility
             if (stolen)
             {
                 InitializeRecoveryTracking(in config, in enemyHealth, ref runtime);
-                ApplyVisualState(enemyEntity, in runtime, ref visualStateLookup);
+                ApplyVisualState(enemyEntity, in runtime, in config, ref visualStateLookup);
             }
 
             if (stolen)
@@ -418,6 +418,10 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                                                     ref runtime.StoredActivePowerUp))
             return false;
 
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyStolenOwnershipPolicy(slotIndex,
+                                                                                   ref runtime.StoredActivePowerUp,
+                                                                                   ref powerUpsState);
+
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;
         powerUpsState.PreviousSecondaryPressed = 0;
@@ -651,9 +655,11 @@ internal static class EnemyPowerUpStealerRuntimeUtility
     /// </summary>
     /// <param name="enemyEntity">Enemy entity that owns the visual state.</param>
     /// <param name="runtime">Stealer runtime entry holding the stolen payload.</param>
+    /// <param name="config">Stealer config carrying the icon scale multiplier.</param>
     /// <param name="visualStateLookup">Mutable visual state lookup.</param>
     private static void ApplyVisualState(Entity enemyEntity,
                                          in EnemyPowerUpStealerRuntimeElement runtime,
+                                         in EnemyPowerUpStealerConfigElement config,
                                          ref ComponentLookup<EnemyPowerUpStealerVisualState> visualStateLookup)
     {
         if (!visualStateLookup.HasComponent(enemyEntity))
@@ -663,7 +669,8 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         {
             HasStolenPowerUp = 1,
             PowerUpId = runtime.PowerUpId,
-            StolenKind = runtime.StolenKind
+            StolenKind = runtime.StolenKind,
+            IconScaleMultiplier = math.max(0.01f, config.StolenPowerUpIconScaleMultiplier)
         };
     }
 
@@ -682,7 +689,8 @@ internal static class EnemyPowerUpStealerRuntimeUtility
         {
             HasStolenPowerUp = 0,
             PowerUpId = default,
-            StolenKind = PlayerPowerUpUnlockKind.Active
+            StolenKind = PlayerPowerUpUnlockKind.Active,
+            IconScaleMultiplier = 1f
         };
     }
     #endregion

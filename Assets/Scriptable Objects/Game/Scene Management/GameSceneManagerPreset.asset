@@ -25,6 +25,12 @@ MonoBehaviour:
   logTransitions: 1
   fadeSettings:
     fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    fadeMode: 1
+    wipeDirection: 0
+    directionalEdgeSoftness: 0.4
+    directionalNoiseStrength: 0.2
+    directionalNoiseScale: 5.5
+    easing: 1
     fadeOutSeconds: 0.35
     postLoadReadyExtraSeconds: 0.08
     fadeInSeconds: 0.35

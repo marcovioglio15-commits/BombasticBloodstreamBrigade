@@ -45,6 +45,12 @@ public static class PlayerRuntimeReturningProjectileScalingUtility
             case "returningProjectiles.returnDelaySeconds":
                 config.ReturnDelaySeconds = math.max(0f, resolvedValue);
                 return true;
+            case "returningProjectiles.resourceReturnThresholdPercent":
+                config.ResourceReturnThresholdPercent = math.clamp(resolvedValue, 0f, 100f);
+                return true;
+            case "returningProjectiles.stolenOwnershipPolicy":
+                config.StolenOwnershipPolicy = PlayerRuntimeScalingEnumUtility.ResolveProjectileStolenOwnershipPolicy(resolvedValue);
+                return true;
             case "returningProjectiles.returnRumbleMultiplier":
                 config.ReturnRumbleMultiplier = math.max(0f, resolvedValue);
                 return true;

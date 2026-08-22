@@ -266,6 +266,14 @@ public sealed class GameRoomRewardPortalLogSettings
     [SerializeField]
     private Color staticBackgroundColor = new Color(0f, 0f, 0f, 0.75f);
 
+    [Tooltip("Requests the shared portal-unlock FMOD event when clearing a room makes its assigned exits traversable.")]
+    [SerializeField]
+    private bool playUnlockAudio;
+
+    [Tooltip("Plays the shared unlock event once for the room or once at every portal position opened by the same clear.")]
+    [SerializeField]
+    private GameRoomPortalUnlockAudioPlaybackMode unlockAudioPlaybackMode;
+
     [Tooltip("Transform or Animator-clip animations started after ECS marks the portal as a traversable exit.")]
     [SerializeField]
     private List<GameRoomPortalActivationAnimationDefinition> activationAnimations =
@@ -295,6 +303,8 @@ public sealed class GameRoomRewardPortalLogSettings
     public Vector2 StaticMinimumPanelSize => staticMinimumPanelSize;
     public Sprite StaticBackgroundSprite => staticBackgroundSprite;
     public Color StaticBackgroundColor => staticBackgroundColor;
+    public bool PlayUnlockAudio => playUnlockAudio;
+    public GameRoomPortalUnlockAudioPlaybackMode UnlockAudioPlaybackMode => unlockAudioPlaybackMode;
     public IReadOnlyList<GameRoomPortalActivationAnimationDefinition> ActivationAnimations =>
         activationAnimations;
     public IReadOnlyList<GameRoomPortalPrefabReplacementDefinition> ActivationPrefabReplacements =>

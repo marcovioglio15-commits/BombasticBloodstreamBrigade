@@ -411,6 +411,12 @@ internal static class PlayerRuntimeScalingApplyUtility
                             PlayerPowerUpUnlockKind.Active,
                             ref slotConfig,
                             ref unusedPassiveTool);
+
+        if (slotConfig.HasResourceGate == 0 &&
+            ProjectileReturnStartModeUtility.UsesResourceDrain(slotConfig.ReturningProjectiles.ReturnStartMode))
+        {
+            slotConfig.ReturningProjectiles.ReturnStartMode = ProjectileReturnStartMode.AutomaticDelay;
+        }
     }
 
     private static void ApplyPowerUpScaling(DynamicBuffer<PlayerRuntimePowerUpScalingElement> powerUpScaling,

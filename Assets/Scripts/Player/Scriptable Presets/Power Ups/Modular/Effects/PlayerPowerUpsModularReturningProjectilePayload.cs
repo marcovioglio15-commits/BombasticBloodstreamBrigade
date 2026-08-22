@@ -59,7 +59,7 @@ public sealed class PowerUpReturningProjectilesModuleData
     private int additionalOutboundHits = 1;
 
     [Header("Return Transition")]
-    [Tooltip("Selects whether return starts automatically after Return Delay or waits for an additional tap of the owning active power-up input. Activation Tap is applied only by Active power-ups.")]
+    [Tooltip("Selects the return triggers used by an Active power-up. Resource modes require a Resource Gate in the same power-up and continuously consume its maintenance resource while a projectile remains outside.")]
     [SerializeField]
     private ProjectileReturnStartMode returnStartMode = ProjectileReturnStartMode.AutomaticDelay;
 
@@ -67,13 +67,21 @@ public sealed class PowerUpReturningProjectilesModuleData
     [SerializeField]
     private float returnDelaySeconds;
 
-    [Tooltip("Allows the additional activation tap to recall active projectiles before they reach their outbound range or lifetime limit. Used only by Activation Tap mode.")]
+    [Tooltip("Allows modes with an activation-tap trigger to recall active projectiles before they reach their outbound range or lifetime limit.")]
     [SerializeField]
     private bool allowEarlyActivationRecall;
 
-    [Tooltip("Requires and consumes the Resource Gate activation cost again when the additional recall tap is accepted. Used only by Activation Tap mode when the owning Active contains Resource Gate.")]
+    [Tooltip("Requires and consumes the Resource Gate activation cost again when an additional recall tap is accepted. Used only by modes with an activation-tap trigger.")]
     [SerializeField]
     private bool reapplyResourceGateCostOnRecall;
+
+    [Tooltip("Resource percentage at or below which continuous drain requests an automatic return. The value uses the Resource Gate maintenance resource and its maximum capacity.")]
+    [SerializeField]
+    private float resourceReturnThresholdPercent;
+
+    [Tooltip("Controls whether a live projectile despawns when this unprotected Active is stolen or remains suspended and reconnects when the same power-up is reacquired.")]
+    [SerializeField]
+    private ProjectileStolenOwnershipPolicy stolenOwnershipPolicy = ProjectileStolenOwnershipPolicy.Despawn;
 
     [Tooltip("Additional return-start controller vibration as a multiplier of the configured firing rumble. Set to zero to disable this haptic pulse without affecting camera shake.")]
     [SerializeField]
@@ -196,6 +204,8 @@ public sealed class PowerUpReturningProjectilesModuleData
     public float ReturnDelaySeconds => returnDelaySeconds;
     public bool AllowEarlyActivationRecall => allowEarlyActivationRecall;
     public bool ReapplyResourceGateCostOnRecall => reapplyResourceGateCostOnRecall;
+    public float ResourceReturnThresholdPercent => resourceReturnThresholdPercent;
+    public ProjectileStolenOwnershipPolicy StolenOwnershipPolicy => stolenOwnershipPolicy;
     public float ReturnRumbleMultiplier => returnRumbleMultiplier;
     public float ReturnCameraShakeMultiplier => returnCameraShakeMultiplier;
     public float OutboundSizeMultiplier => outboundSizeMultiplier;
@@ -239,7 +249,7 @@ public sealed class PowerUpReturningProjectilesModuleData
     /// <param name="outboundLifetimeMultiplierValue">Outbound maximum-lifetime multiplier.</param>
     /// <param name="outboundHitPolicyValue">Enemy-impact termination policy used during outbound travel.</param>
     /// <param name="additionalOutboundHitsValue">Additional outbound hit budget used after natural penetration is exhausted.</param>
-    /// <param name="returnStartModeValue">Automatic-delay or additional-active-tap return trigger.</param>
+    /// <param name="returnStartModeValue">Automatic delay, active tap, continuous Resource Gate drain, or a mixed return trigger.</param>
     /// <param name="returnDelaySecondsValue">Stationary delay before turnaround or return.</param>
     /// <param name="allowEarlyActivationRecallValue">Whether the additional active tap may recall outbound projectiles early.</param>
     /// <param name="reapplyResourceGateCostOnRecallValue">Whether an accepted recall tap pays the Resource Gate activation cost again.</param>
@@ -267,6 +277,8 @@ public sealed class PowerUpReturningProjectilesModuleData
     /// <param name="applyTinyMegaProjectileScalingValue">Whether compatible projectile-size Character Tuning applies.</param>
     /// <param name="applyToActivePowerUpProjectilesValue">Whether other active power-up projectile tools inherit the module.</param>
     /// <param name="allowConcurrentActiveProjectilesValue">Whether the owning non-toggleable active can overlap projectiles.</param>
+    /// <param name="resourceReturnThresholdPercentValue">Maintenance-resource percentage that requests automatic return.</param>
+    /// <param name="stolenOwnershipPolicyValue">Behavior applied to a live projectile when its unprotected active is stolen.</param>
     public void Configure(GameObject replacementProjectilePrefabValue,
                           bool keepProjectileVfxValue,
                           bool keepMuzzleFlashVfxValue,
@@ -305,7 +317,9 @@ public sealed class PowerUpReturningProjectilesModuleData
                           bool completeOrbitalPathBeforeReturnValue,
                           bool applyTinyMegaProjectileScalingValue,
                           bool applyToActivePowerUpProjectilesValue,
-                          bool allowConcurrentActiveProjectilesValue)
+                          bool allowConcurrentActiveProjectilesValue,
+                          float resourceReturnThresholdPercentValue = 0f,
+                          ProjectileStolenOwnershipPolicy stolenOwnershipPolicyValue = ProjectileStolenOwnershipPolicy.Despawn)
     {
         replacementProjectilePrefab = replacementProjectilePrefabValue;
         keepProjectileVfx = keepProjectileVfxValue;
@@ -322,6 +336,8 @@ public sealed class PowerUpReturningProjectilesModuleData
         returnDelaySeconds = returnDelaySecondsValue;
         allowEarlyActivationRecall = allowEarlyActivationRecallValue;
         reapplyResourceGateCostOnRecall = reapplyResourceGateCostOnRecallValue;
+        resourceReturnThresholdPercent = resourceReturnThresholdPercentValue;
+        stolenOwnershipPolicy = stolenOwnershipPolicyValue;
         returnRumbleMultiplier = returnRumbleMultiplierValue;
         returnCameraShakeMultiplier = returnCameraShakeMultiplierValue;
         outboundSizeMultiplier = outboundSizeMultiplierValue;

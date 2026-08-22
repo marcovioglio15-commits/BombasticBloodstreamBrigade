@@ -9,6 +9,7 @@ using UnityEngine;
 /// Rebuilds preauthored portal logs when graph edge assignments expose a rewarded destination room.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateAfter(typeof(GameSceneFadePresentationSystem))]
 [UpdateBefore(typeof(GameAudioPlaybackSystem))]
 public partial class GameRoomPortalRewardPresentationSystem : SystemBase
 {
@@ -41,7 +42,9 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                       typeof(GameRoomRewardPresentationElement),
                                       typeof(GameRoomPortalActivationAnimationElement),
                                       typeof(GameRoomPortalPrefabReplacementElement),
-                                      typeof(GameRoomPortalAnimationAudioCue),
+                                      typeof(GameRoomPortalUnlockAudioRuntimeState),
+                                      typeof(GameSceneTransitionState),
+                                      typeof(GameSceneFadePresentationState),
                                       typeof(GameProceduralLevelRuntimeState),
                                       typeof(GameProceduralRoomNodeElement),
                                       typeof(GameProceduralRoomEdgeElement));
@@ -65,7 +68,17 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
             return;
 
         Entity managerEntity = managerQuery.GetSingletonEntity();
-        DispatchDueAudioCues(managerEntity);
+        GameProceduralLevelRuntimeState runtimeState =
+            EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
+        GameSceneTransitionState transitionState =
+            EntityManager.GetComponentData<GameSceneTransitionState>(managerEntity);
+        GameSceneFadePresentationState fadeState =
+            EntityManager.GetComponentData<GameSceneFadePresentationState>(managerEntity);
+
+        if (ShouldPreserveOutgoingEffects(in runtimeState,
+                                          in transitionState,
+                                          in fadeState))
+            return;
 
         if (playerQuery.CalculateEntityCount() != 1)
             return;
@@ -73,8 +86,6 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
         Entity playerEntity = playerQuery.GetSingletonEntity();
         GameRoomRewardConfig config =
             EntityManager.GetComponentData<GameRoomRewardConfig>(managerEntity);
-        GameProceduralLevelRuntimeState runtimeState =
-            EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
         uint anchorRevision = GameRoomPortalRewardLogAnchor.Revision;
         bool graphChanged = lastGenerationVersion != runtimeState.GenerationVersion;
         bool roomChanged = lastCurrentNodeIndex != runtimeState.CurrentNodeIndex;
@@ -92,10 +103,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
         if (runtimeState.CurrentRoomCleared == 0)
         {
             if (requiresFullRefresh)
-            {
                 GameRoomPortalRewardLogAnchor.HideAll();
-                EntityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(managerEntity).Clear();
-            }
 
             return;
         }
@@ -143,8 +151,6 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                 EntityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(managerEntity, true);
             DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacements =
                 EntityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity, true);
-            DynamicBuffer<GameRoomPortalAnimationAudioCue> audioCues =
-                EntityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(managerEntity);
             DynamicBuffer<PlayerScalableStatElement> scalableStats =
                 EntityManager.GetBuffer<PlayerScalableStatElement>(playerEntity, true);
             PlayerHealth health =
@@ -190,22 +196,9 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                                portalState.AssignedEdgeIndex,
                                                portal.PortalId.GetHashCode());
 
-                if (anchor.ActivateEffects(signature,
-                                           portalAnimations,
-                                           portalReplacements,
-                                           out bool hasAudioCue,
-                                           out float audioDelay,
-                                           out Vector3 audioPosition) &&
-                    hasAudioCue)
-                {
-                    ScheduleAudioCue(audioCues,
-                                     portalEntity,
-                                     runtimeState.GenerationVersion,
-                                     portalState.AssignedEdgeIndex,
-                                     signature,
-                                     audioDelay,
-                                     audioPosition);
-                }
+                anchor.ActivateEffects(signature,
+                                       portalAnimations,
+                                       portalReplacements);
 
                 if (!view.NeedsRebuild(signature))
                     continue;
@@ -244,7 +237,10 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                              in config);
             }
 
-            DispatchDueAudioCues(managerEntity);
+            DispatchPortalUnlockAudio(managerEntity,
+                                      in config,
+                                      in runtimeState,
+                                      portalEntities);
         }
         finally
         {
@@ -253,93 +249,104 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     }
     #endregion
 
-    #region Audio Synchronization
+    #region Transition Coverage
     /// <summary>
-    /// Adds one positioned ECS audio cue at the start time of its owning managed Transform animation.
+    /// Keeps outgoing prefab replacements intact until the authored Canvas has rendered complete transition coverage.
     /// </summary>
-    /// <param name="audioCues">Mutable room reward audio schedule.</param>
-    /// <param name="portalEntity">Authoritative portal that must remain traversable until playback.</param>
-    /// <param name="generationVersion">Graph generation that owns the portal assignment.</param>
-    /// <param name="assignedEdgeIndex">Edge assignment that owns the activation animation.</param>
-    /// <param name="signature">Portal assignment signature retained for diagnostics.</param>
-    /// <param name="delay">Animation start delay in scaled seconds.</param>
-    /// <param name="position">World position of the linked animation target.</param>
-    private void ScheduleAudioCue(DynamicBuffer<GameRoomPortalAnimationAudioCue> audioCues,
-                                  Entity portalEntity,
-                                  uint generationVersion,
-                                  int assignedEdgeIndex,
-                                  int signature,
-                                  float delay,
-                                  Vector3 position)
+    /// <param name="runtimeState">Procedural lifecycle state that changes before the Scene Manager consumes its request.</param>
+    /// <param name="transitionState">Scene transition lifecycle and purpose.</param>
+    /// <param name="fadeState">Fade state carrying the render acknowledgement.</param>
+    /// <returns>True while presentation teardown would still be visible in the outgoing room.</returns>
+    private static bool ShouldPreserveOutgoingEffects(
+        in GameProceduralLevelRuntimeState runtimeState,
+        in GameSceneTransitionState transitionState,
+        in GameSceneFadePresentationState fadeState)
     {
-        audioCues.Add(new GameRoomPortalAnimationAudioCue
-        {
-            TriggerTime = SystemAPI.Time.ElapsedTime + Mathf.Max(0f, delay),
-            Position = position,
-            PortalEntity = portalEntity,
-            GenerationVersion = generationVersion,
-            AssignedEdgeIndex = assignedEdgeIndex,
-            Signature = signature
-        });
-    }
+        bool transitionPending;
 
-    /// <summary>
-    /// Moves due portal-animation cues into the shared audio request buffer before FMOD playback runs.
-    /// </summary>
-    /// <param name="managerEntity">Room reward manager owning the mutable cue schedule.</param>
-    private void DispatchDueAudioCues(Entity managerEntity)
-    {
-        if (audioQuery.CalculateEntityCount() != 1 ||
-            !EntityManager.HasBuffer<GameRoomPortalAnimationAudioCue>(managerEntity))
+        switch (runtimeState.Phase)
         {
-            return;
+            case GameProceduralLevelRuntimePhase.Traversing:
+            case GameProceduralLevelRuntimePhase.Generating:
+            case GameProceduralLevelRuntimePhase.LoadingInitialRoom:
+                transitionPending = true;
+                break;
+            default:
+                transitionPending = transitionState.IsTransitioning != 0;
+                break;
         }
 
-        DynamicBuffer<GameRoomPortalAnimationAudioCue> audioCues =
-            EntityManager.GetBuffer<GameRoomPortalAnimationAudioCue>(managerEntity);
+        if (!transitionPending || !GameSceneFadeCanvasView.HasActiveView)
+            return false;
+
+        return fadeState.OpaquePresented == 0;
+    }
+    #endregion
+
+    #region Portal Unlock Audio
+    /// <summary>
+    /// Emits the shared portal-unlock event once for the room or once for each newly traversable exit.
+    /// </summary>
+    /// <param name="managerEntity">Room reward manager owning the ECS dispatch checkpoint.</param>
+    /// <param name="config">Baked room reward presentation configuration.</param>
+    /// <param name="runtimeState">Current procedural room lifecycle state.</param>
+    /// <param name="portalEntities">Active-room portals evaluated during the current presentation refresh.</param>
+    private void DispatchPortalUnlockAudio(Entity managerEntity,
+                                           in GameRoomRewardConfig config,
+                                           in GameProceduralLevelRuntimeState runtimeState,
+                                           NativeList<Entity> portalEntities)
+    {
+        GameRoomPortalUnlockAudioRuntimeState audioState =
+            EntityManager.GetComponentData<GameRoomPortalUnlockAudioRuntimeState>(managerEntity);
+        bool roomChanged = audioState.GenerationVersion != runtimeState.GenerationVersion ||
+                           audioState.NodeIndex != runtimeState.CurrentNodeIndex;
+
+        // A new room or an uncleared room resets the checkpoint without emitting presentation requests.
+        if (roomChanged || runtimeState.CurrentRoomCleared == 0)
+        {
+            audioState.GenerationVersion = runtimeState.GenerationVersion;
+            audioState.NodeIndex = runtimeState.CurrentNodeIndex;
+            audioState.Dispatched = 0;
+            EntityManager.SetComponentData(managerEntity, audioState);
+        }
+
+        if (runtimeState.CurrentRoomCleared == 0 ||
+            audioState.Dispatched != 0 ||
+            config.PortalUnlockAudioEnabled == 0 ||
+            audioQuery.CalculateEntityCount() != 1)
+            return;
+
         DynamicBuffer<GameAudioEventRequest> audioRequests =
             EntityManager.GetBuffer<GameAudioEventRequest>(audioQuery.GetSingletonEntity());
-        GameProceduralLevelRuntimeState runtimeState =
-            EntityManager.GetComponentData<GameProceduralLevelRuntimeState>(managerEntity);
-        double elapsedTime = SystemAPI.Time.ElapsedTime;
-        int cueIndex = 0;
+        bool dispatched = false;
 
-        // Remove consumed cues in place so equal-time requests retain authored portal order.
-        while (cueIndex < audioCues.Length)
+        // Resolve current ECS portal positions independently from managed animation or replacement bindings.
+        for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
         {
-            GameRoomPortalAnimationAudioCue cue = audioCues[cueIndex];
-
-            if (cue.TriggerTime > elapsedTime)
-            {
-                cueIndex++;
-                continue;
-            }
-
-            if (runtimeState.CurrentRoomCleared == 0 ||
-                cue.GenerationVersion != runtimeState.GenerationVersion ||
-                !EntityManager.Exists(cue.PortalEntity) ||
-                !EntityManager.HasComponent<GameRoomPortalRuntimeState>(cue.PortalEntity))
-            {
-                audioCues.RemoveAt(cueIndex);
-                continue;
-            }
-
+            Entity portalEntity = portalEntities[portalIndex];
             GameRoomPortalRuntimeState portalState =
-                EntityManager.GetComponentData<GameRoomPortalRuntimeState>(cue.PortalEntity);
+                EntityManager.GetComponentData<GameRoomPortalRuntimeState>(portalEntity);
 
-            if (portalState.TraversalEnabled == 0 ||
-                portalState.AssignedEdgeIndex != cue.AssignedEdgeIndex)
-            {
-                audioCues.RemoveAt(cueIndex);
+            if (portalState.TraversalEnabled == 0 || portalState.AssignedEdgeIndex < 0)
                 continue;
-            }
+
+            GameRoomPortal portal = EntityManager.GetComponentData<GameRoomPortal>(portalEntity);
 
             GameAudioEventRequestUtility.EnqueuePositioned(
                 audioRequests,
-                GameAudioEventId.RoomRewardPortalAnimation,
-                cue.Position);
-            audioCues.RemoveAt(cueIndex);
+                GameAudioEventId.RoomRewardPortalUnlock,
+                portal.Center);
+            dispatched = true;
+
+            if (config.PortalUnlockAudioPlaybackMode == GameRoomPortalUnlockAudioPlaybackMode.OncePerRoom)
+                break;
         }
+
+        if (!dispatched)
+            return;
+
+        audioState.Dispatched = 1;
+        EntityManager.SetComponentData(managerEntity, audioState);
     }
     #endregion
 

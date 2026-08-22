@@ -74,6 +74,13 @@ internal static class PlayerPowerUpContainerSpawnUtility
         {
             StoredEnergy = storedPowerUp.StoredEnergy,
             StoredCooldownRemaining = storedPowerUp.StoredCooldownRemaining,
+            ReturningProjectileCount = storedPowerUp.ReturningProjectileCount,
+            ReturningProjectileRecallReadyCount = storedPowerUp.ReturningProjectileRecallReadyCount,
+            ReturningProjectileGeneration = storedPowerUp.ReturningProjectileGeneration,
+            ReturningProjectileRecallVersion = storedPowerUp.ReturningProjectileRecallVersion,
+            ReturningProjectileResourceRecallVersion = storedPowerUp.ReturningProjectileResourceRecallVersion,
+            ReturningProjectileResourceDrainActive = storedPowerUp.ReturningProjectileResourceDrainActive,
+            PreserveReturningProjectileOwnership = storedPowerUp.PreserveReturningProjectileOwnership,
             HasStoredPowerUp = 1
         });
         DynamicBuffer<PlayerDroppedPowerUpContainerSlotElement> slotBuffer = commandBuffer.AddBuffer<PlayerDroppedPowerUpContainerSlotElement>(containerEntity);

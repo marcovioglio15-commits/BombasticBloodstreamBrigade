@@ -30,6 +30,7 @@ public static class GameSceneManagementProjectSetupUtility
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
     private const string DefaultSettingsPresetPath = "Assets/Scriptable Objects/Game/Settings/GameSettingsManagerPreset.asset";
     private const string DefaultHudPresetPath = "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset";
+    private const string FadeMaterialPath = "Assets/2D/Materials/M_UI_SceneFadeGradient.mat";
     private const string BootstrapManagerObjectName = "GameSceneManager";
     private const string FadeCanvasObjectName = "Canvas_SceneTransitionFade";
     private const string FadeSurfaceObjectName = "FadeSurface";
@@ -267,6 +268,12 @@ public static class GameSceneManagementProjectSetupUtility
             return;
 
         SetColor(fadeSettingsProperty, "fadeColor", Color.black);
+        SetInt(fadeSettingsProperty, "fadeMode", (int)GameSceneFadeMode.DirectionalGradient);
+        SetInt(fadeSettingsProperty, "wipeDirection", (int)GameSceneFadeWipeDirection.LeftToRight);
+        SetFloat(fadeSettingsProperty, "directionalEdgeSoftness", 0.16f);
+        SetFloat(fadeSettingsProperty, "directionalNoiseStrength", 0.035f);
+        SetFloat(fadeSettingsProperty, "directionalNoiseScale", 5.5f);
+        SetInt(fadeSettingsProperty, "easing", (int)GameSceneFadeEasing.SmoothStep);
         SetFloat(fadeSettingsProperty, "fadeOutSeconds", 0.35f);
         SetFloat(fadeSettingsProperty, "postLoadReadyExtraSeconds", 0.08f);
         SetFloat(fadeSettingsProperty, "fadeInSeconds", 0.35f);
@@ -596,6 +603,11 @@ public static class GameSceneManagementProjectSetupUtility
         GraphicRaycaster raycaster = EnsureComponent<GraphicRaycaster>(view.gameObject);
         CanvasGroup canvasGroup = EnsureComponent<CanvasGroup>(view.gameObject);
         Image fadeImage = EnsureFadeSurface(view.transform);
+        Material fadeMaterial = AssetDatabase.LoadAssetAtPath<Material>(FadeMaterialPath);
+
+        if (fadeMaterial == null)
+            throw new InvalidOperationException("Scene fade gradient material is missing: " + FadeMaterialPath + ".");
+
         RectTransform canvasRect = EnsureComponent<RectTransform>(view.gameObject);
         StretchToParent(canvasRect);
 
@@ -610,6 +622,7 @@ public static class GameSceneManagementProjectSetupUtility
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
         fadeImage.color = Color.black;
+        fadeImage.material = fadeMaterial;
         fadeImage.raycastTarget = true;
         fadeImage.enabled = false;
 
@@ -618,6 +631,7 @@ public static class GameSceneManagementProjectSetupUtility
         SetObjectReference(serializedView, "fadeCanvas", canvas);
         SetObjectReference(serializedView, "canvasGroup", canvasGroup);
         SetObjectReference(serializedView, "fadeImage", fadeImage);
+        SetObjectReference(serializedView, "fadeMaterial", fadeMaterial);
         serializedView.ApplyModifiedPropertiesWithoutUndo();
         GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureBootstrapPresentation(scene, view, canvas);
         GameSceneManagementProjectSetupLoadingProgressUtility.EnsureLoadingProgressView(view.gameObject);

@@ -33,6 +33,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
     /// <param name="showToggleDurationOption">True when binding context supports matching a toggleable active lifetime.</param>
     /// <param name="showActiveProjectileConcurrencyOption">True when the payload belongs to a non-toggleable active that can own live projectile instances.</param>
     /// <param name="hasOwningResourceGate">True when active-only payload controls may reuse Resource Gate costs.</param>
+    /// <param name="showStolenOwnershipPolicy">True when the owning Active can be stolen and needs an in-flight projectile policy.</param>
     public static void BuildPayloadEditor(VisualElement payloadContainer,
                                           SerializedProperty payloadProperty,
                                           PowerUpModuleKind moduleKind,
@@ -40,7 +41,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                           bool showActiveTriggerCharacterTuningOption = false,
                                           bool showToggleDurationOption = false,
                                           bool showActiveProjectileConcurrencyOption = false,
-                                          bool hasOwningResourceGate = false)
+                                          bool hasOwningResourceGate = false,
+                                          bool showStolenOwnershipPolicy = true)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -90,7 +92,8 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                 PowerUpReturningProjectilesPayloadDrawerUtility.Build(payloadContainer,
                                                                       payloadProperty,
                                                                       showActiveProjectileConcurrencyOption,
-                                                                      hasOwningResourceGate);
+                                                                      hasOwningResourceGate,
+                                                                      showStolenOwnershipPolicy);
                 return;
             case PowerUpModuleKind.StateSuppressShooting:
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);

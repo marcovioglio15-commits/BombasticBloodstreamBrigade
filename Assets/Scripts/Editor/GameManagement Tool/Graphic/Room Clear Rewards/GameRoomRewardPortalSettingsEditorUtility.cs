@@ -32,9 +32,9 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         Label title = new Label("Portal Reward Log");
         title.style.unityFontStyleAndWeight = FontStyle.Bold;
         root.Add(title);
-        root.Add(new HelpBox(
-            "The portal opens from authoritative ECS state. Static Rows preserves the complete authored scene position and rotation, while activation effects resolve freely linked objects on each managed anchor.",
-            HelpBoxMessageType.Info));
+        //root.Add(new HelpBox(
+        //    "The portal opens from authoritative ECS state. Static Rows preserves the complete authored scene position and rotation, while activation effects resolve freely linked objects on each managed anchor.",
+        //    HelpBoxMessageType.Info));
 
         SerializedProperty layoutMode = settings.FindPropertyRelative("layoutMode");
         SerializedProperty valueDisplayMode = settings.FindPropertyRelative("valueDisplayMode");
@@ -52,15 +52,23 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         VisualElement staticGroup = BuildStaticRowsGroup(settings);
         root.Add(scrollingGroup);
         root.Add(staticGroup);
-        UpdateLayoutVisibility(layoutMode, scrollingGroup, staticGroup);
+        UpdateLayoutVisibility((GameRoomRewardPortalLogLayoutMode)layoutMode.intValue,
+                               scrollingGroup,
+                               staticGroup);
 
         if (layoutField != null)
         {
             layoutField.RegisterValueChangedCallback(evt =>
             {
-                UpdateLayoutVisibility(layoutMode, scrollingGroup, staticGroup);
+                UpdateLayoutVisibility((GameRoomRewardPortalLogLayoutMode)evt.newValue,
+                                       scrollingGroup,
+                                       staticGroup);
             });
         }
+
+        GameRoomPortalUnlockAudioEditorUtility.Build(root, settings);
+
+        root.Add(GameRoomPortalCatalogRefreshEditorUtility.Build(root, serializedPreset));
 
         GameRoomPortalLinkedObjectChoiceCatalog linkedObjectCatalog =
             GameRoomPortalLinkedObjectEditorCatalogUtility.Build();
@@ -125,21 +133,19 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     /// <summary>
     /// Shows only settings relevant to the currently serialized portal layout enum.
     /// </summary>
-    /// <param name="layoutMode">Serialized layout enum.</param>
+    /// <param name="layoutMode">Current layout enum value.</param>
     /// <param name="scrollingGroup">Scrolling-only controls.</param>
     /// <param name="staticGroup">Static-only controls.</param>
-    private static void UpdateLayoutVisibility(SerializedProperty layoutMode,
+    private static void UpdateLayoutVisibility(GameRoomRewardPortalLogLayoutMode layoutMode,
                                                VisualElement scrollingGroup,
                                                VisualElement staticGroup)
     {
-        GameRoomRewardPortalLogLayoutMode mode =
-            (GameRoomRewardPortalLogLayoutMode)layoutMode.intValue;
         GameRoomRewardEditorElementUtility.SetVisible(
             scrollingGroup,
-            mode == GameRoomRewardPortalLogLayoutMode.Scrolling);
+            layoutMode == GameRoomRewardPortalLogLayoutMode.Scrolling);
         GameRoomRewardEditorElementUtility.SetVisible(
             staticGroup,
-            mode == GameRoomRewardPortalLogLayoutMode.StaticRows);
+            layoutMode == GameRoomRewardPortalLogLayoutMode.StaticRows);
     }
     #endregion
 
@@ -150,7 +156,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     /// <param name="root">Portal tab root.</param>
     /// <param name="serializedPreset">Owning serialization context.</param>
     /// <param name="animations">Serialized animation array.</param>
-    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by dynamic identifier.</param>
+    /// <param name="linkedObjectCatalog">Project scene-object labels keyed by dynamic identifier.</param>
     private static void BuildAnimationList(VisualElement root,
                                            SerializedObject serializedPreset,
                                            SerializedProperty animations,
@@ -227,9 +233,10 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
             AddProperty(animatorGroup, animation, "animatorSpeed", "Playback Speed");
             foldout.Add(transformGroup);
             foldout.Add(animatorGroup);
-            AddProperty(foldout, animation, "playAudioEvent", "Play FMOD Event");
-            UpdateAnimationSourceVisibility(source, transformGroup, animatorGroup);
-            UpdateAnimationChannelVisibility(mode,
+            UpdateAnimationSourceVisibility((GameRoomPortalActivationAnimationSource)source.intValue,
+                                            transformGroup,
+                                            animatorGroup);
+            UpdateAnimationChannelVisibility((GameRoomPortalTransformAnimationMode)mode.intValue,
                                              positionGroup,
                                              rotationGroup,
                                              scaleGroup);
@@ -238,7 +245,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
             {
                 modeField.RegisterValueChangedCallback(evt =>
                 {
-                    UpdateAnimationChannelVisibility(mode,
+                    UpdateAnimationChannelVisibility((GameRoomPortalTransformAnimationMode)evt.newValue,
                                                      positionGroup,
                                                      rotationGroup,
                                                      scaleGroup);
@@ -249,7 +256,9 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
             {
                 sourceField.RegisterValueChangedCallback(evt =>
                 {
-                    UpdateAnimationSourceVisibility(source, transformGroup, animatorGroup);
+                    UpdateAnimationSourceVisibility((GameRoomPortalActivationAnimationSource)evt.newValue,
+                                                    transformGroup,
+                                                    animatorGroup);
                 });
             }
 
@@ -291,46 +300,42 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     /// <summary>
     /// Shows only the controls used by the selected portal animation source.
     /// </summary>
-    /// <param name="source">Serialized animation source enum.</param>
+    /// <param name="source">Current animation source enum value.</param>
     /// <param name="transformGroup">Transform-only controls.</param>
     /// <param name="animatorGroup">Animator-clip-only controls.</param>
-    private static void UpdateAnimationSourceVisibility(SerializedProperty source,
+    private static void UpdateAnimationSourceVisibility(GameRoomPortalActivationAnimationSource source,
                                                         VisualElement transformGroup,
                                                         VisualElement animatorGroup)
     {
-        GameRoomPortalActivationAnimationSource animationSource =
-            (GameRoomPortalActivationAnimationSource)source.intValue;
         GameRoomRewardEditorElementUtility.SetVisible(
             transformGroup,
-            animationSource == GameRoomPortalActivationAnimationSource.Transform);
+            source == GameRoomPortalActivationAnimationSource.Transform);
         GameRoomRewardEditorElementUtility.SetVisible(
             animatorGroup,
-            animationSource == GameRoomPortalActivationAnimationSource.AnimatorClip);
+            source == GameRoomPortalActivationAnimationSource.AnimatorClip);
     }
 
     /// <summary>
     /// Shows only Transform payloads written by the selected animation channel enum.
     /// </summary>
-    /// <param name="mode">Serialized channel enum.</param>
+    /// <param name="mode">Current Transform channel enum value.</param>
     /// <param name="positionGroup">Position payload controls.</param>
     /// <param name="rotationGroup">Rotation payload controls.</param>
     /// <param name="scaleGroup">Scale payload controls.</param>
-    private static void UpdateAnimationChannelVisibility(SerializedProperty mode,
+    private static void UpdateAnimationChannelVisibility(GameRoomPortalTransformAnimationMode mode,
                                                          VisualElement positionGroup,
                                                          VisualElement rotationGroup,
                                                          VisualElement scaleGroup)
     {
-        GameRoomPortalTransformAnimationMode animationMode =
-            (GameRoomPortalTransformAnimationMode)mode.intValue;
         GameRoomRewardEditorElementUtility.SetVisible(
             positionGroup,
-            GameRoomPortalTransformAnimationModeUtility.IncludesPosition(animationMode));
+            GameRoomPortalTransformAnimationModeUtility.IncludesPosition(mode));
         GameRoomRewardEditorElementUtility.SetVisible(
             rotationGroup,
-            GameRoomPortalTransformAnimationModeUtility.IncludesRotation(animationMode));
+            GameRoomPortalTransformAnimationModeUtility.IncludesRotation(mode));
         GameRoomRewardEditorElementUtility.SetVisible(
             scaleGroup,
-            GameRoomPortalTransformAnimationModeUtility.IncludesScale(animationMode));
+            GameRoomPortalTransformAnimationModeUtility.IncludesScale(mode));
     }
 
     /// <summary>
@@ -362,7 +367,6 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         animation.FindPropertyRelative("positionOffset").vector3Value = Vector3.zero;
         animation.FindPropertyRelative("rotationOffset").vector3Value = Vector3.zero;
         animation.FindPropertyRelative("scaleMultiplier").vector3Value = Vector3.one;
-        animation.FindPropertyRelative("playAudioEvent").boolValue = false;
         animation.FindPropertyRelative("animatorClip").objectReferenceValue = null;
         animation.FindPropertyRelative("animatorPath").stringValue = string.Empty;
         animation.FindPropertyRelative("animatorSpeed").floatValue = 1f;
@@ -377,7 +381,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
     /// <param name="root">Portal tab root.</param>
     /// <param name="serializedPreset">Owning serialization context.</param>
     /// <param name="replacements">Serialized prefab replacement array.</param>
-    /// <param name="linkedObjectCatalog">Loaded scene-object labels keyed by dynamic identifier.</param>
+    /// <param name="linkedObjectCatalog">Project scene-object labels keyed by dynamic identifier.</param>
     private static void BuildReplacementList(VisualElement root,
                                              SerializedObject serializedPreset,
                                              SerializedProperty replacements,
@@ -411,10 +415,20 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
                     targetBindingId.stringValue,
                     in linkedObjectCatalog),
                 "Prefab asset instantiated at the linked 3D scene object's local pose when the portal opens.");
-            GameRoomRewardPortalEffectEditorFieldUtility.AddLinkedObjectField(
-                foldout,
-                targetBindingId,
-                in linkedObjectCatalog);
+            DropdownField linkedObjectField =
+                GameRoomRewardPortalEffectEditorFieldUtility.AddLinkedObjectField(
+                    foldout,
+                    targetBindingId,
+                    in linkedObjectCatalog);
+
+            if (linkedObjectField != null)
+            {
+                linkedObjectField.RegisterValueChangedCallback(evt =>
+                {
+                    CommitAndRebuild(root, serializedPreset);
+                });
+            }
+
             AddProperty(foldout, replacement, "replacementPrefab", "Replacement Prefab");
             foldout.Add(BuildElementActions(
                 replacementIndex,
@@ -626,6 +640,7 @@ internal static class GameRoomRewardPortalSettingsEditorUtility
         root.Clear();
         Build(root, serializedPreset);
     }
+
     #endregion
 
     #endregion
