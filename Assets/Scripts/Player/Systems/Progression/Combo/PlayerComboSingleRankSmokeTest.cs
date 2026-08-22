@@ -41,7 +41,8 @@ public static class PlayerComboSingleRankSmokeTest
             ValidateFirstMilestonePresentationGate(ranks);
             ValidateDamageDowngradeAndDecay(ranks);
             ValidateFormulaDistribution(ranks, formulas);
-            Debug.Log("[PlayerComboSingleRankSmokeTest] Threshold, gated presentation, scaling, downgrade, decay, and formula-range checks passed.");
+            ValidateMilestoneTierFormulaContext(entityManager);
+            Debug.Log("[PlayerComboSingleRankSmokeTest] Threshold, presentation, scaling, downgrade, decay, formula-range, milestone tier-context, pickup-radius, and container-context checks passed.");
         }
         finally
         {
@@ -302,6 +303,140 @@ public static class PlayerComboSingleRankSmokeTest
         if (finalMilestoneWeightBeforeCompletion > PrecisionEpsilon ||
             Math.Abs(finalMilestoneWeightAtCompletion - 1f) > PrecisionEpsilon)
             throw new Exception("A final milestone at maximum progression did not activate deterministically at completion.");
+    }
+
+    /// <summary>
+    /// Verifies milestone tier formulas consume the effective Luck value after linear Synchro bonuses instead of the permanent base value.
+    /// </summary>
+    /// <param name="entityManager">Temporary smoke-test entity manager used to allocate ECS buffers.</param>
+    private static void ValidateMilestoneTierFormulaContext(EntityManager entityManager)
+    {
+        // Build the milestone-time ECS state used by the effective formula-context pipeline.
+        Entity entity = entityManager.CreateEntity();
+        entityManager.AddBuffer<PlayerScalableStatElement>(entity);
+        entityManager.AddBuffer<PlayerRoomRewardTemporaryModifierElement>(entity);
+        entityManager.AddBuffer<PlayerRuntimeComboRankElement>(entity);
+        entityManager.AddBuffer<PlayerPowerUpCharacterTuningFormulaElement>(entity);
+        DynamicBuffer<PlayerScalableStatElement> scalableStats = entityManager.GetBuffer<PlayerScalableStatElement>(entity);
+        DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers = entityManager.GetBuffer<PlayerRoomRewardTemporaryModifierElement>(entity);
+        DynamicBuffer<PlayerRuntimeComboRankElement> ranks = entityManager.GetBuffer<PlayerRuntimeComboRankElement>(entity);
+        DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> formulas = entityManager.GetBuffer<PlayerPowerUpCharacterTuningFormulaElement>(entity);
+        scalableStats.Add(new PlayerScalableStatElement
+        {
+            Name = new FixedString64Bytes("Luck"),
+            Type = (byte)PlayerScalableStatType.Float,
+            MinimumValue = 0f,
+            MaximumValue = 100f,
+            Value = 1f
+        });
+        formulas.Add(new PlayerPowerUpCharacterTuningFormulaElement
+        {
+            Formula = new FixedString128Bytes("[Luck]=[Luck]+50")
+        });
+        ranks.Add(new PlayerRuntimeComboRankElement
+        {
+            Mode = PlayerComboCounterMode.SingleRankProgression,
+            RankId = new FixedString64Bytes("SYNCHRO"),
+            Enabled = 1,
+            RequiredComboValue = 0,
+            RequiredProgressPercent = 0f,
+            BonusFormulaStartIndex = 0,
+            BonusFormulaCount = 1
+        });
+
+        // Compose the 10% Synchro sample through the same reusable path consumed by milestone rolls.
+        PlayerRuntimeComboCounterConfig config = CreateConfig(PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression);
+        PlayerComboCounterState state = new PlayerComboCounterState
+        {
+            CurrentValue = 100
+        };
+        List<PlayerScalableStatElement> effectiveStats = new List<PlayerScalableStatElement>(1);
+        Dictionary<string, PlayerFormulaValue> variableContext = new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
+        PlayerRuntimeScalingFormulaContextUtility.Fill(scalableStats,
+                                                        temporaryModifiers,
+                                                        0u,
+                                                        in config,
+                                                        in state,
+                                                        ranks,
+                                                        formulas,
+                                                        effectiveStats,
+                                                        variableContext);
+
+        // Resolve the three configured drop-tier formulas against effective Luck 6.
+        float tierOnePercentage = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierRollPercentage(60f,
+                                                                                                      60f,
+                                                                                                      "([Luck]>5)?0:60",
+                                                                                                      variableContext);
+        float tierTwoPercentage = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierRollPercentage(30f,
+                                                                                                      30f,
+                                                                                                      "([Luck]>5)?0:30",
+                                                                                                      variableContext);
+        float tierThreePercentage = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierRollPercentage(10f,
+                                                                                                        10f,
+                                                                                                        "([Luck]>5)?100:10",
+                                                                                                        variableContext);
+
+        // Require the exact effective-stat threshold and deterministic Tier 3 distribution.
+        if (!variableContext.TryGetValue("Luck", out PlayerFormulaValue luckValue) ||
+            luckValue.Type != PlayerFormulaValueType.Number ||
+            Math.Abs(luckValue.NumberValue - 6f) > PrecisionEpsilon ||
+            tierOnePercentage > PrecisionEpsilon ||
+            tierTwoPercentage > PrecisionEpsilon ||
+            Math.Abs(tierThreePercentage - 100f) > PrecisionEpsilon)
+            throw new Exception("Milestone tier formulas did not consume the effective Luck value produced by 10% Synchro progression.");
+
+        // Resolve progression Add Scaling from the same effective list retained by the runtime rebuild.
+        BlobAssetReference<PlayerProgressionConfigBlob> progressionBlob = default;
+        BlobBuilder blobBuilder = new BlobBuilder(Allocator.Temp);
+
+        try
+        {
+            ref PlayerProgressionConfigBlob progressionRoot =
+                ref blobBuilder.ConstructRoot<PlayerProgressionConfigBlob>();
+            progressionRoot.BaseExperiencePickupRadius = 1f;
+            progressionRoot.ExperiencePickupRadius = 1f;
+            blobBuilder.AllocateString(ref progressionRoot.ExperiencePickupRadiusScalingFormula,
+                                       "[this] * [Luck]");
+            progressionBlob = blobBuilder.CreateBlobAssetReference<PlayerProgressionConfigBlob>(Allocator.Temp);
+        }
+        finally
+        {
+            blobBuilder.Dispose();
+        }
+
+        try
+        {
+            PlayerProgressionConfig progressionConfig = new PlayerProgressionConfig
+            {
+                Config = progressionBlob
+            };
+            float pickupRadius = PlayerExperiencePickupRadiusRuntimeUtility.ResolveCurrentPickupRadius(progressionConfig,
+                                                                                                        effectiveStats,
+                                                                                                        1f);
+
+            if (Math.Abs(pickupRadius - 6f) > PrecisionEpsilon)
+                throw new Exception("Experience pickup radius scaling did not consume the effective Luck value produced by 10% Synchro progression.");
+        }
+        finally
+        {
+            progressionBlob.Dispose();
+        }
+
+        // Resolve a container formula through the EntityManager entry point used by HUD and ECS swaps.
+        entityManager.AddComponentData(entity, config);
+        entityManager.AddComponentData(entity, state);
+        entityManager.AddComponentData(entity, new PlayerPowerUpContainerInteractionConfig
+        {
+            BaseInteractionLockDuration = 1f,
+            InteractionLockDuration = 1f,
+            InteractionLockDurationScalingFormula = new FixedString512Bytes("[this] * [Luck]")
+        });
+        float interactionLockDuration =
+            PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(entityManager,
+                                                                                            entity);
+
+        if (Math.Abs(interactionLockDuration - 6f) > PrecisionEpsilon)
+            throw new Exception("Container interaction scaling did not consume the effective Luck value produced by 10% Synchro progression.");
     }
 
     /// <summary>

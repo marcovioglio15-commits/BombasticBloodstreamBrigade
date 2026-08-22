@@ -62,7 +62,7 @@ public static class GameRoomRewardRuntimeSmokeTest
             system.Update();
             ValidateExpiredTemporaryState(entityManager, playerEntity);
             ValidateRunReset(entityManager, managerEntity, playerEntity);
-            Debug.Log("[GameRoomRewardRuntimeSmokeTest] Ordered, clamped, idempotent, temporary and run-reset reward checks passed.");
+            Debug.Log("[GameRoomRewardRuntimeSmokeTest] Ordered, clamped, idempotent, effective formula-context, temporary and run-reset reward checks passed.");
         }
         finally
         {
@@ -198,7 +198,9 @@ public static class GameRoomRewardRuntimeSmokeTest
                                                           typeof(PlayerPowerUpsState),
                                                           typeof(PlayerRoomRewardGrantState),
                                                           typeof(PlayerRoomRewardTemporaryState),
-                                                          typeof(PlayerRuntimeScalingState));
+                                                          typeof(PlayerRuntimeScalingState),
+                                                          typeof(PlayerRuntimeComboCounterConfig),
+                                                          typeof(PlayerComboCounterState));
         entityManager.SetComponentData(playerEntity, new PlayerHealth
         {
             Current = 90f,
@@ -213,6 +215,18 @@ public static class GameRoomRewardRuntimeSmokeTest
             LastScalableStatsHash = 123u,
             Initialized = 1
         });
+        entityManager.SetComponentData(playerEntity, new PlayerRuntimeComboCounterConfig
+        {
+            Enabled = 1,
+            Mode = PlayerComboCounterMode.SingleRankProgression,
+            SingleRankId = new FixedString64Bytes("SYNCHRO"),
+            SingleRankMaximumComboValue = 1000,
+            SingleRankFormulaDistributionMode = PlayerComboSingleRankFormulaDistributionMode.LinearAcrossProgression
+        });
+        entityManager.SetComponentData(playerEntity, new PlayerComboCounterState
+        {
+            CurrentValue = 100
+        });
         entityManager.AddBuffer<PlayerPowerUpsConfigElement>(playerEntity);
         DynamicBuffer<PlayerScalableStatElement> stats =
             entityManager.AddBuffer<PlayerScalableStatElement>(playerEntity);
@@ -224,9 +238,35 @@ public static class GameRoomRewardRuntimeSmokeTest
             MaximumValue = 100f,
             Value = 10f
         });
+        stats.Add(new PlayerScalableStatElement
+        {
+            Name = new FixedString64Bytes("Luck"),
+            Type = (byte)PlayerScalableStatType.Float,
+            MinimumValue = 0f,
+            MaximumValue = 100f,
+            Value = 1f
+        });
         entityManager.AddBuffer<PlayerRoomRewardTemporaryModifierElement>(playerEntity);
         entityManager.AddBuffer<PlayerRoomRewardTemporaryResourceElement>(playerEntity);
         entityManager.AddBuffer<PlayerRoomRewardPresentationEvent>(playerEntity);
+        DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> formulas =
+            entityManager.AddBuffer<PlayerPowerUpCharacterTuningFormulaElement>(playerEntity);
+        formulas.Add(new PlayerPowerUpCharacterTuningFormulaElement
+        {
+            Formula = new FixedString128Bytes("[Luck]=[Luck]+50")
+        });
+        DynamicBuffer<PlayerRuntimeComboRankElement> ranks =
+            entityManager.AddBuffer<PlayerRuntimeComboRankElement>(playerEntity);
+        ranks.Add(new PlayerRuntimeComboRankElement
+        {
+            Mode = PlayerComboCounterMode.SingleRankProgression,
+            RankId = new FixedString64Bytes("SYNCHRO"),
+            Enabled = 1,
+            RequiredComboValue = 0,
+            RequiredProgressPercent = 0f,
+            BonusFormulaStartIndex = 0,
+            BonusFormulaCount = 1
+        });
         return playerEntity;
     }
     #endregion
@@ -333,11 +373,18 @@ public static class GameRoomRewardRuntimeSmokeTest
             entityManager.GetComponentData<PlayerExperience>(playerEntity);
         PlayerPowerUpsState powerUpsState =
             entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+        Dictionary<string, PlayerFormulaValue> formulaContext =
+            new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Damage"] = PlayerFormulaValue.CreateNumber(10f),
+                ["Luck"] = PlayerFormulaValue.CreateNumber(6f)
+            };
         GameRoomRewardModuleElement formulaModule = modules[3];
         bool evaluated =
             PlayerRoomRewardValueUtility.TryEvaluateFormulaPreview(
                 in formulaModule,
                 scalableStats,
+                formulaContext,
                 in health,
                 in experience,
                 in powerUpsState,
@@ -361,6 +408,30 @@ public static class GameRoomRewardRuntimeSmokeTest
                 "Portal preview did not expose the resolved formula result.");
         Require(item.Text.IndexOf("formula", StringComparison.OrdinalIgnoreCase) < 0,
                 "Portal preview still exposed the generic Formula placeholder.");
+
+        // Prove resource formulas consume the same 10% Synchro Luck projection as gameplay scaling.
+        GameRoomRewardModuleElement synchroFormulaModule = new GameRoomRewardModuleElement
+        {
+            Formula = new FixedString512Bytes("12 + [Luck] * 0.5"),
+            TargetDomain = GameRoomRewardTargetDomain.Resource,
+            Resource = GameRoomRewardResource.Experience,
+            ValueSource = GameRoomRewardValueSource.Formula,
+            Duration = GameRoomRewardDuration.Permanent
+        };
+        bool synchroFormulaEvaluated = PlayerRoomRewardValueUtility.TryEvaluateFormulaPreview(
+            in synchroFormulaModule,
+            scalableStats,
+            formulaContext,
+            in health,
+            in experience,
+            in powerUpsState,
+            out PlayerFormulaValue _,
+            out PlayerFormulaValue synchroFormulaResult);
+        Require(synchroFormulaEvaluated,
+                "Resource formula preview did not resolve the effective Synchro context.");
+        RequireApproximately(synchroFormulaResult.NumberValue,
+                             15f,
+                             "Resource formula preview ignored the linearly distributed Synchro Luck bonus.");
         GameRoomRewardPresentationItem simplifiedItem =
             GameRoomRewardPresentationFormatter.FormatPortalModule(
                 in formulaModule,

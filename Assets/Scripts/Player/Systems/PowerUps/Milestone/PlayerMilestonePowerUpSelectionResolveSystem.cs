@@ -41,7 +41,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         state.RequireForUpdate<PlayerRuntimeGamePhaseElement>();
         state.RequireForUpdate<PlayerLevel>();
         state.RequireForUpdate<PlayerExperience>();
-        state.RequireForUpdate<PlayerExperienceCollection>();
         state.RequireForUpdate<PlayerScalableStatElement>();
         state.RequireForUpdate<PlayerHealth>();
         state.RequireForUpdate<PlayerShield>();
@@ -67,7 +66,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
         ComponentLookup<PlayerProgressionConfig> progressionConfigLookup = SystemAPI.GetComponentLookup<PlayerProgressionConfig>(true);
         ComponentLookup<PlayerLevel> playerLevelLookup = SystemAPI.GetComponentLookup<PlayerLevel>(false);
         ComponentLookup<PlayerExperience> playerExperienceLookup = SystemAPI.GetComponentLookup<PlayerExperience>(false);
-        ComponentLookup<PlayerExperienceCollection> playerExperienceCollectionLookup = SystemAPI.GetComponentLookup<PlayerExperienceCollection>(false);
         ComponentLookup<PlayerHealth> playerHealthLookup = SystemAPI.GetComponentLookup<PlayerHealth>(false);
         ComponentLookup<PlayerShield> playerShieldLookup = SystemAPI.GetComponentLookup<PlayerShield>(false);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(false);
@@ -99,7 +97,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                 !progressionConfigLookup.HasComponent(entity) ||
                 !playerLevelLookup.HasComponent(entity) ||
                 !playerExperienceLookup.HasComponent(entity) ||
-                !playerExperienceCollectionLookup.HasComponent(entity) ||
                 !playerHealthLookup.HasComponent(entity) ||
                 !playerShieldLookup.HasComponent(entity) ||
                 !powerUpsConfigLookup.HasBuffer(entity) ||
@@ -140,7 +137,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             PlayerMilestoneTimeScaleResumeState milestoneTimeScaleResumeStateValue = milestoneTimeScaleResumeStateLookup[entity];
             PlayerProgressionConfig progressionConfigValue = progressionConfigLookup[entity];
             PlayerLevel playerLevelValue = playerLevelLookup[entity];
-            PlayerExperienceCollection playerExperienceCollectionValue = playerExperienceCollectionLookup[entity];
             PlayerPowerUpsConfig powerUpsConfigValue;
             PlayerPowerUpsConfigBufferUtility.Read(entity,
                                                    in powerUpsConfigLookup,
@@ -273,7 +269,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
                                                                                                              runtimeGamePhaseBuffer,
                                                                                                              ref playerExperienceValue,
                                                                                                              ref playerLevelValue,
-                                                                                                             ref playerExperienceCollectionValue,
                                                                                                              out appliedCharacterTuningCount);
             }
 
@@ -288,7 +283,6 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             powerUpsStateLookup[entity] = powerUpsStateValue;
             playerExperienceLookup[entity] = playerExperienceValue;
             playerLevelLookup[entity] = playerLevelValue;
-            playerExperienceCollectionLookup[entity] = playerExperienceCollectionValue;
             FinalizeSelection(progressionConfigValue,
                               selectionOffersBuffer,
                               ref selectionStateValue,

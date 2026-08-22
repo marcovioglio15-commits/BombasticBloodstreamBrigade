@@ -50,7 +50,7 @@ public static class PlayerMilestonePowerUpRollUtility
     /// <param name="progressionConfig">Runtime progression configuration component.</param>
     /// <param name="activeGamePhaseIndex">Resolved active game-phase index for current level.</param>
     /// <param name="milestoneLevel">Milestone level being processed.</param>
-    /// <param name="scalableStats">Current runtime scalable-stat buffer used by runtime scaling formulas.</param>
+    /// <param name="variableContext">Effective typed stat context containing permanent, room-scoped, and combo-derived values.</param>
     /// <param name="unlockCatalog">Unlock catalog used to exclude already unlocked entries.</param>
     /// <param name="tierDefinitions">Tier definitions buffer.</param>
     /// <param name="tierEntries">Flattened tier-entry buffer.</param>
@@ -67,7 +67,7 @@ public static class PlayerMilestonePowerUpRollUtility
     public static bool TryOpenMilestoneSelection(PlayerProgressionConfig progressionConfig,
                                                  int activeGamePhaseIndex,
                                                  int milestoneLevel,
-                                                 DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                                 IReadOnlyDictionary<string, PlayerFormulaValue> variableContext,
                                                  DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                                                  DynamicBuffer<PlayerPowerUpTierDefinitionElement> tierDefinitions,
                                                  DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
@@ -105,8 +105,6 @@ public static class PlayerMilestonePowerUpRollUtility
             return false;
 
         selectionOffers.Clear();
-        Dictionary<string, PlayerFormulaValue> variableContext = new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
-        PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
         HashSet<int> rolledCatalogIndices = new HashSet<int>();
         HashSet<PassiveToolKind> blockedPassiveKinds = BuildBlockedPassiveKinds(equippedPassiveTools);
         HashSet<string> blockedOrbitalProjectionCategoryIds = BuildBlockedOrbitalProjectionCategoryIds(equippedPassiveTools,
@@ -237,7 +235,8 @@ public static class PlayerMilestonePowerUpRollUtility
         for (int tierRollIndex = 0; tierRollIndex < powerUpUnlockBlob.TierRolls.Length; tierRollIndex++)
         {
             ref PlayerMilestoneTierRollBlob tierRoll = ref powerUpUnlockBlob.TierRolls[tierRollIndex];
-            float tierRollPercentage = ResolveTierRollPercentage(ref tierRoll, variableContext);
+            float tierRollPercentage = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierRollPercentage(ref tierRoll,
+                                                                                                           variableContext);
 
             if (tierRollPercentage <= 0f)
                 continue;
@@ -270,7 +269,8 @@ public static class PlayerMilestonePowerUpRollUtility
         int selectedTierRollIndex = rollCandidateIndices[selectedTierRollCandidate];
         ref PlayerMilestoneTierRollBlob selectedTierRoll = ref powerUpUnlockBlob.TierRolls[selectedTierRollIndex];
         selectedTierId = selectedTierRoll.TierId.ToString();
-        selectedTierPercentage = ResolveTierRollPercentage(ref selectedTierRoll, variableContext);
+        selectedTierPercentage = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierRollPercentage(ref selectedTierRoll,
+                                                                                                      variableContext);
 
         if (!TryResolveTierDefinition(tierDefinitions, selectedTierId, out PlayerPowerUpTierDefinitionElement selectedTierDefinition))
             return false;
@@ -348,10 +348,10 @@ public static class PlayerMilestonePowerUpRollUtility
         {
             PlayerPowerUpTierEntryElement tierEntry = tierEntries[tierEntryIndex];
 
-            if (ResolveTierEntryWeight(tierEntries,
-                                       tierEntryScaling,
-                                       tierEntryIndex,
-                                       variableContext) <= 0f)
+            if (PlayerMilestonePowerUpRollFormulaUtility.ResolveTierEntryWeight(tierEntries,
+                                                                                tierEntryScaling,
+                                                                                tierEntryIndex,
+                                                                                variableContext) <= 0f)
                 continue;
 
             int catalogIndex = tierEntry.CatalogIndex;
@@ -419,10 +419,10 @@ public static class PlayerMilestonePowerUpRollUtility
         for (int tierEntryIndex = startIndex; tierEntryIndex < endIndex; tierEntryIndex++)
         {
             PlayerPowerUpTierEntryElement tierEntry = tierEntries[tierEntryIndex];
-            float tierEntryWeight = ResolveTierEntryWeight(tierEntries,
-                                                           tierEntryScaling,
-                                                           tierEntryIndex,
-                                                           variableContext);
+            float tierEntryWeight = PlayerMilestonePowerUpRollFormulaUtility.ResolveTierEntryWeight(tierEntries,
+                                                                                                     tierEntryScaling,
+                                                                                                     tierEntryIndex,
+                                                                                                     variableContext);
 
             if (tierEntryWeight <= 0f)
                 continue;
@@ -620,80 +620,6 @@ public static class PlayerMilestonePowerUpRollUtility
             return effectiveUnlockCount;
 
         return mathMax(effectiveUnlockCount, reservedUnlockCount);
-    }
-
-    private static float ResolveTierRollPercentage(ref PlayerMilestoneTierRollBlob tierRoll,
-                                                   IReadOnlyDictionary<string, PlayerFormulaValue> variableContext)
-    {
-        float selectionPercentage = mathMax(0f, tierRoll.SelectionPercentage);
-        string scalingFormula = tierRoll.ScalingFormula.ToString();
-
-        if (string.IsNullOrWhiteSpace(scalingFormula))
-            return selectionPercentage;
-
-        if (!PlayerScalingRuntimeFormulaUtility.TryEvaluateFormula(scalingFormula,
-                                                                   tierRoll.BaseSelectionPercentage,
-                                                                   variableContext,
-                                                                   out float evaluatedValue,
-                                                                   out string _))
-        {
-            return selectionPercentage;
-        }
-
-        return mathMax(0f, evaluatedValue);
-    }
-
-    private static float ResolveTierEntryWeight(DynamicBuffer<PlayerPowerUpTierEntryElement> tierEntries,
-                                                DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
-                                                int tierEntryIndex,
-                                                IReadOnlyDictionary<string, PlayerFormulaValue> variableContext)
-    {
-        if (tierEntryIndex < 0 || tierEntryIndex >= tierEntries.Length)
-            return 0f;
-
-        float selectionWeight = mathMax(0f, tierEntries[tierEntryIndex].SelectionWeight);
-
-        if (!TryResolveTierEntryScaling(tierEntryScaling, tierEntryIndex, out PlayerPowerUpTierEntryScalingElement scalingEntry))
-            return selectionWeight;
-
-        string scalingFormula = scalingEntry.ScalingFormula.ToString();
-
-        if (string.IsNullOrWhiteSpace(scalingFormula))
-            return selectionWeight;
-
-        if (!PlayerScalingRuntimeFormulaUtility.TryEvaluateFormula(scalingFormula,
-                                                                   scalingEntry.BaseSelectionWeight,
-                                                                   variableContext,
-                                                                   out float evaluatedValue,
-                                                                   out string _))
-        {
-            return selectionWeight;
-        }
-
-        return mathMax(0f, evaluatedValue);
-    }
-
-    private static bool TryResolveTierEntryScaling(DynamicBuffer<PlayerPowerUpTierEntryScalingElement> tierEntryScaling,
-                                                   int tierEntryIndex,
-                                                   out PlayerPowerUpTierEntryScalingElement scalingEntry)
-    {
-        scalingEntry = default;
-
-        if (!tierEntryScaling.IsCreated)
-            return false;
-
-        for (int scalingIndex = 0; scalingIndex < tierEntryScaling.Length; scalingIndex++)
-        {
-            PlayerPowerUpTierEntryScalingElement candidate = tierEntryScaling[scalingIndex];
-
-            if (candidate.TierEntryIndex != tierEntryIndex)
-                continue;
-
-            scalingEntry = candidate;
-            return true;
-        }
-
-        return false;
     }
 
     /// <summary>

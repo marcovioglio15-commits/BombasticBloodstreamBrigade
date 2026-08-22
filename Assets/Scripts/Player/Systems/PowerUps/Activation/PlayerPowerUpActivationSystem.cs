@@ -333,8 +333,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                                projectileSizePowerUpMultipliers,
                                                                                                                                                ref passiveToolsState,
                                                                                                                                                ref playerExperience,
-                                                                                                                                               ref playerLevel,
-                                                                                                                                               ref playerExperienceCollection);
+                                                                                                                                               ref playerLevel);
 
             if (scopedCharacterTuningChangedBeforePrimary)
             {
@@ -484,8 +483,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                                  projectileSizePowerUpMultipliers,
                                                                                                                                                  ref passiveToolsState,
                                                                                                                                                  ref playerExperience,
-                                                                                                                                                 ref playerLevel,
-                                                                                                                                                 ref playerExperienceCollection);
+                                                                                                                                                 ref playerLevel);
 
             if (scopedCharacterTuningChangedBeforeSecondary)
             {
@@ -633,8 +631,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                                                                                        projectileSizePowerUpMultipliers,
                                                                                                                                        ref passiveToolsState,
                                                                                                                                        ref playerExperience,
-                                                                                                                                       ref playerLevel,
-                                                                                                                                       ref playerExperienceCollection);
+                                                                                                                                       ref playerLevel);
 
             if (scopedCharacterTuningChangedFinal)
             {

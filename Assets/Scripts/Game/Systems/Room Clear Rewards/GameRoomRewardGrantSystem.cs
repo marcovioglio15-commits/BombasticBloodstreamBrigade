@@ -14,6 +14,8 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     #region Fields
     private readonly List<PlayerScalableStatElement> effectiveScalableStats =
         new List<PlayerScalableStatElement>(64);
+    private readonly Dictionary<string, PlayerFormulaValue> effectiveVariableContext =
+        new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
     private EntityQuery managerQuery;
     private EntityQuery playerQuery;
     #endregion
@@ -112,18 +114,17 @@ public partial class GameRoomRewardGrantSystem : SystemBase
         for (int index = 0; index < orderedResourceIndices.Count; index++)
         {
             PlayerRoomRewardTemporaryResourceElement resource = resources[orderedResourceIndices[index]];
-            PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats,
-                                                                         effectiveScalableStats);
-            PlayerRoomRewardTemporaryModifierUtility.ApplyActiveModifiers(
-                modifiers,
-                enteredEvent.VisitOrdinal,
-                effectiveScalableStats);
+            PlayerRuntimeScalingFormulaContextUtility.Fill(EntityManager,
+                                                            playerEntity,
+                                                            enteredEvent.VisitOrdinal,
+                                                            effectiveScalableStats,
+                                                            effectiveVariableContext);
             float delta = PlayerRoomRewardValueUtility.ApplyResource(resource.Resource,
                                                                       resource.ValueSource,
                                                                       resource.FlatNumericValue,
                                                                       resource.Formula.ToString(),
                                                                       scalableStats,
-                                                                      effectiveScalableStats,
+                                                                      effectiveVariableContext,
                                                                       ref health,
                                                                       ref experience,
                                                                       ref powerUpsState,
@@ -210,6 +211,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
             for (int rewardQuantityIndex = 0; rewardQuantityIndex < tileBinding.Quantity; rewardQuantityIndex++)
             {
                 ApplyReward(reward,
+                            playerEntity,
                             moduleBindings,
                             modules,
                             scalableStats,
@@ -240,6 +242,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// Applies every module binding in one composed reward using explicit order and quantity.
     /// </summary>
     /// <param name="reward">Flattened reward definition.</param>
+    /// <param name="playerEntity">Authoritative player receiving the composed reward.</param>
     /// <param name="moduleBindings">All flattened reward-to-module bindings.</param>
     /// <param name="modules">All flattened atomic modules.</param>
     /// <param name="scalableStats">Mutable player scalable stats.</param>
@@ -252,19 +255,20 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// <param name="powerUpsConfig">Current active power-up slot config.</param>
     /// <param name="currentVisitOrdinal">Latest distinct room visit committed for the player.</param>
     /// <param name="grantSequence">Monotonic clear version used to order presentation and temporary effects.</param>
-    private static void ApplyReward(in GameRoomRewardDefinitionElement reward,
-                                    DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindings,
-                                    DynamicBuffer<GameRoomRewardModuleElement> modules,
-                                    DynamicBuffer<PlayerScalableStatElement> scalableStats,
-                                    DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers,
-                                    DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> temporaryResources,
-                                    DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
-                                    ref PlayerHealth health,
-                                    ref PlayerExperience experience,
-                                    ref PlayerPowerUpsState powerUpsState,
-                                    in PlayerPowerUpsConfig powerUpsConfig,
-                                    uint currentVisitOrdinal,
-                                    uint grantSequence)
+    private void ApplyReward(in GameRoomRewardDefinitionElement reward,
+                             Entity playerEntity,
+                             DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindings,
+                             DynamicBuffer<GameRoomRewardModuleElement> modules,
+                             DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                             DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers,
+                             DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> temporaryResources,
+                             DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
+                             ref PlayerHealth health,
+                             ref PlayerExperience experience,
+                             ref PlayerPowerUpsState powerUpsState,
+                             in PlayerPowerUpsConfig powerUpsConfig,
+                             uint currentVisitOrdinal,
+                             uint grantSequence)
     {
         IReadOnlyList<int> orderedModuleIndices =
             GameRoomRewardRuntimeBufferUtility.BuildOrderedModuleBindingIndices(moduleBindings,
@@ -283,6 +287,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
             for (int quantityIndex = 0; quantityIndex < binding.Quantity; quantityIndex++)
             {
                 ApplyModule(in module,
+                            playerEntity,
                             scalableStats,
                             temporaryModifiers,
                             temporaryResources,
@@ -301,6 +306,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// Applies one permanent module or schedules one temporary module for the next distinct room.
     /// </summary>
     /// <param name="module">Atomic baked module.</param>
+    /// <param name="playerEntity">Authoritative player receiving or scheduling the module.</param>
     /// <param name="scalableStats">Mutable player scalable stats.</param>
     /// <param name="temporaryModifiers">Temporary stat modifier buffer.</param>
     /// <param name="temporaryResources">Temporary resource stipend buffer.</param>
@@ -311,21 +317,23 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// <param name="powerUpsConfig">Current active power-up slot config.</param>
     /// <param name="currentVisitOrdinal">Current distinct room visit ordinal.</param>
     /// <param name="grantSequence">Monotonic room-clear sequence.</param>
-    private static void ApplyModule(in GameRoomRewardModuleElement module,
-                                    DynamicBuffer<PlayerScalableStatElement> scalableStats,
-                                    DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers,
-                                    DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> temporaryResources,
-                                    DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
-                                    ref PlayerHealth health,
-                                    ref PlayerExperience experience,
-                                    ref PlayerPowerUpsState powerUpsState,
-                                    in PlayerPowerUpsConfig powerUpsConfig,
-                                    uint currentVisitOrdinal,
-                                    uint grantSequence)
+    private void ApplyModule(in GameRoomRewardModuleElement module,
+                             Entity playerEntity,
+                             DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                             DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> temporaryModifiers,
+                             DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> temporaryResources,
+                             DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
+                             ref PlayerHealth health,
+                             ref PlayerExperience experience,
+                             ref PlayerPowerUpsState powerUpsState,
+                             in PlayerPowerUpsConfig powerUpsConfig,
+                             uint currentVisitOrdinal,
+                             uint grantSequence)
     {
         if (module.Duration == GameRoomRewardDuration.Temporary)
         {
             ScheduleTemporary(in module,
+                              playerEntity,
                               scalableStats,
                               temporaryModifiers,
                               temporaryResources,
@@ -340,12 +348,16 @@ public partial class GameRoomRewardGrantSystem : SystemBase
 
         if (module.TargetDomain == GameRoomRewardTargetDomain.Resource)
         {
+            PlayerRuntimeScalingFormulaContextUtility.Fill(EntityManager,
+                                                            playerEntity,
+                                                            effectiveScalableStats,
+                                                            effectiveVariableContext);
             float delta = PlayerRoomRewardValueUtility.ApplyResource(module.Resource,
                                                                       module.ValueSource,
                                                                       module.FlatNumericValue,
                                                                       module.Formula.ToString(),
                                                                       scalableStats,
-                                                                      null,
+                                                                      effectiveVariableContext,
                                                                       ref health,
                                                                       ref experience,
                                                                       ref powerUpsState,
@@ -382,6 +394,7 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// Schedules a temporary modifier or stipend starting on the next distinct room visit.
     /// </summary>
     /// <param name="module">Temporary atomic module.</param>
+    /// <param name="playerEntity">Authoritative player receiving the future-room schedule.</param>
     /// <param name="scalableStats">Current authoritative stats used to project formula presentation values.</param>
     /// <param name="modifiers">Temporary stat modifier buffer.</param>
     /// <param name="resources">Temporary resource stipend buffer.</param>
@@ -391,16 +404,17 @@ public partial class GameRoomRewardGrantSystem : SystemBase
     /// <param name="powerUpsState">Current player energy state used by resource formula projections.</param>
     /// <param name="currentVisitOrdinal">Current distinct room visit ordinal.</param>
     /// <param name="grantSequence">Monotonic room-clear sequence.</param>
-    private static void ScheduleTemporary(in GameRoomRewardModuleElement module,
-                                          DynamicBuffer<PlayerScalableStatElement> scalableStats,
-                                          DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> modifiers,
-                                          DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> resources,
-                                          DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
-                                          in PlayerHealth health,
-                                          in PlayerExperience experience,
-                                          in PlayerPowerUpsState powerUpsState,
-                                          uint currentVisitOrdinal,
-                                          uint grantSequence)
+    private void ScheduleTemporary(in GameRoomRewardModuleElement module,
+                                   Entity playerEntity,
+                                   DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                   DynamicBuffer<PlayerRoomRewardTemporaryModifierElement> modifiers,
+                                   DynamicBuffer<PlayerRoomRewardTemporaryResourceElement> resources,
+                                   DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents,
+                                   in PlayerHealth health,
+                                   in PlayerExperience experience,
+                                   in PlayerPowerUpsState powerUpsState,
+                                   uint currentVisitOrdinal,
+                                   uint grantSequence)
     {
         uint activeFromVisit = currentVisitOrdinal == uint.MaxValue
             ? uint.MaxValue
@@ -445,9 +459,14 @@ public partial class GameRoomRewardGrantSystem : SystemBase
         }
 
         // Capture an acquisition-time projection for the preauthored player log.
+        PlayerRuntimeScalingFormulaContextUtility.Fill(EntityManager,
+                                                        playerEntity,
+                                                        effectiveScalableStats,
+                                                        effectiveVariableContext);
         PlayerRoomRewardValueUtility.ResolveScheduledPresentationValue(
             in module,
             scalableStats,
+            effectiveVariableContext,
             in health,
             in experience,
             in powerUpsState,

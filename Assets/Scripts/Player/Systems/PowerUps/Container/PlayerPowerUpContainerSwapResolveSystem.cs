@@ -37,7 +37,6 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
         ComponentLookup<PlayerPowerUpContainerInteractionConfig> interactionConfigLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionConfig>(true);
         ComponentLookup<PlayerPowerUpContainerInteractionLock> interactionLockLookup = SystemAPI.GetComponentLookup<PlayerPowerUpContainerInteractionLock>(false);
         BufferLookup<PlayerDroppedPowerUpContainerSlotElement> droppedContainerSlotLookup = SystemAPI.GetBufferLookup<PlayerDroppedPowerUpContainerSlotElement>(false);
-        BufferLookup<PlayerScalableStatElement> scalableStatsLookup = SystemAPI.GetBufferLookup<PlayerScalableStatElement>(true);
         BufferLookup<PlayerPowerUpUnlockCatalogElement> unlockCatalogLookup = SystemAPI.GetBufferLookup<PlayerPowerUpUnlockCatalogElement>(false);
         EntityCommandBuffer commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
@@ -61,11 +60,8 @@ public partial struct PlayerPowerUpContainerSwapResolveSystem : ISystem
 
             PlayerPowerUpContainerInteractionConfig interactionConfig = interactionConfigLookup[playerEntity];
             PlayerPowerUpContainerStoredStateMode storedStateMode = interactionConfig.StoredStateMode;
-            DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup.HasBuffer(playerEntity)
-                ? scalableStatsLookup[playerEntity]
-                : default;
-            float interactionLockDuration = PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(in interactionConfig,
-                                                                                                                            scalableStats);
+            float interactionLockDuration = PlayerPowerUpContainerInteractionRuntimeUtility.ResolveInteractionLockDuration(state.EntityManager,
+                                                                                                                            playerEntity);
             PlayerPowerUpsConfig powerUpsConfig;
             PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigBuffer,
                                                    out powerUpsConfig);

@@ -32,7 +32,7 @@ Material:
     - _ColorMask: 15
     - _EdgeSoftness: 0.4
     - _FadeDirection: 0
-    - _FadeMode: 0
+    - _FadeMode: 1
     - _FadeProgress: 0
     - _NoiseScale: 5.5
     - _NoiseStrength: 0.2

@@ -69,7 +69,7 @@ public static class PlayerRoomRewardValueUtility
     /// <param name="flatValue">Flat delta when no formula is used.</param>
     /// <param name="formula">Unified formula expression that resolves a resource delta.</param>
     /// <param name="scalableStats">Authoritative scalable stats updated when experience changes.</param>
-    /// <param name="formulaScalableStats">Optional effective stat projection exposed to formula variables.</param>
+    /// <param name="formulaContext">Effective scalable-stat context exposed to formula variables.</param>
     /// <param name="health">Mutable player health.</param>
     /// <param name="experience">Mutable player experience.</param>
     /// <param name="powerUpsState">Mutable active power-up energy state.</param>
@@ -80,7 +80,7 @@ public static class PlayerRoomRewardValueUtility
                                       float flatValue,
                                       string formula,
                                       DynamicBuffer<PlayerScalableStatElement> scalableStats,
-                                      IReadOnlyList<PlayerScalableStatElement> formulaScalableStats,
+                                      IReadOnlyDictionary<string, PlayerFormulaValue> formulaContext,
                                       ref PlayerHealth health,
                                       ref PlayerExperience experience,
                                       ref PlayerPowerUpsState powerUpsState,
@@ -94,14 +94,12 @@ public static class PlayerRoomRewardValueUtility
 
         if (valueSource == GameRoomRewardValueSource.Formula)
         {
-            if (formulaScalableStats == null)
-                PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
-            else
-                PlayerScalingRuntimeFormulaUtility.FillVariableContext(formulaScalableStats, variableContext);
+            if (formulaContext == null)
+                return 0f;
 
             if (!PlayerScalingRuntimeFormulaUtility.TryEvaluateFormula(formula,
                                                                         currentValue,
-                                                                        variableContext,
+                                                                        formulaContext,
                                                                         out delta,
                                                                         out string _,
                                                                         false))
@@ -143,7 +141,8 @@ public static class PlayerRoomRewardValueUtility
     /// matching the semantics consumed by the production grant path.
     /// </summary>
     /// <param name="module">Baked formula module to preview.</param>
-    /// <param name="scalableStats">Current authoritative scalable-stat buffer exposed to named variables.</param>
+    /// <param name="scalableStats">Current authoritative scalable-stat buffer used by stat-target previews.</param>
+    /// <param name="formulaContext">Effective scalable-stat context used by resource formula previews.</param>
     /// <param name="health">Current player health used for a Health resource formula's reserved [this] value.</param>
     /// <param name="experience">Current player experience used for an Experience formula's reserved [this] value.</param>
     /// <param name="powerUpsState">Current energy state used by active power-up resource formulas.</param>
@@ -153,6 +152,7 @@ public static class PlayerRoomRewardValueUtility
     public static bool TryEvaluateFormulaPreview(
         in GameRoomRewardModuleElement module,
         DynamicBuffer<PlayerScalableStatElement> scalableStats,
+        IReadOnlyDictionary<string, PlayerFormulaValue> formulaContext,
         in PlayerHealth health,
         in PlayerExperience experience,
         in PlayerPowerUpsState powerUpsState,
@@ -207,13 +207,14 @@ public static class PlayerRoomRewardValueUtility
                                                           in experience,
                                                           in powerUpsState);
         baseValue = PlayerFormulaValue.CreateNumber(currentResourceValue);
-        PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats,
-                                                               variableContext);
+
+        if (formulaContext == null)
+            return false;
 
         if (!PlayerScalingRuntimeFormulaUtility.TryEvaluateFormula(
                 module.Formula.ToString(),
                 currentResourceValue,
-                variableContext,
+                formulaContext,
                 out float numericResult,
                 out string _,
                 false))
@@ -230,7 +231,8 @@ public static class PlayerRoomRewardValueUtility
     /// Formula failures retain their source marker so presentation can expose an explicit unavailable value.
     /// </summary>
     /// <param name="module">Temporary module whose presentation payload is projected.</param>
-    /// <param name="scalableStats">Current authoritative stats exposed to formula variables.</param>
+    /// <param name="scalableStats">Current authoritative stats used by stat-target preview semantics.</param>
+    /// <param name="formulaContext">Effective scalable-stat context used by resource formula previews.</param>
     /// <param name="health">Current player health used by resource formulas.</param>
     /// <param name="experience">Current player experience used by resource formulas.</param>
     /// <param name="powerUpsState">Current player energy state used by resource formulas.</param>
@@ -241,6 +243,7 @@ public static class PlayerRoomRewardValueUtility
     public static void ResolveScheduledPresentationValue(
         in GameRoomRewardModuleElement module,
         DynamicBuffer<PlayerScalableStatElement> scalableStats,
+        IReadOnlyDictionary<string, PlayerFormulaValue> formulaContext,
         in PlayerHealth health,
         in PlayerExperience experience,
         in PlayerPowerUpsState powerUpsState,
@@ -261,6 +264,7 @@ public static class PlayerRoomRewardValueUtility
         // Evaluate formulas through the same parser, variable context and target normalization as grants.
         if (!TryEvaluateFormulaPreview(in module,
                                        scalableStats,
+                                       formulaContext,
                                        in health,
                                        in experience,
                                        in powerUpsState,

@@ -35,7 +35,6 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
     /// <param name="passiveToolsState">Mutable passive snapshot receiving the combined embedded projectile-size multiplier.</param>
     /// <param name="playerExperience">Mutable runtime experience component synchronized after reconciliation.</param>
     /// <param name="playerLevel">Mutable runtime level component synchronized after reconciliation.</param>
-    /// <param name="playerExperienceCollection">Mutable runtime pickup-radius component synchronized after reconciliation.</param>
     /// <returns>True when the reconciliation changed at least one scalable stat; otherwise false.</returns>
     public static bool ReconcileScopedCharacterTuning(in PlayerPowerUpSlotConfig primarySlotConfig,
                                                       in PlayerPowerUpSlotConfig secondarySlotConfig,
@@ -51,8 +50,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                                                       DynamicBuffer<PlayerProjectileSizePowerUpMultiplierElement> projectileSizeMultipliers,
                                                       ref PlayerPassiveToolsState passiveToolsState,
                                                       ref PlayerExperience playerExperience,
-                                                      ref PlayerLevel playerLevel,
-                                                      ref PlayerExperienceCollection playerExperienceCollection)
+                                                      ref PlayerLevel playerLevel)
     {
         bool primaryWasApplied = chargeCharacterTuningState.PrimaryIsApplied != 0;
         bool secondaryWasApplied = chargeCharacterTuningState.SecondaryIsApplied != 0;
@@ -179,8 +177,7 @@ internal static class PlayerPowerUpChargeCharacterTuningRuntimeUtility
                                                                                progressionConfig,
                                                                                runtimeGamePhases,
                                                                                ref playerExperience,
-                                                                               ref playerLevel,
-                                                                               ref playerExperienceCollection);
+                                                                               ref playerLevel);
         return true;
     }
     #endregion

@@ -25,7 +25,6 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
         state.RequireForUpdate<PlayerRuntimeGamePhaseElement>();
         state.RequireForUpdate<PlayerExperience>();
         state.RequireForUpdate<PlayerLevel>();
-        state.RequireForUpdate<PlayerExperienceCollection>();
     }
 
     /// <summary>
@@ -34,33 +33,25 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        ComponentLookup<PlayerExperienceCollection> playerExperienceCollectionLookup = SystemAPI.GetComponentLookup<PlayerExperienceCollection>(false);
-
         foreach ((DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalog,
                   DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulas,
                   DynamicBuffer<PlayerScalableStatElement> scalableStats,
                   DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                   RefRO<PlayerProgressionConfig> progressionConfig,
                   RefRW<PlayerExperience> playerExperience,
-                  RefRW<PlayerLevel> playerLevel,
-                  Entity entity)
+                  RefRW<PlayerLevel> playerLevel)
                  in SystemAPI.Query<DynamicBuffer<PlayerPowerUpUnlockCatalogElement>,
                                     DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement>,
                                     DynamicBuffer<PlayerScalableStatElement>,
                                     DynamicBuffer<PlayerRuntimeGamePhaseElement>,
                                     RefRO<PlayerProgressionConfig>,
                                     RefRW<PlayerExperience>,
-                                    RefRW<PlayerLevel>>().WithEntityAccess())
+                                    RefRW<PlayerLevel>>())
         {
-            if (!playerExperienceCollectionLookup.HasComponent(entity))
-                continue;
-
             DynamicBuffer<PlayerPowerUpUnlockCatalogElement> unlockCatalogBuffer = unlockCatalog;
             DynamicBuffer<PlayerPowerUpCharacterTuningFormulaElement> characterTuningFormulaBuffer = characterTuningFormulas;
             DynamicBuffer<PlayerScalableStatElement> scalableStatsBuffer = scalableStats;
             DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhaseBuffer = runtimeGamePhases;
-            PlayerExperienceCollection playerExperienceCollection = playerExperienceCollectionLookup[entity];
-            bool anyPending = false;
 
             for (int catalogIndex = 0; catalogIndex < unlockCatalogBuffer.Length; catalogIndex++)
             {
@@ -69,7 +60,6 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
                 if (unlockCatalogEntry.PendingInitialCharacterTuningApply == 0)
                     continue;
 
-                anyPending = true;
                 PlayerPowerUpCharacterTuningRuntimeUtility.TryApplyCharacterTuning(in unlockCatalogEntry,
                                                                                    characterTuningFormulaBuffer,
                                                                                    scalableStatsBuffer,
@@ -77,15 +67,9 @@ public partial struct PlayerPowerUpCharacterTuningInitializeSystem : ISystem
                                                                                    runtimeGamePhaseBuffer,
                                                                                    ref playerExperience.ValueRW,
                                                                                    ref playerLevel.ValueRW,
-                                                                                   ref playerExperienceCollection,
                                                                                    out int _);
                 unlockCatalogEntry.PendingInitialCharacterTuningApply = 0;
             }
-
-            if (!anyPending)
-                continue;
-
-            playerExperienceCollectionLookup[entity] = playerExperienceCollection;
         }
     }
     #endregion

@@ -12,6 +12,7 @@ using UnityEngine;
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerProgressionInitializeSystem))]
+[UpdateAfter(typeof(PlayerRuntimeScalingSyncSystem))]
 public partial struct PlayerScalingDebugConsoleSystem : ISystem
 {
     #region Constants
@@ -20,6 +21,11 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
     #endregion
 
     #region Fields
+    private static readonly List<PlayerScalableStatElement> effectiveScalableStats =
+        new List<PlayerScalableStatElement>(64);
+    private static readonly Dictionary<string, PlayerFormulaValue> variableContext =
+        new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
+    private static readonly StringBuilder batchedLogBuilder = new StringBuilder(1024);
     private EntityQuery ruleDebugQuery;
     private NativeParallelHashMap<ulong, float> lastLoggedRuleValues;
     private NativeParallelHashMap<ulong, uint> lastEntityVariableHashes;
@@ -95,8 +101,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
 
         nextAllowedLogTime = elapsedTime + MinimumLogIntervalSeconds;
 
-        Dictionary<string, PlayerFormulaValue> variableContext = new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
-        StringBuilder batchedLogBuilder = new StringBuilder(1024);
+        batchedLogBuilder.Clear();
         int batchedRuleCount = 0;
 
         foreach ((DynamicBuffer<PlayerScalingDebugRuleElement> debugRules,
@@ -109,12 +114,17 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
                 continue;
 
             ulong entityKey = ComposeEntityKey(entity);
-            uint variableContextHash = PlayerScalableStatHashUtility.ComputeHash(scalableStats);
+            uint variableContextHash = state.EntityManager.HasComponent<PlayerRuntimeScalingState>(entity)
+                ? state.EntityManager.GetComponentData<PlayerRuntimeScalingState>(entity).LastScalableStatsHash
+                : PlayerScalableStatHashUtility.ComputeHash(scalableStats);
 
             if (!HasEntityVariableHashChanged(entityKey, variableContextHash))
                 continue;
 
-            PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
+            PlayerRuntimeScalingFormulaContextUtility.Fill(state.EntityManager,
+                                                            entity,
+                                                            effectiveScalableStats,
+                                                            variableContext);
 
             for (int ruleIndex = 0; ruleIndex < debugRules.Length; ruleIndex++)
             {
@@ -189,6 +199,7 @@ public partial struct PlayerScalingDebugConsoleSystem : ISystem
         return (entityKey * 1099511628211UL) ^ rulePart;
     }
 
+    /// <summary>
     /// Updates the entity-variable hash cache and reports whether the context changed since the previous logged sample.
     /// </summary>
     /// <param name="entityKey">Packed entity key.</param>

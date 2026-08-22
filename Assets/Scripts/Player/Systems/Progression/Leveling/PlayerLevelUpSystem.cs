@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -21,6 +20,10 @@ public partial struct PlayerLevelUpSystem : ISystem
     #region Fields
     private static readonly Dictionary<string, PlayerFormulaValue> scheduleVariableContext =
         new Dictionary<string, PlayerFormulaValue>(64, StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, PlayerFormulaValue> milestoneVariableContext =
+        new Dictionary<string, PlayerFormulaValue>(64, StringComparer.OrdinalIgnoreCase);
+    private static readonly List<PlayerScalableStatElement> milestoneEffectiveScalableStats =
+        new List<PlayerScalableStatElement>(64);
     private EntityQuery stolenPowerUpStealerQuery;
     #endregion
 
@@ -250,7 +253,7 @@ public partial struct PlayerLevelUpSystem : ISystem
             // Pause progression consumption while a milestone selection is active.
             if (hasMilestoneSelectionData && milestoneSelectionState.IsSelectionActive != 0)
             {
-                int selectionActiveLevel = mathMax(0, playerLevel.ValueRO.Current);
+                int selectionActiveLevel = Math.Max(0, playerLevel.ValueRO.Current);
 
                 if (PlayerProgressionPhaseUtility.HasReachedLevelCap(progressionConfig.ValueRO, selectionActiveLevel))
                 {
@@ -262,15 +265,14 @@ public partial struct PlayerLevelUpSystem : ISystem
                     };
                 }
 
-                SyncScalableStats(scalableStats, playerExperience.ValueRO.Current, playerLevel.ValueRO.Current);
-                PlayerExperiencePickupRadiusRuntimeUtility.SyncRuntimeComponent(ref playerExperienceCollection.ValueRW,
-                                                                               progressionConfig.ValueRO,
-                                                                               scalableStats);
+                PlayerLevelUpRuntimeUtility.SyncScalableStats(scalableStats,
+                                                               playerExperience.ValueRO.Current,
+                                                               playerLevel.ValueRO.Current);
                 continue;
             }
 
-            float currentExperience = mathMax(0f, playerExperience.ValueRO.Current);
-            int currentLevel = mathMax(0, playerLevel.ValueRO.Current);
+            float currentExperience = Math.Max(0f, playerExperience.ValueRO.Current);
+            int currentLevel = Math.Max(0, playerLevel.ValueRO.Current);
             int levelCap = PlayerProgressionPhaseUtility.ResolveLevelCap(progressionConfig.ValueRO);
             int activeGamePhaseIndex = PlayerProgressionPhaseUtility.ResolveActiveGamePhaseIndex(progressionConfig.ValueRO, currentLevel);
             bool nextLevelIsMilestone = false;
@@ -304,7 +306,7 @@ public partial struct PlayerLevelUpSystem : ISystem
                 currentExperience -= requiredExperienceForNextLevel;
                 currentLevel += 1;
                 gainedLevelsCount += 1;
-                SyncScalableStats(scalableStats, currentExperience, currentLevel);
+                PlayerLevelUpRuntimeUtility.SyncScalableStats(scalableStats, currentExperience, currentLevel);
 
                 // Apply repeating level-up schedule for the newly reached level.
                 if (TryApplyScheduleStep(progressionConfig.ValueRO,
@@ -445,10 +447,22 @@ public partial struct PlayerLevelUpSystem : ISystem
                                                                                             out Dictionary<string, int> reservedUnlockCountsByPowerUpId,
                                                                                             out HashSet<PassiveToolKind> reservedPassiveKinds);
 
+                // Rebuild the same effective stat context used by runtime scaling before evaluating tier and entry formulas.
+                PlayerRuntimeScalingFormulaContextUtility.Fill(entity,
+                                                                in scalableStatsLookup,
+                                                                in temporaryModifiersLookup,
+                                                                in temporaryStateLookup,
+                                                                in runtimeComboConfigLookup,
+                                                                in comboCounterStateLookup,
+                                                                in runtimeComboRanksLookup,
+                                                                in characterTuningFormulaLookup,
+                                                                milestoneEffectiveScalableStats,
+                                                                milestoneVariableContext);
+
                 if (!PlayerMilestonePowerUpRollUtility.TryOpenMilestoneSelection(progressionConfig.ValueRO,
                                                                                  consumedRequirementPhaseIndex,
                                                                                  consumedMilestoneLevel,
-                                                                                 scalableStats,
+                                                                                 milestoneVariableContext,
                                                                                  unlockCatalog,
                                                                                  tierDefinitions,
                                                                                  tierEntries,
@@ -486,10 +500,7 @@ public partial struct PlayerLevelUpSystem : ISystem
                 ActiveGamePhaseIndex = activeGamePhaseIndex,
                 RequiredExperienceForNextLevel = requiredExperienceForNextLevel
             };
-            SyncScalableStats(scalableStats, currentExperience, currentLevel);
-            PlayerExperiencePickupRadiusRuntimeUtility.SyncRuntimeComponent(ref playerExperienceCollection.ValueRW,
-                                                                           progressionConfig.ValueRO,
-                                                                           scalableStats);
+            PlayerLevelUpRuntimeUtility.SyncScalableStats(scalableStats, currentExperience, currentLevel);
 
             if (hasMilestoneSelectionData)
                 milestoneSelectionStateLookup[entity] = milestoneSelectionState;
@@ -511,12 +522,12 @@ public partial struct PlayerLevelUpSystem : ISystem
                 GameAudioEventRequestUtility.EnqueueGlobal(audioRequests, levelAudioEventId);
             }
 
-            QueueLevelUpVfx(entity,
-                            gainedLevelsCount,
-                            reachedMilestone,
-                            in levelUpVfxConfigLookup,
-                            in localTransformLookup,
-                            powerUpVfxRequestsLookup);
+            PlayerLevelUpRuntimeUtility.QueueLevelUpVfx(entity,
+                                                        gainedLevelsCount,
+                                                        reachedMilestone,
+                                                        in levelUpVfxConfigLookup,
+                                                        in localTransformLookup,
+                                                        powerUpVfxRequestsLookup);
 
             string previousPhaseID = PlayerProgressionPhaseUtility.ResolvePhaseID(progressionConfig.ValueRO, startingGamePhaseIndex);
             string activePhaseID = PlayerProgressionPhaseUtility.ResolvePhaseID(progressionConfig.ValueRO, activeGamePhaseIndex);
@@ -536,68 +547,6 @@ public partial struct PlayerLevelUpSystem : ISystem
                                     requiredExperienceForNextLevel,
                                     milestoneState,
                                     selectionState));
-        }
-    }
-    #endregion
-
-    #region Level-Up VFX
-    /// <summary>
-    /// Queues managed visual feedback for player level-up events after progression state has advanced.
-    /// </summary>
-    /// <param name="playerEntity">Player entity that leveled up.</param>
-    /// <param name="gainedLevelsCount">Number of levels gained during the current progression update.</param>
-    /// <param name="reachedMilestone">True when at least one consumed level-up threshold was a milestone.</param>
-    /// <param name="levelUpVfxConfigLookup">Lookup containing optional visual-preset level-up VFX config.</param>
-    /// <param name="localTransformLookup">Lookup used to seed the initial VFX world position.</param>
-    /// <param name="powerUpVfxRequestsLookup">Writable request buffer lookup consumed by the managed VFX pool.</param>
-    private static void QueueLevelUpVfx(Entity playerEntity,
-                                        int gainedLevelsCount,
-                                        bool reachedMilestone,
-                                        in ComponentLookup<PlayerLevelUpVfxConfig> levelUpVfxConfigLookup,
-                                        in ComponentLookup<LocalTransform> localTransformLookup,
-                                        BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestsLookup)
-    {
-        if (gainedLevelsCount <= 0)
-            return;
-
-        if (!levelUpVfxConfigLookup.HasComponent(playerEntity))
-            return;
-
-        if (!powerUpVfxRequestsLookup.HasBuffer(playerEntity))
-            return;
-
-        PlayerLevelUpVfxConfig config = levelUpVfxConfigLookup[playerEntity];
-
-        if (config.PrefabEntity == Entity.Null && config.SourcePrefab.Value == null)
-            return;
-
-        if (config.TriggerMode == PlayerLevelUpVfxTriggerMode.MilestonePowerUpsOnly && !reachedMilestone)
-            return;
-
-        int spawnCount = config.TriggerMode == PlayerLevelUpVfxTriggerMode.EveryLevelUp
-            ? math.max(1, gainedLevelsCount)
-            : 1;
-        float3 playerPosition = localTransformLookup.HasComponent(playerEntity)
-            ? localTransformLookup[playerEntity].Position
-            : float3.zero;
-        DynamicBuffer<PlayerPowerUpVfxSpawnRequest> vfxRequests = powerUpVfxRequestsLookup[playerEntity];
-
-        for (int spawnIndex = 0; spawnIndex < spawnCount; spawnIndex++)
-        {
-            vfxRequests.Add(new PlayerPowerUpVfxSpawnRequest
-            {
-                PrefabEntity = config.PrefabEntity,
-                SourcePrefab = config.SourcePrefab,
-                Position = playerPosition + config.SpawnOffset,
-                Rotation = quaternion.identity,
-                UniformScale = math.max(0.01f, config.UniformScale),
-                LifetimeSeconds = math.max(0.05f, config.LifetimeSeconds),
-                FollowTargetEntity = playerEntity,
-                FollowPositionOffset = config.SpawnOffset,
-                FollowValidationEntity = Entity.Null,
-                FollowValidationSpawnVersion = 0u,
-                Velocity = float3.zero
-            });
         }
     }
     #endregion
@@ -726,61 +675,6 @@ public partial struct PlayerLevelUpSystem : ISystem
         }
 
         return -1;
-    }
-    #endregion
-
-    #region Helpers
-    /// <summary>
-    /// Synchronizes common progression scalable stat values after experience/level changes.
-    /// </summary>
-    /// <param name="scalableStats">Runtime scalable stat buffer.</param>
-    /// <param name="experienceValue">Current experience value to propagate.</param>
-    /// <param name="levelValue">Current level value to propagate.</param>
-
-    private static void SyncScalableStats(DynamicBuffer<PlayerScalableStatElement> scalableStats, float experienceValue, int levelValue)
-    {
-        if (!scalableStats.IsCreated)
-            return;
-
-        for (int statIndex = 0; statIndex < scalableStats.Length; statIndex++)
-        {
-            PlayerScalableStatElement statElement = scalableStats[statIndex];
-            string statName = statElement.Name.ToString();
-
-            if (string.Equals(statName, "experience", StringComparison.OrdinalIgnoreCase))
-            {
-                if (PlayerScalableStatValueUtility.TryWriteRuntimeValue(ref statElement,
-                                                                        PlayerFormulaValue.CreateNumber(experienceValue),
-                                                                        out string _))
-                {
-                    scalableStats[statIndex] = statElement;
-                }
-
-                continue;
-            }
-
-            if (!string.Equals(statName, "level", StringComparison.OrdinalIgnoreCase))
-                continue;
-
-            if (!PlayerScalableStatValueUtility.TryWriteRuntimeValue(ref statElement,
-                                                                     PlayerFormulaValue.CreateNumber(levelValue),
-                                                                     out string _))
-            {
-                continue;
-            }
-
-            scalableStats[statIndex] = statElement;
-        }
-    }
-
-    private static int mathMax(int left, int right)
-    {
-        return left > right ? left : right;
-    }
-
-    private static float mathMax(float left, float right)
-    {
-        return left > right ? left : right;
     }
     #endregion
 

@@ -107,10 +107,9 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
     /// <param name="unlockCatalogEntry">Catalog entry containing the flattened formula range.</param>
     /// <param name="characterTuningFormulas">Flattened Character Tuning formula buffer.</param>
     /// <param name="scalableStats">Mutable scalable-stat buffer updated in place.</param>
-    /// <param name="progressionConfig">Runtime progression config used to synchronize level requirements and pickup radius.</param>
+    /// <param name="progressionConfig">Runtime progression config used to synchronize level requirements.</param>
     /// <param name="playerExperience">Mutable runtime experience component synchronized after formula execution.</param>
     /// <param name="playerLevel">Mutable runtime level component synchronized after formula execution.</param>
-    /// <param name="playerExperienceCollection">Mutable runtime experience-collection component synchronized after formula execution.</param>
     /// <param name="appliedFormulaCount">Number of formulas successfully applied.</param>
     /// <returns>True when at least one formula changed runtime scalable stats; otherwise false.</returns>
     public static bool TryApplyCharacterTuning(in PlayerPowerUpUnlockCatalogElement unlockCatalogEntry,
@@ -120,7 +119,6 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
                                                DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                ref PlayerExperience playerExperience,
                                                ref PlayerLevel playerLevel,
-                                               ref PlayerExperienceCollection playerExperienceCollection,
                                                out int appliedFormulaCount)
     {
         if (!TryApplyCharacterTuningFormulas(in unlockCatalogEntry,
@@ -135,8 +133,7 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
                                     progressionConfig,
                                     runtimeGamePhases,
                                     ref playerExperience,
-                                    ref playerLevel,
-                                    ref playerExperienceCollection);
+                                    ref playerLevel);
         return true;
     }
 
@@ -282,16 +279,14 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
     /// Synchronizes progression runtime components and reserved scalable stats after Character Tuning changes.
     /// </summary>
     /// <param name="scalableStats">Mutable scalable-stat buffer containing the latest values.</param>
-    /// <param name="progressionConfig">Runtime progression config used to resolve the current level requirement and pickup radius.</param>
+    /// <param name="progressionConfig">Runtime progression config used to resolve the current level requirement.</param>
     /// <param name="playerExperience">Mutable runtime experience component.</param>
     /// <param name="playerLevel">Mutable runtime level component.</param>
-    /// <param name="playerExperienceCollection">Mutable runtime experience-collection component.</param>
     public static void SyncProgressionRuntimeState(DynamicBuffer<PlayerScalableStatElement> scalableStats,
                                                    PlayerProgressionConfig progressionConfig,
                                                    DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases,
                                                    ref PlayerExperience playerExperience,
-                                                   ref PlayerLevel playerLevel,
-                                                   ref PlayerExperienceCollection playerExperienceCollection)
+                                                   ref PlayerLevel playerLevel)
     {
         float resolvedExperience = math.max(0f, ResolveScalableStatValue(scalableStats, "experience", playerExperience.Current));
         int levelCap = PlayerProgressionPhaseUtility.ResolveLevelCap(progressionConfig);
@@ -325,9 +320,6 @@ public static class PlayerPowerUpCharacterTuningRuntimeUtility
 
         TryWriteReservedStatValue(scalableStats, "experience", resolvedExperience);
         TryWriteReservedStatValue(scalableStats, "level", resolvedLevel);
-        PlayerExperiencePickupRadiusRuntimeUtility.SyncRuntimeComponent(ref playerExperienceCollection,
-                                                                        progressionConfig,
-                                                                        scalableStats);
     }
 
     /// <summary>

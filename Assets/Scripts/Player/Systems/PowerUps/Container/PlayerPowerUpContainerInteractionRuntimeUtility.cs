@@ -9,7 +9,10 @@ using Unity.Mathematics;
 internal static class PlayerPowerUpContainerInteractionRuntimeUtility
 {
     #region Fields
-    private static readonly Dictionary<string, PlayerFormulaValue> variableContext = new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
+    private static readonly List<PlayerScalableStatElement> effectiveScalableStats =
+        new List<PlayerScalableStatElement>(64);
+    private static readonly Dictionary<string, PlayerFormulaValue> variableContext =
+        new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
     #endregion
 
     #region Methods
@@ -19,10 +22,10 @@ internal static class PlayerPowerUpContainerInteractionRuntimeUtility
     /// Resolves the current post-swap interaction cooldown from baked config and optional Add Scaling metadata.
     /// </summary>
     /// <param name="interactionConfig">Runtime container interaction config baked on the player entity.</param>
-    /// <param name="scalableStats">Current runtime scalable-stat buffer used by formula variables.</param>
+    /// <param name="formulaContext">Effective scalable-stat context used by the unified formula.</param>
     /// <returns>Non-negative cooldown duration in seconds.</returns>
     public static float ResolveInteractionLockDuration(in PlayerPowerUpContainerInteractionConfig interactionConfig,
-                                                       DynamicBuffer<PlayerScalableStatElement> scalableStats)
+                                                       IReadOnlyDictionary<string, PlayerFormulaValue> formulaContext)
     {
         float defaultDuration = math.max(0f, interactionConfig.InteractionLockDuration);
         string formula = interactionConfig.InteractionLockDurationScalingFormula.ToString();
@@ -30,17 +33,13 @@ internal static class PlayerPowerUpContainerInteractionRuntimeUtility
         if (string.IsNullOrWhiteSpace(formula))
             return defaultDuration;
 
-        if (!scalableStats.IsCreated || scalableStats.Length <= 0)
+        if (formulaContext == null || formulaContext.Count <= 0)
             return defaultDuration;
-
-        // Build the same typed variable context used by other runtime scaling formulas.
-        variableContext.Clear();
-        PlayerScalingRuntimeFormulaUtility.FillVariableContext(scalableStats, variableContext);
 
         if (!PlayerRuntimeScalingFormulaEvaluationUtility.TryEvaluateNumericValue(formula,
                                                                                   math.max(0f, interactionConfig.BaseInteractionLockDuration),
                                                                                   false,
-                                                                                  variableContext,
+                                                                                  formulaContext,
                                                                                   out float resolvedDuration))
         {
             return defaultDuration;
@@ -66,11 +65,12 @@ internal static class PlayerPowerUpContainerInteractionRuntimeUtility
         if (!entityManager.HasComponent<PlayerPowerUpContainerInteractionConfig>(playerEntity))
             return 0f;
 
-        DynamicBuffer<PlayerScalableStatElement> scalableStats = entityManager.HasBuffer<PlayerScalableStatElement>(playerEntity)
-            ? entityManager.GetBuffer<PlayerScalableStatElement>(playerEntity)
-            : default;
         PlayerPowerUpContainerInteractionConfig interactionConfig = entityManager.GetComponentData<PlayerPowerUpContainerInteractionConfig>(playerEntity);
-        return ResolveInteractionLockDuration(in interactionConfig, scalableStats);
+        PlayerRuntimeScalingFormulaContextUtility.Fill(entityManager,
+                                                        playerEntity,
+                                                        effectiveScalableStats,
+                                                        variableContext);
+        return ResolveInteractionLockDuration(in interactionConfig, variableContext);
     }
     #endregion
 

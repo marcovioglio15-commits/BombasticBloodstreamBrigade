@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
@@ -16,11 +17,16 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     #region Fields
     private readonly List<GameRoomRewardPresentationItem> formattedItems =
         new List<GameRoomRewardPresentationItem>(16);
+    private readonly List<PlayerScalableStatElement> effectiveScalableStats =
+        new List<PlayerScalableStatElement>(64);
+    private readonly Dictionary<string, PlayerFormulaValue> effectiveVariableContext =
+        new Dictionary<string, PlayerFormulaValue>(StringComparer.OrdinalIgnoreCase);
     private EntityQuery managerQuery;
     private EntityQuery audioQuery;
     private EntityQuery playerQuery;
     private EntityQuery portalQuery;
     private uint lastAnchorRevision;
+    private uint lastFormulaContextHash;
     private uint lastGenerationVersion;
     private int lastCurrentNodeIndex = -1;
     private byte lastRoomCleared;
@@ -51,6 +57,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
         playerQuery = GetEntityQuery(typeof(PlayerHealth),
                                      typeof(PlayerExperience),
                                      typeof(PlayerPowerUpsState),
+                                     typeof(PlayerRuntimeScalingState),
                                      typeof(PlayerScalableStatElement));
         audioQuery = GetEntityQuery(typeof(GameAudioEventRequest));
         portalQuery = GetEntityQuery(typeof(GameRoomPortal),
@@ -84,18 +91,23 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
             return;
 
         Entity playerEntity = playerQuery.GetSingletonEntity();
+        uint formulaContextHash =
+            EntityManager.GetComponentData<PlayerRuntimeScalingState>(playerEntity).LastScalableStatsHash;
         GameRoomRewardConfig config =
             EntityManager.GetComponentData<GameRoomRewardConfig>(managerEntity);
         uint anchorRevision = GameRoomPortalRewardLogAnchor.Revision;
         bool graphChanged = lastGenerationVersion != runtimeState.GenerationVersion;
         bool roomChanged = lastCurrentNodeIndex != runtimeState.CurrentNodeIndex;
         bool clearStateChanged = lastRoomCleared != runtimeState.CurrentRoomCleared;
+        bool formulaContextChanged = lastFormulaContextHash != formulaContextHash;
         bool requiresFullRefresh = graphChanged ||
                                    roomChanged ||
                                    clearStateChanged ||
+                                   formulaContextChanged ||
                                    lastAnchorRevision != anchorRevision;
 
         lastAnchorRevision = anchorRevision;
+        lastFormulaContextHash = formulaContextHash;
         lastGenerationVersion = runtimeState.GenerationVersion;
         lastCurrentNodeIndex = runtimeState.CurrentNodeIndex;
         lastRoomCleared = runtimeState.CurrentRoomCleared;
@@ -159,6 +171,10 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                 EntityManager.GetComponentData<PlayerExperience>(playerEntity);
             PlayerPowerUpsState powerUpsState =
                 EntityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+            PlayerRuntimeScalingFormulaContextUtility.Fill(EntityManager,
+                                                            playerEntity,
+                                                            effectiveScalableStats,
+                                                            effectiveVariableContext);
 
             // Each changed active portal resolves its assigned edge once and rebuilds only when its signature differs.
             for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
@@ -200,7 +216,10 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                        portalAnimations,
                                        portalReplacements);
 
-                if (!view.NeedsRebuild(signature))
+                int presentationSignature = BuildPresentationSignature(signature,
+                                                                       formulaContextHash);
+
+                if (!view.NeedsRebuild(presentationSignature))
                     continue;
 
                 if (!TryResolveDestinationTileIndex(portalState.AssignedEdgeIndex,
@@ -219,6 +238,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                       modules,
                                       mappings,
                                       scalableStats,
+                                      effectiveVariableContext,
                                       in health,
                                       in experience,
                                       in powerUpsState,
@@ -231,7 +251,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                 }
 
                 float3 center = portal.Center;
-                view.Rebuild(signature,
+                view.Rebuild(presentationSignature,
                              formattedItems,
                              new Vector3(center.x, center.y, center.z),
                              in config);
@@ -396,7 +416,8 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     /// <param name="moduleBindings">All reward-to-module bindings.</param>
     /// <param name="modules">All flattened atomic modules.</param>
     /// <param name="mappings">All shared presentation mappings.</param>
-    /// <param name="scalableStats">Current authoritative player stats exposed to formula variables.</param>
+    /// <param name="scalableStats">Current authoritative player stats used by stat-target previews.</param>
+    /// <param name="formulaContext">Effective scalable-stat context used by resource formula previews.</param>
     /// <param name="health">Current player health used by resource formulas.</param>
     /// <param name="experience">Current player experience used by resource formulas.</param>
     /// <param name="powerUpsState">Current player active power-up energy used by resource formulas.</param>
@@ -409,6 +430,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
         DynamicBuffer<GameRoomRewardModuleElement> modules,
         DynamicBuffer<GameRoomRewardPresentationElement> mappings,
         DynamicBuffer<PlayerScalableStatElement> scalableStats,
+        IReadOnlyDictionary<string, PlayerFormulaValue> formulaContext,
         in PlayerHealth health,
         in PlayerExperience experience,
         in PlayerPowerUpsState powerUpsState,
@@ -450,6 +472,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                     PlayerRoomRewardValueUtility.TryEvaluateFormulaPreview(
                         in module,
                         scalableStats,
+                        formulaContext,
                         in health,
                         in experience,
                         in powerUpsState,
@@ -484,6 +507,21 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
             signature = signature * 397 ^ assignedEdgeIndex;
             signature = signature * 397 ^ portalHash;
             return signature;
+        }
+    }
+
+    /// <summary>
+    /// Extends the stable portal signature with the current effective scalable-stat context.
+    /// </summary>
+    /// <param name="portalSignature">Stable graph, assignment and portal identity signature.</param>
+    /// <param name="formulaContextHash">Current runtime scaling hash including temporary and combo inputs.</param>
+    /// <returns>Combined signature used to invalidate formula-backed portal content.</returns>
+    private static int BuildPresentationSignature(int portalSignature,
+                                                  uint formulaContextHash)
+    {
+        unchecked
+        {
+            return portalSignature * 397 ^ (int)formulaContextHash;
         }
     }
     #endregion
