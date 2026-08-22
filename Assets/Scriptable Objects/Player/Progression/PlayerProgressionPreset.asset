@@ -110,9 +110,9 @@ MonoBehaviour:
     defaultTokenValue: 
   - statName: Knockback
     statType: 0
-    defaultValue: 7
-    minimumValue: -1000000
-    maximumValue: 1000000
+    defaultValue: 5
+    minimumValue: 0
+    maximumValue: 100
     defaultBooleanValue: 0
     defaultTokenValue: 
   - statName: BulletElementType_A
@@ -155,6 +155,13 @@ MonoBehaviour:
     defaultValue: 50
     minimumValue: -1000000
     maximumValue: 1000000
+    defaultBooleanValue: 0
+    defaultTokenValue: 
+  - statName: PostDamageImmunity
+    statType: 0
+    defaultValue: 1
+    minimumValue: 0
+    maximumValue: 10
     defaultBooleanValue: 0
     defaultTokenValue: 
   scalingRules:
