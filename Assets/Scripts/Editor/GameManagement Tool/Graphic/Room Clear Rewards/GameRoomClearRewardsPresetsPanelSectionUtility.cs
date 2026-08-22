@@ -42,14 +42,14 @@ internal static class GameRoomClearRewardsPresetsPanelSectionUtility
                               serializedPreset,
                               "Player Reward Log",
                               "playerLogSettings",
-                              "Preauthored vertical rows above the player. Runtime code never instantiates UI.");
+                              "Preauthored vertical rows above the player.");
                 break;
             case GameRoomClearRewardsPresetsPanel.DetailsTab.PortalLog:
-                BuildSettings(root,
-                              serializedPreset,
-                              "Portal Reward Log",
-                              "portalLogSettings",
-                              "Preauthored horizontal cells on portals. Preview content is rebuilt only when its destination changes.");
+                GameRoomRewardPortalSettingsEditorUtility.Build(root, serializedPreset);
+                break;
+            case GameRoomClearRewardsPresetsPanel.DetailsTab.PortalIndicators:
+                GameRoomRewardPortalIndicatorSettingsEditorUtility.Build(root,
+                                                                         serializedPreset);
                 break;
         }
     }
@@ -81,7 +81,7 @@ internal static class GameRoomClearRewardsPresetsPanelSectionUtility
     /// </summary>
     /// <param name="root">Content root receiving the settings.</param>
     /// <param name="serializedPreset">Current serialized preset.</param>
-    /// <param name="title">-facing section title.</param>
+    /// <param name="title">Visible section title.</param>
     /// <param name="propertyName">Serialized settings property name.</param>
     /// <param name="message">Architecture note shown above settings.</param>
     private static void BuildSettings(VisualElement root,
@@ -112,7 +112,7 @@ internal static class GameRoomClearRewardsPresetsPanelSectionUtility
     /// <param name="root">Parent visual element.</param>
     /// <param name="serializedPreset">Current serialized preset.</param>
     /// <param name="propertyName">Serialized property name.</param>
-    /// <param name="label">-facing field label.</param>
+    /// <param name="label">Visible field label.</param>
     /// <returns>Created field, or null when the serialized property is unavailable.</returns>
     private static PropertyField AddProperty(VisualElement root,
                                              SerializedObject serializedPreset,

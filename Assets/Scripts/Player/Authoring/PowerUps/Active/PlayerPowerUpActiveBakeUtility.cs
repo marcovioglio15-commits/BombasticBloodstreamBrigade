@@ -581,6 +581,12 @@ public static class PlayerPowerUpActiveBakeUtility
 
         if (hasReturningProjectiles)
         {
+            if (ProjectileReturnStartModeUtility.UsesResourceDrain(returningProjectilesConfig.ReturnStartMode) &&
+                !hasGateResource)
+            {
+                returningProjectilesConfig.ReturnStartMode = ProjectileReturnStartMode.AutomaticDelay;
+            }
+
             PlayerPassiveToolConfig samePowerUpModules = isToggleable
                 ? togglePassiveTool
                 : triggeredProjectilePassiveTool;
@@ -761,6 +767,7 @@ public static class PlayerPowerUpActiveBakeUtility
         };
         slotConfig.HasReturningProjectiles = hasReturningProjectiles ? (byte)1 : (byte)0;
         slotConfig.ReturningProjectiles = returningProjectilesConfig;
+        slotConfig.HasResourceGate = hasGateResource ? (byte)1 : (byte)0;
     }
 
     /// <summary>

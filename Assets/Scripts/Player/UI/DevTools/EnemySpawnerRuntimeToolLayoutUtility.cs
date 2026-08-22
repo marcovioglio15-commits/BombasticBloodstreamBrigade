@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,3 +40,4 @@ public static class EnemySpawnerRuntimeToolLayoutUtility
 
     #endregion
 }
+#endif

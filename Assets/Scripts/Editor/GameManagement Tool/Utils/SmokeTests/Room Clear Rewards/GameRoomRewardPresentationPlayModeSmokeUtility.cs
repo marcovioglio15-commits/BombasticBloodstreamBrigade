@@ -164,8 +164,10 @@ internal static class GameRoomRewardPresentationPlayModeSmokeUtility
                     if (!GameRoomPortalRewardLogAnchor.TryResolve(
                             portal.PortalId,
                             portal.Center,
-                            out GameRoomPortalRewardLogView view))
+                            out GameRoomPortalRewardLogAnchor anchor))
                         continue;
+
+                    GameRoomPortalRewardLogView view = anchor.LogView;
 
                     if (view != null && view.HasVisibleContent)
                     {

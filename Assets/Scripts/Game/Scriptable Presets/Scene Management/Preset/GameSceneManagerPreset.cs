@@ -47,6 +47,10 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     [Tooltip("When enabled, transition lifecycle messages are logged by the runtime execution system.")]
     [SerializeField] private bool logTransitions;
 
+    [Header("Gameplay Camera")]
+    [Tooltip("When enabled, environment renderers between the gameplay camera and the player are hidden without changing their collision.")]
+    [SerializeField] private bool enablePlayerCameraOcclusion = true;
+
     [Header("Fade")]
     [Tooltip("Default fade presentation and timing applied to transitions without overrides.")]
     [SerializeField] private GameSceneFadeSettings fadeSettings = new GameSceneFadeSettings();
@@ -156,6 +160,14 @@ public sealed class GameSceneManagerPreset : ScriptableObject
         get
         {
             return logTransitions;
+        }
+    }
+
+    public bool EnablePlayerCameraOcclusion
+    {
+        get
+        {
+            return enablePlayerCameraOcclusion;
         }
     }
 

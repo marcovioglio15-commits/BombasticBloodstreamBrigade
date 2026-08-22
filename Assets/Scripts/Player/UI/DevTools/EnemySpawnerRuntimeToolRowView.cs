@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -249,3 +250,4 @@ public sealed class EnemySpawnerRuntimeToolRowView : MonoBehaviour
 
     #endregion
 }
+#endif

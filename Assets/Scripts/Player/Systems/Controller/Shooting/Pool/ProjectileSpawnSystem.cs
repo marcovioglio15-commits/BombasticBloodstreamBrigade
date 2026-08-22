@@ -212,11 +212,16 @@ public partial struct ProjectileSpawnSystem : ISystem
                 if (missingProjectiles <= 0)
                     continue;
 
+                int expandCount = ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(requestPrefab,
+                                                                                              prefabEntity,
+                                                                                              missingProjectiles,
+                                                                                              expandBatch);
+
                 expansionRequests.Add(new PoolExpansionRequest
                 {
                     ShooterEntity = shooterEntity,
                     ProjectilePrefab = requestPrefab,
-                    ExpandCount = math.max(expandBatch, missingProjectiles)
+                    ExpandCount = expandCount
                 });
             }
         }
@@ -389,6 +394,17 @@ public partial struct ProjectileSpawnSystem : ISystem
                                                                                                     prefabEntity,
                                                                                                     entityManager);
 
+                bool hasReturningProjectiles = ProjectileSpawnPoolSelectionUtility.TryResolveReturningProjectiles(in request,
+                                                                                                                    in passiveToolsState,
+                                                                                                                    out ReturningProjectilesConfig returningProjectilesConfig);
+
+                // Returning Projectiles owns whether an otherwise compatible orbital source may alter this shot.
+                if (hasReturningProjectiles &&
+                    !ProjectileReturnPowerUpInteractionUtility.AllowsOrbitalTrajectory(in returningProjectilesConfig))
+                {
+                    hasPerfectCircle = false;
+                }
+
                 if (!ProjectileSpawnPoolSelectionUtility.TryAcquire(shooterProjectilePool,
                                                                     requestPrefab,
                                                                     out Entity projectileEntity))
@@ -414,9 +430,6 @@ public partial struct ProjectileSpawnSystem : ISystem
 
                 float baseScale = ResolveProjectileBaseScale(projectileEntity, projectileTransform.Scale, in projectileBaseScaleLookup);
 
-                bool hasReturningProjectiles = ProjectileSpawnPoolSelectionUtility.TryResolveReturningProjectiles(in request,
-                                                                                                                   in passiveToolsState,
-                                                                                                                   out ReturningProjectilesConfig returningProjectilesConfig);
                 float embeddedPowerUpSizeMultiplier = request.ProjectileSizePowerUpMultiplier > 0f
                     ? request.ProjectileSizePowerUpMultiplier
                     : 1f;

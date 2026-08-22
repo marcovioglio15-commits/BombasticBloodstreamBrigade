@@ -93,6 +93,12 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
             case GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress:
                 BuildPropertySection(panel, "Loading Progress", "loadingProgressSettings", "Circular loading-progress indicator shown during black-screen transition loading.");
                 break;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.GameplayCamera:
+                BuildGameplayCameraSection(panel);
+                break;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.BuildFeatures:
+                BuildBuildFeaturesSection(panel);
+                break;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Triggers:
                 BuildTriggerSection(panel);
                 break;
@@ -197,6 +203,38 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
     {
         VisualElement section = CreateSection(panel, title);
         AddPropertyField(panel, section, propertyName, tooltip);
+    }
+
+    /// <summary>
+    /// Builds gameplay-camera presentation controls baked by the selected Scene Manager preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    private static void BuildGameplayCameraSection(GameSceneManagerPresetsPanel panel)
+    {
+        VisualElement section = CreateSection(panel, "Gameplay Camera");
+        AddPropertyField(panel,
+                         section,
+                         "enablePlayerCameraOcclusion",
+                         "Hide environment renderers that block the camera's view of the player while preserving collision and simulation.");
+    }
+
+    /// <summary>
+    /// Builds project-wide player-build feature switches that are independent from the selected preset draft.
+    /// </summary>
+    /// <param name="panel">Owning panel receiving the project build controls.</param>
+    private static void BuildBuildFeaturesSection(GameSceneManagerPresetsPanel panel)
+    {
+        VisualElement section = CreateSection(panel, "Build Features");
+        Toggle excludeSpawnerToolToggle = new Toggle("Exclude Runtime Enemy Spawner Tool From Player Builds");
+        excludeSpawnerToolToggle.tooltip = "When enabled, player builds omit the main-menu button, authored panel hierarchy, runtime catalog, ECS override buffers, and all executable runtime-spawner test logic.";
+        excludeSpawnerToolToggle.SetValueWithoutNotify(EnemySpawnerRuntimeToolBuildFeatureUtility.IsExcludedFromPlayerBuilds);
+        excludeSpawnerToolToggle.RegisterValueChangedCallback(changeEvent =>
+            EnemySpawnerRuntimeToolBuildFeatureUtility.SetExcludedFromPlayerBuilds(changeEvent.newValue));
+        section.Add(excludeSpawnerToolToggle);
+
+        HelpBox scopeBox = new HelpBox("This project-wide switch applies immediately and is not part of the selected preset draft. The tool remains available in Editor for test-scene authoring; excluded player builds contain neither its UI nor its runtime data and code.",
+                                       HelpBoxMessageType.Info);
+        section.Add(scopeBox);
     }
 
     /// <summary>
@@ -307,6 +345,8 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Transitions, "Transitions");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Fade, "Fade");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress, "Loading Progress");
+        AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.GameplayCamera, "Gameplay Camera");
+        AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.BuildFeatures, "Build Features");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Triggers, "Triggers");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Validation, "Validation");
         AddSectionButton(panel, buttonsRoot, GameSceneManagerPresetsPanel.DetailsSectionType.Addressables, "Addressables");
@@ -355,6 +395,10 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
                 return 112f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.LoadingProgress:
                 return 136f;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.GameplayCamera:
+                return 132f;
+            case GameSceneManagerPresetsPanel.DetailsSectionType.BuildFeatures:
+                return 112f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Transitions:
                 return 96f;
             case GameSceneManagerPresetsPanel.DetailsSectionType.Validation:

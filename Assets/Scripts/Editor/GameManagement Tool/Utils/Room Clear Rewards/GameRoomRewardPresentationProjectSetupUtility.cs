@@ -23,6 +23,7 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         SharedViewPrefabFolder + "/PF_RoomRewardPortalAnchor.prefab";
     private const string PlayerViewObjectName = "Room Clear Reward Log";
     private const string PortalLogObjectName = "Room Reward Log";
+    private const string PortalIndicatorObjectName = "Open Portal Indicator";
     private const float CanvasWorldScale = 0.1f;
     #endregion
 
@@ -46,6 +47,51 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         SynchronizeRoomMetadata();
         Debug.Log("[GameRoomRewardPresentationProjectSetupUtility] Room reward presentation and portal isolation setup completed.");
     }
+
+    // [MenuItem("Tools/Game Management/Room Clear Rewards/Refresh Open Portal Indicator Prefab")]
+    /// <summary>
+    /// Adds or refreshes only the preauthored portal indicator hierarchy without rebuilding scenes or unrelated views.
+    /// </summary>
+    public static void ExecutePortalIndicatorSetup()
+    {
+        GameObject prefabRoot = PrefabUtility.LoadPrefabContents(
+            PortalLogAnchorPrefabPath);
+
+        try
+        {
+            RemoveOwnedChild(prefabRoot.transform, PortalIndicatorObjectName);
+            GameRoomPortalOffscreenIndicatorView indicatorView =
+                CreatePortalIndicatorView(prefabRoot.transform);
+            GameRoomPortalRewardLogAnchor anchor =
+                prefabRoot.GetComponent<GameRoomPortalRewardLogAnchor>();
+            GameRoomPortalRewardLogView logView =
+                prefabRoot.GetComponentInChildren<GameRoomPortalRewardLogView>(true);
+            GameRoomPortalRewardEffectView effectView =
+                prefabRoot.GetComponent<GameRoomPortalRewardEffectView>();
+
+            if (anchor == null || logView == null || effectView == null)
+            {
+                throw new InvalidOperationException(
+                    "The shared portal anchor prefab is missing a required presentation component.");
+            }
+
+            anchor.ConfigureAuthoring(anchor.PortalId,
+                                      logView,
+                                      effectView,
+                                      indicatorView);
+            PrefabUtility.SaveAsPrefabAsset(prefabRoot,
+                                            PortalLogAnchorPrefabPath);
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(prefabRoot);
+        }
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+        Debug.Log("[GameRoomRewardPresentationProjectSetupUtility] Open portal indicator prefab refreshed.");
+    }
+
     #endregion
 
     #region Metadata Synchronization
@@ -215,6 +261,10 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         GameObject portalLogTemplate = CreateWorldCanvasObject(PortalLogObjectName,
                                                                null,
                                                                new Vector2(24f, 5f));
+        portalLogTemplate.AddComponent<CanvasRenderer>();
+        Image portalBackground = portalLogTemplate.AddComponent<Image>();
+        portalBackground.raycastTarget = false;
+        portalBackground.enabled = false;
         RectMask2D mask = portalLogTemplate.AddComponent<RectMask2D>();
         mask.padding = Vector4.zero;
         Canvas portalLogCanvas = portalLogTemplate.GetComponent<Canvas>();
@@ -226,13 +276,14 @@ public static class GameRoomRewardPresentationProjectSetupUtility
                         GameRoomPortalRewardLogView.PreauthoredCellCapacity,
                         new Vector2(22f, 4f),
                         TextAlignmentOptions.Center);
-        portalLogView.ConfigureAuthoring(portalLogCanvas, cells);
+        portalLogView.ConfigureAuthoring(portalLogCanvas, cells, portalBackground);
         GameObject portalLogPrefab =
             PrefabUtility.SaveAsPrefabAsset(portalLogTemplate,
                                             PortalLogPrefabPath);
         UnityEngine.Object.DestroyImmediate(portalLogTemplate);
         GameObject anchorTemplate = new GameObject(
             "Room Reward Portal Anchor",
+            typeof(GameRoomPortalRewardEffectView),
             typeof(GameRoomPortalRewardLogAnchor));
         GameObject portalLogViewInstance =
             InstantiateSharedView(portalLogPrefab,
@@ -240,8 +291,15 @@ public static class GameRoomRewardPresentationProjectSetupUtility
                                   PortalLogObjectName);
         GameRoomPortalRewardLogView portalLogViewComponent =
             portalLogViewInstance.GetComponent<GameRoomPortalRewardLogView>();
+        GameRoomPortalRewardEffectView portalEffectView =
+            anchorTemplate.GetComponent<GameRoomPortalRewardEffectView>();
+        GameRoomPortalOffscreenIndicatorView portalIndicatorView =
+            CreatePortalIndicatorView(anchorTemplate.transform);
         anchorTemplate.GetComponent<GameRoomPortalRewardLogAnchor>()
-            .ConfigureAuthoring(string.Empty, portalLogViewComponent);
+            .ConfigureAuthoring(string.Empty,
+                                portalLogViewComponent,
+                                portalEffectView,
+                                portalIndicatorView);
         portalLogAnchorPrefab =
             PrefabUtility.SaveAsPrefabAsset(anchorTemplate,
                                             PortalLogAnchorPrefabPath);
@@ -301,6 +359,51 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         canvas.overrideSorting = true;
         canvasObject.layer = 0;
         return canvasObject;
+    }
+
+    /// <summary>
+    /// Creates one setup-owned screen-space portal indicator with no runtime-instantiated UI objects.
+    /// </summary>
+    /// <param name="parent">Portal anchor transform receiving the indicator canvas.</param>
+    /// <returns>Configured preauthored portal indicator view.</returns>
+    private static GameRoomPortalOffscreenIndicatorView CreatePortalIndicatorView(
+        Transform parent)
+    {
+        GameObject canvasObject = new GameObject(
+            PortalIndicatorObjectName,
+            typeof(RectTransform),
+            typeof(Canvas),
+            typeof(GameRoomPortalOffscreenIndicatorView));
+        RectTransform canvasTransform = canvasObject.GetComponent<RectTransform>();
+        canvasTransform.SetParent(parent, false);
+        canvasTransform.localPosition = Vector3.zero;
+        canvasTransform.localRotation = Quaternion.identity;
+        canvasTransform.localScale = Vector3.one;
+        Canvas canvas = canvasObject.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 450;
+        canvas.overrideSorting = true;
+        GameObject indicatorObject = new GameObject(
+            "Indicator",
+            typeof(RectTransform),
+            typeof(CanvasRenderer),
+            typeof(Image));
+        RectTransform indicatorTransform =
+            indicatorObject.GetComponent<RectTransform>();
+        indicatorTransform.SetParent(canvasTransform, false);
+        indicatorTransform.anchorMin = new Vector2(0.5f, 0.5f);
+        indicatorTransform.anchorMax = new Vector2(0.5f, 0.5f);
+        indicatorTransform.pivot = new Vector2(0.5f, 0.5f);
+        indicatorTransform.localScale = Vector3.one;
+        Image indicatorImage = indicatorObject.GetComponent<Image>();
+        indicatorImage.raycastTarget = false;
+        indicatorImage.preserveAspect = true;
+        GameRoomPortalOffscreenIndicatorView indicatorView =
+            canvasObject.GetComponent<GameRoomPortalOffscreenIndicatorView>();
+        indicatorView.ConfigureAuthoring(canvas,
+                                         indicatorTransform,
+                                         indicatorImage);
+        return indicatorView;
     }
 
     /// <summary>

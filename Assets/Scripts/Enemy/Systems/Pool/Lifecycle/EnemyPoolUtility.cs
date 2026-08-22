@@ -645,7 +645,8 @@ public static class EnemyPoolUtility
         {
             HasStolenPowerUp = 0,
             PowerUpId = default,
-            StolenKind = PlayerPowerUpUnlockKind.Active
+            StolenKind = PlayerPowerUpUnlockKind.Active,
+            IconScaleMultiplier = 1f
         };
     }
 

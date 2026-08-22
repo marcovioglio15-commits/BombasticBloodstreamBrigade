@@ -19,10 +19,12 @@ public static class GameRoomRewardPresentationFormatter
     /// </summary>
     /// <param name="rewardEvent">Post-clamp grant event emitted by the authoritative reward system.</param>
     /// <param name="mappings">Baked target presentation mappings.</param>
+    /// <param name="displayMode">Detailed or sign-only value presentation.</param>
     /// <returns>Immutable descriptor consumed by the preauthored player log.</returns>
     public static GameRoomRewardPresentationItem FormatPlayerEvent(
         in PlayerRoomRewardPresentationEvent rewardEvent,
-        DynamicBuffer<GameRoomRewardPresentationElement> mappings)
+        DynamicBuffer<GameRoomRewardPresentationElement> mappings,
+        GameRoomRewardValueDisplayMode displayMode)
     {
         GameRoomRewardPresentationElement mapping =
             ResolveMapping(rewardEvent.PresentationMappingIndex, mappings, out bool hasMapping);
@@ -32,12 +34,16 @@ public static class GameRoomRewardPresentationFormatter
         string label = hasMapping && !mapping.DisplayLabel.IsEmpty
             ? mapping.DisplayLabel.ToString()
             : fallbackLabel;
-        string valueSummary = rewardEvent.StartsNextRoom != 0
-            ? ResolveScheduledValueSummary(in rewardEvent)
-            : ResolveAppliedValueSummary(in rewardEvent);
+        bool simplified = displayMode == GameRoomRewardValueDisplayMode.Simplified;
+        string valueSummary = simplified
+            ? ResolveSimplifiedPlayerValue(in rewardEvent)
+            : rewardEvent.StartsNextRoom != 0
+                ? ResolveScheduledValueSummary(in rewardEvent)
+                : ResolveAppliedValueSummary(in rewardEvent);
         string durationSummary = ResolveDurationSummary(rewardEvent.StartsNextRoom != 0,
                                                         rewardEvent.IsTemporary != 0,
-                                                        rewardEvent.DurationRooms);
+                                                        rewardEvent.DurationRooms,
+                                                        simplified);
         string text = string.Concat(label, " ", valueSummary, durationSummary);
         return BuildItem(text, mapping, hasMapping);
     }
@@ -51,6 +57,7 @@ public static class GameRoomRewardPresentationFormatter
     /// <param name="formulaBaseValue">Current typed target value used as [this] by a formula module.</param>
     /// <param name="formulaResult">Typed formula result resolved from the current authoritative player snapshot.</param>
     /// <param name="hasFormulaResult">True when a formula module was evaluated successfully.</param>
+    /// <param name="displayMode">Detailed or sign-only value presentation.</param>
     /// <returns>Immutable descriptor consumed by a portal log.</returns>
     public static GameRoomRewardPresentationItem FormatPortalModule(
         in GameRoomRewardModuleElement module,
@@ -58,7 +65,8 @@ public static class GameRoomRewardPresentationFormatter
         DynamicBuffer<GameRoomRewardPresentationElement> mappings,
         in PlayerFormulaValue formulaBaseValue,
         in PlayerFormulaValue formulaResult,
-        bool hasFormulaResult)
+        bool hasFormulaResult,
+        GameRoomRewardValueDisplayMode displayMode)
     {
         GameRoomRewardPresentationElement mapping =
             ResolveMapping(module.PresentationMappingIndex, mappings, out bool hasMapping);
@@ -68,17 +76,25 @@ public static class GameRoomRewardPresentationFormatter
         string label = hasMapping && !mapping.DisplayLabel.IsEmpty
             ? mapping.DisplayLabel.ToString()
             : fallbackLabel;
-        string valueSummary = ResolveModulePreviewValue(in module,
-                                                        in formulaBaseValue,
-                                                        in formulaResult,
-                                                        hasFormulaResult);
-        string durationSummary = module.Duration == GameRoomRewardDuration.Temporary
+        bool simplified = displayMode == GameRoomRewardValueDisplayMode.Simplified;
+        string valueSummary = simplified
+            ? ResolveSimplifiedPortalValue(in module,
+                                           in formulaBaseValue,
+                                           in formulaResult,
+                                           hasFormulaResult)
+            : ResolveModulePreviewValue(in module,
+                                        in formulaBaseValue,
+                                        in formulaResult,
+                                        hasFormulaResult);
+        string durationSummary = module.Duration == GameRoomRewardDuration.Temporary && simplified
+            ? " (temporary)"
+            : module.Duration == GameRoomRewardDuration.Temporary
             ? string.Format(CultureInfo.InvariantCulture,
                             " (next {0} room{1})",
                             module.DurationRooms,
                             module.DurationRooms == 1 ? string.Empty : "s")
             : string.Empty;
-        string quantitySummary = quantity > 1
+        string quantitySummary = quantity > 1 && !simplified
             ? string.Format(CultureInfo.InvariantCulture, " ×{0}", quantity)
             : string.Empty;
         string text = string.Concat(label,
@@ -91,6 +107,84 @@ public static class GameRoomRewardPresentationFormatter
     #endregion
 
     #region Value Formatting
+    /// <summary>
+    /// Reduces one authoritative player event to a sign without exposing numeric or token payloads.
+    /// </summary>
+    /// <param name="rewardEvent">Applied or scheduled player reward event.</param>
+    /// <returns>Positive, negative or neutral sign summary.</returns>
+    private static string ResolveSimplifiedPlayerValue(
+        in PlayerRoomRewardPresentationEvent rewardEvent)
+    {
+        if (rewardEvent.TargetDomain == GameRoomRewardTargetDomain.Resource)
+            return ResolveSign(rewardEvent.NumericDelta);
+
+        switch (rewardEvent.StatType)
+        {
+            case PlayerScalableStatType.Boolean:
+                return rewardEvent.BooleanValue != 0 ? "+" : "-";
+            case PlayerScalableStatType.Token:
+                return "+";
+            default:
+                return ResolveSign(rewardEvent.NumericDelta);
+        }
+    }
+
+    /// <summary>
+    /// Reduces one portal module preview to a sign while preserving typed formula semantics.
+    /// </summary>
+    /// <param name="module">Flattened reward module.</param>
+    /// <param name="formulaBaseValue">Current typed target value supplied to formula evaluation.</param>
+    /// <param name="formulaResult">Typed formula result.</param>
+    /// <param name="hasFormulaResult">True when formula evaluation produced a compatible result.</param>
+    /// <returns>Positive, negative, neutral or unavailable sign summary.</returns>
+    private static string ResolveSimplifiedPortalValue(
+        in GameRoomRewardModuleElement module,
+        in PlayerFormulaValue formulaBaseValue,
+        in PlayerFormulaValue formulaResult,
+        bool hasFormulaResult)
+    {
+        if (module.ValueSource == GameRoomRewardValueSource.Flat)
+        {
+            if (module.TargetDomain == GameRoomRewardTargetDomain.Resource)
+                return ResolveSign(module.FlatNumericValue);
+
+            switch (module.TargetStatType)
+            {
+                case PlayerScalableStatType.Boolean:
+                    return module.FlatBooleanValue != 0 ? "+" : "-";
+                case PlayerScalableStatType.Token:
+                    return "+";
+                default:
+                    return ResolveSign(module.FlatNumericValue);
+            }
+        }
+
+        if (!hasFormulaResult || !formulaResult.IsValid)
+            return unavailableValueSummary;
+
+        if (module.TargetDomain == GameRoomRewardTargetDomain.Resource)
+        {
+            return formulaResult.Type == PlayerFormulaValueType.Number
+                ? ResolveSign(formulaResult.NumberValue)
+                : unavailableValueSummary;
+        }
+
+        switch (module.TargetStatType)
+        {
+            case PlayerScalableStatType.Boolean:
+                return formulaResult.Type == PlayerFormulaValueType.Boolean
+                    ? (formulaResult.BooleanValue ? "+" : "-")
+                    : unavailableValueSummary;
+            case PlayerScalableStatType.Token:
+                return formulaResult.Type == PlayerFormulaValueType.Token ? "+" : unavailableValueSummary;
+            default:
+                return formulaBaseValue.Type == PlayerFormulaValueType.Number &&
+                       formulaResult.Type == PlayerFormulaValueType.Number
+                    ? ResolveSign(formulaResult.NumberValue - formulaBaseValue.NumberValue)
+                    : unavailableValueSummary;
+        }
+    }
+
     /// <summary>
     /// Formats the actual post-clamp value carried by a player event.
     /// </summary>
@@ -263,11 +357,16 @@ public static class GameRoomRewardPresentationFormatter
     /// <param name="startsNextRoom">True for a newly acquired future-room schedule.</param>
     /// <param name="temporary">True for temporary effects.</param>
     /// <param name="durationRooms">Configured or currently represented room duration.</param>
+    /// <param name="simplified">True when numeric duration values must remain hidden.</param>
     /// <returns>Compact duration suffix.</returns>
     private static string ResolveDurationSummary(bool startsNextRoom,
                                                  bool temporary,
-                                                 int durationRooms)
+                                                 int durationRooms,
+                                                 bool simplified)
     {
+        if (simplified)
+            return startsNextRoom || temporary ? " (temporary)" : string.Empty;
+
         if (startsNextRoom)
         {
             return string.Format(CultureInfo.InvariantCulture,
@@ -289,6 +388,22 @@ public static class GameRoomRewardPresentationFormatter
     {
         string format = integral ? "+0;-0;0" : "+0.##;-0.##;0";
         return value.ToString(format, CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// Resolves a numeric direction without exposing its magnitude.
+    /// </summary>
+    /// <param name="value">Numeric delta or resource amount.</param>
+    /// <returns>Positive, negative or neutral sign.</returns>
+    private static string ResolveSign(float value)
+    {
+        if (value > 0f)
+            return "+";
+
+        if (value < 0f)
+            return "-";
+
+        return "±";
     }
     #endregion
 

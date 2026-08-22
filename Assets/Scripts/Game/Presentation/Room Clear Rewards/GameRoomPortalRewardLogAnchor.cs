@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
+using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -10,13 +11,6 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 {
-    #region Constants
-    /// <summary>
-    /// Gets the maximum world-space distance allowed between a managed anchor and its matching ECS portal center.
-    /// </summary>
-    public const float MaximumPositionError = 0.25f;
-    #endregion
-
     #region Fields
 
     #region Serialized Fields
@@ -27,6 +21,14 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     [Tooltip("Preauthored world-space log controlled by the ECS presentation bridge for this portal.")]
     [SerializeField]
     private GameRoomPortalRewardLogView logView;
+
+    [Tooltip("Preauthored bridge that maps baked portal effects to linked managed scene objects.")]
+    [SerializeField]
+    private GameRoomPortalRewardEffectView effectView;
+
+    [Tooltip("Preauthored screen-space indicator view used while this open portal is outside the camera view.")]
+    [SerializeField]
+    private GameRoomPortalOffscreenIndicatorView offscreenIndicatorView;
     #endregion
 
     #region Runtime Fields
@@ -48,6 +50,16 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     public GameRoomPortalRewardLogView LogView => logView;
 
+    /// <summary>
+    /// Gets the managed Transform and prefab-replacement bridge owned by this anchor.
+    /// </summary>
+    public GameRoomPortalRewardEffectView EffectView => effectView;
+
+    /// <summary>
+    /// Gets the preauthored screen-edge indicator owned by this portal anchor.
+    /// </summary>
+    public GameRoomPortalOffscreenIndicatorView OffscreenIndicatorView => offscreenIndicatorView;
+
     public static uint Revision => revision;
     #endregion
 
@@ -59,25 +71,51 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     /// <param name="resolvedPortalId">Stable identifier copied from the matching ECS portal authoring.</param>
     /// <param name="resolvedLogView">Preauthored world-space log owned by this anchor.</param>
+    /// <param name="resolvedEffectView">Preauthored linked-object effect bridge owned by this anchor.</param>
+    /// <param name="resolvedOffscreenIndicatorView">Preauthored screen-edge indicator owned by this anchor.</param>
     public void ConfigureAuthoring(string resolvedPortalId,
-                                   GameRoomPortalRewardLogView resolvedLogView)
+                                   GameRoomPortalRewardLogView resolvedLogView,
+                                   GameRoomPortalRewardEffectView resolvedEffectView,
+                                   GameRoomPortalOffscreenIndicatorView resolvedOffscreenIndicatorView)
     {
         portalId = resolvedPortalId;
         logView = resolvedLogView;
+        effectView = resolvedEffectView;
+        offscreenIndicatorView = resolvedOffscreenIndicatorView;
     }
 
     /// <summary>
-    /// Resolves the closest loaded managed-scene log matching one ECS portal identity and world position.
+    /// Starts baked portal effects once for a new authoritative portal assignment.
+    /// </summary>
+    /// <param name="signature">Generation and edge signature preventing duplicate activation.</param>
+    /// <param name="animations">Baked Transform animation definitions.</param>
+    /// <param name="replacements">Baked prefab replacement definitions.</param>
+    /// <returns>True when a new signature was accepted by the effect bridge.</returns>
+    public bool ActivateEffects(
+        int signature,
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> animations,
+        DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements)
+    {
+        if (effectView != null)
+            return effectView.Activate(signature,
+                                       animations,
+                                       replacements);
+
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves a loaded managed-scene log by identity, using position only to disambiguate duplicates.
     /// </summary>
     /// <param name="resolvedPortalId">Stable ECS portal identifier.</param>
     /// <param name="portalCenter">Current portal center after room-instance placement.</param>
-    /// <param name="view">Closest valid preauthored log when resolution succeeds.</param>
-    /// <returns>True when one loaded anchor matches both identity and placed world position.</returns>
+    /// <param name="resolvedAnchor">Closest valid preauthored anchor when resolution succeeds.</param>
+    /// <returns>True when one loaded anchor has the requested stable identity at any authored position.</returns>
     public static bool TryResolve(FixedString64Bytes resolvedPortalId,
                                   float3 portalCenter,
-                                  out GameRoomPortalRewardLogView view)
+                                  out GameRoomPortalRewardLogAnchor resolvedAnchor)
     {
-        view = null;
+        resolvedAnchor = null;
 
         if (resolvedPortalId.Length <= 0)
             return false;
@@ -88,25 +126,25 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         // Match identity first, then position to disambiguate duplicate staged instances of one room template.
         for (int anchorIndex = registeredAnchors.Count - 1; anchorIndex >= 0; anchorIndex--)
         {
-            GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
+            GameRoomPortalRewardLogAnchor candidate = registeredAnchors[anchorIndex];
 
-            if (anchor == null)
+            if (candidate == null)
             {
                 registeredAnchors.RemoveAt(anchorIndex);
                 IncrementRevision();
                 continue;
             }
 
-            if (!anchor.isActiveAndEnabled ||
-                anchor.logView == null ||
-                !string.Equals(anchor.portalId,
+            if (!candidate.isActiveAndEnabled ||
+                candidate.logView == null ||
+                !string.Equals(candidate.portalId,
                                resolvedPortalIdString,
                                StringComparison.Ordinal))
             {
                 continue;
             }
 
-            Vector3 offset = anchor.transform.position -
+            Vector3 offset = candidate.transform.position -
                              new Vector3(portalCenter.x, portalCenter.y, portalCenter.z);
             float distanceSquared = offset.sqrMagnitude;
 
@@ -114,14 +152,10 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
                 continue;
 
             nearestDistanceSquared = distanceSquared;
-            view = anchor.logView;
+            resolvedAnchor = candidate;
         }
 
-        if (nearestDistanceSquared <= MaximumPositionError * MaximumPositionError)
-            return true;
-
-        view = null;
-        return false;
+        return resolvedAnchor != null;
     }
 
     /// <summary>
@@ -134,8 +168,31 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
         {
             GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
 
-            if (anchor != null && anchor.logView != null)
+            if (anchor == null)
+                continue;
+
+            if (anchor.logView != null)
                 anchor.logView.Hide();
+
+            if (anchor.effectView != null)
+                anchor.effectView.Deactivate();
+
+            if (anchor.offscreenIndicatorView != null)
+                anchor.offscreenIndicatorView.Hide();
+        }
+    }
+
+    /// <summary>
+    /// Hides all registered screen-edge portal indicators while preserving logs and activation effects.
+    /// </summary>
+    public static void HideAllIndicators()
+    {
+        for (int anchorIndex = 0; anchorIndex < registeredAnchors.Count; anchorIndex++)
+        {
+            GameRoomPortalRewardLogAnchor anchor = registeredAnchors[anchorIndex];
+
+            if (anchor != null && anchor.offscreenIndicatorView != null)
+                anchor.offscreenIndicatorView.Hide();
         }
     }
     #endregion
@@ -146,6 +203,12 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        if (effectView == null)
+            effectView = GetComponent<GameRoomPortalRewardEffectView>();
+
+        if (offscreenIndicatorView == null)
+            offscreenIndicatorView = GetComponentInChildren<GameRoomPortalOffscreenIndicatorView>(true);
+
         if (!registeredAnchors.Contains(this))
         {
             registeredAnchors.Add(this);
@@ -154,6 +217,12 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 
         if (logView != null)
             logView.Hide();
+
+        if (effectView != null)
+            effectView.Deactivate();
+
+        if (offscreenIndicatorView != null)
+            offscreenIndicatorView.Hide();
     }
 
     /// <summary>
@@ -166,6 +235,12 @@ public sealed class GameRoomPortalRewardLogAnchor : MonoBehaviour
 
         if (logView != null)
             logView.Hide();
+
+        if (effectView != null)
+            effectView.Deactivate();
+
+        if (offscreenIndicatorView != null)
+            offscreenIndicatorView.Hide();
     }
     #endregion
 

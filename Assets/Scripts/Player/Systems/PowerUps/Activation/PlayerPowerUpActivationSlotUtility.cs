@@ -17,6 +17,7 @@ public static class PlayerPowerUpActivationSlotUtility
     /// <param name="otherSlotConfig">Compiled peer slot configuration used by interruption rules.</param>
     /// <param name="slotIndex">Stable active slot index used by slot-specific state.</param>
     /// <param name="activeReturningProjectileCount">Live returning projectiles currently registered to this slot.</param>
+    /// <param name="returningProjectileReconnectPending">Whether a reacquired projectile must return before another launch is allowed.</param>
     /// <param name="returningProjectileRecallReadyCount">Mutable count of projectiles waiting at an outbound endpoint.</param>
     /// <param name="returningProjectileRecallVersion">Mutable version advanced by each accepted recall tap.</param>
     /// <param name="isPressed">Whether the bound input is currently held.</param>
@@ -70,6 +71,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
                                         byte slotIndex,
                                         int activeReturningProjectileCount,
+                                        byte returningProjectileReconnectPending,
                                         ref int returningProjectileRecallReadyCount,
                                         ref uint returningProjectileRecallVersion,
                                         bool isPressed,
@@ -141,8 +143,9 @@ public static class PlayerPowerUpActivationSlotUtility
         }
 
         if (slotConfig.HasReturningProjectiles != 0 &&
-            slotConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0 &&
-            activeReturningProjectileCount > 0)
+            activeReturningProjectileCount > 0 &&
+            (returningProjectileReconnectPending != 0 ||
+             slotConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0))
         {
             return;
         }

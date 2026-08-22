@@ -177,7 +177,8 @@ public sealed class EnemyAuthoringBaker : Baker<EnemyAuthoring>
         {
             HasStolenPowerUp = 0,
             PowerUpId = default,
-            StolenKind = PlayerPowerUpUnlockKind.Active
+            StolenKind = PlayerPowerUpUnlockKind.Active,
+            IconScaleMultiplier = 1f
         });
 
         if (ShouldBakeShooterRuntime(compiledPattern))

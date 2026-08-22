@@ -23,6 +23,8 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     private static bool hasAnimation;
     private static bool loggedMissingAnimator;
     private static bool originalApplyRootMotion;
+    private static AnimatorUpdateMode originalUpdateMode;
+    private static bool animatorUpdateModeOverridden;
     private static bool rendererIsolationReady;
     private static float animationDuration;
     #endregion
@@ -73,6 +75,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
 
         isolatedAnimator = animator;
         rendererIsolationReady = true;
+        EnableUnscaledAnimator(animator);
 
         if (config.HasPlayerTransitionAnimation == 0)
             return;
@@ -112,6 +115,9 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         if (transitionAnimator != null)
             transitionAnimator.applyRootMotion = originalApplyRootMotion;
 
+        if (isolatedAnimator != null && animatorUpdateModeOverridden)
+            isolatedAnimator.updateMode = originalUpdateMode;
+
         GameSceneCameraLayerUtility.RestoreRendererObjectLayers(originalRendererLayers);
         trackedPlayerEntity = Entity.Null;
         animationPlayable = default;
@@ -119,6 +125,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         transitionAnimator = null;
         animationDuration = 0f;
         hasAnimation = false;
+        animatorUpdateModeOverridden = false;
         rendererIsolationReady = false;
         active = false;
         endRequested = false;
@@ -237,6 +244,20 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
                                                                      playerLayerIndex,
                                                                      originalRendererLayers) > 0 ||
                originalRendererLayers.Count > 0;
+    }
+
+    /// <summary>
+    /// Keeps the existing controller graph advancing while scene time is paused, without replacing its active state.
+    /// </summary>
+    /// <param name="animator">Persistent player Animator isolated by the transition camera.</param>
+    private static void EnableUnscaledAnimator(Animator animator)
+    {
+        if (animatorUpdateModeOverridden)
+            return;
+
+        originalUpdateMode = animator.updateMode;
+        animator.updateMode = AnimatorUpdateMode.UnscaledTime;
+        animatorUpdateModeOverridden = true;
     }
 
     /// <summary>

@@ -59,7 +59,10 @@ public partial class PlayerRoomRewardLogPresentationSystem : SystemBase
         {
             PlayerRoomRewardPresentationEvent rewardEvent = events[eventIndex];
             GameRoomRewardPresentationItem item =
-                GameRoomRewardPresentationFormatter.FormatPlayerEvent(in rewardEvent, mappings);
+                GameRoomRewardPresentationFormatter.FormatPlayerEvent(
+                    in rewardEvent,
+                    mappings,
+                    config.PlayerLogValueDisplayMode);
             view.Enqueue(in item);
         }
 

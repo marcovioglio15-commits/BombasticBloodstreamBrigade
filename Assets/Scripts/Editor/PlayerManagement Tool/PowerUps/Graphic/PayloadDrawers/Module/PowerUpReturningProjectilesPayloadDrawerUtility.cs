@@ -16,6 +16,7 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
     internal const string AutomaticReturnDelayContainerName = "returning-projectiles-automatic-delay";
     internal const string ActivationRecallOptionsContainerName = "returning-projectiles-activation-recall-options";
     internal const string ActivationRecallResourceGateContainerName = "returning-projectiles-activation-recall-resource-gate";
+    internal const string ResourceDrainOptionsContainerName = "returning-projectiles-resource-drain-options";
     internal const string ReturnTransitionContainerName = "returning-projectiles-return-transition";
     internal const string RepeatedContactDamageSettingsContainerName = "returning-projectiles-repeated-contact-damage-settings";
     #endregion
@@ -30,10 +31,12 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
     /// <param name="payloadProperty">Serialized Returning Projectiles payload.</param>
     /// <param name="showActiveProjectileConcurrencyOption">Whether the active-only overlap setting is relevant.</param>
     /// <param name="hasOwningResourceGate">Whether the owning Active can reapply Resource Gate recall costs.</param>
+    /// <param name="showStolenOwnershipPolicy">Whether the owning Active can be stolen and needs an in-flight projectile policy.</param>
     public static void Build(VisualElement payloadContainer,
                              SerializedProperty payloadProperty,
                              bool showActiveProjectileConcurrencyOption,
-                             bool hasOwningResourceGate = false)
+                             bool hasOwningResourceGate = false,
+                             bool showStolenOwnershipPolicy = true)
     {
         if (payloadContainer == null || payloadProperty == null)
             return;
@@ -80,11 +83,20 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         activationRecallOptionsContainer.style.marginLeft = 12f;
         VisualElement activationRecallResourceGateContainer = new VisualElement();
         activationRecallResourceGateContainer.name = ActivationRecallResourceGateContainerName;
+        VisualElement resourceDrainOptionsContainer = new VisualElement();
+        resourceDrainOptionsContainer.name = ResourceDrainOptionsContainerName;
+        resourceDrainOptionsContainer.style.marginLeft = 12f;
         projectileFoldout.Add(returnTransitionContainer);
 
         if (showActiveProjectileConcurrencyOption)
         {
-            PowerUpModuleDefinitionPayloadDrawerUtility.AddField(returnTransitionContainer, returnStartModeProperty, "Return Start Mode");
+            VisualElement returnStartModeField = PowerUpModuleDefinitionPayloadDrawerUtility.AddField(returnTransitionContainer,
+                                                                                                        returnStartModeProperty,
+                                                                                                        "Return Start Mode");
+
+            if (!hasOwningResourceGate)
+                RestrictReturnStartModeOptions(returnStartModeField, returnStartModeProperty);
+
             AddField(activationRecallOptionsContainer, payloadProperty, "allowEarlyActivationRecall", "Allow Early Activation Recall");
 
             if (hasOwningResourceGate)
@@ -105,6 +117,15 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         returnTransitionContainer.Add(automaticReturnDelayContainer);
         returnTransitionContainer.Add(activationRecallOptionsContainer);
         activationRecallOptionsContainer.Add(activationRecallResourceGateContainer);
+        returnTransitionContainer.Add(resourceDrainOptionsContainer);
+
+        if (showActiveProjectileConcurrencyOption && hasOwningResourceGate)
+        {
+            AddField(resourceDrainOptionsContainer,
+                     payloadProperty,
+                     "resourceReturnThresholdPercent",
+                     "Resource Return Threshold Percent");
+        }
 
         PowerUpModuleDefinitionPayloadDrawerUtility.AddField(automaticReturnDelayContainer,
                                                              returnDelaySecondsProperty,
@@ -167,11 +188,16 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
         AddField(otherInteractionOptionsContainer, payloadProperty, "enableProjectileSplitting", "Enable Projectile Splitting");
         AddField(otherInteractionOptionsContainer, payloadProperty, "applyToSplitProjectiles", "Apply to External Projectile Split Children");
         AddField(otherInteractionOptionsContainer, payloadProperty, "completeBouncesBeforeReturn", "Complete External Bounces Before Return");
-        AddField(otherInteractionOptionsContainer, payloadProperty, "completeOrbitalPathBeforeReturn", "Complete External Orbital Path Before Return");
+        AddField(otherInteractionOptionsContainer, payloadProperty, "completeOrbitalPathBeforeReturn", "Enable and Complete Orbital Path Before Return");
         AddField(otherInteractionOptionsContainer, payloadProperty, "applyTinyMegaProjectileScaling", "Apply Tiny/Mega Projectile Scaling");
 
         if (showActiveProjectileConcurrencyOption)
+        {
             AddField(interactionFoldout, payloadProperty, "allowConcurrentActiveProjectiles", "Allow Concurrent Active Projectiles");
+
+            if (showStolenOwnershipPolicy)
+                AddField(interactionFoldout, payloadProperty, "stolenOwnershipPolicy", "Stolen Projectile Policy");
+        }
         else
             AddField(otherInteractionOptionsContainer, payloadProperty, "applyToActivePowerUpProjectiles", "Apply to Other Active Projectile Shots");
 
@@ -213,11 +239,21 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
             otherInteractionOptionsContainer.style.display = allowOtherInteractionsProperty.boolValue
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
-            bool waitsForActivationRecall = showActiveProjectileConcurrencyOption &&
-                                            returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.ActivationTap;
-            automaticReturnDelayContainer.style.display = waitsForActivationRecall ? DisplayStyle.None : DisplayStyle.Flex;
-            activationRecallOptionsContainer.style.display = waitsForActivationRecall ? DisplayStyle.Flex : DisplayStyle.None;
-            activationRecallResourceGateContainer.style.display = waitsForActivationRecall && hasOwningResourceGate
+            ProjectileReturnStartMode returnStartMode = showActiveProjectileConcurrencyOption
+                ? (ProjectileReturnStartMode)returnStartModeProperty.enumValueIndex
+                : ProjectileReturnStartMode.AutomaticDelay;
+            bool usesActivationTap = showActiveProjectileConcurrencyOption &&
+                                     ProjectileReturnStartModeUtility.UsesActivationTap(returnStartMode);
+            bool usesResourceDrain = showActiveProjectileConcurrencyOption &&
+                                     ProjectileReturnStartModeUtility.UsesResourceDrain(returnStartMode);
+            automaticReturnDelayContainer.style.display = ProjectileReturnStartModeUtility.UsesAutomaticDelay(returnStartMode)
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            activationRecallOptionsContainer.style.display = usesActivationTap ? DisplayStyle.Flex : DisplayStyle.None;
+            activationRecallResourceGateContainer.style.display = usesActivationTap && hasOwningResourceGate
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            resourceDrainOptionsContainer.style.display = usesResourceDrain && hasOwningResourceGate
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
             repeatedContactDamageSettingsContainer.style.display = enableRepeatedContactDamageProperty.boolValue
@@ -240,8 +276,11 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
             AddPositiveWarning(payloadProperty, "returnSpeedMultiplier", "Return Speed Multiplier", warnings);
             AddPositiveWarning(payloadProperty, "outboundRangeMultiplier", "Outbound Range Multiplier", warnings);
             AddPositiveWarning(payloadProperty, "outboundLifetimeMultiplier", "Outbound Lifetime Multiplier", warnings);
-            if (!showActiveProjectileConcurrencyOption ||
-                returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.AutomaticDelay)
+            ProjectileReturnStartMode returnStartMode = showActiveProjectileConcurrencyOption
+                ? (ProjectileReturnStartMode)returnStartModeProperty.enumValueIndex
+                : ProjectileReturnStartMode.AutomaticDelay;
+
+            if (ProjectileReturnStartModeUtility.UsesAutomaticDelay(returnStartMode))
             {
                 AddNonNegativeWarning(payloadProperty, "returnDelaySeconds", "Return Delay", warnings);
             }
@@ -249,12 +288,26 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
             SerializedProperty reapplyResourceGateCostProperty = payloadProperty.FindPropertyRelative("reapplyResourceGateCostOnRecall");
 
             if (showActiveProjectileConcurrencyOption &&
-                returnStartModeProperty.enumValueIndex == (int)ProjectileReturnStartMode.ActivationTap &&
+                ProjectileReturnStartModeUtility.UsesActivationTap(returnStartMode) &&
                 !hasOwningResourceGate &&
                 reapplyResourceGateCostProperty != null &&
                 reapplyResourceGateCostProperty.boolValue)
             {
                 warnings.Add("Reapply Resource Gate Cost on Recall is ignored because this Active does not contain Resource Gate.");
+            }
+
+            if (ProjectileReturnStartModeUtility.UsesResourceDrain(returnStartMode) && !hasOwningResourceGate)
+                warnings.Add("Resource-drain return modes require Resource Gate in the same Active. Runtime falls back to Automatic Delay until it is bound.");
+
+            if (ProjectileReturnStartModeUtility.UsesResourceDrain(returnStartMode))
+            {
+                SerializedProperty thresholdProperty = payloadProperty.FindPropertyRelative("resourceReturnThresholdPercent");
+
+                if (thresholdProperty != null &&
+                    (thresholdProperty.floatValue < 0f || thresholdProperty.floatValue > 100f))
+                {
+                    warnings.Add("Resource Return Threshold Percent must remain between 0 and 100.");
+                }
             }
 
             AddNonNegativeWarning(payloadProperty, "returnRumbleMultiplier", "Return Rumble Multiplier", warnings);
@@ -301,6 +354,51 @@ public static class PowerUpReturningProjectilesPayloadDrawerUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Replaces the enum value control with a scaling-compatible popup that cannot introduce Resource Gate-only modes.
+    /// An already invalid serialized value remains visible so it can be changed without mutating it implicitly.
+    /// </summary>
+    /// <param name="scalingFieldRoot">Scaling-aware field root containing the default serialized enum control.</param>
+    /// <param name="returnStartModeProperty">Serialized return mode property updated by the restricted popup.</param>
+    private static void RestrictReturnStartModeOptions(VisualElement scalingFieldRoot,
+                                                       SerializedProperty returnStartModeProperty)
+    {
+        if (scalingFieldRoot == null || returnStartModeProperty == null)
+            return;
+
+        PropertyField propertyField = scalingFieldRoot.Q<PropertyField>();
+
+        if (propertyField == null || propertyField.parent == null)
+            return;
+
+        List<ProjectileReturnStartMode> options = new List<ProjectileReturnStartMode>
+        {
+            ProjectileReturnStartMode.AutomaticDelay,
+            ProjectileReturnStartMode.ActivationTap
+        };
+        ProjectileReturnStartMode currentMode = (ProjectileReturnStartMode)returnStartModeProperty.enumValueIndex;
+
+        if (!options.Contains(currentMode))
+            options.Add(currentMode);
+
+        VisualElement valueRow = propertyField.parent;
+        int fieldIndex = valueRow.IndexOf(propertyField);
+        PopupField<ProjectileReturnStartMode> popup = new PopupField<ProjectileReturnStartMode>("Return Start Mode",
+                                                                                                options,
+                                                                                                currentMode);
+        popup.tooltip = "Resource-drain modes become selectable after an enabled Resource Gate is bound to this Active.";
+        popup.style.flexGrow = 1f;
+        propertyField.RemoveFromHierarchy();
+        valueRow.Insert(fieldIndex, popup);
+        popup.RegisterValueChangedCallback(changeEvent =>
+        {
+            returnStartModeProperty.serializedObject.Update();
+            returnStartModeProperty.enumValueIndex = (int)changeEvent.newValue;
+            returnStartModeProperty.serializedObject.ApplyModifiedProperties();
+            PlayerManagementDraftSession.MarkDirty();
+        });
+    }
+
     /// <summary>
     /// Adds one field through the shared scaling factory.
     /// </summary>

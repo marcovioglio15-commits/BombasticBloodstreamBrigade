@@ -23,9 +23,10 @@ public static class GameRoomRewardPresentationValidationUtility
     {
         if (preset == null ||
             preset.PlayerLogSettings == null ||
-            preset.PortalLogSettings == null)
+            preset.PortalLogSettings == null ||
+            preset.PortalIndicatorSettings == null)
         {
-            failureMessage = "Player Log and Portal Log settings are required.";
+            failureMessage = "Player Log, Portal Log and Portal Indicator settings are required.";
             return false;
         }
 
@@ -38,7 +39,60 @@ public static class GameRoomRewardPresentationValidationUtility
             return false;
         }
 
+        if (!TryValidatePortalIndicators(preset.PortalIndicatorSettings,
+                                         out failureMessage))
+        {
+            return false;
+        }
+
         return TryValidateMappings(preset, out failureMessage);
+    }
+    #endregion
+
+    #region Portal Indicators
+    /// <summary>
+    /// Validates the optional preauthored open-portal indicator without correcting authored values.
+    /// </summary>
+    /// <param name="settings">Portal indicator settings to inspect.</param>
+    /// <param name="failureMessage">First actionable indicator validation failure.</param>
+    /// <returns>True when disabled or when every enabled indicator value is finite and renderable.</returns>
+    private static bool TryValidatePortalIndicators(
+        GameRoomRewardPortalIndicatorSettings settings,
+        out string failureMessage)
+    {
+        if (!settings.Enabled)
+        {
+            failureMessage = string.Empty;
+            return true;
+        }
+
+        if (settings.IndicatorSprite == null)
+        {
+            failureMessage = "Portal Indicators requires an Indicator Sprite while enabled.";
+            return false;
+        }
+
+        if (!IsFinitePositive(settings.IndicatorSizePixels) ||
+            !IsFiniteNonnegative(settings.EdgePaddingPixels) ||
+            !IsFinite(settings.WorldOffset))
+        {
+            failureMessage = "Portal Indicator size, edge padding or world offset contains unsupported values.";
+            return false;
+        }
+
+        Color color = settings.IndicatorColor;
+
+        if (!IsFiniteNonnegative(color.r) ||
+            !IsFiniteNonnegative(color.g) ||
+            !IsFiniteNonnegative(color.b) ||
+            !IsFiniteNonnegative(color.a))
+        {
+            failureMessage = "Portal Indicator color contains a non-finite or negative channel.";
+            return false;
+        }
+
+        failureMessage = string.Empty;
+        return true;
     }
     #endregion
 
@@ -197,10 +251,46 @@ public static class GameRoomRewardPresentationValidationUtility
         GameRoomRewardPortalLogSettings settings,
         out string failureMessage)
     {
-        if (!IsFinitePositive(settings.FontSize) ||
-            !IsFinitePositive(settings.CellSpacing))
+        if (!HasSupportedPortalLogEnums(settings))
         {
-            failureMessage = "Portal Log font size and cell spacing must be finite positive values.";
+            failureMessage = "Portal Log contains an unsupported layout, value display or unlock-audio enum value.";
+            return false;
+        }
+
+        if (!IsFinitePositive(settings.FontSize))
+        {
+            failureMessage = "Portal Log font size must be a finite positive value.";
+            return false;
+        }
+
+        if (settings.LayoutMode == GameRoomRewardPortalLogLayoutMode.Scrolling &&
+            !TryValidateScrollingPortalLog(settings, out failureMessage))
+        {
+            return false;
+        }
+
+        if (settings.LayoutMode == GameRoomRewardPortalLogLayoutMode.StaticRows &&
+            !TryValidateStaticPortalLog(settings, out failureMessage))
+        {
+            return false;
+        }
+
+        return TryValidatePortalEffects(settings, out failureMessage);
+    }
+
+    /// <summary>
+    /// Validates horizontal spacing, visible capacity and timing used only by the scrolling portal layout.
+    /// </summary>
+    /// <param name="settings">Portal settings containing scrolling values.</param>
+    /// <param name="failureMessage">First actionable scrolling-layout failure.</param>
+    /// <returns>True when the scrolling layout can run within the preauthored pool.</returns>
+    private static bool TryValidateScrollingPortalLog(
+        GameRoomRewardPortalLogSettings settings,
+        out string failureMessage)
+    {
+        if (!IsFinitePositive(settings.CellSpacing))
+        {
+            failureMessage = "Portal Log cell spacing must be a finite positive value in Scrolling mode.";
             return false;
         }
 
@@ -227,6 +317,262 @@ public static class GameRoomRewardPresentationValidationUtility
         failureMessage = string.Empty;
         return true;
     }
+
+    /// <summary>
+    /// Validates adaptive background dimensions and row spacing used only by the static portal layout.
+    /// </summary>
+    /// <param name="settings">Portal settings containing Static Rows values.</param>
+    /// <param name="failureMessage">First actionable static-layout failure.</param>
+    /// <returns>True when the adaptive panel values are finite and nonnegative where supported.</returns>
+    private static bool TryValidateStaticPortalLog(
+        GameRoomRewardPortalLogSettings settings,
+        out string failureMessage)
+    {
+        if (!IsFiniteNonnegative(settings.StaticRowSpacing) ||
+            !IsFiniteNonnegative(settings.StaticPanelPadding.x) ||
+            !IsFiniteNonnegative(settings.StaticPanelPadding.y) ||
+            !IsFinitePositive(settings.StaticMinimumPanelSize.x) ||
+            !IsFinitePositive(settings.StaticMinimumPanelSize.y))
+        {
+            failureMessage = "Portal Log Static Rows spacing, padding and minimum panel size contain unsupported values.";
+            return false;
+        }
+
+        Color backgroundColor = settings.StaticBackgroundColor;
+
+        if (!IsFiniteNonnegative(backgroundColor.r) ||
+            !IsFiniteNonnegative(backgroundColor.g) ||
+            !IsFiniteNonnegative(backgroundColor.b) ||
+            !IsFiniteNonnegative(backgroundColor.a))
+        {
+            failureMessage = "Portal Log Static Rows background color contains a non-finite or negative channel.";
+            return false;
+        }
+
+        failureMessage = string.Empty;
+        return true;
+    }
+
+    /// <summary>
+    /// Validates portal animation and replacement targets without correcting authored effect values.
+    /// </summary>
+    /// <param name="settings">Portal settings containing activation effects.</param>
+    /// <param name="failureMessage">First actionable animation or replacement failure.</param>
+    /// <returns>True when every effect has a stable target and supported payload.</returns>
+    private static bool TryValidatePortalEffects(
+        GameRoomRewardPortalLogSettings settings,
+        out string failureMessage)
+    {
+        for (int animationIndex = 0;
+             animationIndex < settings.ActivationAnimations.Count;
+             animationIndex++)
+        {
+            GameRoomPortalActivationAnimationDefinition animation =
+                settings.ActivationAnimations[animationIndex];
+
+            if (animation == null)
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex + " is missing.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(animation.TargetBindingId))
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex + " has no linked object.";
+                return false;
+            }
+
+            if (Encoding.UTF8.GetByteCount(animation.TargetBindingId) > 64)
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex +
+                                 " has a linked-object identifier longer than the 64-byte ECS capacity.";
+                return false;
+            }
+
+            if (!IsFiniteNonnegative(animation.StartDelay))
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex + " has an invalid start delay.";
+                return false;
+            }
+
+            if (!HasSupportedPortalAnimationEnums(animation))
+            {
+                failureMessage = "Portal activation animation at index " + animationIndex +
+                                 " contains an unsupported source, channel, playback or easing enum value.";
+                return false;
+            }
+
+            switch (animation.Source)
+            {
+                case GameRoomPortalActivationAnimationSource.AnimatorClip:
+                    if (animation.AnimatorClip == null ||
+                        !IsFinitePositive(animation.AnimatorSpeed))
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " requires a selected Animator clip, its child path and a positive playback speed.";
+                        return false;
+                    }
+
+                    if (Encoding.UTF8.GetByteCount(animation.AnimatorPath ?? string.Empty) > 128)
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " has an Animator hierarchy path longer than the 128-byte ECS capacity.";
+                        return false;
+                    }
+                    break;
+                default:
+                    if (!IsFinitePositive(animation.Duration) ||
+                        !IsFinite(animation.PositionOffset) ||
+                        !IsFinite(animation.RotationOffset) ||
+                        !IsFinite(animation.ScaleMultiplier))
+                    {
+                        failureMessage = "Portal activation animation at index " + animationIndex +
+                                         " contains invalid duration or Transform values.";
+                        return false;
+                    }
+                    break;
+            }
+
+        }
+
+        HashSet<string> replacementBindings = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int replacementIndex = 0;
+             replacementIndex < settings.ActivationPrefabReplacements.Count;
+             replacementIndex++)
+        {
+            GameRoomPortalPrefabReplacementDefinition replacement =
+                settings.ActivationPrefabReplacements[replacementIndex];
+
+            if (replacement == null)
+            {
+                failureMessage = "Portal prefab replacement at index " + replacementIndex + " is missing.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(replacement.TargetBindingId) ||
+                replacement.ReplacementPrefab == null)
+            {
+                failureMessage = "Portal prefab replacement at index " + replacementIndex + " requires an existing linked 3D scene object and a replacement prefab asset.";
+                return false;
+            }
+
+            if (Encoding.UTF8.GetByteCount(replacement.TargetBindingId) > 64)
+            {
+                failureMessage = "Portal prefab replacement at index " + replacementIndex +
+                                 " has a linked-object identifier longer than the 64-byte ECS capacity.";
+                return false;
+            }
+
+            if (replacement.ReplacementPrefab.scene.IsValid())
+            {
+                failureMessage = "Portal prefab replacement at index " + replacementIndex + " references a scene object. Assign a prefab asset that is not already present in a scene.";
+                return false;
+            }
+
+            if (!replacementBindings.Add(replacement.TargetBindingId))
+            {
+                failureMessage = "Portal prefab replacement binding '" + replacement.TargetBindingId + "' is configured more than once.";
+                return false;
+            }
+        }
+
+        failureMessage = string.Empty;
+        return true;
+    }
+
+    /// <summary>
+    /// Validates conditional Portal Log enum values without runtime reflection or value correction.
+    /// </summary>
+    /// <param name="settings">Portal Log settings containing authored enum values.</param>
+    /// <returns>True when every active enum value is supported.</returns>
+    private static bool HasSupportedPortalLogEnums(GameRoomRewardPortalLogSettings settings)
+    {
+        switch (settings.LayoutMode)
+        {
+            case GameRoomRewardPortalLogLayoutMode.Scrolling:
+            case GameRoomRewardPortalLogLayoutMode.StaticRows:
+                break;
+            default:
+                return false;
+        }
+
+        switch (settings.ValueDisplayMode)
+        {
+            case GameRoomRewardValueDisplayMode.Detailed:
+            case GameRoomRewardValueDisplayMode.Simplified:
+                break;
+            default:
+                return false;
+        }
+
+        if (!settings.PlayUnlockAudio)
+            return true;
+
+        switch (settings.UnlockAudioPlaybackMode)
+        {
+            case GameRoomPortalUnlockAudioPlaybackMode.OncePerRoom:
+            case GameRoomPortalUnlockAudioPlaybackMode.OncePerPortal:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Validates every enum consumed by one portal animation before bake flattening.
+    /// </summary>
+    /// <param name="animation">Portal animation definition to inspect.</param>
+    /// <returns>True when source, channel, playback and easing values are supported.</returns>
+    private static bool HasSupportedPortalAnimationEnums(
+        GameRoomPortalActivationAnimationDefinition animation)
+    {
+        switch (animation.Source)
+        {
+            case GameRoomPortalActivationAnimationSource.Transform:
+                switch (animation.Mode)
+                {
+                    case GameRoomPortalTransformAnimationMode.Position:
+                    case GameRoomPortalTransformAnimationMode.Rotation:
+                    case GameRoomPortalTransformAnimationMode.Scale:
+                    case GameRoomPortalTransformAnimationMode.PositionAndRotation:
+                    case GameRoomPortalTransformAnimationMode.PositionAndScale:
+                    case GameRoomPortalTransformAnimationMode.RotationAndScale:
+                    case GameRoomPortalTransformAnimationMode.PositionRotationAndScale:
+                        break;
+                    default:
+                        return false;
+                }
+                break;
+            case GameRoomPortalActivationAnimationSource.AnimatorClip:
+                break;
+            default:
+                return false;
+        }
+
+        switch (animation.Playback)
+        {
+            case GameRoomPortalTransformAnimationPlayback.Once:
+            case GameRoomPortalTransformAnimationPlayback.Loop:
+            case GameRoomPortalTransformAnimationPlayback.PingPong:
+                break;
+            default:
+                return false;
+        }
+
+        switch (animation.Easing)
+        {
+            case GameRoomPortalTransformAnimationEase.Linear:
+            case GameRoomPortalTransformAnimationEase.EaseIn:
+            case GameRoomPortalTransformAnimationEase.EaseOut:
+            case GameRoomPortalTransformAnimationEase.EaseInOut:
+            case GameRoomPortalTransformAnimationEase.SmoothStep:
+            case GameRoomPortalTransformAnimationEase.SmootherStep:
+                return true;
+            default:
+                return false;
+        }
+    }
     #endregion
 
     #region Numeric Validation
@@ -252,6 +598,21 @@ public static class GameRoomRewardPresentationValidationUtility
         return !float.IsNaN(value) &&
                !float.IsInfinity(value) &&
                value >= 0f;
+    }
+
+    /// <summary>
+    /// Returns whether every component of one Vector3 is finite.
+    /// </summary>
+    /// <param name="value">Vector to inspect.</param>
+    /// <returns>True when no component is NaN or infinite.</returns>
+    private static bool IsFinite(Vector3 value)
+    {
+        return !float.IsNaN(value.x) &&
+               !float.IsInfinity(value.x) &&
+               !float.IsNaN(value.y) &&
+               !float.IsInfinity(value.y) &&
+               !float.IsNaN(value.z) &&
+               !float.IsInfinity(value.z);
     }
     #endregion
 

@@ -33,6 +33,7 @@ public static class GameRoomRewardRuntimeSmokeTest
             ValidateFormulaPortalPreview(entityManager,
                                          managerEntity,
                                          playerEntity);
+            ValidatePortalActivationEffects(entityManager, managerEntity);
             GameRoomRewardGrantSystem system =
                 world.GetOrCreateSystemManaged<GameRoomRewardGrantSystem>();
             GrantRoomClear(entityManager, managerEntity);
@@ -60,7 +61,7 @@ public static class GameRoomRewardRuntimeSmokeTest
             EnterRoom(entityManager, managerEntity, 4u, true);
             system.Update();
             ValidateExpiredTemporaryState(entityManager, playerEntity);
-            ValidateRunReset(entityManager, playerEntity);
+            ValidateRunReset(entityManager, managerEntity, playerEntity);
             Debug.Log("[GameRoomRewardRuntimeSmokeTest] Ordered, clamped, idempotent, temporary and run-reset reward checks passed.");
         }
         finally
@@ -88,6 +89,12 @@ public static class GameRoomRewardRuntimeSmokeTest
         entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardTileBindingElement>(managerEntity);
         entityManager.AddBuffer<GameRoomRewardPresentationElement>(managerEntity);
+        entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(managerEntity);
+        entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity);
+        entityManager.AddComponentData(managerEntity, new GameRoomPortalUnlockAudioRuntimeState
+        {
+            NodeIndex = -1
+        });
         entityManager.AddBuffer<GameProceduralRoomClearedEvent>(managerEntity);
         entityManager.AddBuffer<GameProceduralRoomEnteredEvent>(managerEntity);
         DynamicBuffer<GameRoomRewardModuleElement> modules =
@@ -226,6 +233,85 @@ public static class GameRoomRewardRuntimeSmokeTest
 
     #region Presentation Validation
     /// <summary>
+    /// Proves activation replaces an existing 3D scene object, targets the instance for animation and restores cleanly.
+    /// </summary>
+    /// <param name="entityManager">Fixture entity manager owning the baked effect buffers.</param>
+    /// <param name="managerEntity">Reward manager receiving representative portal effect definitions.</param>
+    private static void ValidatePortalActivationEffects(EntityManager entityManager,
+                                                        Entity managerEntity)
+    {
+        GameObject anchorObject = new GameObject("Portal Effect Smoke Anchor");
+        GameObject sceneParent = new GameObject("Portal Effect Smoke Scene Parent");
+        GameObject sceneObject = new GameObject("Existing 3D Scene Object",
+                                                typeof(MeshFilter),
+                                                typeof(MeshRenderer));
+        GameObject replacementPrefab = new GameObject("Replacement Prefab Asset Fixture",
+                                                       typeof(MeshFilter),
+                                                       typeof(MeshRenderer));
+
+        try
+        {
+            sceneObject.transform.SetParent(sceneParent.transform, false);
+            sceneObject.transform.localPosition = new Vector3(1f, 2f, 3f);
+            sceneObject.transform.localRotation = Quaternion.Euler(0f, 35f, 0f);
+            sceneObject.transform.localScale = new Vector3(2f, 1f, 0.5f);
+            GameRoomPortalRewardEffectView effectView =
+                anchorObject.AddComponent<GameRoomPortalRewardEffectView>();
+            effectView.ConfigureAuthoring(
+                new GameRoomPortalLinkedObjectBinding[]
+                {
+                    new GameRoomPortalLinkedObjectBinding(
+                        "SmokeObject",
+                        "Existing 3D Scene Object",
+                        sceneObject)
+                });
+            DynamicBuffer<GameRoomPortalActivationAnimationElement> animations =
+                entityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(managerEntity);
+            DynamicBuffer<GameRoomPortalPrefabReplacementElement> replacements =
+                entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(managerEntity);
+            animations.Add(new GameRoomPortalActivationAnimationElement
+            {
+                TargetBindingId = "SmokeObject",
+                Source = GameRoomPortalActivationAnimationSource.Transform,
+                Mode = GameRoomPortalTransformAnimationMode.Position,
+                Playback = GameRoomPortalTransformAnimationPlayback.Once,
+                Easing = GameRoomPortalTransformAnimationEase.Linear,
+                StartDelay = 0.25f,
+                Duration = 0.5f,
+                PositionOffset = Vector3.right,
+                ScaleMultiplier = Vector3.one
+            });
+            replacements.Add(new GameRoomPortalPrefabReplacementElement
+            {
+                TargetBindingId = "SmokeObject",
+                ReplacementPrefab = replacementPrefab
+            });
+            bool activated = effectView.Activate(71,
+                                                 animations,
+                                                 replacements);
+
+            Require(activated && !sceneObject.activeSelf && sceneParent.transform.childCount == 2,
+                    "Portal activation did not replace the existing 3D scene object exactly once.");
+            Require(!effectView.Activate(71,
+                                         animations,
+                                         replacements),
+                    "Portal activation signature did not prevent duplicate replacement instances.");
+            effectView.Deactivate();
+            Require(sceneObject.activeSelf && sceneParent.transform.childCount == 1,
+                    "Portal reset did not restore the original 3D scene object and remove its replacement.");
+            RequireApproximately(sceneObject.transform.localPosition.x,
+                                 1f,
+                                 "Portal reset did not restore the original local Transform.");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(anchorObject);
+            UnityEngine.Object.DestroyImmediate(sceneParent);
+            UnityEngine.Object.DestroyImmediate(replacementPrefab);
+        }
+    }
+
+    /// <summary>
     /// Proves a portal preview evaluates a formula against current player stats and exposes its numeric result.
     /// </summary>
     /// <param name="entityManager">Fixture entity manager owning reward and player data.</param>
@@ -264,7 +350,8 @@ public static class GameRoomRewardRuntimeSmokeTest
                 mappings,
                 in formulaBaseValue,
                 in formulaResult,
-                evaluated);
+                evaluated,
+                GameRoomRewardValueDisplayMode.Detailed);
 
         Require(evaluated,
                 "Portal preview did not evaluate the formula through the shared runtime path.");
@@ -274,6 +361,19 @@ public static class GameRoomRewardRuntimeSmokeTest
                 "Portal preview did not expose the resolved formula result.");
         Require(item.Text.IndexOf("formula", StringComparison.OrdinalIgnoreCase) < 0,
                 "Portal preview still exposed the generic Formula placeholder.");
+        GameRoomRewardPresentationItem simplifiedItem =
+            GameRoomRewardPresentationFormatter.FormatPortalModule(
+                in formulaModule,
+                3,
+                mappings,
+                in formulaBaseValue,
+                in formulaResult,
+                evaluated,
+                GameRoomRewardValueDisplayMode.Simplified);
+        Require(string.Equals(simplifiedItem.Text,
+                              "Experience + (temporary)",
+                              StringComparison.Ordinal),
+                "Simplified portal preview exposed a numeric value, quantity or room count.");
     }
     #endregion
 
@@ -364,13 +464,25 @@ public static class GameRoomRewardRuntimeSmokeTest
         // Verify the player log receives the post-order formula projection instead of a generic label.
         PlayerRoomRewardPresentationEvent formulaEvent = events[3];
         GameRoomRewardPresentationItem formulaSchedule =
-            GameRoomRewardPresentationFormatter.FormatPlayerEvent(in formulaEvent, mappings);
+            GameRoomRewardPresentationFormatter.FormatPlayerEvent(
+                in formulaEvent,
+                mappings,
+                GameRoomRewardValueDisplayMode.Detailed);
         Require(string.Equals(formulaSchedule.Text,
                               "Experience +7.5 (next 2 rooms)",
                               StringComparison.Ordinal),
                 "The player log did not expose the resolved scheduled formula result.");
         Require(formulaSchedule.Text.IndexOf("formula", StringComparison.OrdinalIgnoreCase) < 0,
                 "The player log still exposed the generic Formula placeholder.");
+        GameRoomRewardPresentationItem simplifiedSchedule =
+            GameRoomRewardPresentationFormatter.FormatPlayerEvent(
+                in formulaEvent,
+                mappings,
+                GameRoomRewardValueDisplayMode.Simplified);
+        Require(string.Equals(simplifiedSchedule.Text,
+                              "Experience + (temporary)",
+                              StringComparison.Ordinal),
+                "Simplified player presentation exposed a numeric value or room count.");
     }
 
     /// <summary>
@@ -441,8 +553,10 @@ public static class GameRoomRewardRuntimeSmokeTest
     /// Seeds stale transactional data, resets the procedural run and verifies every room-reward runtime hook.
     /// </summary>
     /// <param name="entityManager">Fixture entity manager.</param>
+    /// <param name="managerEntity">Reward manager owning the room-scoped portal audio checkpoint.</param>
     /// <param name="playerEntity">Player whose room-reward state is reset.</param>
     private static void ValidateRunReset(EntityManager entityManager,
+                                         Entity managerEntity,
                                          Entity playerEntity)
     {
         entityManager.SetComponentData(playerEntity, new PlayerRoomRewardGrantState
@@ -461,6 +575,13 @@ public static class GameRoomRewardRuntimeSmokeTest
             playerEntity).Add(default);
         entityManager.GetBuffer<PlayerRoomRewardTemporaryResourceElement>(
             playerEntity).Add(default);
+        entityManager.SetComponentData(managerEntity,
+                                       new GameRoomPortalUnlockAudioRuntimeState
+                                       {
+                                           GenerationVersion = 5u,
+                                           NodeIndex = 7,
+                                           Dispatched = 1
+                                       });
 
         GameRoomRewardRunResetUtility.ResetPlayers(entityManager);
 
@@ -485,6 +606,12 @@ public static class GameRoomRewardRuntimeSmokeTest
                 entityManager.GetBuffer<PlayerRoomRewardPresentationEvent>(
                     playerEntity).Length == 0,
                 "Run reset retained temporary schedules or presentation entries.");
+        GameRoomPortalUnlockAudioRuntimeState audioState =
+            entityManager.GetComponentData<GameRoomPortalUnlockAudioRuntimeState>(managerEntity);
+        Require(audioState.GenerationVersion == 0u &&
+                audioState.NodeIndex == -1 &&
+                audioState.Dispatched == 0,
+                "Run reset retained the portal unlock audio checkpoint.");
         Require(scalingState.Initialized == 0 &&
                 scalingState.LastScalableStatsHash == 0u,
                 "Run reset did not invalidate runtime scaling.");

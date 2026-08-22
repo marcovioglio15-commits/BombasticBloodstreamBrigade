@@ -15,6 +15,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
     private FixedString64Bytes sourceSceneId, targetSceneId;
     private GameSceneTransitionPhase activePhase;
     private GameSceneTransitionPurpose activePurpose;
+    private GameSceneFadeMode activeFadeMode;
+    private GameSceneFadeWipeDirection activeFadeWipeDirection;
     private float phaseTimer, fadeOutSeconds, postLoadReadyExtraSeconds, fadeInSeconds;
     private float previousTimeScale = 1f;
     private readonly List<GameSceneDefinitionElement> persistentPlayerPreLoadUnloadScenes = new List<GameSceneDefinitionElement>(2);
@@ -71,6 +73,10 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         DynamicBuffer<GameSceneTransitionRequest> requests = EntityManager.GetBuffer<GameSceneTransitionRequest>(managerEntity);
         if (transitionState.IsTransitioning != 0)
         {
+            GameSceneTransitionFadePresentationUtility.Apply(
+                ref config,
+                activeFadeMode,
+                activeFadeWipeDirection);
             TickActiveTransition(managerEntity, config, ref transitionState, ref fadeState, ref loadingProgressState);
             EntityManager.SetComponentData(managerEntity, transitionState);
             EntityManager.SetComponentData(managerEntity, fadeState);
@@ -151,6 +157,14 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         hasTargetCompanionScene = GameSceneLoadBackendUtility.TryFindCompanionScene(scenes, targetScene, out targetCompanionScene);
         reloadActiveScene = isRestart || sourceSceneId.Equals(targetSceneId);
         activePurpose = request.Purpose;
+        GameSceneTransitionFadePresentationUtility.Resolve(
+            in request,
+            out activeFadeMode,
+            out activeFadeWipeDirection);
+        GameSceneTransitionFadePresentationUtility.Apply(
+            ref config,
+            activeFadeMode,
+            activeFadeWipeDirection);
         transactionalRoomStreaming = GameProceduralRoomTransitionTransactionUtility.UsesTransactionalStreaming(EntityManager,
                                                                                                                   managerEntity,
                                                                                                                   activePurpose);
@@ -280,6 +294,10 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                GameSceneManagerConfig config)
     {
+        // Wait until PresentationSystemGroup has rendered complete coverage before resetting visible runtime content.
+        if (GameSceneTransitionFadePresentationUtility.IsWaitingForRenderedCoverage(in fadeState))
+            return;
+
         preLoadRuntimeCleanupComplete = GameSceneTransitionExecutionUtility.RunPreLoadRuntimeCleanupIfNeeded(EntityManager,
                                                                                                             preLoadRuntimeCleanupComplete,
                                                                                                             reloadActiveScene,
@@ -336,6 +354,10 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                              ref GameSceneLoadingProgressPresentationState loadingProgressState,
                              GameSceneManagerConfig config)
     {
+        // Direct-to-loading transitions must observe the same rendered-coverage gate as pre-unload paths.
+        if (GameSceneTransitionFadePresentationUtility.IsWaitingForRenderedCoverage(in fadeState))
+            return;
+
         if (GameScenePersistentPlayerSceneUtility.TickUnloadSteps(persistentPlayerPreLoadUnloadScenes, ref persistentPlayerPreLoadUnloadIndex))
         {
             ApplyCurrentLoadingProgress(ref loadingProgressState,
@@ -473,6 +495,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
 
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
+
     #endregion
 
     #region Post Unload

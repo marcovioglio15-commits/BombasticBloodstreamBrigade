@@ -127,7 +127,7 @@ internal static class GameSceneTransitionRuntimeGuardUtility
             return;
 
         requiresStableMotionRelease = IsStableProceduralFadeIn(transitionState);
-        allowsLiveMotion = requiresStableMotionRelease ||
+        allowsLiveMotion = IsSafeProceduralPresentationPhase(transitionState) ||
                            IsContinuousPlayerTraversal(transitionState);
         allowsLiveCombat = allowsLiveMotion &&
                            transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
@@ -188,6 +188,29 @@ internal static class GameSceneTransitionRuntimeGuardUtility
         return transitionState.IsTransitioning != 0 &&
                transitionState.Phase == GameSceneTransitionPhase.FadeIn &&
                GameSceneTransitionPurposeUtility.IsProcedural(transitionState.Purpose);
+    }
+
+    /// <summary>
+    /// Allows current movement and look samples while the procedural source or fully prepared destination still owns safe physics.
+    /// </summary>
+    /// <param name="transitionState">Current authoritative transition state.</param>
+    /// <returns>True during procedural fade-out or fade-in presentation.</returns>
+    private static bool IsSafeProceduralPresentationPhase(GameSceneTransitionState transitionState)
+    {
+        if (transitionState.IsTransitioning == 0 ||
+            transitionState.Purpose != GameSceneTransitionPurpose.ProceduralRoomTraversal)
+        {
+            return false;
+        }
+
+        switch (transitionState.Phase)
+        {
+            case GameSceneTransitionPhase.FadeOut:
+            case GameSceneTransitionPhase.FadeIn:
+                return true;
+            default:
+                return false;
+        }
     }
 
     /// <summary>

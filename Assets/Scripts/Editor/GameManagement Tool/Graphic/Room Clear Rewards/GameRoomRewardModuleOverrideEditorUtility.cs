@@ -588,7 +588,7 @@ internal static class GameRoomRewardModuleOverrideEditorUtility
     /// </summary>
     /// <param name="root">Override body receiving the field.</param>
     /// <param name="property">Serialized payload property.</param>
-    /// <param name="label">-facing field label.</param>
+    /// <param name="label">Visible field label.</param>
     private static void AddBoundField(VisualElement root,
                                       SerializedProperty property,
                                       string label)

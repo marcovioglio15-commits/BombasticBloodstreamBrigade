@@ -17,11 +17,11 @@ public static class PlayerPowerUpReturningProjectileBakeUtility
     /// </summary>
     /// <param name="payload">Serialized module payload to convert.</param>
     /// <param name="resolveDynamicPrefabEntity">Optional prefab-to-entity resolver supplied by the player baker.</param>
-    /// <param name="allowActivationRecall">Whether active-only recall input settings may enter runtime configuration.</param>
+    /// <param name="allowActiveReturnTriggers">Whether active-only input and resource return triggers may enter runtime configuration.</param>
     /// <returns>Unmanaged runtime configuration, or default when the payload is missing.</returns>
     public static ReturningProjectilesConfig BuildConfig(PowerUpReturningProjectilesModuleData payload,
                                                           Func<GameObject, Entity> resolveDynamicPrefabEntity,
-                                                          bool allowActivationRecall)
+                                                          bool allowActiveReturnTriggers)
     {
         if (payload == null)
             return default;
@@ -43,12 +43,14 @@ public static class PlayerPowerUpReturningProjectileBakeUtility
             OutboundLifetimeMultiplier = math.max(0.01f, payload.OutboundLifetimeMultiplier),
             OutboundHitPolicy = payload.OutboundHitPolicy,
             AdditionalOutboundHits = math.max(1, payload.AdditionalOutboundHits),
-            ReturnStartMode = allowActivationRecall
+            ReturnStartMode = allowActiveReturnTriggers
                 ? payload.ReturnStartMode
                 : ProjectileReturnStartMode.AutomaticDelay,
             ReturnDelaySeconds = math.max(0f, payload.ReturnDelaySeconds),
-            AllowEarlyActivationRecall = allowActivationRecall && payload.AllowEarlyActivationRecall ? (byte)1 : (byte)0,
-            ReapplyResourceGateCostOnRecall = allowActivationRecall && payload.ReapplyResourceGateCostOnRecall ? (byte)1 : (byte)0,
+            AllowEarlyActivationRecall = allowActiveReturnTriggers && payload.AllowEarlyActivationRecall ? (byte)1 : (byte)0,
+            ReapplyResourceGateCostOnRecall = allowActiveReturnTriggers && payload.ReapplyResourceGateCostOnRecall ? (byte)1 : (byte)0,
+            ResourceReturnThresholdPercent = math.clamp(payload.ResourceReturnThresholdPercent, 0f, 100f),
+            StolenOwnershipPolicy = payload.StolenOwnershipPolicy,
             ReturnRumbleMultiplier = math.max(0f, payload.ReturnRumbleMultiplier),
             ReturnCameraShakeMultiplier = math.max(0f, payload.ReturnCameraShakeMultiplier),
             OutboundSizeMultiplier = math.max(0.01f, payload.OutboundSizeMultiplier),

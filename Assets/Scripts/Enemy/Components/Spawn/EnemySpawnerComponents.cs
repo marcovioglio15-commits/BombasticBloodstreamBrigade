@@ -29,6 +29,7 @@ public struct EnemySpawnerState : IComponentData
 /// <summary>
 /// Identifies one authored spawner across runtime scene loads and main-menu override edits.
 /// </summary>
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 public struct EnemySpawnerRuntimeIdentity : IComponentData
 {
     public FixedString64Bytes SceneGuid;
@@ -49,6 +50,7 @@ public struct EnemySpawnerRuntimeOverrideState : IComponentData
     public FixedString64Bytes FailedWavePresetGuid;
     public byte AppliedEnabled;
 }
+#endif
 
 /// <summary>
 /// Declares how one wave derives its start time from the previous wave.
@@ -147,6 +149,7 @@ public struct EnemySpawnerPrefabPoolMapElement : IBufferElementData
 /// <summary>
 /// Describes one pre-baked wave-preset variant available to a runtime-overridable spawner.
 /// </summary>
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 public struct EnemySpawnerWavePresetVariantElement : IBufferElementData
 {
     public FixedString64Bytes WavePresetGuid;
@@ -208,6 +211,7 @@ public struct EnemySpawnerWavePresetVariantRequirementElement : IBufferElementDa
     public Entity PrefabEntity;
     public int TotalPlannedCount;
 }
+#endif
 
 /// <summary>
 /// Stores immutable runtime settings for one enemy pool entity.

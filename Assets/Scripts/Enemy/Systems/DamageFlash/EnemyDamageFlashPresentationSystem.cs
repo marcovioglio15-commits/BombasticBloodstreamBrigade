@@ -489,7 +489,7 @@ public partial struct EnemyDamageFlashPresentationSystem : ISystem
                                          icon,
                                          DamageFlashRuntimeUtility.ToManagedColor(style.Color),
                                          worldOffset,
-                                         style.Scale);
+                                         style.Scale * math.max(0.01f, stealerVisualState.IconScaleMultiplier));
         return true;
     }
 

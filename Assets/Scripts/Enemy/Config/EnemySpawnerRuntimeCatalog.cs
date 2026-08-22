@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,7 +10,7 @@ using UnityEngine;
 public sealed class EnemySpawnerRuntimeCatalog : ScriptableObject
 {
     #region Constants
-    public const string DefaultAssetPath = "Assets/Resources/EnemySpawnerRuntimeCatalog.asset";
+    public const string DefaultAssetPath = "Assets/Scriptable Objects/Enemy/Runtime Tool/EnemySpawnerRuntimeCatalog.asset";
     #endregion
 
     #region Fields
@@ -513,3 +514,4 @@ public sealed class EnemySpawnerRuntimeWavePresetEntry
 
     #endregion
 }
+#endif

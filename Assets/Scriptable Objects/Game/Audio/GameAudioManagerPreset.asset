@@ -430,3 +430,19 @@ MonoBehaviour:
       enabled: 0
       maxPlaysPerWindow: 0
       windowSeconds: 1
+  - eventId: 27
+    eventCode: MISC_SFX_RoomReward_PortalAnimation
+    displayName: Room Reward Portal Animation
+    description: Requested when the selected room reward portal activation animation
+      starts.
+    eventPath: event:/SFX/Activations/MC_SFX_Active_EnergyFull
+    volume: 1
+    pitch: 1
+    spatialize: 1
+    minimumDistance: 8
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1

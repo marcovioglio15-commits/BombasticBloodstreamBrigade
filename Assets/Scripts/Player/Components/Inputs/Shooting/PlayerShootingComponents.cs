@@ -197,6 +197,7 @@ public struct ProjectileReturnState : IComponentData
     public byte ActiveSlotIndex;
     public uint ConcurrencyGeneration;
     public uint LastObservedActivationRecallVersion;
+    public uint LastObservedResourceRecallVersion;
     public ReturningProjectilesConfig Config;
     public float OutboundSpeed;
     public float OriginalDamage;

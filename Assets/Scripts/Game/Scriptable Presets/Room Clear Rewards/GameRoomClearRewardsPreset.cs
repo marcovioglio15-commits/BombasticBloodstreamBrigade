@@ -16,7 +16,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     [SerializeField]
     private string presetId;
 
-    [Tooltip("Designer-facing preset name displayed in Game Management Tool.")]
+    [Tooltip("Preset name displayed in Game Management Tool.")]
     [SerializeField]
     private string presetName = "New Room Clear Rewards Preset";
 
@@ -57,6 +57,12 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     [Tooltip("Layout, capacity and timing applied to preauthored destination portal reward logs.")]
     [SerializeField]
     private GameRoomRewardPortalLogSettings portalLogSettings = new GameRoomRewardPortalLogSettings();
+
+    [Header("Portal Indicators")]
+    [Tooltip("Screen-edge indicator presentation applied to open destination portals outside the camera view.")]
+    [SerializeField]
+    private GameRoomRewardPortalIndicatorSettings portalIndicatorSettings =
+        new GameRoomRewardPortalIndicatorSettings();
     #endregion
 
     #endregion
@@ -72,6 +78,7 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
     public IReadOnlyList<GameRoomRewardPresentationDefinition> PresentationMappings => presentationMappings;
     public GameRoomRewardPlayerLogSettings PlayerLogSettings => playerLogSettings;
     public GameRoomRewardPortalLogSettings PortalLogSettings => portalLogSettings;
+    public GameRoomRewardPortalIndicatorSettings PortalIndicatorSettings => portalIndicatorSettings;
     #endregion
 
     #region Methods
@@ -99,6 +106,11 @@ public sealed class GameRoomClearRewardsPreset : ScriptableObject
 
         if (portalLogSettings == null)
             portalLogSettings = new GameRoomRewardPortalLogSettings();
+
+        if (portalIndicatorSettings == null)
+            portalIndicatorSettings = new GameRoomRewardPortalIndicatorSettings();
+
+        portalLogSettings.EnsureInitialized();
 
         // Initialize valid nested entries while preserving null entries for explicit validation.
         for (int index = 0; index < modules.Count; index++)

@@ -42,6 +42,7 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
         SerializedProperty selectionModeProperty = stealerProperty.FindPropertyRelative("selectionMode");
         SerializedProperty activeTargetBiasPercentProperty = stealerProperty.FindPropertyRelative("activeTargetBiasPercent");
         SerializedProperty acquisitionStealCooldownSecondsProperty = stealerProperty.FindPropertyRelative("acquisitionStealCooldownSeconds");
+        SerializedProperty stolenPowerUpIconScaleMultiplierProperty = stealerProperty.FindPropertyRelative("stolenPowerUpIconScaleMultiplier");
         SerializedProperty recoverAfterDamageTakenPercentProperty = stealerProperty.FindPropertyRelative("recoverAfterDamageTakenPercent");
         SerializedProperty recoveryDamageTakenPercentProperty = stealerProperty.FindPropertyRelative("recoveryDamageTakenPercent");
         SerializedProperty recoverAfterDamageWindowProperty = stealerProperty.FindPropertyRelative("recoverAfterDamageWindow");
@@ -54,6 +55,7 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
             selectionModeProperty == null ||
             activeTargetBiasPercentProperty == null ||
             acquisitionStealCooldownSecondsProperty == null ||
+            stolenPowerUpIconScaleMultiplierProperty == null ||
             recoverAfterDamageTakenPercentProperty == null ||
             recoveryDamageTakenPercentProperty == null ||
             recoverAfterDamageWindowProperty == null ||
@@ -72,7 +74,8 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
                           targetKindProperty,
                           selectionModeProperty,
                           activeTargetBiasPercentProperty,
-                          acquisitionStealCooldownSecondsProperty);
+                          acquisitionStealCooldownSecondsProperty,
+                          stolenPowerUpIconScaleMultiplierProperty);
 
         Foldout recoveryFoldout = CreatePayloadFoldout(stealerProperty, "Recovery", "PowerUpStealerRecovery");
         payloadContainer.Add(recoveryFoldout);
@@ -100,13 +103,15 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
     /// <param name="selectionModeProperty">Serialized within-category selection mode property.</param>
     /// <param name="activeTargetBiasPercentProperty">Serialized active-target bias percentage property.</param>
     /// <param name="acquisitionStealCooldownSecondsProperty">Serialized per-power-up anti-steal cooldown duration.</param>
+    /// <param name="stolenPowerUpIconScaleMultiplierProperty">Serialized stolen-icon scale multiplier.</param>
     private static void BuildStealSection(Foldout stealFoldout,
                                           SerializedProperty triggerModeProperty,
                                           SerializedProperty consumeModuleActivationAttemptOnSpawnOnlyProperty,
                                           SerializedProperty targetKindProperty,
                                           SerializedProperty selectionModeProperty,
                                           SerializedProperty activeTargetBiasPercentProperty,
-                                          SerializedProperty acquisitionStealCooldownSecondsProperty)
+                                          SerializedProperty acquisitionStealCooldownSecondsProperty,
+                                          SerializedProperty stolenPowerUpIconScaleMultiplierProperty)
     {
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, triggerModeProperty, "Trigger Mode");
         VisualElement moduleActivationContainer = new VisualElement();
@@ -123,6 +128,9 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, targetKindProperty, "Target Kind");
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, selectionModeProperty, "Selection Mode");
         EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout, acquisitionStealCooldownSecondsProperty, "Acquisition Steal Cooldown Seconds");
+        EnemyAdvancedPatternDrawerUtility.AddField(stealFoldout,
+                                                   stolenPowerUpIconScaleMultiplierProperty,
+                                                   "Stolen Power-Up Icon Scale Multiplier");
 
         VisualElement activeBiasContainer = new VisualElement();
         activeBiasContainer.tooltip = "Shown only when the module can steal either active or passive power-ups.";
@@ -139,14 +147,30 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
 
         HelpBox warningBox = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
         stealFoldout.Add(warningBox);
-        RefreshStealWarnings(activeTargetBiasPercentProperty, acquisitionStealCooldownSecondsProperty, warningBox);
+        RefreshStealWarnings(activeTargetBiasPercentProperty,
+                             acquisitionStealCooldownSecondsProperty,
+                             stolenPowerUpIconScaleMultiplierProperty,
+                             warningBox);
         stealFoldout.TrackPropertyValue(activeTargetBiasPercentProperty, changedProperty =>
         {
-            RefreshStealWarnings(changedProperty, acquisitionStealCooldownSecondsProperty, warningBox);
+            RefreshStealWarnings(changedProperty,
+                                 acquisitionStealCooldownSecondsProperty,
+                                 stolenPowerUpIconScaleMultiplierProperty,
+                                 warningBox);
         });
         stealFoldout.TrackPropertyValue(acquisitionStealCooldownSecondsProperty, changedProperty =>
         {
-            RefreshStealWarnings(activeTargetBiasPercentProperty, changedProperty, warningBox);
+            RefreshStealWarnings(activeTargetBiasPercentProperty,
+                                 changedProperty,
+                                 stolenPowerUpIconScaleMultiplierProperty,
+                                 warningBox);
+        });
+        stealFoldout.TrackPropertyValue(stolenPowerUpIconScaleMultiplierProperty, changedProperty =>
+        {
+            RefreshStealWarnings(activeTargetBiasPercentProperty,
+                                 acquisitionStealCooldownSecondsProperty,
+                                 changedProperty,
+                                 warningBox);
         });
     }
 
@@ -446,9 +470,11 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
     /// </summary>
     /// <param name="activeTargetBiasPercentProperty">Serialized active-target bias percentage property.</param>
     /// <param name="acquisitionStealCooldownSecondsProperty">Serialized per-power-up anti-steal cooldown duration.</param>
+    /// <param name="stolenPowerUpIconScaleMultiplierProperty">Serialized stolen-icon scale multiplier.</param>
     /// <param name="warningBox">Warning box updated in place.</param>
     private static void RefreshStealWarnings(SerializedProperty activeTargetBiasPercentProperty,
                                              SerializedProperty acquisitionStealCooldownSecondsProperty,
+                                             SerializedProperty stolenPowerUpIconScaleMultiplierProperty,
                                              HelpBox warningBox)
     {
         List<string> warnings = new List<string>();
@@ -463,6 +489,12 @@ internal static class EnemyPowerUpStealerPayloadDrawerUtility
             acquisitionStealCooldownSecondsProperty.floatValue < 0f)
         {
             warnings.Add("Acquisition Steal Cooldown Seconds is negative. Runtime treats negative cooldown as zero.");
+        }
+
+        if (stolenPowerUpIconScaleMultiplierProperty != null &&
+            stolenPowerUpIconScaleMultiplierProperty.floatValue <= 0f)
+        {
+            warnings.Add("Stolen Power-Up Icon Scale Multiplier must be greater than zero.");
         }
 
         ApplyWarnings(warnings, warningBox);

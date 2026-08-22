@@ -13,545 +13,9 @@ MonoBehaviour:
   m_Name: SUB_LGTEST_METRO_BOSS_ParallelWaves
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWavePreset
   waves:
-  - waveId: 1075425290a0440584b1456ed7b199d8
+  - waveId: f666ae151614429c94d6ef601c67da05
     waveLabel: Wave 1
     sequenceStepIndex: 0
-    referenceWaveId: 
-    previewInScene: 1
-    startMode: 0
-    startDelaySeconds: 1
-    spawnDurationSeconds: 5
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 5
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 70a892e0dfce424fb7aa6752147d07fe
-    waveLabel: Wave 2
-    sequenceStepIndex: 1
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: bfbcb1f71f494efe9dd6f4dd0079269e
-    waveLabel: Wave 3
-    sequenceStepIndex: 2
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 7, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: e37022ba13b24f7e82fd5a65e2f384f6
-    waveLabel: Wave 4
-    sequenceStepIndex: 3
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 3}
-      brushCategoryId: category_69fed44f89b848a4f97e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 71996253aeae4934964ed0871eaa369d
-    waveLabel: Wave 6
-    sequenceStepIndex: 4
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 3}
-      brushCategoryId: category_44859ebceb11b7141aff
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 3c23ee1cf76441d9aeda74b0b108a061
-    waveLabel: Wave 7
-    sequenceStepIndex: 5
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 3cb30b5a077245f6b037ff9a5e6a00d2
-    waveLabel: Wave 8
-    sequenceStepIndex: 6
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 3}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 94ff69ee8f3345b5b4802496d7973d28
-    waveLabel: Wave 9
-    sequenceStepIndex: 7
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 1
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 1, y: 14}
-      brushCategoryId: category_a35ced4eda7a12b4dbaa
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: f666ae151614429c94d6ef601c67da05
-    waveLabel: Wave 9
-    sequenceStepIndex: 8
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -673,8 +137,8 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 8c316cbf67cb414ebb264cd36c1aa7b9
-    waveLabel: Wave 10
-    sequenceStepIndex: 9
+    waveLabel: Wave 2
+    sequenceStepIndex: 1
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -795,132 +259,9 @@ MonoBehaviour:
     minimumDifficulty: 0
     maximumDifficulty: 100
     selectionWeight: 1
-  - waveId: cff231341e5d4182a5db2031ac5bd817
-    waveLabel: Wave 11
-    sequenceStepIndex: 10
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 1, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 7, y: 1}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 11}
-      brushCategoryId: category_69fed44f89b848a4f97e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
   - waveId: 797500c11ec346169c99b4ef29982314
-    waveLabel: Wave 12
-    sequenceStepIndex: 11
+    waveLabel: Wave 3
+    sequenceStepIndex: 2
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -1069,255 +410,9 @@ MonoBehaviour:
     minimumDifficulty: 0
     maximumDifficulty: 100
     selectionWeight: 1
-  - waveId: 86625a16ec00485faa77729d9e6253ce
-    waveLabel: Wave 13
-    sequenceStepIndex: 12
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 3, y: 12}
-      brushCategoryId: category_69fed44f89b848a4f97e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 5, y: 12}
-      brushCategoryId: category_69fed44f89b848a4f97e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 31b520253184449a8f87721f3808a923
-    waveLabel: Wave 14
-    sequenceStepIndex: 13
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 4}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 8}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
   - waveId: a1bae55462e746fe89bcfb788e014763
-    waveLabel: Wave 15
-    sequenceStepIndex: 14
+    waveLabel: Wave 4
+    sequenceStepIndex: 3
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -1439,8 +534,8 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: a31a3194f5be4522a7733e46014d4a7c
-    waveLabel: Wave 16
-    sequenceStepIndex: 15
+    waveLabel: Wave 5
+    sequenceStepIndex: 4
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -1561,887 +656,9 @@ MonoBehaviour:
     minimumDifficulty: 0
     maximumDifficulty: 100
     selectionWeight: 1
-  - waveId: 8414c3b7edc044e1b4ea8bfa681a3193
-    waveLabel: Wave 17
-    sequenceStepIndex: 16
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 14}
-      brushCategoryId: category_a35ced4eda7a12b4dbaa
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 1}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 3}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 7}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 13806a29d5bf4361838573ed4b7532cf
-    waveLabel: Wave 18
-    sequenceStepIndex: 17
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 1, y: 14}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 7, y: 1}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 7}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 2, y: 7}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 6, y: 7}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: c38f691a1da1418b87b1f6a9ee60c5e9
-    waveLabel: Wave 19
-    sequenceStepIndex: 18
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 1, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 7, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 14}
-      brushCategoryId: category_a35ced4eda7a12b4dbaa
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: a79c739d234d43acbca32dfd9ce2b17e
-    waveLabel: Wave 20
-    sequenceStepIndex: 19
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 1, y: 14}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 7, y: 1}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 7, y: 14}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 037d101c1e73418d823a92e41966d870
-    waveLabel: Wave 21
-    sequenceStepIndex: 20
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 3, y: 1}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 5, y: 1}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 2}
-      brushCategoryId: category_44859ebceb11b7141aff
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 2002ddf87a164ce39782259ce4320328
-    waveLabel: Wave 22
-    sequenceStepIndex: 21
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells:
-    - cellCoordinate: {x: 4, y: 12}
-      brushCategoryId: category_44859ebceb11b7141aff
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 0}
-      brushCategoryId: category_c64113c66ddb2374d8f8
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 14}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    - cellCoordinate: {x: 4, y: 9}
-      brushCategoryId: category_9f65ffa9659e02a458f0
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
   - waveId: e83c7bd4fd0e452ca4458fc728935bf8
-    waveLabel: Wave 23
-    sequenceStepIndex: 22
+    waveLabel: Wave 6
+    sequenceStepIndex: 5
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -2647,8 +864,8 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: b90e4abb28ee42ccabb73dfc747286e0
-    waveLabel: Wave 24
-    sequenceStepIndex: 23
+    waveLabel: Wave 7
+    sequenceStepIndex: 6
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -2798,8 +1015,8 @@ MonoBehaviour:
     maximumDifficulty: 100
     selectionWeight: 1
   - waveId: 2ad5bc93f8164a93b135f902c7983050
-    waveLabel: Wave 25
-    sequenceStepIndex: 24
+    waveLabel: Wave 8
+    sequenceStepIndex: 7
     referenceWaveId: 
     previewInScene: 0
     startMode: 3
@@ -2864,14 +1081,14 @@ MonoBehaviour:
     minimumDifficulty: 0
     maximumDifficulty: 100
     selectionWeight: 1
-  - waveId: 0c1c369c52a445539ffced80f2c5230b
+  - waveId: 7fea2248d9644e4ba9c9713c305b51b4
     waveLabel: Wave 1 Parallel
     sequenceStepIndex: 0
     referenceWaveId: 
     previewInScene: 0
     startMode: 0
     startDelaySeconds: 0
-    spawnDurationSeconds: 40
+    spawnDurationSeconds: 4
     defaultDistributionCurve:
       serializedVersion: 2
       m_Curve:
@@ -2896,7 +1113,391 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    paintedCells: []
+    paintedCells:
+    - cellCoordinate: {x: 2, y: 1}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 6, y: 1}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 2e05e40ff35c4c29a1296d91152941f3
+    waveLabel: Wave 2 Parallel
+    sequenceStepIndex: 1
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 1, y: 14}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 7, y: 14}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: fa16e9baa108472abad05ac8613c2411
+    waveLabel: Wave 3 Parallel
+    sequenceStepIndex: 2
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 7, y: 3}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 1, y: 3}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 22b28329e9c7481b8f38d468a23c2b9e
+    waveLabel: Wave 4 Parallel
+    sequenceStepIndex: 3
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 1, y: 14}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 7, y: 1}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: 2f406f14deb74b16a2077b39e9b3952a
+    waveLabel: Wave 5 Parallel
+    sequenceStepIndex: 4
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 1, y: 4}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 7, y: 4}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: c06f02ac8e8a4b788885ee96a74fa257
+    waveLabel: Wave 6 Parallel
+    sequenceStepIndex: 5
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 1, y: 14}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 7, y: 1}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    useDifficultySelection: 0
+    difficultySelectionGroupId: 
+    difficultyCoefficientId: 
+    minimumDifficulty: 0
+    maximumDifficulty: 100
+    selectionWeight: 1
+  - waveId: c82cce75920046b48e41d611cd5321b1
+    waveLabel: Wave 7 Parallel
+    sequenceStepIndex: 6
+    referenceWaveId: 
+    previewInScene: 0
+    startMode: 3
+    startDelaySeconds: 0
+    spawnDurationSeconds: 4
+    defaultDistributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    paintedCells:
+    - cellCoordinate: {x: 3, y: 8}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 4, y: 8}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 5, y: 8}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
     useDifficultySelection: 0
     difficultySelectionGroupId: 
     difficultyCoefficientId: 

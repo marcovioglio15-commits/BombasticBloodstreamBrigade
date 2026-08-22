@@ -135,13 +135,27 @@ public static class PlayerReturningProjectileInteractionSmokeTest
         returnState.Config.CompleteOrbitalPathBeforeReturn = 1;
         returnState.Config.SamePowerUpHasOrbitalProjectiles = 0;
 
+        if (ProjectileReturnPowerUpInteractionUtility.AllowsOrbitalTrajectory(in returnState.Config))
+            throw new InvalidOperationException("An external orbital module remained enabled while cross-power-up interactions were disabled.");
+
         if (!ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState, in perfectCircleState))
             throw new InvalidOperationException("An external orbital module delayed return while cross-power-up interactions were disabled.");
 
         returnState.Config.SamePowerUpHasOrbitalProjectiles = 1;
 
+        if (!ProjectileReturnPowerUpInteractionUtility.AllowsOrbitalTrajectory(in returnState.Config))
+            throw new InvalidOperationException("A co-located orbital module was excluded despite its enabled dedicated interaction setting.");
+
         if (ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState, in perfectCircleState))
             throw new InvalidOperationException("A co-located orbital module did not preserve its full-path prerequisite.");
+
+        returnState.Config.CompleteOrbitalPathBeforeReturn = 0;
+
+        if (ProjectileReturnPowerUpInteractionUtility.AllowsOrbitalTrajectory(in returnState.Config) ||
+            !ProjectileReturnRuntimeUtility.CanBeginReturn(in returnState, in perfectCircleState))
+        {
+            throw new InvalidOperationException("The disabled orbital interaction still altered a returning projectile.");
+        }
     }
     #endregion
 

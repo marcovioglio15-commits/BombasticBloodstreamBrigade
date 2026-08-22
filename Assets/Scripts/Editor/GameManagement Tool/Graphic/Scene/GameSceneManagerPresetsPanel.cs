@@ -336,7 +336,9 @@ public sealed class GameSceneManagerPresetsPanel
         Triggers = 5,
         Validation = 6,
         Addressables = 7,
-        LoadingProgress = 8
+        LoadingProgress = 8,
+        GameplayCamera = 9,
+        BuildFeatures = 10
     }
     #endregion
 }

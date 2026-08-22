@@ -44,7 +44,9 @@ public sealed class EnemyWavePreset : ScriptableObject
     {
         EnsureWaveList();
         EnsureWaveIdentities();
+#if UNITY_EDITOR
         EnemySpawnerRuntimeBakeMetadataUtility.ClearRuntimeWavePresetCandidateCache();
+#endif
     }
     #endregion
 

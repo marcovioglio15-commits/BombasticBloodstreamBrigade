@@ -130,14 +130,14 @@ public static class EnemyWallSteeringUtility
                                                                     out float3 secondCandidateVelocity,
                                                                     out float3 secondCandidateHitNormal);
 
-        if (hasFirstCandidate == false && hasSecondCandidate == false)
+        if (!hasFirstCandidate && !hasSecondCandidate)
             return false;
 
         bool useSecondCandidate = false;
 
         if (hasSecondCandidate)
         {
-            if (hasFirstCandidate == false)
+            if (!hasFirstCandidate)
                 useSecondCandidate = true;
             else if (secondCandidateScore > firstCandidateScore)
                 useSecondCandidate = true;

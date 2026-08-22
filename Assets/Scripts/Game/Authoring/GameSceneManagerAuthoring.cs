@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
@@ -181,6 +182,12 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         {
             Alpha = 0f,
             Color = config.FadeColor,
+            Mode = config.FadeMode,
+            WipeDirection = config.FadeWipeDirection,
+            Easing = config.FadeEasing,
+            DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness,
+            DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength,
+            DirectionalNoiseScale = config.FadeDirectionalNoiseScale,
             Visible = 0
         });
         entityManager.SetComponentData(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
@@ -290,6 +297,12 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
             entityManager.AddBuffer<GameRoomRewardModuleBindingElement>(entity);
             entityManager.AddBuffer<GameRoomRewardTileBindingElement>(entity);
             entityManager.AddBuffer<GameRoomRewardPresentationElement>(entity);
+            entityManager.AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
+            entityManager.AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
+            entityManager.AddComponentData(entity, new GameRoomPortalUnlockAudioRuntimeState
+            {
+                NodeIndex = -1
+            });
         }
         else if (rewardPreset != null)
         {
@@ -313,7 +326,9 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
                 entityManager.GetBuffer<GameRoomRewardDefinitionElement>(entity),
                 entityManager.GetBuffer<GameRoomRewardModuleBindingElement>(entity),
                 entityManager.GetBuffer<GameRoomRewardTileBindingElement>(entity),
-                entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity));
+                entityManager.GetBuffer<GameRoomRewardPresentationElement>(entity),
+                entityManager.GetBuffer<GameRoomPortalActivationAnimationElement>(entity),
+                entityManager.GetBuffer<GameRoomPortalPrefabReplacementElement>(entity));
         }
     }
     #endregion
@@ -352,6 +367,12 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         {
             Alpha = 0f,
             Color = config.FadeColor,
+            Mode = config.FadeMode,
+            WipeDirection = config.FadeWipeDirection,
+            Easing = config.FadeEasing,
+            DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness,
+            DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength,
+            DirectionalNoiseScale = config.FadeDirectionalNoiseScale,
             Visible = 0
         });
         AddComponent(entity, GameSceneManagementBakeUtility.BuildLoadingProgressPresentationState(config));
@@ -413,6 +434,29 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
 
                 if (rewardPreset.PortalLogSettings != null && rewardPreset.PortalLogSettings.Font != null)
                     DependsOn(rewardPreset.PortalLogSettings.Font);
+
+                if (rewardPreset.PortalLogSettings != null &&
+                    rewardPreset.PortalLogSettings.StaticBackgroundSprite != null)
+                {
+                    DependsOn(rewardPreset.PortalLogSettings.StaticBackgroundSprite);
+                }
+
+                if (rewardPreset.PortalLogSettings != null)
+                {
+                    IReadOnlyList<GameRoomPortalPrefabReplacementDefinition> replacements =
+                        rewardPreset.PortalLogSettings.ActivationPrefabReplacements;
+
+                    for (int replacementIndex = 0;
+                         replacementIndex < replacements.Count;
+                         replacementIndex++)
+                    {
+                        GameRoomPortalPrefabReplacementDefinition replacement =
+                            replacements[replacementIndex];
+
+                        if (replacement != null && replacement.ReplacementPrefab != null)
+                            DependsOn(replacement.ReplacementPrefab);
+                    }
+                }
 
                 for (int mappingIndex = 0; mappingIndex < rewardPreset.PresentationMappings.Count; mappingIndex++)
                 {
@@ -565,13 +609,21 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         DynamicBuffer<GameRoomRewardModuleBindingElement> moduleBindingBuffer = AddBuffer<GameRoomRewardModuleBindingElement>(entity);
         DynamicBuffer<GameRoomRewardTileBindingElement> tileBindingBuffer = AddBuffer<GameRoomRewardTileBindingElement>(entity);
         DynamicBuffer<GameRoomRewardPresentationElement> presentationBuffer = AddBuffer<GameRoomRewardPresentationElement>(entity);
+        DynamicBuffer<GameRoomPortalActivationAnimationElement> portalAnimationBuffer = AddBuffer<GameRoomPortalActivationAnimationElement>(entity);
+        DynamicBuffer<GameRoomPortalPrefabReplacementElement> portalReplacementBuffer = AddBuffer<GameRoomPortalPrefabReplacementElement>(entity);
+        AddComponent(entity, new GameRoomPortalUnlockAudioRuntimeState
+        {
+            NodeIndex = -1
+        });
         GameRoomRewardBakeUtility.PopulateBuffers(rewardPreset,
                                                   proceduralPreset,
                                                   moduleBuffer,
                                                   rewardBuffer,
                                                   moduleBindingBuffer,
                                                   tileBindingBuffer,
-                                                  presentationBuffer);
+                                                  presentationBuffer,
+                                                  portalAnimationBuffer,
+                                                  portalReplacementBuffer);
     }
     #endregion
 

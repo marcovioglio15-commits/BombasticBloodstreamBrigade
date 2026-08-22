@@ -508,6 +508,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                                          resolvedValue,
                                                                          ref passiveToolConfig.ReturningProjectiles))
         {
+            if (string.Equals(payloadPath,
+                              "returningProjectiles.returnStartMode",
+                              StringComparison.Ordinal))
+            {
+                passiveToolConfig.ReturningProjectiles.ReturnStartMode = ProjectileReturnStartMode.AutomaticDelay;
+            }
+
             return;
         }
 

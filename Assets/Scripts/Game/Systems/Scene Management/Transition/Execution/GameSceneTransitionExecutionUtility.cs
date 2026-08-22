@@ -394,6 +394,15 @@ internal static class GameSceneTransitionExecutionUtility
         fadeState.Alpha = Mathf.Clamp01(alpha);
         fadeState.Visible = visible ? (byte)1 : (byte)0;
         fadeState.Color = config.FadeColor;
+        fadeState.Mode = config.FadeMode;
+        fadeState.WipeDirection = config.FadeWipeDirection;
+        fadeState.Easing = config.FadeEasing;
+        fadeState.DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness;
+        fadeState.DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength;
+        fadeState.DirectionalNoiseScale = config.FadeDirectionalNoiseScale;
+
+        if (fadeState.Alpha < 0.9999f || !visible)
+            fadeState.OpaquePresented = 0;
     }
     #endregion
 

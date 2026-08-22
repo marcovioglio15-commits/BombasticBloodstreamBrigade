@@ -563,11 +563,16 @@ public partial struct PlayerMilestonePowerUpSelectionResolveSystem : ISystem
             PlayerPowerUpContainerInteractionConfig interactionConfig = powerUpContainerConfigLookup[playerEntity];
             LocalTransform playerTransform = localTransformLookup[playerEntity];
             spawnedDroppedContainer = PlayerPowerUpContainerSpawnUtility.TrySpawnDroppedContainer(in physicsWorldSingleton,
-                                                                                                  in playerTransform,
-                                                                                                  in interactionConfig,
-                                                                                                  in replacedPowerUp,
-                                                                                                  ref commandBuffer);
+                                                                                                   in playerTransform,
+                                                                                                   in interactionConfig,
+                                                                                                   in replacedPowerUp,
+                                                                                                   ref commandBuffer);
         }
+
+        if (replacedPowerUp.SlotConfig.IsDefined != 0 && !spawnedDroppedContainer)
+            PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDiscardedOwnershipPolicy(targetSlotIndex,
+                                                                                          ref replacedPowerUp,
+                                                                                          ref powerUpsState);
 
         switch (targetSlotIndex)
         {

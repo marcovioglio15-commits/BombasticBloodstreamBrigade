@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System;
 
 /// <summary>
@@ -60,3 +61,4 @@ public sealed class EnemySpawnerRuntimeToolGamepadNavigationController : IDispos
 
     #endregion
 }
+#endif

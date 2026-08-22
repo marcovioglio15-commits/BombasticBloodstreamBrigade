@@ -251,6 +251,7 @@ public struct EnemyPowerUpStealerConfigElement : IBufferElementData
     public byte ConsumeModuleActivationAttemptOnSpawnOnly;
     public float ActiveTargetBiasPercent;
     public float AcquisitionStealCooldownSeconds;
+    public float StolenPowerUpIconScaleMultiplier;
     public byte UseMinimumRange;
     public float MinimumRange;
     public byte UseMaximumRange;
@@ -302,6 +303,7 @@ public struct EnemyPowerUpStealerVisualState : IComponentData
     public byte HasStolenPowerUp;
     public FixedString64Bytes PowerUpId;
     public PlayerPowerUpUnlockKind StolenKind;
+    public float IconScaleMultiplier;
 }
 
 /// <summary>

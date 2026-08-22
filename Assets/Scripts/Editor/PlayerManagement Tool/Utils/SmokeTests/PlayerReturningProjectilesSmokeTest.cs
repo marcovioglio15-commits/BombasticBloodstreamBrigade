@@ -39,19 +39,29 @@ public static class PlayerReturningProjectilesSmokeTest
         }
 
         ValidateBaselineBake(preset);
+        RunDeterministicChecks();
+        Debug.Log("[PlayerReturningProjectilesSmokeTest] Baseline content and all Returning Projectiles checks passed.");
+    }
+
+    /// <summary>
+    /// Runs Returning Projectiles editor and runtime checks without reading or modifying authored preset content.
+    /// </summary>
+    public static void RunDeterministicChecks()
+    {
         ValidateAuthoringScalingTargets();
         ValidateRuntimeScalingPaths();
         ValidateSourceFiltering();
         ValidateProjectileSizeFiltering();
         ValidateReplacementProjectileFootprint();
         PlayerReturningProjectileInteractionSmokeTest.Run();
+        ValidateSpecializedPoolExpansionPolicy();
         ValidatePoolStoragePartitioning();
         ValidateReturnTransition();
         PlayerReturningProjectileRecallSmokeTest.Run();
         PlayerReturningProjectileContactDamageSmokeTest.Run();
         PlayerReturnCameraShakeRuntimeSmokeTest.Run();
         GameSceneTransitionGameplayRuntimeCleanupSmokeTest.Run();
-        Debug.Log("[PlayerReturningProjectilesSmokeTest] Baseline content and all Returning Projectiles checks passed.");
+        Debug.Log("[PlayerReturningProjectilesSmokeTest] Deterministic Returning Projectiles checks passed.");
     }
     #endregion
 
@@ -187,6 +197,8 @@ public static class PlayerReturningProjectilesSmokeTest
                 "returnDelaySeconds",
                 "allowEarlyActivationRecall",
                 "reapplyResourceGateCostOnRecall",
+                "resourceReturnThresholdPercent",
+                "stolenOwnershipPolicy",
                 "returnRumbleMultiplier",
                 "returnCameraShakeMultiplier",
                 "outboundSizeMultiplier",
@@ -277,6 +289,7 @@ public static class PlayerReturningProjectilesSmokeTest
         PlayerPowerUpSlotConfig activeConfig = new PlayerPowerUpSlotConfig
         {
             HasReturningProjectiles = 1,
+            HasResourceGate = 1,
             ReturningProjectiles = new ReturningProjectilesConfig
             {
                 KeepProjectileVfx = 1,
@@ -330,7 +343,17 @@ public static class PlayerReturningProjectilesSmokeTest
                                                            ref passiveConfig);
         PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.returnStartMode",
                                                            PlayerPowerUpUnlockKind.Active,
-                                                           (float)ProjectileReturnStartMode.ActivationTap,
+                                                           (float)ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.resourceReturnThresholdPercent",
+                                                           PlayerPowerUpUnlockKind.Active,
+                                                           35f,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.stolenOwnershipPolicy",
+                                                           PlayerPowerUpUnlockKind.Active,
+                                                           (float)ProjectileStolenOwnershipPolicy.PreserveAndReconnect,
                                                            ref activeConfig,
                                                            ref passiveConfig);
         PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.returnRumbleMultiplier",
@@ -413,6 +436,11 @@ public static class PlayerReturningProjectilesSmokeTest
                                                            (float)ProjectileReturnHitPolicy.LimitedAdditionalHits,
                                                            ref activeConfig,
                                                            ref passiveConfig);
+        PlayerRuntimePowerUpScalingPathUtility.ApplyValue("returningProjectiles.returnStartMode",
+                                                           PlayerPowerUpUnlockKind.Passive,
+                                                           (float)ProjectileReturnStartMode.ResourceDrain,
+                                                           ref activeConfig,
+                                                           ref passiveConfig);
         PlayerRuntimePowerUpScalingPathUtility.ApplyBooleanValue("returningProjectiles.applyToSplitProjectiles",
                                                                   PlayerPowerUpUnlockKind.Passive,
                                                                   true,
@@ -425,7 +453,9 @@ public static class PlayerReturningProjectilesSmokeTest
             math.abs(activeConfig.ReturningProjectiles.OutboundLifetimeMultiplier - 1.5f) > PrecisionEpsilon ||
             activeConfig.ReturningProjectiles.OutboundHitPolicy != ProjectileOutboundHitPolicy.LimitedAdditionalHits ||
             activeConfig.ReturningProjectiles.AdditionalOutboundHits != 4 ||
-            activeConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.ActivationTap ||
+            activeConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain ||
+            math.abs(activeConfig.ReturningProjectiles.ResourceReturnThresholdPercent - 35f) > PrecisionEpsilon ||
+            activeConfig.ReturningProjectiles.StolenOwnershipPolicy != ProjectileStolenOwnershipPolicy.PreserveAndReconnect ||
             math.abs(activeConfig.ReturningProjectiles.ReturnDelaySeconds - 0.4f) > PrecisionEpsilon ||
             math.abs(activeConfig.ReturningProjectiles.ReturnRumbleMultiplier - 0.65f) > PrecisionEpsilon ||
             math.abs(activeConfig.ReturningProjectiles.ReturnCameraShakeMultiplier - 0.8f) > PrecisionEpsilon ||
@@ -443,6 +473,7 @@ public static class PlayerReturningProjectilesSmokeTest
             activeConfig.ReturningProjectiles.EnableProjectileSplitting != 0 ||
             activeConfig.ReturningProjectiles.ApplyTinyMegaProjectileScaling != 0 ||
             passiveConfig.ReturningProjectiles.ReturnHitPolicy != ProjectileReturnHitPolicy.LimitedAdditionalHits ||
+            passiveConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.AutomaticDelay ||
             passiveConfig.ReturningProjectiles.ApplyToSplitProjectiles == 0)
         {
             throw new InvalidOperationException("Returning Projectiles runtime formula paths did not update typed configs.");
@@ -521,6 +552,39 @@ public static class PlayerReturningProjectilesSmokeTest
     #endregion
 
     #region Runtime Policies
+    /// <summary>
+    /// Verifies a high-throughput base pool batch can never multiply a one-shot specialized prefab request.
+    /// </summary>
+    private static void ValidateSpecializedPoolExpansionPolicy()
+    {
+        Entity basePrefabEntity = new Entity
+        {
+            Index = 1,
+            Version = 1
+        };
+        Entity replacementPrefabEntity = new Entity
+        {
+            Index = 2,
+            Version = 1
+        };
+
+        if (ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(replacementPrefabEntity,
+                                                                      basePrefabEntity,
+                                                                      1,
+                                                                      1500) != 1)
+        {
+            throw new InvalidOperationException("A one-shot returning replacement inherited the base pool's 1500-projectile expansion batch.");
+        }
+
+        if (ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(basePrefabEntity,
+                                                                      basePrefabEntity,
+                                                                      3,
+                                                                      128) != 128)
+        {
+            throw new InvalidOperationException("The high-throughput base projectile lost its configured pool expansion batch.");
+        }
+    }
+
     /// <summary>
     /// Verifies passive source filters and explicit active overrides resolve without per-frame discovery.
     /// </summary>

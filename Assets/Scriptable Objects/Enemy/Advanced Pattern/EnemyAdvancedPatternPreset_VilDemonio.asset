@@ -253,6 +253,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -520,6 +521,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -787,6 +789,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -1054,6 +1057,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -1321,6 +1325,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -1594,6 +1599,7 @@ MonoBehaviour:
         selectionMode: 0
         activeTargetBiasPercent: 50
         acquisitionStealCooldownSeconds: 3
+        stolenPowerUpIconScaleMultiplier: 1
         recoverAfterDamageTakenPercent: 0
         recoveryDamageTakenPercent: 25
         recoverAfterDamageWindow: 0
@@ -1874,6 +1880,7 @@ MonoBehaviour:
           selectionMode: 0
           activeTargetBiasPercent: 50
           acquisitionStealCooldownSeconds: 3
+          stolenPowerUpIconScaleMultiplier: 1
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0
@@ -2141,6 +2148,7 @@ MonoBehaviour:
           selectionMode: 0
           activeTargetBiasPercent: 50
           acquisitionStealCooldownSeconds: 3
+          stolenPowerUpIconScaleMultiplier: 1
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0
@@ -2408,6 +2416,7 @@ MonoBehaviour:
           selectionMode: 0
           activeTargetBiasPercent: 50
           acquisitionStealCooldownSeconds: 3
+          stolenPowerUpIconScaleMultiplier: 1
           recoverAfterDamageTakenPercent: 0
           recoveryDamageTakenPercent: 25
           recoverAfterDamageWindow: 0

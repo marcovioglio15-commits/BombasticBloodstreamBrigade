@@ -27,6 +27,13 @@ public struct PlayerStoredActivePowerUpData
     public PlayerPowerUpSlotConfig SlotConfig;
     public float StoredEnergy;
     public float StoredCooldownRemaining;
+    public int ReturningProjectileCount;
+    public int ReturningProjectileRecallReadyCount;
+    public uint ReturningProjectileGeneration;
+    public uint ReturningProjectileRecallVersion;
+    public uint ReturningProjectileResourceRecallVersion;
+    public byte ReturningProjectileResourceDrainActive;
+    public byte PreserveReturningProjectileOwnership;
 }
 
 /// <summary>
@@ -37,6 +44,13 @@ public struct PlayerDroppedPowerUpContainerContent : IComponentData
 {
     public float StoredEnergy;
     public float StoredCooldownRemaining;
+    public int ReturningProjectileCount;
+    public int ReturningProjectileRecallReadyCount;
+    public uint ReturningProjectileGeneration;
+    public uint ReturningProjectileRecallVersion;
+    public uint ReturningProjectileResourceRecallVersion;
+    public byte ReturningProjectileResourceDrainActive;
+    public byte PreserveReturningProjectileOwnership;
     public byte HasStoredPowerUp;
 }
 

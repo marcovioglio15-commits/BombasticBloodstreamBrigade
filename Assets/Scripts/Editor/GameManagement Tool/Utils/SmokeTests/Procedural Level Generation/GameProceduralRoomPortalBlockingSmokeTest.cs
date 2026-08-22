@@ -70,6 +70,7 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
 
             ValidateFilter(blockerFilter);
             ValidatePhysicsWorldParticipation(blockerCollider);
+            ValidateWallLineOfSightOcclusion();
             ValidateAssignmentSynchronization(entityManager,
                                               managerEntity,
                                               outgoingBlocker,
@@ -166,6 +167,64 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
         finally
         {
             physicsWorld.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Verifies the shared wall segment query blocks projectile damage across geometry without blocking same-side hits.
+    /// </summary>
+    private static void ValidateWallLineOfSightOcclusion()
+    {
+        CollisionFilter wallsFilter =
+            WorldWallCollisionUtility.BuildWallsCollisionFilter(WallsLayerMask);
+        BlobAssetReference<Unity.Physics.Collider> wallCollider =
+            PhysicsBoxCollider.Create(new BoxGeometry
+            {
+                Center = float3.zero,
+                Orientation = quaternion.identity,
+                Size = new float3(2f, 2f, 0.4f),
+                BevelRadius = 0f
+            }, wallsFilter);
+        PhysicsWorld physicsWorld = new PhysicsWorld(1, 0, 0);
+
+        try
+        {
+            NativeArray<RigidBody> staticBodies = physicsWorld.StaticBodies;
+            staticBodies[0] = new RigidBody
+            {
+                WorldFromBody = new RigidTransform(quaternion.identity,
+                                                   float3.zero),
+                Scale = 1f,
+                Collider = wallCollider,
+                Entity = Entity.Null
+            };
+            physicsWorld.CollisionWorld.BuildBroadphase(ref physicsWorld,
+                                                        1f / 60f,
+                                                        float3.zero);
+            PhysicsWorldSingleton physicsWorldSingleton =
+                new PhysicsWorldSingleton
+                {
+                    PhysicsWorld = physicsWorld
+                };
+            Require(WorldWallCollisionUtility.IsLineOfSightBlocked(
+                        in physicsWorldSingleton,
+                        new float3(0f, 0f, -2f),
+                        new float3(0f, 0f, 2f),
+                        in wallsFilter),
+                    "A wall did not block projectile damage between opposite sides.");
+            Require(!WorldWallCollisionUtility.IsLineOfSightBlocked(
+                        in physicsWorldSingleton,
+                        new float3(0f, 0f, -2f),
+                        new float3(0.5f, 0f, -1f),
+                        in wallsFilter),
+                    "A wall blocked projectile damage between two unobstructed same-side points.");
+        }
+        finally
+        {
+            physicsWorld.Dispose();
+
+            if (wallCollider.IsCreated)
+                wallCollider.Dispose();
         }
     }
 

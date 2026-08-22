@@ -114,12 +114,91 @@ public enum ProjectileReturnPathMode
 }
 
 /// <summary>
-/// Selects whether an active returning projectile starts its return after a timed delay or a second activation tap.
+/// Selects which active trigger can begin returning-projectile travel.
 /// </summary>
 public enum ProjectileReturnStartMode
 {
     AutomaticDelay = 0,
-    ActivationTap = 1
+    ActivationTap = 1,
+    ResourceDrain = 2,
+    ActivationTapOrResourceDrain = 3,
+    AutomaticDelayOrActivationTapOrResourceDrain = 4
+}
+
+/// <summary>
+/// Selects how live returning projectiles react when their unprotected owning active power-up is stolen.
+/// </summary>
+public enum ProjectileStolenOwnershipPolicy
+{
+    Despawn = 0,
+    PreserveAndReconnect = 1
+}
+
+/// <summary>
+/// Centralizes trigger capabilities shared by authoring, scaling, activation, and projectile simulation.
+/// </summary>
+public static class ProjectileReturnStartModeUtility
+{
+    #region Methods
+
+    /// <summary>
+    /// Resolves whether a mode supports an additional active-input recall tap.
+    /// </summary>
+    /// <param name="mode">Return trigger mode to inspect.</param>
+    /// <returns>True when active input can request return.</returns>
+    public static bool UsesActivationTap(ProjectileReturnStartMode mode)
+    {
+        switch (mode)
+        {
+            case ProjectileReturnStartMode.ActivationTap:
+            case ProjectileReturnStartMode.ActivationTapOrResourceDrain:
+            case ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Resolves whether a mode continuously consumes the owning Resource Gate resource while its projectile is outside.
+    /// </summary>
+    /// <param name="mode">Return trigger mode to inspect.</param>
+    /// <returns>True when continuous resource drain can request return.</returns>
+    public static bool UsesResourceDrain(ProjectileReturnStartMode mode)
+    {
+        switch (mode)
+        {
+            case ProjectileReturnStartMode.ResourceDrain:
+            case ProjectileReturnStartMode.ActivationTapOrResourceDrain:
+            case ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Resolves whether endpoint suspension has a maximum authored duration.
+    /// </summary>
+    /// <param name="mode">Return trigger mode to inspect.</param>
+    /// <returns>True when Return Delay remains an automatic return trigger.</returns>
+    public static bool UsesAutomaticDelay(ProjectileReturnStartMode mode)
+    {
+        return mode == ProjectileReturnStartMode.AutomaticDelay ||
+               mode == ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain;
+    }
+
+    /// <summary>
+    /// Resolves whether endpoint suspension waits indefinitely for an external recall request.
+    /// </summary>
+    /// <param name="mode">Return trigger mode to inspect.</param>
+    /// <returns>True when no automatic endpoint delay can complete the return trigger.</returns>
+    public static bool WaitsForExternalRecall(ProjectileReturnStartMode mode)
+    {
+        return !UsesAutomaticDelay(mode);
+    }
+
+    #endregion
 }
 
 /// <summary>

@@ -15,6 +15,7 @@ public struct GameRoomRewardConfig : IComponentData
     public int RewardCount;
     public int MappingCount;
     public float3 PlayerLogWorldOffset;
+    public GameRoomRewardValueDisplayMode PlayerLogValueDisplayMode;
     public float PlayerLogFontSize;
     public float PlayerLogRowSpacing;
     public int PlayerLogVisibleRows;
@@ -25,6 +26,8 @@ public struct GameRoomRewardConfig : IComponentData
     public float PlayerLogScrollDistance;
     public UnityObjectRef<TMPro.TMP_FontAsset> PlayerLogFont;
     public float3 PortalWorldOffset;
+    public GameRoomRewardPortalLogLayoutMode PortalLayoutMode;
+    public GameRoomRewardValueDisplayMode PortalValueDisplayMode;
     public float PortalFontSize;
     public float PortalCellSpacing;
     public int PortalVisibleCells;
@@ -32,6 +35,21 @@ public struct GameRoomRewardConfig : IComponentData
     public float PortalInitialPause;
     public float PortalLoopPause;
     public UnityObjectRef<TMPro.TMP_FontAsset> PortalFont;
+    public float PortalStaticRowSpacing;
+    public float2 PortalStaticPanelPadding;
+    public float2 PortalStaticMinimumPanelSize;
+    public float4 PortalStaticBackgroundColor;
+    public UnityObjectRef<Sprite> PortalStaticBackgroundSprite;
+    public int PortalAnimationCount;
+    public int PortalPrefabReplacementCount;
+    public GameRoomPortalUnlockAudioPlaybackMode PortalUnlockAudioPlaybackMode;
+    public byte PortalUnlockAudioEnabled;
+    public byte PortalIndicatorsEnabled;
+    public float3 PortalIndicatorWorldOffset;
+    public float4 PortalIndicatorColor;
+    public float PortalIndicatorSizePixels;
+    public float PortalIndicatorEdgePaddingPixels;
+    public UnityObjectRef<Sprite> PortalIndicatorSprite;
 }
 
 /// <summary>
@@ -117,6 +135,47 @@ public struct GameRoomRewardPresentationElement : IBufferElementData
     public float4 TextColor;
     public UnityObjectRef<Sprite> Sprite;
     public int SortOrder;
+}
+
+/// <summary>
+/// Stores one immutable Transform or Animator-clip animation applied by a managed portal anchor.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct GameRoomPortalActivationAnimationElement : IBufferElementData
+{
+    public FixedString64Bytes TargetBindingId;
+    public FixedString128Bytes AnimatorPath;
+    public GameRoomPortalActivationAnimationSource Source;
+    public GameRoomPortalTransformAnimationMode Mode;
+    public GameRoomPortalTransformAnimationPlayback Playback;
+    public GameRoomPortalTransformAnimationEase Easing;
+    public float StartDelay;
+    public float Duration;
+    public float3 PositionOffset;
+    public float3 RotationOffset;
+    public float3 ScaleMultiplier;
+    public float AnimatorSpeed;
+    public UnityObjectRef<AnimationClip> AnimatorClip;
+}
+
+/// <summary>
+/// Stores one immutable prefab replacement applied before portal activation animations.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct GameRoomPortalPrefabReplacementElement : IBufferElementData
+{
+    public FixedString64Bytes TargetBindingId;
+    public UnityObjectRef<GameObject> ReplacementPrefab;
+}
+
+/// <summary>
+/// Stores room-scoped dispatch state for the shared portal-unlock audio event.
+/// </summary>
+public struct GameRoomPortalUnlockAudioRuntimeState : IComponentData
+{
+    public uint GenerationVersion;
+    public int NodeIndex;
+    public byte Dispatched;
 }
 #endregion
 

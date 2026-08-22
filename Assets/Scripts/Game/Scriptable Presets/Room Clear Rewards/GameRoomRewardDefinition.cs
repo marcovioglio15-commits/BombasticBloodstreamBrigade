@@ -15,7 +15,7 @@ public sealed class GameRoomRewardDefinition
     [SerializeField]
     private string technicalId;
 
-    [Tooltip("-facing room reward name displayed by dynamic tile selectors.")]
+    [Tooltip("Room reward name displayed by dynamic tile selectors.")]
     [SerializeField]
     private string displayName = "New Room Reward";
 

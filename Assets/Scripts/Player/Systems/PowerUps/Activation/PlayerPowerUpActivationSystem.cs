@@ -297,6 +297,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             int secondaryReturningProjectileRecallReadyCount = powerUpsState.ValueRO.SecondaryReturningProjectileRecallReadyCount;
             uint primaryReturningProjectileRecallVersion = powerUpsState.ValueRO.PrimaryReturningProjectileRecallVersion;
             uint secondaryReturningProjectileRecallVersion = powerUpsState.ValueRO.SecondaryReturningProjectileRecallVersion;
+            uint primaryReturningProjectileResourceRecallVersion = powerUpsState.ValueRO.PrimaryReturningProjectileResourceRecallVersion;
+            uint secondaryReturningProjectileResourceRecallVersion = powerUpsState.ValueRO.SecondaryReturningProjectileResourceRecallVersion;
+            byte primaryReturningProjectileResourceDrainActive = powerUpsState.ValueRO.PrimaryReturningProjectileResourceDrainActive;
+            byte secondaryReturningProjectileResourceDrainActive = powerUpsState.ValueRO.SecondaryReturningProjectileResourceDrainActive;
             byte primaryIsCharging = powerUpsState.ValueRO.PrimaryIsCharging;
             byte secondaryIsCharging = powerUpsState.ValueRO.SecondaryIsCharging;
             byte primaryIsActive = powerUpsState.ValueRO.PrimaryIsActive;
@@ -389,10 +393,24 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                           ref playerExperienceCollection);
             }
 
+            PlayerReturningProjectileResourceDrainUtility.Tick(in primarySlotConfig,
+                                                                powerUpsState.ValueRO.PrimaryReturningProjectileCount,
+                                                                deltaTime,
+                                                                ref primaryReturningProjectileResourceDrainActive,
+                                                                ref primaryReturningProjectileResourceRecallVersion,
+                                                                ref primaryEnergy,
+                                                                entity,
+                                                                ref healthLookup,
+                                                                ref updatedHealth,
+                                                                ref healthChanged,
+                                                                ref shieldLookup,
+                                                                ref updatedShield,
+                                                                ref shieldChanged);
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in primarySlotConfig,
                                                                 in secondarySlotConfig,
                                                                 0,
                                                                 powerUpsState.ValueRO.PrimaryReturningProjectileCount,
+                                                                powerUpsState.ValueRO.PrimaryReturningProjectileReconnectPending,
                                                                 ref primaryReturningProjectileRecallReadyCount,
                                                                 ref primaryReturningProjectileRecallVersion,
                                                                 primaryPressed,
@@ -526,10 +544,24 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                           ref playerExperienceCollection);
             }
 
+            PlayerReturningProjectileResourceDrainUtility.Tick(in secondarySlotConfig,
+                                                                powerUpsState.ValueRO.SecondaryReturningProjectileCount,
+                                                                deltaTime,
+                                                                ref secondaryReturningProjectileResourceDrainActive,
+                                                                ref secondaryReturningProjectileResourceRecallVersion,
+                                                                ref secondaryEnergy,
+                                                                entity,
+                                                                ref healthLookup,
+                                                                ref updatedHealth,
+                                                                ref healthChanged,
+                                                                ref shieldLookup,
+                                                                ref updatedShield,
+                                                                ref shieldChanged);
             PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in secondarySlotConfig,
                                                                 in primarySlotConfig,
                                                                 1,
                                                                 powerUpsState.ValueRO.SecondaryReturningProjectileCount,
+                                                                powerUpsState.ValueRO.SecondaryReturningProjectileReconnectPending,
                                                                 ref secondaryReturningProjectileRecallReadyCount,
                                                                 ref secondaryReturningProjectileRecallVersion,
                                                                 secondaryPressed,
@@ -679,6 +711,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             powerUpsState.ValueRW.SecondaryReturningProjectileRecallReadyCount = secondaryReturningProjectileRecallReadyCount;
             powerUpsState.ValueRW.PrimaryReturningProjectileRecallVersion = primaryReturningProjectileRecallVersion;
             powerUpsState.ValueRW.SecondaryReturningProjectileRecallVersion = secondaryReturningProjectileRecallVersion;
+            powerUpsState.ValueRW.PrimaryReturningProjectileResourceRecallVersion = primaryReturningProjectileResourceRecallVersion;
+            powerUpsState.ValueRW.SecondaryReturningProjectileResourceRecallVersion = secondaryReturningProjectileResourceRecallVersion;
+            powerUpsState.ValueRW.PrimaryReturningProjectileResourceDrainActive = primaryReturningProjectileResourceDrainActive;
+            powerUpsState.ValueRW.SecondaryReturningProjectileResourceDrainActive = secondaryReturningProjectileResourceDrainActive;
             powerUpsState.ValueRW.PrimaryIsCharging = primaryIsCharging;
             powerUpsState.ValueRW.SecondaryIsCharging = secondaryIsCharging;
             powerUpsState.ValueRW.PrimaryIsActive = primaryIsActive;

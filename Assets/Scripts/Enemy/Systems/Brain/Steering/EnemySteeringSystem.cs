@@ -222,6 +222,7 @@ public partial struct EnemySteeringSystem : ISystem
         NativeArray<float> priorityYieldUrgencyResults = default;
         NativeArray<float> priorityYieldGapResults = default;
         NativeArray<float3> navigationVelocityResults = default;
+        NativeArray<byte> navigationDetourResults = default;
         NativeArray<float3> tacticalVelocityResults = default;
         NativeArray<EnemyNavigationRuntimeState> tacticalRuntimeResults = default;
         JobHandle steeringJobsHandle = state.Dependency;
@@ -252,6 +253,7 @@ public partial struct EnemySteeringSystem : ISystem
             priorityYieldUrgencyResults = CollectionHelper.CreateNativeArray<float>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             priorityYieldGapResults = CollectionHelper.CreateNativeArray<float>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             navigationVelocityResults = CollectionHelper.CreateNativeArray<float3>(evaluatedCount, frameAllocator, NativeArrayOptions.ClearMemory);
+            navigationDetourResults = CollectionHelper.CreateNativeArray<byte>(evaluatedCount, frameAllocator, NativeArrayOptions.ClearMemory);
             tacticalVelocityResults = CollectionHelper.CreateNativeArray<float3>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
             tacticalRuntimeResults = CollectionHelper.CreateNativeArray<EnemyNavigationRuntimeState>(evaluatedCount, frameAllocator, NativeArrayOptions.UninitializedMemory);
 
@@ -313,7 +315,7 @@ public partial struct EnemySteeringSystem : ISystem
             if (tacticalNavigationReady)
             {
                 // Per-enemy navigation raycasts run in parallel Burst, independent of approach/separation (all read positions read-only).
-                navigationHandle = new EnemyNavigationResolveJob
+                navigationHandle = new EnemyNavigationResolveJobUtility.ResolveJob
                 {
                     EvaluatedEnemyIndices = evaluatedEnemyIndices.AsArray(),
                     Positions = positions,
@@ -325,7 +327,8 @@ public partial struct EnemySteeringSystem : ISystem
                     WallsLayerMask = tacticalWallsLayerMask,
                     NavigationGridState = tacticalNavigationGridState,
                     NavigationCells = tacticalNavigationCells.AsNativeArray(),
-                    NavigationVelocityResults = navigationVelocityResults
+                    NavigationVelocityResults = navigationVelocityResults,
+                    NavigationDetourResults = navigationDetourResults
                 }.Schedule(evaluatedCount, 32, state.Dependency);
             }
 
@@ -345,6 +348,7 @@ public partial struct EnemySteeringSystem : ISystem
                 SeparationResults = separationResults,
                 SeparationUrgencyResults = separationUrgencyResults,
                 NavigationVelocityResults = navigationVelocityResults,
+                NavigationDetourResults = navigationDetourResults,
                 TacticalConfigs = tacticalConfigArray,
                 RuntimeStates = navigationRuntimeArray,
                 PlayerPosition = playerPosition,
@@ -484,45 +488,6 @@ public partial struct EnemySteeringSystem : ISystem
     #endregion
 
     #region Jobs
-    /// <summary>
-    /// Resolves per-enemy navigation-aware velocity (wall-aware flow-field follow) in parallel Burst.
-    /// </summary>
-    [BurstCompile]
-    private struct EnemyNavigationResolveJob : IJobParallelFor
-    {
-        [ReadOnly] public NativeArray<int> EvaluatedEnemyIndices;
-        [ReadOnly] public NativeArray<float3> Positions;
-        [ReadOnly] public NativeArray<float2> SpeedData;
-        [ReadOnly] public NativeArray<float> BodyRadii;
-        [ReadOnly] public NativeArray<EnemyData> EnemyDataArray;
-        [ReadOnly] public NativeArray<EnemyNavigationCellElement> NavigationCells;
-        [ReadOnly] public PhysicsWorldSingleton PhysicsWorld;
-        public EnemyNavigationGridState NavigationGridState;
-        public float3 PlayerPosition;
-        public int WallsLayerMask;
-        public NativeArray<float3> NavigationVelocityResults;
-
-        public void Execute(int evaluatedIndex)
-        {
-            int enemyIndex = EvaluatedEnemyIndices[evaluatedIndex];
-            float navigationDesiredSpeed = SpeedData[enemyIndex].y > 0f ? SpeedData[enemyIndex].y : SpeedData[enemyIndex].x;
-            float navigationCollisionRadius = math.max(0.01f, BodyRadii[enemyIndex] + EnemyDataArray[enemyIndex].MinimumWallDistance);
-
-            if (EnemyNavigationFlowFieldUtility.TryResolveNavigationVelocity(Positions[enemyIndex],
-                                                                            PlayerPosition,
-                                                                            navigationCollisionRadius,
-                                                                            navigationDesiredSpeed,
-                                                                            in PhysicsWorld,
-                                                                            WallsLayerMask,
-                                                                            in NavigationGridState,
-                                                                            NavigationCells,
-                                                                            out float3 navigationVelocity))
-            {
-                NavigationVelocityResults[evaluatedIndex] = navigationVelocity;
-            }
-        }
-    }
-
     /// <summary>
     /// Integrates per-enemy desired velocity into movement: acceleration, wall raycasts, circumnavigation, knockback and facing.
     /// Each iteration reads and writes only its own index, so parallel execution is race-free.

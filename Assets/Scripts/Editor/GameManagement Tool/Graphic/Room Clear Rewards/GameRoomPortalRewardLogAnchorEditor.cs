@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -19,7 +20,92 @@ internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        DrawAlignmentControls(target as GameRoomPortalRewardLogAnchor);
+        GameRoomPortalRewardLogAnchor anchor = target as GameRoomPortalRewardLogAnchor;
+        DrawLinkedObjectValidation(anchor);
+        DrawAlignmentControls(anchor);
+    }
+    #endregion
+
+    #region Linked Objects
+    /// <summary>
+    /// Reports missing effect setup and invalid enum-slot mappings beside the owning portal anchor.
+    /// </summary>
+    /// <param name="anchor">Selected managed portal reward anchor.</param>
+    private static void DrawLinkedObjectValidation(GameRoomPortalRewardLogAnchor anchor)
+    {
+        if (anchor == null)
+            return;
+
+        EditorGUILayout.Space();
+
+        if (anchor.EffectView == null)
+        {
+            EditorGUILayout.HelpBox(
+                "The linked-object effect view is missing. Re-run Room Clear Rewards presentation setup.",
+                MessageType.Warning);
+            return;
+        }
+
+        if (!anchor.EffectView.TryValidateLinkedObjects(out string failureMessage))
+            EditorGUILayout.HelpBox(failureMessage, MessageType.Warning);
+        else
+        {
+            EditorGUILayout.HelpBox(
+                "Linked objects form a freely sized list. Their stable labels are exposed by the animation and prefab-replacement selectors in the Portal Log tab.",
+                MessageType.Info);
+        }
+
+        DrawStaticAnimationWarning(anchor.EffectView.LinkedObjects);
+
+        if (anchor.OffscreenIndicatorView == null)
+        {
+            EditorGUILayout.HelpBox(
+                "The preauthored open-portal indicator is missing. Run the Room Clear Rewards portal indicator setup once.",
+                MessageType.Warning);
+        }
+    }
+
+    /// <summary>
+    /// Warns when a linked target contains batching-static renderers that cannot visually follow Transform animation.
+    /// </summary>
+    /// <param name="linkedObjects">Freely authored linked-object bindings inspected for static renderers.</param>
+    private static void DrawStaticAnimationWarning(
+        IReadOnlyList<GameRoomPortalLinkedObjectBinding> linkedObjects)
+    {
+        if (linkedObjects == null)
+            return;
+
+        for (int bindingIndex = 0; bindingIndex < linkedObjects.Count; bindingIndex++)
+        {
+            GameRoomPortalLinkedObjectBinding binding = linkedObjects[bindingIndex];
+
+            if (binding == null || binding.TargetObject == null)
+                continue;
+
+            Renderer[] renderers =
+                binding.TargetObject.GetComponentsInChildren<Renderer>(true);
+
+            for (int rendererIndex = 0;
+                 rendererIndex < renderers.Length;
+                 rendererIndex++)
+            {
+                Renderer renderer = renderers[rendererIndex];
+
+                if (renderer == null ||
+                    (GameObjectUtility.GetStaticEditorFlags(renderer.gameObject) &
+                     StaticEditorFlags.BatchingStatic) == 0)
+                {
+                    continue;
+                }
+
+                EditorGUILayout.HelpBox(
+                    "Linked object '" + binding.BindingId +
+                    "' contains Batching Static renderer '" + renderer.name +
+                    "'. Clear Batching Static before using Transform animation, otherwise ECS will activate the effect but the batched geometry can remain visually fixed.",
+                    MessageType.Warning);
+                break;
+            }
+        }
     }
     #endregion
 

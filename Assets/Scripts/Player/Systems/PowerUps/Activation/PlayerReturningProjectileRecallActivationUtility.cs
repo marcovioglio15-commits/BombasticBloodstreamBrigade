@@ -41,7 +41,7 @@ public static class PlayerReturningProjectileRecallActivationUtility
                                   ref bool shieldChanged)
     {
         if (slotConfig.HasReturningProjectiles == 0 ||
-            slotConfig.ReturningProjectiles.ReturnStartMode != ProjectileReturnStartMode.ActivationTap ||
+            !ProjectileReturnStartModeUtility.UsesActivationTap(slotConfig.ReturningProjectiles.ReturnStartMode) ||
             activeReturningProjectileCount <= 0 ||
             !pressedThisFrame)
         {

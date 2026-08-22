@@ -17,7 +17,7 @@ internal static class GameRoomRewardCompositionEditorSupportUtility
     /// Builds module labels and hidden technical identifiers in explicit module menu order.
     /// </summary>
     /// <param name="serializedPreset">Current serialized reward preset.</param>
-    /// <param name="labels">Output -facing module labels.</param>
+    /// <param name="labels">Output visible module labels.</param>
     /// <param name="identifiers">Output stable technical identifiers matching each label.</param>
     public static void BuildModuleChoices(SerializedObject serializedPreset,
                                           List<string> labels,
@@ -158,7 +158,7 @@ internal static class GameRoomRewardCompositionEditorSupportUtility
     /// </summary>
     /// <param name="parent">Parent receiving the field.</param>
     /// <param name="property">Serialized property to bind.</param>
-    /// <param name="label">-facing field label.</param>
+    /// <param name="label">Visible field label.</param>
     /// <returns>Created field, or null when the property is unavailable.</returns>
     public static PropertyField AddBoundField(VisualElement parent,
                                               SerializedProperty property,

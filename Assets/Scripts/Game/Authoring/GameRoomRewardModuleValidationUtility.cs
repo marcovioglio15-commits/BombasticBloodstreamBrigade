@@ -230,7 +230,7 @@ public static class GameRoomRewardModuleValidationUtility
     /// <param name="formula">Resolved unified formula.</param>
     /// <param name="flatNumericValue">Resolved flat numeric value.</param>
     /// <param name="durationRooms">Resolved future-room duration.</param>
-    /// <param name="context">-facing module or override identity.</param>
+    /// <param name="context">Module or override identity shown in validation.</param>
     /// <param name="failureMessage">First payload validation failure.</param>
     /// <returns>True when the resolved payload satisfies its inherited category.</returns>
     private static bool ValidatePayload(GameRoomClearRewardsPreset preset,
@@ -368,7 +368,7 @@ public static class GameRoomRewardModuleValidationUtility
     /// </summary>
     /// <param name="identifier">Authored technical identifier.</param>
     /// <param name="identifiers">Previously visited identifiers.</param>
-    /// <param name="context">-facing definition kind.</param>
+    /// <param name="context">Definition kind shown in validation.</param>
     /// <param name="failureMessage">Validation failure when invalid.</param>
     /// <returns>True when the identifier is nonempty, unique and runtime-safe.</returns>
     private static bool ValidateIdentity(string identifier,

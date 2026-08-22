@@ -14,7 +14,7 @@ public sealed class GameRoomRewardModuleDefinition
     [SerializeField]
     private string technicalId;
 
-    [Tooltip("-facing module name displayed by dynamic selectors and validation messages.")]
+    [Tooltip("Module name displayed by dynamic selectors and validation messages.")]
     [SerializeField]
     private string displayName = "New Reward Module";
 
@@ -64,7 +64,7 @@ public sealed class GameRoomRewardModuleDefinition
     [SerializeField]
     private int durationRooms = 1;
 
-    [Tooltip("-controlled order used to group modules consistently in dynamic selectors.")]
+    [Tooltip("Authored order used to group modules consistently in dynamic selectors.")]
     [SerializeField]
     private int sortOrder;
     #endregion

@@ -264,6 +264,10 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         overrideContainer.style.display = showOverride ? DisplayStyle.Flex : DisplayStyle.None;
 
         bool showToggleDurationOption = ShouldShowToggleDurationOption(bindingProperty, moduleKind);
+        bool showActiveTriggerCharacterTuningOption = ShouldShowActiveTriggerCharacterTuningOption(bindingProperty, moduleKind);
+        bool showActiveProjectileConcurrencyOption = ShouldShowActiveProjectileConcurrencyOption(bindingProperty, moduleKind);
+        bool hasOwningResourceGate = showActiveProjectileConcurrencyOption && HasEnabledOwningResourceGate(bindingProperty);
+        bool showStolenOwnershipPolicy = showActiveProjectileConcurrencyOption && !IsOwningPowerUpStealProtected(bindingProperty);
         string rebuildKey = BuildOverridePayloadRebuildKey(showOverride,
                                                            moduleResolved,
                                                            moduleKind,
@@ -271,7 +275,9 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                            overridePayloadProperty,
                                                            moduleDefaultPayloadProperty,
                                                            bindingProperty,
-                                                           showToggleDurationOption);
+                                                           showToggleDurationOption,
+                                                           hasOwningResourceGate,
+                                                           showStolenOwnershipPolicy);
         BindingDrawerState resolvedDrawerState = ResolveDrawerState(overrideContainer, drawerState);
 
         if (resolvedDrawerState != null &&
@@ -323,9 +329,6 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         }
 
         AddOverridePayloadWarnings(overrideContainer, overridePayloadProperty, moduleDefaultPayloadProperty, moduleKind);
-        bool showActiveTriggerCharacterTuningOption = ShouldShowActiveTriggerCharacterTuningOption(bindingProperty, moduleKind);
-        bool showActiveProjectileConcurrencyOption = ShouldShowActiveProjectileConcurrencyOption(bindingProperty, moduleKind);
-        bool hasOwningResourceGate = showActiveProjectileConcurrencyOption && HasEnabledOwningResourceGate(bindingProperty);
         PowerUpModuleDefinitionPropertyDrawer.BuildPayloadEditor(overrideContainer,
                                                                  payloadProperty,
                                                                  moduleKind,
@@ -333,7 +336,8 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                                  showActiveTriggerCharacterTuningOption,
                                                                  showToggleDurationOption,
                                                                  showActiveProjectileConcurrencyOption,
-                                                                 hasOwningResourceGate);
+                                                                 hasOwningResourceGate,
+                                                                 showStolenOwnershipPolicy);
     }
 
     /// <summary>
@@ -397,6 +401,20 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Reports whether the Active that owns one binding is protected from Power-Up Stealer interactions.
+    /// </summary>
+    /// <param name="bindingProperty">Serialized binding used to resolve the owning Active.</param>
+    /// <returns>True when stealing cannot occur or the owning protection setting cannot be resolved.</returns>
+    private static bool IsOwningPowerUpStealProtected(SerializedProperty bindingProperty)
+    {
+        if (!TryResolveOwningActivePowerUpProperty(bindingProperty, out SerializedProperty powerUpProperty))
+            return true;
+
+        SerializedProperty stealProtectedProperty = powerUpProperty.FindPropertyRelative("stealProtected");
+        return stealProtectedProperty == null || stealProtectedProperty.boolValue;
     }
 
     private static bool TryResolveModuleInfo(SerializedObject serializedObject,
@@ -823,13 +841,15 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                                                          SerializedProperty overridePayloadProperty,
                                                          SerializedProperty moduleDefaultPayloadProperty,
                                                          SerializedProperty bindingProperty,
-                                                         bool showToggleDurationOption)
+                                                         bool showToggleDurationOption,
+                                                         bool hasOwningResourceGate,
+                                                         bool showStolenOwnershipPolicy)
     {
         string useOverridePath = useOverrideProperty != null ? useOverrideProperty.propertyPath : string.Empty;
         string overridePayloadPath = overridePayloadProperty != null ? overridePayloadProperty.propertyPath : string.Empty;
         string defaultPayloadPath = moduleDefaultPayloadProperty != null ? moduleDefaultPayloadProperty.propertyPath : string.Empty;
         string bindingPath = bindingProperty != null ? bindingProperty.propertyPath : string.Empty;
-        return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}",
+        return string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}",
                              showOverride,
                              moduleResolved,
                              (int)moduleKind,
@@ -837,7 +857,9 @@ public sealed class PowerUpModuleBindingPropertyDrawer : PropertyDrawer
                              overridePayloadPath,
                              defaultPayloadPath,
                              bindingPath,
-                             showToggleDurationOption);
+                             showToggleDurationOption,
+                             hasOwningResourceGate,
+                             showStolenOwnershipPolicy);
     }
 
     private static string ResolveInitialModuleId(string currentId, List<string> options)
