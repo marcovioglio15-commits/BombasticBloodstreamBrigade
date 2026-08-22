@@ -16,8 +16,10 @@ public sealed class MainMenuController : MonoBehaviour
     [Tooltip("Button that starts the gameplay scene.")]
     [SerializeField] private Button playButton;
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
     [Tooltip("Button that opens the runtime enemy spawner override tool.")]
     [SerializeField] private Button enemySpawnerToolButton;
+#endif
 
     [Tooltip("Button that opens the runtime Settings menu.")]
     [SerializeField] private Button settingsButton;
@@ -25,9 +27,11 @@ public sealed class MainMenuController : MonoBehaviour
     [Tooltip("Button that closes the application.")]
     [SerializeField] private Button quitButton;
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
     [Header("Runtime Tools")]
     [Tooltip("Runtime enemy spawner override panel opened from the main menu.")]
     [SerializeField] private EnemySpawnerRuntimeToolPanelController enemySpawnerToolPanel;
+#endif
 
     [Tooltip("Reusable runtime Settings menu opened from the main menu.")]
     [SerializeField] private SettingsMenuController settingsMenu;
@@ -56,6 +60,10 @@ public sealed class MainMenuController : MonoBehaviour
     private void Awake()
     {
         selectionController = GetComponent<MenuSelectionController>();
+#if UNITY_EDITOR && !NASHCORE_RUNTIME_SPAWNER_TOOL
+        if (enemySpawnerToolButton != null)
+            enemySpawnerToolButton.gameObject.SetActive(false);
+#endif
     }
 
     /// <summary>
@@ -98,8 +106,10 @@ public sealed class MainMenuController : MonoBehaviour
         if (playButton != null)
             playButton.onClick.AddListener(HandlePlayPressed);
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.onClick.AddListener(HandleEnemySpawnerToolPressed);
+#endif
 
         if (settingsButton != null)
             settingsButton.onClick.AddListener(HandleSettingsPressed);
@@ -107,8 +117,10 @@ public sealed class MainMenuController : MonoBehaviour
         if (quitButton != null)
             quitButton.onClick.AddListener(HandleQuitPressed);
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolPanel != null)
             enemySpawnerToolPanel.ToolClosed += HandleToolClosed;
+#endif
 
         if (settingsMenu != null)
             settingsMenu.MenuClosed += HandleSettingsClosed;
@@ -122,8 +134,10 @@ public sealed class MainMenuController : MonoBehaviour
         if (playButton != null)
             playButton.onClick.RemoveListener(HandlePlayPressed);
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.onClick.RemoveListener(HandleEnemySpawnerToolPressed);
+#endif
 
         if (settingsButton != null)
             settingsButton.onClick.RemoveListener(HandleSettingsPressed);
@@ -131,8 +145,10 @@ public sealed class MainMenuController : MonoBehaviour
         if (quitButton != null)
             quitButton.onClick.RemoveListener(HandleQuitPressed);
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolPanel != null)
             enemySpawnerToolPanel.ToolClosed -= HandleToolClosed;
+#endif
 
         if (settingsMenu != null)
             settingsMenu.MenuClosed -= HandleSettingsClosed;
@@ -191,6 +207,7 @@ public sealed class MainMenuController : MonoBehaviour
         Debug.LogWarning("[MainMenuController] Unable to enqueue gameplay loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
     }
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
     /// <summary>
     /// Opens the runtime enemy spawner override panel from the main menu.
     /// </summary>
@@ -211,6 +228,7 @@ public sealed class MainMenuController : MonoBehaviour
         SetNavigationLocked(true);
         enemySpawnerToolPanel.OpenTool();
     }
+#endif
 
     /// <summary>
     /// Opens the shared runtime Settings menu from the main menu.
@@ -233,6 +251,7 @@ public sealed class MainMenuController : MonoBehaviour
         settingsMenu.Open(settingsButton);
     }
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
     /// <summary>
     /// Restores main-menu navigation when the spawner tool overlay reports that it has closed.
     /// </summary>
@@ -240,6 +259,7 @@ public sealed class MainMenuController : MonoBehaviour
     {
         SetNavigationLocked(false);
     }
+#endif
 
     /// <summary>
     /// Restores main-menu navigation when the Settings overlay reports that it has closed.
@@ -300,8 +320,10 @@ public sealed class MainMenuController : MonoBehaviour
         if (playButton != null)
             playButton.interactable = interactable;
 
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.interactable = interactable;
+#endif
 
         if (settingsButton != null)
             settingsButton.interactable = interactable;
@@ -418,7 +440,11 @@ public sealed class MainMenuController : MonoBehaviour
     /// <returns>Runtime tool button when available, otherwise Play button.</returns>
     private Selectable ResolveToolOrPlayFallback()
     {
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         return enemySpawnerToolButton != null ? enemySpawnerToolButton : playButton;
+#else
+        return playButton;
+#endif
     }
     #endregion
 

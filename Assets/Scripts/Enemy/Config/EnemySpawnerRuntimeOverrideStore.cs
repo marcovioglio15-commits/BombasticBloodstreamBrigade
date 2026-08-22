@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System.Collections.Generic;
 
 /// <summary>
@@ -493,3 +494,4 @@ public readonly struct EnemySpawnerRuntimeOverrideValue
     }
     #endregion
 }
+#endif

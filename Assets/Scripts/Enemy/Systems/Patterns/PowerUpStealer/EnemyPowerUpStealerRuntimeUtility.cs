@@ -418,9 +418,9 @@ internal static class EnemyPowerUpStealerRuntimeUtility
                                                                     ref runtime.StoredActivePowerUp))
             return false;
 
-        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyStolenOwnershipPolicy(slotIndex,
-                                                                                   ref runtime.StoredActivePowerUp,
-                                                                                   ref powerUpsState);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDetachedOwnershipPolicy(slotIndex,
+                                                                                     ref runtime.StoredActivePowerUp,
+                                                                                     ref powerUpsState);
 
         powerUpsState.IsShootingSuppressed = 0;
         powerUpsState.PreviousPrimaryPressed = 0;

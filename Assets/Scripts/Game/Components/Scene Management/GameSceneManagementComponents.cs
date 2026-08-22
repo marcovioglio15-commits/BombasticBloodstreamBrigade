@@ -15,6 +15,7 @@ public struct GameSceneManagerConfig : IComponentData
     public GameSceneLoadBackend LoadBackend;
     public byte AutoLoadInitialScene;
     public byte LogTransitions;
+    public byte EnablePlayerCameraOcclusion;
     public byte LockGameplayInput;
     public byte SetTimeScaleDuringTransition;
     public float FadeOutSeconds;

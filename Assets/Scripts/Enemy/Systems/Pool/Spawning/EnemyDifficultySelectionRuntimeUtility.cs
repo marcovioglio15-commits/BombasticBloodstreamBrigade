@@ -254,9 +254,11 @@ public static class EnemyDifficultySelectionRuntimeUtility
                                                     Entity spawnerEntity,
                                                     int discriminator)
     {
-        uint identityHash = entityManager.HasComponent<EnemySpawnerRuntimeIdentity>(spawnerEntity)
-            ? (uint)entityManager.GetComponentData<EnemySpawnerRuntimeIdentity>(spawnerEntity).SpawnerGuid.GetHashCode()
-            : (uint)spawnerEntity.Index;
+        uint identityHash = (uint)spawnerEntity.Index;
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
+        if (entityManager.HasComponent<EnemySpawnerRuntimeIdentity>(spawnerEntity))
+            identityHash = (uint)entityManager.GetComponentData<EnemySpawnerRuntimeIdentity>(spawnerEntity).SpawnerGuid.GetHashCode();
+#endif
         return math.hash(new uint2(identityHash, unchecked((uint)discriminator)));
     }
 

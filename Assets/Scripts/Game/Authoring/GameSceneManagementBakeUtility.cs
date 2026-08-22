@@ -34,6 +34,7 @@ public static class GameSceneManagementBakeUtility
             LoadBackend = preset != null ? preset.LoadBackend : GameSceneLoadBackend.BuildSettings,
             AutoLoadInitialScene = preset != null && preset.AutoLoadInitialScene ? (byte)1 : (byte)0,
             LogTransitions = preset != null && preset.LogTransitions ? (byte)1 : (byte)0,
+            EnablePlayerCameraOcclusion = preset == null || preset.EnablePlayerCameraOcclusion ? (byte)1 : (byte)0,
             LockGameplayInput = fadeSettings != null && fadeSettings.LockGameplayInput ? (byte)1 : (byte)0,
             SetTimeScaleDuringTransition = fadeSettings != null && fadeSettings.SetTimeScaleDuringTransition ? (byte)1 : (byte)0,
             FadeOutSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeOutSeconds) : 0.35f,

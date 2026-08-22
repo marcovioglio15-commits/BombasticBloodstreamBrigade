@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using UnityEngine;
 
 /// <summary>
@@ -29,3 +30,4 @@ public readonly struct EnemySpawnerRuntimeToolCursorStyle
     }
     #endregion
 }
+#endif

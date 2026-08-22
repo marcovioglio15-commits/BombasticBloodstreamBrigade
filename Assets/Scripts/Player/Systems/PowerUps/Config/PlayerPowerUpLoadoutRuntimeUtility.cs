@@ -75,12 +75,19 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                               out int targetSlotIndex)
     {
         PlayerStoredActivePowerUpData replacedPowerUp = default;
-        return TryEquipIntoOldestSlot(in activeSlotConfig,
-                                      PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown,
-                                      ref powerUpsConfig,
-                                      ref powerUpsState,
-                                      out targetSlotIndex,
-                                      out replacedPowerUp);
+        bool equipped = TryEquipIntoOldestSlot(in activeSlotConfig,
+                                               PlayerPowerUpContainerStoredStateMode.PreserveEnergyAndCooldown,
+                                               ref powerUpsConfig,
+                                               ref powerUpsState,
+                                               out targetSlotIndex,
+                                               out replacedPowerUp);
+
+        if (equipped)
+            PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDiscardedOwnershipPolicy(targetSlotIndex,
+                                                                                          ref replacedPowerUp,
+                                                                                          ref powerUpsState);
+
+        return equipped;
     }
 
     /// <summary>
@@ -111,6 +118,9 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                storedStateMode,
                                                in powerUpsConfig,
                                                in powerUpsState);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDetachedOwnershipPolicy(targetSlotIndex,
+                                                                                     ref replacedPowerUp,
+                                                                                     ref powerUpsState);
 
         switch (targetSlotIndex)
         {
@@ -160,6 +170,9 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                                              storedStateMode,
                                                                              in powerUpsConfig,
                                                                              in powerUpsState);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDetachedOwnershipPolicy(targetSlotIndex,
+                                                                                     ref replacedPowerUp,
+                                                                                     ref powerUpsState);
         ApplyStoredPowerUpToSlot(in storedPowerUp,
                                  targetSlotIndex,
                                  0,

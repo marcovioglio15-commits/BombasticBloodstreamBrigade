@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -10,10 +11,6 @@ using UnityEngine.UI;
 [DisallowMultipleComponent]
 public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
 {
-    #region Constants
-    private const string DefaultCatalogResourcePath = "EnemySpawnerRuntimeCatalog";
-    #endregion
-
     #region Fields
 
     #region Serialized Fields
@@ -138,7 +135,6 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
             panelRoot.SetActive(true);
 
         EnemySpawnerRuntimeToolViewportUtility.NormalizePanel(rowsContentRoot, rowTemplate, sceneDropdown, presetFolderDropdown);
-        LoadCatalogIfNeeded();
         RebuildSelectors();
         RefreshSceneState();
         RefreshRows();
@@ -208,17 +204,6 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
     #endregion
 
     #region Selectors
-    /// <summary>
-    /// Loads the runtime catalog from Resources when no explicit scene reference is assigned.
-    /// </summary>
-    private void LoadCatalogIfNeeded()
-    {
-        if (runtimeCatalog != null)
-            return;
-
-        runtimeCatalog = Resources.Load<EnemySpawnerRuntimeCatalog>(DefaultCatalogResourcePath);
-    }
-
     /// <summary>
     /// Rebuilds scene and preset-folder dropdowns from the runtime catalog.
     /// </summary>
@@ -727,3 +712,4 @@ public sealed class EnemySpawnerRuntimeToolPanelController : MonoBehaviour
 
     #endregion
 }
+#endif

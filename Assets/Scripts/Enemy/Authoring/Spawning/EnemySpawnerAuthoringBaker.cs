@@ -22,7 +22,7 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             return;
 
         DependsOn(authoring.WavePreset);
-#if UNITY_EDITOR
+#if UNITY_EDITOR && NASHCORE_RUNTIME_SPAWNER_TOOL
         EnemySpawnerRuntimeCatalog runtimeCatalog = EnemySpawnerRuntimeBakeMetadataUtility.ResolveRuntimeCatalogAsset();
 
         if (runtimeCatalog != null)
@@ -54,6 +54,7 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             MaximumSpawnDistanceFromCenter = ResolveMaximumSpawnDistanceFromCenter(stagedWaveEvents, authoring.CellSize),
             TotalPlannedEnemyCount = CountTotalPlannedEnemies(plannedCountByPrefab)
         });
+#if UNITY_EDITOR && NASHCORE_RUNTIME_SPAWNER_TOOL
         AddComponent(spawnerEntity, new EnemySpawnerRuntimeIdentity
         {
             SceneGuid = new FixedString64Bytes(EnemySpawnerRuntimeBakeMetadataUtility.ResolveAuthoringSceneGuid(authoring)),
@@ -70,6 +71,7 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             FailedWavePresetGuid = default,
             AppliedEnabled = runtimeEnabledByDefault ? (byte)1 : (byte)0
         });
+#endif
 
         if (!runtimeEnabledByDefault)
             AddComponent<Disabled>(spawnerEntity);
@@ -88,10 +90,12 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
         DynamicBuffer<EnemySpawnerWaveEventElement> waveEventBuffer = AddBuffer<EnemySpawnerWaveEventElement>(spawnerEntity);
         DynamicBuffer<EnemySpawnerPrefabRequirementElement> prefabRequirementBuffer = AddBuffer<EnemySpawnerPrefabRequirementElement>(spawnerEntity);
         AddBuffer<EnemySpawnerPrefabPoolMapElement>(spawnerEntity);
+#if UNITY_EDITOR && NASHCORE_RUNTIME_SPAWNER_TOOL
         DynamicBuffer<EnemySpawnerWavePresetVariantElement> variantBuffer = AddBuffer<EnemySpawnerWavePresetVariantElement>(spawnerEntity);
         DynamicBuffer<EnemySpawnerWavePresetVariantDefinitionElement> variantDefinitionBuffer = AddBuffer<EnemySpawnerWavePresetVariantDefinitionElement>(spawnerEntity);
         DynamicBuffer<EnemySpawnerWavePresetVariantEventElement> variantEventBuffer = AddBuffer<EnemySpawnerWavePresetVariantEventElement>(spawnerEntity);
         DynamicBuffer<EnemySpawnerWavePresetVariantRequirementElement> variantRequirementBuffer = AddBuffer<EnemySpawnerWavePresetVariantRequirementElement>(spawnerEntity);
+#endif
 
         for (int definitionIndex = 0; definitionIndex < stagedWaveDefinitions.Count; definitionIndex++)
             waveDefinitionBuffer.Add(stagedWaveDefinitions[definitionIndex]);
@@ -111,12 +115,14 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             });
         }
 
+#if UNITY_EDITOR && NASHCORE_RUNTIME_SPAWNER_TOOL
         BakeRuntimeWavePresetVariants(authoring,
                                       spawnerWarningConfig,
                                       variantBuffer,
                                       variantDefinitionBuffer,
                                       variantEventBuffer,
                                       variantRequirementBuffer);
+#endif
     }
     #endregion
 
@@ -377,6 +383,7 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             plannedCountByPrefab[prefabEntity] = enemyCount;
     }
 
+#if UNITY_EDITOR && NASHCORE_RUNTIME_SPAWNER_TOOL
     /// <summary>
     /// Bakes every project wave preset as a selectable runtime variant for one spawner.
     /// </summary>
@@ -516,6 +523,7 @@ public sealed class EnemySpawnerAuthoringBaker : Baker<EnemySpawnerAuthoring>
             TotalPlannedEnemyCount = CountTotalPlannedEnemies(plannedCountByPrefab)
         });
     }
+#endif
 
     /// <summary>
     /// Resolves the prefab entity used by one painted cell through its master and visual presets.

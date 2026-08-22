@@ -316,7 +316,7 @@ public static class PlayerReturningProjectileRecallSmokeTest
         };
         PlayerReturningProjectileLoadoutRuntimeUtility.CaptureSnapshot(0, in powerUpsState, ref storedPowerUp);
         PlayerReturningProjectileLoadoutRuntimeUtility.ResetSlot(0, ref powerUpsState);
-        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyStolenOwnershipPolicy(0, ref storedPowerUp, ref powerUpsState);
+        PlayerReturningProjectileLoadoutRuntimeUtility.ApplyDetachedOwnershipPolicy(0, ref storedPowerUp, ref powerUpsState);
         ProjectileReturnState returnState = new ProjectileReturnState
         {
             Enabled = 1,

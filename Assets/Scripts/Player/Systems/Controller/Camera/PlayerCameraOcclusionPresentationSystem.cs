@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Entities.Graphics;
 using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Rendering;
@@ -24,6 +25,7 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
     private const float PlayerLateralFocusOffset = 0.32f;
     private const float OcclusionProbeRadius = 0.12f;
     private const float CameraOverlapRadius = 0.18f;
+    private const string EnvironmentLayerName = "Environment";
     private const int ClassicHitCapacity = 32;
     private const int ClassicOverlapCapacity = 16;
     private const int MaximumOccluderHierarchyDepth = 8;
@@ -39,9 +41,12 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
     private readonly List<Entity> entityRestoreBuffer = new List<Entity>(8);
     private readonly List<float3> playerProbeOrigins = new List<float3>(5);
     private readonly ClassicRaycastHit[] classicHits = new ClassicRaycastHit[ClassicHitCapacity];
+    private readonly PlayerCameraOcclusionClassicRendererCache classicRendererCache =
+        new PlayerCameraOcclusionClassicRendererCache();
     private readonly UnityEngine.Collider[] classicOverlapColliders =
         new UnityEngine.Collider[ClassicOverlapCapacity];
     private EntityQuery playerQuery;
+    private EntityQuery entityVisualQuery;
     private double nextRefreshTime;
     #endregion
 
@@ -49,14 +54,17 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
 
     #region Lifecycle
     /// <summary>
-    /// Requires an authoritative player and DOTS collision world before probing occlusion.
+    /// Requires an authoritative player while keeping classic visual occlusion independent from DOTS Physics.
     /// </summary>
     protected override void OnCreate()
     {
         playerQuery = GetEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
                                      ComponentType.ReadOnly<LocalTransform>());
+        entityVisualQuery = GetEntityQuery(ComponentType.ReadOnly<MaterialMeshInfo>(),
+                                           ComponentType.ReadOnly<WorldRenderBounds>(),
+                                           ComponentType.ReadOnly<RenderFilterSettings>());
         RequireForUpdate(playerQuery);
-        RequireForUpdate<PhysicsWorldSingleton>();
+        classicRendererCache.Initialize();
     }
 
     /// <summary>
@@ -64,6 +72,7 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
     /// </summary>
     protected override void OnDestroy()
     {
+        classicRendererCache.Dispose();
         RestoreAllClassicRenderers();
 
         if (World != null && World.IsCreated)
@@ -80,6 +89,13 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
 
         nextRefreshTime = SystemAPI.Time.ElapsedTime + RefreshIntervalSeconds;
 
+        if (SystemAPI.TryGetSingleton(out GameSceneManagerConfig sceneManagerConfig) &&
+            sceneManagerConfig.EnablePlayerCameraOcclusion == 0)
+        {
+            RestoreAllOccluders();
+            return;
+        }
+
         if (GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning() ||
             !PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera) ||
             !TryResolvePlayerPosition(out float3 playerPosition))
@@ -89,12 +105,9 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
         }
 
         int wallsLayerMask = ResolveWallsLayerMask();
-
-        if (wallsLayerMask == 0)
-        {
-            RestoreAllOccluders();
-            return;
-        }
+        int visualLayerMask = ResolveVisualOcclusionLayerMasks(
+            wallsLayerMask,
+            out int entityVisualLayerMask);
 
         float3 cameraPosition = camera.transform.position;
         float3 probeDisplacement = cameraPosition - playerPosition;
@@ -108,8 +121,31 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
         desiredClassicRenderers.Clear();
         desiredEntityRenderers.Clear();
         BuildPlayerProbeOrigins(playerPosition, camera.transform.right);
-        CollectClassicOccluders(cameraPosition, wallsLayerMask);
-        CollectEntityOccluders(cameraPosition, wallsLayerMask);
+
+        if (visualLayerMask != 0)
+        {
+            CollectClassicOccluders(cameraPosition, visualLayerMask);
+            classicRendererCache.CollectOccluders(playerProbeOrigins,
+                                                   cameraPosition,
+                                                   OcclusionProbeRadius,
+                                                   visualLayerMask,
+                                                   camera.cullingMask,
+                                                   SystemAPI.Time.ElapsedTime,
+                                                   hiddenClassicRenderers,
+                                                   desiredClassicRenderers);
+        }
+
+        if (entityVisualLayerMask != 0)
+        {
+            CollectEntityVisualBoundsOccluders(cameraPosition, entityVisualLayerMask);
+        }
+
+        if (wallsLayerMask != 0 &&
+            SystemAPI.TryGetSingleton(out PhysicsWorldSingleton physicsWorld))
+        {
+            CollectEntityOccluders(cameraPosition, wallsLayerMask, physicsWorld);
+        }
+
         ApplyClassicVisibility();
         ApplyEntityVisibility();
     }
@@ -168,6 +204,23 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
         }
 
         return WorldWallCollisionUtility.ResolveWallsLayerMask();
+    }
+
+    /// <summary>
+    /// Combines authored wall collision layers with the Environment presentation layer and optionally
+    /// exposes Default only to classic rendering. Default is excluded from the ECS bounds pass so large
+    /// pools of default-layer projectiles never enter per-entity occlusion checks.
+    /// </summary>
+    /// <param name="wallsLayerMask">Authoritative wall layer mask resolved from baked player configuration.</param>
+    /// <param name="entityVisualLayerMask">Wall and Environment layers eligible for Entities Graphics bounds checks.</param>
+    /// <returns>Wall, Environment and Default layers eligible for classic camera occlusion suppression.</returns>
+    private static int ResolveVisualOcclusionLayerMasks(int wallsLayerMask,
+                                                        out int entityVisualLayerMask)
+    {
+        int environmentLayer = LayerMask.NameToLayer(EnvironmentLayerName);
+        int environmentLayerMask = environmentLayer >= 0 ? 1 << environmentLayer : 0;
+        entityVisualLayerMask = wallsLayerMask | environmentLayerMask;
+        return entityVisualLayerMask | 1 << 0;
     }
     #endregion
 
@@ -305,6 +358,10 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
             return false;
 
         Bounds expandedBounds = renderer.bounds;
+
+        if (expandedBounds.Contains((Vector3)playerProbeOrigins[0]))
+            return false;
+
         expandedBounds.Expand(OcclusionProbeRadius * 2f);
 
         if (!expandedBounds.IntersectRay(
@@ -350,13 +407,126 @@ public partial class PlayerCameraOcclusionPresentationSystem : SystemBase
 
     #region Entity Occlusion
     /// <summary>
+    /// Collects Entities Graphics render bounds on wall, environment and legacy Default layers even when
+    /// their visible entity is not connected to the collider entity reached by DOTS Physics.
+    /// </summary>
+    /// <param name="cameraPosition">Current gameplay camera position.</param>
+    /// <param name="visualLayerMask">Rendering layers eligible for camera occlusion suppression.</param>
+    private void CollectEntityVisualBoundsOccluders(float3 cameraPosition, int visualLayerMask)
+    {
+        if (entityVisualQuery.IsEmptyIgnoreFilter)
+            return;
+
+        NativeArray<ArchetypeChunk> chunks =
+            entityVisualQuery.ToArchetypeChunkArray(Allocator.Temp);
+
+        try
+        {
+            ComponentTypeHandle<WorldRenderBounds> worldBoundsHandle =
+                GetComponentTypeHandle<WorldRenderBounds>(true);
+            SharedComponentTypeHandle<RenderFilterSettings> filterSettingsHandle =
+                GetSharedComponentTypeHandle<RenderFilterSettings>();
+            EntityTypeHandle entityHandle = GetEntityTypeHandle();
+
+            // Reject entire chunks before reading per-entity bounds when their shared rendering layer is irrelevant.
+            for (int chunkIndex = 0; chunkIndex < chunks.Length; chunkIndex++)
+            {
+                ArchetypeChunk chunk = chunks[chunkIndex];
+                RenderFilterSettings filterSettings =
+                    chunk.GetSharedComponentManaged(filterSettingsHandle, EntityManager);
+
+                if (filterSettings.Layer < 0 ||
+                    filterSettings.Layer > 31 ||
+                    (visualLayerMask & 1 << filterSettings.Layer) == 0)
+                {
+                    continue;
+                }
+
+                NativeArray<WorldRenderBounds> worldBounds =
+                    chunk.GetNativeArray(ref worldBoundsHandle);
+                NativeArray<Entity> entities = chunk.GetNativeArray(entityHandle);
+
+                // Bounds tests run only for visual entities on eligible shared layers.
+                for (int entityIndex = 0; entityIndex < entities.Length; entityIndex++)
+                {
+                    Entity entity = entities[entityIndex];
+
+                    if (EntityManager.HasComponent<DisableRendering>(entity) &&
+                        !hiddenEntityRenderers.Contains(entity))
+                    {
+                        continue;
+                    }
+
+                    AABB worldAabb = worldBounds[entityIndex].Value;
+                    Bounds rendererBounds = new Bounds(
+                        (Vector3)worldAabb.Center,
+                        (Vector3)(worldAabb.Extents * 2f));
+
+                    if (rendererBounds.Contains((Vector3)playerProbeOrigins[0]))
+                        continue;
+
+                    for (int probeIndex = 0; probeIndex < playerProbeOrigins.Count; probeIndex++)
+                    {
+                        if (!PlayerCameraOcclusionClassicRendererCache.IntersectsProbeSegment(
+                                rendererBounds,
+                                playerProbeOrigins[probeIndex],
+                                cameraPosition,
+                                OcclusionProbeRadius))
+                        {
+                            continue;
+                        }
+
+                        if (!IsPlayerOwnedEntity(entity))
+                            desiredEntityRenderers.Add(entity);
+
+                        break;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            chunks.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Checks whether one visual entity belongs to the authoritative player hierarchy so fallback bounds
+    /// detection can never suppress the player renderer itself when it uses the legacy Default layer.
+    /// </summary>
+    /// <param name="entity">Visual entity reached by a player-to-camera bounds probe.</param>
+    /// <returns>True when the entity or one of its nearest parents owns PlayerControllerConfig.</returns>
+    private bool IsPlayerOwnedEntity(Entity entity)
+    {
+        Entity current = entity;
+
+        for (int depth = 0; depth < MaximumOccluderHierarchyDepth; depth++)
+        {
+            if (!EntityManager.Exists(current))
+                return false;
+
+            if (EntityManager.HasComponent<PlayerControllerConfig>(current))
+                return true;
+
+            if (!EntityManager.HasComponent<Parent>(current))
+                return false;
+
+            current = EntityManager.GetComponentData<Parent>(current).Value;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Collects Entities Graphics render entities reached by wall-only DOTS ray hits.
     /// </summary>
     /// <param name="cameraPosition">Current gameplay camera position.</param>
     /// <param name="wallsLayerMask">DOTS collision layer mask.</param>
-    private void CollectEntityOccluders(float3 cameraPosition, int wallsLayerMask)
+    /// <param name="physicsWorld">Current DOTS collision world used for wall-only raycasts.</param>
+    private void CollectEntityOccluders(float3 cameraPosition,
+                                        int wallsLayerMask,
+                                        PhysicsWorldSingleton physicsWorld)
     {
-        PhysicsWorldSingleton physicsWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>();
         NativeList<DotsRaycastHit> hits = new NativeList<DotsRaycastHit>(Allocator.Temp);
 
         try

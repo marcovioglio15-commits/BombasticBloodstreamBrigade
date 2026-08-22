@@ -23,6 +23,7 @@ MonoBehaviour:
   autoLoadInitialScene: 1
   loadBackend: 1
   logTransitions: 1
+  enablePlayerCameraOcclusion: 0
   fadeSettings:
     fadeColor: {r: 0, g: 0, b: 0, a: 1}
     fadeMode: 1

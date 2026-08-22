@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -606,3 +607,4 @@ public partial struct EnemySpawnerRuntimeOverrideSystem : ISystem
 
     #endregion
 }
+#endif

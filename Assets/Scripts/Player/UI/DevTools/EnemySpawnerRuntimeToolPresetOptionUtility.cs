@@ -1,3 +1,4 @@
+#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -182,3 +183,4 @@ public static class EnemySpawnerRuntimeToolPresetOptionUtility
 
     #endregion
 }
+#endif

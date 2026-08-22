@@ -107,23 +107,54 @@ public static class PlayerReturningProjectileLoadoutRuntimeUtility
     }
 
     /// <summary>
-    /// Applies the configured stolen-projectile policy to a captured active after its slot has been removed.
+    /// Applies the configured ownership policy when a returning-projectile active leaves its slot through stealing or replacement.
     /// </summary>
     /// <param name="slotIndex">Original active slot index.</param>
     /// <param name="storedPowerUp">Mutable stored payload carrying the captured returning-projectile identity.</param>
     /// <param name="powerUpsState">Mutable player state receiving the suspension or despawn command.</param>
-    public static void ApplyStolenOwnershipPolicy(int slotIndex,
-                                                  ref PlayerStoredActivePowerUpData storedPowerUp,
-                                                  ref PlayerPowerUpsState powerUpsState)
+    public static void ApplyDetachedOwnershipPolicy(int slotIndex,
+                                                    ref PlayerStoredActivePowerUpData storedPowerUp,
+                                                    ref PlayerPowerUpsState powerUpsState)
+    {
+        ProjectileStolenOwnershipPolicy policy = storedPowerUp.SlotConfig.ReturningProjectiles.StolenOwnershipPolicy;
+        ApplyOwnershipPolicy(slotIndex, ref storedPowerUp, ref powerUpsState, policy);
+    }
+
+    /// <summary>
+    /// Despawns live ownership when an outgoing active cannot be retained in a recoverable container.
+    /// </summary>
+    /// <param name="slotIndex">Original active slot index.</param>
+    /// <param name="storedPowerUp">Mutable outgoing payload whose reconnect flag is cleared.</param>
+    /// <param name="powerUpsState">Mutable player state receiving the despawn command.</param>
+    public static void ApplyDiscardedOwnershipPolicy(int slotIndex,
+                                                     ref PlayerStoredActivePowerUpData storedPowerUp,
+                                                     ref PlayerPowerUpsState powerUpsState)
+    {
+        ApplyOwnershipPolicy(slotIndex,
+                             ref storedPowerUp,
+                             ref powerUpsState,
+                             ProjectileStolenOwnershipPolicy.Despawn);
+    }
+    #endregion
+
+    #region Commands
+    /// <summary>
+    /// Writes one detached-generation command and records whether the stored active may reconnect to its projectile.
+    /// </summary>
+    /// <param name="slotIndex">Original active slot index.</param>
+    /// <param name="storedPowerUp">Mutable stored payload carrying captured returning-projectile ownership.</param>
+    /// <param name="powerUpsState">Mutable player state receiving the detached ownership command.</param>
+    /// <param name="policy">Ownership behavior applied while the active remains unequipped.</param>
+    private static void ApplyOwnershipPolicy(int slotIndex,
+                                             ref PlayerStoredActivePowerUpData storedPowerUp,
+                                             ref PlayerPowerUpsState powerUpsState,
+                                             ProjectileStolenOwnershipPolicy policy)
     {
         if (storedPowerUp.SlotConfig.HasReturningProjectiles == 0 ||
             storedPowerUp.ReturningProjectileCount <= 0 ||
             storedPowerUp.ReturningProjectileGeneration == 0u)
-        {
             return;
-        }
 
-        ProjectileStolenOwnershipPolicy policy = storedPowerUp.SlotConfig.ReturningProjectiles.StolenOwnershipPolicy;
         storedPowerUp.PreserveReturningProjectileOwnership = policy == ProjectileStolenOwnershipPolicy.PreserveAndReconnect
             ? (byte)1
             : (byte)0;
@@ -185,9 +216,7 @@ public static class PlayerReturningProjectileLoadoutRuntimeUtility
                 return;
         }
     }
-    #endregion
 
-    #region Commands
     /// <summary>
     /// Clears a suspension or despawn command after its stored active reconnects to a slot.
     /// </summary>
