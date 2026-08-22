@@ -448,9 +448,9 @@ MonoBehaviour:
       pointsDecayPerSecond: 0
       valueDisplayMode: 1
       formulaDistributionMode: 1
-      linearBonusRangeMode: 1
+      linearBonusRangeMode: 0
       showMeterOnlyAfterFirstMilestone: 0
-      startLinearBonusesAtFirstMilestone: 1
+      startLinearBonusesAtFirstMilestone: 0
       bonusMilestones:
       - milestoneId: SYNCHRO RATE
         isEnabled: 1
