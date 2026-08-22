@@ -125,48 +125,6 @@ MonoBehaviour:
     subSceneGuid: 71a89c8d3835e6c419e0f79016c3670f
     wavePreset: {fileID: 11400000, guid: 1bbf094f5f2d8374b99178884f87b8aa, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: 5a34e40218bcc094382de3b9fedebc81, type: 3}
-  - displayName: SCN_LGTEST_MAINT_BOSS
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_BOSS.unity
-    mainSceneGuid: 82bb006d89574a24488682f06c9e1332
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_BOSS.unity
-    subSceneGuid: 1445cefc53858504595d53844ea1c106
-    wavePreset: {fileID: 11400000, guid: 684c0ac4006b3394eb08ccea8782e89b, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: 82bb006d89574a24488682f06c9e1332, type: 3}
-  - displayName: SCN_LGTEST_MAINT_CORNER_NE
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_NE.unity
-    mainSceneGuid: c56a428650e3345448e82cd5306813e9
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_NE.unity
-    subSceneGuid: 0e48015b144c0bf40bc2313f9ff6e857
-    wavePreset: {fileID: 11400000, guid: d5ebd8c263f046844a74a6089642e196, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: c56a428650e3345448e82cd5306813e9, type: 3}
-  - displayName: SCN_LGTEST_MAINT_CORNER_SW
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_CORNER_SW.unity
-    mainSceneGuid: f10e13dba6645024c946748fa4b1d1ac
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_CORNER_SW.unity
-    subSceneGuid: 4dc5b9b5f89cd9a4daa16405739f795d
-    wavePreset: {fileID: 11400000, guid: 28bb90c832a1bca40b8877370d425e9f, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: f10e13dba6645024c946748fa4b1d1ac, type: 3}
-  - displayName: SCN_LGTEST_MAINT_HUB
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_HUB.unity
-    mainSceneGuid: 80bfeafb9e94c1f40bb4093fc4936c4b
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_HUB.unity
-    subSceneGuid: 639e2226352ce744d800e13ef0939777
-    wavePreset: {fileID: 11400000, guid: 967311ac065d8ba408307e72a4366046, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: 80bfeafb9e94c1f40bb4093fc4936c4b, type: 3}
-  - displayName: SCN_LGTEST_MAINT_START
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_START.unity
-    mainSceneGuid: d0f579d17b03b154287cfa15e7887024
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_START.unity
-    subSceneGuid: 81ce760752675f04994cf109c0b3448c
-    wavePreset: {fileID: 11400000, guid: e3a837cb228a6624a8390d7a3a1f3dc9, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: d0f579d17b03b154287cfa15e7887024, type: 3}
-  - displayName: SCN_LGTEST_MAINT_TRIAD
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SCN_LGTEST_MAINT_TRIAD.unity
-    mainSceneGuid: a3bb29a1d6ea86b46bb5e1b7c1c5a197
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MaintenanceTunnels/SubScenes/SUB_LGTEST_MAINT_TRIAD.unity
-    subSceneGuid: be0774ecaec68d54381a390484f9b644
-    wavePreset: {fileID: 11400000, guid: 006f5c7823242de4789c51e3f6de02dd, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: a3bb29a1d6ea86b46bb5e1b7c1c5a197, type: 3}
   - displayName: SCN_LGTEST_METRO_BOSS
     mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
     mainSceneGuid: 27d9e1327f828944794adba3410c0657
@@ -174,13 +132,6 @@ MonoBehaviour:
     subSceneGuid: f478b078461c39a41a85f0474f1a408f
     wavePreset: {fileID: 11400000, guid: af1d65e57f343f546b4a3c7ae73e41bb, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: 27d9e1327f828944794adba3410c0657, type: 3}
-  - displayName: SCN_LGTEST_METRO_CROSS
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_CROSS.unity
-    mainSceneGuid: 86787f958b7747a44892e18620a2fe75
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_CROSS.unity
-    subSceneGuid: 9e9cbe8c0d82f484ca2d1014f6d1b065
-    wavePreset: {fileID: 11400000, guid: f0dbbe91f6b9c4241aaa8aa4a3c88e07, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: 86787f958b7747a44892e18620a2fe75, type: 3}
   - displayName: SCN_LGTEST_METRO_DOUBLE
     mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
     mainSceneGuid: 433f03176860b0e409c1d762e15cd364
@@ -202,20 +153,6 @@ MonoBehaviour:
     subSceneGuid: 4989da56774b24444a4e8df669174e42
     wavePreset: {fileID: 11400000, guid: d429b6143f1c1334e9a7099327c114bd, type: 2}
     mainSceneAsset: {fileID: 102900000, guid: 0b11934e90dbb314e87551aabe87ec57, type: 3}
-  - displayName: SCN_LGTEST_METRO_START
-    mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_START.unity
-    mainSceneGuid: 54c97702b5bc17f439c3b98c04743afb
-    subScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_START.unity
-    subSceneGuid: d3688453e5f08c04496dcf80c5c0e215
-    wavePreset: {fileID: 11400000, guid: 410c7ac654c20ba4e9a4bba878964395, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: 54c97702b5bc17f439c3b98c04743afb, type: 3}
-  - displayName: SCN_MainScene
-    mainScenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene.unity
-    mainSceneGuid: 99c9720ab356a0642a771bea13969a05
-    subScenePath: Assets/Scenes/Testing/Main Scenes/SCN_MainScene/SCN_MainScene/SUB_EnemyZone_Main.unity
-    subSceneGuid: 7dd9022369bc6644e85041d97047103e
-    wavePreset: {fileID: 11400000, guid: 423a2d4934efa334d9e1d877e4e3640c, type: 2}
-    mainSceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
   - displayName: SCN_MAIN_METRO_02
     mainScenePath: Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
     mainSceneGuid: eef1df284c2a6f148996f3c85310ad6a
