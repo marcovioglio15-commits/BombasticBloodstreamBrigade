@@ -92,16 +92,6 @@ MonoBehaviour:
     formula: ([Luck]>5)?0:60
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: dropPools.Array.data[0].tierRolls.Array.data[1].selectionPercentage
-    addScaling: 1
-    formula: ([Luck]>5)?0:30
-    debugInConsole: 0
-    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: dropPools.Array.data[0].tierRolls.Array.data[2].selectionPercentage
-    addScaling: 1
-    formula: ([Luck]>5)?100:10
-    debugInConsole: 0
-    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
     addScaling: 1
     formula: '[LaserWidth]'
@@ -191,6 +181,16 @@ MonoBehaviour:
   - statKey: activePowerUps.Array.data[9|powerUpId:ActiveBoomerang].moduleBindings.Array.data[2|moduleId:Module_ReturningProjectiles].overridePayload.returningProjectiles.repeatedContactDamage
     addScaling: 1
     formula: '[Damage]'
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: dropPools.Array.data[0].tierRolls.Array.data[2].selectionPercentage
+    addScaling: 1
+    formula: ([Luck]>5)?100:10
+    debugInConsole: 0
+    debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - statKey: dropPools.Array.data[0].tierRolls.Array.data[1].selectionPercentage
+    addScaling: 1
+    formula: ([Luck]>5)?0:30
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
