@@ -185,6 +185,46 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
+    - cellCoordinate: {x: 10, y: 17}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 5
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 10, y: 15}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 5
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 9, y: 16}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 5
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 11, y: 16}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 5
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
     useDifficultySelection: 0
     difficultySelectionGroupId: 
     difficultyCoefficientId: 
@@ -226,7 +266,7 @@ MonoBehaviour:
     paintedCells:
     - cellCoordinate: {x: 9, y: 4}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 10
+      enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -236,7 +276,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     - cellCoordinate: {x: 10, y: 5}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 10
+      enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -246,7 +286,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     - cellCoordinate: {x: 11, y: 4}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 10
+      enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -256,7 +296,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     - cellCoordinate: {x: 10, y: 3}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 10
+      enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
