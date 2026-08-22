@@ -54,6 +54,7 @@ public static class PlayerReturningProjectilesSmokeTest
         ValidateProjectileSizeFiltering();
         ValidateReplacementProjectileFootprint();
         PlayerReturningProjectileInteractionSmokeTest.Run();
+        ValidateSpecializedPoolExpansionPolicy();
         ValidatePoolStoragePartitioning();
         ValidateReturnTransition();
         PlayerReturningProjectileRecallSmokeTest.Run();
@@ -551,6 +552,39 @@ public static class PlayerReturningProjectilesSmokeTest
     #endregion
 
     #region Runtime Policies
+    /// <summary>
+    /// Verifies a high-throughput base pool batch can never multiply a one-shot specialized prefab request.
+    /// </summary>
+    private static void ValidateSpecializedPoolExpansionPolicy()
+    {
+        Entity basePrefabEntity = new Entity
+        {
+            Index = 1,
+            Version = 1
+        };
+        Entity replacementPrefabEntity = new Entity
+        {
+            Index = 2,
+            Version = 1
+        };
+
+        if (ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(replacementPrefabEntity,
+                                                                      basePrefabEntity,
+                                                                      1,
+                                                                      1500) != 1)
+        {
+            throw new InvalidOperationException("A one-shot returning replacement inherited the base pool's 1500-projectile expansion batch.");
+        }
+
+        if (ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(basePrefabEntity,
+                                                                      basePrefabEntity,
+                                                                      3,
+                                                                      128) != 128)
+        {
+            throw new InvalidOperationException("The high-throughput base projectile lost its configured pool expansion batch.");
+        }
+    }
+
     /// <summary>
     /// Verifies passive source filters and explicit active overrides resolve without per-frame discovery.
     /// </summary>

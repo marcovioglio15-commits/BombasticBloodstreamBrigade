@@ -86,6 +86,29 @@ public static class ProjectileSpawnPoolSelectionUtility
     }
 
     /// <summary>
+    /// Resolves pool growth without applying the base weapon's large batch size to a specialized replacement prefab.
+    /// </summary>
+    /// <param name="requestedPrefabEntity">Prefab partition that must satisfy the current shot demand.</param>
+    /// <param name="basePrefabEntity">Shooter's standard projectile prefab that owns the configured expansion batch.</param>
+    /// <param name="missingProjectiles">Number of projectiles still required for the current frame.</param>
+    /// <param name="configuredExpandBatch">Expansion batch authored for the high-throughput base projectile.</param>
+    /// <returns>Exact specialized demand, or the configured base-projectile batch when it is larger.</returns>
+    public static int ResolveExpansionCount(Entity requestedPrefabEntity,
+                                            Entity basePrefabEntity,
+                                            int missingProjectiles,
+                                            int configuredExpandBatch)
+    {
+        if (missingProjectiles <= 0)
+            return 0;
+
+        if (requestedPrefabEntity != basePrefabEntity)
+            return missingProjectiles;
+
+        int normalizedExpandBatch = configuredExpandBatch > 0 ? configuredExpandBatch : 1;
+        return normalizedExpandBatch > missingProjectiles ? normalizedExpandBatch : missingProjectiles;
+    }
+
+    /// <summary>
     /// Removes one matching projectile from a prefab-specific pool partition without allocating a secondary collection.
     /// </summary>
     /// <param name="projectilePool">Mutable shooter pool.</param>

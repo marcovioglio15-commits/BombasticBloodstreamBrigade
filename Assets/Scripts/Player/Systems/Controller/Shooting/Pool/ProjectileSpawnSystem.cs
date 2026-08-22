@@ -212,11 +212,16 @@ public partial struct ProjectileSpawnSystem : ISystem
                 if (missingProjectiles <= 0)
                     continue;
 
+                int expandCount = ProjectileSpawnPoolSelectionUtility.ResolveExpansionCount(requestPrefab,
+                                                                                              prefabEntity,
+                                                                                              missingProjectiles,
+                                                                                              expandBatch);
+
                 expansionRequests.Add(new PoolExpansionRequest
                 {
                     ShooterEntity = shooterEntity,
                     ProjectilePrefab = requestPrefab,
-                    ExpandCount = math.max(expandBatch, missingProjectiles)
+                    ExpandCount = expandCount
                 });
             }
         }
