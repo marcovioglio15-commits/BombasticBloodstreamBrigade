@@ -19,7 +19,7 @@ MonoBehaviour:
   scalableStats:
   - statName: Health
     statType: 1
-    defaultValue: 5
+    defaultValue: 3
     minimumValue: 1
     maximumValue: 10
     defaultBooleanValue: 0
@@ -224,6 +224,20 @@ MonoBehaviour:
       skipCompensationResources: []
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
+    - milestoneLevel: 15
+      specialExpRequirement: 125
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
   - phaseID: Phase2
     startsAtLevel: 19
     startingRequiredLevelUpExp: 150
@@ -243,8 +257,36 @@ MonoBehaviour:
       skipCompensationResources: []
       legacyPowerUpUnlockRollCount: 0
       legacyMilestoneTierRolls: []
+    - milestoneLevel: 25
+      specialExpRequirement: 185
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
     - milestoneLevel: 30
-      specialExpRequirement: 235
+      specialExpRequirement: 225
+      recurring: 0
+      recurrenceIntervalLevels: 5
+      powerUpUnlocks:
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      - dropPoolId: Milestone
+        legacyTierRolls: []
+      skipCompensationResources: []
+      legacyPowerUpUnlockRollCount: 0
+      legacyMilestoneTierRolls: []
+    - milestoneLevel: 35
+      specialExpRequirement: 275
       recurring: 0
       recurrenceIntervalLevels: 5
       powerUpUnlocks:
@@ -458,7 +500,7 @@ MonoBehaviour:
         bonuses:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
-          - formula: '[Luck]=[Luck]+50'
+          - formula: '[Luck]=[Luck]+80'
         passivePowerUpUnlocks: []
   legacyExperienceRequiredPerLevel: 100
   levelCap: 100

@@ -89,7 +89,7 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: dropPools.Array.data[0].tierRolls.Array.data[0].selectionPercentage
     addScaling: 1
-    formula: ([Luck]>5)?0:60
+    formula: 60 + (((30 - 60) / 100) * [Luck])
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
@@ -185,12 +185,12 @@ MonoBehaviour:
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: dropPools.Array.data[0].tierRolls.Array.data[2].selectionPercentage
     addScaling: 1
-    formula: ([Luck]>5)?100:10
+    formula: 10 + (((30 - 10) / 100) * [Luck])
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - statKey: dropPools.Array.data[0].tierRolls.Array.data[1].selectionPercentage
     addScaling: 1
-    formula: ([Luck]>5)?0:30
+    formula: 30 + (((40 - 30) / 100) * [Luck])
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   primaryToolActionId: e0ab25f2-733a-4721-9b7a-2c8198b602da
@@ -42459,6 +42459,7 @@ MonoBehaviour:
           applyFormulasOnlyOnActiveTrigger: 0
           formulas:
           - formula: '[ShotgunBarrels]=[ShotgunBarrels]+1'
+          - formula: '[FireRate]=[FireRate]-0.3'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
@@ -50947,7 +50948,7 @@ MonoBehaviour:
           - formula: '[Health]=[Health]+1'
           - formula: '[MovementSpeed]=[MovementSpeed]+0.5'
           - formula: '[FireRate]=[FireRate]+0.2'
-          - formula: '[GatheringRadius]=[GatheringRadius]+1'
+          - formula: '[GatheringRadius]=[GatheringRadius]+2'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
@@ -51433,7 +51434,7 @@ MonoBehaviour:
           - formula: '[Shield]=[Shield]+1'
           - formula: '[ShotRange]=[ShotRange]+0.01'
           - formula: '[Damage]=[Damage]+0.2'
-          - formula: '[Luck]=[Luck]+1'
+          - formula: '[Luck]=[Luck]+5'
         bomb:
           bombPrefab: {fileID: 0}
           spawnOffset: {x: 0, y: 0, z: 0}
