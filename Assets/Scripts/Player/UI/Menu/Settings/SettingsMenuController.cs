@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static SettingsMenuControllerUiUtility;
@@ -49,6 +50,9 @@ public sealed class SettingsMenuController : MonoBehaviour
 
     [Tooltip("Button that closes the menu without saving the current draft.")]
     [SerializeField] private Button closeButton;
+
+    [Tooltip("Shared project Input Action asset used by Settings navigation before a player runtime input clone exists.")]
+    [SerializeField] private InputActionAsset navigationInputAsset;
     #endregion
 
     #region Serialized Fields - Panels
@@ -106,18 +110,6 @@ public sealed class SettingsMenuController : MonoBehaviour
     [SerializeField] private TMP_Text fireRumbleValueLabel;
     #endregion
 
-    #region Serialized Fields - Gamepad Navigation
-    [Header("Gamepad Navigation")]
-    [Tooltip("Optional custom sprite for the on-screen gamepad cursor shown while this Settings menu is open. When empty a generated crosshair reticle is used.")]
-    [SerializeField] private Sprite gamepadCursorSprite;
-
-    [Tooltip("Tint multiplied with the gamepad cursor sprite and used by the generated fallback crosshair.")]
-    [SerializeField] private Color gamepadCursorTint = new Color(0.98f, 0.78f, 0.15f, 0.95f);
-
-    [Tooltip("On-screen size in pixels of the Settings menu gamepad cursor.")]
-    [SerializeField] private float gamepadCursorSize = 26f;
-    #endregion
-
     #region Serialized Fields - Audio Runtime
     [Header("Audio Runtime")]
     [Tooltip("FMOD master bus path controlled by the Master slider.")]
@@ -161,7 +153,8 @@ public sealed class SettingsMenuController : MonoBehaviour
     #endregion
 
     #region Runtime
-    private RuntimeMenuGamepadNavigationController gamepadNavigation;
+    private SettingsMenuInputActionNavigationController inputActionNavigation;
+    private SettingsMenuTabController tabController;
     private GameUserSettingsData savedSettings;
     private GameUserSettingsData draftSettings;
     private GameUserSettingsRuntimeOptions runtimeOptions;
@@ -169,6 +162,7 @@ public sealed class SettingsMenuController : MonoBehaviour
     private Selectable restoreSelectionTarget;
     private Coroutine stopPreviewCoroutine;
     private bool suppressControlCallbacks;
+    private bool wrapSettingsTabs;
     #endregion
 
     #endregion
@@ -195,11 +189,15 @@ public sealed class SettingsMenuController : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        gamepadNavigation = new RuntimeMenuGamepadNavigationController("SettingsMenuGamepadCursor",
-                                                                       CancelAndClose,
-                                                                       new RuntimeMenuGamepadCursorStyle(gamepadCursorSprite,
-                                                                                                         gamepadCursorTint,
-                                                                                                         gamepadCursorSize));
+        inputActionNavigation = new SettingsMenuInputActionNavigationController(StepSettingsPanel, CancelAndClose);
+        tabController = new SettingsMenuTabController(audioPanelRoot,
+                                                      gameplayPanelRoot,
+                                                      eventSystemOverride,
+                                                      masterVolumeSlider,
+                                                      visualPointerToggle,
+                                                      audioTabButton,
+                                                      gameplayTabButton,
+                                                      confirmButton);
         GameAudioSettingsFmodRuntimeUtility.ConfigurePreviewFades(audioPreviewFadeInSeconds, audioPreviewFadeOutSeconds);
         RefreshRuntimeConfig();
         savedSettings = GameUserSettingsRuntimeUtility.LoadAndApply(in runtimeOptions);
@@ -221,8 +219,8 @@ public sealed class SettingsMenuController : MonoBehaviour
         float deltaSeconds = Time.unscaledDeltaTime;
         GameAudioSettingsFmodRuntimeUtility.TickPreviewFades(deltaSeconds);
 
-        if (gamepadNavigation != null)
-            gamepadNavigation.Tick(deltaSeconds);
+        if (inputActionNavigation != null)
+            inputActionNavigation.Tick(deltaSeconds);
     }
 
     /// <summary>
@@ -241,17 +239,17 @@ public sealed class SettingsMenuController : MonoBehaviour
         UnregisterCallbacks();
         StopPreviewNow();
 
-        if (gamepadNavigation != null)
-            gamepadNavigation.Deactivate();
+        if (inputActionNavigation != null)
+            inputActionNavigation.Deactivate();
     }
 
     /// <summary>
-    /// Releases the software cursor controller owned by this Settings menu.
+    /// Releases the Input Action navigation controller owned by this Settings menu.
     /// </summary>
     private void OnDestroy()
     {
-        if (gamepadNavigation != null)
-            gamepadNavigation.Dispose();
+        if (inputActionNavigation != null)
+            inputActionNavigation.Dispose();
     }
     #endregion
 
@@ -271,16 +269,28 @@ public sealed class SettingsMenuController : MonoBehaviour
             panelRoot.SetActive(true);
 
         ApplyDraftToRuntime();
-        ShowPanel(SettingsPanel.Audio);
+        tabController.Show((int)SettingsPanel.Audio, false);
 
-        if (gamepadNavigation != null)
+        Selectable defaultSelectable = tabController.ResolveDefault((int)SettingsPanel.Audio);
+        GameHudSettingsNavigationRuntimeConfig navigationConfig;
+
+        bool directNavigationActive = false;
+
+        if (inputActionNavigation != null &&
+            GameHudSettingsNavigationRuntimeUtility.TryResolve(out navigationConfig))
         {
-            Selectable defaultSelectable = audioTabButton != null ? audioTabButton : confirmButton;
-            gamepadNavigation.Activate(runtimeOptions.MenuNavigation, panelRoot, defaultSelectable, eventSystemOverride);
+            wrapSettingsTabs = navigationConfig.WrapTabs != 0;
+            directNavigationActive = inputActionNavigation.Activate(in navigationConfig,
+                                                                     panelRoot,
+                                                                     defaultSelectable,
+                                                                     eventSystemOverride,
+                                                                     navigationInputAsset,
+                                                                     audioTabButton,
+                                                                     gameplayTabButton);
         }
 
-        if (gamepadNavigation == null || !gamepadNavigation.IsUsingGamepadCursor)
-            SettingsMenuControllerUiUtility.SelectSelectable(eventSystemOverride, audioTabButton != null ? audioTabButton : confirmButton);
+        if (!directNavigationActive)
+            SettingsMenuControllerUiUtility.SelectSelectable(eventSystemOverride, defaultSelectable);
     }
 
     /// <summary>
@@ -408,7 +418,7 @@ public sealed class SettingsMenuController : MonoBehaviour
     /// </summary>
     private void HandleAudioTabPressed()
     {
-        ShowPanel(SettingsPanel.Audio);
+        tabController.Show((int)SettingsPanel.Audio, true);
     }
 
     /// <summary>
@@ -416,7 +426,7 @@ public sealed class SettingsMenuController : MonoBehaviour
     /// </summary>
     private void HandleGameplayTabPressed()
     {
-        ShowPanel(SettingsPanel.Gameplay);
+        tabController.Show((int)SettingsPanel.Gameplay, true);
     }
 
     /// <summary>
@@ -557,16 +567,12 @@ public sealed class SettingsMenuController : MonoBehaviour
 
     #region UI State
     /// <summary>
-    /// Shows one settings panel and hides the other panel roots.
+    /// Moves to the adjacent Settings macro tab and focuses its first available control.
     /// </summary>
-    /// <param name="panel">Panel that should be visible.</param>
-    private void ShowPanel(SettingsPanel panel)
+    /// <param name="direction">Negative for the previous tab or positive for the next tab.</param>
+    private void StepSettingsPanel(int direction)
     {
-        if (audioPanelRoot != null)
-            audioPanelRoot.SetActive(panel == SettingsPanel.Audio);
-
-        if (gameplayPanelRoot != null)
-            gameplayPanelRoot.SetActive(panel == SettingsPanel.Gameplay);
+        tabController.Step(direction, wrapSettingsTabs);
     }
 
     /// <summary>
@@ -678,8 +684,8 @@ public sealed class SettingsMenuController : MonoBehaviour
     {
         StopPreviewNow();
 
-        if (gamepadNavigation != null)
-            gamepadNavigation.Deactivate();
+        if (inputActionNavigation != null)
+            inputActionNavigation.Deactivate();
 
         if (panelRoot != null)
             panelRoot.SetActive(false);

@@ -97,6 +97,15 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
     {
         return masterPreset != null ? masterPreset.DifficultyScalingPreset : null;
     }
+
+    /// <summary>
+    /// Resolves the global HUD preset that owns menu-button interaction profiles.
+    /// </summary>
+    /// <returns>HUD Manager preset from the selected Game Master preset, or null when unavailable.</returns>
+    public GameHudManagerPreset ResolveHudManagerPreset()
+    {
+        return masterPreset != null ? masterPreset.HudManagerPreset : null;
+    }
     #endregion
 
     #region Unity Methods
@@ -157,12 +166,14 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
                                                    typeof(GameSceneTransitionState),
                                                    typeof(GameSceneFadePresentationState),
                                                    typeof(GameSceneLoadingProgressPresentationState),
+                                                   typeof(GameHudSettingsNavigationRuntimeConfig),
                                                    typeof(GameRoomCombatCompletionState));
 
         // Add every buffer before retrieving DynamicBuffer handles, because AddBuffer is a structural change.
         entityManager.AddBuffer<GameSceneDefinitionElement>(entity);
         entityManager.AddBuffer<GameSceneTransitionElement>(entity);
         entityManager.AddBuffer<GameSceneTransitionRequest>(entity);
+        entityManager.AddBuffer<GameUiMenuButtonInteractionElement>(entity);
         entityManager.SetComponentData(entity, config);
 
         DynamicBuffer<GameSceneDefinitionElement> sceneBuffer = entityManager.GetBuffer<GameSceneDefinitionElement>(entity);
@@ -171,6 +182,13 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         GameSceneManagementBakeUtility.PopulateSceneBuffer(resolvedPreset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(resolvedPreset, transitionBuffer);
         requestBuffer.Clear();
+        GameHudManagerPreset hudPreset = ResolveHudManagerPreset();
+        entityManager.SetComponentData(entity,
+                                       GameHudSupplementalPresetBakeUtility.BuildSettingsNavigationConfig(
+                                           hudPreset != null ? hudPreset.SettingsNavigationSettings : null));
+        GameHudSupplementalPresetBakeUtility.PopulateButtonInteractionBuffer(
+            hudPreset != null ? hudPreset.ButtonInteractionSettings : null,
+            entityManager.GetBuffer<GameUiMenuButtonInteractionElement>(entity));
         AddDifficultyRuntimeData(entityManager, entity, ResolveDifficultyScalingPreset());
         AddProceduralRuntimeData(entityManager,
                                  entity,
@@ -332,7 +350,6 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
         }
     }
     #endregion
-
     #endregion
 }
 
@@ -382,9 +399,18 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         DynamicBuffer<GameSceneDefinitionElement> sceneBuffer = AddBuffer<GameSceneDefinitionElement>(entity);
         DynamicBuffer<GameSceneTransitionElement> transitionBuffer = AddBuffer<GameSceneTransitionElement>(entity);
         DynamicBuffer<GameSceneTransitionRequest> requestBuffer = AddBuffer<GameSceneTransitionRequest>(entity);
+        DynamicBuffer<GameUiMenuButtonInteractionElement> buttonInteractionBuffer =
+            AddBuffer<GameUiMenuButtonInteractionElement>(entity);
         GameSceneManagementBakeUtility.PopulateSceneBuffer(preset, sceneBuffer);
         GameSceneManagementBakeUtility.PopulateTransitionBuffer(preset, transitionBuffer);
         requestBuffer.Clear();
+        GameHudManagerPreset hudPreset = authoring.ResolveHudManagerPreset();
+        AddComponent(entity,
+                     GameHudSupplementalPresetBakeUtility.BuildSettingsNavigationConfig(
+                         hudPreset != null ? hudPreset.SettingsNavigationSettings : null));
+        GameHudSupplementalPresetBakeUtility.PopulateButtonInteractionBuffer(
+            hudPreset != null ? hudPreset.ButtonInteractionSettings : null,
+            buttonInteractionBuffer);
         BakeDifficultyData(authoring, entity);
         BakeProceduralLevelData(authoring, entity, preset);
     }
@@ -479,10 +505,53 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
                         DependsOn(authoring.MasterPreset.DifficultyScalingPreset.PlayerContextPreset.ProgressionPreset);
                 }
             }
+
+            DeclareButtonInteractionDependencies(authoring.MasterPreset.HudManagerPreset);
         }
 
         if (authoring.SceneManagerPreset != null)
             DependsOn(authoring.SceneManagerPreset);
+    }
+
+    /// <summary>
+    /// Declares the global menu profile and all referenced clips, sprites, and fonts for bootstrap rebaking.
+    /// </summary>
+    /// <param name="hudPreset">HUD preset containing independently configured menu profiles.</param>
+    private void DeclareButtonInteractionDependencies(GameHudManagerPreset hudPreset)
+    {
+        if (hudPreset == null || hudPreset.ButtonInteractionSettings == null)
+            return;
+
+        DependsOn(hudPreset);
+        IReadOnlyList<GameUiMenuButtonInteractionDefinition> profiles = hudPreset.ButtonInteractionSettings.MenuProfiles;
+
+        for (int profileIndex = 0; profileIndex < profiles.Count; profileIndex++)
+        {
+            GameUiMenuButtonInteractionDefinition profile = profiles[profileIndex];
+
+            if (profile == null)
+                continue;
+
+            UnityEngine.Object[] dependencies =
+            {
+                profile.NormalClip,
+                profile.HoverClip,
+                profile.PressedClip,
+                profile.DisabledClip,
+                profile.NormalSprite,
+                profile.HoverSprite,
+                profile.PressedSprite,
+                profile.DisabledSprite,
+                profile.NormalFont,
+                profile.EmphasizedFont
+            };
+
+            for (int dependencyIndex = 0; dependencyIndex < dependencies.Length; dependencyIndex++)
+            {
+                if (dependencies[dependencyIndex] != null)
+                    DependsOn(dependencies[dependencyIndex]);
+            }
+        }
     }
 
     /// <summary>
@@ -577,7 +646,6 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
         GameProceduralLevelBakeUtility.PopulateMetadataBuffers(preset, metadataBuffer, portalBuffer);
         BakeRoomRewardData(authoring, entity, preset);
     }
-
     /// <summary>
     /// Bakes optional room reward definitions and tile bindings onto the procedural manager singleton.
     /// </summary>
@@ -626,6 +694,5 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
                                                   portalReplacementBuffer);
     }
     #endregion
-
     #endregion
 }

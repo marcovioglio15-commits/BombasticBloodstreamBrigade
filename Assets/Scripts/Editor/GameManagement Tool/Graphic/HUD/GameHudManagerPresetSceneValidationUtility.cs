@@ -98,6 +98,10 @@ internal static class GameHudManagerPresetSceneValidationUtility
                                                                                                                                           "powerUpContainerInteractionSection",
                                                                                                                                           "HUDManager Power-Up Container Interaction Section",
                                                                                                                                           warnings);
+        HUDPowerUpSummarySection summarySection = CheckRequiredReference<HUDPowerUpSummarySection>(serializedHudManager,
+                                                                                                   "powerUpSummarySection",
+                                                                                                   "HUDManager Power-Up Summary Section",
+                                                                                                   warnings);
         HUDPlayerDamageVignetteSection damageVignetteSection = CheckRequiredReference<HUDPlayerDamageVignetteSection>(serializedHudManager,
                                                                                                                        "damageVignetteSection",
                                                                                                                        "HUDManager Damage Vignette Section",
@@ -112,6 +116,7 @@ internal static class GameHudManagerPresetSceneValidationUtility
         ValidateSynchroMeterSection(comboCounterSection, preset, warnings);
         ValidateMilestoneSelectionSection(milestoneSelectionSection, preset, warnings);
         ValidateContainerInteractionSection(containerInteractionSection, warnings);
+        ValidatePowerUpSummarySection(summarySection, preset, warnings);
         ValidateDamageVignetteSection(damageVignetteSection, preset, warnings);
     }
     #endregion
@@ -356,6 +361,48 @@ internal static class GameHudManagerPresetSceneValidationUtility
     }
 
     /// <summary>
+    /// Validates fixed summary pools and core authored hierarchy references when the inline settings enable the section.
+    /// </summary>
+    /// <param name="section">Power-up summary section assigned on HUDManager.</param>
+    /// <param name="preset">Selected HUD preset used to skip an explicitly disabled summary.</param>
+    /// <param name="warnings">Mutable warning list receiving scene-binding diagnostics.</param>
+    private static void ValidatePowerUpSummarySection(HUDPowerUpSummarySection section,
+                                                      GameHudManagerPreset preset,
+                                                      List<string> warnings)
+    {
+        if (section == null)
+            return;
+
+        if (preset != null &&
+            preset.PowerUpSummarySettings != null &&
+            !preset.PowerUpSummarySettings.IsEnabled)
+            return;
+
+        SerializedObject serializedSection = new SerializedObject(section);
+        serializedSection.Update();
+        CheckRequiredReference<RectTransform>(serializedSection, "panelRoot", "Power-Up Summary panel root", warnings);
+        CheckRequiredReference<RectTransform>(serializedSection, "contentRoot", "Power-Up Summary content root", warnings);
+        CheckRequiredReference<RectTransform>(serializedSection, "powerUpAreaRoot", "Power-Up Summary upper area", warnings);
+        CheckRequiredReference<RectTransform>(serializedSection, "statisticsAreaRoot", "Power-Up Summary statistic area", warnings);
+        CheckRequiredReference<Button>(serializedSection, "toggleButton", "Power-Up Summary toggle button", warnings);
+        ValidateArrayCapacity(serializedSection,
+                              "activeIconViews",
+                              GameHudPowerUpSummarySettings.AuthoredActiveSlotCapacity,
+                              "active icon",
+                              warnings);
+        ValidateArrayCapacity(serializedSection,
+                              "passiveIconViews",
+                              GameHudPowerUpSummarySettings.AuthoredPassiveSlotCapacity,
+                              "passive icon",
+                              warnings);
+        ValidateArrayCapacity(serializedSection,
+                              "statisticRows",
+                              GameHudPowerUpSummarySettings.AuthoredStatisticRowCapacity,
+                              "statistic row",
+                              warnings);
+    }
+
+    /// <summary>
     /// Validates damage vignette image references when the preset enables the section.
     /// </summary>
     /// <param name="section">Damage vignette section assigned on HUDManager.</param>
@@ -401,11 +448,48 @@ internal static class GameHudManagerPresetSceneValidationUtility
     }
 
     /// <summary>
+    /// Validates one fixed preauthored component-reference pool and reports missing slots.
+    /// </summary>
+    /// <param name="serializedObject">Serialized section owning the pool.</param>
+    /// <param name="propertyName">Serialized array field name.</param>
+    /// <param name="expectedCapacity">Required fixed pool capacity.</param>
+    /// <param name="label">Entry label included in warnings.</param>
+    /// <param name="warnings">Mutable warning list receiving scene-binding diagnostics.</param>
+    private static void ValidateArrayCapacity(SerializedObject serializedObject,
+                                              string propertyName,
+                                              int expectedCapacity,
+                                              string label,
+                                              List<string> warnings)
+    {
+        SerializedProperty property = serializedObject.FindProperty(propertyName);
+
+        if (property == null || !property.isArray)
+        {
+            warnings.Add("Power-Up Summary " + label + " pool was not found.");
+            return;
+        }
+
+        if (property.arraySize != expectedCapacity)
+            warnings.Add(string.Format("Power-Up Summary {0} pool contains {1} entries instead of the required fixed capacity of {2}.",
+                                       label,
+                                       property.arraySize,
+                                       expectedCapacity));
+
+        for (int entryIndex = 0; entryIndex < property.arraySize; entryIndex++)
+        {
+            if (property.GetArrayElementAtIndex(entryIndex).objectReferenceValue != null)
+                continue;
+
+            warnings.Add(string.Format("Power-Up Summary {0} pool entry {1} is missing.", label, entryIndex + 1));
+        }
+    }
+
+    /// <summary>
     /// Reads one required object reference and reports a warning when it is missing.
     /// </summary>
     /// <param name="serializedObject">Serialized object that owns the reference field.</param>
     /// <param name="propertyName">Serialized property name to inspect.</param>
-    /// <param name="label">Human-readable binding label included in warnings.</param>
+    /// <param name="label">Clear binding label included in warnings.</param>
     /// <param name="warnings">Mutable warning list receiving scene-binding diagnostics.</param>
     /// <returns>Resolved object reference, or null when missing or incompatible.</returns>
     private static TReference CheckRequiredReference<TReference>(SerializedObject serializedObject,

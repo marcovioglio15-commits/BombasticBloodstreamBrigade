@@ -31,7 +31,7 @@ Material:
     m_Floats:
     - _ColorMask: 15
     - _EdgeSoftness: 0.4
-    - _FadeDirection: 0
+    - _FadeDirection: 2
     - _FadeMode: 1
     - _FadeProgress: 0
     - _NoiseScale: 5.5

@@ -88,6 +88,7 @@ public static class GameSceneManagementProjectSetupUtility
 
         GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
         GameHudManagerPreset hudPreset = EnsureHudManagerPreset();
+        GameHudSupplementalProjectSetupUtility.EnsureDefaultSettings(hudPreset);
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
         GameMasterPreset existingMasterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
         GameProceduralLevelPreset proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsurePreset(existingMasterPreset != null
@@ -96,7 +97,7 @@ public static class GameSceneManagementProjectSetupUtility
                                                                                                             scenePreset);
         GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset, proceduralLevelPreset);
         EnsureBootstrapScene(masterPreset, scenePreset);
-        GameSceneManagementProjectSetupGameplayUiUtility.EnsureGameplayUiScene();
+        GameHudSupplementalProjectSetupUtility.EnsureLoadedGameplayUiAndMenus();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
         scenePreset = EnsureSceneManagerPreset();
         GameScenePersistentGameplayCameraSetupUtility.Apply(scenePreset, false);
@@ -543,7 +544,7 @@ public static class GameSceneManagementProjectSetupUtility
     /// </summary>
     /// <param name="candidate">Candidate object already resolved by the setup pipeline.</param>
     /// <param name="assetPath">Project-relative canonical asset path.</param>
-    /// <param name="assetLabel">Human-readable asset label used in failure messages.</param>
+    /// <param name="assetLabel">Clear asset label used in failure messages.</param>
     /// <returns>Resolved persistent asset reference.</returns>
     private static TAsset ResolveDefaultSetupAsset<TAsset>(TAsset candidate,
                                                            string assetPath,

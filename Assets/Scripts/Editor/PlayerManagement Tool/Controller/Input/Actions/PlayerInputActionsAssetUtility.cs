@@ -66,6 +66,7 @@ public static class PlayerInputActionsAssetUtility
         changed |= EnsureAction(map, "PowerUpContainerInteract", InputActionType.Button, "Button", AddDefaultPowerUpContainerInteractBindings);
         changed |= EnsureAction(map, "PowerUpContainerReplacePrimary", InputActionType.Button, "Button", AddDefaultPowerUpContainerReplacePrimaryBindings);
         changed |= EnsureAction(map, "PowerUpContainerReplaceSecondary", InputActionType.Button, "Button", AddDefaultPowerUpContainerReplaceSecondaryBindings);
+        changed |= EnsureAction(map, "PowerUpSummaryToggle", InputActionType.Button, "Button", AddDefaultPowerUpSummaryToggleBindings);
         changed |= EnsureAction(map, "CheatPresetDigit", InputActionType.Button, "Button", AddDefaultCheatPresetDigitBindings);
         changed |= EnsureAction(map, "CheatModifierControl", InputActionType.Button, "Button", AddDefaultCheatModifierControlBindings);
         changed |= EnsureAction(map, "CheatModifierShift", InputActionType.Button, "Button", AddDefaultCheatModifierShiftBindings);
@@ -74,6 +75,10 @@ public static class PlayerInputActionsAssetUtility
         changed |= EnsureAction(uiMap, "Navigate", InputActionType.PassThrough, "Vector2", AddDefaultUINavigateBindings);
         changed |= EnsureAction(uiMap, "Submit", InputActionType.Button, "Button", AddDefaultUISubmitBindings);
         changed |= EnsureAction(uiMap, "Cancel", InputActionType.Button, "Button", AddDefaultUICancelBindings);
+        changed |= EnsureAction(uiMap, "SettingsPreviousTab", InputActionType.Button, "Button", AddDefaultSettingsPreviousTabBindings);
+        changed |= EnsureAction(uiMap, "SettingsNextTab", InputActionType.Button, "Button", AddDefaultSettingsNextTabBindings);
+        changed |= EnsureAction(uiMap, "SettingsNavigateVertical", InputActionType.PassThrough, "Axis", AddDefaultSettingsVerticalBindings);
+        changed |= EnsureAction(uiMap, "SettingsNavigateHorizontal", InputActionType.PassThrough, "Axis", AddDefaultSettingsHorizontalBindings);
 
         if (changed)
             PersistAssetChanges(asset);
@@ -276,6 +281,19 @@ public static class PlayerInputActionsAssetUtility
     }
 
     /// <summary>
+    /// Adds default gameplay bindings for expanding or collapsing the power-up summary.
+    /// </summary>
+    /// <param name="action">Button action receiving keyboard and gamepad bindings.</param>
+    private static void AddDefaultPowerUpSummaryToggleBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Keyboard>/i").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Gamepad>/select").WithGroup("Gamepad");
+    }
+
+    /// <summary>
     /// Adds default bindings for digit selection used by runtime power-up preset cheat swaps.
     /// </summary>
     /// <param name="action"></param>
@@ -387,6 +405,76 @@ public static class PlayerInputActionsAssetUtility
         action.AddBinding("<Gamepad>/start").WithGroup("Gamepad");
     }
 
+    /// <summary>
+    /// Adds default bindings for selecting the previous Settings macro tab.
+    /// </summary>
+    /// <param name="action">Button action receiving keyboard and gamepad bindings.</param>
+    private static void AddDefaultSettingsPreviousTabBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Keyboard>/q").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Keyboard>/pageUp").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Gamepad>/leftShoulder").WithGroup("Gamepad");
+    }
+
+    /// <summary>
+    /// Adds default bindings for selecting the next Settings macro tab.
+    /// </summary>
+    /// <param name="action">Button action receiving keyboard and gamepad bindings.</param>
+    private static void AddDefaultSettingsNextTabBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Keyboard>/e").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Keyboard>/pageDown").WithGroup("Keyboard&Mouse");
+        action.AddBinding("<Gamepad>/rightShoulder").WithGroup("Gamepad");
+    }
+
+    /// <summary>
+    /// Adds one-dimensional bindings used to move between Settings rows.
+    /// </summary>
+    /// <param name="action">Axis action receiving keyboard and gamepad bindings.</param>
+    private static void AddDefaultSettingsVerticalBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Gamepad>/leftStick/y").WithGroup("Gamepad");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Gamepad>/dpad/down")
+            .With("Positive", "<Gamepad>/dpad/up");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/downArrow")
+            .With("Positive", "<Keyboard>/upArrow");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/s")
+            .With("Positive", "<Keyboard>/w");
+    }
+
+    /// <summary>
+    /// Adds one-dimensional bindings used to move horizontally or adjust Settings values.
+    /// </summary>
+    /// <param name="action">Axis action receiving keyboard and gamepad bindings.</param>
+    private static void AddDefaultSettingsHorizontalBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddBinding("<Gamepad>/leftStick/x").WithGroup("Gamepad");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Gamepad>/dpad/left")
+            .With("Positive", "<Gamepad>/dpad/right");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/leftArrow")
+            .With("Positive", "<Keyboard>/rightArrow");
+        action.AddCompositeBinding("1DAxis")
+            .With("Negative", "<Keyboard>/a")
+            .With("Positive", "<Keyboard>/d");
+    }
+
 
 
 
@@ -432,6 +520,9 @@ public static class PlayerInputActionsAssetUtility
         InputAction powerUpContainerReplaceSecondary = map.AddAction("PowerUpContainerReplaceSecondary", InputActionType.Button, null, null, null, null, "Button");
         AddDefaultPowerUpContainerReplaceSecondaryBindings(powerUpContainerReplaceSecondary);
 
+        InputAction powerUpSummaryToggle = map.AddAction("PowerUpSummaryToggle", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultPowerUpSummaryToggleBindings(powerUpSummaryToggle);
+
         InputAction cheatPresetDigit = map.AddAction("CheatPresetDigit", InputActionType.Button, null, null, null, null, "Button");
         AddDefaultCheatPresetDigitBindings(cheatPresetDigit);
 
@@ -450,6 +541,14 @@ public static class PlayerInputActionsAssetUtility
         AddDefaultUISubmitBindings(submit);
         InputAction cancel = uiMap.AddAction("Cancel", InputActionType.Button, null, null, null, null, "Button");
         AddDefaultUICancelBindings(cancel);
+        InputAction settingsPreviousTab = uiMap.AddAction("SettingsPreviousTab", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultSettingsPreviousTabBindings(settingsPreviousTab);
+        InputAction settingsNextTab = uiMap.AddAction("SettingsNextTab", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultSettingsNextTabBindings(settingsNextTab);
+        InputAction settingsNavigateVertical = uiMap.AddAction("SettingsNavigateVertical", InputActionType.PassThrough, null, null, null, null, "Axis");
+        AddDefaultSettingsVerticalBindings(settingsNavigateVertical);
+        InputAction settingsNavigateHorizontal = uiMap.AddAction("SettingsNavigateHorizontal", InputActionType.PassThrough, null, null, null, null, "Axis");
+        AddDefaultSettingsHorizontalBindings(settingsNavigateHorizontal);
         asset.AddActionMap(uiMap);
 
         return asset;

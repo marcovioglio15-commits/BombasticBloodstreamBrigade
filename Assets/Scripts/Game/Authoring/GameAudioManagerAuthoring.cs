@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
@@ -138,6 +139,10 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         Entity entity = GetEntity(TransformUsageFlags.None);
         AddComponent(entity, BuildSettingsRuntimeConfig(settingsPreset));
         AddComponent(entity, GameHudManagerPresetBakeUtility.BuildConfig(hudPreset));
+        GameHudPowerUpSummarySettings summarySettings = hudPreset != null ? hudPreset.PowerUpSummarySettings : null;
+        AddComponent(entity, GameHudSupplementalPresetBakeUtility.BuildSummaryConfig(summarySettings));
+        DynamicBuffer<GamePowerUpSummaryStatisticElement> statisticBuffer = AddBuffer<GamePowerUpSummaryStatisticElement>(entity);
+        GameHudSupplementalPresetBakeUtility.PopulateStatisticBuffer(summarySettings, statisticBuffer);
 
         if (audioPreset == null)
             return;
@@ -170,7 +175,10 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
                 DependsOn(authoring.MasterPreset.SettingsManagerPreset);
 
             if (authoring.MasterPreset.HudManagerPreset != null)
+            {
                 DependsOn(authoring.MasterPreset.HudManagerPreset);
+                DeclareHudPresentationDependencies(authoring.MasterPreset.HudManagerPreset);
+            }
         }
 
         if (authoring.AudioManagerPreset != null)
@@ -180,7 +188,50 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
             DependsOn(authoring.SettingsManagerPreset);
 
         if (authoring.HudManagerPreset != null)
+        {
             DependsOn(authoring.HudManagerPreset);
+            DeclareHudPresentationDependencies(authoring.HudManagerPreset);
+        }
+    }
+
+    /// <summary>
+    /// Declares inline summary presentation assets referenced by one HUD Manager preset.
+    /// </summary>
+    /// <param name="hudPreset">HUD Manager preset whose nested object references participate in baking.</param>
+    private void DeclareHudPresentationDependencies(GameHudManagerPreset hudPreset)
+    {
+        if (hudPreset == null)
+            return;
+
+        GameHudPowerUpSummarySettings summarySettings = hudPreset.PowerUpSummarySettings;
+
+        if (summarySettings != null)
+        {
+            if (summarySettings.BackgroundSprite != null)
+                DependsOn(summarySettings.BackgroundSprite);
+
+            if (summarySettings.ToggleSprite != null)
+                DependsOn(summarySettings.ToggleSprite);
+
+            if (summarySettings.IconBackgroundSprite != null)
+                DependsOn(summarySettings.IconBackgroundSprite);
+
+            if (summarySettings.CounterFont != null)
+                DependsOn(summarySettings.CounterFont);
+
+            if (summarySettings.TitleFont != null)
+                DependsOn(summarySettings.TitleFont);
+
+            IReadOnlyList<GameHudStatisticDisplayDefinition> statistics = summarySettings.Statistics;
+
+            for (int statisticIndex = 0; statisticIndex < statistics.Count; statisticIndex++)
+            {
+                GameHudStatisticDisplayDefinition statistic = statistics[statisticIndex];
+
+                if (statistic != null && statistic.Font != null)
+                    DependsOn(statistic.Font);
+            }
+        }
     }
 
     /// <summary>

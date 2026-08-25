@@ -34,6 +34,9 @@ public static class GameHudManagerPresetValidationUtility
         ValidateSynchroMeterSettings(preset.SynchroMeterSettings, warnings);
         ValidateMilestoneSelectionSettings(preset.MilestoneSelectionSettings, warnings);
         ValidateDamageVignetteSettings(preset.DamageVignetteSettings, warnings);
+        GameHudSupplementalPresetValidationUtility.ValidatePowerUpSummary(preset.PowerUpSummarySettings, warnings);
+        GameHudSupplementalPresetValidationUtility.ValidateButtonInteractions(preset.ButtonInteractionSettings, warnings);
+        GameHudSupplementalPresetValidationUtility.ValidateSettingsNavigation(preset.SettingsNavigationSettings, warnings);
     }
     #endregion
 

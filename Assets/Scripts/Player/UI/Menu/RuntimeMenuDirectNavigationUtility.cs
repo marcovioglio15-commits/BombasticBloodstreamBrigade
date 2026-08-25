@@ -81,7 +81,7 @@ internal static class RuntimeMenuDirectNavigationUtility
     /// <param name="selectable">Current selectable focus.</param>
     /// <param name="direction">Requested navigation direction.</param>
     /// <returns>True when a slider consumed the navigation input.</returns>
-    private static bool TryAdjustSelectedSlider(Selectable selectable, RuntimeMenuNavigationDirection direction)
+    public static bool TryAdjustSelectedSlider(Selectable selectable, RuntimeMenuNavigationDirection direction)
     {
         if (direction != RuntimeMenuNavigationDirection.Left && direction != RuntimeMenuNavigationDirection.Right)
             return false;
@@ -130,7 +130,7 @@ internal static class RuntimeMenuDirectNavigationUtility
     /// <param name="eventSystem">EventSystem that owns current focus.</param>
     /// <param name="menuRoot">Menu root used to keep focus inside the active overlay.</param>
     /// <returns>Current selectable, or null when none is valid.</returns>
-    private static Selectable ResolveCurrentSelectable(EventSystem eventSystem, GameObject menuRoot)
+    public static Selectable ResolveCurrentSelectable(EventSystem eventSystem, GameObject menuRoot)
     {
         if (eventSystem == null || eventSystem.currentSelectedGameObject == null)
             return null;
@@ -151,7 +151,7 @@ internal static class RuntimeMenuDirectNavigationUtility
     /// </summary>
     /// <param name="eventSystem">EventSystem that receives selected GameObject updates.</param>
     /// <param name="selectable">Selectable that should own menu focus.</param>
-    private static void SelectSelectable(EventSystem eventSystem, Selectable selectable)
+    public static void SelectSelectable(EventSystem eventSystem, Selectable selectable)
     {
         if (!IsSelectionCandidateValid(selectable))
             return;
@@ -170,7 +170,7 @@ internal static class RuntimeMenuDirectNavigationUtility
     /// </summary>
     /// <param name="selectable">Selectable to inspect.</param>
     /// <returns>True when the selectable is active and interactable.</returns>
-    private static bool IsSelectionCandidateValid(Selectable selectable)
+    public static bool IsSelectionCandidateValid(Selectable selectable)
     {
         if (selectable == null)
             return false;

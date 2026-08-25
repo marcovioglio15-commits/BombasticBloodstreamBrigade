@@ -89,7 +89,6 @@ public sealed class GameHudManagerPresetsPanel
             else
                 SelectPreset(previousSelection);
         }
-
         GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
     }
     #endregion
@@ -199,7 +198,6 @@ public sealed class GameHudManagerPresetsPanel
             SelectPreset(null);
             return;
         }
-
         if (selectedPreset == null || !filteredPresets.Contains(selectedPreset))
         {
             GameHudManagerPreset restoredPreset = ManagementToolStateUtility.LoadAsset<GameHudManagerPreset>(SelectedPresetPathStateKey);
@@ -454,6 +452,18 @@ public sealed class GameHudManagerPresetsPanel
             case DetailsSectionType.Damage:
                 GameHudManagerPresetsPanelUtility.BuildDamageVignetteSection(CreateSection("Damage Vignettes"), presetSerializedObject);
                 break;
+            case DetailsSectionType.PowerUpSummary:
+                GameHudManagerSupplementalPanelUtility.BuildPowerUpSummarySection(sectionContentRoot,
+                                                                                   presetSerializedObject);
+                break;
+            case DetailsSectionType.ButtonInteractions:
+                GameHudManagerSupplementalPanelUtility.BuildButtonInteractionSection(sectionContentRoot,
+                                                                                       presetSerializedObject);
+                break;
+            case DetailsSectionType.SettingsNavigation:
+                GameHudManagerSupplementalPanelUtility.BuildSettingsNavigationSection(sectionContentRoot,
+                                                                                        presetSerializedObject);
+                break;
             case DetailsSectionType.Validation:
                 BuildValidationSection();
                 break;
@@ -546,6 +556,9 @@ public sealed class GameHudManagerPresetsPanel
         AddSectionButton(buttonsRoot, DetailsSectionType.SynchroMeter, "Synchro Meter", 112f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Milestone, "Milestone", 92f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Damage, "Damage", 84f);
+        AddSectionButton(buttonsRoot, DetailsSectionType.PowerUpSummary, "Power-Up Summary", 144f);
+        AddSectionButton(buttonsRoot, DetailsSectionType.ButtonInteractions, "Menu Buttons", 112f);
+        AddSectionButton(buttonsRoot, DetailsSectionType.SettingsNavigation, "Settings Navigation", 148f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Validation, "Validation", 92f);
         return buttonsRoot;
     }
@@ -682,8 +695,6 @@ public sealed class GameHudManagerPresetsPanel
 
         GameHudManagerSynchroMeterScenePreviewUtility.Schedule(this, selectedPreset);
     }
-
     #endregion
-
     #endregion
 }

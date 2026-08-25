@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8614955332117012688}
   - component: {fileID: 2163844647157107785}
   - component: {fileID: 8261287334454883371}
+  - component: {fileID: 4873618453046528295}
   m_Layer: 5
   m_Name: SkipButton
   m_TagString: Untagged
@@ -122,6 +123,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4873618453046528295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796851273923954690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 4
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1076552935320926401
 GameObject:
   m_ObjectHideFlags: 0

@@ -705,6 +705,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 0
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!114 &103493810
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3612,6 +3616,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 0
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!114 &649989088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3845,6 +3853,7 @@ GameObject:
   - component: {fileID: 712615529}
   - component: {fileID: 712615528}
   - component: {fileID: 712615527}
+  - component: {fileID: 712615531}
   m_Layer: 0
   m_Name: CloseButton
   m_TagString: Untagged
@@ -3974,6 +3983,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 712615525}
   m_CullTransparentMesh: 1
+--- !u!114 &712615531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 712615525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 7
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &719782764
 GameObject:
   m_ObjectHideFlags: 0
@@ -4239,6 +4265,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 0
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!114 &803349367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6152,6 +6182,7 @@ GameObject:
   - component: {fileID: 1250021871}
   - component: {fileID: 1250021870}
   - component: {fileID: 1250021869}
+  - component: {fileID: 1250021873}
   m_Layer: 0
   m_Name: ResetSceneButton
   m_TagString: Untagged
@@ -6281,6 +6312,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1250021867}
   m_CullTransparentMesh: 1
+--- !u!114 &1250021873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1250021867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 7
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1262875023
 GameObject:
   m_ObjectHideFlags: 0
@@ -6294,6 +6342,7 @@ GameObject:
   - component: {fileID: 1262875027}
   - component: {fileID: 1262875026}
   - component: {fileID: 1262875025}
+  - component: {fileID: 1262875029}
   m_Layer: 0
   m_Name: EnableAllButton
   m_TagString: Untagged
@@ -6423,6 +6472,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1262875023}
   m_CullTransparentMesh: 1
+--- !u!114 &1262875029
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1262875023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 7
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1296749275
 GameObject:
   m_ObjectHideFlags: 0
@@ -6436,6 +6502,7 @@ GameObject:
   - component: {fileID: 1296749279}
   - component: {fileID: 1296749278}
   - component: {fileID: 1296749277}
+  - component: {fileID: 1296749281}
   m_Layer: 0
   m_Name: DisableAllButton
   m_TagString: Untagged
@@ -6565,6 +6632,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1296749275}
   m_CullTransparentMesh: 1
+--- !u!114 &1296749281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296749275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 7
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1300279803
 GameObject:
   m_ObjectHideFlags: 0
@@ -6908,6 +6992,7 @@ GameObject:
   - component: {fileID: 1351941514}
   - component: {fileID: 1351941513}
   - component: {fileID: 1351941512}
+  - component: {fileID: 1351941516}
   m_Layer: 0
   m_Name: ResetButton
   m_TagString: Untagged
@@ -7037,6 +7122,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1351941510}
   m_CullTransparentMesh: 1
+--- !u!114 &1351941516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351941510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dfcdc3be47cc855409a7c11af49d0fed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
+  selectionControllerOverride: {fileID: 0}
+  menuKind: 7
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1372463285
 GameObject:
   m_ObjectHideFlags: 0
@@ -8558,6 +8660,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 0
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!114 &1568910202
 MonoBehaviour:
   m_ObjectHideFlags: 0

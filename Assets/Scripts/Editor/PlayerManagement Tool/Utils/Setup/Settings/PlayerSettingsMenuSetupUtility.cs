@@ -48,6 +48,7 @@ public static class PlayerSettingsMenuSetupUtility
             TMP_FontAsset fontAsset = PlayerGameplayMenuSetupSharedUtility.ResolveFontAsset();
             PlayerSettingsMenuReferences references = BuildHierarchy(prefabRoot: prefabRoot.transform, fontAsset: fontAsset);
             PlayerSettingsMenuReferenceAssignmentUtility.AssignControllerReferences(controller, references);
+            PlayerSettingsMenuNavigationSetupUtility.Configure(controller, references);
             references.PanelRoot.SetActive(false);
             PrefabUtility.SaveAsPrefabAsset(prefabRoot, SettingsMenuPrefabPath);
         }

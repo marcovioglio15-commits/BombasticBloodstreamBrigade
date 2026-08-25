@@ -41,6 +41,15 @@ public sealed class GameHudManagerPreset : ScriptableObject
 
     [Tooltip("Damage vignette section toggles.")]
     [SerializeField] private GameHudDamageVignetteSettings damageVignetteSettings = new GameHudDamageVignetteSettings();
+
+    [Tooltip("Inline layout, input, style, power-up pool, and player-stat configuration for the collapsible summary section.")]
+    [SerializeField] private GameHudPowerUpSummarySettings powerUpSummarySettings = new GameHudPowerUpSummarySettings();
+
+    [Tooltip("Independent hover, focus, press, sprite, clip, and text profiles applied to runtime menu buttons.")]
+    [SerializeField] private GameHudButtonInteractionSettings buttonInteractionSettings = new GameHudButtonInteractionSettings();
+
+    [Tooltip("Input Action-only navigation used by the Settings menu without a virtual mouse.")]
+    [SerializeField] private GameHudSettingsNavigationSettings settingsNavigationSettings = new GameHudSettingsNavigationSettings();
     #endregion
 
     #endregion
@@ -125,6 +134,30 @@ public sealed class GameHudManagerPreset : ScriptableObject
             return damageVignetteSettings;
         }
     }
+
+    public GameHudPowerUpSummarySettings PowerUpSummarySettings
+    {
+        get
+        {
+            return powerUpSummarySettings;
+        }
+    }
+
+    public GameHudButtonInteractionSettings ButtonInteractionSettings
+    {
+        get
+        {
+            return buttonInteractionSettings;
+        }
+    }
+
+    public GameHudSettingsNavigationSettings SettingsNavigationSettings
+    {
+        get
+        {
+            return settingsNavigationSettings;
+        }
+    }
     #endregion
 
     #region Methods
@@ -155,6 +188,18 @@ public sealed class GameHudManagerPreset : ScriptableObject
 
         if (damageVignetteSettings == null)
             damageVignetteSettings = new GameHudDamageVignetteSettings();
+
+        if (powerUpSummarySettings == null)
+            powerUpSummarySettings = new GameHudPowerUpSummarySettings();
+
+        if (buttonInteractionSettings == null)
+            buttonInteractionSettings = new GameHudButtonInteractionSettings();
+
+        if (settingsNavigationSettings == null)
+            settingsNavigationSettings = new GameHudSettingsNavigationSettings();
+
+        powerUpSummarySettings.EnsureInitialized();
+        buttonInteractionSettings.EnsureInitialized();
     }
     #endregion
 

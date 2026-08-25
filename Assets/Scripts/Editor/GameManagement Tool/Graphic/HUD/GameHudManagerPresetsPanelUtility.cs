@@ -519,5 +519,8 @@ internal enum DetailsSectionType
     SynchroMeter = 6,
     Milestone = 7,
     Damage = 8,
-    Validation = 9
+    Validation = 9,
+    PowerUpSummary = 10,
+    ButtonInteractions = 11,
+    SettingsNavigation = 12
 }

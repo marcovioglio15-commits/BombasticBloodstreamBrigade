@@ -97,3 +97,555 @@ MonoBehaviour:
   damageVignetteSettings:
     isEnabled: 1
     hideWhenPlayerMissing: 1
+  powerUpSummarySettings:
+    isEnabled: 1
+    startsExpanded: 0
+    hideWhenPlayerMissing: 1
+    panelSide: 1
+    powerUpOrder: 0
+    expandedWidth: 520
+    collapsedHandleWidth: 42
+    contentPadding: 16
+    powerUpColumnSpacing: 14
+    sectionSpacing: 16
+    powerUpAreaHeightNormalized: 0.58
+    slideDurationSeconds: 0.22
+    slideEasing: 2
+    useUnscaledTime: 1
+    enableInputToggle: 1
+    toggleActionId: 5e39a200-8c68-46a0-a3d2-0a48387eff0e
+    enableClickToggle: 0
+    maximumVisibleActivePowerUps: 24
+    maximumVisiblePassivePowerUps: 48
+    iconSize: 52
+    iconSpacing: 8
+    iconTint: {r: 1, g: 1, b: 1, a: 1}
+    iconBackgroundSprite: {fileID: 0}
+    iconBackgroundTint: {r: 0.08, g: 0.08, b: 0.1, a: 0.9}
+    hideEmptyActiveColumn: 0
+    hideEmptyPassiveColumn: 0
+    counterFont: {fileID: 0}
+    counterFontSize: 16
+    counterColor: {r: 1, g: 1, b: 1, a: 1}
+    counterPrefix: x
+    showSingleCollectionCount: 1
+    activeTitle: ACTIVE
+    passiveTitle: PASSIVE
+    statisticsTitle: PLAYER STATS
+    titleFont: {fileID: 0}
+    titleFontSize: 20
+    titleColor: {r: 1, g: 1, b: 1, a: 1}
+    showPowerUpColumnSeparator: 1
+    showStatisticsSeparator: 1
+    separatorColor: {r: 1, g: 1, b: 1, a: 0.28}
+    separatorThickness: 1
+    backgroundSprite: {fileID: 0}
+    backgroundTint: {r: 0.025, g: 0.025, b: 0.04, a: 0.94}
+    toggleSprite: {fileID: 0}
+    toggleTint: {r: 1, g: 1, b: 1, a: 1}
+    statisticRefreshIntervalSeconds: 0.1
+    statistics:
+    - statistic: 0
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 1
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 2
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 3
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 4
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 10
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 16
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 15
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 8
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 20
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+    - statistic: 22
+      scalableStatName: 
+      labelOverride: 
+      valueFormat: 0
+      decimalPlaces: 1
+      displayMultiplier: 1
+      suffix: 
+      showLabel: 1
+      trueText: On
+      falseText: Off
+      font: {fileID: 0}
+      fontSize: 18
+      fontStyle: 0
+      color: {r: 1, g: 1, b: 1, a: 1}
+  buttonInteractionSettings:
+    menuProfiles:
+    - menuKind: 0
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 1
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 2
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 3
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 4
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 5
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 6
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+    - menuKind: 7
+      isEnabled: 1
+      motionMode: 1
+      transitionDurationSeconds: 0.12
+      useUnscaledTime: 1
+      hoverTransformMode: 1
+      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycles: 1
+      loopHoverPulse: 1
+      hoverScale: {x: 1.04, y: 1.04, z: 1}
+      hoverPositionOffset: {x: 0, y: 0, z: 0}
+      hoverRotationOffset: {x: 0, y: 0, z: 0}
+      pressedScale: {x: 0.98, y: 0.98, z: 1}
+      pressedPositionOffset: {x: 0, y: 0, z: 0}
+      pressedRotationOffset: {x: 0, y: 0, z: 0}
+      normalClip: {fileID: 0}
+      hoverClip: {fileID: 0}
+      pressedClip: {fileID: 0}
+      disabledClip: {fileID: 0}
+      overrideSprites: 0
+      normalSprite: {fileID: 0}
+      hoverSprite: {fileID: 0}
+      pressedSprite: {fileID: 0}
+      disabledSprite: {fileID: 0}
+      overrideGraphicColors: 0
+      normalGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedGraphicColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledGraphicColor: {r: 1, g: 1, b: 1, a: 0.45}
+      overrideTextStyle: 0
+      normalFont: {fileID: 0}
+      emphasizedFont: {fileID: 0}
+      normalFontSize: 24
+      emphasizedFontSize: 26
+      normalFontStyle: 0
+      emphasizedFontStyle: 0
+      normalTextColor: {r: 1, g: 1, b: 1, a: 1}
+      hoverTextColor: {r: 1, g: 1, b: 1, a: 1}
+      pressedTextColor: {r: 1, g: 1, b: 1, a: 1}
+      disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
+  settingsNavigationSettings:
+    isEnabled: 1
+    wrapTabs: 1
+    previousTabActionId: 0f731c51-cb11-4d48-83b0-173174e67119
+    nextTabActionId: 1f813de7-40c5-4e08-8597-ec7461002142
+    verticalNavigationActionId: 0134931e-076e-4c62-8c55-91bad3a08c21
+    horizontalNavigationActionId: 3cfbaa38-7e11-4f7b-a46d-b4b3a47194c0
+    submitActionId: 7607c7b6-cd76-4816-beef-bd0341cfe950
+    cancelActionId: 15cef263-9014-4fd5-94d9-4e4a6234a6ef
+    includeDropdownHeadersInNavigation: 0
+    customizeSelectionPresentation: 1
+    overrideSelectionGraphicColors: 1
+    unselectedGraphicColor: {r: 0.09, g: 0.13, b: 0.16, a: 1}
+    selectedGraphicColor: {r: 0.18, g: 0.31, b: 0.39, a: 1}
+    overrideSelectionTextStyle: 1
+    unselectedTextColor: {r: 0.82, g: 0.86, b: 0.9, a: 1}
+    selectedTextColor: {r: 1, g: 1, b: 1, a: 1}
+    unselectedFontStyle: 0
+    selectedFontStyle: 1
+    overrideSelectionScale: 1
+    unselectedScale: {x: 1, y: 1, z: 1}
+    selectedScale: {x: 1.025, y: 1.025, z: 1}
+    showSelectionOutline: 1
+    selectionOutlineColor: {r: 0.98, g: 0.78, b: 0.15, a: 1}
+    selectionOutlineDistance: {x: 3, y: -3}
+    inputDeadzone: 0.55
+    repeatDelaySeconds: 0.32
+    repeatIntervalSeconds: 0.1

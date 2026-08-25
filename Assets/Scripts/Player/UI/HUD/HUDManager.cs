@@ -43,6 +43,9 @@ public sealed class HUDManager : MonoBehaviour
 
     [Tooltip("Scene component that fades the two full-screen damage vignette overlays driven by the active player visual preset.")]
     [SerializeField] private HUDPlayerDamageVignetteSection damageVignetteSection;
+
+    [Tooltip("Preauthored collapsible panel that summarizes collected power-ups and selected ECS player statistics.")]
+    [SerializeField] private HUDPowerUpSummarySection powerUpSummarySection;
     #endregion
 
     private World defaultWorld;
@@ -95,6 +98,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (powerUpContainerInteractionSection != null)
             powerUpContainerInteractionSection.Dispose();
+
+        if (powerUpSummarySection != null)
+            powerUpSummarySection.Dispose();
     }
 
     /// <summary>
@@ -152,6 +158,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (damageVignetteSection != null)
             damageVignetteSection.UpdateSection(entityManager, playerEntity);
+
+        if (powerUpSummarySection != null)
+            powerUpSummarySection.UpdateSection(entityManager, playerEntity);
     }
     #endregion
 
@@ -427,6 +436,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (damageVignetteSection == null)
             damageVignetteSection = FindFirstObjectByType<HUDPlayerDamageVignetteSection>(FindObjectsInactive.Include);
+
+        if (powerUpSummarySection == null)
+            powerUpSummarySection = FindFirstObjectByType<HUDPowerUpSummarySection>(FindObjectsInactive.Include);
     }
 
     /// <summary>
@@ -465,6 +477,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (damageVignetteSection != null)
             damageVignetteSection.Initialize();
+
+        if (powerUpSummarySection != null)
+            powerUpSummarySection.Initialize();
 
         sectionsInitialized = true;
     }
@@ -554,6 +569,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (damageVignetteSection != null)
             damageVignetteSection.HandleMissingPlayer();
+
+        if (powerUpSummarySection != null)
+            powerUpSummarySection.HandleMissingPlayer();
     }
     #endregion
 

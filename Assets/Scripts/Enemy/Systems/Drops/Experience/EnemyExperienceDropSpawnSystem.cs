@@ -8,7 +8,6 @@ using Unity.Transforms;
 /// </summary>
 [UpdateInGroup(typeof(EnemySystemGroup))]
 [UpdateAfter(typeof(EnemyFinalizeDespawnSystem))]
-[UpdateBefore(typeof(EnemyExperienceDropCollectSystem))]
 public partial struct EnemyExperienceDropSpawnSystem : ISystem
 {
     #region Constants

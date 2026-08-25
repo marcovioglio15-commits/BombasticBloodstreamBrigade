@@ -293,6 +293,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 1
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &1575311225583182335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1668,6 +1672,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 1
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &5422271176871256162
 GameObject:
   m_ObjectHideFlags: 0
@@ -1824,6 +1832,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 3
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &5459530395928175643
 GameObject:
   m_ObjectHideFlags: 0
@@ -1980,6 +1992,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 1
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &5501066969875845136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2395,6 +2411,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 3
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &7640474221576033767
 GameObject:
   m_ObjectHideFlags: 0
@@ -2709,6 +2729,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 1
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &8000966525981686751
 GameObject:
   m_ObjectHideFlags: 0
@@ -2865,6 +2889,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 1
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &8241878147623520197
 GameObject:
   m_ObjectHideFlags: 0
@@ -3021,6 +3049,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableHoverRelay
   selectionControllerOverride: {fileID: 0}
+  menuKind: 3
+  targetGraphicOverride: {fileID: 0}
+  targetTextOverride: {fileID: 0}
+  transformTargetOverride: {fileID: 0}
 --- !u!1 &8675188837352398930
 GameObject:
   m_ObjectHideFlags: 0
