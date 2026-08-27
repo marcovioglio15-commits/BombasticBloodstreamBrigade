@@ -32,7 +32,7 @@ public partial struct GameProceduralRoomCompletionSystem : ISystem
     }
 
     /// <summary>
-    /// Marks the active room complete once, unlocks regular exits and exposes terminal Boss completion to run outcome.
+    /// Marks the active room complete once, starts exit activation and exposes terminal Boss completion to run outcome.
     /// </summary>
     /// <param name="state">Current ECS system state.</param>
     public void OnUpdate(ref SystemState state)

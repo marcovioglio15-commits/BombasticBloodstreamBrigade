@@ -45,6 +45,10 @@ public sealed class GameHudManagerPreset : ScriptableObject
     [Tooltip("Inline layout, input, style, power-up pool, and player-stat configuration for the collapsible summary section.")]
     [SerializeField] private GameHudPowerUpSummarySettings powerUpSummarySettings = new GameHudPowerUpSummarySettings();
 
+    [Tooltip("Optional room-clear announcement content, motion, placement, and typography.")]
+    [SerializeField]
+    private GameHudWaveClearAnnouncementSettings waveClearAnnouncementSettings = new GameHudWaveClearAnnouncementSettings();
+
     [Tooltip("Independent hover, focus, press, sprite, clip, and text profiles applied to runtime menu buttons.")]
     [SerializeField] private GameHudButtonInteractionSettings buttonInteractionSettings = new GameHudButtonInteractionSettings();
 
@@ -143,6 +147,14 @@ public sealed class GameHudManagerPreset : ScriptableObject
         }
     }
 
+    public GameHudWaveClearAnnouncementSettings WaveClearAnnouncementSettings
+    {
+        get
+        {
+            return waveClearAnnouncementSettings;
+        }
+    }
+
     public GameHudButtonInteractionSettings ButtonInteractionSettings
     {
         get
@@ -191,6 +203,9 @@ public sealed class GameHudManagerPreset : ScriptableObject
 
         if (powerUpSummarySettings == null)
             powerUpSummarySettings = new GameHudPowerUpSummarySettings();
+
+        if (waveClearAnnouncementSettings == null)
+            waveClearAnnouncementSettings = new GameHudWaveClearAnnouncementSettings();
 
         if (buttonInteractionSettings == null)
             buttonInteractionSettings = new GameHudButtonInteractionSettings();

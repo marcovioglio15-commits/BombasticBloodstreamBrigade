@@ -243,19 +243,7 @@ public static class PlayerGameplayMenuSetupUtility
     /// <param name="buttons">Buttons ordered from top to bottom.</param>
     private static void ConfigureVerticalNavigation(params Button[] buttons)
     {
-        for (int buttonIndex = 0; buttonIndex < buttons.Length; buttonIndex++)
-        {
-            Button button = buttons[buttonIndex];
-
-            if (button == null)
-                continue;
-
-            Navigation navigation = button.navigation;
-            navigation.mode = Navigation.Mode.Explicit;
-            navigation.selectOnUp = ResolvePreviousButton(buttons, buttonIndex);
-            navigation.selectOnDown = ResolveNextButton(buttons, buttonIndex);
-            button.navigation = navigation;
-        }
+        MenuVerticalNavigationUtility.ConfigureCyclic(buttons);
     }
     #endregion
 

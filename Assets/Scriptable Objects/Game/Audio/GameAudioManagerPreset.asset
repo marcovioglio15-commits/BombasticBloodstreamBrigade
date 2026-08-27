@@ -75,7 +75,7 @@ MonoBehaviour:
     eventPath: 
     volume: 1
     pitch: 1
-    spatialize: 0
+    spatialize: 1
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0
@@ -286,7 +286,7 @@ MonoBehaviour:
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_DeathCry_01
     volume: 5
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0
@@ -439,6 +439,37 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     spatialize: 1
+    minimumDistance: 8
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1
+  - eventId: 28
+    eventCode: MISC_SFX_WaveClear
+    displayName: Room Clear
+    description: Optionally requested when a standard room-clear HUD message starts.
+    eventPath: event:/SFX/sfx_woosh
+    volume: 1
+    pitch: 1
+    spatialize: 0
+    minimumDistance: 8
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1
+  - eventId: 29
+    eventCode: MISC_SFX_FinalWaveClear
+    displayName: Final Boss Room Clear
+    description: Optionally requested when the terminal Boss room-clear HUD message
+      starts.
+    eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_02
+    volume: 1
+    pitch: 1
+    spatialize: 0
     minimumDistance: 8
     maximumDistance: 45
     singleInstance: 0

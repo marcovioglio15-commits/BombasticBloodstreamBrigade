@@ -204,6 +204,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
     /// <param name="property">Serialized menu profile.</param>
     private static void AddSpriteFields(VisualElement root, SerializedProperty property)
     {
+        AddProperty(root, property.FindPropertyRelative("allowEmptySprites"), "Allow Empty Sprites");
         AddProperty(root, property.FindPropertyRelative("normalSprite"), "Normal Sprite");
         AddProperty(root, property.FindPropertyRelative("hoverSprite"), "Hover / Focus Sprite");
         AddProperty(root, property.FindPropertyRelative("pressedSprite"), "Pressed Sprite");

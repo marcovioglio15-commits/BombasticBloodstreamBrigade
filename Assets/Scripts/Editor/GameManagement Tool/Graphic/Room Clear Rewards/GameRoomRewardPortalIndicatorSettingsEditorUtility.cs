@@ -52,6 +52,9 @@ internal static class GameRoomRewardPortalIndicatorSettingsEditorUtility
                     settings.FindPropertyRelative("edgePaddingPixels"),
                     "Edge Padding Pixels");
         AddProperty(enabledGroup,
+                    settings.FindPropertyRelative("sortingOrder"),
+                    "HUD Sorting Order");
+        AddProperty(enabledGroup,
                     settings.FindPropertyRelative("worldOffset"),
                     "Portal World Offset");
         root.Add(enabledGroup);

@@ -9,7 +9,7 @@ public static class GameProceduralRoomCompletionTransactionUtility
 
     #region Public Methods
     /// <summary>
-    /// Marks the active node complete, emits its one-shot clear event and synchronizes portal traversal availability.
+    /// Marks the active node complete, emits its one-shot clear event and keeps gated portals closed until linked effects finish.
     /// The caller remains responsible for deciding whether the room completion predicate has been satisfied.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the procedural runtime singleton and graph buffers.</param>

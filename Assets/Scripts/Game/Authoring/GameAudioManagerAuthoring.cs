@@ -141,6 +141,14 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         AddComponent(entity, GameHudManagerPresetBakeUtility.BuildConfig(hudPreset));
         GameHudPowerUpSummarySettings summarySettings = hudPreset != null ? hudPreset.PowerUpSummarySettings : null;
         AddComponent(entity, GameHudSupplementalPresetBakeUtility.BuildSummaryConfig(summarySettings));
+        GameHudWaveClearAnnouncementSettings announcementSettings =
+            hudPreset != null ? hudPreset.WaveClearAnnouncementSettings : null;
+        AddComponent(entity,
+                     GameHudSupplementalPresetBakeUtility.BuildWaveClearAnnouncementConfig(announcementSettings));
+        AddComponent(entity, new GameHudWaveClearAnnouncementPresentationState
+        {
+            NodeIndex = -1
+        });
         DynamicBuffer<GamePowerUpSummaryStatisticElement> statisticBuffer = AddBuffer<GamePowerUpSummaryStatisticElement>(entity);
         GameHudSupplementalPresetBakeUtility.PopulateStatisticBuffer(summarySettings, statisticBuffer);
 
@@ -195,7 +203,7 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
     }
 
     /// <summary>
-    /// Declares inline summary presentation assets referenced by one HUD Manager preset.
+    /// Declares supplemental HUD presentation assets referenced by one HUD Manager preset.
     /// </summary>
     /// <param name="hudPreset">HUD Manager preset whose nested object references participate in baking.</param>
     private void DeclareHudPresentationDependencies(GameHudManagerPreset hudPreset)
@@ -204,6 +212,10 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
             return;
 
         GameHudPowerUpSummarySettings summarySettings = hudPreset.PowerUpSummarySettings;
+        GameHudWaveClearAnnouncementSettings announcementSettings = hudPreset.WaveClearAnnouncementSettings;
+
+        if (announcementSettings != null && announcementSettings.Font != null)
+            DependsOn(announcementSettings.Font);
 
         if (summarySettings != null)
         {

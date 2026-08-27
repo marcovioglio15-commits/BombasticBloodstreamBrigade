@@ -15,6 +15,7 @@ public struct GamePowerUpSummaryRuntimeConfig : IComponentData
     public byte HideWhenPlayerMissing;
     public GameHudSummaryPanelSide PanelSide;
     public GameHudSummaryPowerUpOrder PowerUpOrder;
+    public GameHudSummaryPowerUpVisibility PowerUpVisibility;
     public float ExpandedWidth;
     public float CollapsedHandleWidth;
     public float ContentPadding;
@@ -56,6 +57,57 @@ public struct GamePowerUpSummaryRuntimeConfig : IComponentData
     public UnityObjectRef<Sprite> ToggleSprite;
     public float4 ToggleTint;
     public float StatisticRefreshIntervalSeconds;
+    #endregion
+}
+
+/// <summary>
+/// Stores the baked presentation, terminal override, and audio values consumed by the preauthored room-clear announcement.
+/// </summary>
+public struct GameHudWaveClearAnnouncementRuntimeConfig : IComponentData
+{
+    #region Fields
+    public byte Enabled;
+    public FixedString512Bytes Content;
+    public byte PlayAudioEvent;
+    public GameAudioEventId AudioEventId;
+    public GameHudWaveClearAnnouncementDirection Direction;
+    public float TraversalDurationSeconds;
+    public GameHudWaveClearAnnouncementEasing Easing;
+    public byte PauseAtCenter;
+    public float CenterHoldDurationSeconds;
+    public byte UseUnscaledTime;
+    public byte UseFinalWaveOverride;
+    public FixedString512Bytes FinalWaveContent;
+    public GameHudWaveClearAnnouncementDirection FinalWaveDirection;
+    public float FinalWaveTraversalDurationSeconds;
+    public GameHudWaveClearAnnouncementEasing FinalWaveEasing;
+    public byte FinalWavePauseAtCenter;
+    public float FinalWaveCenterHoldDurationSeconds;
+    public byte PlayFinalWaveAudioEvent;
+    public GameAudioEventId FinalWaveAudioEventId;
+    public float VerticalPositionNormalized;
+    public float HorizontalOffscreenPadding;
+    public UnityObjectRef<TMP_FontAsset> Font;
+    public float FontSize;
+    public int FontStyle;
+    public float4 Color;
+    #endregion
+}
+
+/// <summary>
+/// Coordinates ECS room-clear requests, managed presentation completion, room-change cancellation, and victory-menu gating.
+/// </summary>
+public struct GameHudWaveClearAnnouncementPresentationState : IComponentData
+{
+    #region Fields
+    public uint RequestedVersion;
+    public uint CompletedVersion;
+    public uint GenerationVersion;
+    public int NodeIndex;
+    public byte Pending;
+    public byte Active;
+    public byte IsFinalWave;
+    public byte BlocksVictoryMenu;
     #endregion
 }
 
@@ -146,6 +198,7 @@ public struct GameUiMenuButtonInteractionElement : IBufferElementData
     public UnityObjectRef<AnimationClip> PressedClip;
     public UnityObjectRef<AnimationClip> DisabledClip;
     public byte OverrideSprites;
+    public byte AllowEmptySprites;
     public UnityObjectRef<Sprite> NormalSprite;
     public UnityObjectRef<Sprite> HoverSprite;
     public UnityObjectRef<Sprite> PressedSprite;

@@ -118,6 +118,7 @@ public static class GameRoomRewardBakeUtility
                                               portalIndicators.IndicatorColor.a),
             PortalIndicatorSizePixels = portalIndicators.IndicatorSizePixels,
             PortalIndicatorEdgePaddingPixels = portalIndicators.EdgePaddingPixels,
+            PortalIndicatorSortingOrder = portalIndicators.SortingOrder,
             PortalIndicatorSprite = portalIndicators.IndicatorSprite
         };
     }

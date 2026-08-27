@@ -30,6 +30,7 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
     private uint lastGenerationVersion;
     private int lastCurrentNodeIndex = -1;
     private byte lastRoomCleared;
+    private bool hasPendingActivationEffects;
     #endregion
 
     #region Methods
@@ -104,7 +105,8 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                    roomChanged ||
                                    clearStateChanged ||
                                    formulaContextChanged ||
-                                   lastAnchorRevision != anchorRevision;
+                                   lastAnchorRevision != anchorRevision ||
+                                   hasPendingActivationEffects;
 
         lastAnchorRevision = anchorRevision;
         lastFormulaContextHash = formulaContextHash;
@@ -114,6 +116,8 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
 
         if (runtimeState.CurrentRoomCleared == 0)
         {
+            hasPendingActivationEffects = false;
+
             if (requiresFullRefresh)
                 GameRoomPortalRewardLogAnchor.HideAll();
 
@@ -175,8 +179,10 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                                             playerEntity,
                                                             effectiveScalableStats,
                                                             effectiveVariableContext);
+            bool activationReadinessChanged = false;
+            bool pendingActivationEffects = false;
 
-            // Each changed active portal resolves its assigned edge once and rebuilds only when its signature differs.
+            // Start or poll linked effects before exposing traversal and destination reward presentation.
             for (int portalIndex = 0; portalIndex < portalEntities.Length; portalIndex++)
             {
                 Entity portalEntity = portalEntities[portalIndex];
@@ -189,16 +195,20 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                         portal.Center,
                         out GameRoomPortalRewardLogAnchor anchor))
                 {
+                    if (portalState.AssignedEdgeIndex !=
+                            GameProceduralRoomTraversalConstants.UnassignedEdgeIndex &&
+                        portalState.ActivationEffectsReady == 0)
+                    {
+                        pendingActivationEffects = true;
+                    }
+
                     continue;
                 }
 
                 GameRoomPortalRewardLogView view = anchor.LogView;
 
-                if (view == null)
-                    continue;
-
-                if (portalState.AssignedEdgeIndex < 0 ||
-                    portalState.TraversalEnabled == 0)
+                if (portalState.AssignedEdgeIndex ==
+                    GameProceduralRoomTraversalConstants.UnassignedEdgeIndex)
                 {
                     view.Hide();
 
@@ -212,9 +222,31 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                                                portalState.AssignedEdgeIndex,
                                                portal.PortalId.GetHashCode());
 
-                anchor.ActivateEffects(signature,
-                                       portalAnimations,
-                                       portalReplacements);
+                if (portalState.ActivationEffectsReady == 0)
+                {
+                    view.Hide();
+                    anchor.ActivateEffects(signature,
+                                           portalAnimations,
+                                           portalReplacements);
+
+                    if (anchor.EffectView != null &&
+                        !anchor.EffectView.IsActivationReady)
+                    {
+                        pendingActivationEffects = true;
+                        continue;
+                    }
+
+                    portalState.ActivationEffectsReady = 1;
+                    EntityManager.SetComponentData(portalEntity, portalState);
+                    activationReadinessChanged = true;
+                    continue;
+                }
+
+                if (portalState.TraversalEnabled == 0)
+                {
+                    view.Hide();
+                    continue;
+                }
 
                 int presentationSignature = BuildPresentationSignature(signature,
                                                                        formulaContextHash);
@@ -255,6 +287,15 @@ public partial class GameRoomPortalRewardPresentationSystem : SystemBase
                              formattedItems,
                              new Vector3(center.x, center.y, center.z),
                              in config);
+            }
+
+            hasPendingActivationEffects = pendingActivationEffects;
+
+            if (activationReadinessChanged)
+            {
+                GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(
+                    EntityManager,
+                    managerEntity);
             }
 
             DispatchPortalUnlockAudio(managerEntity,

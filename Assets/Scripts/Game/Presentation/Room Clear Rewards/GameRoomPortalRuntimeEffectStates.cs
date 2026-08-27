@@ -105,6 +105,47 @@ internal sealed class GameRoomPortalRuntimeBindingState
 }
 
 /// <summary>
+/// Stores one mutable Transform clock beside its immutable baked definition and binding index.
+/// </summary>
+internal struct GameRoomPortalTransformAnimationState
+{
+    #region Fields
+    public readonly GameRoomPortalActivationAnimationElement Definition;
+    public readonly int BindingIndex;
+    public float Elapsed;
+    #endregion
+
+    #region Properties
+    /// <summary>
+    /// Gets whether this animation has reached the end of its first forward playback pass.
+    /// </summary>
+    public bool HasReachedActivationCompletion =>
+        Elapsed >= Mathf.Max(0f, Definition.StartDelay) +
+        Mathf.Max(0.0001f, Definition.Duration);
+    #endregion
+
+    #region Methods
+
+    #region Constructors
+    /// <summary>
+    /// Creates one stopped Transform animation state for an already resolved dynamic binding.
+    /// </summary>
+    /// <param name="definition">Immutable baked animation definition.</param>
+    /// <param name="bindingIndex">Resolved runtime binding index.</param>
+    public GameRoomPortalTransformAnimationState(
+        GameRoomPortalActivationAnimationElement definition,
+        int bindingIndex)
+    {
+        Definition = definition;
+        BindingIndex = bindingIndex;
+        Elapsed = 0f;
+    }
+    #endregion
+
+    #endregion
+}
+
+/// <summary>
 /// Owns one manually evaluated playable graph for direct controller-independent clip playback.
 /// </summary>
 internal sealed class GameRoomPortalAnimatorAnimationState
@@ -115,6 +156,15 @@ internal sealed class GameRoomPortalAnimatorAnimationState
     private readonly PlayableGraph graph;
     private readonly AnimationClipPlayable playable;
     private float elapsed;
+    #endregion
+
+    #region Properties
+    /// <summary>
+    /// Gets whether this clip has reached the end of its first forward playback pass.
+    /// </summary>
+    public bool HasReachedActivationCompletion =>
+        elapsed >= Mathf.Max(0f, definition.StartDelay) +
+        Mathf.Max(0.0001f, clip.length) / Mathf.Max(0.0001f, definition.AnimatorSpeed);
     #endregion
 
     #region Methods

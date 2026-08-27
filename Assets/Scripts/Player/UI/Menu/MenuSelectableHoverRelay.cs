@@ -443,7 +443,16 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         }
 
         Sprite stateSprite = GameMenuButtonPresentationUtility.ResolveSprite(in interaction, state);
-        image.sprite = stateSprite != null ? stateSprite : originalSprite;
+        image.sprite = stateSprite != null || interaction.AllowEmptySprites != 0
+            ? stateSprite
+            : originalSprite;
+
+        if (stateSprite == null && interaction.AllowEmptySprites != 0)
+        {
+            Color transparentGraphicColor = targetGraphic.color;
+            transparentGraphicColor.a = 0f;
+            targetGraphic.color = transparentGraphicColor;
+        }
     }
 
     /// <summary>

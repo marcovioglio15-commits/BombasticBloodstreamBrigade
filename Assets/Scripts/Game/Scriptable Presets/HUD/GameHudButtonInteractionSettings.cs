@@ -111,6 +111,10 @@ public sealed class GameUiMenuButtonInteractionDefinition
     [Tooltip("Overrides the target Button image sprite for each interaction state.")]
     [SerializeField] private bool overrideSprites;
 
+    [Tooltip("Keeps empty sprite overrides as None and hides the Button image while retaining its pointer hit area, leaving only the label visible.")]
+    [SerializeField]
+    private bool allowEmptySprites;
+
     [Tooltip("Optional sprite used by the normal button state.")]
     [SerializeField] private Sprite normalSprite;
 
@@ -197,6 +201,7 @@ public sealed class GameUiMenuButtonInteractionDefinition
     public AnimationClip PressedClip => pressedClip;
     public AnimationClip DisabledClip => disabledClip;
     public bool OverrideSprites => overrideSprites;
+    public bool AllowEmptySprites => allowEmptySprites;
     public Sprite NormalSprite => normalSprite;
     public Sprite HoverSprite => hoverSprite;
     public Sprite PressedSprite => pressedSprite;

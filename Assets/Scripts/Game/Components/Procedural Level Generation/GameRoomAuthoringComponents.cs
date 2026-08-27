@@ -23,12 +23,13 @@ public struct GameRoomPortal : IComponentData
 }
 
 /// <summary>
-/// Stores mutable assignment and entry-latch state for one room portal instance.
+/// Stores mutable assignment, linked-effect readiness and entry-latch state for one room portal instance.
 /// </summary>
 public struct GameRoomPortalRuntimeState : IComponentData
 {
     public int AssignedEdgeIndex;
     public byte TraversalEnabled;
+    public byte ActivationEffectsReady;
     public byte WasPlayerInside;
     public byte HasTriggered;
 }

@@ -118,31 +118,16 @@ public static class EnemySpawnerRuntimeToolMainMenuSetupUtility
     {
         if (settingsButton != null)
         {
-            ConfigureButtonNavigation(playButton, quitButton, settingsButton);
-            ConfigureButtonNavigation(settingsButton, playButton, toolButton);
-            ConfigureButtonNavigation(toolButton, settingsButton, quitButton);
-            ConfigureButtonNavigation(quitButton, toolButton, playButton);
+            MenuVerticalNavigationUtility.ConfigureCyclic(playButton,
+                                                          settingsButton,
+                                                          toolButton,
+                                                          quitButton);
             return;
         }
 
-        ConfigureButtonNavigation(playButton, quitButton, toolButton);
-        ConfigureButtonNavigation(toolButton, playButton, quitButton);
-        ConfigureButtonNavigation(quitButton, toolButton, playButton);
-    }
-
-    /// <summary>
-    /// Applies explicit vertical navigation to one menu button.
-    /// </summary>
-    /// <param name="button">Button receiving navigation.</param>
-    /// <param name="up">Selectable reached by upward input.</param>
-    /// <param name="down">Selectable reached by downward input.</param>
-    private static void ConfigureButtonNavigation(Button button, Selectable up, Selectable down)
-    {
-        Navigation navigation = button.navigation;
-        navigation.mode = Navigation.Mode.Explicit;
-        navigation.selectOnUp = up;
-        navigation.selectOnDown = down;
-        button.navigation = navigation;
+        MenuVerticalNavigationUtility.ConfigureCyclic(playButton,
+                                                      toolButton,
+                                                      quitButton);
     }
     #endregion
 

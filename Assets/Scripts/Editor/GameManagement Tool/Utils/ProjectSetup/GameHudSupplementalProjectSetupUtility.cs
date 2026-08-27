@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 /// <summary>
-/// Maintains inline HUD defaults, the summary prefab instance, and authored relays for independently styled menus.
+/// Maintains inline HUD defaults, preauthored supplemental sections, and relays for independently styled menus.
 /// </summary>
 public static class GameHudSupplementalProjectSetupUtility
 {
@@ -47,6 +47,7 @@ public static class GameHudSupplementalProjectSetupUtility
         GameHudManagerPreset hudPreset = AssetDatabase.LoadAssetAtPath<GameHudManagerPreset>(
             "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset");
         EnsureDefaultSettings(hudPreset);
+        EnsureWaveClearAudioBindings();
 
         Scene gameplayUiScene = EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.GameplayUiScenePath,
                                                               OpenSceneMode.Single);
@@ -55,7 +56,25 @@ public static class GameHudSupplementalProjectSetupUtility
         EnsureMenuAssets();
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("[GameHudSupplementalProjectSetupUtility] Summary and menu-button setup completed.");
+        Debug.Log("[GameHudSupplementalProjectSetupUtility] Supplemental HUD sections and menu-button setup completed.");
+    }
+
+    /// <summary>
+    /// Adds the wave slots and fills missing verified FMOD defaults without replacing authored paths.
+    /// </summary>
+    private static void EnsureWaveClearAudioBindings()
+    {
+        GameAudioManagerPreset audioPreset = AssetDatabase.LoadAssetAtPath<GameAudioManagerPreset>(
+            "Assets/Scriptable Objects/Game/Audio/GameAudioManagerPreset.asset");
+
+        if (audioPreset == null)
+            return;
+
+        int configurationChanges = audioPreset.EnsureDefaultEventBindings();
+        configurationChanges += audioPreset.EnsureDefaultEventPaths();
+
+        if (configurationChanges > 0)
+            EditorUtility.SetDirty(audioPreset);
     }
 
     /// <summary>
@@ -106,7 +125,7 @@ public static class GameHudSupplementalProjectSetupUtility
     }
 
     /// <summary>
-    /// Ensures the preauthored summary hierarchy, HUDManager reference, and known gameplay-menu relays exist.
+    /// Ensures preauthored supplemental HUD hierarchies, HUDManager references, and known gameplay-menu relays exist.
     /// </summary>
     /// <param name="gameplayUiScene">Loaded additive gameplay UI scene to update.</param>
     public static void EnsureGameplayUiScene(Scene gameplayUiScene)
@@ -121,11 +140,16 @@ public static class GameHudSupplementalProjectSetupUtility
             return;
 
         HUDPowerUpSummarySection section = GameHudPowerUpSummaryProjectSetupUtility.EnsureSection(canvas);
+        HUDWaveClearAnnouncementSection announcementSection =
+            GameHudWaveClearAnnouncementProjectSetupUtility.EnsureSection(canvas);
         SerializedObject serializedHudManager = new SerializedObject(hudManager);
         serializedHudManager.Update();
         GameSceneManagementProjectSetupSerializedUtility.SetObjectReference(serializedHudManager,
                                                                             "powerUpSummarySection",
                                                                             section);
+        GameSceneManagementProjectSetupSerializedUtility.SetObjectReference(serializedHudManager,
+                                                                            "waveClearAnnouncementSection",
+                                                                            announcementSection);
         serializedHudManager.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(hudManager);
         EnsureRelays(canvas.gameObject);
@@ -242,6 +266,7 @@ public static class GameHudSupplementalProjectSetupUtility
             SetEnum(profileProperty, "motionMode", (int)GameUiButtonMotionMode.ManualTransform);
             SetFloat(profileProperty, "transitionDurationSeconds", 0.12f);
             SetBool(profileProperty, "useUnscaledTime", true);
+            SetBool(profileProperty, "allowEmptySprites", false);
             SetVector3(profileProperty, "hoverScale", new Vector3(1.04f, 1.04f, 1f));
             SetVector3(profileProperty, "pressedScale", new Vector3(0.98f, 0.98f, 1f));
             SetFloat(profileProperty, "normalFontSize", 24f);

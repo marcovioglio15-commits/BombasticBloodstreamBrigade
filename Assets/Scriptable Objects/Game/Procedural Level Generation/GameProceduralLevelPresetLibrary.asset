@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameProceduralLevelPresetLibrary
   presets:
   - {fileID: 11400000, guid: 589c03b88dfe96a4381b34b67c2585f9, type: 2}
+  - {fileID: 11400000, guid: b9e71c44606464d4bb3d2300874f705a, type: 2}

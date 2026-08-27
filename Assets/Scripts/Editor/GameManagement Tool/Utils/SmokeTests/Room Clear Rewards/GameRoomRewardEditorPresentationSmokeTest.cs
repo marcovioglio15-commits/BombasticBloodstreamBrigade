@@ -69,6 +69,9 @@ public static class GameRoomRewardEditorPresentationSmokeTest
             Require(FindPropertyField(portalIndicatorRoot,
                                       "Enable Portal Indicators") != null,
                     "The dedicated Portal Indicators tab does not expose its feature toggle.");
+            Require(FindPropertyField(portalIndicatorRoot,
+                                      "HUD Sorting Order") != null,
+                    "The dedicated Portal Indicators tab does not expose its HUD sorting order.");
 
             // Menu-group changes intentionally perform one controlled regrouping and must leave valid named content.
             ValidateRewardRegroup(rewardsRoot, copy.Rewards.Count);

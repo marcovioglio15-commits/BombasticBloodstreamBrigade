@@ -16,10 +16,8 @@ public sealed class MainMenuController : MonoBehaviour
     [Tooltip("Button that starts the gameplay scene.")]
     [SerializeField] private Button playButton;
 
-#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
     [Tooltip("Button that opens the runtime enemy spawner override tool.")]
     [SerializeField] private Button enemySpawnerToolButton;
-#endif
 
     [Tooltip("Button that opens the runtime Settings menu.")]
     [SerializeField] private Button settingsButton;
@@ -60,10 +58,6 @@ public sealed class MainMenuController : MonoBehaviour
     private void Awake()
     {
         selectionController = GetComponent<MenuSelectionController>();
-#if UNITY_EDITOR && !NASHCORE_RUNTIME_SPAWNER_TOOL
-        if (enemySpawnerToolButton != null)
-            enemySpawnerToolButton.gameObject.SetActive(false);
-#endif
     }
 
     /// <summary>
@@ -71,9 +65,14 @@ public sealed class MainMenuController : MonoBehaviour
     /// </summary>
     private void OnEnable()
     {
+        if (selectionController == null)
+            selectionController = GetComponent<MenuSelectionController>();
+
         terminalCommandSubmitted = false;
         navigationLocked = false;
+        ApplyRuntimeToolAvailability();
         SetMenuButtonsInteractable(true);
+        RefreshButtonNavigation();
 
         if (selectionController != null)
             selectionController.enabled = true;
@@ -312,6 +311,39 @@ public sealed class MainMenuController : MonoBehaviour
 
     #region Helpers
     /// <summary>
+    /// Applies the compile-time runtime-tool policy before selection and navigation are restored.
+    /// </summary>
+    private void ApplyRuntimeToolAvailability()
+    {
+        if (enemySpawnerToolButton != null)
+            enemySpawnerToolButton.gameObject.SetActive(IsRuntimeSpawnerToolAvailable());
+    }
+
+    /// <summary>
+    /// Reports whether this player configuration includes the runtime enemy spawner tool.
+    /// </summary>
+    /// <returns>True only when the runtime spawner tool scripting define is enabled.</returns>
+    private static bool IsRuntimeSpawnerToolAvailable()
+    {
+#if NASHCORE_RUNTIME_SPAWNER_TOOL
+        return true;
+#else
+        return false;
+#endif
+    }
+
+    /// <summary>
+    /// Rebuilds the cyclic vertical graph from buttons that can exist in the current player configuration.
+    /// </summary>
+    private void RefreshButtonNavigation()
+    {
+        MenuVerticalNavigationUtility.ConfigureCyclic(playButton,
+                                                      settingsButton,
+                                                      enemySpawnerToolButton,
+                                                      quitButton);
+    }
+
+    /// <summary>
     /// Sets the interactable state of every authored menu button so navigation can be suspended in one call.
     /// </summary>
     /// <param name="interactable">True to enable the menu buttons, false to disable them.</param>
@@ -320,10 +352,8 @@ public sealed class MainMenuController : MonoBehaviour
         if (playButton != null)
             playButton.interactable = interactable;
 
-#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
         if (enemySpawnerToolButton != null)
             enemySpawnerToolButton.interactable = interactable;
-#endif
 
         if (settingsButton != null)
             settingsButton.interactable = interactable;
@@ -440,11 +470,10 @@ public sealed class MainMenuController : MonoBehaviour
     /// <returns>Runtime tool button when available, otherwise Play button.</returns>
     private Selectable ResolveToolOrPlayFallback()
     {
-#if UNITY_EDITOR || NASHCORE_RUNTIME_SPAWNER_TOOL
-        return enemySpawnerToolButton != null ? enemySpawnerToolButton : playButton;
-#else
+        if (RuntimeMenuDirectNavigationUtility.IsSelectionCandidateValid(enemySpawnerToolButton))
+            return enemySpawnerToolButton;
+
         return playButton;
-#endif
     }
     #endregion
 

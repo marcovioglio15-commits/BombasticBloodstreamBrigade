@@ -46,6 +46,10 @@ public sealed class HUDManager : MonoBehaviour
 
     [Tooltip("Preauthored collapsible panel that summarizes collected power-ups and selected ECS player statistics.")]
     [SerializeField] private HUDPowerUpSummarySection powerUpSummarySection;
+
+    [Tooltip("Preauthored text presentation triggered by the authoritative procedural room-clear transaction.")]
+    [SerializeField]
+    private HUDWaveClearAnnouncementSection waveClearAnnouncementSection;
     #endregion
 
     private World defaultWorld;
@@ -101,6 +105,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (powerUpSummarySection != null)
             powerUpSummarySection.Dispose();
+
+        if (waveClearAnnouncementSection != null)
+            waveClearAnnouncementSection.Dispose();
     }
 
     /// <summary>
@@ -115,6 +122,9 @@ public sealed class HUDManager : MonoBehaviour
         }
 
         RefreshHudConfigIfAvailable();
+
+        if (waveClearAnnouncementSection != null)
+            waveClearAnnouncementSection.UpdateSection(entityManager);
 
         if (!TryResolvePlayerEntity(out Entity playerEntity))
         {
@@ -439,6 +449,10 @@ public sealed class HUDManager : MonoBehaviour
 
         if (powerUpSummarySection == null)
             powerUpSummarySection = FindFirstObjectByType<HUDPowerUpSummarySection>(FindObjectsInactive.Include);
+
+        if (waveClearAnnouncementSection == null)
+            waveClearAnnouncementSection =
+                FindFirstObjectByType<HUDWaveClearAnnouncementSection>(FindObjectsInactive.Include);
     }
 
     /// <summary>
@@ -480,6 +494,9 @@ public sealed class HUDManager : MonoBehaviour
 
         if (powerUpSummarySection != null)
             powerUpSummarySection.Initialize();
+
+        if (waveClearAnnouncementSection != null)
+            waveClearAnnouncementSection.Initialize();
 
         sectionsInitialized = true;
     }

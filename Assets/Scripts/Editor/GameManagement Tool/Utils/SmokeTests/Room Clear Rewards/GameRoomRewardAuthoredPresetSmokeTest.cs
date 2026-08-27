@@ -16,7 +16,6 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
     private const int ExpectedModuleCount = 12;
     private const int ExpectedRewardCount = 10;
     private const int ExpectedMappingCount = 9;
-    private const int ExpectedAssignedTileCount = 26;
     private const int ExpectedOverrideModuleCount = 1;
     private const float ExpectedSurvivorRepairValue = 2f;
     #endregion
@@ -63,12 +62,11 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
                 "The authored reward catalog does not contain the expected compositions.");
         Require(rewardPreset.PresentationMappings.Count == ExpectedMappingCount,
                 "The authored target catalog does not contain one mapping for every used target.");
-        Require(CountAssignedEligibleTiles(proceduralPreset) == ExpectedAssignedTileCount,
-                "Not every authored procedural room tile owns a valid Room Clear Reward assignment.");
+        int assignedTileCount = ValidateEligibleTileAssignments(proceduralPreset);
         ValidateOverrideBake(rewardPreset, proceduralPreset);
         Debug.Log(
             "[GameRoomRewardAuthoredPresetSmokeTest] Metadata, solvability, formulas, override baking, presentation and " +
-            ExpectedAssignedTileCount + " tile assignments passed.");
+            assignedTileCount + " eligible tile assignments passed.");
     }
     #endregion
 
@@ -145,6 +143,11 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
             Require(config.PortalIndicatorSprite.Value ==
                     rewardPreset.PortalIndicatorSettings.IndicatorSprite,
                     "The open-portal indicator sprite did not propagate into immutable ECS config.");
+            Require(config.PortalIndicatorSortingOrder ==
+                    rewardPreset.PortalIndicatorSettings.SortingOrder,
+                    "The open-portal indicator sorting order did not propagate into immutable ECS config.");
+            Require(config.PortalIndicatorSortingOrder < 0,
+                    "The open-portal indicator must remain behind the primary gameplay HUD.");
             Require(firstBakedBinding.ModuleIndex >= ExpectedModuleCount,
                     "The override binding still references its reusable source module.");
             Require(overrideModule.TechnicalId.ToString() == firstAuthoredBinding.BindingId,
@@ -164,11 +167,11 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
     /// </summary>
     /// <param name="preset">Procedural preset containing authored tile assignments and room metadata.</param>
     /// <returns>Number of assigned tiles backed by at least one active spawner with a non-empty wave.</returns>
-    private static int CountAssignedEligibleTiles(GameProceduralLevelPreset preset)
+    private static int ValidateEligibleTileAssignments(GameProceduralLevelPreset preset)
     {
         int assignedTileCount = 0;
 
-        // Traverse authored order so a failure points to the same tile order shown by the management tool.
+        // Traverse authored order and require every currently eligible room to own a valid reward assignment.
         for (int levelIndex = 0; levelIndex < preset.Levels.Count; levelIndex++)
         {
             GameProceduralLevelDefinition level = preset.Levels[levelIndex];
@@ -180,17 +183,28 @@ public static class GameRoomRewardAuthoredPresetSmokeTest
             {
                 GameProceduralRoomTileDefinition tile = level.RoomTiles[tileIndex];
 
-                if (tile == null || tile.RoomRewards.Count == 0)
+                if (tile == null)
                     continue;
 
                 Require(preset.TryFindRoomMetadata(tile.SceneId, out GameRoomSceneMetadata metadata) &&
-                        metadata != null &&
-                        metadata.IsRoomClearRewardEligible,
-                        "Tile '" + tile.TileId + "' is assigned but its refreshed room is not reward-eligible.");
+                        metadata != null,
+                        "Tile '" + tile.TileId + "' has no refreshed room metadata.");
+
+                if (!metadata.IsRoomClearRewardEligible)
+                {
+                    Require(tile.RoomRewards.Count == 0,
+                            "Tile '" + tile.TileId + "' is assigned but its refreshed room is not reward-eligible.");
+                    continue;
+                }
+
+                Require(tile.RoomRewards.Count > 0,
+                        "Reward-eligible tile '" + tile.TileId + "' has no Room Clear Reward assignment.");
                 assignedTileCount++;
             }
         }
 
+        Require(assignedTileCount > 0,
+                "The authored Procedural Level preset contains no reward-eligible room tiles.");
         return assignedTileCount;
     }
 

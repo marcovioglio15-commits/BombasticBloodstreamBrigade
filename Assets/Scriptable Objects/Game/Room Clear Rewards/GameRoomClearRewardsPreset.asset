@@ -682,18 +682,32 @@ MonoBehaviour:
       animatorClip: {fileID: 0}
       animatorPath: 
       animatorSpeed: 1
-    - targetBindingId: Train01
+    - targetBindingId: TrainWestArrival
       targetSlot: 0
-      source: 1
+      source: 0
       mode: 0
       playback: 0
-      easing: 3
-      startDelay: 0
-      duration: 0.5
-      positionOffset: {x: 0, y: 0, z: 0}
+      easing: 5
+      startDelay: 0.15
+      duration: 3.5
+      positionOffset: {x: 0, y: 0, z: 56.68}
       rotationOffset: {x: 0, y: 0, z: 0}
       scaleMultiplier: {x: 1, y: 1, z: 1}
-      animatorClip: {fileID: 7400000, guid: 5ef40297cee01534a879144ee93a09b2, type: 2}
+      animatorClip: {fileID: 0}
+      animatorPath: 
+      animatorSpeed: 1
+    - targetBindingId: TrainEastArrival
+      targetSlot: 0
+      source: 0
+      mode: 0
+      playback: 0
+      easing: 5
+      startDelay: 0.15
+      duration: 3.5
+      positionOffset: {x: 0, y: 0, z: -70.7}
+      rotationOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: {x: 1, y: 1, z: 1}
+      animatorClip: {fileID: 0}
       animatorPath: 
       animatorSpeed: 1
     activationPrefabReplacements:
@@ -706,4 +720,5 @@ MonoBehaviour:
     indicatorColor: {r: 1, g: 1, b: 1, a: 1}
     indicatorSizePixels: 64
     edgePaddingPixels: 20
+    sortingOrder: -100
     worldOffset: {x: 0, y: 1.5, z: 0}

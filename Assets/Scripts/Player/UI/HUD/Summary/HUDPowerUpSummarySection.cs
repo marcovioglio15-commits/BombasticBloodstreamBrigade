@@ -202,10 +202,15 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
         ApplyTitleStyle(activeTitleText, config.ActiveTitle.ToString());
         ApplyTitleStyle(passiveTitleText, config.PassiveTitle.ToString());
         ApplyTitleStyle(statisticsTitleText, config.StatisticsTitle.ToString());
-        ApplySeparatorStyle(powerUpColumnSeparator, config.ShowPowerUpColumnSeparator != 0, false);
+        ApplySeparatorStyle(powerUpColumnSeparator,
+                            ShowsActivePowerUps() &&
+                            ShowsPassivePowerUps() &&
+                            config.ShowPowerUpColumnSeparator != 0,
+                            false);
         ApplySeparatorStyle(statisticsSeparator, config.ShowStatisticsSeparator != 0, true);
         HUDPowerUpSummaryViewPoolUtility.ApplyIconStyles(activeIconViews, in config);
         HUDPowerUpSummaryViewPoolUtility.ApplyIconStyles(passiveIconViews, in config);
+        ApplyPowerUpColumnVisibility(0, 0);
 
         int visibleStatisticCount = math.min(statisticDefinitions.Length, statisticRows != null ? statisticRows.Length : 0);
 
@@ -242,10 +247,12 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
 
         ApplyContentAreaLayout();
 
-        if (powerUpColumnsLayout != null)
-            powerUpColumnsLayout.spacing = config.PowerUpColumnSpacing;
+        bool showsBothColumns = ShowsActivePowerUps() && ShowsPassivePowerUps();
 
-        if (activeColumnRoot != null && passiveColumnRoot != null)
+        if (powerUpColumnsLayout != null)
+            powerUpColumnsLayout.spacing = showsBothColumns ? config.PowerUpColumnSpacing : 0f;
+
+        if (showsBothColumns && activeColumnRoot != null && passiveColumnRoot != null)
         {
             bool activeFirst = config.PowerUpOrder == GameHudSummaryPowerUpOrder.ActiveFirst;
             activeColumnRoot.SetSiblingIndex(activeFirst ? 0 : 2);
@@ -310,13 +317,13 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
         if (backgroundImage != null)
         {
             backgroundImage.sprite = config.BackgroundSprite.Value;
-            backgroundImage.color = ToColor(config.BackgroundTint);
+            backgroundImage.color = HUDPowerUpSummaryPresentationUtility.ToColor(config.BackgroundTint);
         }
 
         if (toggleImage != null)
         {
             toggleImage.sprite = config.ToggleSprite.Value;
-            toggleImage.color = ToColor(config.ToggleTint);
+            toggleImage.color = HUDPowerUpSummaryPresentationUtility.ToColor(config.ToggleTint);
         }
     }
 
@@ -345,7 +352,7 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
 
         titleText.text = text;
         titleText.fontSize = config.TitleFontSize;
-        titleText.color = ToColor(config.TitleColor);
+        titleText.color = HUDPowerUpSummaryPresentationUtility.ToColor(config.TitleColor);
 
         if (config.TitleFont.Value != null)
             titleText.font = config.TitleFont.Value;
@@ -363,7 +370,7 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
             return;
 
         separator.gameObject.SetActive(visible);
-        separator.color = ToColor(config.SeparatorColor);
+        separator.color = HUDPowerUpSummaryPresentationUtility.ToColor(config.SeparatorColor);
         RectTransform separatorRect = separator.rectTransform;
 
         if (horizontal)
@@ -469,6 +476,7 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
         {
             HUDPowerUpSummaryViewPoolUtility.HideAllIconViews(activeIconViews);
             HUDPowerUpSummaryViewPoolUtility.HideAllIconViews(passiveIconViews);
+            ApplyPowerUpColumnVisibility(0, 0);
             iconsInitialized = false;
             return;
         }
@@ -482,22 +490,63 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
 
         powerUpCatalogHash = resolvedHash;
         iconsInitialized = true;
-        int activeCount = HUDPowerUpSummaryViewPoolUtility.FillIconViews(catalog,
+        int activeCount = 0;
+
+        if (ShowsActivePowerUps())
+            activeCount = HUDPowerUpSummaryViewPoolUtility.FillIconViews(catalog,
                                                                          PlayerPowerUpUnlockKind.Active,
                                                                          activeIconViews,
                                                                          config.MaximumVisibleActivePowerUps,
                                                                          in config);
-        int passiveCount = HUDPowerUpSummaryViewPoolUtility.FillIconViews(catalog,
+        else
+            HUDPowerUpSummaryViewPoolUtility.HideAllIconViews(activeIconViews);
+
+        int passiveCount = 0;
+
+        if (ShowsPassivePowerUps())
+            passiveCount = HUDPowerUpSummaryViewPoolUtility.FillIconViews(catalog,
                                                                           PlayerPowerUpUnlockKind.Passive,
                                                                           passiveIconViews,
                                                                           config.MaximumVisiblePassivePowerUps,
                                                                           in config);
+        else
+            HUDPowerUpSummaryViewPoolUtility.HideAllIconViews(passiveIconViews);
 
+        ApplyPowerUpColumnVisibility(activeCount, passiveCount);
+    }
+
+    /// <summary>
+    /// Applies authored category and empty-column policies without changing either fixed icon pool.
+    /// </summary>
+    /// <param name="activeCount">Number of populated active icon slots.</param>
+    /// <param name="passiveCount">Number of populated passive icon slots.</param>
+    private void ApplyPowerUpColumnVisibility(int activeCount, int passiveCount)
+    {
         if (activeColumnRoot != null)
-            activeColumnRoot.gameObject.SetActive(activeCount > 0 || config.HideEmptyActiveColumn == 0);
+            activeColumnRoot.gameObject.SetActive(ShowsActivePowerUps() &&
+                                                  (activeCount > 0 || config.HideEmptyActiveColumn == 0));
 
         if (passiveColumnRoot != null)
-            passiveColumnRoot.gameObject.SetActive(passiveCount > 0 || config.HideEmptyPassiveColumn == 0);
+            passiveColumnRoot.gameObject.SetActive(ShowsPassivePowerUps() &&
+                                                   (passiveCount > 0 || config.HideEmptyPassiveColumn == 0));
+    }
+
+    /// <summary>
+    /// Reports whether the baked upper summary includes the active power-up category.
+    /// </summary>
+    /// <returns>True when active power-ups may use their preauthored column.</returns>
+    private bool ShowsActivePowerUps()
+    {
+        return config.PowerUpVisibility != GameHudSummaryPowerUpVisibility.PassiveOnly;
+    }
+
+    /// <summary>
+    /// Reports whether the baked upper summary includes the passive power-up category.
+    /// </summary>
+    /// <returns>True when passive power-ups may use their preauthored column.</returns>
+    private bool ShowsPassivePowerUps()
+    {
+        return config.PowerUpVisibility != GameHudSummaryPowerUpVisibility.ActiveOnly;
     }
 
     /// <summary>
@@ -574,7 +623,9 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
             float normalizedTime = math.saturate(elapsedSeconds / durationSeconds);
             panelRoot.anchoredPosition = Vector2.LerpUnclamped(startPosition,
                                                                targetPosition,
-                                                               EvaluateSlide(normalizedTime));
+                                                               HUDPowerUpSummaryPresentationUtility.EvaluateSlide(
+                                                                   config.SlideEasing,
+                                                                   normalizedTime));
             yield return null;
         }
 
@@ -620,24 +671,6 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
         return new Vector2(horizontalPosition, 0f);
     }
 
-    /// <summary>
-    /// Evaluates the selected authored panel easing without allocating an AnimationCurve.
-    /// </summary>
-    /// <param name="normalizedTime">Normalized transition time.</param>
-    /// <returns>Eased interpolation factor.</returns>
-    private float EvaluateSlide(float normalizedTime)
-    {
-        switch (config.SlideEasing)
-        {
-            case GameHudSummarySlideEasing.Linear:
-                return normalizedTime;
-            case GameHudSummarySlideEasing.SmoothStep:
-                return normalizedTime * normalizedTime * (3f - 2f * normalizedTime);
-            default:
-                float inverse = 1f - normalizedTime;
-                return 1f - inverse * inverse * inverse;
-        }
-    }
     #endregion
 
     #region Helpers
@@ -653,15 +686,6 @@ public sealed class HUDPowerUpSummarySection : MonoBehaviour
         panelRoot.gameObject.SetActive(active);
     }
 
-    /// <summary>
-    /// Converts an ECS color to the Unity UI representation.
-    /// </summary>
-    /// <param name="value">RGBA color stored in ECS.</param>
-    /// <returns>Unity color used by UI graphics.</returns>
-    private static Color ToColor(float4 value)
-    {
-        return new Color(value.x, value.y, value.z, value.w);
-    }
     #endregion
 
     #endregion

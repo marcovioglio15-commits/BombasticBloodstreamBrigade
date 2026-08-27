@@ -274,4 +274,18 @@ public struct GameRoomCombatCompletionState : IComponentData
 {
     public byte IsComplete;
 }
+
+/// <summary>
+/// Tracks authoritative room-clear observations and emits monotonically increasing HUD request versions.
+/// </summary>
+public struct GameRoomClearAnnouncementProgressState : IComponentData
+{
+    public uint CompletionVersion;
+    public uint ObservedClearVersion;
+    public uint ObservedGenerationVersion;
+    public int ObservedNodeIndex;
+    public byte LastCompletionWasFinal;
+    public byte ObservedCombatComplete;
+    public byte Initialized;
+}
 #endregion

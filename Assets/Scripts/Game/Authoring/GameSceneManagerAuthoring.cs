@@ -163,11 +163,15 @@ public sealed class GameSceneManagerAuthoring : MonoBehaviour
 
         // Keep the shared Victory predicate on the base manager archetype for legacy and procedural rooms.
         Entity entity = entityManager.CreateEntity(typeof(GameSceneManagerConfig),
-                                                   typeof(GameSceneTransitionState),
-                                                   typeof(GameSceneFadePresentationState),
-                                                   typeof(GameSceneLoadingProgressPresentationState),
-                                                   typeof(GameHudSettingsNavigationRuntimeConfig),
-                                                   typeof(GameRoomCombatCompletionState));
+                                                    typeof(GameSceneTransitionState),
+                                                    typeof(GameSceneFadePresentationState),
+                                                    typeof(GameSceneLoadingProgressPresentationState),
+                                                    typeof(GameHudSettingsNavigationRuntimeConfig),
+                                                    typeof(GameRoomCombatCompletionState));
+        entityManager.AddComponentData(entity, new GameRoomClearAnnouncementProgressState
+        {
+            ObservedNodeIndex = -1
+        });
 
         // Add every buffer before retrieving DynamicBuffer handles, because AddBuffer is a structural change.
         entityManager.AddBuffer<GameSceneDefinitionElement>(entity);
@@ -396,6 +400,10 @@ public sealed class GameSceneManagerAuthoringBaker : Baker<GameSceneManagerAutho
 
         // Legacy and procedural rooms share the same allocation-free Victory predicate.
         AddComponent(entity, new GameRoomCombatCompletionState());
+        AddComponent(entity, new GameRoomClearAnnouncementProgressState
+        {
+            ObservedNodeIndex = -1
+        });
         DynamicBuffer<GameSceneDefinitionElement> sceneBuffer = AddBuffer<GameSceneDefinitionElement>(entity);
         DynamicBuffer<GameSceneTransitionElement> transitionBuffer = AddBuffer<GameSceneTransitionElement>(entity);
         DynamicBuffer<GameSceneTransitionRequest> requestBuffer = AddBuffer<GameSceneTransitionRequest>(entity);

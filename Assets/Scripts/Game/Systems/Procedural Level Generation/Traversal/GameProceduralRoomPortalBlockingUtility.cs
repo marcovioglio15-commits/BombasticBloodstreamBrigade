@@ -161,7 +161,7 @@ public static class GameProceduralRoomPortalBlockingUtility
                                                                    portalEntities,
                                                                    portal.PortalId) &&
                                            IsTraversalAvailable(portal,
-                                                                portalState.AssignedEdgeIndex,
+                                                                portalState,
                                                                 runtimeState,
                                                                 levelRequiresClear)
                 ? (byte)1
@@ -202,27 +202,31 @@ public static class GameProceduralRoomPortalBlockingUtility
     /// Resolves whether one valid outgoing assignment is physically unlocked for the active lifecycle event.
     /// </summary>
     /// <param name="portal">Immutable authored portal policy.</param>
-    /// <param name="assignedEdgeIndex">Generated edge index or traversal sentinel.</param>
+    /// <param name="portalState">Generated assignment and linked-effect completion state.</param>
     /// <param name="runtimeState">Current room and level lifecycle.</param>
     /// <param name="levelRequiresClear">Whether every regular exit is gated by room completion.</param>
     /// <returns>True when the physical blocker may be removed.</returns>
     private static bool IsTraversalAvailable(GameRoomPortal portal,
-                                             int assignedEdgeIndex,
+                                             GameRoomPortalRuntimeState portalState,
                                              GameProceduralLevelRuntimeState runtimeState,
                                              bool levelRequiresClear)
     {
         if (!SupportsOutgoingTraversal(portal.Capability))
             return false;
 
-        if (assignedEdgeIndex == GameProceduralRoomTraversalConstants.LevelExitEdgeIndex)
+        if (portalState.AssignedEdgeIndex == GameProceduralRoomTraversalConstants.LevelExitEdgeIndex)
             return runtimeState.Phase == GameProceduralLevelRuntimePhase.LevelComplete &&
-                   runtimeState.CurrentRoomCleared != 0;
+                   runtimeState.CurrentRoomCleared != 0 &&
+                   portalState.ActivationEffectsReady != 0;
 
-        if (assignedEdgeIndex < 0)
+        if (portalState.AssignedEdgeIndex < 0)
             return false;
 
-        if ((levelRequiresClear || portal.RequireRoomClear != 0) && runtimeState.CurrentRoomCleared == 0)
-            return false;
+        if (levelRequiresClear || portal.RequireRoomClear != 0)
+        {
+            if (runtimeState.CurrentRoomCleared == 0 || portalState.ActivationEffectsReady == 0)
+                return false;
+        }
 
         switch (runtimeState.Phase)
         {

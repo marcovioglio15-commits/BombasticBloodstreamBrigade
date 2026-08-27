@@ -49,6 +49,7 @@ public struct GameRoomRewardConfig : IComponentData
     public float4 PortalIndicatorColor;
     public float PortalIndicatorSizePixels;
     public float PortalIndicatorEdgePaddingPixels;
+    public int PortalIndicatorSortingOrder;
     public UnityObjectRef<Sprite> PortalIndicatorSprite;
 }
 

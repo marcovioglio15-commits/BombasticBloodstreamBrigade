@@ -196,3 +196,79 @@ internal enum RuntimeMenuNavigationDirection
     Left = 3,
     Right = 4
 }
+
+/// <summary>
+/// Builds deterministic cyclic vertical navigation for preauthored menu selectables.
+/// </summary>
+public static class MenuVerticalNavigationUtility
+{
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Connects every active and interactable selectable to the previous and next valid entries in the supplied visual order.
+    /// </summary>
+    /// <param name="selectables">Selectables ordered from top to bottom.</param>
+    public static void ConfigureCyclic(params Selectable[] selectables)
+    {
+        if (selectables == null || selectables.Length == 0)
+            return;
+
+        // Configure each valid entry against the same ordered list so both directions remain symmetrical.
+        for (int selectableIndex = 0; selectableIndex < selectables.Length; selectableIndex++)
+        {
+            Selectable selectable = selectables[selectableIndex];
+
+            if (!IsNavigationCandidate(selectable))
+                continue;
+
+            Navigation navigation = selectable.navigation;
+            navigation.mode = Navigation.Mode.Explicit;
+            navigation.selectOnUp = ResolveNeighbor(selectables, selectableIndex, -1);
+            navigation.selectOnDown = ResolveNeighbor(selectables, selectableIndex, 1);
+            selectable.navigation = navigation;
+        }
+    }
+    #endregion
+
+    #region Resolution
+    /// <summary>
+    /// Finds the next active and interactable selectable while wrapping across the supplied visual order.
+    /// </summary>
+    /// <param name="selectables">Ordered selectable graph.</param>
+    /// <param name="startIndex">Index whose neighbor is requested.</param>
+    /// <param name="step">Negative one for the previous entry or positive one for the next entry.</param>
+    /// <returns>Resolved neighbor, including the start entry when it is the only valid selectable.</returns>
+    private static Selectable ResolveNeighbor(Selectable[] selectables,
+                                               int startIndex,
+                                               int step)
+    {
+        // Visit every possible neighbor once so sparse lists remain cyclic without recursive searches.
+        for (int offset = 1; offset <= selectables.Length; offset++)
+        {
+            int candidateIndex = (startIndex + step * offset + selectables.Length) % selectables.Length;
+            Selectable candidate = selectables[candidateIndex];
+
+            if (IsNavigationCandidate(candidate))
+                return candidate;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Reports whether a selectable can currently participate in analog or keyboard navigation.
+    /// </summary>
+    /// <param name="selectable">Candidate selectable from the authored visual order.</param>
+    /// <returns>True when the selectable is active in its hierarchy and accepts interaction.</returns>
+    private static bool IsNavigationCandidate(Selectable selectable)
+    {
+        return selectable != null &&
+               selectable.isActiveAndEnabled &&
+               selectable.gameObject.activeInHierarchy &&
+               selectable.IsInteractable();
+    }
+    #endregion
+
+    #endregion
+}

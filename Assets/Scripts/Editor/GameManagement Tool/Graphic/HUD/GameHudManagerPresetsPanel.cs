@@ -464,6 +464,10 @@ public sealed class GameHudManagerPresetsPanel
                 GameHudManagerSupplementalPanelUtility.BuildSettingsNavigationSection(sectionContentRoot,
                                                                                         presetSerializedObject);
                 break;
+            case DetailsSectionType.WaveClearAnnouncement:
+                GameHudManagerSupplementalPanelUtility.BuildWaveClearAnnouncementSection(sectionContentRoot,
+                                                                                           presetSerializedObject);
+                break;
             case DetailsSectionType.Validation:
                 BuildValidationSection();
                 break;
@@ -559,6 +563,7 @@ public sealed class GameHudManagerPresetsPanel
         AddSectionButton(buttonsRoot, DetailsSectionType.PowerUpSummary, "Power-Up Summary", 144f);
         AddSectionButton(buttonsRoot, DetailsSectionType.ButtonInteractions, "Menu Buttons", 112f);
         AddSectionButton(buttonsRoot, DetailsSectionType.SettingsNavigation, "Settings Navigation", 148f);
+        AddSectionButton(buttonsRoot, DetailsSectionType.WaveClearAnnouncement, "Room Clear Text", 132f);
         AddSectionButton(buttonsRoot, DetailsSectionType.Validation, "Validation", 92f);
         return buttonsRoot;
     }

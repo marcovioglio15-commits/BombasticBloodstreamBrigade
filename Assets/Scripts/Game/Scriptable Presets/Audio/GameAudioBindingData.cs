@@ -473,6 +473,24 @@ public sealed class GameAudioEventBinding
     }
 
     /// <summary>
+    /// Applies a verified project default only while the FMOD path is empty, preserving every authored replacement.
+    /// </summary>
+    /// <param name="definition">Default descriptor supplying the optional FMOD path and playback dimensionality.</param>
+    /// <returns>True when an empty binding received its project default.</returns>
+    public bool ConfigureDefaultEventPath(GameAudioDefaultEventDefinition definition)
+    {
+        if (!string.IsNullOrWhiteSpace(eventPath) ||
+            string.IsNullOrWhiteSpace(definition.DefaultEventPath))
+        {
+            return false;
+        }
+
+        eventPath = definition.DefaultEventPath;
+        spatialize = definition.DefaultSpatialize;
+        return true;
+    }
+
+    /// <summary>
     /// Applies the default enemy projectile cap used by newly created presets.
     /// </summary>
     /// <param name="maxPlays">Maximum allowed plays in one window.</param>

@@ -84,6 +84,7 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
                                         blockerCollider);
             ValidateRoomClearGating(entityManager,
                                     managerEntity,
+                                    levelExitPortal,
                                     levelExitBlocker,
                                     blockerCollider);
             ValidateDuplicateIdentityFailsClosed(entityManager,
@@ -91,6 +92,53 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
                                                  levelExitPortal,
                                                  levelExitBlocker);
             Debug.Log("[GameProceduralRoomPortalBlockingSmokeTest] All physical portal barrier checks passed.");
+        }
+        finally
+        {
+            world.Dispose();
+
+            if (blockerCollider.IsCreated)
+                blockerCollider.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Executes the isolated linked-effect readiness gate without depending on broadphase raycast coverage.
+    /// </summary>
+    public static void RunActivationGateOnly()
+    {
+        CollisionFilter blockerFilter =
+            GameProceduralRoomPortalBlockingUtility.BuildBlockingFilter(PortalBarrierLayerMask);
+        BlobAssetReference<Unity.Physics.Collider> blockerCollider =
+            PhysicsBoxCollider.Create(new BoxGeometry
+            {
+                Center = float3.zero,
+                Orientation = quaternion.identity,
+                Size = new float3(2f, 2f, 0.4f),
+                BevelRadius = 0f
+            }, blockerFilter);
+        World world = new World("GameProceduralRoomPortalActivationGateSmokeTest");
+
+        try
+        {
+            EntityManager entityManager = world.EntityManager;
+            Entity levelExitPortal = CreatePortal(
+                entityManager,
+                "LEVEL_EXIT",
+                GameRoomPortalCapability.Exit,
+                GameProceduralRoomTraversalConstants.LevelExitEdgeIndex,
+                false);
+            Entity levelExitBlocker = CreateBlocker(entityManager,
+                                                    "LEVEL_EXIT",
+                                                    blockerCollider);
+            Entity managerEntity = CreateManager(entityManager);
+            ValidateRoomClearGating(entityManager,
+                                    managerEntity,
+                                    levelExitPortal,
+                                    levelExitBlocker,
+                                    blockerCollider);
+            Debug.Log(
+                "[GameProceduralRoomPortalBlockingSmokeTest] Linked-effect traversal gate checks passed.");
         }
         finally
         {
@@ -290,10 +338,12 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
     /// </summary>
     /// <param name="entityManager">Fixture entity manager.</param>
     /// <param name="managerEntity">Procedural lifecycle manager shared by all gate checks.</param>
+    /// <param name="levelExitPortal">Existing assigned LevelExit portal.</param>
     /// <param name="levelExitBlocker">Existing assigned LevelExit barrier.</param>
     /// <param name="blockingCollider">Reusable baked-style collider reference.</param>
     private static void ValidateRoomClearGating(EntityManager entityManager,
                                                 Entity managerEntity,
+                                                Entity levelExitPortal,
                                                 Entity levelExitBlocker,
                                                 BlobAssetReference<Unity.Physics.Collider> blockingCollider)
     {
@@ -341,16 +391,25 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
         runtimeState.CurrentRoomCleared = 1;
         entityManager.SetComponentData(managerEntity, runtimeState);
         GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(entityManager, managerEntity);
-        Require(!IsBlocking(entityManager, globalBlocker) && !IsBlocking(entityManager, localBlocker),
-                "Completed regular room did not open all graph-assigned regular exits.");
+        Require(!IsBlocking(entityManager, globalBlocker) && IsBlocking(entityManager, localBlocker),
+                "A clear-gated regular exit opened before linked effects completed.");
         Require(IsBlocking(entityManager, levelExitBlocker),
                 "LevelExit opened before the runtime entered LevelComplete.");
+        SetActivationEffectsReady(entityManager, globalPortal);
+        SetActivationEffectsReady(entityManager, localPortal);
+        GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(entityManager, managerEntity);
+        Require(!IsBlocking(entityManager, globalBlocker) && !IsBlocking(entityManager, localBlocker),
+                "Completed linked effects did not open all graph-assigned regular exits.");
         Require(entityManager.GetComponentData<GameRoomPortalRuntimeState>(globalPortal).TraversalEnabled != 0 &&
                 entityManager.GetComponentData<GameRoomPortalRuntimeState>(localPortal).TraversalEnabled != 0,
-                "Physical regular-exit gating diverged from logical traversal availability.");
+                "Physical regular-exit gating diverged from logical activation readiness.");
 
         runtimeState.Phase = GameProceduralLevelRuntimePhase.LevelComplete;
         entityManager.SetComponentData(managerEntity, runtimeState);
+        GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(entityManager, managerEntity);
+        Require(IsBlocking(entityManager, levelExitBlocker),
+                "LevelExit opened before its linked effects completed.");
+        SetActivationEffectsReady(entityManager, levelExitPortal);
         GameProceduralRoomPortalBlockingUtility.SynchronizeTraversalAvailability(entityManager, managerEntity);
         Require(!IsBlocking(entityManager, levelExitBlocker),
                 "Completed non-final Boss did not open its assigned LevelExit.");
@@ -490,6 +549,20 @@ public static class GameProceduralRoomPortalBlockingSmokeTest
     #endregion
 
     #region Helper Methods
+    /// <summary>
+    /// Marks one fixture portal ready after its synchronous switches and activation animations complete.
+    /// </summary>
+    /// <param name="entityManager">Fixture entity manager.</param>
+    /// <param name="portalEntity">Portal receiving the completed-effect checkpoint.</param>
+    private static void SetActivationEffectsReady(EntityManager entityManager,
+                                                  Entity portalEntity)
+    {
+        GameRoomPortalRuntimeState portalState =
+            entityManager.GetComponentData<GameRoomPortalRuntimeState>(portalEntity);
+        portalState.ActivationEffectsReady = 1;
+        entityManager.SetComponentData(portalEntity, portalState);
+    }
+
     /// <summary>
     /// Resolves whether one blocker owns both an enabled state flag and a valid collider reference.
     /// </summary>

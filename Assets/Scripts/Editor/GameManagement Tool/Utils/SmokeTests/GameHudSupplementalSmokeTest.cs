@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// Verifies inline HUD baking, Input Actions, typed ECS statistic resolution, summary prefab pools, menu relays, and drop-system ordering.
+/// Verifies supplemental HUD baking, authored presentation pools, menu relays, and drop-system ordering.
 /// </summary>
 public static class GameHudSupplementalSmokeTest
 {
@@ -43,7 +43,10 @@ public static class GameHudSupplementalSmokeTest
             "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset");
         Require(hudPreset != null, "Default HUD Manager preset is missing.");
         Require(hudPreset.PowerUpSummarySettings != null, "Default HUD preset does not contain inline Power-Up Summary settings.");
+        Require(hudPreset.WaveClearAnnouncementSettings != null,
+                "Default HUD preset does not contain Wave Clear Announcement settings.");
         ValidatePreset(hudPreset);
+        GameHudWaveClearAnnouncementSmokeTestUtility.ValidateAudioBindings();
         ValidateInputActions(hudPreset);
         ValidateBakeAndRuntime(hudPreset);
         ValidateExperienceDropSystemOrdering();
@@ -102,13 +105,16 @@ public static class GameHudSupplementalSmokeTest
 
     #region Preset and Bake
     /// <summary>
-    /// Validates inline summary, button, and Settings navigation through the tool's non-mutating warning path.
+    /// Validates summary, announcement, button, and Settings navigation through the non-mutating warning path.
     /// </summary>
     /// <param name="hudPreset">Default HUD preset to inspect.</param>
     private static void ValidatePreset(GameHudManagerPreset hudPreset)
     {
         List<string> warnings = new List<string>();
         GameHudSupplementalPresetValidationUtility.ValidatePowerUpSummary(hudPreset.PowerUpSummarySettings, warnings);
+        GameHudSupplementalPresetValidationUtility.ValidateWaveClearAnnouncement(
+            hudPreset.WaveClearAnnouncementSettings,
+            warnings);
         GameHudSupplementalPresetValidationUtility.ValidateButtonInteractions(hudPreset.ButtonInteractionSettings, warnings);
         GameHudSupplementalPresetValidationUtility.ValidateSettingsNavigation(hudPreset.SettingsNavigationSettings, warnings);
         Require(warnings.Count == 0, "Supplemental HUD validation warnings: " + string.Join(" | ", warnings));
@@ -153,6 +159,49 @@ public static class GameHudSupplementalSmokeTest
                 "Baked active capacity exceeds the authored pool.");
         Require(summaryConfig.MaximumVisiblePassivePowerUps <= GameHudPowerUpSummarySettings.AuthoredPassiveSlotCapacity,
                 "Baked passive capacity exceeds the authored pool.");
+        Require(summaryConfig.PowerUpVisibility == hudPreset.PowerUpSummarySettings.PowerUpVisibility,
+                "Baked summary power-up visibility does not match the HUD preset.");
+        GameHudWaveClearAnnouncementRuntimeConfig announcementConfig =
+            GameHudSupplementalPresetBakeUtility.BuildWaveClearAnnouncementConfig(
+                hudPreset.WaveClearAnnouncementSettings);
+        Require(announcementConfig.Enabled != 0, "Baked Wave Clear Announcement config is disabled.");
+        Require(announcementConfig.Content.Length > 0,
+                "Baked Wave Clear Announcement content is empty.");
+        Require(announcementConfig.Direction == hudPreset.WaveClearAnnouncementSettings.Direction,
+                "Baked Wave Clear Announcement direction does not match the HUD preset.");
+        Require(announcementConfig.PlayAudioEvent ==
+                (hudPreset.WaveClearAnnouncementSettings.PlayAudioEvent ? (byte)1 : (byte)0),
+                "Baked Wave Clear Announcement audio toggle does not match the HUD preset.");
+        Require(announcementConfig.AudioEventId == hudPreset.WaveClearAnnouncementSettings.AudioEventId,
+                "Baked Wave Clear Announcement audio event does not match the HUD preset.");
+        Require(announcementConfig.UseFinalWaveOverride ==
+                (hudPreset.WaveClearAnnouncementSettings.UseFinalWaveOverride ? (byte)1 : (byte)0),
+                "Baked terminal-wave override toggle does not match the HUD preset.");
+        Require(announcementConfig.FinalWaveContent.ToString() ==
+                hudPreset.WaveClearAnnouncementSettings.FinalWaveContent,
+                "Baked terminal-wave content does not match the HUD preset.");
+        Require(announcementConfig.FinalWaveDirection ==
+                hudPreset.WaveClearAnnouncementSettings.FinalWaveDirection,
+                "Baked terminal-wave direction does not match the HUD preset.");
+        Require(Mathf.Approximately(announcementConfig.FinalWaveTraversalDurationSeconds,
+                                    hudPreset.WaveClearAnnouncementSettings.FinalWaveTraversalDurationSeconds),
+                "Baked terminal-wave traversal duration does not match the HUD preset.");
+        Require(announcementConfig.FinalWaveEasing ==
+                hudPreset.WaveClearAnnouncementSettings.FinalWaveEasing,
+                "Baked terminal-wave easing does not match the HUD preset.");
+        Require(announcementConfig.FinalWavePauseAtCenter ==
+                (hudPreset.WaveClearAnnouncementSettings.FinalWavePauseAtCenter ? (byte)1 : (byte)0),
+                "Baked terminal-wave pause toggle does not match the HUD preset.");
+        Require(Mathf.Approximately(announcementConfig.FinalWaveCenterHoldDurationSeconds,
+                                    hudPreset.WaveClearAnnouncementSettings.FinalWaveCenterHoldDurationSeconds),
+                "Baked terminal-wave hold duration does not match the HUD preset.");
+        Require(announcementConfig.PlayFinalWaveAudioEvent ==
+                (hudPreset.WaveClearAnnouncementSettings.PlayFinalWaveAudioEvent ? (byte)1 : (byte)0),
+                "Baked terminal-wave audio toggle does not match the HUD preset.");
+        Require(announcementConfig.FinalWaveAudioEventId ==
+                hudPreset.WaveClearAnnouncementSettings.FinalWaveAudioEventId,
+                "Baked terminal-wave audio event does not match the HUD preset.");
+        GameHudWaveClearAnnouncementSmokeTestUtility.ValidateRequestRuntime(announcementConfig);
         GameHudSettingsNavigationRuntimeConfig navigationConfig =
             GameHudSupplementalPresetBakeUtility.BuildSettingsNavigationConfig(hudPreset.SettingsNavigationSettings);
         Require(navigationConfig.Enabled != 0, "Baked Settings navigation config is disabled.");
@@ -177,7 +226,47 @@ public static class GameHudSupplementalSmokeTest
                     "Baked statistic buffer does not preserve the configured row count.");
             Require(buttonBuffer.Length == (int)GameUiMenuKind.RuntimeTools + 1,
                     "Baked button buffer does not contain every concrete menu group.");
+            ValidateButtonInteractionBake(hudPreset.ButtonInteractionSettings,
+                                          buttonBuffer);
             ValidateTypedStatisticResolution(entityManager);
+        }
+    }
+
+    /// <summary>
+    /// Verifies the authored empty-sprite policy reaches the matching ECS menu-profile element unchanged.
+    /// </summary>
+    /// <param name="settings">Authored menu-button profiles.</param>
+    /// <param name="buttonBuffer">Baked ECS interaction buffer.</param>
+    private static void ValidateButtonInteractionBake(
+        GameHudButtonInteractionSettings settings,
+        DynamicBuffer<GameUiMenuButtonInteractionElement> buttonBuffer)
+    {
+        IReadOnlyList<GameUiMenuButtonInteractionDefinition> profiles = settings.MenuProfiles;
+
+        // Match by stable menu kind so the test does not depend on list ordering.
+        for (int profileIndex = 0; profileIndex < profiles.Count; profileIndex++)
+        {
+            GameUiMenuButtonInteractionDefinition profile = profiles[profileIndex];
+
+            if (profile == null)
+                continue;
+
+            bool found = false;
+
+            for (int elementIndex = 0; elementIndex < buttonBuffer.Length; elementIndex++)
+            {
+                GameUiMenuButtonInteractionElement element = buttonBuffer[elementIndex];
+
+                if (element.MenuKind != profile.MenuKind)
+                    continue;
+
+                Require(element.AllowEmptySprites == (profile.AllowEmptySprites ? (byte)1 : (byte)0),
+                        "Baked Allow Empty Sprites does not match the " + profile.MenuKind + " profile.");
+                found = true;
+                break;
+            }
+
+            Require(found, "No baked interaction element exists for " + profile.MenuKind + ".");
         }
     }
 
@@ -288,9 +377,13 @@ public static class GameHudSupplementalSmokeTest
         HUDManager hudManager = GameSceneManagementProjectSetupSceneUtility.FindFirstComponentInScene<HUDManager>(scene);
         List<HUDPowerUpSummarySection> summarySections =
             GameSceneManagementProjectSetupSceneUtility.FindComponentsInScene<HUDPowerUpSummarySection>(scene);
+        List<HUDWaveClearAnnouncementSection> announcementSections =
+            GameSceneManagementProjectSetupSceneUtility.FindComponentsInScene<HUDWaveClearAnnouncementSection>(scene);
         Require(hudManager != null, "Gameplay UI scene does not contain HUDManager.");
         Require(summarySections.Count == 1,
                 "Gameplay UI scene should contain exactly one authored HUDPowerUpSummarySection instance.");
+        Require(announcementSections.Count == 1,
+                "Gameplay UI scene should contain exactly one authored HUDWaveClearAnnouncementSection instance.");
         HUDPowerUpSummarySection section = summarySections[0];
         Require(PrefabUtility.IsPartOfPrefabInstance(section),
                 "Power-Up Summary scene hierarchy is not a prefab instance.");
@@ -311,6 +404,35 @@ public static class GameHudSupplementalSmokeTest
         Require(linkedSummary == section,
                 "HUDManager Power-Up Summary reference mismatch. Linked: " +
                 DescribeObject(linkedSummary) + " | Found: " + DescribeObject(section));
+
+        HUDWaveClearAnnouncementSection announcementSection = announcementSections[0];
+        Require(PrefabUtility.IsPartOfPrefabInstance(announcementSection),
+                "Wave Clear Announcement scene hierarchy is not a prefab instance.");
+        GameObject announcementSource =
+            PrefabUtility.GetCorrespondingObjectFromSource(announcementSection.gameObject);
+        Require(announcementSource != null &&
+                string.Equals(AssetDatabase.GetAssetPath(announcementSource),
+                              GameHudWaveClearAnnouncementProjectSetupUtility.AnnouncementPrefabPath,
+                              StringComparison.Ordinal),
+                "Wave Clear Announcement scene instance does not use its dedicated prefab.");
+        SerializedProperty announcementReferenceProperty =
+            serializedHudManager.FindProperty("waveClearAnnouncementSection");
+        UnityEngine.Object linkedAnnouncement = announcementReferenceProperty != null
+            ? announcementReferenceProperty.objectReferenceValue
+            : null;
+        Require(linkedAnnouncement == announcementSection,
+                "HUDManager Wave Clear Announcement reference mismatch. Linked: " +
+                DescribeObject(linkedAnnouncement) + " | Found: " + DescribeObject(announcementSection));
+        SerializedObject serializedAnnouncement = new SerializedObject(announcementSection);
+        serializedAnnouncement.Update();
+        Require(serializedAnnouncement.FindProperty("presentationRoot").objectReferenceValue != null,
+                "Wave Clear Announcement presentation root is missing.");
+        Require(serializedAnnouncement.FindProperty("textRoot").objectReferenceValue != null,
+                "Wave Clear Announcement text root is missing.");
+        Require(serializedAnnouncement.FindProperty("announcementText").objectReferenceValue != null,
+                "Wave Clear Announcement TMP text is missing.");
+        Require(serializedAnnouncement.FindProperty("canvasGroup").objectReferenceValue != null,
+                "Wave Clear Announcement canvas group is missing.");
 
         SerializedObject serializedSection = new SerializedObject(section);
         serializedSection.Update();
@@ -356,14 +478,73 @@ public static class GameHudSupplementalSmokeTest
     /// </summary>
     private static void ValidateMainMenuScene()
     {
+        ValidateCyclicMenuNavigation();
         Scene scene = EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.MainMenuScenePath,
                                                    OpenSceneMode.Single);
         List<Button> buttons = GameSceneManagementProjectSetupSceneUtility.FindComponentsInScene<Button>(scene);
+        List<MainMenuController> controllers =
+            GameSceneManagementProjectSetupSceneUtility.FindComponentsInScene<MainMenuController>(scene);
         Require(buttons.Count > 0, "Main Menu scene contains no Buttons.");
+        Require(controllers.Count == 1, "Main Menu scene must contain exactly one MainMenuController.");
+
+        SerializedObject serializedController = new SerializedObject(controllers[0]);
+        Button playButton = serializedController.FindProperty("playButton").objectReferenceValue as Button;
+        Button settingsButton = serializedController.FindProperty("settingsButton").objectReferenceValue as Button;
+        Button toolButton = serializedController.FindProperty("enemySpawnerToolButton").objectReferenceValue as Button;
+        Button quitButton = serializedController.FindProperty("quitButton").objectReferenceValue as Button;
+        Require(playButton != null && settingsButton != null && toolButton != null && quitButton != null,
+                "Main Menu controller has an incomplete authored button chain.");
+        Require(!toolButton.gameObject.activeSelf,
+                "Runtime Spawner Tool button must start inactive until its scripting define is enabled.");
+        Require(playButton.navigation.selectOnDown == settingsButton &&
+                settingsButton.navigation.selectOnDown == quitButton &&
+                quitButton.navigation.selectOnUp == settingsButton &&
+                quitButton.navigation.selectOnDown == playButton,
+                "Main Menu authored navigation does not bypass the inactive runtime tool button.");
 
         for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
             Require(buttons[buttonIndex].GetComponent<MenuSelectableHoverRelay>() != null,
                     "Main Menu button " + buttons[buttonIndex].name + " has no interaction relay.");
+    }
+
+    /// <summary>
+    /// Verifies cyclic menu navigation wraps in both directions while skipping unavailable entries.
+    /// </summary>
+    private static void ValidateCyclicMenuNavigation()
+    {
+        GameObject playObject = new GameObject("SmokeTestPlay", typeof(RectTransform), typeof(Button));
+        GameObject settingsObject = new GameObject("SmokeTestSettings", typeof(RectTransform), typeof(Button));
+        GameObject hiddenObject = new GameObject("SmokeTestHidden", typeof(RectTransform), typeof(Button));
+        GameObject quitObject = new GameObject("SmokeTestQuit", typeof(RectTransform), typeof(Button));
+
+        try
+        {
+            Button playButton = playObject.GetComponent<Button>();
+            Button settingsButton = settingsObject.GetComponent<Button>();
+            Button hiddenButton = hiddenObject.GetComponent<Button>();
+            Button quitButton = quitObject.GetComponent<Button>();
+            hiddenObject.SetActive(false);
+            MenuVerticalNavigationUtility.ConfigureCyclic(playButton,
+                                                          settingsButton,
+                                                          hiddenButton,
+                                                          quitButton);
+            Require(playButton.navigation.selectOnUp == quitButton &&
+                    playButton.navigation.selectOnDown == settingsButton,
+                    "Main Menu cyclic navigation does not wrap from the first entry.");
+            Require(settingsButton.navigation.selectOnUp == playButton &&
+                    settingsButton.navigation.selectOnDown == quitButton,
+                    "Main Menu cyclic navigation does not skip an unavailable middle entry.");
+            Require(quitButton.navigation.selectOnUp == settingsButton &&
+                    quitButton.navigation.selectOnDown == playButton,
+                    "Main Menu cyclic navigation does not wrap from the last entry.");
+        }
+        finally
+        {
+            UnityEngine.Object.DestroyImmediate(playObject);
+            UnityEngine.Object.DestroyImmediate(settingsObject);
+            UnityEngine.Object.DestroyImmediate(hiddenObject);
+            UnityEngine.Object.DestroyImmediate(quitObject);
+        }
     }
 
     /// <summary>

@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 /// <summary>
-/// Builds inline summary, Settings navigation, and independently configured menu-button HUD tabs.
+/// Builds inline summary, room-clear announcement, Settings navigation, and independently configured menu-button HUD tabs.
 /// </summary>
 internal static class GameHudManagerSupplementalPanelUtility
 {
@@ -26,12 +26,12 @@ internal static class GameHudManagerSupplementalPanelUtility
         root.Add(availability);
 
         VisualElement enabledOptions = new VisualElement();
-        AddLayoutFoldout(enabledOptions, serializedObject, prefix);
+        PropertyField visibilityField = AddLayoutFoldout(enabledOptions, serializedObject, prefix);
         AddMotionAndInputFoldout(enabledOptions, serializedObject, prefix);
-        AddGridFoldout(enabledOptions, serializedObject, prefix);
+        AddGridFoldout(enabledOptions, serializedObject, prefix, visibilityField);
         AddCounterFoldout(enabledOptions, serializedObject, prefix);
-        AddTitlesFoldout(enabledOptions, serializedObject, prefix);
-        AddSeparatorsFoldout(enabledOptions, serializedObject, prefix);
+        AddTitlesFoldout(enabledOptions, serializedObject, prefix, visibilityField);
+        AddSeparatorsFoldout(enabledOptions, serializedObject, prefix, visibilityField);
         AddPanelStyleFoldout(enabledOptions, serializedObject, prefix);
         AddStatisticsFoldout(enabledOptions, serializedObject, prefix);
         root.Add(enabledOptions);
@@ -48,18 +48,36 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="root">Container receiving the foldout.</param>
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     /// <param name="prefix">Serialized summary property prefix.</param>
-    private static void AddLayoutFoldout(VisualElement root, SerializedObject serializedObject, string prefix)
+    /// <returns>Visibility selector used to keep dependent controls context-sensitive.</returns>
+    private static PropertyField AddLayoutFoldout(VisualElement root,
+                                                  SerializedObject serializedObject,
+                                                  string prefix)
     {
         Foldout foldout = CreateFoldout("Panel Layout", "Controls edge anchoring, dimensions, spacing, and active/passive column order.");
         AddProperty(foldout, serializedObject, prefix + "panelSide", "Panel Side");
-        AddProperty(foldout, serializedObject, prefix + "powerUpOrder", "Power-Up Order");
+        PropertyField visibilityField = AddProperty(foldout,
+                                                    serializedObject,
+                                                    prefix + "powerUpVisibility",
+                                                    "Visible Power-Ups");
+        VisualElement dualColumnOptions = new VisualElement();
+        AddProperty(dualColumnOptions, serializedObject, prefix + "powerUpOrder", "Power-Up Order");
+        AddProperty(dualColumnOptions,
+                    serializedObject,
+                    prefix + "powerUpColumnSpacing",
+                    "Power-Up Column Spacing");
+        foldout.Add(dualColumnOptions);
+        TrackPowerUpVisibility(visibilityField,
+                               dualColumnOptions,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Both);
         AddProperty(foldout, serializedObject, prefix + "expandedWidth", "Expanded Width");
         AddProperty(foldout, serializedObject, prefix + "collapsedHandleWidth", "Collapsed Handle Width");
         AddProperty(foldout, serializedObject, prefix + "contentPadding", "Content Padding");
-        AddProperty(foldout, serializedObject, prefix + "powerUpColumnSpacing", "Power-Up Column Spacing");
         AddProperty(foldout, serializedObject, prefix + "sectionSpacing", "Section Spacing");
         AddProperty(foldout, serializedObject, prefix + "powerUpAreaHeightNormalized", "Power-Up Area Height");
         root.Add(foldout);
+        return visibilityField;
     }
 
     /// <summary>
@@ -99,18 +117,43 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="root">Container receiving the foldout.</param>
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     /// <param name="prefix">Serialized summary property prefix.</param>
-    private static void AddGridFoldout(VisualElement root, SerializedObject serializedObject, string prefix)
+    /// <param name="visibilityField">Visibility selector controlling category-specific fields.</param>
+    private static void AddGridFoldout(VisualElement root,
+                                       SerializedObject serializedObject,
+                                       string prefix,
+                                       PropertyField visibilityField)
     {
         Foldout foldout = CreateFoldout("Power-Up Grid", "Controls the preauthored active and passive icon pools.");
-        AddProperty(foldout, serializedObject, prefix + "maximumVisibleActivePowerUps", "Maximum Visible Active Power-Ups");
-        AddProperty(foldout, serializedObject, prefix + "maximumVisiblePassivePowerUps", "Maximum Visible Passive Power-Ups");
+        VisualElement activeOptions = new VisualElement();
+        AddProperty(activeOptions,
+                    serializedObject,
+                    prefix + "maximumVisibleActivePowerUps",
+                    "Maximum Visible Active Power-Ups");
+        AddProperty(activeOptions, serializedObject, prefix + "hideEmptyActiveColumn", "Hide Empty Active Column");
+        foldout.Add(activeOptions);
+        TrackPowerUpVisibility(visibilityField,
+                               activeOptions,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Active);
+
+        VisualElement passiveOptions = new VisualElement();
+        AddProperty(passiveOptions,
+                    serializedObject,
+                    prefix + "maximumVisiblePassivePowerUps",
+                    "Maximum Visible Passive Power-Ups");
+        AddProperty(passiveOptions, serializedObject, prefix + "hideEmptyPassiveColumn", "Hide Empty Passive Column");
+        foldout.Add(passiveOptions);
+        TrackPowerUpVisibility(visibilityField,
+                               passiveOptions,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Passive);
         AddProperty(foldout, serializedObject, prefix + "iconSize", "Icon Size");
         AddProperty(foldout, serializedObject, prefix + "iconSpacing", "Icon Spacing");
         AddProperty(foldout, serializedObject, prefix + "iconTint", "Icon Tint");
         AddProperty(foldout, serializedObject, prefix + "iconBackgroundSprite", "Icon Background Sprite");
         AddProperty(foldout, serializedObject, prefix + "iconBackgroundTint", "Icon Background Tint");
-        AddProperty(foldout, serializedObject, prefix + "hideEmptyActiveColumn", "Hide Empty Active Column");
-        AddProperty(foldout, serializedObject, prefix + "hideEmptyPassiveColumn", "Hide Empty Passive Column");
         root.Add(foldout);
     }
 
@@ -137,11 +180,25 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="root">Container receiving the foldout.</param>
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     /// <param name="prefix">Serialized summary property prefix.</param>
-    private static void AddTitlesFoldout(VisualElement root, SerializedObject serializedObject, string prefix)
+    /// <param name="visibilityField">Visibility selector controlling category-specific fields.</param>
+    private static void AddTitlesFoldout(VisualElement root,
+                                         SerializedObject serializedObject,
+                                         string prefix,
+                                         PropertyField visibilityField)
     {
         Foldout foldout = CreateFoldout("Section Titles", "Controls Active, Passive, and Player Stats headings.");
-        AddProperty(foldout, serializedObject, prefix + "activeTitle", "Active Title");
-        AddProperty(foldout, serializedObject, prefix + "passiveTitle", "Passive Title");
+        PropertyField activeTitle = AddProperty(foldout, serializedObject, prefix + "activeTitle", "Active Title");
+        TrackPowerUpVisibility(visibilityField,
+                               activeTitle,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Active);
+        PropertyField passiveTitle = AddProperty(foldout, serializedObject, prefix + "passiveTitle", "Passive Title");
+        TrackPowerUpVisibility(visibilityField,
+                               passiveTitle,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Passive);
         AddProperty(foldout, serializedObject, prefix + "statisticsTitle", "Statistics Title");
         AddProperty(foldout, serializedObject, prefix + "titleFont", "Title Font");
         AddProperty(foldout, serializedObject, prefix + "titleFontSize", "Title Font Size");
@@ -155,10 +212,22 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="root">Container receiving the foldout.</param>
     /// <param name="serializedObject">Serialized HUD preset being edited.</param>
     /// <param name="prefix">Serialized summary property prefix.</param>
-    private static void AddSeparatorsFoldout(VisualElement root, SerializedObject serializedObject, string prefix)
+    /// <param name="visibilityField">Visibility selector controlling the dual-column divider.</param>
+    private static void AddSeparatorsFoldout(VisualElement root,
+                                             SerializedObject serializedObject,
+                                             string prefix,
+                                             PropertyField visibilityField)
     {
         Foldout foldout = CreateFoldout("Separators", "Controls the active/passive divider and the player-stat divider.");
-        AddProperty(foldout, serializedObject, prefix + "showPowerUpColumnSeparator", "Show Power-Up Column Separator");
+        PropertyField columnSeparator = AddProperty(foldout,
+                                                    serializedObject,
+                                                    prefix + "showPowerUpColumnSeparator",
+                                                    "Show Power-Up Column Separator");
+        TrackPowerUpVisibility(visibilityField,
+                               columnSeparator,
+                               serializedObject,
+                               prefix + "powerUpVisibility",
+                               GameHudSummaryVisibilityRequirement.Both);
         AddProperty(foldout, serializedObject, prefix + "showStatisticsSeparator", "Show Statistics Separator");
         AddProperty(foldout, serializedObject, prefix + "separatorColor", "Separator Color");
         AddProperty(foldout, serializedObject, prefix + "separatorThickness", "Separator Thickness");
@@ -193,6 +262,131 @@ internal static class GameHudManagerSupplementalPanelUtility
         AddProperty(foldout, serializedObject, prefix + "statisticRefreshIntervalSeconds", "Refresh Interval");
         AddProperty(foldout, serializedObject, prefix + "statistics", "Displayed Statistics");
         root.Add(foldout);
+    }
+    #endregion
+
+    #region Wave Clear Announcement
+    /// <summary>
+    /// Builds standard and terminal-Boss room-clear presentation with context-sensitive timing and audio controls.
+    /// </summary>
+    /// <param name="root">HUD details root receiving announcement controls.</param>
+    /// <param name="serializedObject">Serialized HUD preset containing announcement settings.</param>
+    public static void BuildWaveClearAnnouncementSection(VisualElement root, SerializedObject serializedObject)
+    {
+        string prefix = "waveClearAnnouncementSettings.";
+        Foldout availability = CreateFoldout("Availability And Content",
+                                             "Controls whether authoritative room completions present an announcement and which standard text is displayed.");
+        PropertyField enabledField = AddProperty(availability, serializedObject, prefix + "isEnabled", "Enabled");
+        AddProperty(availability, serializedObject, prefix + "content", "Content");
+        root.Add(availability);
+
+        VisualElement enabledOptions = new VisualElement();
+        Foldout motion = CreateFoldout("Motion",
+                                       "Controls traversal direction, velocity profile, and the optional pause at screen center.");
+        AddProperty(motion, serializedObject, prefix + "direction", "Direction");
+        AddProperty(motion, serializedObject, prefix + "traversalDurationSeconds", "Traversal Duration");
+        AddProperty(motion, serializedObject, prefix + "easing", "Easing");
+        PropertyField pauseField = AddProperty(motion, serializedObject, prefix + "pauseAtCenter", "Pause At Center");
+        PropertyField holdField = AddProperty(motion,
+                                              serializedObject,
+                                              prefix + "centerHoldDurationSeconds",
+                                              "Center Hold Duration");
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(pauseField,
+                                                                    holdField,
+                                                                    serializedObject,
+                                                                    prefix + "pauseAtCenter",
+                                                                    true);
+        AddProperty(motion, serializedObject, prefix + "useUnscaledTime", "Use Unscaled Time");
+        enabledOptions.Add(motion);
+
+        Foldout standardAudio = CreateFoldout("Standard Audio",
+                                              "Optionally requests one stable Audio Manager event with standard room-clear messages.");
+        PropertyField playAudioField = AddProperty(standardAudio,
+                                                   serializedObject,
+                                                   prefix + "playAudioEvent",
+                                                   "Play Audio Event");
+        PropertyField audioEventField = AddProperty(standardAudio,
+                                                    serializedObject,
+                                                    prefix + "audioEventId",
+                                                    "Audio Event");
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(playAudioField,
+                                                                    audioEventField,
+                                                                    serializedObject,
+                                                                    prefix + "playAudioEvent",
+                                                                    true);
+        enabledOptions.Add(standardAudio);
+
+        Foldout finalWave = CreateFoldout("Terminal Boss Room",
+                                          "Overrides content, motion timing, and audio when the final Boss room is cleared.");
+        PropertyField finalOverrideField = AddProperty(finalWave,
+                                                       serializedObject,
+                                                       prefix + "useFinalWaveOverride",
+                                                       "Use Final Wave Override");
+        VisualElement finalOptions = new VisualElement();
+        AddProperty(finalOptions, serializedObject, prefix + "finalWaveContent", "Content");
+        AddProperty(finalOptions, serializedObject, prefix + "finalWaveDirection", "Direction");
+        AddProperty(finalOptions,
+                    serializedObject,
+                    prefix + "finalWaveTraversalDurationSeconds",
+                    "Traversal Duration");
+        AddProperty(finalOptions, serializedObject, prefix + "finalWaveEasing", "Easing");
+        PropertyField finalPauseField = AddProperty(finalOptions,
+                                                    serializedObject,
+                                                    prefix + "finalWavePauseAtCenter",
+                                                    "Pause At Center");
+        PropertyField finalHoldField = AddProperty(finalOptions,
+                                                   serializedObject,
+                                                   prefix + "finalWaveCenterHoldDurationSeconds",
+                                                   "Center Hold Duration");
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalPauseField,
+                                                                    finalHoldField,
+                                                                    serializedObject,
+                                                                    prefix + "finalWavePauseAtCenter",
+                                                                    true);
+        PropertyField finalAudioField = AddProperty(finalOptions,
+                                                    serializedObject,
+                                                    prefix + "playFinalWaveAudioEvent",
+                                                    "Play Audio Event");
+        PropertyField finalAudioEventField = AddProperty(finalOptions,
+                                                         serializedObject,
+                                                         prefix + "finalWaveAudioEventId",
+                                                         "Audio Event");
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalAudioField,
+                                                                    finalAudioEventField,
+                                                                    serializedObject,
+                                                                    prefix + "playFinalWaveAudioEvent",
+                                                                    true);
+        finalWave.Add(finalOptions);
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalOverrideField,
+                                                                    finalOptions,
+                                                                    serializedObject,
+                                                                    prefix + "useFinalWaveOverride",
+                                                                    true);
+        enabledOptions.Add(finalWave);
+
+        Foldout placement = CreateFoldout("Placement", "Controls the vertical path and fully off-screen travel margin.");
+        AddProperty(placement,
+                    serializedObject,
+                    prefix + "verticalPositionNormalized",
+                    "Vertical Screen Position");
+        AddProperty(placement,
+                    serializedObject,
+                    prefix + "horizontalOffscreenPadding",
+                    "Off-Screen Padding");
+        enabledOptions.Add(placement);
+
+        Foldout typography = CreateFoldout("Style", "Controls the preauthored announcement text presentation.");
+        AddProperty(typography, serializedObject, prefix + "font", "Font");
+        AddProperty(typography, serializedObject, prefix + "fontSize", "Font Size");
+        AddProperty(typography, serializedObject, prefix + "fontStyle", "Font Style");
+        AddProperty(typography, serializedObject, prefix + "color", "Color");
+        enabledOptions.Add(typography);
+        root.Add(enabledOptions);
+        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(enabledField,
+                                                                    enabledOptions,
+                                                                    serializedObject,
+                                                                    prefix + "isEnabled",
+                                                                    true);
     }
     #endregion
 
@@ -309,6 +503,46 @@ internal static class GameHudManagerSupplementalPanelUtility
 
     #region Helpers
     /// <summary>
+    /// Keeps one summary control visible only for the power-up categories it can affect.
+    /// </summary>
+    /// <param name="driverField">Enum field that triggers visibility refreshes.</param>
+    /// <param name="targetRoot">Control or container whose visibility is updated.</param>
+    /// <param name="serializedObject">Serialized HUD preset storing the enum.</param>
+    /// <param name="propertyPath">Serialized enum property path.</param>
+    /// <param name="requirement">Category requirement represented by the target control.</param>
+    private static void TrackPowerUpVisibility(PropertyField driverField,
+                                               VisualElement targetRoot,
+                                               SerializedObject serializedObject,
+                                               string propertyPath,
+                                               GameHudSummaryVisibilityRequirement requirement)
+    {
+        if (driverField == null || targetRoot == null)
+            return;
+
+        SerializedProperty property = serializedObject.FindProperty(propertyPath);
+
+        if (property == null)
+            return;
+
+        System.Action refresh = () =>
+        {
+            GameHudSummaryPowerUpVisibility visibility =
+                (GameHudSummaryPowerUpVisibility)property.enumValueIndex;
+            bool visible = requirement switch
+            {
+                GameHudSummaryVisibilityRequirement.Active =>
+                    visibility != GameHudSummaryPowerUpVisibility.PassiveOnly,
+                GameHudSummaryVisibilityRequirement.Passive =>
+                    visibility != GameHudSummaryPowerUpVisibility.ActiveOnly,
+                _ => visibility == GameHudSummaryPowerUpVisibility.ActiveAndPassive
+            };
+            targetRoot.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+        };
+        driverField.RegisterCallback<SerializedPropertyChangeEvent>(evt => refresh.Invoke());
+        refresh.Invoke();
+    }
+
+    /// <summary>
     /// Adds a stable Input Action picker and assigns its named default when the current reference is empty.
     /// </summary>
     /// <param name="root">Container receiving the action foldout.</param>
@@ -393,4 +627,14 @@ internal static class GameHudManagerSupplementalPanelUtility
     #endregion
 
     #endregion
+}
+
+/// <summary>
+/// Identifies which summary category must be visible for one dependent editor control to be useful.
+/// </summary>
+internal enum GameHudSummaryVisibilityRequirement : byte
+{
+    Both = 0,
+    Active = 1,
+    Passive = 2
 }

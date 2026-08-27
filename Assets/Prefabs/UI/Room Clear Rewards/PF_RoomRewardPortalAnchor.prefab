@@ -59,7 +59,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 450
+  m_SortingOrder: -100
   m_TargetDisplay: 0
 --- !u!114 &3997876536197251054
 MonoBehaviour:
@@ -160,8 +160,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 649015273392379195}
-  - component: {fileID: 1097113701923057890}
   - component: {fileID: 610271392951262406}
+  - component: {fileID: 1097113701923057890}
   m_Layer: 0
   m_Name: PF_RoomRewardPortalAnchor
   m_TagString: Untagged
@@ -186,6 +186,19 @@ Transform:
   - {fileID: 3660116936042325536}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &610271392951262406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8499497740196082647}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8b72d1ecc05d25489e7596a9ca6030f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameRoomPortalRewardEffectView
+  linkedObjects: []
 --- !u!114 &1097113701923057890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,19 +215,6 @@ MonoBehaviour:
   logView: {fileID: 3564922931365893817}
   effectView: {fileID: 610271392951262406}
   offscreenIndicatorView: {fileID: 3997876536197251054}
---- !u!114 &610271392951262406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8499497740196082647}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8b72d1ecc05d25489e7596a9ca6030f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameRoomPortalRewardEffectView
-  linkedObjects: []
 --- !u!1001 &2286513933710732691
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -102,6 +102,15 @@ internal static class GameHudManagerPresetSceneValidationUtility
                                                                                                    "powerUpSummarySection",
                                                                                                    "HUDManager Power-Up Summary Section",
                                                                                                    warnings);
+        HUDWaveClearAnnouncementSection announcementSection = null;
+
+        if (preset == null ||
+            preset.WaveClearAnnouncementSettings == null ||
+            preset.WaveClearAnnouncementSettings.IsEnabled)
+            announcementSection = CheckRequiredReference<HUDWaveClearAnnouncementSection>(serializedHudManager,
+                                                                                           "waveClearAnnouncementSection",
+                                                                                           "HUDManager Room Clear Announcement Section",
+                                                                                           warnings);
         HUDPlayerDamageVignetteSection damageVignetteSection = CheckRequiredReference<HUDPlayerDamageVignetteSection>(serializedHudManager,
                                                                                                                        "damageVignetteSection",
                                                                                                                        "HUDManager Damage Vignette Section",
@@ -117,6 +126,7 @@ internal static class GameHudManagerPresetSceneValidationUtility
         ValidateMilestoneSelectionSection(milestoneSelectionSection, preset, warnings);
         ValidateContainerInteractionSection(containerInteractionSection, warnings);
         ValidatePowerUpSummarySection(summarySection, preset, warnings);
+        ValidateWaveClearAnnouncementSection(announcementSection, preset, warnings);
         ValidateDamageVignetteSection(damageVignetteSection, preset, warnings);
     }
     #endregion
@@ -400,6 +410,44 @@ internal static class GameHudManagerPresetSceneValidationUtility
                               GameHudPowerUpSummarySettings.AuthoredStatisticRowCapacity,
                               "statistic row",
                               warnings);
+    }
+
+    /// <summary>
+    /// Validates the preauthored full-screen root, moving text, and canvas group when announcements are enabled.
+    /// </summary>
+    /// <param name="section">Room-clear announcement section assigned on HUDManager.</param>
+    /// <param name="preset">Selected HUD preset used to skip disabled announcement checks.</param>
+    /// <param name="warnings">Mutable warning list receiving scene-binding diagnostics.</param>
+    private static void ValidateWaveClearAnnouncementSection(HUDWaveClearAnnouncementSection section,
+                                                             GameHudManagerPreset preset,
+                                                             List<string> warnings)
+    {
+        if (section == null)
+            return;
+
+        if (preset != null &&
+            preset.WaveClearAnnouncementSettings != null &&
+            !preset.WaveClearAnnouncementSettings.IsEnabled)
+            return;
+
+        SerializedObject serializedSection = new SerializedObject(section);
+        serializedSection.Update();
+        CheckRequiredReference<RectTransform>(serializedSection,
+                                              "presentationRoot",
+                                              "Room Clear Announcement presentation root",
+                                              warnings);
+        CheckRequiredReference<RectTransform>(serializedSection,
+                                              "textRoot",
+                                              "Room Clear Announcement moving text root",
+                                              warnings);
+        CheckRequiredReference<TMP_Text>(serializedSection,
+                                         "announcementText",
+                                         "Room Clear Announcement text",
+                                         warnings);
+        CheckRequiredReference<CanvasGroup>(serializedSection,
+                                            "canvasGroup",
+                                            "Room Clear Announcement canvas group",
+                                            warnings);
     }
 
     /// <summary>

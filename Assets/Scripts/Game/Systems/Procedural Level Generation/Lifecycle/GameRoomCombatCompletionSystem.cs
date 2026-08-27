@@ -1,7 +1,8 @@
+using Unity.Collections;
 using Unity.Entities;
 
 /// <summary>
-/// Aggregates spawner-wave and Boss-minion completion without temporary arrays or per-frame entity copies.
+/// Aggregates spawner-wave and Boss-minion completion into the shared authoritative room predicate.
 /// </summary>
 [UpdateInGroup(typeof(SimulationSystemGroup))]
 [UpdateAfter(typeof(EnemySystemGroup))]
@@ -59,6 +60,7 @@ public partial struct GameRoomCombatCompletionSystem : ISystem
             }
 
             anyWaveFound |= spawnerHasWaves;
+
         }
 
         bool hasBlockingBossMinion = false;

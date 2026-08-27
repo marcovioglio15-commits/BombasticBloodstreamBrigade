@@ -77,6 +77,8 @@ public sealed class GameplayMenuController : MonoBehaviour
     private bool settingsMenuVisible;
     private bool terminalCommandSubmitted;
     private MenuSelectionController selectionController;
+    private readonly GameplayMenuWaveClearVictoryGate waveClearVictoryGate =
+        new GameplayMenuWaveClearVictoryGate();
     #endregion
 
     #endregion
@@ -132,6 +134,7 @@ public sealed class GameplayMenuController : MonoBehaviour
         pauseMenuVisible = false;
         endingMenuVisible = false;
         settingsMenuVisible = false;
+        waveClearVictoryGate.Invalidate();
     }
 
     /// <summary>
@@ -158,6 +161,12 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         if (endingMenuVisible)
             return;
+
+        if (runOutcomeState.Outcome == PlayerRunOutcome.Victory &&
+            waveClearVictoryGate.IsBlocked(defaultWorld, entityManager))
+        {
+            return;
+        }
 
         ShowEndingMenu(runOutcomeState.Outcome);
     }
@@ -394,6 +403,7 @@ public sealed class GameplayMenuController : MonoBehaviour
 
         return GameplayMenuEcsBindingUtility.IsMilestoneSelectionActive(entityManager, playerEntity);
     }
+
     #endregion
 
     #region Menu Flow
@@ -514,7 +524,7 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
             return;
 
-        if (ReloadActiveScene())
+        if (GameplayMenuSceneFlowUtility.ReloadActiveScene())
             LockTerminalCommands();
     }
 
@@ -574,7 +584,7 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
             return;
 
-        if (LoadMainMenuScene())
+        if (GameplayMenuSceneFlowUtility.LoadMainMenuScene())
             LockTerminalCommands();
     }
 
@@ -599,7 +609,7 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
             return;
 
-        if (ReloadActiveScene())
+        if (GameplayMenuSceneFlowUtility.ReloadActiveScene())
             LockTerminalCommands();
     }
 
@@ -611,7 +621,7 @@ public sealed class GameplayMenuController : MonoBehaviour
         if (GameSceneTransitionRuntimeGuardUtility.ShouldBlockTerminalUiCommand(terminalCommandSubmitted))
             return;
 
-        if (LoadMainMenuScene())
+        if (GameplayMenuSceneFlowUtility.LoadMainMenuScene())
             LockTerminalCommands();
     }
 
@@ -661,37 +671,6 @@ public sealed class GameplayMenuController : MonoBehaviour
                                                            endingPlayAgainButton,
                                                            endingMainMenuButton,
                                                            endingQuitButton);
-    }
-    #endregion
-
-    #region Scene Flow
-    /// <summary>
-    /// Restarts the active procedural run when available, otherwise requests the active managed scene restart.
-    /// </summary>
-    /// <returns>True when the authoritative runtime accepted or already owns the restart request.</returns>
-    private bool ReloadActiveScene()
-    {
-        if (GameProceduralLevelRunRequestUtility.TryRestartActiveRun())
-            return true;
-
-        if (GameSceneTransitionRequestUtility.EnqueueRestartActiveScene())
-            return true;
-
-        Debug.LogWarning("[GameplayMenuController] Unable to enqueue gameplay restart. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
-        return false;
-    }
-
-    /// <summary>
-    /// Requests the configured main menu through the ECS Scene Manager.
-    /// </summary>
-    /// <returns>True when the authoritative Scene Manager accepted or already owns the main-menu request.</returns>
-    private bool LoadMainMenuScene()
-    {
-        if (GameSceneTransitionRequestUtility.EnqueueLoadMainMenu())
-            return true;
-
-        Debug.LogWarning("[GameplayMenuController] Unable to enqueue main-menu loading. Start from SCN_Bootstrap or verify the GameSceneManagerAuthoring setup.");
-        return false;
     }
     #endregion
 

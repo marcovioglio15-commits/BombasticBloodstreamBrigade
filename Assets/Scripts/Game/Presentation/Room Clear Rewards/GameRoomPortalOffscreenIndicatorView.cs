@@ -35,6 +35,7 @@ public sealed class GameRoomPortalOffscreenIndicatorView : MonoBehaviour
     private Sprite appliedSprite;
     private Color appliedColor = Color.clear;
     private float appliedSizePixels = -1f;
+    private int appliedSortingOrder = int.MaxValue;
     #endregion
 
     #endregion
@@ -96,7 +97,8 @@ public sealed class GameRoomPortalOffscreenIndicatorView : MonoBehaviour
                               config.PortalIndicatorColor.y,
                               config.PortalIndicatorColor.z,
                               config.PortalIndicatorColor.w),
-                    config.PortalIndicatorSizePixels);
+                    config.PortalIndicatorSizePixels,
+                    config.PortalIndicatorSortingOrder);
 
         if (!ScreenSpaceOffscreenIndicatorUtility.TryApplyEdgeTransform(
                 indicatorRoot,
@@ -144,15 +146,24 @@ public sealed class GameRoomPortalOffscreenIndicatorView : MonoBehaviour
 
     #region Configuration
     /// <summary>
-    /// Applies sprite, tint and square dimensions only when their baked values change.
+    /// Applies sprite, tint, square dimensions, and behind-HUD sorting only when baked values change.
     /// </summary>
     /// <param name="indicatorSprite">Sprite displayed by the indicator image.</param>
     /// <param name="indicatorColor">Tint applied to the indicator image.</param>
     /// <param name="sizePixels">Square indicator size in screen pixels.</param>
+    /// <param name="sortingOrder">Canvas sorting order kept below the primary gameplay HUD.</param>
     private void ApplyConfig(Sprite indicatorSprite,
                              Color indicatorColor,
-                             float sizePixels)
+                             float sizePixels,
+                             int sortingOrder)
     {
+        if (indicatorCanvas != null && appliedSortingOrder != sortingOrder)
+        {
+            indicatorCanvas.overrideSorting = true;
+            indicatorCanvas.sortingOrder = sortingOrder;
+            appliedSortingOrder = sortingOrder;
+        }
+
         if (appliedSprite != indicatorSprite)
         {
             indicatorImage.sprite = indicatorSprite;

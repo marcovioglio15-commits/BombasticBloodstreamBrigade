@@ -35,6 +35,9 @@ public static class GameHudManagerPresetValidationUtility
         ValidateMilestoneSelectionSettings(preset.MilestoneSelectionSettings, warnings);
         ValidateDamageVignetteSettings(preset.DamageVignetteSettings, warnings);
         GameHudSupplementalPresetValidationUtility.ValidatePowerUpSummary(preset.PowerUpSummarySettings, warnings);
+        GameHudSupplementalPresetValidationUtility.ValidateWaveClearAnnouncement(
+            preset.WaveClearAnnouncementSettings,
+            warnings);
         GameHudSupplementalPresetValidationUtility.ValidateButtonInteractions(preset.ButtonInteractionSettings, warnings);
         GameHudSupplementalPresetValidationUtility.ValidateSettingsNavigation(preset.SettingsNavigationSettings, warnings);
     }

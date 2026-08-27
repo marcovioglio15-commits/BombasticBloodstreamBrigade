@@ -22,6 +22,16 @@ public enum GameHudSummaryPowerUpOrder : byte
 }
 
 /// <summary>
+/// Selects which collected power-up categories occupy the upper summary area.
+/// </summary>
+public enum GameHudSummaryPowerUpVisibility : byte
+{
+    ActiveAndPassive = 0,
+    ActiveOnly = 1,
+    PassiveOnly = 2
+}
+
+/// <summary>
 /// Selects the easing curve used by the authored summary-panel slide.
 /// </summary>
 public enum GameHudSummarySlideEasing : byte
@@ -200,6 +210,10 @@ public sealed class GameHudPowerUpSummarySettings
     [Tooltip("Controls whether active or passive power-ups occupy the first horizontal column.")]
     [SerializeField] private GameHudSummaryPowerUpOrder powerUpOrder;
 
+    [Tooltip("Chooses whether the upper summary area shows both power-up categories, active power-ups only, or passive power-ups only.")]
+    [SerializeField]
+    private GameHudSummaryPowerUpVisibility powerUpVisibility;
+
     [Tooltip("Expanded panel width in pixels. Runtime presentation clamps invalid values without rewriting this preset.")]
     [SerializeField] private float expandedWidth = 520f;
 
@@ -342,6 +356,7 @@ public sealed class GameHudPowerUpSummarySettings
     public bool HideWhenPlayerMissing => hideWhenPlayerMissing;
     public GameHudSummaryPanelSide PanelSide => panelSide;
     public GameHudSummaryPowerUpOrder PowerUpOrder => powerUpOrder;
+    public GameHudSummaryPowerUpVisibility PowerUpVisibility => powerUpVisibility;
     public float ExpandedWidth => expandedWidth;
     public float CollapsedHandleWidth => collapsedHandleWidth;
     public float ContentPadding => contentPadding;

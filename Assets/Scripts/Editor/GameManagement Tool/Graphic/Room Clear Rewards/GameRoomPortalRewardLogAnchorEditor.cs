@@ -6,7 +6,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 
 /// <summary>
-/// Explains the strict ECS locator contract beside every managed portal reward anchor.
+/// Validates each managed portal reward anchor and exposes exact local and project-wide alignment actions.
 /// </summary>
 [CustomEditor(typeof(GameRoomPortalRewardLogAnchor))]
 internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
@@ -15,7 +15,7 @@ internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
 
     #region Unity Methods
     /// <summary>
-    /// Draws the locator contract before the serialized anchor references to prevent invalid scene authoring.
+    /// Draws serialized anchor references, validation feedback and conditional portal alignment actions.
     /// </summary>
     public override void OnInspectorGUI()
     {
@@ -142,6 +142,18 @@ internal sealed class GameRoomPortalRewardLogAnchorEditor : Editor
 
         if (GUILayout.Button("Align Root To Portal Volume Center"))
             AlignAnchor(anchor);
+
+        using (new EditorGUI.DisabledScope(anchor.LogView == null))
+        {
+            GUIContent synchronizeLogPose = new GUIContent(
+                "Synchronize Room Reward Log Pose Across All Portals",
+                "Copies this Room Reward Log position from the lower center of its authoritative Portal Volume and its rotation from the logical Portal Side, then applies that floor-relative pose to every other portal log in all project scenes.");
+
+            if (GUILayout.Button(synchronizeLogPose))
+                EditorApplication.delayCall += () =>
+                    GameRoomPortalSceneSynchronizationUtility
+                        .SynchronizeRoomRewardLogPose(anchor);
+        }
     }
 
     /// <summary>

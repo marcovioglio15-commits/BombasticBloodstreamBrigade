@@ -54,7 +54,36 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
                                                      out Vector3 worldCenter,
                                                      out string failure)
     {
+        GameRoomPortalReferencePose referencePose;
+
+        if (TryResolvePortalReferencePose(roomScene,
+                                          portalId,
+                                          out referencePose,
+                                          out failure))
+        {
+            worldCenter = referencePose.WorldCenter;
+            return true;
+        }
+
         worldCenter = Vector3.zero;
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves one unique authoritative portal reference frame in a loaded managed room scene.
+    /// </summary>
+    /// <param name="roomScene">Loaded managed room scene containing the anchor and its SubScene references.</param>
+    /// <param name="portalId">Exact stable portal identifier already assigned to the managed anchor.</param>
+    /// <param name="referencePose">Resolved center and orientation when lookup succeeds.</param>
+    /// <param name="failure">Actionable explanation when the identifier cannot resolve exactly one portal.</param>
+    /// <returns>True when exactly one valid SubScene portal matches the requested identifier.</returns>
+    internal static bool TryResolvePortalReferencePose(
+        Scene roomScene,
+        string portalId,
+        out GameRoomPortalReferencePose referencePose,
+        out string failure)
+    {
+        referencePose = default;
         failure = string.Empty;
 
         if (!roomScene.IsValid() || !roomScene.isLoaded)
@@ -69,27 +98,27 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
             return false;
         }
 
-        List<PortalPresentationSource> sources = CollectPortalSources(roomScene);
+        List<GameRoomPortalReferencePose> sources = CollectPortalReferencePoses(roomScene);
         bool found = false;
 
         // Require one exact identity so duplicate portal authoring can never move an anchor ambiguously.
         for (int sourceIndex = 0; sourceIndex < sources.Count; sourceIndex++)
         {
-            PortalPresentationSource source = sources[sourceIndex];
+            GameRoomPortalReferencePose source = sources[sourceIndex];
 
             if (!string.Equals(source.PortalId, portalId, StringComparison.Ordinal))
                 continue;
 
             if (found)
             {
-                worldCenter = Vector3.zero;
+                referencePose = default;
                 failure = "Portal ID '" + portalId +
                           "' is duplicated across the referenced SubScenes. Keep the ID unique before aligning.";
                 return false;
             }
 
             found = true;
-            worldCenter = source.WorldCenter;
+            referencePose = source;
         }
 
         if (found)
@@ -167,7 +196,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
 
         try
         {
-            List<PortalPresentationSource> sources = CollectPortalSources(roomScene);
+            List<GameRoomPortalReferencePose> sources = CollectPortalReferencePoses(roomScene);
             SynchronizePresentationAnchors(roomScene,
                                            sources,
                                            portalAnchorPrefab);
@@ -189,7 +218,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// <param name="portalAnchorPrefab">Shared anchor prefab used only for missing portals.</param>
     private static void SynchronizePresentationAnchors(
         Scene roomScene,
-        IReadOnlyList<PortalPresentationSource> sources,
+        IReadOnlyList<GameRoomPortalReferencePose> sources,
         GameObject portalAnchorPrefab)
     {
         GameObject[] roots = roomScene.GetRootGameObjects();
@@ -232,7 +261,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
         // Reuse valid anchors so scene object links and Static Rows placement survive every setup pass.
         for (int sourceIndex = 0; sourceIndex < sources.Count; sourceIndex++)
         {
-            PortalPresentationSource source = sources[sourceIndex];
+            GameRoomPortalReferencePose source = sources[sourceIndex];
 
             if (!anchorsByPortalId.TryGetValue(source.PortalId,
                                                 out GameRoomPortalRewardLogAnchor anchor))
@@ -255,7 +284,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// <returns>Created managed portal anchor.</returns>
     private static GameRoomPortalRewardLogAnchor CreatePresentationAnchor(
         Scene roomScene,
-        PortalPresentationSource source,
+        GameRoomPortalReferencePose source,
         GameObject portalAnchorPrefab)
     {
         GameObject anchorObject =
@@ -285,7 +314,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// <param name="source">Authoritative portal identity and center.</param>
     private static void ConfigurePresentationAnchor(
         GameRoomPortalRewardLogAnchor anchor,
-        PortalPresentationSource source)
+        GameRoomPortalReferencePose source)
     {
         GameObject anchorObject = anchor.gameObject;
         anchorObject.name = AnchorNamePrefix + source.PortalId;
@@ -313,13 +342,13 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
 
     #region SubScene Inspection
     /// <summary>
-    /// Reads every valid portal identity and world center from the SubScenes referenced by one managed room.
+    /// Reads every valid portal identity, world center and orientation from the SubScenes referenced by one managed room.
     /// </summary>
     /// <param name="roomScene">Managed room scene containing SubScene components.</param>
     /// <returns>Stable portal presentation sources ordered by managed hierarchy and SubScene hierarchy.</returns>
-    private static List<PortalPresentationSource> CollectPortalSources(Scene roomScene)
+    internal static List<GameRoomPortalReferencePose> CollectPortalReferencePoses(Scene roomScene)
     {
-        List<PortalPresentationSource> sources = new List<PortalPresentationSource>(8);
+        List<GameRoomPortalReferencePose> sources = new List<GameRoomPortalReferencePose>(8);
         List<SubScene> subScenes = new List<SubScene>(2);
         GameObject[] roots = roomScene.GetRootGameObjects();
 
@@ -342,7 +371,7 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
     /// <param name="subScene">Managed SubScene component referencing the authored ECS scene.</param>
     /// <param name="sources">Mutable destination for collected portal sources.</param>
     private static void CollectSubScenePortalSources(SubScene subScene,
-                                                     List<PortalPresentationSource> sources)
+                                                     List<GameRoomPortalReferencePose> sources)
     {
         if (subScene == null || subScene.SceneAsset == null)
             return;
@@ -376,9 +405,8 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
                         continue;
                     }
 
-                    sources.Add(new PortalPresentationSource(
-                        portal.PortalId,
-                        portal.PortalVolume.transform.TransformPoint(portal.PortalVolume.center)));
+                    sources.Add(
+                        GameRoomPortalReferencePose.CreateFromAuthoring(portal));
                 }
             }
         }
@@ -392,34 +420,91 @@ internal static class GameRoomRewardPortalManagedSceneSetupUtility
 
     #endregion
 
-    #region Nested Types
+}
+
+/// <summary>
+/// Stores the immutable world-space reference frame built from one authoritative SubScene portal center and logical side.
+/// </summary>
+internal readonly struct GameRoomPortalReferencePose
+{
+    #region Fields
+    public readonly string PortalId;
+    public readonly Vector3 WorldCenter;
+    public readonly Vector3 WorldBaseCenter;
+    public readonly Quaternion WorldRotation;
+    #endregion
+
+    #region Methods
+
+    #region Factories
     /// <summary>
-    /// Stores immutable managed presentation identity and placement copied from one SubScene portal.
+    /// Creates a portal reference frame whose orientation follows the logical room side instead of collider axes.
+    /// This keeps presentation offsets stable when equivalent Portal Volumes were authored with different rotations.
     /// </summary>
-    private readonly struct PortalPresentationSource
+    /// <param name="portal">Valid portal authoring component supplying identity, volume center and logical orientation.</param>
+    /// <returns>Immutable canonical reference frame used by editor synchronization.</returns>
+    public static GameRoomPortalReferencePose CreateFromAuthoring(
+        GameRoomPortalAuthoring portal)
     {
-        #region Fields
-        public readonly string PortalId;
-        public readonly Vector3 WorldCenter;
-        #endregion
-
-        #region Methods
-
-        #region Constructors
-        /// <summary>
-        /// Captures one stable portal identity and its authored world-space volume center.
-        /// </summary>
-        /// <param name="portalId">Stable identifier shared with the baked ECS portal.</param>
-        /// <param name="worldCenter">Authored world-space center mirrored by the managed anchor.</param>
-        public PortalPresentationSource(string portalId, Vector3 worldCenter)
-        {
-            PortalId = portalId;
-            WorldCenter = worldCenter;
-        }
-        #endregion
-
-        #endregion
+        // Disabled authoring colliders expose empty Bounds, so derive their world vertical extent from all three scaled axes.
+        BoxCollider volume = portal.PortalVolume;
+        Transform volumeTransform = volume.transform;
+        Vector3 worldCenter =
+            volumeTransform.TransformPoint(volume.center);
+        Vector3 halfSize = volume.size * 0.5f;
+        float verticalExtent =
+            Mathf.Abs(volumeTransform.TransformVector(
+                new Vector3(halfSize.x, 0f, 0f)).y) +
+            Mathf.Abs(volumeTransform.TransformVector(
+                new Vector3(0f, halfSize.y, 0f)).y) +
+            Mathf.Abs(volumeTransform.TransformVector(
+                new Vector3(0f, 0f, halfSize.z)).y);
+        return new GameRoomPortalReferencePose(
+            portal.PortalId,
+            worldCenter,
+            new Vector3(worldCenter.x,
+                        worldCenter.y - verticalExtent,
+                        worldCenter.z),
+            portal.ResolveWorldPresentationRotation());
     }
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    /// Captures the identity and center-based frame used by presentation categories that do not need a lower extent.
+    /// </summary>
+    /// <param name="portalId">Stable identifier shared with the baked ECS portal.</param>
+    /// <param name="worldCenter">World-space center of the authored portal volume.</param>
+    /// <param name="worldRotation">Canonical world-space orientation whose forward axis points through the logical portal side.</param>
+    public GameRoomPortalReferencePose(string portalId,
+                                       Vector3 worldCenter,
+                                       Quaternion worldRotation)
+        : this(portalId,
+               worldCenter,
+               worldCenter,
+               worldRotation)
+    {
+    }
+
+    /// <summary>
+    /// Captures the identity, volume center, lower threshold center and canonical presentation orientation.
+    /// </summary>
+    /// <param name="portalId">Stable identifier shared with the baked ECS portal.</param>
+    /// <param name="worldCenter">World-space center of the authored portal volume.</param>
+    /// <param name="worldBaseCenter">World-space center of the volume's lowest vertical extent.</param>
+    /// <param name="worldRotation">Canonical world-space orientation whose forward axis points through the logical portal side.</param>
+    public GameRoomPortalReferencePose(string portalId,
+                                       Vector3 worldCenter,
+                                       Vector3 worldBaseCenter,
+                                       Quaternion worldRotation)
+    {
+        PortalId = portalId;
+        WorldCenter = worldCenter;
+        WorldBaseCenter = worldBaseCenter;
+        WorldRotation = worldRotation;
+    }
+    #endregion
+
     #endregion
 }
 #endif

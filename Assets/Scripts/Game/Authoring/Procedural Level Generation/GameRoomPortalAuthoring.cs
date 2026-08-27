@@ -23,6 +23,7 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
 {
     #region Constants
     private const int MaximumFixedString64Utf8Bytes = 61;
+    private const float MinimumDirectionSqrMagnitude = 0.000001f;
     #endregion
 
     #region Fields
@@ -193,11 +194,47 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
         failureMessage = failures.ToString();
         return failures.Length == 0;
     }
+
+    /// <summary>
+    /// Resolves the normalized world-space direction pointing from the room interior through this portal side.
+    /// The result is independent from the Portal Volume collider axes and is suitable for presentation alignment.
+    /// </summary>
+    /// <returns>Normalized outward direction represented by the authored logical side.</returns>
+    public Vector3 ResolveWorldSideDirection()
+    {
+        Vector3 worldDirection =
+            transform.TransformDirection(ResolveLocalSideDirection());
+
+        if (worldDirection.sqrMagnitude <= MinimumDirectionSqrMagnitude)
+            return Vector3.forward;
+
+        return worldDirection.normalized;
+    }
+
+    /// <summary>
+    /// Builds the stable world-space reference rotation used to transfer presentation poses between portals.
+    /// Local forward points outward through the logical portal side and local up follows the portal hierarchy.
+    /// </summary>
+    /// <returns>Canonical portal rotation independent from BoxCollider authoring orientation.</returns>
+    public Quaternion ResolveWorldPresentationRotation()
+    {
+        Vector3 forward = ResolveWorldSideDirection();
+        Vector3 up = Vector3.ProjectOnPlane(transform.up, forward);
+
+        // Fall back to world axes only when an unusually tilted hierarchy makes its up direction degenerate.
+        if (up.sqrMagnitude <= MinimumDirectionSqrMagnitude)
+            up = Vector3.ProjectOnPlane(Vector3.up, forward);
+
+        if (up.sqrMagnitude <= MinimumDirectionSqrMagnitude)
+            up = Vector3.ProjectOnPlane(Vector3.right, forward);
+
+        return Quaternion.LookRotation(forward, up.normalized);
+    }
     #endregion
 
     #region Unity Methods
     /// <summary>
-    /// Initializes stable identity and local references when the component is first added by a .
+    /// Initializes stable identity and local references when the component is first added in the editor.
     /// </summary>
     private void Reset()
     {
@@ -277,7 +314,7 @@ public sealed class GameRoomPortalAuthoring : MonoBehaviour
     private void DrawSelectedAnnotations(BoxCollider volume, Color portalColor)
     {
         Vector3 worldCenter = volume.transform.TransformPoint(volume.center);
-        Vector3 worldDirection = transform.TransformDirection(ResolveLocalSideDirection()).normalized;
+        Vector3 worldDirection = ResolveWorldSideDirection();
         float arrowLength = Mathf.Max(0.75f, volume.bounds.extents.magnitude * 0.65f);
         Gizmos.color = new Color(portalColor.r, portalColor.g, portalColor.b, 1f);
         Gizmos.DrawLine(worldCenter, worldCenter + worldDirection * arrowLength);

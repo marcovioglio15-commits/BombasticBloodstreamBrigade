@@ -522,5 +522,6 @@ internal enum DetailsSectionType
     Validation = 9,
     PowerUpSummary = 10,
     ButtonInteractions = 11,
-    SettingsNavigation = 12
+    SettingsNavigation = 12,
+    WaveClearAnnouncement = 13
 }

@@ -44,6 +44,7 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         GameProceduralRoomManagedSceneOptimizationUtility.Configure();
         GameRoomRewardPortalManagedSceneSetupUtility.Configure(
             portalLogAnchorPrefab);
+        GameRoomTrainArrivalProjectSetupUtility.Configure();
         SynchronizeRoomMetadata();
         Debug.Log("[GameRoomRewardPresentationProjectSetupUtility] Room reward presentation and portal isolation setup completed.");
     }
@@ -381,7 +382,7 @@ public static class GameRoomRewardPresentationProjectSetupUtility
         canvasTransform.localScale = Vector3.one;
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 450;
+        canvas.sortingOrder = -100;
         canvas.overrideSorting = true;
         GameObject indicatorObject = new GameObject(
             "Indicator",

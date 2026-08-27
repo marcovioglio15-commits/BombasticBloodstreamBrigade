@@ -330,7 +330,10 @@ public static class GameRoomRewardRuntimeSmokeTest
                                                  animations,
                                                  replacements);
 
-            Require(activated && !sceneObject.activeSelf && sceneParent.transform.childCount == 2,
+            Require(activated &&
+                    !effectView.IsActivationReady &&
+                    !sceneObject.activeSelf &&
+                    sceneParent.transform.childCount == 2,
                     "Portal activation did not replace the existing 3D scene object exactly once.");
             Require(!effectView.Activate(71,
                                          animations,
@@ -342,6 +345,15 @@ public static class GameRoomRewardRuntimeSmokeTest
             RequireApproximately(sceneObject.transform.localPosition.x,
                                  1f,
                                  "Portal reset did not restore the original local Transform.");
+
+            // A replacement-only switch completes synchronously and can release traversal immediately.
+            animations.Clear();
+            Require(effectView.Activate(72,
+                                        animations,
+                                        replacements) &&
+                    effectView.IsActivationReady,
+                    "A synchronous linked-object replacement did not complete its activation gate immediately.");
+            effectView.Deactivate();
         }
         finally
         {

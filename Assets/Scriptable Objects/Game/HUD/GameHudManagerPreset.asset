@@ -103,6 +103,7 @@ MonoBehaviour:
     hideWhenPlayerMissing: 1
     panelSide: 1
     powerUpOrder: 0
+    powerUpVisibility: 2
     expandedWidth: 520
     collapsedHandleWidth: 42
     contentPadding: 16
@@ -299,6 +300,32 @@ MonoBehaviour:
       fontSize: 18
       fontStyle: 0
       color: {r: 1, g: 1, b: 1, a: 1}
+  waveClearAnnouncementSettings:
+    isEnabled: 1
+    content: ROOM CLEARED
+    playAudioEvent: 0
+    audioEventId: 28
+    direction: 1
+    traversalDurationSeconds: 1.4
+    easing: 2
+    pauseAtCenter: 1
+    centerHoldDurationSeconds: 0.7
+    useUnscaledTime: 1
+    useFinalWaveOverride: 1
+    finalWaveContent: AREA CLEARED
+    finalWaveDirection: 1
+    finalWaveTraversalDurationSeconds: 2.4
+    finalWaveEasing: 2
+    finalWavePauseAtCenter: 1
+    finalWaveCenterHoldDurationSeconds: 1.5
+    playFinalWaveAudioEvent: 0
+    finalWaveAudioEventId: 29
+    verticalPositionNormalized: 0.62
+    horizontalOffscreenPadding: 48
+    font: {fileID: 0}
+    fontSize: 72
+    fontStyle: 1
+    color: {r: 1, g: 1, b: 1, a: 1}
   buttonInteractionSettings:
     menuProfiles:
     - menuKind: 0
@@ -320,9 +347,10 @@ MonoBehaviour:
       hoverClip: {fileID: 0}
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
-      overrideSprites: 0
+      overrideSprites: 1
+      allowEmptySprites: 1
       normalSprite: {fileID: 0}
-      hoverSprite: {fileID: 0}
+      hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
       pressedSprite: {fileID: 0}
       disabledSprite: {fileID: 0}
       overrideGraphicColors: 0
@@ -361,8 +389,9 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 1
       normalSprite: {fileID: 0}
-      hoverSprite: {fileID: 0}
+      hoverSprite: {fileID: 21300000, guid: e4f2b00e5b0de1f4994733596d02a814, type: 3}
       pressedSprite: {fileID: 0}
       disabledSprite: {fileID: 0}
       overrideGraphicColors: 0
@@ -401,6 +430,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}
@@ -441,6 +471,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}
@@ -481,6 +512,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}
@@ -521,6 +553,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}
@@ -561,6 +594,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}
@@ -601,6 +635,7 @@ MonoBehaviour:
       pressedClip: {fileID: 0}
       disabledClip: {fileID: 0}
       overrideSprites: 0
+      allowEmptySprites: 0
       normalSprite: {fileID: 0}
       hoverSprite: {fileID: 0}
       pressedSprite: {fileID: 0}

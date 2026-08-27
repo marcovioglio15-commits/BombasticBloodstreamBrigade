@@ -37,6 +37,7 @@ public static class GameHudSupplementalPresetBakeUtility
                 HideWhenPlayerMissing = 1,
                 PanelSide = GameHudSummaryPanelSide.Right,
                 PowerUpOrder = GameHudSummaryPowerUpOrder.ActiveFirst,
+                PowerUpVisibility = GameHudSummaryPowerUpVisibility.ActiveAndPassive,
                 ExpandedWidth = DefaultExpandedWidth,
                 CollapsedHandleWidth = DefaultHandleWidth,
                 PowerUpAreaHeightNormalized = 0.58f,
@@ -67,6 +68,7 @@ public static class GameHudSupplementalPresetBakeUtility
             HideWhenPlayerMissing = ToByte(settings.HideWhenPlayerMissing),
             PanelSide = settings.PanelSide,
             PowerUpOrder = settings.PowerUpOrder,
+            PowerUpVisibility = settings.PowerUpVisibility,
             ExpandedWidth = ResolvePositive(settings.ExpandedWidth, DefaultExpandedWidth),
             CollapsedHandleWidth = ResolveNonNegative(settings.CollapsedHandleWidth, DefaultHandleWidth),
             ContentPadding = ResolveNonNegative(settings.ContentPadding, 16f),
@@ -151,6 +153,49 @@ public static class GameHudSupplementalPresetBakeUtility
                 Color = ToFloat4(statistic.Color)
             });
         }
+    }
+    #endregion
+
+    #region Wave Clear Announcement
+    /// <summary>
+    /// Builds safe runtime presentation values for the preauthored room-clear announcement without changing its preset.
+    /// </summary>
+    /// <param name="settings">Announcement settings, or null while no HUD preset is assigned.</param>
+    /// <returns>Baked announcement config consumed by the managed HUD presentation.</returns>
+    public static GameHudWaveClearAnnouncementRuntimeConfig BuildWaveClearAnnouncementConfig(
+        GameHudWaveClearAnnouncementSettings settings)
+    {
+        if (settings == null)
+            return default;
+
+        return new GameHudWaveClearAnnouncementRuntimeConfig
+        {
+            Enabled = ToByte(settings.IsEnabled),
+            Content = BuildFixedString512(settings.Content),
+            PlayAudioEvent = ToByte(settings.PlayAudioEvent),
+            AudioEventId = settings.AudioEventId,
+            Direction = settings.Direction,
+            TraversalDurationSeconds = ResolvePositive(settings.TraversalDurationSeconds, 1.4f),
+            Easing = settings.Easing,
+            PauseAtCenter = ToByte(settings.PauseAtCenter),
+            CenterHoldDurationSeconds = ResolveNonNegative(settings.CenterHoldDurationSeconds, 0.7f),
+            UseUnscaledTime = ToByte(settings.UseUnscaledTime),
+            UseFinalWaveOverride = ToByte(settings.UseFinalWaveOverride),
+            FinalWaveContent = BuildFixedString512(settings.FinalWaveContent),
+            FinalWaveDirection = settings.FinalWaveDirection,
+            FinalWaveTraversalDurationSeconds = ResolvePositive(settings.FinalWaveTraversalDurationSeconds, 2.4f),
+            FinalWaveEasing = settings.FinalWaveEasing,
+            FinalWavePauseAtCenter = ToByte(settings.FinalWavePauseAtCenter),
+            FinalWaveCenterHoldDurationSeconds = ResolveNonNegative(settings.FinalWaveCenterHoldDurationSeconds, 1.5f),
+            PlayFinalWaveAudioEvent = ToByte(settings.PlayFinalWaveAudioEvent),
+            FinalWaveAudioEventId = settings.FinalWaveAudioEventId,
+            VerticalPositionNormalized = math.saturate(ResolveFinite(settings.VerticalPositionNormalized, 0.62f)),
+            HorizontalOffscreenPadding = ResolveNonNegative(settings.HorizontalOffscreenPadding, 48f),
+            Font = settings.Font,
+            FontSize = ResolvePositive(settings.FontSize, 72f),
+            FontStyle = (int)settings.FontStyle,
+            Color = ToFloat4(settings.Color)
+        };
     }
     #endregion
 
@@ -257,6 +302,7 @@ public static class GameHudSupplementalPresetBakeUtility
             PressedClip = profile.PressedClip,
             DisabledClip = profile.DisabledClip,
             OverrideSprites = ToByte(profile.OverrideSprites),
+            AllowEmptySprites = ToByte(profile.AllowEmptySprites),
             NormalSprite = profile.NormalSprite,
             HoverSprite = profile.HoverSprite,
             PressedSprite = profile.PressedSprite,
@@ -356,6 +402,18 @@ public static class GameHudSupplementalPresetBakeUtility
         FixedString64Bytes result = default;
         string resolvedValue = value ?? string.Empty;
         result.CopyFromTruncated(resolvedValue);
+        return result;
+    }
+
+    /// <summary>
+    /// Converts announcement text into its larger ECS fixed-string representation with safe UTF-8 truncation.
+    /// </summary>
+    /// <param name="value">Announcement text to store in runtime configuration.</param>
+    /// <returns>Fixed-capacity announcement text.</returns>
+    private static FixedString512Bytes BuildFixedString512(string value)
+    {
+        FixedString512Bytes result = default;
+        result.CopyFromTruncated(value ?? string.Empty);
         return result;
     }
 

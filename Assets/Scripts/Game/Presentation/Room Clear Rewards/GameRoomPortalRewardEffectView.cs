@@ -24,8 +24,8 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         new Dictionary<string, int>(StringComparer.Ordinal);
     private readonly List<GameRoomPortalRuntimeBindingState> runtimeBindings =
         new List<GameRoomPortalRuntimeBindingState>(8);
-    private readonly List<RuntimeTransformAnimationState> transformAnimations =
-        new List<RuntimeTransformAnimationState>(8);
+    private readonly List<GameRoomPortalTransformAnimationState> transformAnimations =
+        new List<GameRoomPortalTransformAnimationState>(8);
     private readonly List<GameRoomPortalAnimatorAnimationState> animatorAnimations =
         new List<GameRoomPortalAnimatorAnimationState>(4);
     private int activationSignature = int.MinValue;
@@ -38,6 +38,11 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     /// Gets the linked scene-object mappings authored on this portal anchor.
     /// </summary>
     public IReadOnlyList<GameRoomPortalLinkedObjectBinding> LinkedObjects => linkedObjects;
+
+    /// <summary>
+    /// Gets whether replacements are applied and every linked animation has completed its first playback pass.
+    /// </summary>
+    public bool IsActivationReady { get; private set; }
     #endregion
 
     #region Methods
@@ -75,6 +80,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         CaptureLinkedObjectState();
         ApplyReplacements(replacements);
         BuildAnimationStates(animations);
+        IsActivationReady = transformAnimations.Count == 0 && animatorAnimations.Count == 0;
         enabled = transformAnimations.Count > 0 || animatorAnimations.Count > 0;
         return true;
     }
@@ -87,6 +93,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         DestroyAnimatorGraphs();
         transformAnimations.Clear();
         animatorAnimations.Clear();
+        IsActivationReady = false;
 
         // Restore every linked object before removing its optional runtime replacement.
         for (int bindingIndex = 0; bindingIndex < runtimeBindings.Count; bindingIndex++)
@@ -179,6 +186,9 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         float deltaTime = Mathf.Max(0f, Time.deltaTime);
         bool transformComplete = UpdateTransformAnimations(deltaTime);
         bool animatorComplete = UpdateAnimatorAnimations(deltaTime);
+
+        if (!IsActivationReady)
+            IsActivationReady = HaveAnimationsReachedActivationCompletion();
 
         if (transformComplete && animatorComplete)
             enabled = false;
@@ -327,13 +337,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
             GameRoomPortalActivationAnimationElement animation = animations[animationIndex];
 
             if (!TryGetBindingIndex(animation.TargetBindingId, out int bindingIndex))
-            {
-                Debug.LogWarning("[GameRoomPortalRewardEffectView] Portal effect binding '" +
-                                 animation.TargetBindingId + "' has no linked scene object on anchor '" +
-                                 name + "'.",
-                                 this);
                 continue;
-            }
 
             GameRoomPortalRuntimeBindingState binding = runtimeBindings[bindingIndex];
             switch (animation.Source)
@@ -343,8 +347,9 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
                     break;
                 default:
                     binding.CaptureAnimationBaseline();
-                    transformAnimations.Add(new RuntimeTransformAnimationState(animation,
-                                                                                bindingIndex));
+                    transformAnimations.Add(new GameRoomPortalTransformAnimationState(
+                        animation,
+                        bindingIndex));
                     break;
             }
         }
@@ -398,7 +403,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
              animationIndex < transformAnimations.Count;
              animationIndex++)
         {
-            RuntimeTransformAnimationState state = transformAnimations[animationIndex];
+            GameRoomPortalTransformAnimationState state = transformAnimations[animationIndex];
             state.Elapsed += deltaTime;
             float progress = ResolveProgress(state.Elapsed,
                                              state.Definition.StartDelay,
@@ -440,6 +445,33 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         }
 
         return allComplete;
+    }
+
+    /// <summary>
+    /// Checks the first complete pass of every active animation so continuous playback cannot deadlock traversal.
+    /// </summary>
+    /// <returns>True when every Transform and Animator animation has reached its first end pose.</returns>
+    private bool HaveAnimationsReachedActivationCompletion()
+    {
+        // Every Transform channel must finish its first forward pass.
+        for (int animationIndex = 0;
+             animationIndex < transformAnimations.Count;
+             animationIndex++)
+        {
+            if (!transformAnimations[animationIndex].HasReachedActivationCompletion)
+                return false;
+        }
+
+        // Every direct Animator clip follows the same first-pass checkpoint.
+        for (int animationIndex = 0;
+             animationIndex < animatorAnimations.Count;
+             animationIndex++)
+        {
+            if (!animatorAnimations[animationIndex].HasReachedActivationCompletion)
+                return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -495,7 +527,7 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
     /// </summary>
     /// <param name="state">Animation definition and resolved dynamic binding index.</param>
     /// <param name="progress">Eased normalized progress.</param>
-    private void ApplyTransformAnimation(in RuntimeTransformAnimationState state,
+    private void ApplyTransformAnimation(in GameRoomPortalTransformAnimationState state,
                                          float progress)
     {
         Transform target = runtimeBindings[state.BindingIndex].ActiveTransform;
@@ -622,40 +654,6 @@ public sealed class GameRoomPortalRewardEffectView : MonoBehaviour
         binding.RestoreActiveTransform();
     }
     #endregion
-
-    #endregion
-
-    #region Nested Types
-    /// <summary>
-    /// Stores one mutable Transform clock beside its immutable baked definition and binding index.
-    /// </summary>
-    private struct RuntimeTransformAnimationState
-    {
-        #region Fields
-        public readonly GameRoomPortalActivationAnimationElement Definition;
-        public readonly int BindingIndex;
-        public float Elapsed;
-        #endregion
-
-        #region Methods
-
-        #region Constructors
-        /// <summary>
-        /// Creates one stopped Transform animation state for an already resolved dynamic binding.
-        /// </summary>
-        /// <param name="definition">Immutable baked animation definition.</param>
-        /// <param name="bindingIndex">Resolved runtime binding index.</param>
-        public RuntimeTransformAnimationState(GameRoomPortalActivationAnimationElement definition,
-                                              int bindingIndex)
-        {
-            Definition = definition;
-            BindingIndex = bindingIndex;
-            Elapsed = 0f;
-        }
-        #endregion
-
-        #endregion
-    }
 
     #endregion
 }

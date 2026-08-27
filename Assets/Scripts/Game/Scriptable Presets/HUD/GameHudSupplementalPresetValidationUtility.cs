@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
+using Unity.Collections;
 
 /// <summary>
-/// Produces non-mutating warnings for power-up summary and menu-button interaction settings.
+/// Produces non-mutating warnings for supplemental HUD presentation and interaction settings.
 /// </summary>
 public static class GameHudSupplementalPresetValidationUtility
 {
@@ -94,6 +96,76 @@ public static class GameHudSupplementalPresetValidationUtility
                              string.Format("Power-Up Summary statistic row {0} font size", statisticIndex + 1),
                              warnings);
         }
+    }
+    #endregion
+
+    #region Wave Clear Announcement
+    /// <summary>
+    /// Appends warnings for content capacity, motion timing, placement, and typography without changing authored values.
+    /// </summary>
+    /// <param name="settings">Room-clear announcement settings to inspect.</param>
+    /// <param name="warnings">Mutable warning list receiving diagnostics.</param>
+    public static void ValidateWaveClearAnnouncement(GameHudWaveClearAnnouncementSettings settings,
+                                                     List<string> warnings)
+    {
+        if (warnings == null)
+            return;
+
+        if (settings == null)
+        {
+            warnings.Add("Room Clear Announcement settings are missing.");
+            return;
+        }
+
+        if (!settings.IsEnabled)
+            return;
+
+        if (string.IsNullOrWhiteSpace(settings.Content))
+            warnings.Add("Room Clear Announcement content is empty, so no visible message will be presented.");
+        else if (Encoding.UTF8.GetByteCount(settings.Content) > FixedString512Bytes.UTF8MaxLengthInBytes)
+            warnings.Add("Room Clear Announcement content exceeds the baked 512-byte UTF-8 capacity and will be truncated at runtime.");
+
+        ValidatePositive(settings.TraversalDurationSeconds,
+                         "Room Clear Announcement traversal duration",
+                         warnings);
+        ValidateNormalized(settings.VerticalPositionNormalized,
+                           "Room Clear Announcement vertical position",
+                           warnings);
+        ValidateNonNegative(settings.HorizontalOffscreenPadding,
+                            "Room Clear Announcement off-screen padding",
+                            warnings);
+        ValidatePositive(settings.FontSize, "Room Clear Announcement font size", warnings);
+
+        if (settings.PauseAtCenter)
+            ValidateNonNegative(settings.CenterHoldDurationSeconds,
+                                "Room Clear Announcement center hold duration",
+                                warnings);
+
+        if (settings.PlayAudioEvent && settings.AudioEventId == GameAudioEventId.None)
+            warnings.Add("Room Clear Announcement audio is enabled but no standard Audio Event is selected.");
+
+        if (settings.UseFinalWaveOverride)
+        {
+            if (string.IsNullOrWhiteSpace(settings.FinalWaveContent))
+                warnings.Add("Room Clear Announcement terminal Boss content is empty, so the victory menu will not be delayed by a visible message.");
+            else if (Encoding.UTF8.GetByteCount(settings.FinalWaveContent) > FixedString512Bytes.UTF8MaxLengthInBytes)
+                warnings.Add("Room Clear Announcement terminal Boss content exceeds the baked 512-byte UTF-8 capacity and will be truncated at runtime.");
+
+            ValidatePositive(settings.FinalWaveTraversalDurationSeconds,
+                             "Room Clear Announcement terminal Boss traversal duration",
+                             warnings);
+
+            if (settings.FinalWavePauseAtCenter)
+                ValidateNonNegative(settings.FinalWaveCenterHoldDurationSeconds,
+                                    "Room Clear Announcement terminal Boss center hold duration",
+                                    warnings);
+
+            if (settings.PlayFinalWaveAudioEvent && settings.FinalWaveAudioEventId == GameAudioEventId.None)
+                warnings.Add("Room Clear Announcement terminal Boss audio is enabled but no Audio Event is selected.");
+        }
+
+        if (!IsFinite(settings.Color))
+            warnings.Add("Room Clear Announcement color should contain only finite channels.");
     }
     #endregion
 

@@ -8,6 +8,8 @@ public readonly struct GameAudioDefaultEventDefinition
     public readonly string EventCode;
     public readonly string DisplayName;
     public readonly string Description;
+    public readonly string DefaultEventPath;
+    public readonly bool DefaultSpatialize;
     #endregion
 
     #region Constructors
@@ -16,17 +18,23 @@ public readonly struct GameAudioDefaultEventDefinition
     /// </summary>
     /// <param name="eventId">Stable gameplay event identifier.</param>
     /// <param name="eventCode">Production-facing event code shown in the tool.</param>
-    /// <param name="displayName"> section label.</param>
+    /// <param name="displayName">Section label shown in the Audio Manager tool.</param>
     /// <param name="description">Short explanation of when this event is requested.</param>
+    /// <param name="defaultEventPath">Optional project FMOD path assigned when a binding has no authored path.</param>
+    /// <param name="defaultSpatialize">Whether the optional default event should use positional playback.</param>
     public GameAudioDefaultEventDefinition(GameAudioEventId eventId,
                                            string eventCode,
                                            string displayName,
-                                           string description)
+                                           string description,
+                                           string defaultEventPath = null,
+                                           bool defaultSpatialize = true)
     {
         EventId = eventId;
         EventCode = eventCode;
         DisplayName = displayName;
         Description = description;
+        DefaultEventPath = defaultEventPath;
+        DefaultSpatialize = defaultSpatialize;
     }
     #endregion
 }
@@ -146,7 +154,19 @@ public static class GameAudioDefaultEventDefinitions
         new GameAudioDefaultEventDefinition(GameAudioEventId.RoomRewardPortalUnlock,
                                             "MISC_SFX_RoomReward_PortalAnimation",
                                             "Room Reward Portal Unlock",
-                                            "Requested when clearing a room unlocks its assigned destination portals.")
+                                            "Requested when clearing a room unlocks its assigned destination portals."),
+        new GameAudioDefaultEventDefinition(GameAudioEventId.WaveClear,
+                                            "MISC_SFX_WaveClear",
+                                            "Room Clear",
+                                            "Optionally requested when a standard room-clear HUD message starts.",
+                                            "event:/SFX/sfx_woosh",
+                                            false),
+        new GameAudioDefaultEventDefinition(GameAudioEventId.FinalWaveClear,
+                                            "MISC_SFX_FinalWaveClear",
+                                            "Final Boss Room Clear",
+                                            "Optionally requested when the terminal Boss room-clear HUD message starts.",
+                                            "event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_02",
+                                            false)
     };
     #endregion
 

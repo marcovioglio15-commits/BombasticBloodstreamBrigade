@@ -204,6 +204,34 @@ public sealed class GameAudioManagerPreset : ScriptableObject
 
         return synchronizedCount;
     }
+
+    /// <summary>
+    /// Populates verified project FMOD defaults only for bindings whose path is still empty.
+    /// </summary>
+    /// <returns>Number of bindings that received a default path.</returns>
+    public int EnsureDefaultEventPaths()
+    {
+        EnsureInitialized();
+        int configuredCount = 0;
+
+        for (int bindingIndex = 0; bindingIndex < eventBindings.Count; bindingIndex++)
+        {
+            GameAudioEventBinding binding = eventBindings[bindingIndex];
+
+            if (binding == null ||
+                !GameAudioDefaultEventDefinitions.TryGetDefinition(
+                    binding.EventId,
+                    out GameAudioDefaultEventDefinition definition))
+            {
+                continue;
+            }
+
+            if (binding.ConfigureDefaultEventPath(definition))
+                configuredCount++;
+        }
+
+        return configuredCount;
+    }
     #endregion
 
     #region Unity Methods
@@ -226,6 +254,7 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     {
         GameAudioEventBinding binding = new GameAudioEventBinding();
         binding.ConfigureIdentity(definition);
+        binding.ConfigureDefaultEventPath(definition);
 
         if (definition.EventId == GameAudioEventId.EnemyShootProjectile)
             binding.ConfigureEnemyProjectileCap(DefaultEnemyProjectileMaxPlays, DefaultEnemyProjectileWindowSeconds);

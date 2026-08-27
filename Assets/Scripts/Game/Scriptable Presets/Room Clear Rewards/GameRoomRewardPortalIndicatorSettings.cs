@@ -30,6 +30,10 @@ public sealed class GameRoomRewardPortalIndicatorSettings
     [SerializeField]
     private float edgePaddingPixels = 20f;
 
+    [Tooltip("Canvas sorting order used by portal indicators. Keep this below zero so primary gameplay HUD elements remain in front.")]
+    [SerializeField]
+    private int sortingOrder = -100;
+
     [Tooltip("World-space offset added to the authoritative portal center before camera projection.")]
     [SerializeField]
     private Vector3 worldOffset = new Vector3(0f, 1.5f, 0f);
@@ -43,6 +47,7 @@ public sealed class GameRoomRewardPortalIndicatorSettings
     public Color IndicatorColor => indicatorColor;
     public float IndicatorSizePixels => indicatorSizePixels;
     public float EdgePaddingPixels => edgePaddingPixels;
+    public int SortingOrder => sortingOrder;
     public Vector3 WorldOffset => worldOffset;
     #endregion
 }

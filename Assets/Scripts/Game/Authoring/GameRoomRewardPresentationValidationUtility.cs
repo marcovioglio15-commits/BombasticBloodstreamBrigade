@@ -80,6 +80,12 @@ public static class GameRoomRewardPresentationValidationUtility
             return false;
         }
 
+        if (settings.SortingOrder >= 0)
+        {
+            failureMessage = "Portal Indicator HUD Sorting Order must remain below zero so primary gameplay UI renders in front.";
+            return false;
+        }
+
         Color color = settings.IndicatorColor;
 
         if (!IsFiniteNonnegative(color.r) ||
