@@ -28,11 +28,15 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
     public static PlayerGrowthSequenceHudVisualConfig BuildGrowthSequenceConfig(IPlayerUiVisualPresetData visualPreset)
     {
         PlayerGrowthSequenceHudSettings settings = visualPreset != null ? visualPreset.GrowthSequence : null;
+        Color levelUpStatGrowthColor = settings != null ? settings.LevelUpStatGrowthColor : Color.white;
 
         return new PlayerGrowthSequenceHudVisualConfig
         {
             Enabled = settings == null || settings.Enabled ? (byte)1 : (byte)0,
             HideWhenPlayerMissing = settings == null || settings.HideWhenPlayerMissing ? (byte)1 : (byte)0,
+            ShowLevelUpStatGrowthAbovePlayer = settings != null && settings.ShowLevelUpStatGrowthAbovePlayer ? (byte)1 : (byte)0,
+            UsePerStatLevelUpGrowthColors = settings != null && settings.UsePerStatLevelUpGrowthColors ? (byte)1 : (byte)0,
+            LevelUpStatGrowthColor = ToFloat4(levelUpStatGrowthColor),
             MaximumVisibleSteps = settings != null ? math.max(0, settings.MaximumVisibleSteps) : 0
         };
     }
@@ -105,7 +109,9 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
                 NextOutlineColor = step.NextOutlineColor,
                 NormalOutlineColor = step.NormalOutlineColor,
                 NextOutlineWidth = step.NextOutlineWidth,
-                NormalOutlineWidth = step.NormalOutlineWidth
+                NormalOutlineWidth = step.NormalOutlineWidth,
+                UseLevelUpGrowthColorOverride = step.UseLevelUpGrowthColorOverride,
+                LevelUpGrowthColor = step.LevelUpGrowthColor
             });
         }
     }
@@ -286,7 +292,9 @@ public static class PlayerHudGrowthSequenceVisualBakeUtility
             NextOutlineColor = nextText != null ? ToFloat4(nextText.OutlineColor) : new float4(0f, 0f, 0f, 1f),
             NormalOutlineColor = normalText != null ? ToFloat4(normalText.OutlineColor) : new float4(0f, 0f, 0f, 1f),
             NextOutlineWidth = nextText != null ? ResolveNonNegativeFinite(nextText.OutlineWidth, 0.22f) : 0.22f,
-            NormalOutlineWidth = normalText != null ? ResolveNonNegativeFinite(normalText.OutlineWidth, 0.16f) : 0.16f
+            NormalOutlineWidth = normalText != null ? ResolveNonNegativeFinite(normalText.OutlineWidth, 0.16f) : 0.16f,
+            UseLevelUpGrowthColorOverride = authoredStep != null && authoredStep.UseLevelUpGrowthColorOverride ? (byte)1 : (byte)0,
+            LevelUpGrowthColor = authoredStep != null ? ToFloat4(authoredStep.LevelUpGrowthColor) : new float4(1f)
         };
     }
 

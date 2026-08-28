@@ -566,6 +566,9 @@ MonoBehaviour:
     enabled: 1
     hideWhenPlayerMissing: 1
     maximumVisibleSteps: 5
+    showLevelUpStatGrowthAbovePlayer: 1
+    levelUpStatGrowthColor: {r: 0.35, g: 1, b: 0.62, a: 1}
+    usePerStatLevelUpGrowthColors: 1
     schedules:
     - scheduleId: ScheduleRookie
       steps:
@@ -593,6 +596,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 1
+        levelUpGrowthColor: {r: 1, g: 0.6984, b: 0.42, a: 1}
       - stepIndex: 1
         statName: ShotRange
         textOverride: RNG
@@ -617,6 +622,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 1
+        levelUpGrowthColor: {r: 0.5291583, g: 0.42, b: 1, a: 1}
       - stepIndex: 2
         statName: MovementSpeed
         textOverride: SPD
@@ -641,6 +648,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 1
+        levelUpGrowthColor: {r: 0.4800834, g: 1, b: 0.42, a: 1}
       - stepIndex: 3
         statName: Damage
         textOverride: DMG
@@ -665,6 +674,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 1
+        levelUpGrowthColor: {r: 1, g: 0.42, b: 0.6493252, a: 1}
       - stepIndex: 4
         statName: Luck
         textOverride: LCK
@@ -689,4 +700,6 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 1
+        levelUpGrowthColor: {r: 0.42, g: 0.8185669, b: 1, a: 1}
   scalingRules: []

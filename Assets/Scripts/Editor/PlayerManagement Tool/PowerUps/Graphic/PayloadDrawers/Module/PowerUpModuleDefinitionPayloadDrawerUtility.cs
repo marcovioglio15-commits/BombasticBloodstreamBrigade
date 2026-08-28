@@ -95,6 +95,9 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
                                                                       hasOwningResourceGate,
                                                                       showStolenOwnershipPolicy);
                 return;
+            case PowerUpModuleKind.RandomStatGrowth:
+                PowerUpRandomStatGrowthPayloadDrawerUtility.Build(payloadContainer, payloadProperty);
+                return;
             case PowerUpModuleKind.StateSuppressShooting:
                 BuildSuppressShootingPayloadUi(payloadContainer, payloadProperty);
                 return;
@@ -615,6 +618,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         SerializedProperty activationResourceProperty = resourceGatePayloadProperty.FindPropertyRelative("activationResource");
         SerializedProperty maintenanceResourceProperty = resourceGatePayloadProperty.FindPropertyRelative("maintenanceResource");
         SerializedProperty maximumEnergyProperty = resourceGatePayloadProperty.FindPropertyRelative("maximumEnergy");
+        SerializedProperty initialEnergyProperty = resourceGatePayloadProperty.FindPropertyRelative("initialEnergy");
         SerializedProperty activationCostProperty = resourceGatePayloadProperty.FindPropertyRelative("activationCost");
         SerializedProperty maintenanceCostPerSecondProperty = resourceGatePayloadProperty.FindPropertyRelative("maintenanceCostPerSecond");
         SerializedProperty isToggleableProperty = resourceGatePayloadProperty.FindPropertyRelative("isToggleable");
@@ -629,6 +633,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         if (activationResourceProperty == null ||
             maintenanceResourceProperty == null ||
             maximumEnergyProperty == null ||
+            initialEnergyProperty == null ||
             activationCostProperty == null ||
             maintenanceCostPerSecondProperty == null ||
             isToggleableProperty == null ||
@@ -648,6 +653,7 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         AddField(payloadContainer, activationResourceProperty, "Activation Resource");
         AddField(payloadContainer, maintenanceResourceProperty, "Maintenance Resource");
         AddField(payloadContainer, maximumEnergyProperty, "Maximum Energy");
+        VisualElement initialEnergyField = AddField(payloadContainer, initialEnergyProperty, "Initial Energy");
         AddField(payloadContainer, activationCostProperty, "Activation Cost");
         AddField(payloadContainer, maintenanceCostPerSecondProperty, "Maintenance Cost Per Second");
         AddField(payloadContainer, minimumActivationEnergyPercentProperty, "Minimum Energy Activation Percent");
@@ -655,6 +661,34 @@ public static class PowerUpModuleDefinitionPayloadDrawerUtility
         AddField(payloadContainer, chargePerTriggerProperty, "Charge Per Trigger");
         AddField(payloadContainer, cooldownSecondsProperty, "Cooldown Seconds");
         AddField(payloadContainer, isToggleableProperty, "Is Toggleable");
+
+        HelpBox initialEnergyWarning = new HelpBox(string.Empty, HelpBoxMessageType.Warning);
+        initialEnergyWarning.style.display = DisplayStyle.None;
+        payloadContainer.Add(initialEnergyWarning);
+
+        Action refreshInitialEnergyWarning = () =>
+        {
+            bool nonFiniteInitialEnergy = !float.IsFinite(initialEnergyProperty.floatValue);
+            bool negativeInitialEnergy = !nonFiniteInitialEnergy && initialEnergyProperty.floatValue < 0f;
+            bool exceedsCapacity = !nonFiniteInitialEnergy &&
+                                   initialEnergyProperty.floatValue > maximumEnergyProperty.floatValue;
+            string warningText = string.Empty;
+
+            if (nonFiniteInitialEnergy)
+                warningText = "Initial Energy must be finite.";
+            else if (negativeInitialEnergy)
+                warningText = "Initial Energy cannot be negative.";
+            else if (exceedsCapacity)
+                warningText = "Initial Energy exceeds Maximum Energy and will be capped at the runtime boundary.";
+
+            initialEnergyWarning.text = warningText;
+            initialEnergyWarning.style.display = nonFiniteInitialEnergy || negativeInitialEnergy || exceedsCapacity
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+        };
+        RegisterRefreshCallback(initialEnergyField, refreshInitialEnergyWarning);
+        payloadContainer.TrackPropertyValue(maximumEnergyProperty, changedProperty => refreshInitialEnergyWarning());
+        refreshInitialEnergyWarning();
 
         VisualElement toggleableContainer = new VisualElement();
         toggleableContainer.style.marginLeft = 12f;

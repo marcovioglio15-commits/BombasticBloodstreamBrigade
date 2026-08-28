@@ -125,6 +125,9 @@ internal static class PlayerRuntimeScalingApplyUtility
         }
 
         runtimeScalingState.Initialized = 1;
+        runtimeScalingState.ApplyVersion = runtimeScalingState.ApplyVersion == uint.MaxValue
+            ? 1u
+            : runtimeScalingState.ApplyVersion + 1u;
         PlayerRuntimeScalingComboApplyUtility.CopyBaseScalableStats(scalableStats, effectiveScalableStats);
         PlayerRoomRewardTemporaryModifierUtility.ApplyActiveModifiers(temporaryModifiers,
                                                                       temporaryState.LastVisitOrdinal,
@@ -540,10 +543,18 @@ internal static class PlayerRuntimeScalingApplyUtility
                                                            runtimeHealth.MaxShieldAdjustmentMode);
     }
 
-    private static float ResolveAdjustedCurrentValue(float previousCurrentValue,
-                                                     float previousMaxValue,
-                                                     float nextMaxValue,
-                                                     PlayerMaxStatAdjustmentMode adjustmentMode)
+    /// <summary>
+    /// Preserves or adjusts a current reserve when its maximum changes according to the configured policy.
+    /// </summary>
+    /// <param name="previousCurrentValue">Current reserve before the maximum changes.</param>
+    /// <param name="previousMaxValue">Previous maximum reserve.</param>
+    /// <param name="nextMaxValue">New maximum reserve.</param>
+    /// <param name="adjustmentMode">Policy used to retain value, percentage, or maximum delta.</param>
+    /// <returns>Adjusted current reserve clamped to the new maximum.</returns>
+    public static float ResolveAdjustedCurrentValue(float previousCurrentValue,
+                                                    float previousMaxValue,
+                                                    float nextMaxValue,
+                                                    PlayerMaxStatAdjustmentMode adjustmentMode)
     {
         float sanitizedCurrentValue = math.max(0f, previousCurrentValue);
         float sanitizedPreviousMaxValue = math.max(0f, previousMaxValue);

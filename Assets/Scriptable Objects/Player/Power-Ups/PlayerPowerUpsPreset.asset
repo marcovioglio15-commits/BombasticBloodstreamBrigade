@@ -17,7 +17,7 @@ MonoBehaviour:
   description: 
   version: 1.0.0
   scalingRules:
-  - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[2|moduleId:Module_StateSuppressShooting].overridePayload.resourceGate.cooldownSeconds
+  - statKey: activePowerUps.Array.data[1|powerUpId:Active_ChargeShot].moduleBindings.Array.data[2|moduleId:Module_StateSuppressShooting].overridePayload.resourceGate.cooldownSeconds
     addScaling: 0
     formula: 
     debugInConsole: 0
@@ -77,7 +77,7 @@ MonoBehaviour:
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[2|moduleId:Module_StateSuppressShooting].overridePayload.suppressShooting.suppressBaseShootingWhileActive
+  - statKey: activePowerUps.Array.data[1|powerUpId:Active_ChargeShot].moduleBindings.Array.data[2|moduleId:Module_StateSuppressShooting].overridePayload.suppressShooting.suppressBaseShootingWhileActive
     addScaling: 0
     formula: 
     debugInConsole: 0
@@ -92,7 +92,7 @@ MonoBehaviour:
     formula: 60 + (((30 - 60) / 100) * [Luck])
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[1|powerUpId:ActiveChargeShot].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
+  - statKey: activePowerUps.Array.data[1|powerUpId:Active_ChargeShot].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
     addScaling: 1
     formula: '[LaserWidth]'
     debugInConsole: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
     formula: '[LaserWidth_Big]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[2|powerUpId:ActiveGigaLaser].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
+  - statKey: activePowerUps.Array.data[2|powerUpId:Active_GigaLaser].moduleBindings.Array.data[1|moduleId:Module_TriggerHoldCharge].overridePayload.holdCharge.chargedLaserBeam.bodyWidthMultiplier
     addScaling: 1
     formula: '[LaserWidth_Big]'
     debugInConsole: 0
@@ -157,28 +157,28 @@ MonoBehaviour:
     formula: '[Damage]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[2|powerUpId:ActiveGigaLaser].moduleBindings.Array.data[6|moduleId:Module_SwitchWeapon].overridePayload.switchWeapon.weaponId
+  - statKey: activePowerUps.Array.data[2|powerUpId:Active_GigaLaser].moduleBindings.Array.data[6|moduleId:Module_SwitchWeapon].overridePayload.switchWeapon.weaponId
     addScaling: 0
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[3|powerUpId:PassiveBouncingProjectiles].moduleBindings.Array.data[0|moduleId:Module_Character
+  - statKey: passivePowerUps.Array.data[3|powerUpId:Passive_BouncingProjectiles].moduleBindings.Array.data[0|moduleId:Module_Character
       Tuning].overridePayload.projectileBounceOnWalls.maxBounces
     addScaling: 1
     formula: '[BulletBounces]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: passivePowerUps.Array.data[3|powerUpId:PassiveBouncingProjectiles].moduleBindings.Array.data[1|moduleId:Module_BouncingProjectiles].overridePayload.projectileBounceOnWalls.maxBounces
+  - statKey: passivePowerUps.Array.data[3|powerUpId:Passive_BouncingProjectiles].moduleBindings.Array.data[1|moduleId:Module_BouncingProjectiles].overridePayload.projectileBounceOnWalls.maxBounces
     addScaling: 1
     formula: '[BulletBounces]'
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[6|powerUpId:ActiveBulletTime].moduleBindings.Array.data[3|moduleId:Module_GhostTrail].overridePayload.ghostTrail.tint.x
+  - statKey: activePowerUps.Array.data[6|powerUpId:Active_BulletTime].moduleBindings.Array.data[3|moduleId:Module_GhostTrail].overridePayload.ghostTrail.tint.x
     addScaling: 0
     formula: 
     debugInConsole: 0
     debugColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - statKey: activePowerUps.Array.data[9|powerUpId:ActiveBoomerang].moduleBindings.Array.data[2|moduleId:Module_ReturningProjectiles].overridePayload.returningProjectiles.repeatedContactDamage
+  - statKey: activePowerUps.Array.data[9|powerUpId:Active_Boomerang].moduleBindings.Array.data[2|moduleId:Module_ReturningProjectiles].overridePayload.returningProjectiles.repeatedContactDamage
     addScaling: 1
     formula: '[Damage]'
     debugInConsole: 0
@@ -441,6 +441,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -660,6 +661,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -932,6 +936,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -1151,6 +1156,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1423,6 +1431,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -1642,6 +1651,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1914,6 +1926,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 30
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -2133,6 +2146,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2405,6 +2421,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -2624,6 +2641,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2896,6 +2916,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -3115,6 +3136,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3387,6 +3411,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -3606,6 +3631,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3878,6 +3906,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -4097,6 +4126,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4369,6 +4401,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -4588,6 +4621,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4860,6 +4896,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -5079,6 +5116,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5351,6 +5391,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -5570,6 +5611,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5842,6 +5886,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -6061,6 +6106,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6333,6 +6381,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -6552,6 +6601,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6824,6 +6876,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -7043,6 +7096,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7315,6 +7371,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -7534,6 +7591,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 2
         cooldownSeconds: 0
@@ -7806,6 +7866,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -8025,6 +8086,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8297,6 +8361,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -8516,6 +8581,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8788,6 +8856,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -9007,6 +9076,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9279,6 +9351,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -9498,6 +9571,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9770,6 +9846,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -9989,6 +10066,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10261,6 +10341,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -10480,6 +10561,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10780,6 +10864,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -10999,6 +11084,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -11271,6 +11359,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -11490,6 +11579,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -11763,6 +11855,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -11982,6 +12075,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -12254,6 +12350,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -12473,6 +12570,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -12746,6 +12846,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -12965,6 +13066,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -13238,6 +13342,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -13457,6 +13562,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -13730,6 +13838,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -13949,6 +14058,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -14222,6 +14334,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -14441,6 +14554,513 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
+      deathExplosion:
+        triggerMode: 0
+        cooldownSeconds: 2
+        radius: 4
+        damage: 20
+        affectAllEnemiesInRadius: 1
+        triggerOffset: {x: 0, y: 0, z: 0}
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      projectileOrbitOverride:
+        pathMode: 0
+        radialEntrySpeed: 12
+        orbitalSpeed: 8
+        orbitRadiusMin: 4
+        orbitRadiusMax: 6
+        orbitPulseFrequency: 0.7
+        orbitEntryRatio: 0.9
+        orbitBlendDuration: 0.3
+        heightOffset: 0
+        goldenAngleDegrees: 137.5
+        spiralStartRadius: 2.5
+        spiralMaximumRadius: 8
+        spiralAngularSpeedDegreesPerSecond: 240
+        spiralGrowthMultiplier: 1
+        spiralTurnsBeforeDespawn: 1.25
+        spiralClockwise: 0
+      orbitalProjections:
+        acquisitionPolicy: 0
+        useCategoryIdAsExclusionFilter: 0
+        activeDurationSeconds: 5
+        spawnAnimationSeconds: 0.25
+        despawnAnimationSeconds: 0.2
+        projections: []
+      projectileBounceOnWalls:
+        maxBounces: 2
+        speedPercentChangePerBounce: -5
+        minimumSpeedMultiplierAfterBounce: 0.1
+        maximumSpeedMultiplierAfterBounce: 3
+      returningProjectiles:
+        replacementProjectilePrefab: {fileID: 0}
+        keepProjectileVfx: 1
+        keepMuzzleFlashVfx: 1
+        keepHitVfx: 1
+        keepDeathVfx: 1
+        returnPathMode: 0
+        returnSpeedMultiplier: 1
+        outboundRangeMultiplier: 1
+        outboundLifetimeMultiplier: 1
+        outboundHitPolicy: 0
+        additionalOutboundHits: 1
+        returnStartMode: 0
+        returnDelaySeconds: 0
+        allowEarlyActivationRecall: 0
+        reapplyResourceGateCostOnRecall: 0
+        resourceReturnThresholdPercent: 0
+        stolenOwnershipPolicy: 0
+        returnRumbleMultiplier: 0.5
+        returnCameraShakeMultiplier: 0.5
+        outboundSizeMultiplier: 1
+        returnSizeMultiplier: 1
+        spinDuringFlight: 1
+        spinSpeedDegreesPerSecond: 540
+        spinAxis: 0
+        turnaroundRotationSpeedDegreesPerSecond: 720
+        turnaroundAxis: 0
+        returnHitPolicy: 0
+        additionalReturnHits: 1
+        enableRepeatedContactDamage: 0
+        repeatedContactDamage: 1
+        repeatedContactDamageIntervalSeconds: 0.5
+        pathSampleDistance: 0.25
+        returnCompletionDistance: 0.2
+        allowOtherPowerUpInteractions: 1
+        enableProjectileSplitting: 1
+        applyToSplitProjectiles: 1
+        completeBouncesBeforeReturn: 1
+        completeOrbitalPathBeforeReturn: 1
+        applyTinyMegaProjectileScaling: 1
+        applyToActivePowerUpProjectiles: 0
+        allowConcurrentActiveProjectiles: 0
+      projectileSplit:
+        triggerMode: 0
+        directionMode: 0
+        splitProjectileCount: 2
+        splitOffsetDegrees: 0
+        customAnglesDegrees:
+        - -20
+        - 20
+        splitDamagePercentFromOriginal: 50
+        splitSizePercentFromOriginal: 75
+        splitSpeedPercentFromOriginal: 85
+        splitLifetimePercentFromOriginal: 65
+      laserBeam:
+        damageMultiplier: 1
+        continuousDamagePerSecondMultiplier: 0.28
+        virtualProjectileSpeedMultiplier: 1
+        damageTickIntervalSeconds: 0.15
+        maximumContinuousActiveSeconds: 2.5
+        cooldownSeconds: 2
+        maximumBounceSegments: 0
+        applyPlayerHandlingNerfWhileFiring: 0
+        firingMoveSpeedMultiplier: 1
+        firingRotationSpeedMultiplier: 1
+        visualPresetId: 0
+        bodyProfile: 2
+        sourceShape: 0
+        terminalCapShape: 1
+        bodyWidthMultiplier: 4.25
+        collisionWidthMultiplier: 1
+        sourceScaleMultiplier: 1.35
+        terminalCapScaleMultiplier: 1.85
+        contactFlareScaleMultiplier: 1.2
+        bodyOpacity: 0.96
+        coreWidthMultiplier: 0.52
+        coreBrightness: 1.45
+        rimBrightness: 1.32
+        flowScrollSpeed: 1.15
+        flowPulseFrequency: 1.6
+        stormTwistSpeed: 14
+        stormTickPostTravelHoldSeconds: 0.6
+        stormIdleIntensity: 0.48
+        stormBurstIntensity: 1.1
+        sourceOffset: 0.08
+        sourceDischargeIntensity: 1.2
+        stormShellWidthMultiplier: 1.12
+        stormShellSeparation: 0.32
+        stormRingFrequency: 5.4
+        stormRingThickness: 0.18
+        stormTickTravelSpeed: 1
+        stormTickDamageLengthTolerance: 0.18
+        terminalCapIntensity: 1.12
+        contactFlareIntensity: 1.28
+        wobbleAmplitude: 0.08
+        bubbleDriftSpeed: 1.8
+      switchWeapon:
+        weaponId: 
+      trailSpawn:
+        trailSegmentLifetimeSeconds: 1.5
+        trailSpawnDistance: 0.6
+        trailSpawnIntervalSeconds: 0.1
+        trailRadius: 1.2
+        maxActiveSegmentsPerPlayer: 30
+        trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+      elementalAreaTick:
+        effectData:
+          elementType: 0
+          effectKind: 0
+          procMode: 0
+          reapplyMode: 0
+          procThresholdStacks: 5
+          maximumStacks: 20
+          stackDecayPerSecond: 1
+          consumeStacksOnProc: 0
+          dotDamagePerTick: 4
+          dotTickInterval: 0.5
+          dotDurationSeconds: 2
+          impedimentSlowPercentPerStack: 10
+          impedimentProcSlowPercent: 50
+          impedimentMaxSlowPercent: 100
+          impedimentDurationSeconds: 2
+        stacksPerTick: 1
+        applyIntervalSeconds: 0.2
+      stackable:
+        maxAcquisitions: 2
+  - moduleId: Module_RandomStatGrowth
+    displayName: Random Stat Growth
+    moduleKind: 29
+    defaultStage: 4
+    notes: Permanently increases one random native or numeric custom player statistic
+      after a successful active activation.
+    data:
+      holdCharge:
+        requiredCharge: 500
+        maximumCharge: 500
+        chargeRatePerSecond: 125
+        chargeAnimationClipSlot: 0
+        releaseAnimationClipSlot: 0
+        decayAfterRelease: 0
+        decayAfterReleasePercentPerSecond: 25
+        passiveChargeGainWhileReleased: 0
+        passiveChargeGainPercentPerSecond: 10
+        laserDurationSeconds: 0.45
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+        useChargedLaserBeam: 0
+        chargedLaserDurationSeconds: 0.45
+        chargedLaserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        slowPlayerWhileCharging: 0
+        maximumPlayerSlowPercent: 35
+        playerSlowCurve:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+      triggerEvent:
+        eventType: 0
+      delayedShootApplication:
+        shotInterval: 3
+      suddenStrike:
+        conditionMode: 0
+        countRotationAsMovement: 0
+        stationarySpeedTolerance: 0.05
+        stationaryRotationToleranceDegrees: 1
+        applyChargeMovementSlow: 0
+        movementSlowRecoverySeconds: 0.25
+      selfPreservationInstinct:
+        thresholdMode: 0
+        healthThreshold: 25
+      resourceGate:
+        activationResource: 1
+        maintenanceResource: 1
+        maximumEnergy: 100
+        initialEnergy: 100
+        activationCost: 100
+        maintenanceCostPerSecond: 0
+        isToggleable: 0
+        maintenanceTicksPerSecond: 4
+        minimumActivationEnergyPercent: 0
+        chargeType: 0
+        chargePerTrigger: 100
+        cooldownSeconds: 1
+        allowRechargeDuringToggleStartupLock: 0
+        maximumToggleActiveDurationSeconds: 0
+      suppressShooting:
+        suppressBaseShootingWhileActive: 1
+        interruptOtherSlotOnEnter: 0
+        interruptOtherSlotChargingOnly: 1
+      projectilePatternCone:
+        projectileCount: 6
+        coneAngleDegrees: 45
+        laserDurationSeconds: 0.35
+        ignoreInheritedPlayerVelocityX: 0
+        ignoreInheritedPlayerVelocityZ: 0
+      characterTuning:
+        applyFormulasOnlyOnActiveTrigger: 0
+        formulas: []
+      bomb:
+        bombPrefab: {fileID: 0}
+        spawnOffset: {x: 0, y: 0, z: 1.2}
+        spawnOffsetOrientation: 0
+        deploySpeed: 4.5
+        velocityDirection: 0
+        collisionRadius: 0.18
+        bounceOnWalls: 1
+        bounceDamping: 0.65
+        linearDampingPerSecond: 1.2
+        fuseSeconds: 1.25
+        radius: 7
+        enableDamagePayload: 1
+        damage: 120
+        affectAllEnemiesInRadius: 1
+        explosionVfxPrefab: {fileID: 0}
+        scaleVfxToRadius: 1
+        vfxScaleMultiplier: 1
+      dash:
+        distance: 6
+        directionMode: 0
+        duration: 0.18
+        speedTransitionInSeconds: 0.06
+        speedTransitionOutSeconds: 0.08
+        wallBounceIntensity: 0.65
+        grantsInvulnerability: 1
+        invulnerabilityExtraTime: 0.1
+      bulletTime:
+        duration: 3
+        enemySlowPercent: 40
+        playerProjectileSlowPercent: 0
+        transitionTimeSeconds: 0.2
+      impactFrame:
+        durationMode: 0
+        durationFrames: 6
+        referenceFrameRate: 60
+        maximumUnscaledDurationSeconds: 0.12
+        easeInUnscaledSeconds: 0.02
+        easeOutUnscaledSeconds: 0.08
+        easingMode: 2
+        timeSlowdownPercent: 95
+        refreshOnShorterRequest: 0
+        presentationScope: 1
+        cameraFeedback:
+          enabled: 0
+          motionMode: 1
+          axisRightEnabled: 1
+          axisUpEnabled: 1
+          axisForwardEnabled: 0
+          positionalAmplitude: 0.35
+          forwardAmplitude: 0.12
+          rotationalAmplitude: 1.25
+          frequency: 18
+          zoomEnabled: 0
+          zoomFovDelta: -2
+        overlayIntensity: 1
+        filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+        desaturationAmount: 0.65
+        vignetteIntensity: 0.55
+        vignetteSoftness: 0.6
+        vignetteExtent: 0.35
+        vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+        radialVignetteIntensity: 0
+        radialVignetteRadius: 0.55
+        radialVignetteSoftness: 0.12
+        radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+        chromaticAberration: 0.012
+        scanlineIntensity: 0.18
+        scanlineFrequency: 320
+        flashIntensity: 0.35
+        radialDistortion: 0.22
+        shockwaveIntensity: 0.35
+        shockwaveRadius: 0.65
+        shockwaveThickness: 0.12
+        zoomPunchIntensity: 0.18
+        invertIntensity: 0
+        posterizeIntensity: 0
+        posterizeSteps: 6
+        edgeInkIntensity: 0.2
+        screenTearIntensity: 0
+        screenTearFrequency: 24
+        paletteFlashIntensity: 0.25
+        paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+        buildIn:
+          enabled: 0
+          releaseUnscaledSeconds: 0.06
+          easingMode: 2
+          effect:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      ghostTrail:
+        durationSeconds: 1.5
+        matchToggleActivationDuration: 0
+        easeInUnscaledSeconds: 0.08
+        easeOutUnscaledSeconds: 0.18
+        easingMode: 2
+        emissionIntervalSeconds: 0.06
+        snapshotLifetimeSeconds: 0.35
+        captureScope: 0
+        movementDistanceThreshold: 0.04
+        rotationAngleThresholdDegrees: 3
+        maximumActiveSnapshots: 18
+        tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+        screenFeedbackEnabled: 0
+        screenFeedback:
+          presentationScope: 1
+          timeSlowdownPercent: 0
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 0
+          filterTint: {r: 1, g: 1, b: 1, a: 1}
+          desaturationAmount: 0
+          vignetteIntensity: 0
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0
+          scanlineIntensity: 0
+          scanlineFrequency: 320
+          flashIntensity: 0
+          radialDistortion: 0
+          shockwaveIntensity: 0
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0
+          paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+      healMissingHealth:
+        applyMode: 0
+        healAmount: 30
+        durationSeconds: 2
+        tickIntervalSeconds: 0.2
+        stackPolicy: 0
+      dropAttraction:
+        attractionRadius: 18
+        consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries:
+        - entryId: cec50bf151c4456f9bc80c365f5f4c75
+          target: 10
+          customScalableStatName: 
+          minimumIncrease: 1
+          maximumIncrease: 2
+          selectionWeight: 1
+          useCustomPresentationColor: 0
+          presentationColor: {r: 1, g: 1, b: 1, a: 1}
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -14727,6 +15347,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -14946,6 +15567,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15218,6 +15842,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 0
           maximumEnergy: 15
+          initialEnergy: 100
           activationCost: 15
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -15437,6 +16062,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15709,6 +16337,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -15928,6 +16557,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16200,6 +16832,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -16419,6 +17052,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16691,6 +17327,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -16912,6 +17549,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17198,6 +17838,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -17417,6 +18058,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17689,6 +18333,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -17908,6 +18553,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18180,6 +18828,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -18399,6 +19048,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18671,6 +19323,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -18894,6 +19547,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19166,6 +19822,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -19389,6 +20046,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19661,6 +20321,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -19884,6 +20545,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20156,6 +20820,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -20379,6 +21044,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20664,6 +21332,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -20883,6 +21552,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21155,6 +21827,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -21374,6 +22047,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21646,6 +22322,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 35
+          initialEnergy: 35
           activationCost: 35
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -21865,6 +22542,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22137,6 +22817,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -22356,6 +23037,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22628,6 +23312,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -22848,6 +23533,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23120,6 +23808,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -23340,6 +24029,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23612,6 +24304,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -23832,6 +24525,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24117,6 +24813,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -24336,6 +25033,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24608,6 +25308,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -24827,6 +25528,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25099,6 +25803,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
+          initialEnergy: 100
           activationCost: 30
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -25318,6 +26023,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25590,6 +26298,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
+          initialEnergy: 100
           activationCost: 30
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -25809,6 +26518,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26095,6 +26807,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -26314,6 +27027,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26586,6 +27302,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 10
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -26805,6 +27522,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27077,6 +27797,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -27296,6 +28017,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27568,6 +28292,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -27787,6 +28512,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28059,6 +28787,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -28278,6 +29007,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28563,6 +29295,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -28782,6 +29515,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -29054,6 +29790,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 25
+          initialEnergy: 100
           activationCost: 25
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -29273,6 +30010,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -29545,6 +30285,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -29764,6 +30505,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -30049,6 +30793,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -30268,6 +31013,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -30540,6 +31288,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 10
           isToggleable: 1
@@ -30759,6 +31508,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31031,6 +31783,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -31250,6 +32003,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31522,6 +32278,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -31741,6 +32498,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -32023,6 +32783,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -32242,6 +33003,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -32514,6 +33278,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 20
+          initialEnergy: 100
           activationCost: 4
           maintenanceCostPerSecond: 4
           isToggleable: 1
@@ -32733,6 +33498,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -33005,6 +33773,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 10
           isToggleable: 1
@@ -33225,6 +33994,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -33490,6 +34262,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -33709,6 +34482,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 30
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -33961,6 +34737,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 0
           maximumEnergy: 10
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -34180,6 +34957,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -34462,6 +35242,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -34681,6 +35462,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -34953,6 +35737,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 35
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -35172,6 +35957,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -35444,6 +36232,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -35663,6 +36452,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -35742,6 +36534,1607 @@ MonoBehaviour:
           completeBouncesBeforeReturn: 0
           completeOrbitalPathBeforeReturn: 0
           applyTinyMegaProjectileScaling: 0
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 2
+          splitOffsetDegrees: 0
+          customAnglesDegrees:
+          - -20
+          - 20
+          splitDamagePercentFromOriginal: 50
+          splitSizePercentFromOriginal: 75
+          splitSpeedPercentFromOriginal: 85
+          splitLifetimePercentFromOriginal: 65
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        switchWeapon:
+          weaponId: 
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 1.5
+          trailSpawnDistance: 0.6
+          trailSpawnIntervalSeconds: 0.1
+          trailRadius: 1.2
+          maxActiveSegmentsPerPlayer: 30
+          trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 5
+            maximumStacks: 20
+            stackDecayPerSecond: 1
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 4
+            dotTickInterval: 0.5
+            dotDurationSeconds: 2
+            impedimentSlowPercentPerStack: 10
+            impedimentProcSlowPercent: 50
+            impedimentMaxSlowPercent: 100
+            impedimentDurationSeconds: 2
+          stacksPerTick: 1
+          applyIntervalSeconds: 0.2
+        stackable:
+          maxAcquisitions: 2
+    stealProtected: 0
+  - commonData:
+      powerUpId: ActiveEngineeredGrowth
+      displayName: Engineered Growth
+      description: Permanently increases one random player statistic after enough
+        enemy kills.
+      icon: {fileID: 0}
+      dropPools:
+      - Milestone
+      dropTier: 3
+      purchaseCost: 180
+    moduleBindings:
+    - bindingId: 677457b7bd1d4fdb80ca5907da6a6d5e
+      moduleId: Module_TriggerPress
+      stage: 0
+      isEnabled: 1
+      useOverridePayload: 0
+      overridePayload:
+        holdCharge:
+          requiredCharge: 500
+          maximumCharge: 500
+          chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 25
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 10
+          laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        delayedShootApplication:
+          shotInterval: 3
+        suddenStrike:
+          conditionMode: 0
+          countRotationAsMovement: 0
+          stationarySpeedTolerance: 0.05
+          stationaryRotationToleranceDegrees: 1
+          applyChargeMovementSlow: 0
+          movementSlowRecoverySeconds: 0.25
+        selfPreservationInstinct:
+          thresholdMode: 0
+          healthThreshold: 25
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 1
+          maximumEnergy: 100
+          initialEnergy: 100
+          activationCost: 100
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 100
+          cooldownSeconds: 1
+          allowRechargeDuringToggleStartupLock: 0
+          maximumToggleActiveDurationSeconds: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 1
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 1
+        projectilePatternCone:
+          projectileCount: 6
+          coneAngleDegrees: 45
+          laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 1.2}
+          spawnOffsetOrientation: 0
+          deploySpeed: 4.5
+          velocityDirection: 0
+          collisionRadius: 0.18
+          bounceOnWalls: 1
+          bounceDamping: 0.65
+          linearDampingPerSecond: 1.2
+          fuseSeconds: 1.25
+          radius: 7
+          enableDamagePayload: 1
+          damage: 120
+          affectAllEnemiesInRadius: 1
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        dash:
+          distance: 6
+          directionMode: 0
+          duration: 0.18
+          speedTransitionInSeconds: 0.06
+          speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 1
+          invulnerabilityExtraTime: 0.1
+        bulletTime:
+          duration: 3
+          enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
+          transitionTimeSeconds: 0.2
+        impactFrame:
+          durationMode: 0
+          durationFrames: 6
+          referenceFrameRate: 60
+          maximumUnscaledDurationSeconds: 0.12
+          easeInUnscaledSeconds: 0.02
+          easeOutUnscaledSeconds: 0.08
+          easingMode: 2
+          timeSlowdownPercent: 95
+          refreshOnShorterRequest: 0
+          presentationScope: 1
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 1
+          filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+          desaturationAmount: 0.65
+          vignetteIntensity: 0.55
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0.012
+          scanlineIntensity: 0.18
+          scanlineFrequency: 320
+          flashIntensity: 0.35
+          radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+          buildIn:
+            enabled: 0
+            releaseUnscaledSeconds: 0.06
+            easingMode: 2
+            effect:
+              presentationScope: 1
+              timeSlowdownPercent: 0
+              cameraFeedback:
+                enabled: 0
+                motionMode: 1
+                axisRightEnabled: 1
+                axisUpEnabled: 1
+                axisForwardEnabled: 0
+                positionalAmplitude: 0.35
+                forwardAmplitude: 0.12
+                rotationalAmplitude: 1.25
+                frequency: 18
+                zoomEnabled: 0
+                zoomFovDelta: -2
+              overlayIntensity: 0
+              filterTint: {r: 1, g: 1, b: 1, a: 1}
+              desaturationAmount: 0
+              vignetteIntensity: 0
+              vignetteSoftness: 0.6
+              vignetteExtent: 0.35
+              vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+              radialVignetteIntensity: 0
+              radialVignetteRadius: 0.55
+              radialVignetteSoftness: 0.12
+              radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+              chromaticAberration: 0
+              scanlineIntensity: 0
+              scanlineFrequency: 320
+              flashIntensity: 0
+              radialDistortion: 0
+              shockwaveIntensity: 0
+              shockwaveRadius: 0.65
+              shockwaveThickness: 0.12
+              zoomPunchIntensity: 0
+              invertIntensity: 0
+              posterizeIntensity: 0
+              posterizeSteps: 6
+              edgeInkIntensity: 0
+              screenTearIntensity: 0
+              screenTearFrequency: 24
+              paletteFlashIntensity: 0
+              paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 30
+          durationSeconds: 2
+          tickIntervalSeconds: 0.2
+          stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 2
+          radius: 4
+          damage: 20
+          affectAllEnemiesInRadius: 1
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 12
+          orbitalSpeed: 8
+          orbitRadiusMin: 4
+          orbitRadiusMax: 6
+          orbitPulseFrequency: 0.7
+          orbitEntryRatio: 0.9
+          orbitBlendDuration: 0.3
+          heightOffset: 0
+          goldenAngleDegrees: 137.5
+          spiralStartRadius: 2.5
+          spiralMaximumRadius: 8
+          spiralAngularSpeedDegreesPerSecond: 240
+          spiralGrowthMultiplier: 1
+          spiralTurnsBeforeDespawn: 1.25
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
+        projectileBounceOnWalls:
+          maxBounces: 2
+          speedPercentChangePerBounce: -5
+          minimumSpeedMultiplierAfterBounce: 0.1
+          maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnStartMode: 0
+          returnDelaySeconds: 0
+          allowEarlyActivationRecall: 0
+          reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          enableRepeatedContactDamage: 0
+          repeatedContactDamage: 1
+          repeatedContactDamageIntervalSeconds: 0.5
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 2
+          splitOffsetDegrees: 0
+          customAnglesDegrees:
+          - -20
+          - 20
+          splitDamagePercentFromOriginal: 50
+          splitSizePercentFromOriginal: 75
+          splitSpeedPercentFromOriginal: 85
+          splitLifetimePercentFromOriginal: 65
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        switchWeapon:
+          weaponId: 
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 1.5
+          trailSpawnDistance: 0.6
+          trailSpawnIntervalSeconds: 0.1
+          trailRadius: 1.2
+          maxActiveSegmentsPerPlayer: 30
+          trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 5
+            maximumStacks: 20
+            stackDecayPerSecond: 1
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 4
+            dotTickInterval: 0.5
+            dotDurationSeconds: 2
+            impedimentSlowPercentPerStack: 10
+            impedimentProcSlowPercent: 50
+            impedimentMaxSlowPercent: 100
+            impedimentDurationSeconds: 2
+          stacksPerTick: 1
+          applyIntervalSeconds: 0.2
+        stackable:
+          maxAcquisitions: 2
+    - bindingId: e8458ef2a1e645fba7bb58d0f3c46b1d
+      moduleId: Module_GateResource
+      stage: 2
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 500
+          maximumCharge: 500
+          chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 25
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 10
+          laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        delayedShootApplication:
+          shotInterval: 3
+        suddenStrike:
+          conditionMode: 0
+          countRotationAsMovement: 0
+          stationarySpeedTolerance: 0.05
+          stationaryRotationToleranceDegrees: 1
+          applyChargeMovementSlow: 0
+          movementSlowRecoverySeconds: 0.25
+        selfPreservationInstinct:
+          thresholdMode: 0
+          healthThreshold: 25
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 1
+          maximumEnergy: 100
+          initialEnergy: 0
+          activationCost: 50
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 0
+          chargeType: 1
+          chargePerTrigger: 10
+          cooldownSeconds: 0
+          allowRechargeDuringToggleStartupLock: 0
+          maximumToggleActiveDurationSeconds: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 1
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 1
+        projectilePatternCone:
+          projectileCount: 6
+          coneAngleDegrees: 45
+          laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 1.2}
+          spawnOffsetOrientation: 0
+          deploySpeed: 4.5
+          velocityDirection: 0
+          collisionRadius: 0.18
+          bounceOnWalls: 1
+          bounceDamping: 0.65
+          linearDampingPerSecond: 1.2
+          fuseSeconds: 1.25
+          radius: 7
+          enableDamagePayload: 1
+          damage: 120
+          affectAllEnemiesInRadius: 1
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        dash:
+          distance: 6
+          directionMode: 0
+          duration: 0.18
+          speedTransitionInSeconds: 0.06
+          speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 1
+          invulnerabilityExtraTime: 0.1
+        bulletTime:
+          duration: 3
+          enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
+          transitionTimeSeconds: 0.2
+        impactFrame:
+          durationMode: 0
+          durationFrames: 6
+          referenceFrameRate: 60
+          maximumUnscaledDurationSeconds: 0.12
+          easeInUnscaledSeconds: 0.02
+          easeOutUnscaledSeconds: 0.08
+          easingMode: 2
+          timeSlowdownPercent: 95
+          refreshOnShorterRequest: 0
+          presentationScope: 1
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 1
+          filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+          desaturationAmount: 0.65
+          vignetteIntensity: 0.55
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0.012
+          scanlineIntensity: 0.18
+          scanlineFrequency: 320
+          flashIntensity: 0.35
+          radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+          buildIn:
+            enabled: 0
+            releaseUnscaledSeconds: 0.06
+            easingMode: 2
+            effect:
+              presentationScope: 1
+              timeSlowdownPercent: 0
+              cameraFeedback:
+                enabled: 0
+                motionMode: 1
+                axisRightEnabled: 1
+                axisUpEnabled: 1
+                axisForwardEnabled: 0
+                positionalAmplitude: 0.35
+                forwardAmplitude: 0.12
+                rotationalAmplitude: 1.25
+                frequency: 18
+                zoomEnabled: 0
+                zoomFovDelta: -2
+              overlayIntensity: 0
+              filterTint: {r: 1, g: 1, b: 1, a: 1}
+              desaturationAmount: 0
+              vignetteIntensity: 0
+              vignetteSoftness: 0.6
+              vignetteExtent: 0.35
+              vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+              radialVignetteIntensity: 0
+              radialVignetteRadius: 0.55
+              radialVignetteSoftness: 0.12
+              radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+              chromaticAberration: 0
+              scanlineIntensity: 0
+              scanlineFrequency: 320
+              flashIntensity: 0
+              radialDistortion: 0
+              shockwaveIntensity: 0
+              shockwaveRadius: 0.65
+              shockwaveThickness: 0.12
+              zoomPunchIntensity: 0
+              invertIntensity: 0
+              posterizeIntensity: 0
+              posterizeSteps: 6
+              edgeInkIntensity: 0
+              screenTearIntensity: 0
+              screenTearFrequency: 24
+              paletteFlashIntensity: 0
+              paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 30
+          durationSeconds: 2
+          tickIntervalSeconds: 0.2
+          stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 2
+          radius: 4
+          damage: 20
+          affectAllEnemiesInRadius: 1
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 12
+          orbitalSpeed: 8
+          orbitRadiusMin: 4
+          orbitRadiusMax: 6
+          orbitPulseFrequency: 0.7
+          orbitEntryRatio: 0.9
+          orbitBlendDuration: 0.3
+          heightOffset: 0
+          goldenAngleDegrees: 137.5
+          spiralStartRadius: 2.5
+          spiralMaximumRadius: 8
+          spiralAngularSpeedDegreesPerSecond: 240
+          spiralGrowthMultiplier: 1
+          spiralTurnsBeforeDespawn: 1.25
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
+        projectileBounceOnWalls:
+          maxBounces: 2
+          speedPercentChangePerBounce: -5
+          minimumSpeedMultiplierAfterBounce: 0.1
+          maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnStartMode: 0
+          returnDelaySeconds: 0
+          allowEarlyActivationRecall: 0
+          reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          enableRepeatedContactDamage: 0
+          repeatedContactDamage: 1
+          repeatedContactDamageIntervalSeconds: 0.5
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
+          applyToActivePowerUpProjectiles: 0
+          allowConcurrentActiveProjectiles: 0
+        projectileSplit:
+          triggerMode: 0
+          directionMode: 0
+          splitProjectileCount: 2
+          splitOffsetDegrees: 0
+          customAnglesDegrees:
+          - -20
+          - 20
+          splitDamagePercentFromOriginal: 50
+          splitSizePercentFromOriginal: 75
+          splitSpeedPercentFromOriginal: 85
+          splitLifetimePercentFromOriginal: 65
+        laserBeam:
+          damageMultiplier: 1
+          continuousDamagePerSecondMultiplier: 0.28
+          virtualProjectileSpeedMultiplier: 1
+          damageTickIntervalSeconds: 0.15
+          maximumContinuousActiveSeconds: 2.5
+          cooldownSeconds: 2
+          maximumBounceSegments: 0
+          applyPlayerHandlingNerfWhileFiring: 0
+          firingMoveSpeedMultiplier: 1
+          firingRotationSpeedMultiplier: 1
+          visualPresetId: 0
+          bodyProfile: 2
+          sourceShape: 0
+          terminalCapShape: 1
+          bodyWidthMultiplier: 4.25
+          collisionWidthMultiplier: 1
+          sourceScaleMultiplier: 1.35
+          terminalCapScaleMultiplier: 1.85
+          contactFlareScaleMultiplier: 1.2
+          bodyOpacity: 0.96
+          coreWidthMultiplier: 0.52
+          coreBrightness: 1.45
+          rimBrightness: 1.32
+          flowScrollSpeed: 1.15
+          flowPulseFrequency: 1.6
+          stormTwistSpeed: 14
+          stormTickPostTravelHoldSeconds: 0.6
+          stormIdleIntensity: 0.48
+          stormBurstIntensity: 1.1
+          sourceOffset: 0.08
+          sourceDischargeIntensity: 1.2
+          stormShellWidthMultiplier: 1.12
+          stormShellSeparation: 0.32
+          stormRingFrequency: 5.4
+          stormRingThickness: 0.18
+          stormTickTravelSpeed: 1
+          stormTickDamageLengthTolerance: 0.18
+          terminalCapIntensity: 1.12
+          contactFlareIntensity: 1.28
+          wobbleAmplitude: 0.08
+          bubbleDriftSpeed: 1.8
+        switchWeapon:
+          weaponId: 
+        trailSpawn:
+          trailSegmentLifetimeSeconds: 1.5
+          trailSpawnDistance: 0.6
+          trailSpawnIntervalSeconds: 0.1
+          trailRadius: 1.2
+          maxActiveSegmentsPerPlayer: 30
+          trailAttachedVfxOffset: {x: 0, y: 0.08, z: 0}
+        elementalAreaTick:
+          effectData:
+            elementType: 0
+            effectKind: 0
+            procMode: 0
+            reapplyMode: 0
+            procThresholdStacks: 5
+            maximumStacks: 20
+            stackDecayPerSecond: 1
+            consumeStacksOnProc: 0
+            dotDamagePerTick: 4
+            dotTickInterval: 0.5
+            dotDurationSeconds: 2
+            impedimentSlowPercentPerStack: 10
+            impedimentProcSlowPercent: 50
+            impedimentMaxSlowPercent: 100
+            impedimentDurationSeconds: 2
+          stacksPerTick: 1
+          applyIntervalSeconds: 0.2
+        stackable:
+          maxAcquisitions: 2
+    - bindingId: 4ddc9f62dbcd4b378a9799dd6e28d615
+      moduleId: Module_RandomStatGrowth
+      stage: 4
+      isEnabled: 1
+      useOverridePayload: 1
+      overridePayload:
+        holdCharge:
+          requiredCharge: 500
+          maximumCharge: 500
+          chargeRatePerSecond: 125
+          chargeAnimationClipSlot: 0
+          releaseAnimationClipSlot: 0
+          decayAfterRelease: 0
+          decayAfterReleasePercentPerSecond: 25
+          passiveChargeGainWhileReleased: 0
+          passiveChargeGainPercentPerSecond: 10
+          laserDurationSeconds: 0.45
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+          useChargedLaserBeam: 0
+          chargedLaserDurationSeconds: 0.45
+          chargedLaserBeam:
+            damageMultiplier: 1
+            continuousDamagePerSecondMultiplier: 0.28
+            virtualProjectileSpeedMultiplier: 1
+            damageTickIntervalSeconds: 0.15
+            maximumContinuousActiveSeconds: 2.5
+            cooldownSeconds: 2
+            maximumBounceSegments: 0
+            applyPlayerHandlingNerfWhileFiring: 0
+            firingMoveSpeedMultiplier: 1
+            firingRotationSpeedMultiplier: 1
+            visualPresetId: 0
+            bodyProfile: 2
+            sourceShape: 0
+            terminalCapShape: 1
+            bodyWidthMultiplier: 4.25
+            collisionWidthMultiplier: 1
+            sourceScaleMultiplier: 1.35
+            terminalCapScaleMultiplier: 1.85
+            contactFlareScaleMultiplier: 1.2
+            bodyOpacity: 0.96
+            coreWidthMultiplier: 0.52
+            coreBrightness: 1.45
+            rimBrightness: 1.32
+            flowScrollSpeed: 1.15
+            flowPulseFrequency: 1.6
+            stormTwistSpeed: 14
+            stormTickPostTravelHoldSeconds: 0.6
+            stormIdleIntensity: 0.48
+            stormBurstIntensity: 1.1
+            sourceOffset: 0.08
+            sourceDischargeIntensity: 1.2
+            stormShellWidthMultiplier: 1.12
+            stormShellSeparation: 0.32
+            stormRingFrequency: 5.4
+            stormRingThickness: 0.18
+            stormTickTravelSpeed: 1
+            stormTickDamageLengthTolerance: 0.18
+            terminalCapIntensity: 1.12
+            contactFlareIntensity: 1.28
+            wobbleAmplitude: 0.08
+            bubbleDriftSpeed: 1.8
+          slowPlayerWhileCharging: 0
+          maximumPlayerSlowPercent: 35
+          playerSlowCurve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 1
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 1
+              inSlope: 1
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+        triggerEvent:
+          eventType: 0
+        delayedShootApplication:
+          shotInterval: 3
+        suddenStrike:
+          conditionMode: 0
+          countRotationAsMovement: 0
+          stationarySpeedTolerance: 0.05
+          stationaryRotationToleranceDegrees: 1
+          applyChargeMovementSlow: 0
+          movementSlowRecoverySeconds: 0.25
+        selfPreservationInstinct:
+          thresholdMode: 0
+          healthThreshold: 25
+        resourceGate:
+          activationResource: 1
+          maintenanceResource: 1
+          maximumEnergy: 100
+          initialEnergy: 100
+          activationCost: 100
+          maintenanceCostPerSecond: 0
+          isToggleable: 0
+          maintenanceTicksPerSecond: 4
+          minimumActivationEnergyPercent: 0
+          chargeType: 0
+          chargePerTrigger: 100
+          cooldownSeconds: 1
+          allowRechargeDuringToggleStartupLock: 0
+          maximumToggleActiveDurationSeconds: 0
+        suppressShooting:
+          suppressBaseShootingWhileActive: 1
+          interruptOtherSlotOnEnter: 0
+          interruptOtherSlotChargingOnly: 1
+        projectilePatternCone:
+          projectileCount: 6
+          coneAngleDegrees: 45
+          laserDurationSeconds: 0.35
+          ignoreInheritedPlayerVelocityX: 0
+          ignoreInheritedPlayerVelocityZ: 0
+        characterTuning:
+          applyFormulasOnlyOnActiveTrigger: 0
+          formulas: []
+        bomb:
+          bombPrefab: {fileID: 0}
+          spawnOffset: {x: 0, y: 0, z: 1.2}
+          spawnOffsetOrientation: 0
+          deploySpeed: 4.5
+          velocityDirection: 0
+          collisionRadius: 0.18
+          bounceOnWalls: 1
+          bounceDamping: 0.65
+          linearDampingPerSecond: 1.2
+          fuseSeconds: 1.25
+          radius: 7
+          enableDamagePayload: 1
+          damage: 120
+          affectAllEnemiesInRadius: 1
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        dash:
+          distance: 6
+          directionMode: 0
+          duration: 0.18
+          speedTransitionInSeconds: 0.06
+          speedTransitionOutSeconds: 0.08
+          wallBounceIntensity: 0.65
+          grantsInvulnerability: 1
+          invulnerabilityExtraTime: 0.1
+        bulletTime:
+          duration: 3
+          enemySlowPercent: 40
+          playerProjectileSlowPercent: 0
+          transitionTimeSeconds: 0.2
+        impactFrame:
+          durationMode: 0
+          durationFrames: 6
+          referenceFrameRate: 60
+          maximumUnscaledDurationSeconds: 0.12
+          easeInUnscaledSeconds: 0.02
+          easeOutUnscaledSeconds: 0.08
+          easingMode: 2
+          timeSlowdownPercent: 95
+          refreshOnShorterRequest: 0
+          presentationScope: 1
+          cameraFeedback:
+            enabled: 0
+            motionMode: 1
+            axisRightEnabled: 1
+            axisUpEnabled: 1
+            axisForwardEnabled: 0
+            positionalAmplitude: 0.35
+            forwardAmplitude: 0.12
+            rotationalAmplitude: 1.25
+            frequency: 18
+            zoomEnabled: 0
+            zoomFovDelta: -2
+          overlayIntensity: 1
+          filterTint: {r: 0.96, g: 0.78, b: 0.55, a: 0.45}
+          desaturationAmount: 0.65
+          vignetteIntensity: 0.55
+          vignetteSoftness: 0.6
+          vignetteExtent: 0.35
+          vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+          radialVignetteIntensity: 0
+          radialVignetteRadius: 0.55
+          radialVignetteSoftness: 0.12
+          radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+          chromaticAberration: 0.012
+          scanlineIntensity: 0.18
+          scanlineFrequency: 320
+          flashIntensity: 0.35
+          radialDistortion: 0.22
+          shockwaveIntensity: 0.35
+          shockwaveRadius: 0.65
+          shockwaveThickness: 0.12
+          zoomPunchIntensity: 0.18
+          invertIntensity: 0
+          posterizeIntensity: 0
+          posterizeSteps: 6
+          edgeInkIntensity: 0.2
+          screenTearIntensity: 0
+          screenTearFrequency: 24
+          paletteFlashIntensity: 0.25
+          paletteFlashTint: {r: 1, g: 0.9, b: 0.45, a: 0.7}
+          buildIn:
+            enabled: 0
+            releaseUnscaledSeconds: 0.06
+            easingMode: 2
+            effect:
+              presentationScope: 1
+              timeSlowdownPercent: 0
+              cameraFeedback:
+                enabled: 0
+                motionMode: 1
+                axisRightEnabled: 1
+                axisUpEnabled: 1
+                axisForwardEnabled: 0
+                positionalAmplitude: 0.35
+                forwardAmplitude: 0.12
+                rotationalAmplitude: 1.25
+                frequency: 18
+                zoomEnabled: 0
+                zoomFovDelta: -2
+              overlayIntensity: 0
+              filterTint: {r: 1, g: 1, b: 1, a: 1}
+              desaturationAmount: 0
+              vignetteIntensity: 0
+              vignetteSoftness: 0.6
+              vignetteExtent: 0.35
+              vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+              radialVignetteIntensity: 0
+              radialVignetteRadius: 0.55
+              radialVignetteSoftness: 0.12
+              radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+              chromaticAberration: 0
+              scanlineIntensity: 0
+              scanlineFrequency: 320
+              flashIntensity: 0
+              radialDistortion: 0
+              shockwaveIntensity: 0
+              shockwaveRadius: 0.65
+              shockwaveThickness: 0.12
+              zoomPunchIntensity: 0
+              invertIntensity: 0
+              posterizeIntensity: 0
+              posterizeSteps: 6
+              edgeInkIntensity: 0
+              screenTearIntensity: 0
+              screenTearFrequency: 24
+              paletteFlashIntensity: 0
+              paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        ghostTrail:
+          durationSeconds: 1.5
+          matchToggleActivationDuration: 0
+          easeInUnscaledSeconds: 0.08
+          easeOutUnscaledSeconds: 0.18
+          easingMode: 2
+          emissionIntervalSeconds: 0.06
+          snapshotLifetimeSeconds: 0.35
+          captureScope: 0
+          movementDistanceThreshold: 0.04
+          rotationAngleThresholdDegrees: 3
+          maximumActiveSnapshots: 18
+          tint: {x: 0.25, y: 0.8, z: 1, w: 0.45}
+          screenFeedbackEnabled: 0
+          screenFeedback:
+            presentationScope: 1
+            timeSlowdownPercent: 0
+            cameraFeedback:
+              enabled: 0
+              motionMode: 1
+              axisRightEnabled: 1
+              axisUpEnabled: 1
+              axisForwardEnabled: 0
+              positionalAmplitude: 0.35
+              forwardAmplitude: 0.12
+              rotationalAmplitude: 1.25
+              frequency: 18
+              zoomEnabled: 0
+              zoomFovDelta: -2
+            overlayIntensity: 0
+            filterTint: {r: 1, g: 1, b: 1, a: 1}
+            desaturationAmount: 0
+            vignetteIntensity: 0
+            vignetteSoftness: 0.6
+            vignetteExtent: 0.35
+            vignetteTint: {x: 0, y: 0, z: 0, w: 1}
+            radialVignetteIntensity: 0
+            radialVignetteRadius: 0.55
+            radialVignetteSoftness: 0.12
+            radialVignetteTint: {r: 0.1, g: 0, b: 0.2, a: 0.8}
+            chromaticAberration: 0
+            scanlineIntensity: 0
+            scanlineFrequency: 320
+            flashIntensity: 0
+            radialDistortion: 0
+            shockwaveIntensity: 0
+            shockwaveRadius: 0.65
+            shockwaveThickness: 0.12
+            zoomPunchIntensity: 0
+            invertIntensity: 0
+            posterizeIntensity: 0
+            posterizeSteps: 6
+            edgeInkIntensity: 0
+            screenTearIntensity: 0
+            screenTearFrequency: 24
+            paletteFlashIntensity: 0
+            paletteFlashTint: {r: 1, g: 1, b: 1, a: 1}
+        healMissingHealth:
+          applyMode: 0
+          healAmount: 30
+          durationSeconds: 2
+          tickIntervalSeconds: 0.2
+          stackPolicy: 0
+        dropAttraction:
+          attractionRadius: 18
+          consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 1
+          entries:
+          - entryId: a7ba421787f14785bbe3d8a60331a0ac
+            target: 0
+            customScalableStatName: 
+            minimumIncrease: 5
+            maximumIncrease: 15
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 1, g: 0.6984, b: 0.42, a: 1}
+          - entryId: 9312c0e1edc04716af40a778cd4286db
+            target: 1
+            customScalableStatName: 
+            minimumIncrease: 4
+            maximumIncrease: 12
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.5291583, g: 0.42, b: 1, a: 1}
+          - entryId: 6ccffaf045534202b2d06f4f0b951ae5
+            target: 2
+            customScalableStatName: 
+            minimumIncrease: 0.25
+            maximumIncrease: 0.75
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.4800834, g: 1, b: 0.42, a: 1}
+          - entryId: 032ccc1678bc42ddb579596a9e6b7827
+            target: 3
+            customScalableStatName: 
+            minimumIncrease: 0.1
+            maximumIncrease: 0.3
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 1, g: 0.42, b: 0.6493252, a: 1}
+          - entryId: b7aa6feb239f42aab2859c2bec453f8e
+            target: 4
+            customScalableStatName: 
+            minimumIncrease: 0.15
+            maximumIncrease: 0.45
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.42, g: 0.8185669, b: 1, a: 1}
+          - entryId: c1643546b19d4fd1bbeafb828d09fcb0
+            target: 10
+            customScalableStatName: 
+            minimumIncrease: 1
+            maximumIncrease: 3
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.6740172, g: 1, b: 0.42, a: 1}
+          - entryId: f570f1806f494e4092cff29139315bde
+            target: 14
+            customScalableStatName: MovementSpeed
+            minimumIncrease: 0.1
+            maximumIncrease: 0.25
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 1, g: 0.42, b: 0.5294675, a: 1}
+          - entryId: 2fa3383066094159b7413a7370a228f0
+            target: 14
+            customScalableStatName: Damage
+            minimumIncrease: 0.5
+            maximumIncrease: 1.5
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.42, g: 0.6987092, b: 1, a: 1}
+          - entryId: af38633d69214c8ebdea55f1f64908d4
+            target: 14
+            customScalableStatName: FireRate
+            minimumIncrease: 0.05
+            maximumIncrease: 0.15
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.8679509, g: 1, b: 0.42, a: 1}
+          - entryId: 2a498662c0534b8e8b715b3af43bc9ad
+            target: 14
+            customScalableStatName: ShotRange
+            minimumIncrease: 0.5
+            maximumIncrease: 1.5
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.9628073, g: 0.42, b: 1, a: 1}
+          - entryId: d9661696152a4ba5814f781131e8e6ba
+            target: 14
+            customScalableStatName: GatheringRadius
+            minimumIncrease: 0.25
+            maximumIncrease: 0.75
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 0.42, g: 1, b: 0.7935656, a: 1}
+          - entryId: f798af71e352440e8c7d79edb4ba43c1
+            target: 14
+            customScalableStatName: Luck
+            minimumIncrease: 0.25
+            maximumIncrease: 1
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 1, g: 0.6243239, b: 0.42, a: 1}
+          - entryId: 1045991de3b245339831d3330256be7e
+            target: 14
+            customScalableStatName: Knockback
+            minimumIncrease: 0.25
+            maximumIncrease: 0.75
+            selectionWeight: 1
+            useCustomPresentationColor: 1
+            presentationColor: {r: 1, g: 0.9381153, b: 0.42, a: 1}
+        deathExplosion:
+          triggerMode: 0
+          cooldownSeconds: 2
+          radius: 4
+          damage: 20
+          affectAllEnemiesInRadius: 1
+          triggerOffset: {x: 0, y: 0, z: 0}
+          explosionVfxPrefab: {fileID: 0}
+          scaleVfxToRadius: 1
+          vfxScaleMultiplier: 1
+        projectileOrbitOverride:
+          pathMode: 0
+          radialEntrySpeed: 12
+          orbitalSpeed: 8
+          orbitRadiusMin: 4
+          orbitRadiusMax: 6
+          orbitPulseFrequency: 0.7
+          orbitEntryRatio: 0.9
+          orbitBlendDuration: 0.3
+          heightOffset: 0
+          goldenAngleDegrees: 137.5
+          spiralStartRadius: 2.5
+          spiralMaximumRadius: 8
+          spiralAngularSpeedDegreesPerSecond: 240
+          spiralGrowthMultiplier: 1
+          spiralTurnsBeforeDespawn: 1.25
+          spiralClockwise: 0
+        orbitalProjections:
+          acquisitionPolicy: 0
+          useCategoryIdAsExclusionFilter: 0
+          activeDurationSeconds: 5
+          spawnAnimationSeconds: 0.25
+          despawnAnimationSeconds: 0.2
+          projections: []
+        projectileBounceOnWalls:
+          maxBounces: 2
+          speedPercentChangePerBounce: -5
+          minimumSpeedMultiplierAfterBounce: 0.1
+          maximumSpeedMultiplierAfterBounce: 3
+        returningProjectiles:
+          replacementProjectilePrefab: {fileID: 0}
+          keepProjectileVfx: 1
+          keepMuzzleFlashVfx: 1
+          keepHitVfx: 1
+          keepDeathVfx: 1
+          returnPathMode: 0
+          returnSpeedMultiplier: 1
+          outboundRangeMultiplier: 1
+          outboundLifetimeMultiplier: 1
+          outboundHitPolicy: 0
+          additionalOutboundHits: 1
+          returnStartMode: 0
+          returnDelaySeconds: 0
+          allowEarlyActivationRecall: 0
+          reapplyResourceGateCostOnRecall: 0
+          resourceReturnThresholdPercent: 0
+          stolenOwnershipPolicy: 0
+          returnRumbleMultiplier: 0.5
+          returnCameraShakeMultiplier: 0.5
+          outboundSizeMultiplier: 1
+          returnSizeMultiplier: 1
+          spinDuringFlight: 1
+          spinSpeedDegreesPerSecond: 540
+          spinAxis: 0
+          turnaroundRotationSpeedDegreesPerSecond: 720
+          turnaroundAxis: 0
+          returnHitPolicy: 0
+          additionalReturnHits: 1
+          enableRepeatedContactDamage: 0
+          repeatedContactDamage: 1
+          repeatedContactDamageIntervalSeconds: 0.5
+          pathSampleDistance: 0.25
+          returnCompletionDistance: 0.2
+          allowOtherPowerUpInteractions: 1
+          enableProjectileSplitting: 1
+          applyToSplitProjectiles: 1
+          completeBouncesBeforeReturn: 1
+          completeOrbitalPathBeforeReturn: 1
+          applyTinyMegaProjectileScaling: 1
           applyToActivePowerUpProjectiles: 0
           allowConcurrentActiveProjectiles: 0
         projectileSplit:
@@ -35950,6 +38343,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -36169,6 +38563,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -36441,6 +38838,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -36660,6 +39058,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -36945,6 +39346,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -37164,6 +39566,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -37449,6 +39854,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -37668,6 +40074,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -37940,6 +40349,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -38160,6 +40570,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -38445,6 +40858,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -38666,6 +41080,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -38938,6 +41355,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -39158,6 +41576,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -39430,6 +41851,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -39650,6 +42072,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -39935,6 +42360,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -40154,6 +42580,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -40437,6 +42866,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -40660,6 +43090,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -40941,6 +43374,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -41164,6 +43598,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41444,6 +43881,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -41664,6 +44102,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41934,6 +44375,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -42154,6 +44596,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42435,6 +44880,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -42656,6 +45102,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42926,6 +45375,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -43146,6 +45596,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43416,6 +45869,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -43636,6 +46090,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43916,6 +46373,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -44136,6 +46594,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -44406,6 +46867,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -44626,6 +47088,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -44906,6 +47371,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -45126,6 +47592,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -45396,6 +47865,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -45616,6 +48086,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -45897,6 +48370,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -46117,6 +48591,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -46398,6 +48875,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -46618,6 +49096,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -46899,6 +49380,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -47118,6 +49600,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -47388,6 +49873,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -47608,6 +50094,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -47878,6 +50367,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -48098,6 +50588,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -48361,6 +50854,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -48580,6 +51074,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -48870,6 +51367,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -49089,6 +51587,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -49379,6 +51880,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -49598,6 +52100,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -49915,6 +52420,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -50134,6 +52640,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -50413,6 +52922,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -50632,6 +53142,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -50922,6 +53435,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -51145,6 +53659,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -51408,6 +53925,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -51631,6 +54149,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -51894,6 +54415,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -52115,6 +54637,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -52378,6 +54903,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -52599,6 +55125,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -52862,6 +55391,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -53083,6 +55613,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -53346,6 +55879,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -53567,6 +56101,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -53819,6 +56356,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -54040,6 +56578,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -54323,6 +56864,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -54542,6 +57084,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -54808,6 +57353,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -55027,6 +57573,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -55279,6 +57828,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -55498,6 +58048,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -55762,6 +58315,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -55981,6 +58535,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -56233,6 +58790,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -56452,6 +59010,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -56704,6 +59265,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -56926,6 +59488,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -57196,6 +59761,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -57419,6 +59985,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -57685,6 +60254,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -57904,6 +60474,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -58156,6 +60729,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -58375,6 +60949,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -58645,6 +61222,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -58864,6 +61442,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -59129,6 +61710,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -59350,6 +61932,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -59614,6 +62199,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -59835,6 +62421,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 0
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -59999,7 +62588,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 0
     stealProtected: 1
-  primaryActivePowerUpId: 
+  primaryActivePowerUpId: ActiveEngineeredGrowth
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:

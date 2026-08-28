@@ -254,6 +254,8 @@ public struct PlayerRoomRewardPresentationEvent : IBufferElementData
     public byte BooleanValue;
     public byte IsTemporary;
     public byte StartsNextRoom;
+    public byte HasTextColorOverride;
+    public float4 TextColorOverride;
     public int DurationRooms;
     public int PresentationMappingIndex;
     public uint Sequence;

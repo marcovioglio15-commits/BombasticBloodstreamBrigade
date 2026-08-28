@@ -45,7 +45,11 @@ public static class GameRoomRewardPresentationFormatter
                                                         rewardEvent.DurationRooms,
                                                         simplified);
         string text = string.Concat(label, " ", valueSummary, durationSummary);
-        return BuildItem(text, mapping, hasMapping);
+        return BuildItem(text,
+                         mapping,
+                         hasMapping,
+                         rewardEvent.TextColorOverride,
+                         rewardEvent.HasTextColorOverride != 0);
     }
 
     /// <summary>
@@ -436,7 +440,31 @@ public static class GameRoomRewardPresentationFormatter
         in GameRoomRewardPresentationElement mapping,
         bool hasMapping)
     {
-        Color color = hasMapping
+        return BuildItem(text, mapping, hasMapping, default, false);
+    }
+
+    /// <summary>
+    /// Builds a mapped descriptor while allowing a source event to override only its text color.
+    /// </summary>
+    /// <param name="text">Fully formatted text summary.</param>
+    /// <param name="mapping">Resolved mapping when available.</param>
+    /// <param name="hasMapping">True when mapping data is valid.</param>
+    /// <param name="textColorOverride">Source-owned color applied before mapping fallback.</param>
+    /// <param name="hasTextColorOverride">True when the source-owned color is enabled.</param>
+    /// <returns>Immutable text or sprite descriptor.</returns>
+    private static GameRoomRewardPresentationItem BuildItem(
+        string text,
+        in GameRoomRewardPresentationElement mapping,
+        bool hasMapping,
+        in Unity.Mathematics.float4 textColorOverride,
+        bool hasTextColorOverride)
+    {
+        Color color = hasTextColorOverride
+            ? new Color(textColorOverride.x,
+                        textColorOverride.y,
+                        textColorOverride.z,
+                        textColorOverride.w)
+            : hasMapping
             ? new Color(mapping.TextColor.x,
                         mapping.TextColor.y,
                         mapping.TextColor.z,

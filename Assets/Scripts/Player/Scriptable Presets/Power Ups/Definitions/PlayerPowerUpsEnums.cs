@@ -34,7 +34,8 @@ public enum ActiveToolKind
     ImpactFrame = 9,
     GhostTrail = 10,
     DropAttraction = 11,
-    ReturningProjectile = 12
+    ReturningProjectile = 12,
+    RandomStatGrowth = 13
 }
 
 /// <summary>

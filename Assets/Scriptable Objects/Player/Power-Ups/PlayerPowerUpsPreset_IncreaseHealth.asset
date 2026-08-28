@@ -371,6 +371,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -590,6 +591,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -862,6 +866,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -1081,6 +1086,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1353,6 +1361,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -1572,6 +1581,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -1844,6 +1856,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 30
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -2063,6 +2076,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2335,6 +2351,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -2554,6 +2571,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -2826,6 +2846,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -3045,6 +3066,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3317,6 +3341,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -3536,6 +3561,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -3808,6 +3836,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -4027,6 +4056,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4299,6 +4331,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -4518,6 +4551,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -4790,6 +4826,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -5009,6 +5046,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5281,6 +5321,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -5500,6 +5541,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -5772,6 +5816,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -5991,6 +6036,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6263,6 +6311,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -6482,6 +6531,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -6754,6 +6806,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -6973,6 +7026,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -7245,6 +7301,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -7464,6 +7521,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 2
         cooldownSeconds: 0
@@ -7736,6 +7796,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -7955,6 +8016,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8227,6 +8291,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -8446,6 +8511,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -8718,6 +8786,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -8937,6 +9006,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9209,6 +9281,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -9428,6 +9501,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -9700,6 +9776,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -9919,6 +9996,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10191,6 +10271,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -10410,6 +10491,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -10710,6 +10794,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -10929,6 +11014,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -11201,6 +11289,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -11420,6 +11509,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -11693,6 +11785,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -11912,6 +12005,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -12185,6 +12281,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -12404,6 +12501,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -12677,6 +12777,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -12896,6 +12997,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -13169,6 +13273,7 @@ MonoBehaviour:
         activationResource: 1
         maintenanceResource: 1
         maximumEnergy: 100
+        initialEnergy: 100
         activationCost: 100
         maintenanceCostPerSecond: 0
         isToggleable: 0
@@ -13388,6 +13493,9 @@ MonoBehaviour:
       dropAttraction:
         attractionRadius: 18
         consumeUnusableDrops: 0
+      randomStatGrowth:
+        useWeightedSelection: 0
+        entries: []
       deathExplosion:
         triggerMode: 0
         cooldownSeconds: 2
@@ -13673,6 +13781,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -13892,6 +14001,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14164,6 +14276,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 0
           maximumEnergy: 15
+          initialEnergy: 100
           activationCost: 15
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -14383,6 +14496,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -14655,6 +14771,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -14874,6 +14991,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15146,6 +15266,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -15365,6 +15486,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -15637,6 +15761,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -15857,6 +15982,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16142,6 +16270,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -16361,6 +16490,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -16633,6 +16765,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -16852,6 +16985,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17124,6 +17260,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -17343,6 +17480,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -17615,6 +17755,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -17838,6 +17979,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18110,6 +18254,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -18333,6 +18478,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -18618,6 +18766,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -18837,6 +18986,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19109,6 +19261,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -19328,6 +19481,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -19600,6 +19756,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 35
+          initialEnergy: 100
           activationCost: 35
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -19819,6 +19976,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20091,6 +20251,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -20310,6 +20471,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -20582,6 +20746,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -20802,6 +20967,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21087,6 +21255,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -21306,6 +21475,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -21578,6 +21750,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -21797,6 +21970,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22069,6 +22245,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
+          initialEnergy: 100
           activationCost: 30
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -22288,6 +22465,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -22573,6 +22753,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -22792,6 +22973,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23064,6 +23248,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 10
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -23283,6 +23468,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -23555,6 +23743,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -23774,6 +23963,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24059,6 +24251,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -24278,6 +24471,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -24550,6 +24746,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 25
+          initialEnergy: 100
           activationCost: 25
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -24769,6 +24966,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25041,6 +25241,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -25260,6 +25461,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -25545,6 +25749,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -25764,6 +25969,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26036,6 +26244,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 30
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 10
           isToggleable: 1
@@ -26255,6 +26464,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -26527,6 +26739,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -26746,6 +26959,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27028,6 +27244,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -27247,6 +27464,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -27519,6 +27739,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 20
+          initialEnergy: 100
           activationCost: 4
           maintenanceCostPerSecond: 4
           isToggleable: 1
@@ -27738,6 +27959,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28010,6 +28234,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 10
           isToggleable: 1
@@ -28230,6 +28455,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -28495,6 +28723,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -28714,6 +28943,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -28993,6 +29225,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 0
           maximumEnergy: 15
+          initialEnergy: 100
           activationCost: 15
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -29212,6 +29445,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -29502,6 +29738,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -29721,6 +29958,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -30000,6 +30240,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 10
           maintenanceCostPerSecond: 5
           isToggleable: 1
@@ -30219,6 +30460,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -30530,6 +30774,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -30749,6 +30994,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31021,6 +31269,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -31240,6 +31489,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -31525,6 +31777,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -31744,6 +31997,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -32029,6 +32285,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -32248,6 +32505,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -32520,6 +32780,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -32740,6 +33001,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -33025,6 +33289,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -33244,6 +33509,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -33529,6 +33797,7 @@ MonoBehaviour:
           activationResource: 1
           maintenanceResource: 1
           maximumEnergy: 100
+          initialEnergy: 100
           activationCost: 100
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -33748,6 +34017,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -34030,6 +34302,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -34253,6 +34526,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -34533,6 +34809,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -34756,6 +35033,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -35036,6 +35316,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -35256,6 +35537,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -35526,6 +35810,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -35746,6 +36031,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -36026,6 +36314,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -36246,6 +36535,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -36516,6 +36808,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -36736,6 +37029,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -37006,6 +37302,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -37226,6 +37523,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -37506,6 +37806,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -37726,6 +38027,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -37996,6 +38300,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -38216,6 +38521,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -38496,6 +38804,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -38716,6 +39025,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -38986,6 +39298,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -39206,6 +39519,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -39486,6 +39802,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -39706,6 +40023,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -39976,6 +40296,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -40196,6 +40517,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -40476,6 +40800,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -40696,6 +41021,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -40966,6 +41294,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -41186,6 +41515,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41466,6 +41798,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -41686,6 +42019,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -41956,6 +42292,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -42176,6 +42513,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42456,6 +42796,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -42676,6 +43017,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -42946,6 +43290,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -43166,6 +43511,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43447,6 +43795,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -43667,6 +44016,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -43948,6 +44300,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -44168,6 +44521,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -44449,6 +44805,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -44668,6 +45025,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -44938,6 +45298,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -45158,6 +45519,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -45421,6 +45785,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -45640,6 +46005,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -45930,6 +46298,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -46149,6 +46518,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -46439,6 +46811,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -46658,6 +47031,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -46975,6 +47351,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -47194,6 +47571,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0
@@ -47473,6 +47853,7 @@ MonoBehaviour:
           activationResource: 0
           maintenanceResource: 0
           maximumEnergy: 0
+          initialEnergy: 100
           activationCost: 0
           maintenanceCostPerSecond: 0
           isToggleable: 0
@@ -47692,6 +48073,9 @@ MonoBehaviour:
         dropAttraction:
           attractionRadius: 18
           consumeUnusableDrops: 0
+        randomStatGrowth:
+          useWeightedSelection: 0
+          entries: []
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 0

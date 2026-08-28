@@ -149,6 +149,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                string resolvedValue,
                                                ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (PlayerRuntimeRandomStatGrowthScalingApplyUtility.TryApplyTokenValue(payloadPath,
+                                                                                resolvedValue,
+                                                                                ref activeSlotConfig.RandomStatGrowthEntries))
+        {
+            return true;
+        }
+
         if (!string.Equals(payloadPath, "switchWeapon.weaponId", System.StringComparison.Ordinal))
             return false;
 
@@ -190,6 +197,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                          float resolvedValue,
                                          ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (PlayerRuntimeRandomStatGrowthScalingApplyUtility.TryApplyValue(payloadPath,
+                                                                           resolvedValue,
+                                                                           ref activeSlotConfig.RandomStatGrowthEntries))
+        {
+            return;
+        }
+
         if (TryApplyLaserBeamValue(payloadPath,
                                    HoldChargeChargedLaserBeamPayloadPrefix,
                                    resolvedValue,
@@ -227,6 +241,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "resourceGate.maximumEnergy":
                 activeSlotConfig.MaximumEnergy = math.max(0f, resolvedValue);
+                return;
+            case "resourceGate.initialEnergy":
+                activeSlotConfig.InitialEnergy = math.max(0f, resolvedValue);
                 return;
             case "resourceGate.activationCost":
                 activeSlotConfig.ActivationCost = math.max(0f, resolvedValue);
@@ -1011,6 +1028,13 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                                                 bool resolvedValue,
                                                 ref PlayerPowerUpSlotConfig activeSlotConfig)
     {
+        if (PlayerRuntimeRandomStatGrowthScalingApplyUtility.TryApplyBooleanValue(payloadPath,
+                                                                                  resolvedValue,
+                                                                                  ref activeSlotConfig.RandomStatGrowthEntries))
+        {
+            return;
+        }
+
         if (TryApplyLaserBeamBooleanValue(payloadPath,
                                           HoldChargeChargedLaserBeamPayloadPrefix,
                                           resolvedValue,
@@ -1045,6 +1069,9 @@ public static class PlayerRuntimePowerUpScalingPathUtility
                 return;
             case "resourceGate.isToggleable":
                 activeSlotConfig.Toggleable = resolvedValue ? (byte)1 : (byte)0;
+                return;
+            case "randomStatGrowth.useWeightedSelection":
+                activeSlotConfig.UseWeightedRandomStatGrowthSelection = resolvedValue ? (byte)1 : (byte)0;
                 return;
             case "characterTuning.applyFormulasOnlyOnActiveTrigger":
                 activeSlotConfig.ApplyCharacterTuningOnActiveTrigger = resolvedValue ? (byte)1 : (byte)0;

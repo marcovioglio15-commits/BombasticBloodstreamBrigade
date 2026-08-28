@@ -56,7 +56,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="dropCollectionRequests">Shared drop-collection request queue receiving activation side effects.</param>
     /// <param name="audioRequests">Optional audio request buffer used when a Game Audio singleton exists.</param>
     /// <param name="canEnqueueAudioRequests">True when audioRequests points to a valid buffer.</param>
-    public static void ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
+    /// <returns>True only on a resource-paid charge release that executes the active payload.</returns>
+    public static bool ProcessChargeShotSlot(in PlayerPowerUpSlotConfig slotConfig,
                                              byte slotIndex,
                                              bool isPressed,
                                              bool pressedThisFrame,
@@ -112,7 +113,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         {
             isCharging = 0;
             charge = 0f;
-            return;
+            return false;
         }
 
         float requiredCharge = math.max(0f, slotConfig.ChargeShot.RequiredCharge);
@@ -123,7 +124,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
         {
             isCharging = 0;
             charge = 0f;
-            return;
+            return false;
         }
 
         if (charge > maximumCharge)
@@ -252,17 +253,18 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
                 cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
                 charge = 0f;
-                return;
+                return true;
             }
         }
 
         if (isPressed)
-            return;
+            return false;
 
         TickReleasedChargeState(in slotConfig.ChargeShot,
                                 deltaTime,
                                 maximumCharge,
                                 ref charge);
+        return false;
     }
 
     /// <summary>
@@ -299,7 +301,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="impactFrameState">Mutable Impact Frame state interrupted by hard slot interruption rules and activated on toggle-on.</param>
     /// <param name="ghostTrailState">Mutable Ghost Trail state interrupted by hard slot rules and activated or stopped with the toggle.</param>
     /// <param name="slotIndex">Owning active slot index used to match Ghost Trail lifetime to this toggle.</param>
-    public static void ProcessPassiveToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
+    /// <returns>True only when the input switches the toggle on after paying its activation cost.</returns>
+    public static bool ProcessPassiveToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
                                                 bool pressedThisFrame,
                                                 ref float slotEnergy,
                                                 ref float cooldownRemaining,
@@ -337,7 +340,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                 isShootingSuppressed = 1;
 
             if (!pressedThisFrame || cooldownRemaining > 0f)
-                return;
+                return false;
 
             isActive = 0;
             maintenanceTickTimer = 0f;
@@ -346,13 +349,13 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
             if (slotConfig.HasGhostTrail != 0)
                 PlayerGhostTrailRuntimeUtility.StopMatchedToggle(ref ghostTrailState, slotIndex);
 
-            return;
+            return false;
         }
 
         maintenanceTickTimer = 0f;
 
         if (!pressedThisFrame)
-            return;
+            return false;
 
         if (!PlayerPowerUpResourceCostUtility.CanPayActivationCost(in slotConfig,
                                                                    slotEnergy,
@@ -363,7 +366,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                                                    ref shieldLookup,
                                                                    ref updatedShield,
                                                                    ref shieldChanged))
-            return;
+            return false;
 
         PlayerPowerUpResourceCostUtility.ConsumeActivationCost(in slotConfig,
                                                                ref slotEnergy,
@@ -408,6 +411,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
 
         if (slotConfig.SuppressBaseShootingWhileActive != 0)
             isShootingSuppressed = 1;
+
+        return true;
     }
 
     /// <summary>

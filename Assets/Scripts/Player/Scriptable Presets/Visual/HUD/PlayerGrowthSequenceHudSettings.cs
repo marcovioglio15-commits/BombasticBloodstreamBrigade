@@ -13,6 +13,29 @@ public enum PlayerGrowthSequenceHudPresentationMode : byte
 }
 
 /// <summary>
+/// Provides shared finite-channel validation for Growth Sequence color settings.
+/// </summary>
+internal static class PlayerGrowthSequenceColorValidationUtility
+{
+    #region Methods
+
+    /// <summary>
+    /// Checks whether every color channel is finite.
+    /// </summary>
+    /// <param name="value">Color value to inspect.</param>
+    /// <returns>True when all channels are finite.</returns>
+    public static bool IsFinite(Color value)
+    {
+        return float.IsFinite(value.r) &&
+               float.IsFinite(value.g) &&
+               float.IsFinite(value.b) &&
+               float.IsFinite(value.a);
+    }
+
+    #endregion
+}
+
+/// <summary>
 /// Stores one text visual state for a growth sequence step.
 /// </summary>
 [Serializable]
@@ -139,23 +162,11 @@ public sealed class PlayerGrowthSequenceHudTextStateSettings
         if (!float.IsFinite(outlineWidth) || outlineWidth < 0f)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: Outline Width should be finite and zero or greater.", ownerAssetName, sectionLabel));
 
-        if (!IsFinite(color) || !IsFinite(outlineColor))
+        if (!PlayerGrowthSequenceColorValidationUtility.IsFinite(color) ||
+            !PlayerGrowthSequenceColorValidationUtility.IsFinite(outlineColor))
+        {
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}: colors contain invalid numeric values.", ownerAssetName, sectionLabel));
-    }
-    #endregion
-
-    #region Validation
-    /// <summary>
-    /// Checks whether every color channel is finite.
-    /// </summary>
-    /// <param name="value">Color value to inspect.</param>
-    /// <returns>True when all channels are finite.</returns>
-    private static bool IsFinite(Color value)
-    {
-        return float.IsFinite(value.r) &&
-               float.IsFinite(value.g) &&
-               float.IsFinite(value.b) &&
-               float.IsFinite(value.a);
+        }
     }
     #endregion
 
@@ -194,6 +205,14 @@ public sealed class PlayerGrowthSequenceHudStepVisualDefinition
 
     [Tooltip("Text state used while this step is not the next level-up target.")]
     [SerializeField] private PlayerGrowthSequenceHudTextStateSettings normalText = new PlayerGrowthSequenceHudTextStateSettings();
+
+    [Tooltip("Overrides the global above-player level-up growth color for this step's statistic when per-stat colors are enabled.")]
+    [SerializeField]
+    private bool useLevelUpGrowthColorOverride;
+
+    [Tooltip("Above-player text color used for this step's statistic when its color override is enabled.")]
+    [SerializeField]
+    private Color levelUpGrowthColor = Color.white;
     #endregion
 
     #endregion
@@ -262,6 +281,22 @@ public sealed class PlayerGrowthSequenceHudStepVisualDefinition
             return normalText;
         }
     }
+
+    public bool UseLevelUpGrowthColorOverride
+    {
+        get
+        {
+            return useLevelUpGrowthColorOverride;
+        }
+    }
+
+    public Color LevelUpGrowthColor
+    {
+        get
+        {
+            return levelUpGrowthColor;
+        }
+    }
     #endregion
 
     #region Methods
@@ -290,6 +325,12 @@ public sealed class PlayerGrowthSequenceHudStepVisualDefinition
             case PlayerGrowthSequenceHudPresentationMode.Text:
                 ValidateTextStates(ownerAssetName, scheduleId, entryIndex);
                 break;
+        }
+
+        if (useLevelUpGrowthColorOverride &&
+            !PlayerGrowthSequenceColorValidationUtility.IsFinite(levelUpGrowthColor))
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence/{1}/{2}: Level-up Growth Color contains invalid numeric values.", ownerAssetName, scheduleId, entryIndex));
         }
     }
     #endregion
@@ -414,6 +455,18 @@ public sealed class PlayerGrowthSequenceHudSettings
     [Tooltip("Maximum number of growth sequence entries rendered from the preauthored UI pool. Set 0 to use the whole matching schedule.")]
     [SerializeField] private int maximumVisibleSteps;
 
+    [Tooltip("Shows every effective level-up schedule increase above the player through the room-reward presentation pipeline.")]
+    [SerializeField]
+    private bool showLevelUpStatGrowthAbovePlayer;
+
+    [Tooltip("Default text color used for level-up statistic increases shown above the player.")]
+    [SerializeField]
+    private Color levelUpStatGrowthColor = Color.white;
+
+    [Tooltip("Allows synchronized Growth Sequence steps to override the above-player color for their statistic.")]
+    [SerializeField]
+    private bool usePerStatLevelUpGrowthColors;
+
     [Tooltip("Visual entries grouped by level-up schedule ID.")]
     [SerializeField] private List<PlayerGrowthSequenceHudScheduleVisualDefinition> schedules = new List<PlayerGrowthSequenceHudScheduleVisualDefinition>();
     #endregion
@@ -445,6 +498,30 @@ public sealed class PlayerGrowthSequenceHudSettings
         }
     }
 
+    public bool ShowLevelUpStatGrowthAbovePlayer
+    {
+        get
+        {
+            return showLevelUpStatGrowthAbovePlayer;
+        }
+    }
+
+    public Color LevelUpStatGrowthColor
+    {
+        get
+        {
+            return levelUpStatGrowthColor;
+        }
+    }
+
+    public bool UsePerStatLevelUpGrowthColors
+    {
+        get
+        {
+            return usePerStatLevelUpGrowthColors;
+        }
+    }
+
     public IReadOnlyList<PlayerGrowthSequenceHudScheduleVisualDefinition> Schedules
     {
         get
@@ -465,6 +542,12 @@ public sealed class PlayerGrowthSequenceHudSettings
     {
         if (maximumVisibleSteps < 0)
             Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence: Maximum Visible Steps should be zero or greater.", ownerAssetName));
+
+        if (showLevelUpStatGrowthAbovePlayer &&
+            !PlayerGrowthSequenceColorValidationUtility.IsFinite(levelUpStatGrowthColor))
+        {
+            Debug.LogWarning(string.Format("[PlayerVisualPreset] '{0}' - Growth Sequence: Level-up Stat Growth Color contains invalid numeric values.", ownerAssetName));
+        }
 
         if (schedules == null)
         {

@@ -43,6 +43,7 @@ public struct PlayerPowerUpSlotConfig
     public PowerUpResourceType MaintenanceResource;
     public PowerUpChargeType ChargeType;
     public float MaximumEnergy;
+    public float InitialEnergy;
     public float ActivationCost;
     public float MaintenanceCostPerSecond;
     public float MaintenanceTicksPerSecond;
@@ -74,6 +75,8 @@ public struct PlayerPowerUpSlotConfig
     public byte HasReturningProjectiles;
     public ReturningProjectilesConfig ReturningProjectiles;
     public byte HasResourceGate;
+    public byte UseWeightedRandomStatGrowthSelection;
+    public FixedList4096Bytes<PlayerRandomStatGrowthEntryConfig> RandomStatGrowthEntries;
     public PlayerPassiveToolConfig TriggeredProjectilePassiveTool;
     public PlayerPassiveToolConfig TogglePassiveTool;
 
@@ -83,6 +86,20 @@ public struct PlayerPowerUpSlotConfig
     // animation override is stored beside the slot.
     public byte HasActiveWeaponSwitch;
     public FixedString64Bytes ActiveWeaponId;
+}
+
+/// <summary>
+/// Stores one baked candidate for a permanent random statistic increase.
+/// </summary>
+public struct PlayerRandomStatGrowthEntryConfig
+{
+    public PlayerRandomStatGrowthTarget Target;
+    public FixedString64Bytes CustomScalableStatName;
+    public float MinimumIncrease;
+    public float MaximumIncrease;
+    public float SelectionWeight;
+    public byte UseCustomPresentationColor;
+    public float4 PresentationColor;
 }
 
 /// <summary>

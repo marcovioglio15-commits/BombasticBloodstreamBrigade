@@ -142,6 +142,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool isToggleable = false;
         float maximumToggleActiveDurationSeconds = 0f;
         float maximumEnergy = 0f;
+        float initialEnergy = 0f;
         float activationCost = 0f;
         float maintenanceCostPerSecond = 0f;
         float maintenanceTicksPerSecond = 0f;
@@ -245,6 +246,9 @@ public static class PlayerPowerUpActiveBakeUtility
         bool hasActiveWeaponSwitch = false;
         bool hasReturningProjectiles = false;
         ReturningProjectilesConfig returningProjectilesConfig = default;
+        bool hasRandomStatGrowth = false;
+        bool useWeightedRandomStatGrowthSelection = false;
+        FixedList4096Bytes<PlayerRandomStatGrowthEntryConfig> randomStatGrowthEntries = default;
         FixedString64Bytes activeWeaponId = default;
         IReadOnlyList<PowerUpModuleBinding> moduleBindings = powerUp.ModuleBindings;
 
@@ -281,6 +285,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                     ref allowRechargeDuringToggleStartupLock,
                                                                                     ref maximumToggleActiveDurationSeconds,
                                                                                     ref maximumEnergy,
+                                                                                    ref initialEnergy,
                                                                                     ref activationCost,
                                                                                     ref maintenanceCostPerSecond,
                                                                                     ref chargePerTrigger,
@@ -523,6 +528,12 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                                             resolveDynamicPrefabEntity,
                                                                                                             true);
                     break;
+                case PowerUpModuleKind.RandomStatGrowth:
+                    PlayerPowerUpRandomStatGrowthBakeUtility.Accumulate(payload.RandomStatGrowth,
+                                                                        ref randomStatGrowthEntries,
+                                                                        ref useWeightedRandomStatGrowthSelection);
+                    hasRandomStatGrowth = hasRandomStatGrowth || randomStatGrowthEntries.Length > 0;
+                    break;
             }
         }
 
@@ -543,7 +554,8 @@ public static class PlayerPowerUpActiveBakeUtility
             if (togglePassiveTool.IsDefined == 0 &&
                 !hasCharacterTuning &&
                 !hasGhostTrail &&
-                !hasConditionalShotApplication)
+                !hasConditionalShotApplication &&
+                !hasRandomStatGrowth)
                 return;
 
             resolvedToolKind = ActiveToolKind.PassiveToggle;
@@ -559,7 +571,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                               hasGhostTrail,
                                                                                               hasHealthPack,
                                                                                               hasOrbitalProjections,
-                                                                                              hasDropAttraction);
+                                                                                              hasDropAttraction,
+                                                                                              hasRandomStatGrowth);
 
             if (resolvedToolKind == ActiveToolKind.Custom && hasReturningProjectiles)
                 resolvedToolKind = ActiveToolKind.ReturningProjectile;
@@ -648,6 +661,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        isToggleable,
                                                                        maximumToggleActiveDurationSeconds,
                                                                        maximumEnergy,
+                                                                       initialEnergy,
                                                                        activationCost,
                                                                        maintenanceCostPerSecond,
                                                                        maintenanceTicksPerSecond,
@@ -736,6 +750,8 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        in togglePassiveTool,
                                                                        hasActiveWeaponSwitch,
                                                                        activeWeaponId,
+                                                                       useWeightedRandomStatGrowthSelection,
+                                                                       in randomStatGrowthEntries,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
 
@@ -828,6 +844,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                                                             resolveDynamicPrefabEntity);
 
         ActiveToolKind toolKind = activeTool.ToolKind == ActiveToolKind.Custom ? ActiveToolKind.Bomb : activeTool.ToolKind;
+        float maximumEnergy = math.max(0f, activeTool.MaximumEnergy);
 
         slotConfig = new PlayerPowerUpSlotConfig
         {
@@ -837,7 +854,8 @@ public static class PlayerPowerUpActiveBakeUtility
             ActivationResource = activeTool.ActivationResource,
             MaintenanceResource = activeTool.MaintenanceResource,
             ChargeType = activeTool.ChargeType,
-            MaximumEnergy = math.max(0f, activeTool.MaximumEnergy),
+            MaximumEnergy = maximumEnergy,
+            InitialEnergy = maximumEnergy,
             ActivationCost = math.max(0f, activeTool.ActivationCost),
             MaintenanceCostPerSecond = math.max(0f, activeTool.MaintenanceCostPerSecond),
             MaintenanceTicksPerSecond = 0f,

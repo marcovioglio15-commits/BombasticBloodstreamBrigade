@@ -138,7 +138,9 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
                 NextOutlineColor = step.NextOutlineColor,
                 NormalOutlineColor = step.NormalOutlineColor,
                 NextOutlineWidth = step.NextOutlineWidth,
-                NormalOutlineWidth = step.NormalOutlineWidth
+                NormalOutlineWidth = step.NormalOutlineWidth,
+                UseLevelUpGrowthColorOverride = step.UseLevelUpGrowthColorOverride,
+                LevelUpGrowthColor = step.LevelUpGrowthColor
             });
         }
     }
@@ -213,6 +215,12 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
             case "hideWhenPlayerMissing":
                 runtimeConfig.HideWhenPlayerMissing = byteValue;
                 return;
+            case "showLevelUpStatGrowthAbovePlayer":
+                runtimeConfig.ShowLevelUpStatGrowthAbovePlayer = byteValue;
+                return;
+            case "usePerStatLevelUpGrowthColors":
+                runtimeConfig.UsePerStatLevelUpGrowthColors = byteValue;
+                return;
         }
 
         if (!TryResolveStepTarget(payloadPath, out FixedString64Bytes scheduleId, out int stepIndex, out string stepPath))
@@ -242,10 +250,23 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
                                           ref PlayerGrowthSequenceHudVisualConfig runtimeConfig,
                                           DynamicBuffer<PlayerGrowthSequenceHudStepVisualElement> runtimeSteps)
     {
-        if (string.Equals(payloadPath, "maximumVisibleSteps", StringComparison.Ordinal))
+        switch (payloadPath)
         {
-            runtimeConfig.MaximumVisibleSteps = math.max(0, (int)math.round(resolvedValue));
-            return;
+            case "maximumVisibleSteps":
+                runtimeConfig.MaximumVisibleSteps = math.max(0, (int)math.round(resolvedValue));
+                return;
+            case "levelUpStatGrowthColor.r":
+                runtimeConfig.LevelUpStatGrowthColor.x = math.saturate(resolvedValue);
+                return;
+            case "levelUpStatGrowthColor.g":
+                runtimeConfig.LevelUpStatGrowthColor.y = math.saturate(resolvedValue);
+                return;
+            case "levelUpStatGrowthColor.b":
+                runtimeConfig.LevelUpStatGrowthColor.z = math.saturate(resolvedValue);
+                return;
+            case "levelUpStatGrowthColor.a":
+                runtimeConfig.LevelUpStatGrowthColor.w = math.saturate(resolvedValue);
+                return;
         }
 
         if (!TryResolveStepTarget(payloadPath, out FixedString64Bytes scheduleId, out int stepIndex, out string stepPath))
@@ -353,6 +374,9 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
             case "normalText.enableAutoSize":
                 step.NormalAutoSizeEnabled = resolvedValue;
                 return;
+            case "useLevelUpGrowthColorOverride":
+                step.UseLevelUpGrowthColorOverride = resolvedValue;
+                return;
         }
     }
 
@@ -417,6 +441,18 @@ public partial struct PlayerRuntimeGrowthSequenceHudVisualScalingSystem : ISyste
                 return;
             case "normalText.outlineColor.a":
                 step.NormalOutlineColor.w = colorValue;
+                return;
+            case "levelUpGrowthColor.r":
+                step.LevelUpGrowthColor.x = colorValue;
+                return;
+            case "levelUpGrowthColor.g":
+                step.LevelUpGrowthColor.y = colorValue;
+                return;
+            case "levelUpGrowthColor.b":
+                step.LevelUpGrowthColor.z = colorValue;
+                return;
+            case "levelUpGrowthColor.a":
+                step.LevelUpGrowthColor.w = colorValue;
                 return;
         }
     }

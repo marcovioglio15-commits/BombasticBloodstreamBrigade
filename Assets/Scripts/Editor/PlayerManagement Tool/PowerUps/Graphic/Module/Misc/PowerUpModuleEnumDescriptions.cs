@@ -45,7 +45,8 @@ public static class PowerUpModuleEnumDescriptions
         PowerUpModuleKind.ReturningProjectiles,
         PowerUpModuleKind.DelayedShootApplication,
         PowerUpModuleKind.SuddenStrike,
-        PowerUpModuleKind.SelfPreservationInstinct
+        PowerUpModuleKind.SelfPreservationInstinct,
+        PowerUpModuleKind.RandomStatGrowth
     };
     #endregion
 
@@ -167,6 +168,8 @@ public static class PowerUpModuleEnumDescriptions
                 return "Charges a sibling Trigger Hold Charge automatically while stationary or not shooting, then applies its full-charge payload and any sibling projectile or object-spawn effects to the next base shot.";
             case PowerUpModuleKind.SelfPreservationInstinct:
                 return "Executes sibling active-effect modules when health crosses an authored percentage or direct-value threshold from above. Supported only by passives.";
+            case PowerUpModuleKind.RandomStatGrowth:
+                return "Permanently increases one equally likely native or numeric custom player statistic when an active power-up activation succeeds.";
             default:
                 return "No description available.";
         }
@@ -293,6 +296,10 @@ public static class PowerUpModuleEnumDescriptions
             case PowerUpModuleKind.SelfPreservationInstinct:
                 relativePropertyPath = "selfPreservationInstinct";
                 payloadLabel = "Self-Preservation Instinct Payload";
+                return true;
+            case PowerUpModuleKind.RandomStatGrowth:
+                relativePropertyPath = "randomStatGrowth";
+                payloadLabel = "Random Stat Growth Payload";
                 return true;
             default:
                 relativePropertyPath = string.Empty;

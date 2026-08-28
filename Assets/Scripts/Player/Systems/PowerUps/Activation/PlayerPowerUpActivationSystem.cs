@@ -72,6 +72,9 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         state.RequireForUpdate<PlayerLevel>();
         state.RequireForUpdate<PlayerExperienceCollection>();
         state.RequireForUpdate<PlayerScalableStatElement>();
+        state.RequireForUpdate<PlayerRandomStatGrowthState>();
+        state.RequireForUpdate<PlayerRandomStatGrowthModifierElement>();
+        state.RequireForUpdate<PlayerRoomRewardPresentationEvent>();
         state.RequireForUpdate<PlayerHealth>();
         state.RequireForUpdate<PlayerShield>();
         state.RequireForUpdate<LocalTransform>();
@@ -154,6 +157,12 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
         BufferLookup<PlayerPowerUpBaseConfigElement> basePowerUpConfigsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpBaseConfigElement>(false);
         BufferLookup<PlayerRuntimePowerUpScalingElement> powerUpScalingLookup = SystemAPI.GetBufferLookup<PlayerRuntimePowerUpScalingElement>(true);
         BufferLookup<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequestsLookup = SystemAPI.GetBufferLookup<PlayerOrbitalProjectionSpawnRequest>(false);
+        ComponentLookup<PlayerRandomStatGrowthState> randomStatGrowthStateLookup =
+            SystemAPI.GetComponentLookup<PlayerRandomStatGrowthState>(false);
+        BufferLookup<PlayerRandomStatGrowthModifierElement> randomStatGrowthModifiersLookup =
+            SystemAPI.GetBufferLookup<PlayerRandomStatGrowthModifierElement>(false);
+        BufferLookup<PlayerRoomRewardPresentationEvent> presentationEventsLookup =
+            SystemAPI.GetBufferLookup<PlayerRoomRewardPresentationEvent>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
         DynamicBuffer<EnemyDropCollectionRequest> dropCollectionRequests =
@@ -241,6 +250,13 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             if (!orbitalProjectionRequestsLookup.HasBuffer(entity))
                 continue;
 
+            if (!randomStatGrowthStateLookup.HasComponent(entity) ||
+                !randomStatGrowthModifiersLookup.HasBuffer(entity) ||
+                !presentationEventsLookup.HasBuffer(entity))
+            {
+                continue;
+            }
+
             PlayerLookState lookState = lookLookup[entity];
             PlayerMovementState movementState = movementLookup[entity];
             PlayerPowerUpsConfig powerUpsConfig;
@@ -268,6 +284,10 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             DynamicBuffer<PlayerScalableStatElement> scalableStats = scalableStatsLookup[entity];
             DynamicBuffer<PlayerRuntimeGamePhaseElement> runtimeGamePhases = runtimeGamePhasesLookup[entity];
             DynamicBuffer<PlayerOrbitalProjectionSpawnRequest> orbitalProjectionRequests = orbitalProjectionRequestsLookup[entity];
+            PlayerRandomStatGrowthState randomStatGrowthState = randomStatGrowthStateLookup[entity];
+            DynamicBuffer<PlayerRandomStatGrowthModifierElement> randomStatGrowthModifiers =
+                randomStatGrowthModifiersLookup[entity];
+            DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents = presentationEventsLookup[entity];
             PlayerLaserBeamState mutableLaserBeamState = laserBeamState.ValueRO;
             bool primaryPressed = inputState.ValueRO.PowerUpPrimary > InputPressThreshold;
             bool secondaryPressed = inputState.ValueRO.PowerUpSecondary > InputPressThreshold;
@@ -405,7 +425,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref shieldLookup,
                                                                 ref updatedShield,
                                                                 ref shieldChanged);
-            PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in primarySlotConfig,
+            bool primaryActivated = PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in primarySlotConfig,
                                                                 in secondarySlotConfig,
                                                                 0,
                                                                 powerUpsState.ValueRO.PrimaryReturningProjectileCount,
@@ -459,6 +479,14 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref shieldLookup,
                                                                 ref updatedShield,
                                                                 ref shieldChanged);
+            ApplyRandomStatGrowthIfActivated(primaryActivated,
+                                             in primarySlotConfig,
+                                             entity,
+                                             scalableStats,
+                                             randomStatGrowthModifiers,
+                                             ref randomStatGrowthState,
+                                             runtimeScalingStateLookup,
+                                             presentationEvents);
 
             bool primaryScopedCharacterTuningShouldBeActiveBeforeSecondary = ShouldScopedCharacterTuningRemainActiveOutsideCurrentSlot(in primarySlotConfig,
                                                                                                                                        primaryIsActive);
@@ -555,7 +583,7 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref shieldLookup,
                                                                 ref updatedShield,
                                                                 ref shieldChanged);
-            PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in secondarySlotConfig,
+            bool secondaryActivated = PlayerPowerUpActivationSlotUtility.ProcessSlotInput(in secondarySlotConfig,
                                                                 in primarySlotConfig,
                                                                 1,
                                                                 powerUpsState.ValueRO.SecondaryReturningProjectileCount,
@@ -609,6 +637,14 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
                                                                 ref shieldLookup,
                                                                 ref updatedShield,
                                                                 ref shieldChanged);
+            ApplyRandomStatGrowthIfActivated(secondaryActivated,
+                                             in secondarySlotConfig,
+                                             entity,
+                                             scalableStats,
+                                             randomStatGrowthModifiers,
+                                             ref randomStatGrowthState,
+                                             runtimeScalingStateLookup,
+                                             presentationEvents);
 
             bool primaryScopedCharacterTuningShouldBeActiveFinal = ShouldScopedCharacterTuningRemainActive(in primarySlotConfig,
                                                                                                               primaryIsCharging,
@@ -726,11 +762,45 @@ public partial struct PlayerPowerUpActivationSystem : ISystem
             playerExperienceLookup[entity] = playerExperience;
             playerLevelLookup[entity] = playerLevel;
             playerExperienceCollectionLookup[entity] = playerExperienceCollection;
+            randomStatGrowthStateLookup[entity] = randomStatGrowthState;
         }
     }
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Commits Random Stat Growth only after the owning slot reports a completed activation.
+    /// </summary>
+    /// <param name="activated">Whether the slot completed its resource-paid execution.</param>
+    /// <param name="slotConfig">Activated slot configuration.</param>
+    /// <param name="playerEntity">Player entity owning runtime scaling state.</param>
+    /// <param name="scalableStats">Mutable scalable-stat buffer.</param>
+    /// <param name="modifiers">Mutable permanent native-stat modifiers.</param>
+    /// <param name="growthState">Mutable Random Stat Growth state.</param>
+    /// <param name="runtimeScalingStateLookup">Mutable runtime scaling state lookup.</param>
+    /// <param name="presentationEvents">Shared above-player presentation queue.</param>
+    private static void ApplyRandomStatGrowthIfActivated(bool activated,
+                                                         in PlayerPowerUpSlotConfig slotConfig,
+                                                         Entity playerEntity,
+                                                         DynamicBuffer<PlayerScalableStatElement> scalableStats,
+                                                         DynamicBuffer<PlayerRandomStatGrowthModifierElement> modifiers,
+                                                         ref PlayerRandomStatGrowthState growthState,
+                                                         ComponentLookup<PlayerRuntimeScalingState> runtimeScalingStateLookup,
+                                                         DynamicBuffer<PlayerRoomRewardPresentationEvent> presentationEvents)
+    {
+        if (!activated || slotConfig.RandomStatGrowthEntries.Length <= 0)
+            return;
+
+        PlayerRuntimeScalingState runtimeScalingState = runtimeScalingStateLookup[playerEntity];
+        PlayerRandomStatGrowthRuntimeUtility.TryApply(in slotConfig,
+                                                      scalableStats,
+                                                      modifiers,
+                                                      ref growthState,
+                                                      ref runtimeScalingState,
+                                                      presentationEvents);
+        runtimeScalingStateLookup[playerEntity] = runtimeScalingState;
+    }
+
     /// <summary>
     /// Resolves whether one runtime-scoped Character Tuning overlay must already be active before the current slot starts processing this frame.
     /// </summary>

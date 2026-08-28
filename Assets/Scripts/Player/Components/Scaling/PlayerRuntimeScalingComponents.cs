@@ -215,6 +215,7 @@ public struct PlayerPowerUpBaseConfigElement : IBufferElementData
 public struct PlayerRuntimeScalingState : IComponentData
 {
     public uint LastScalableStatsHash;
+    public uint ApplyVersion;
     public byte Initialized;
 }
 

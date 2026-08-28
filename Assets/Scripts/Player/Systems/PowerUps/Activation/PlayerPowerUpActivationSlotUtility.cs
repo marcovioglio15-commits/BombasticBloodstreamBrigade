@@ -67,7 +67,8 @@ public static class PlayerPowerUpActivationSlotUtility
     /// <param name="shieldLookup">Mutable player shield lookup.</param>
     /// <param name="updatedShield">Cached mutable shield state reused across both slots.</param>
     /// <param name="shieldChanged">Whether the cached shield state was fetched or changed.</param>
-    public static void ProcessSlotInput(in PlayerPowerUpSlotConfig slotConfig,
+    /// <returns>True when the slot completed a resource-paid activation.</returns>
+    public static bool ProcessSlotInput(in PlayerPowerUpSlotConfig slotConfig,
                                         in PlayerPowerUpSlotConfig otherSlotConfig,
                                         byte slotIndex,
                                         int activeReturningProjectileCount,
@@ -123,7 +124,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         ref bool shieldChanged)
     {
         if (slotConfig.IsDefined == 0)
-            return;
+            return false;
 
         if (PlayerReturningProjectileRecallActivationUtility.TryProcess(in slotConfig,
                                                                         activeReturningProjectileCount,
@@ -139,7 +140,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                         ref updatedShield,
                                                                         ref shieldChanged))
         {
-            return;
+            return false;
         }
 
         if (slotConfig.HasReturningProjectiles != 0 &&
@@ -147,12 +148,12 @@ public static class PlayerPowerUpActivationSlotUtility
             (returningProjectileReconnectPending != 0 ||
              slotConfig.ReturningProjectiles.AllowConcurrentActiveProjectiles == 0))
         {
-            return;
+            return false;
         }
 
         if (slotConfig.ToolKind == ActiveToolKind.ChargeShot)
         {
-            PlayerPowerUpChargeAndToggleActivationUtility.ProcessChargeShotSlot(in slotConfig,
+            return PlayerPowerUpChargeAndToggleActivationUtility.ProcessChargeShotSlot(in slotConfig,
                                                                                 slotIndex,
                                                                                 isPressed,
                                                                                 pressedThisFrame,
@@ -200,12 +201,11 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 dropCollectionRequests,
                                                                                 audioRequests,
                                                                                 canEnqueueAudioRequests);
-            return;
         }
 
         if (slotConfig.ToolKind == ActiveToolKind.PassiveToggle && slotConfig.Toggleable != 0)
         {
-            PlayerPowerUpChargeAndToggleActivationUtility.ProcessPassiveToggleSlot(in slotConfig,
+            return PlayerPowerUpChargeAndToggleActivationUtility.ProcessPassiveToggleSlot(in slotConfig,
                                                                                    pressedThisFrame,
                                                                                    ref slotEnergy,
                                                                                    ref cooldownRemaining,
@@ -236,7 +236,6 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                    ref impactFrameState,
                                                                                    ref ghostTrailState,
                                                                                    slotIndex);
-            return;
         }
 
         isActive = 0;
@@ -254,10 +253,10 @@ public static class PlayerPowerUpActivationSlotUtility
         }
 
         if (!activationTriggered)
-            return;
+            return false;
 
         if (cooldownRemaining > 0f)
-            return;
+            return false;
 
         if (!CanExecuteTool(in slotConfig,
                             in dashState,
@@ -274,7 +273,7 @@ public static class PlayerPowerUpActivationSlotUtility
                             ref healthLookup,
                             ref updatedHealth,
                             ref healthChanged))
-            return;
+            return false;
 
         if (!PlayerPowerUpResourceCostUtility.CanPayActivationCost(in slotConfig,
                                                                    slotEnergy,
@@ -285,7 +284,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                    ref shieldLookup,
                                                                    ref updatedShield,
                                                                    ref shieldChanged))
-            return;
+            return false;
 
         PlayerPowerUpResourceCostUtility.ConsumeActivationCost(in slotConfig,
                                                                ref slotEnergy,
@@ -366,6 +365,7 @@ public static class PlayerPowerUpActivationSlotUtility
             isShootingSuppressed = 1;
 
         cooldownRemaining = math.max(0f, slotConfig.CooldownSeconds);
+        return true;
     }
 
     #endregion
@@ -524,7 +524,10 @@ public static class PlayerPowerUpActivationSlotUtility
             case ActiveToolKind.PassiveToggle:
                 return slotConfig.Toggleable != 0 &&
                        (slotConfig.TogglePassiveTool.IsDefined != 0 ||
-                        slotConfig.HasGhostTrail != 0);
+                        slotConfig.HasGhostTrail != 0 ||
+                        slotConfig.RandomStatGrowthEntries.Length > 0);
+            case ActiveToolKind.RandomStatGrowth:
+                return slotConfig.RandomStatGrowthEntries.Length > 0;
             default:
                 return false;
         }

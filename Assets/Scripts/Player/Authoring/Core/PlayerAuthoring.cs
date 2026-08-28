@@ -544,6 +544,8 @@ public sealed class PlayerAuthoringBaker : Baker<PlayerAuthoring>
             GraceTimeSeconds = math.max(0f, controllerPreset.HealthStatistics.GraceTimeSeconds)
         });
         AddComponent(entity, new PlayerRuntimeScalingState());
+        AddComponent(entity, new PlayerRandomStatGrowthState());
+        AddBuffer<PlayerRandomStatGrowthModifierElement>(entity);
         AddComponent(entity, new PlayerRoomRewardGrantState
         {
             LastNodeIndex = -1

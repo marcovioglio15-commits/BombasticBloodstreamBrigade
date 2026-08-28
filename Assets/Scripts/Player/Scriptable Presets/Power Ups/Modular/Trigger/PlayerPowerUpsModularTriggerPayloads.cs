@@ -371,6 +371,10 @@ public sealed class PowerUpResourceGateModuleData
     [Tooltip("Maximum energy capacity for this active power up.")]
     [SerializeField] private float maximumEnergy = 100f;
 
+    [Tooltip("Energy available immediately when this active power up is obtained or its runtime slot is reset.")]
+    [SerializeField]
+    private float initialEnergy = 100f;
+
     [Tooltip("Resource amount consumed on activation.")]
     [SerializeField] private float activationCost = 100f;
 
@@ -427,6 +431,14 @@ public sealed class PowerUpResourceGateModuleData
         get
         {
             return maximumEnergy;
+        }
+    }
+
+    public float InitialEnergy
+    {
+        get
+        {
+            return initialEnergy;
         }
     }
 
@@ -619,9 +631,58 @@ public sealed class PowerUpResourceGateModuleData
                           bool allowRechargeDuringToggleStartupLockValue,
                           float maximumToggleActiveDurationSecondsValue)
     {
+        Configure(activationResourceValue,
+                  maintenanceResourceValue,
+                  maximumEnergyValue,
+                  maximumEnergyValue,
+                  activationCostValue,
+                  maintenanceCostPerSecondValue,
+                  minimumActivationEnergyPercentValue,
+                  chargeTypeValue,
+                  chargePerTriggerValue,
+                  cooldownSecondsValue,
+                  isToggleableValue,
+                  maintenanceTicksPerSecondValue,
+                  allowRechargeDuringToggleStartupLockValue,
+                  maximumToggleActiveDurationSecondsValue);
+    }
+
+    /// <summary>
+    /// Assigns the complete resource-gate payload, including the energy available when the power-up is obtained.
+    /// </summary>
+    /// <param name="activationResourceValue">Resource charged when activation succeeds.</param>
+    /// <param name="maintenanceResourceValue">Resource charged while the toggle remains active.</param>
+    /// <param name="maximumEnergyValue">Maximum internal energy capacity.</param>
+    /// <param name="initialEnergyValue">Energy available on acquisition or slot reset.</param>
+    /// <param name="activationCostValue">Resource amount charged on activation.</param>
+    /// <param name="maintenanceCostPerSecondValue">Resource amount charged per active second.</param>
+    /// <param name="minimumActivationEnergyPercentValue">Minimum energy percentage required for activation.</param>
+    /// <param name="chargeTypeValue">Runtime event used to recharge energy.</param>
+    /// <param name="chargePerTriggerValue">Energy restored by each recharge trigger.</param>
+    /// <param name="cooldownSecondsValue">Cooldown or toggle startup-lock duration.</param>
+    /// <param name="isToggleableValue">Whether activation switches persistent compatible effects on and off.</param>
+    /// <param name="maintenanceTicksPerSecondValue">Number of maintenance payments attempted per second.</param>
+    /// <param name="allowRechargeDuringToggleStartupLockValue">Whether recharge remains enabled during the startup lock.</param>
+    /// <param name="maximumToggleActiveDurationSecondsValue">Maximum active lifetime, or zero for no time limit.</param>
+    public void Configure(PowerUpResourceType activationResourceValue,
+                          PowerUpResourceType maintenanceResourceValue,
+                          float maximumEnergyValue,
+                          float initialEnergyValue,
+                          float activationCostValue,
+                          float maintenanceCostPerSecondValue,
+                          float minimumActivationEnergyPercentValue,
+                          PowerUpChargeType chargeTypeValue,
+                          float chargePerTriggerValue,
+                          float cooldownSecondsValue,
+                          bool isToggleableValue,
+                          float maintenanceTicksPerSecondValue,
+                          bool allowRechargeDuringToggleStartupLockValue,
+                          float maximumToggleActiveDurationSecondsValue)
+    {
         activationResource = activationResourceValue;
         maintenanceResource = maintenanceResourceValue;
         maximumEnergy = maximumEnergyValue;
+        initialEnergy = initialEnergyValue;
         activationCost = activationCostValue;
         maintenanceCostPerSecond = maintenanceCostPerSecondValue;
         isToggleable = isToggleableValue;

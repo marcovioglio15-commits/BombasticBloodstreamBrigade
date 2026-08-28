@@ -22,6 +22,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               ref bool allowRechargeDuringToggleStartupLock,
                                               ref float maximumToggleActiveDurationSeconds,
                                               ref float maximumEnergy,
+                                              ref float initialEnergy,
                                               ref float activationCost,
                                               ref float maintenanceCostPerSecond,
                                               ref float chargePerTrigger,
@@ -59,6 +60,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
         }
 
         maximumEnergy = math.max(maximumEnergy, math.max(0f, resourceGateData.MaximumEnergy));
+        initialEnergy += math.max(0f, resourceGateData.InitialEnergy);
         activationCost += math.max(0f, resourceGateData.ActivationCost);
         maintenanceCostPerSecond += math.max(0f, resourceGateData.MaintenanceCostPerSecond);
         minimumActivationEnergyPercent = math.max(minimumActivationEnergyPercent,
@@ -251,6 +253,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
     /// <param name="hasHealthPack">Whether the composition restores player health.</param>
     /// <param name="hasOrbitalProjections">Whether the composition spawns orbital projections.</param>
     /// <param name="hasDropAttraction">Whether the composition attracts enemy drops on successful activation.</param>
+    /// <param name="hasRandomStatGrowth">Whether the composition grants one permanent random statistic increase.</param>
     /// <returns>Primary active tool kind used by activation dispatch.</returns>
     public static ActiveToolKind ResolveModularToolKind(bool hasHoldCharge,
                                                          bool hasShotgun,
@@ -261,7 +264,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                                         bool hasGhostTrail,
                                                         bool hasHealthPack,
                                                         bool hasOrbitalProjections,
-                                                        bool hasDropAttraction)
+                                                        bool hasDropAttraction,
+                                                        bool hasRandomStatGrowth)
     {
         if (hasHoldCharge)
             return ActiveToolKind.ChargeShot;
@@ -293,6 +297,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
         if (hasDropAttraction)
             return ActiveToolKind.DropAttraction;
 
+        if (hasRandomStatGrowth)
+            return ActiveToolKind.RandomStatGrowth;
+
         return ActiveToolKind.Custom;
     }
 
@@ -321,6 +328,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               bool isToggleable,
                                               float maximumToggleActiveDurationSeconds,
                                               float maximumEnergy,
+                                              float initialEnergy,
                                               float activationCost,
                                               float maintenanceCostPerSecond,
                                               float maintenanceTicksPerSecond,
@@ -409,6 +417,8 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
                                               in PlayerPassiveToolConfig togglePassiveTool,
                                               bool hasActiveWeaponSwitch,
                                               FixedString64Bytes activeWeaponId,
+                                              bool useWeightedRandomStatGrowthSelection,
+                                              in FixedList4096Bytes<PlayerRandomStatGrowthEntryConfig> randomStatGrowthEntries,
                                               ActiveToolKind resolvedToolKind,
                                               out PlayerPowerUpSlotConfig slotConfig)
     {
@@ -439,6 +449,7 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             MaintenanceResource = maintenanceResource,
             ChargeType = chargeType,
             MaximumEnergy = maximumEnergy,
+            InitialEnergy = math.clamp(initialEnergy, 0f, math.max(0f, maximumEnergy)),
             ActivationCost = activationCost,
             MaintenanceCostPerSecond = maintenanceCostPerSecond,
             MaintenanceTicksPerSecond = isToggleable ? math.max(0.01f, maintenanceTicksPerSecond) : 0f,
@@ -560,7 +571,9 @@ public static class PlayerPowerUpActiveSlotSynthesisUtility
             TriggeredProjectilePassiveTool = triggeredProjectilePassiveTool,
             TogglePassiveTool = togglePassiveTool,
             HasActiveWeaponSwitch = hasActiveWeaponSwitch ? (byte)1 : (byte)0,
-            ActiveWeaponId = activeWeaponId
+            ActiveWeaponId = activeWeaponId,
+            UseWeightedRandomStatGrowthSelection = useWeightedRandomStatGrowthSelection ? (byte)1 : (byte)0,
+            RandomStatGrowthEntries = randomStatGrowthEntries
         };
     }
 

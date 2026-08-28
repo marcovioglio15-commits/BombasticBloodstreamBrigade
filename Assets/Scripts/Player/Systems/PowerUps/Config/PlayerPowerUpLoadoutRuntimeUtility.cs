@@ -36,8 +36,8 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsConfig">Current runtime config used to initialize slot values.</param>
     public static void ResetRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpsConfig powerUpsConfig)
     {
-        powerUpsState.PrimaryEnergy = math.max(0f, powerUpsConfig.PrimarySlot.MaximumEnergy);
-        powerUpsState.SecondaryEnergy = math.max(0f, powerUpsConfig.SecondarySlot.MaximumEnergy);
+        powerUpsState.PrimaryEnergy = ResolveInitialEnergy(in powerUpsConfig.PrimarySlot);
+        powerUpsState.SecondaryEnergy = ResolveInitialEnergy(in powerUpsConfig.SecondarySlot);
         powerUpsState.PrimaryCooldownRemaining = 0f;
         powerUpsState.SecondaryCooldownRemaining = 0f;
         powerUpsState.PrimaryCharge = 0f;
@@ -524,7 +524,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
 
         if (storedStateMode == PlayerPowerUpContainerStoredStateMode.ResetEnergyAndCooldown)
         {
-            storedEnergy = math.max(0f, slotConfig.MaximumEnergy);
+            storedEnergy = ResolveInitialEnergy(in slotConfig);
             storedCooldownRemaining = 0f;
         }
 
@@ -607,7 +607,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="slotConfig">Slot config that now owns the primary slot.</param>
     private static void ResetPrimaryRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpSlotConfig slotConfig)
     {
-        powerUpsState.PrimaryEnergy = math.max(0f, slotConfig.MaximumEnergy);
+        powerUpsState.PrimaryEnergy = ResolveInitialEnergy(in slotConfig);
         powerUpsState.PrimaryCooldownRemaining = 0f;
         powerUpsState.PrimaryCharge = 0f;
         powerUpsState.PrimaryMaintenanceTickTimer = 0f;
@@ -624,7 +624,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="slotConfig">Slot config that now owns the secondary slot.</param>
     private static void ResetSecondaryRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpSlotConfig slotConfig)
     {
-        powerUpsState.SecondaryEnergy = math.max(0f, slotConfig.MaximumEnergy);
+        powerUpsState.SecondaryEnergy = ResolveInitialEnergy(in slotConfig);
         powerUpsState.SecondaryCooldownRemaining = 0f;
         powerUpsState.SecondaryCharge = 0f;
         powerUpsState.SecondaryMaintenanceTickTimer = 0f;
@@ -649,6 +649,16 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
             powerUpsState.NextEquipOrder = restoredEquipOrder + 1;
 
         return restoredEquipOrder;
+    }
+
+    /// <summary>
+    /// Resolves acquisition energy inside the slot capacity without mutating the baked configuration.
+    /// </summary>
+    /// <param name="slotConfig">Slot whose authored acquisition energy is requested.</param>
+    /// <returns>Initial energy clamped to the non-negative slot capacity.</returns>
+    private static float ResolveInitialEnergy(in PlayerPowerUpSlotConfig slotConfig)
+    {
+        return math.clamp(slotConfig.InitialEnergy, 0f, math.max(0f, slotConfig.MaximumEnergy));
     }
 
     /// <summary>

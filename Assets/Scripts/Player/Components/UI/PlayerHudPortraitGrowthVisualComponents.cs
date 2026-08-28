@@ -119,6 +119,9 @@ public struct PlayerGrowthSequenceHudVisualConfig : IComponentData
 {
     public byte Enabled;
     public byte HideWhenPlayerMissing;
+    public byte ShowLevelUpStatGrowthAbovePlayer;
+    public byte UsePerStatLevelUpGrowthColors;
+    public float4 LevelUpStatGrowthColor;
     public int MaximumVisibleSteps;
 }
 
@@ -168,6 +171,8 @@ public struct PlayerGrowthSequenceHudStepVisualElement : IBufferElementData
     public float4 NormalOutlineColor;
     public float NextOutlineWidth;
     public float NormalOutlineWidth;
+    public byte UseLevelUpGrowthColorOverride;
+    public float4 LevelUpGrowthColor;
 }
 
 /// <summary>
@@ -199,6 +204,8 @@ public struct PlayerBaseGrowthSequenceHudStepVisualElement : IBufferElementData
     public float4 NormalOutlineColor;
     public float NextOutlineWidth;
     public float NormalOutlineWidth;
+    public byte UseLevelUpGrowthColorOverride;
+    public float4 LevelUpGrowthColor;
 }
 
 /// <summary>

@@ -32,6 +32,7 @@ public partial struct PlayerLevelUpSystem : ISystem
     {
         public string ScheduleId;
         public string StatName;
+        public PlayerScalableStatType StatType;
         public int StepIndex;
         public int StepCount;
         public PlayerLevelUpScheduleApplyMode ApplyMode;
@@ -161,6 +162,14 @@ public partial struct PlayerLevelUpSystem : ISystem
         ComponentLookup<PlayerLevelUpVfxConfig> levelUpVfxConfigLookup = SystemAPI.GetComponentLookup<PlayerLevelUpVfxConfig>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         BufferLookup<PlayerPowerUpVfxSpawnRequest> powerUpVfxRequestsLookup = SystemAPI.GetBufferLookup<PlayerPowerUpVfxSpawnRequest>(false);
+        ComponentLookup<PlayerPresentationRuntimeReferences> presentationReferencesLookup =
+            SystemAPI.GetComponentLookup<PlayerPresentationRuntimeReferences>(true);
+        ComponentLookup<PlayerGrowthSequenceHudVisualConfig> growthVisualConfigLookup =
+            SystemAPI.GetComponentLookup<PlayerGrowthSequenceHudVisualConfig>(true);
+        BufferLookup<PlayerGrowthSequenceHudStepVisualElement> growthStepVisualsLookup =
+            SystemAPI.GetBufferLookup<PlayerGrowthSequenceHudStepVisualElement>(true);
+        BufferLookup<PlayerRoomRewardPresentationEvent> presentationEventsLookup =
+            SystemAPI.GetBufferLookup<PlayerRoomRewardPresentationEvent>(false);
         DynamicBuffer<GameAudioEventRequest> audioRequests = default;
         bool canEnqueueAudioRequests = SystemAPI.TryGetSingletonBuffer<GameAudioEventRequest>(out audioRequests);
 
@@ -314,6 +323,16 @@ public partial struct PlayerLevelUpSystem : ISystem
                                          currentLevel,
                                          out ScheduleApplyDebugInfo scheduleDebugInfo))
                 {
+                    PlayerLevelUpGrowthPresentationUtility.TryAppend(entity,
+                                                                     scheduleDebugInfo.StatName,
+                                                                     scheduleDebugInfo.StatType,
+                                                                     scheduleDebugInfo.PreviousValue,
+                                                                     scheduleDebugInfo.NewValue,
+                                                                     currentLevel,
+                                                                     presentationReferencesLookup,
+                                                                     growthVisualConfigLookup,
+                                                                     growthStepVisualsLookup,
+                                                                     presentationEventsLookup);
                     Debug.Log(string.Format(CultureInfo.InvariantCulture,
                                             "[PlayerLevelUpSystem] Schedule '{0}' step {1}/{2} applied on '{3}' at level {4}. Mode: {5}, Value: {6:0.###}, Result: {7:0.###} -> {8:0.###}.",
                                             scheduleDebugInfo.ScheduleId,
@@ -620,6 +639,7 @@ public partial struct PlayerLevelUpSystem : ISystem
         {
             ScheduleId = schedule.ScheduleId.ToString(),
             StatName = statName,
+            StatType = (PlayerScalableStatType)scalableStat.Type,
             StepIndex = stepIndex,
             StepCount = schedule.Steps.Length,
             ApplyMode = applyMode,

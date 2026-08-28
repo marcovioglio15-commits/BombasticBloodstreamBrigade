@@ -43,7 +43,8 @@ public enum PowerUpModuleKind
     ReturningProjectiles = 25,
     DelayedShootApplication = 26,
     SuddenStrike = 27,
-    SelfPreservationInstinct = 28
+    SelfPreservationInstinct = 28,
+    RandomStatGrowth = 29
 }
 
 /// <summary>
@@ -125,6 +126,7 @@ public static class PowerUpModuleKindUtility
             case PowerUpModuleKind.GhostTrail:
             case PowerUpModuleKind.AttractDrops:
             case PowerUpModuleKind.ReturningProjectiles:
+            case PowerUpModuleKind.RandomStatGrowth:
                 return PowerUpModuleStage.Execute;
             case PowerUpModuleKind.CharacterTuning:
             case PowerUpModuleKind.Stackable:

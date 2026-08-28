@@ -39,21 +39,48 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
         }
 
         SerializedProperty enabled = settings.FindPropertyRelative("enabled");
+        SerializedProperty showLevelUpGrowth = settings.FindPropertyRelative("showLevelUpStatGrowthAbovePlayer");
+        SerializedProperty usePerStatColors = settings.FindPropertyRelative("usePerStatLevelUpGrowthColors");
         VisualElement details = new VisualElement();
         AddField(root, enabled, scalingRules, "Enabled", "Enables the HUD growth sequence.");
         AddField(details, settings.FindPropertyRelative("hideWhenPlayerMissing"), scalingRules, "Hide When Player Missing", "Hides the growth sequence while no valid player or progression config is available.");
         AddField(details, settings.FindPropertyRelative("maximumVisibleSteps"), scalingRules, "Maximum Visible Steps", "Caps how many preauthored UI slots are used. Set 0 to use the full active schedule.");
+        AddField(details,
+                 showLevelUpGrowth,
+                 scalingRules,
+                 "Show Level-up Growth Above Player",
+                 "Shows each effective level-up schedule increase through the same above-player presentation used by room rewards.");
+        VisualElement overheadColorFields = new VisualElement();
+        AddField(overheadColorFields,
+                 settings.FindPropertyRelative("levelUpStatGrowthColor"),
+                 scalingRules,
+                 "Level-up Growth Color",
+                 "Default above-player text color used by level-up statistic increases.");
+        AddField(overheadColorFields,
+                 usePerStatColors,
+                 scalingRules,
+                 "Use Per-stat Colors",
+                 "Allows synchronized growth steps to override the default above-player color for their statistic.");
+        details.Add(overheadColorFields);
         AddSyncButton(panel, details, settings.FindPropertyRelative("schedules"));
-        BuildSchedules(details, settings.FindPropertyRelative("schedules"), scalingRules);
+        BuildSchedules(details,
+                       settings.FindPropertyRelative("schedules"),
+                       scalingRules,
+                       showLevelUpGrowth,
+                       usePerStatColors);
         root.Add(details);
 
         Refresh();
         root.TrackPropertyValue(enabled, changedProperty => Refresh());
+        root.TrackPropertyValue(showLevelUpGrowth, changedProperty => Refresh());
         return root;
 
         void Refresh()
         {
             details.style.display = enabled != null && enabled.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+            overheadColorFields.style.display = showLevelUpGrowth != null && showLevelUpGrowth.boolValue
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
         }
     }
     #endregion
@@ -65,9 +92,13 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     /// <param name="parent">Parent container receiving schedule foldouts.</param>
     /// <param name="schedules">Serialized schedule visual array.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
+    /// <param name="showLevelUpGrowth">Serialized above-player presentation toggle.</param>
+    /// <param name="usePerStatColors">Serialized per-stat color toggle.</param>
     private static void BuildSchedules(VisualElement parent,
                                        SerializedProperty schedules,
-                                       SerializedProperty scalingRules)
+                                       SerializedProperty scalingRules,
+                                       SerializedProperty showLevelUpGrowth,
+                                       SerializedProperty usePerStatColors)
     {
         if (parent == null || schedules == null)
             return;
@@ -83,7 +114,12 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
                                                                    () =>
                                                                    {
                                                                        AddPlainField(foldout, scheduleId, "Schedule Id", "Schedule ID selected from Level-up & Progression.");
-                                                                       BuildSteps(foldout, schedule.FindPropertyRelative("steps"), scalingRules, capturedScheduleIndex);
+                                                                       BuildSteps(foldout,
+                                                                                  schedule.FindPropertyRelative("steps"),
+                                                                                  scalingRules,
+                                                                                  capturedScheduleIndex,
+                                                                                  showLevelUpGrowth,
+                                                                                  usePerStatColors);
                                                                    });
             parent.Add(foldout);
         }
@@ -96,10 +132,14 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     /// <param name="steps">Serialized step visual array.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     /// <param name="scheduleIndex">Schedule index used in foldout state keys.</param>
+    /// <param name="showLevelUpGrowth">Serialized above-player presentation toggle.</param>
+    /// <param name="usePerStatColors">Serialized per-stat color toggle.</param>
     private static void BuildSteps(VisualElement parent,
                                    SerializedProperty steps,
                                    SerializedProperty scalingRules,
-                                   int scheduleIndex)
+                                   int scheduleIndex,
+                                   SerializedProperty showLevelUpGrowth,
+                                   SerializedProperty usePerStatColors)
     {
         if (parent == null || steps == null)
             return;
@@ -116,7 +156,9 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
                                                                                           step,
                                                                                           presentationMode,
                                                                                           scalingRules,
-                                                                                          capturedStepIndex));
+                                                                                          capturedStepIndex,
+                                                                                          showLevelUpGrowth,
+                                                                                          usePerStatColors));
             parent.Add(foldout);
         }
     }
@@ -129,17 +171,36 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
     /// <param name="presentationMode">Serialized presentation mode used to toggle text/image fields.</param>
     /// <param name="scalingRules">Serialized Add Scaling rules list.</param>
     /// <param name="stepIndex">Step index used in nested foldout state keys.</param>
+    /// <param name="showLevelUpGrowth">Serialized above-player presentation toggle.</param>
+    /// <param name="usePerStatColors">Serialized per-stat color toggle.</param>
     private static void BuildStepDetails(Foldout foldout,
                                          SerializedProperty step,
                                          SerializedProperty presentationMode,
                                          SerializedProperty scalingRules,
-                                         int stepIndex)
+                                         int stepIndex,
+                                         SerializedProperty showLevelUpGrowth,
+                                         SerializedProperty usePerStatColors)
     {
         if (foldout == null || step == null)
             return;
 
         AddPlainField(foldout, step.FindPropertyRelative("stepIndex"), "Step Index", "Zero-based step index inside the selected schedule.");
         AddPlainField(foldout, step.FindPropertyRelative("statName"), "Stat Name", "Copied progression stat name used as readable fallback text.");
+        SerializedProperty useColorOverride = step.FindPropertyRelative("useLevelUpGrowthColorOverride");
+        VisualElement perStatColorFields = new VisualElement();
+        AddField(perStatColorFields,
+                 useColorOverride,
+                 scalingRules,
+                 "Override Level-up Growth Color",
+                 "Uses a unique above-player color for this step's statistic.");
+        VisualElement colorOverrideField = new VisualElement();
+        AddField(colorOverrideField,
+                 step.FindPropertyRelative("levelUpGrowthColor"),
+                 scalingRules,
+                 "Level-up Growth Color",
+                 "Above-player text color used when this statistic's override is enabled.");
+        perStatColorFields.Add(colorOverrideField);
+        foldout.Add(perStatColorFields);
         AddField(foldout, step.FindPropertyRelative("textOverride"), scalingRules, "Text Override", "Optional text used when Presentation Mode is Text.", true);
         AddField(foldout, presentationMode, scalingRules, "Presentation Mode", "Text uses TMP styling. Image uses Next/Normal sprites.");
 
@@ -158,6 +219,41 @@ internal static class PlayerVisualPresetsPanelGrowthSequenceSectionUtility
                                    changedProperty => RefreshGrowthStepMode(presentationMode,
                                                                             imageFields,
                                                                             textFields));
+        Action refreshColorFields = () => RefreshLevelUpGrowthColorFields(showLevelUpGrowth,
+                                                                          usePerStatColors,
+                                                                          useColorOverride,
+                                                                          perStatColorFields,
+                                                                          colorOverrideField);
+        foldout.TrackPropertyValue(showLevelUpGrowth, changedProperty => refreshColorFields());
+        foldout.TrackPropertyValue(usePerStatColors, changedProperty => refreshColorFields());
+        foldout.TrackPropertyValue(useColorOverride, changedProperty => refreshColorFields());
+        refreshColorFields.Invoke();
+    }
+
+    /// <summary>
+    /// Shows per-stat color controls only while the global above-player feature and override mode require them.
+    /// </summary>
+    /// <param name="showLevelUpGrowth">Serialized above-player presentation toggle.</param>
+    /// <param name="usePerStatColors">Serialized per-stat color toggle.</param>
+    /// <param name="useColorOverride">Serialized step color-override toggle.</param>
+    /// <param name="perStatColorFields">Container holding all step-specific color controls.</param>
+    /// <param name="colorOverrideField">Container holding the step color value.</param>
+    private static void RefreshLevelUpGrowthColorFields(SerializedProperty showLevelUpGrowth,
+                                                        SerializedProperty usePerStatColors,
+                                                        SerializedProperty useColorOverride,
+                                                        VisualElement perStatColorFields,
+                                                        VisualElement colorOverrideField)
+    {
+        bool showPerStatFields = showLevelUpGrowth != null &&
+                                 showLevelUpGrowth.boolValue &&
+                                 usePerStatColors != null &&
+                                 usePerStatColors.boolValue;
+        perStatColorFields.style.display = showPerStatFields ? DisplayStyle.Flex : DisplayStyle.None;
+        colorOverrideField.style.display = showPerStatFields &&
+                                           useColorOverride != null &&
+                                           useColorOverride.boolValue
+            ? DisplayStyle.Flex
+            : DisplayStyle.None;
     }
 
     /// <summary>

@@ -844,6 +844,9 @@ MonoBehaviour:
     enabled: 1
     hideWhenPlayerMissing: 1
     maximumVisibleSteps: 5
+    showLevelUpStatGrowthAbovePlayer: 0
+    levelUpStatGrowthColor: {r: 1, g: 1, b: 1, a: 1}
+    usePerStatLevelUpGrowthColors: 0
     schedules:
     - scheduleId: ScheduleRookie
       steps:
@@ -871,6 +874,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 0
+        levelUpGrowthColor: {r: 1, g: 1, b: 1, a: 1}
       - stepIndex: 1
         statName: ShotRange
         textOverride: RNG
@@ -895,6 +900,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 0
+        levelUpGrowthColor: {r: 1, g: 1, b: 1, a: 1}
       - stepIndex: 2
         statName: MovementSpeed
         textOverride: SPD
@@ -919,6 +926,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 0
+        levelUpGrowthColor: {r: 1, g: 1, b: 1, a: 1}
       - stepIndex: 3
         statName: Damage
         textOverride: DMG
@@ -943,6 +952,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 0
+        levelUpGrowthColor: {r: 1, g: 1, b: 1, a: 1}
       - stepIndex: 4
         statName: Luck
         textOverride: LCK
@@ -967,6 +978,8 @@ MonoBehaviour:
           color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
           outlineColor: {r: 0, g: 0, b: 0, a: 0}
           outlineWidth: 0
+        useLevelUpGrowthColorOverride: 0
+        levelUpGrowthColor: {r: 1, g: 1, b: 1, a: 1}
   muzzleFlashVfxPrefab: {fileID: 4241461015770059057, guid: 37299dd5809809446b838a59efc726e3, type: 3}
   muzzleFlashVfxSpawnOffset: {x: 0, y: 0.15, z: -0.1}
   muzzleFlashVfxScaleMultiplier: 1

@@ -457,6 +457,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
                 case PowerUpModuleKind.ReturningProjectiles:
                 case PowerUpModuleKind.DelayedShootApplication:
                 case PowerUpModuleKind.SuddenStrike:
+                case PowerUpModuleKind.RandomStatGrowth:
                     return true;
                 default:
                     return false;
@@ -529,6 +530,7 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasDelayedShootApplication = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication);
         bool hasSuddenStrike = moduleKinds.Contains(PowerUpModuleKind.SuddenStrike);
         bool hasSelfPreservationInstinct = moduleKinds.Contains(PowerUpModuleKind.SelfPreservationInstinct);
+        bool hasRandomStatGrowth = moduleKinds.Contains(PowerUpModuleKind.RandomStatGrowth);
         bool hasIgnoredPassiveOnlyModules = hasTrail || hasOrbit || hasBounce || hasSplit || hasTriggerEvent;
         int primaryExecuteKindCount = 0;
 
@@ -559,13 +561,16 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         if (primaryExecuteKindCount == 0 && hasDropAttraction)
             primaryExecuteKindCount += 1;
 
+        if (primaryExecuteKindCount == 0 && hasRandomStatGrowth)
+            primaryExecuteKindCount += 1;
+
         if (primaryExecuteKindCount == 0 && !hasCharacterTuning && !hasImpactFrame && !hasGhostTrail)
             warningLines.Add("No execute module selected. This active power up compiles as undefined.");
         else if (primaryExecuteKindCount == 0 && !hasImpactFrame && !hasGhostTrail)
             warningLines.Add("No active execute module selected. Only Character Tuning acquisition effects will apply.");
 
         if (primaryExecuteKindCount > 1)
-            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections > ReturningProjectiles > AttractDrops. ReturningProjectiles also modifies compatible projectile execute modules. ImpactFrame, GhostTrail, and AttractDrops run as activation side effects when paired with another active tool.");
+            warningLines.Add("Multiple execute modules found. Runtime priority is: TriggerHoldCharge > ProjectilesPatternCone > SpawnObject > Dash > TimeDilationEnemies > Heal > OrbitalProjections > ReturningProjectiles > AttractDrops > RandomStatGrowth. ReturningProjectiles modifies compatible projectile execute modules; RandomStatGrowth runs after every successful paired activation.");
 
         if (hasDeathExplosion && !hasSpawnObject)
             warningLines.Add("DeathExplosion is ignored unless SpawnObject is also bound.");
@@ -614,9 +619,10 @@ public static class PlayerPowerUpsPresetsPanelEntriesSupportUtility
         bool hasReturningProjectiles = moduleKinds.Contains(PowerUpModuleKind.ReturningProjectiles);
         bool hasDelayedShootApplication = moduleKinds.Contains(PowerUpModuleKind.DelayedShootApplication);
         bool hasSuddenStrike = moduleKinds.Contains(PowerUpModuleKind.SuddenStrike);
+        bool hasRandomStatGrowth = moduleKinds.Contains(PowerUpModuleKind.RandomStatGrowth);
         bool hasTriggerEvent = moduleKinds.Contains(PowerUpModuleKind.TriggerEvent);
         bool hasTriggerRelease = moduleKinds.Contains(PowerUpModuleKind.TriggerRelease);
-        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction || hasReturningProjectiles || hasDelayedShootApplication || hasSuddenStrike;
+        bool hasPassiveRuntimeConsumer = hasTrail || hasExplosion || hasOrbit || hasOrbitalProjections || hasBounce || hasSplit || hasShotgun || hasHeal || hasBulletTime || hasCharacterTuning || hasLaserBeam || hasGhostTrail || hasDropAttraction || hasReturningProjectiles || hasDelayedShootApplication || hasSuddenStrike || hasRandomStatGrowth;
         List<string> ignoredActiveModules = new List<string>();
 
         if (!hasPassiveRuntimeConsumer)

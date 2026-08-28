@@ -22,7 +22,8 @@ internal static class PlayerScalingStableIdUtility
         "milestoneId",
         "passivePowerUpId",
         "weaponId",
-        "animationId"
+        "animationId",
+        "entryId"
     };
 
     private static readonly string[] StableNestedStringIdPropertyPaths =

@@ -35,12 +35,15 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
             return root;
         }
 
-        AddField(root, commonDataProperty, "Common Data");
-        AddField(root, stealProtectedProperty, "Steal Protected");
-        string contextKey = BuildContextKey(property);
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(root, commonDataProperty, "Common Data");
+        PowerUpModuleDefinitionPayloadDrawerUtility.AddField(root, stealProtectedProperty, "Steal Protected");
+        string contextKey = ModularPowerUpDefinitionDrawerStateUtility.BuildContextKey(property);
         Foldout moduleBindingsFoldout = BuildModuleBindingsFoldout(contextKey);
         root.Add(moduleBindingsFoldout);
-        BuildModuleBindingsSection(moduleBindingsFoldout, property, contextKey);
+        PlayerManagementFoldoutStateUtility.AttachLazyFoldout(moduleBindingsFoldout,
+                                                               () => BuildModuleBindingsSection(moduleBindingsFoldout,
+                                                                                                property,
+                                                                                                contextKey));
 
         HelpBox helpBox = new HelpBox("Each binding references a Module ID from Modules Management and can optionally override payload values.", HelpBoxMessageType.Info);
         helpBox.style.marginTop = 4f;
@@ -51,7 +54,7 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
     private static Foldout BuildModuleBindingsFoldout(string contextKey)
     {
-        return PlayerManagementFoldoutStateUtility.CreateFoldout("Module Bindings", contextKey, true);
+        return PlayerManagementFoldoutStateUtility.CreateFoldout("Module Bindings", contextKey, false);
     }
 
     private static void BuildModuleBindingsSection(VisualElement parent, SerializedProperty powerUpProperty, string contextKey)
@@ -82,7 +85,8 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
         TextField moduleIdFilterField = new TextField("Filter Module ID");
         moduleIdFilterField.isDelayed = true;
-        moduleIdFilterField.value = ResolveFilterValue(moduleIdFilterByContextKey, contextKey);
+        moduleIdFilterField.value = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleIdFilterByContextKey,
+                                                                                                    contextKey);
         moduleIdFilterField.tooltip = "Show only bindings whose Module ID contains this text.";
         moduleIdFilterField.style.flexGrow = 1f;
         moduleIdFilterField.style.marginRight = 6f;
@@ -90,7 +94,8 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
         TextField displayNameFilterField = new TextField("Filter Display Name");
         displayNameFilterField.isDelayed = true;
-        displayNameFilterField.value = ResolveFilterValue(moduleDisplayNameFilterByContextKey, contextKey);
+        displayNameFilterField.value = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleDisplayNameFilterByContextKey,
+                                                                                                        contextKey);
         displayNameFilterField.tooltip = "Show only bindings whose referenced module Display Name contains this text.";
         displayNameFilterField.style.flexGrow = 1f;
         filtersRow.Add(displayNameFilterField);
@@ -144,8 +149,12 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
         Button clearFiltersButton = new Button(() =>
         {
-            StoreFilterValue(moduleIdFilterByContextKey, contextKey, string.Empty);
-            StoreFilterValue(moduleDisplayNameFilterByContextKey, contextKey, string.Empty);
+            ModularPowerUpDefinitionDrawerStateUtility.StoreFilterValue(moduleIdFilterByContextKey,
+                                                                         contextKey,
+                                                                         string.Empty);
+            ModularPowerUpDefinitionDrawerStateUtility.StoreFilterValue(moduleDisplayNameFilterByContextKey,
+                                                                         contextKey,
+                                                                         string.Empty);
             moduleIdFilterField.SetValueWithoutNotify(string.Empty);
             displayNameFilterField.SetValueWithoutNotify(string.Empty);
             RebuildBindingsCards(powerUpProperty, cardsContainer, countLabel);
@@ -160,13 +169,17 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
 
         moduleIdFilterField.RegisterValueChangedCallback(evt =>
         {
-            StoreFilterValue(moduleIdFilterByContextKey, contextKey, evt.newValue);
+            ModularPowerUpDefinitionDrawerStateUtility.StoreFilterValue(moduleIdFilterByContextKey,
+                                                                         contextKey,
+                                                                         evt.newValue);
             RebuildBindingsCards(powerUpProperty, cardsContainer, countLabel);
         });
 
         displayNameFilterField.RegisterValueChangedCallback(evt =>
         {
-            StoreFilterValue(moduleDisplayNameFilterByContextKey, contextKey, evt.newValue);
+            ModularPowerUpDefinitionDrawerStateUtility.StoreFilterValue(moduleDisplayNameFilterByContextKey,
+                                                                         contextKey,
+                                                                         evt.newValue);
             RebuildBindingsCards(powerUpProperty, cardsContainer, countLabel);
         });
 
@@ -197,9 +210,11 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         EnsureBindingStableIds(moduleBindingsProperty);
         powerUpProperty.serializedObject.UpdateIfRequiredOrScript();
 
-        string contextKey = BuildContextKey(powerUpProperty);
-        string moduleIdFilterValue = ResolveFilterValue(moduleIdFilterByContextKey, contextKey);
-        string displayNameFilterValue = ResolveFilterValue(moduleDisplayNameFilterByContextKey, contextKey);
+        string contextKey = ModularPowerUpDefinitionDrawerStateUtility.BuildContextKey(powerUpProperty);
+        string moduleIdFilterValue = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleIdFilterByContextKey,
+                                                                                                     contextKey);
+        string displayNameFilterValue = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleDisplayNameFilterByContextKey,
+                                                                                                        contextKey);
 
         Dictionary<string, PowerUpModuleCatalogEntry> moduleCatalogById = PowerUpModuleCatalogUtility.BuildCatalogById(powerUpProperty.serializedObject);
         HashSet<string> validStateKeys = new HashSet<string>(StringComparer.Ordinal);
@@ -216,7 +231,8 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
             string moduleId = ModularPowerUpBindingDrawerUtility.ResolveBindingModuleId(bindingProperty);
             string displayName = ModularPowerUpBindingDrawerUtility.ResolveBindingDisplayName(moduleCatalogById, moduleId);
             PowerUpModuleStage stage = ModularPowerUpBindingDrawerUtility.ResolveDefaultStageForModule(moduleCatalogById, moduleId);
-            string foldoutStateKey = BuildBindingFoldoutStateKey(contextKey, bindingProperty);
+            string foldoutStateKey = ModularPowerUpDefinitionDrawerStateUtility.BuildBindingFoldoutStateKey(contextKey,
+                                                                                                             bindingProperty);
             validStateKeys.Add(foldoutStateKey);
 
             if (!ModularPowerUpBindingDrawerUtility.IsMatchingBindingFilters(moduleId, displayName, moduleIdFilterValue, displayNameFilterValue))
@@ -236,7 +252,7 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
             visibleCount += 1;
         }
 
-        PruneBindingFoldoutStates(contextKey, validStateKeys);
+        ModularPowerUpDefinitionDrawerStateUtility.PruneBindingFoldoutStates(contextKey, validStateKeys);
 
         if (countLabel != null)
             countLabel.text = string.Format("Visible Bindings: {0} / {1}", visibleCount, totalCount);
@@ -441,7 +457,9 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
                                   string selectedModuleId = moduleIdOptions.Count > 0 ? moduleIdOptions[0] : string.Empty;
                                   PowerUpModuleStage selectedStage = ModularPowerUpBindingDrawerUtility.ResolveDefaultStageForModule(moduleCatalogById, selectedModuleId);
                                   ModularPowerUpBindingDrawerUtility.ConfigureBinding(insertedBinding, selectedModuleId, selectedStage, true, false);
-                                  string foldoutStateKey = BuildBindingFoldoutStateKey(BuildContextKey(powerUpProperty), insertedBinding);
+                                  string foldoutStateKey = ModularPowerUpDefinitionDrawerStateUtility.BuildBindingFoldoutStateKey(
+                                      ModularPowerUpDefinitionDrawerStateUtility.BuildContextKey(powerUpProperty),
+                                      insertedBinding);
                                   PlayerManagementFoldoutStateUtility.SetFoldoutState(foldoutStateKey, true);
                               },
                               cardsContainer,
@@ -466,7 +484,9 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
                                       return;
 
                                   ModularPowerUpBindingDrawerUtility.AssignNewBindingStableId(duplicatedBinding);
-                                  string foldoutStateKey = BuildBindingFoldoutStateKey(BuildContextKey(powerUpProperty), duplicatedBinding);
+                                  string foldoutStateKey = ModularPowerUpDefinitionDrawerStateUtility.BuildBindingFoldoutStateKey(
+                                      ModularPowerUpDefinitionDrawerStateUtility.BuildContextKey(powerUpProperty),
+                                      duplicatedBinding);
                                   PlayerManagementFoldoutStateUtility.SetFoldoutState(foldoutStateKey, true);
                               },
                               cardsContainer,
@@ -570,9 +590,11 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         if (moduleBindingsProperty == null)
             return;
 
-        string contextKey = BuildContextKey(powerUpProperty);
-        string moduleIdFilterValue = ResolveFilterValue(moduleIdFilterByContextKey, contextKey);
-        string displayNameFilterValue = ResolveFilterValue(moduleDisplayNameFilterByContextKey, contextKey);
+        string contextKey = ModularPowerUpDefinitionDrawerStateUtility.BuildContextKey(powerUpProperty);
+        string moduleIdFilterValue = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleIdFilterByContextKey,
+                                                                                                     contextKey);
+        string displayNameFilterValue = ModularPowerUpDefinitionDrawerStateUtility.ResolveFilterValue(moduleDisplayNameFilterByContextKey,
+                                                                                                        contextKey);
         Dictionary<string, PowerUpModuleCatalogEntry> moduleCatalogById = PowerUpModuleCatalogUtility.BuildCatalogById(powerUpProperty.serializedObject);
 
         for (int bindingIndex = 0; bindingIndex < moduleBindingsProperty.arraySize; bindingIndex++)
@@ -588,65 +610,10 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
             if (!ModularPowerUpBindingDrawerUtility.IsMatchingBindingFilters(moduleId, displayName, moduleIdFilterValue, displayNameFilterValue))
                 continue;
 
-            string foldoutStateKey = BuildBindingFoldoutStateKey(contextKey, bindingProperty);
+            string foldoutStateKey = ModularPowerUpDefinitionDrawerStateUtility.BuildBindingFoldoutStateKey(contextKey,
+                                                                                                             bindingProperty);
             PlayerManagementFoldoutStateUtility.SetFoldoutState(foldoutStateKey, expanded);
         }
-    }
-
-    private static string BuildContextKey(SerializedProperty powerUpProperty)
-    {
-        return PlayerManagementFoldoutStateUtility.BuildPropertyStateKey(powerUpProperty, "ModuleBindingsSection");
-    }
-
-    private static string BuildBindingFoldoutStateKey(string contextKey, SerializedProperty bindingProperty)
-    {
-        if (string.IsNullOrWhiteSpace(contextKey))
-            return string.Empty;
-
-        string bindingId = ModularPowerUpBindingDrawerUtility.ResolveBindingStableId(bindingProperty);
-
-        if (string.IsNullOrWhiteSpace(bindingId))
-            bindingId = PlayerManagementFoldoutStateUtility.BuildPropertyContextKey(bindingProperty);
-
-        return string.Format("{0}|Binding:{1}", contextKey, bindingId);
-    }
-
-    private static void PruneBindingFoldoutStates(string contextKey, HashSet<string> validStateKeys)
-    {
-        PlayerManagementFoldoutStateUtility.PruneFoldoutStates(string.Format("{0}|Binding:", contextKey), validStateKeys);
-    }
-
-    private static string ResolveFilterValue(Dictionary<string, string> filterByContextKey, string contextKey)
-    {
-        if (filterByContextKey == null)
-            return string.Empty;
-
-        if (string.IsNullOrWhiteSpace(contextKey))
-            return string.Empty;
-
-        string filterValue;
-
-        if (filterByContextKey.TryGetValue(contextKey, out filterValue))
-            return filterValue;
-
-        return string.Empty;
-    }
-
-    private static void StoreFilterValue(Dictionary<string, string> filterByContextKey, string contextKey, string value)
-    {
-        if (filterByContextKey == null)
-            return;
-
-        if (string.IsNullOrWhiteSpace(contextKey))
-            return;
-
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            filterByContextKey.Remove(contextKey);
-            return;
-        }
-
-        filterByContextKey[contextKey] = value;
     }
 
     private static void ScheduleBindingsCardsRebuild(SerializedObject serializedObject,
@@ -729,19 +696,5 @@ public sealed class ModularPowerUpDefinitionPropertyDrawer : PropertyDrawer
         PlayerManagementDraftSession.MarkDirty();
     }
 
-    private static void AddField(VisualElement parent, SerializedProperty property, string label)
-    {
-        if (parent == null)
-            return;
-
-        if (property == null)
-            return;
-
-        SerializedProperty scalingRulesProperty = property.serializedObject != null
-            ? property.serializedObject.FindProperty("scalingRules")
-            : null;
-        VisualElement field = PlayerScalingFieldElementFactory.CreateField(property, scalingRulesProperty, label);
-        parent.Add(field);
-    }
     #endregion
 }

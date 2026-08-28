@@ -78,6 +78,11 @@ public sealed class PowerUpModuleData
     [SerializeField]
     private PowerUpDropAttractionModuleData dropAttraction = new PowerUpDropAttractionModuleData();
 
+    [Header("Execute - Random Stat Growth")]
+    [Tooltip("Permanent random statistic growth settings used by RandomStatGrowth modules.")]
+    [SerializeField]
+    private PowerUpRandomStatGrowthModuleData randomStatGrowth = new PowerUpRandomStatGrowthModuleData();
+
     [Header("Hook - Death Explosion")]
     [Tooltip("Explosion settings used by DeathExplosion modules.")]
     [SerializeField] private ExplosionPassiveToolData deathExplosion = new ExplosionPassiveToolData();
@@ -257,6 +262,14 @@ public sealed class PowerUpModuleData
         }
     }
 
+    public PowerUpRandomStatGrowthModuleData RandomStatGrowth
+    {
+        get
+        {
+            return randomStatGrowth;
+        }
+    }
+
     public ExplosionPassiveToolData DeathExplosion
     {
         get
@@ -399,6 +412,9 @@ public sealed class PowerUpModuleData
         if (dropAttraction == null)
             dropAttraction = new PowerUpDropAttractionModuleData();
 
+        if (randomStatGrowth == null)
+            randomStatGrowth = new PowerUpRandomStatGrowthModuleData();
+
         if (deathExplosion == null)
             deathExplosion = new ExplosionPassiveToolData();
 
@@ -446,6 +462,7 @@ public sealed class PowerUpModuleData
         ghostTrail.Validate();
         healMissingHealth.Validate();
         dropAttraction.Validate();
+        randomStatGrowth.Validate();
         deathExplosion.Validate();
         projectileOrbitOverride.Validate();
         orbitalProjections.Validate();

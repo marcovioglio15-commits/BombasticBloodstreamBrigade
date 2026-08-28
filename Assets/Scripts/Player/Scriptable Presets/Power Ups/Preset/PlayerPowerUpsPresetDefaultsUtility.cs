@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Builds default modular power-up content for empty presets.
@@ -39,6 +40,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ModuleIdDelayedShootApplication = "Module_DelayedShootApplication";
     internal const string ModuleIdSuddenStrike = "Module_SuddenStrike";
     internal const string ModuleIdSelfPreservationInstinct = "Module_SelfPreservationInstinct";
+    internal const string ModuleIdRandomStatGrowth = "Module_RandomStatGrowth";
 
     internal const string ActivePowerUpIdShotgun = "ActiveShotgun";
     internal const string ActivePowerUpIdChargeShot = "ActiveChargeShot";
@@ -47,6 +49,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
     internal const string ActivePowerUpIdPortableHealthPack = "ActivePortableHealthPack";
     internal const string ActivePowerUpIdBulletTime = "ActiveBulletTime";
     internal const string ActivePowerUpIdBoomerang = PlayerReturningProjectilesPresetDefaultsUtility.BoomerangPowerUpId;
+    internal const string ActivePowerUpIdEngineeredGrowth = PlayerRandomStatGrowthPresetDefaultsUtility.PowerUpId;
 
     internal const string PassivePowerUpIdElementalTrail = "PassiveElementalTrail";
     internal const string PassivePowerUpIdEnemiesExplodeOnDeath = "PassiveEnemiesExplodeOnDeath";
@@ -195,6 +198,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         definitions.Add(CreateModuleDefinition(ModuleIdDelayedShootApplication, "Delayed Shoot Application", PowerUpModuleKind.DelayedShootApplication, PowerUpModuleStage.Trigger, "Applies sibling discrete-projectile modules only to every configured base shot."));
         definitions.Add(CreateModuleDefinition(ModuleIdSuddenStrike, "Sudden Strike", PowerUpModuleKind.SuddenStrike, PowerUpModuleStage.Trigger, "Charges a sibling Trigger Hold Charge automatically while its condition is satisfied, then applies its full-charge payload and any sibling projectile or object-spawn effects to the next base shot."));
         definitions.Add(CreateModuleDefinition(ModuleIdSelfPreservationInstinct, "Self-Preservation Instinct", PowerUpModuleKind.SelfPreservationInstinct, PowerUpModuleStage.Trigger, "Executes sibling active-effect modules when player health crosses the configured threshold from above."));
+        definitions.Add(CreateModuleDefinition(ModuleIdRandomStatGrowth, "Random Stat Growth", PowerUpModuleKind.RandomStatGrowth, PowerUpModuleStage.Execute, "Permanently increases one random native or numeric custom player statistic after a successful active activation."));
         return definitions;
     }
 
@@ -309,6 +313,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
                                                 CreateBinding(ModuleIdTimeDilationEnemies, PowerUpModuleStage.Execute, null)));
 
         definitions.Add(CreateDefaultBoomerang(defaultDropPools));
+        definitions.Add(PlayerRandomStatGrowthPresetDefaultsUtility.CreateEngineeredGrowth(defaultDropPools, null));
 
         return definitions;
     }
@@ -443,6 +448,17 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
             case PowerUpModuleKind.SelfPreservationInstinct:
                 payload.SelfPreservationInstinct.Configure(SelfPreservationHealthThresholdMode.MaximumHealthPercent, 25f);
                 break;
+            case PowerUpModuleKind.RandomStatGrowth:
+                PlayerRandomStatGrowthEntryData randomGrowthEntry = new PlayerRandomStatGrowthEntryData();
+                randomGrowthEntry.Configure(PlayerRandomStatGrowthTarget.ProjectileDamage,
+                                            string.Empty,
+                                            1f,
+                                            2f,
+                                            1f,
+                                            false,
+                                            Color.white);
+                payload.RandomStatGrowth.Configure(new[] { randomGrowthEntry });
+                break;
             case PowerUpModuleKind.GateResource:
                 payload.ResourceGate.Configure(PowerUpResourceType.Energy,
                                                PowerUpResourceType.Energy,
@@ -533,14 +549,14 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         return payload;
     }
 
-    private static ModularPowerUpDefinition CreatePowerUpDefinition(string powerUpId,
-                                                                    string displayName,
-                                                                    string descriptionValue,
-                                                                    List<string> dropPools,
-                                                                    int dropTier,
-                                                                    int purchaseCost,
-                                                                    bool stealProtected,
-                                                                    params PowerUpModuleBinding[] bindings)
+    internal static ModularPowerUpDefinition CreatePowerUpDefinition(string powerUpId,
+                                                                     string displayName,
+                                                                     string descriptionValue,
+                                                                     List<string> dropPools,
+                                                                     int dropTier,
+                                                                     int purchaseCost,
+                                                                     bool stealProtected,
+                                                                     params PowerUpModuleBinding[] bindings)
     {
         ModularPowerUpDefinition powerUpDefinition = new ModularPowerUpDefinition();
         powerUpDefinition.Configure(CreateCommonData(powerUpId, displayName, descriptionValue, dropPools, dropTier, purchaseCost), stealProtected);
@@ -575,7 +591,7 @@ internal static class PlayerPowerUpsPresetDefaultsUtility
         return commonData;
     }
 
-    private static PowerUpModuleBinding CreateBinding(string moduleId, PowerUpModuleStage stage, PowerUpModuleData overridePayload)
+    internal static PowerUpModuleBinding CreateBinding(string moduleId, PowerUpModuleStage stage, PowerUpModuleData overridePayload)
     {
         PowerUpModuleBinding binding = new PowerUpModuleBinding();
         binding.Configure(moduleId, stage, true);
