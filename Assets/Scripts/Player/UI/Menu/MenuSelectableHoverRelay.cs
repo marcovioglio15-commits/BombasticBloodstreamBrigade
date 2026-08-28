@@ -34,7 +34,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     [Tooltip("Optional TMP label override. The first child TMP text is used when this is empty.")]
     [SerializeField] private TMP_Text targetTextOverride;
 
-    [Tooltip("Optional child transform isolating position, rotation, scale, and clip feedback from the layout-driven button root. Manual transform feedback works without this override by using the current post-layout baseline.")]
+    [Tooltip("Optional whole-button motion target used instead of the layout-driven button root. Text Only motion ignores this override and automatically uses the resolved TMP label.")]
     [SerializeField] private Transform transformTargetOverride;
     #endregion
 
@@ -60,6 +60,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     private bool isHovered;
     private bool isPressed;
     private bool isSelected;
+    private bool protectLayoutPosition;
     private bool rootPositionModified;
     private bool stateInitialized;
     #endregion
@@ -78,6 +79,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         targetGraphic = targetGraphicOverride != null ? targetGraphicOverride : selectable.targetGraphic;
         targetText = targetTextOverride != null ? targetTextOverride : GetComponentInChildren<TMP_Text>(true);
         presentationTransform = transformTargetOverride != null ? transformTargetOverride : transform;
+        protectLayoutPosition = transformTargetOverride == null;
         CacheOriginalPresentation();
         ResolveSelectionController();
         TryResolveInteraction();
@@ -115,7 +117,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         isSelected = false;
         StopTransition();
 
-        if (transformTargetOverride == null &&
+        if (protectLayoutPosition &&
             (!stateInitialized || currentState == GameUiButtonPresentationState.Normal))
             rootPositionModified = false;
 
@@ -216,6 +218,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         if (!GameMenuButtonInteractionRuntimeUtility.TryResolve(menuKind, out interaction))
             return false;
 
+        ConfigureMotionTarget(interaction.MotionTarget);
         interactionResolved = true;
         return true;
     }
@@ -270,9 +273,19 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         ApplySpriteAndGraphic(state);
         ApplyTextStyle(state);
         StopTransition();
+
+        // Resolve motion independently from sprite, graphic-color, and text-style state changes.
+        bool hasMotionTarget = presentationTransform != null;
+        bool usesManualMotion = hasMotionTarget && GameMenuButtonPresentationUtility.UsesManualMotion(in interaction);
+        bool usesClip = hasMotionTarget && GameMenuButtonPresentationUtility.UsesClips(in interaction);
+        AnimationClip targetClip = usesClip
+            ? GameMenuButtonPresentationUtility.ResolveClip(in interaction, state)
+            : null;
+
+        if (!usesManualMotion && targetClip == null)
+            return;
+
         float durationSeconds = animate ? interaction.TransitionDurationSeconds : 0f;
-        bool usesManualMotion = GameMenuButtonPresentationUtility.UsesManualMotion(in interaction);
-        bool usesClip = GameMenuButtonPresentationUtility.UsesClips(in interaction);
         Vector3 targetPosition = GameMenuButtonPresentationUtility.ResolvePosition(in interaction,
                                                                                   state,
                                                                                   originalLocalPosition);
@@ -282,9 +295,6 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         Vector3 targetScale = GameMenuButtonPresentationUtility.ResolveScale(in interaction,
                                                                             state,
                                                                             originalLocalScale);
-        AnimationClip targetClip = usesClip
-            ? GameMenuButtonPresentationUtility.ResolveClip(in interaction, state)
-            : null;
 
         if ((state == GameUiButtonPresentationState.Hovered ||
              state == GameUiButtonPresentationState.Selected) &&
@@ -496,7 +506,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         if (presentationTransform == null)
             return;
 
-        if (transformTargetOverride != null || rootPositionModified)
+        if (!protectLayoutPosition || rootPositionModified)
             presentationTransform.localPosition = position;
 
         presentationTransform.localRotation = rotation;
@@ -510,9 +520,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     /// </summary>
     private void CacheOriginalPresentation()
     {
-        originalLocalPosition = presentationTransform.localPosition;
-        originalLocalRotation = presentationTransform.localRotation;
-        originalLocalScale = presentationTransform.localScale;
+        CacheOriginalTransform();
         originalGraphicColor = targetGraphic != null ? targetGraphic.color : Color.white;
         Image image = targetGraphic as Image;
         originalSprite = image != null ? image.sprite : null;
@@ -527,12 +535,58 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     }
 
     /// <summary>
+    /// Caches the authored transform baseline after the baked motion target has been resolved.
+    /// </summary>
+    private void CacheOriginalTransform()
+    {
+        if (presentationTransform == null)
+            return;
+
+        originalLocalPosition = presentationTransform.localPosition;
+        originalLocalRotation = presentationTransform.localRotation;
+        originalLocalScale = presentationTransform.localScale;
+    }
+
+    /// <summary>
+    /// Selects the whole-button or TMP-label motion target once when the ECS profile becomes available.
+    /// </summary>
+    /// <param name="motionTarget">Baked target policy selected by the active menu profile.</param>
+    private void ConfigureMotionTarget(GameUiButtonMotionTarget motionTarget)
+    {
+        Transform resolvedTarget;
+        bool resolvedLayoutProtection;
+
+        switch (motionTarget)
+        {
+            case GameUiButtonMotionTarget.TextOnly:
+                resolvedTarget = targetText != null ? targetText.transform : null;
+                resolvedLayoutProtection = false;
+                break;
+            default:
+                resolvedTarget = transformTargetOverride != null ? transformTargetOverride : transform;
+                resolvedLayoutProtection = transformTargetOverride == null;
+                break;
+        }
+
+        protectLayoutPosition = resolvedLayoutProtection;
+
+        if (presentationTransform == resolvedTarget)
+            return;
+
+        presentationTransform = resolvedTarget;
+        rootPositionModified = false;
+        CacheOriginalTransform();
+    }
+
+    /// <summary>
     /// Captures the current layout-owned root position immediately before the first non-normal transform state.
     /// </summary>
     /// <param name="targetState">Presentation state about to be applied.</param>
     private void PreparePositionBaseline(GameUiButtonPresentationState targetState)
     {
-        if (transformTargetOverride != null || targetState == GameUiButtonPresentationState.Normal)
+        if (presentationTransform == null ||
+            !protectLayoutPosition ||
+            targetState == GameUiButtonPresentationState.Normal)
             return;
 
         if (!stateInitialized || currentState == GameUiButtonPresentationState.Normal)
@@ -614,7 +668,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         Vector3 layoutPosition = presentationTransform.localPosition;
         clip.SampleAnimation(presentationTransform.gameObject, timeSeconds);
 
-        if (transformTargetOverride == null)
+        if (protectLayoutPosition)
             presentationTransform.localPosition = layoutPosition;
     }
     #endregion

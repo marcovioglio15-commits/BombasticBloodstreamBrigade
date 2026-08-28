@@ -331,10 +331,11 @@ MonoBehaviour:
     - menuKind: 0
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -372,10 +373,11 @@ MonoBehaviour:
     - menuKind: 1
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -413,10 +415,11 @@ MonoBehaviour:
     - menuKind: 2
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -454,10 +457,11 @@ MonoBehaviour:
     - menuKind: 3
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -495,10 +499,11 @@ MonoBehaviour:
     - menuKind: 4
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -536,10 +541,11 @@ MonoBehaviour:
     - menuKind: 5
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -577,10 +583,11 @@ MonoBehaviour:
     - menuKind: 6
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}
@@ -618,10 +625,11 @@ MonoBehaviour:
     - menuKind: 7
       isEnabled: 1
       motionMode: 1
+      motionTarget: 1
       transitionDurationSeconds: 0.12
       useUnscaledTime: 1
       hoverTransformMode: 1
-      hoverPulseCycleSeconds: 0.34
+      hoverPulseCycleSeconds: 0.5
       hoverPulseCycles: 1
       loopHoverPulse: 1
       hoverScale: {x: 1.04, y: 1.04, z: 1}

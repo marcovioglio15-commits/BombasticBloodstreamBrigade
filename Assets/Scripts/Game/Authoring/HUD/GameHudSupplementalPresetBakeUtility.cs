@@ -285,6 +285,7 @@ public static class GameHudSupplementalPresetBakeUtility
             MenuKind = profile.MenuKind,
             Enabled = ToByte(profile.IsEnabled),
             MotionMode = profile.MotionMode,
+            MotionTarget = profile.MotionTarget,
             TransitionDurationSeconds = ResolveNonNegative(profile.TransitionDurationSeconds, 0.12f),
             UseUnscaledTime = ToByte(profile.UseUnscaledTime),
             HoverTransformMode = profile.HoverTransformMode,

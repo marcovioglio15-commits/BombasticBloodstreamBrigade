@@ -30,6 +30,15 @@ public enum GameUiButtonMotionMode : byte
 }
 
 /// <summary>
+/// Selects whether motion feedback affects the complete button or only its TMP label.
+/// </summary>
+public enum GameUiButtonMotionTarget : byte
+{
+    WholeButton = 0,
+    TextOnly = 1
+}
+
+/// <summary>
 /// Selects whether hover transform feedback holds its target or completes pulse cycles.
 /// </summary>
 public enum GameUiButtonHoverTransformMode : byte
@@ -57,6 +66,9 @@ public sealed class GameUiMenuButtonInteractionDefinition
     [Header("Motion")]
     [Tooltip("Selects manual RectTransform motion, authored clips, both paths, or no motion.")]
     [SerializeField] private GameUiButtonMotionMode motionMode = GameUiButtonMotionMode.ManualTransform;
+
+    [Tooltip("Selects whether transform and clip feedback animates the complete button or only its TMP label. Sprite overrides and graphic colors remain independent.")]
+    [SerializeField] private GameUiButtonMotionTarget motionTarget;
 
     [Tooltip("Seconds used to blend manual transform states and sample transition clips through the selected time source.")]
     [SerializeField] private float transitionDurationSeconds = 0.12f;
@@ -184,6 +196,7 @@ public sealed class GameUiMenuButtonInteractionDefinition
     public GameUiMenuKind MenuKind => menuKind;
     public bool IsEnabled => isEnabled;
     public GameUiButtonMotionMode MotionMode => motionMode;
+    public GameUiButtonMotionTarget MotionTarget => motionTarget;
     public float TransitionDurationSeconds => transitionDurationSeconds;
     public bool UseUnscaledTime => useUnscaledTime;
     public GameUiButtonHoverTransformMode HoverTransformMode => hoverTransformMode;

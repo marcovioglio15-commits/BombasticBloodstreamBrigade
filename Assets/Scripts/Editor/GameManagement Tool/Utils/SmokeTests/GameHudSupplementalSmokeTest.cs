@@ -209,6 +209,7 @@ public static class GameHudSupplementalSmokeTest
                 "Baked Settings navigation includes dropdown headers despite its default policy.");
         Require(navigationConfig.CustomizeSelectionPresentation != 0,
                 "Baked Settings selection presentation is disabled.");
+        GameHudButtonInteractionSmokeTestUtility.ValidateTextOnlyMotionTargetBake();
 
         using (World world = new World("GameHudSupplementalSmokeTest", WorldFlags.Game))
         {
@@ -233,7 +234,7 @@ public static class GameHudSupplementalSmokeTest
     }
 
     /// <summary>
-    /// Verifies the authored empty-sprite policy reaches the matching ECS menu-profile element unchanged.
+    /// Verifies authored motion-target and empty-sprite choices reach the matching ECS menu-profile element unchanged.
     /// </summary>
     /// <param name="settings">Authored menu-button profiles.</param>
     /// <param name="buttonBuffer">Baked ECS interaction buffer.</param>
@@ -260,6 +261,8 @@ public static class GameHudSupplementalSmokeTest
                 if (element.MenuKind != profile.MenuKind)
                     continue;
 
+                Require(element.MotionTarget == profile.MotionTarget,
+                        "Baked Motion Target does not match the " + profile.MenuKind + " profile.");
                 Require(element.AllowEmptySprites == (profile.AllowEmptySprites ? (byte)1 : (byte)0),
                         "Baked Allow Empty Sprites does not match the " + profile.MenuKind + " profile.");
                 found = true;

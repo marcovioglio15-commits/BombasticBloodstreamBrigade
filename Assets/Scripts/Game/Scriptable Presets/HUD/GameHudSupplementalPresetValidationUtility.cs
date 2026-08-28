@@ -250,6 +250,16 @@ public static class GameHudSupplementalPresetValidationUtility
             if (!visitedMenus.Add(profile.MenuKind))
                 warnings.Add(string.Format("Menu Button Interaction contains more than one {0} profile. Only the first entry is baked.", profile.MenuKind));
 
+            switch (profile.MotionTarget)
+            {
+                case GameUiButtonMotionTarget.WholeButton:
+                case GameUiButtonMotionTarget.TextOnly:
+                    break;
+                default:
+                    warnings.Add(string.Format("{0} button motion target is unsupported. Runtime will use the complete button target.", profile.MenuKind));
+                    break;
+            }
+
             ValidateNonNegative(profile.TransitionDurationSeconds,
                                 string.Format("{0} button transition duration", profile.MenuKind),
                                 warnings);

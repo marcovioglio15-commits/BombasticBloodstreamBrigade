@@ -181,6 +181,7 @@ public struct GameUiMenuButtonInteractionElement : IBufferElementData
     public GameUiMenuKind MenuKind;
     public byte Enabled;
     public GameUiButtonMotionMode MotionMode;
+    public GameUiButtonMotionTarget MotionTarget;
     public float TransitionDurationSeconds;
     public byte UseUnscaledTime;
     public GameUiButtonHoverTransformMode HoverTransformMode;

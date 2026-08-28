@@ -123,6 +123,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
 
         if (motionMode != GameUiButtonMotionMode.None)
         {
+            AddProperty(root, property.FindPropertyRelative("motionTarget"), "Motion Target");
             AddProperty(root, property.FindPropertyRelative("transitionDurationSeconds"), "Transition Duration");
             AddProperty(root, property.FindPropertyRelative("useUnscaledTime"), "Use Unscaled Time");
         }

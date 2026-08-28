@@ -264,6 +264,7 @@ public static class GameHudSupplementalProjectSetupUtility
 
             SetBool(profileProperty, "isEnabled", true);
             SetEnum(profileProperty, "motionMode", (int)GameUiButtonMotionMode.ManualTransform);
+            SetEnum(profileProperty, "motionTarget", (int)GameUiButtonMotionTarget.WholeButton);
             SetFloat(profileProperty, "transitionDurationSeconds", 0.12f);
             SetBool(profileProperty, "useUnscaledTime", true);
             SetBool(profileProperty, "allowEmptySprites", false);
