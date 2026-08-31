@@ -16850,6 +16850,8 @@ MonoBehaviour:
   menuKind: 6
   targetGraphicOverride: {fileID: 0}
   targetTextOverride: {fileID: 0}
+  buttonContentId: 
+  targetImageOverride: {fileID: 0}
   transformTargetOverride: {fileID: 0}
 --- !u!1 &5144004334426334720
 GameObject:

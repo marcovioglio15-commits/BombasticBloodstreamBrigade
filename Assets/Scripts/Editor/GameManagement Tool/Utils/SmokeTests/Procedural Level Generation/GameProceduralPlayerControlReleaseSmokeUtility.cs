@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 /// <summary>
 /// Injects held virtual movement and look samples across destructive loading and verifies that procedural player
-/// control starts during stable fade-in without a position or facing burst on the final transition-release frame.
+/// control remains live during safe traversal presentation and releases without a position or facing burst.
 /// </summary>
 public static class GameProceduralPlayerControlReleaseSmokeUtility
 {
@@ -70,7 +70,7 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
     #region Sampling
     /// <summary>
     /// Holds synthetic movement and look samples through one procedural transition and records when ECS input and
-    /// motion become live. Destructive phases must keep ECS input at zero; FadeIn must consume the current samples.
+    /// motion become live. Destructive phases keep ECS input at zero; safe traversal FadeOut and FadeIn may consume it.
     /// </summary>
     /// <param name="entityManager">Default-world entity manager containing transition and player state.</param>
     /// <param name="transitionState">Current authoritative scene transition state.</param>
@@ -113,6 +113,10 @@ public static class GameProceduralPlayerControlReleaseSmokeUtility
 
         if (transitionState.Phase != GameSceneTransitionPhase.FadeIn)
         {
+            if (transitionState.Phase == GameSceneTransitionPhase.FadeOut &&
+                transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal)
+                return true;
+
             if (math.lengthsq(inputState.Move) <= activeInputThresholdSquared &&
                 math.lengthsq(inputState.Look) <= activeInputThresholdSquared)
                 return true;

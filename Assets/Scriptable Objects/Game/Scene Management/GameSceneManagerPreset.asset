@@ -24,13 +24,22 @@ MonoBehaviour:
   loadBackend: 1
   logTransitions: 1
   enablePlayerCameraOcclusion: 0
+  enableCameraBoundaries: 1
+  cameraBoundaryMode: 0
+  cameraBoundarySoftZoneDistance: 3
   fadeSettings:
     fadeColor: {r: 0, g: 0, b: 0, a: 1}
+    visualStyle: 1
     fadeMode: 1
     wipeDirection: 0
-    directionalEdgeSoftness: 0.4
-    directionalNoiseStrength: 0.2
+    directionalEdgeSoftness: 0.16
+    directionalNoiseStrength: 0.035
     directionalNoiseScale: 5.5
+    paintEdgeSoftness: 0.025
+    paintNoiseStrength: 0.22
+    paintNoiseScale: 2.4
+    paintBristleStrength: 0.075
+    paintBristleScale: 48
     easing: 1
     fadeOutSeconds: 0.35
     postLoadReadyExtraSeconds: 0.08

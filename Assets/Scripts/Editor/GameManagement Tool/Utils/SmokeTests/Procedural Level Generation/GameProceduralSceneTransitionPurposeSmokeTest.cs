@@ -33,6 +33,7 @@ public static class GameProceduralSceneTransitionPurposeSmokeTest
         ValidateProceduralPurpose(GameSceneTransitionPurpose.ProceduralLevelBoundary);
         ValidateCompanionReloadPolicy();
         GameProceduralTransitionPresentationSmokeUtility.ValidateRoomLoadingSuppressionPolicy();
+        GameProceduralTransitionPresentationSmokeUtility.ValidateFadePresentationPolicy();
         ValidateTraversalRequestArbitration();
         ValidateSameFrameStandardTriggerPriority();
         ValidateDirectDefaultGameplayReplacement();

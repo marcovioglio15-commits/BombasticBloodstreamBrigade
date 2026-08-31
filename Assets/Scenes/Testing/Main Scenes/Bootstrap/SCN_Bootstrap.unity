@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 2100000, guid: c40195a64f1641f29db8c02cd534adc0, type: 2}
+  m_Material: {fileID: 2100000, guid: 90e64bb878bf48aaa3a6a04b21af8205, type: 2}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -962,7 +962,7 @@ MonoBehaviour:
   fadeCanvas: {fileID: 1002157448}
   canvasGroup: {fileID: 1002157445}
   fadeImage: {fileID: 111132464}
-  fadeMaterial: {fileID: 2100000, guid: c40195a64f1641f29db8c02cd534adc0, type: 2}
+  fadeMaterial: {fileID: 2100000, guid: 90e64bb878bf48aaa3a6a04b21af8205, type: 2}
 --- !u!225 &1002157445
 CanvasGroup:
   m_ObjectHideFlags: 0

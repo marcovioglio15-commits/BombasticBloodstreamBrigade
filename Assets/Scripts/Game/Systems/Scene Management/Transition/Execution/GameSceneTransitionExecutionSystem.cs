@@ -117,7 +117,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         }
     }
     #endregion
-
     #region Start
     /// <summary>Resolves and starts one transition request.</summary>
     /// <param name="managerEntity">Scene manager entity supplying purpose-specific presentation policy.</param>
@@ -159,6 +158,7 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         activePurpose = request.Purpose;
         GameSceneTransitionFadePresentationUtility.Resolve(
             in request,
+            config.FadeVisualStyle,
             out activeFadeMode,
             out activeFadeWipeDirection);
         GameSceneTransitionFadePresentationUtility.Apply(
@@ -223,7 +223,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         return true;
     }
     #endregion
-
     #region Tick
     /// <summary>Advances the active transition state machine.</summary>
     /// <param name="managerEntity">Scene manager entity that owns the transition state.</param>
@@ -283,7 +282,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         if (suppressLoadingProgress)
             GameSceneLoadingProgressRuntimeUtility.Hide(ref loadingProgressState, config);
     }
-
     /// <summary>Unloads the active scene before reload transitions load the new instance.</summary>
     /// <param name="transitionState">Mutable scene transition state.</param>
     /// <param name="fadeState">Mutable fade presentation state.</param>
@@ -297,7 +295,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         // Wait until PresentationSystemGroup has rendered complete coverage before resetting visible runtime content.
         if (GameSceneTransitionFadePresentationUtility.IsWaitingForRenderedCoverage(in fadeState))
             return;
-
         preLoadRuntimeCleanupComplete = GameSceneTransitionExecutionUtility.RunPreLoadRuntimeCleanupIfNeeded(EntityManager,
                                                                                                             preLoadRuntimeCleanupComplete,
                                                                                                             reloadActiveScene,
@@ -322,7 +319,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, sourceScene);
             return;
         }
-
         if (GameSceneTransitionPurposeUtility.ShouldUnloadSourceCompanionBeforeLoad(unloadSourceBeforeLoad,
                                                                                    hasSourceCompanionScene,
                                                                                    hasTargetCompanionScene,
@@ -340,10 +336,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, sourceCompanionScene);
             return;
         }
-
         BeginPhase(GameSceneTransitionPhase.Loading, ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
-
     /// <summary>Loads the target scene additively and activates it when the asynchronous operation completes.</summary>
     /// <param name="transitionState">Mutable scene transition state.</param>
     /// <param name="fadeState">Mutable fade presentation state.</param>
@@ -357,7 +351,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         // Direct-to-loading transitions must observe the same rendered-coverage gate as pre-unload paths.
         if (GameSceneTransitionFadePresentationUtility.IsWaitingForRenderedCoverage(in fadeState))
             return;
-
         if (GameScenePersistentPlayerSceneUtility.TickUnloadSteps(persistentPlayerPreLoadUnloadScenes, ref persistentPlayerPreLoadUnloadIndex))
         {
             ApplyCurrentLoadingProgress(ref loadingProgressState,
@@ -368,7 +361,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                            targetScene));
             return;
         }
-
         preLoadRuntimeCleanupComplete = GameSceneTransitionExecutionUtility.RunPreLoadRuntimeCleanupIfNeeded(EntityManager,
                                                                                                             preLoadRuntimeCleanupComplete,
                                                                                                             reloadActiveScene,
@@ -379,7 +371,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                             GameSceneTransitionExecutionUtility.ShouldForceProceduralRuntimeCleanup(activePurpose,
                                                                                                                                                                                         transactionalRoomStreaming,
                                                                                                                                                                                         singleSlotRoomStreaming));
-
         if (GameScenePersistentPlayerSceneUtility.TickLoadSteps(persistentPlayerLoadScenes, ref persistentPlayerLoadIndex))
         {
             ApplyCurrentLoadingProgress(ref loadingProgressState,
@@ -390,7 +381,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                            targetScene));
             return;
         }
-
         if (transactionalRoomStreaming &&
             !targetSceneLoaded &&
             !GameProceduralRoomTransitionTransactionUtility.TryCommitPendingTarget(EntityManager,
@@ -402,11 +392,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Loading, targetScene);
             return;
         }
-
         if (transactionalRoomStreaming)
         {
             targetSceneLoaded = true;
-
             if (transactionalSourceOwned)
                 sourceSceneUnloadComplete = true;
         }
@@ -421,7 +409,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Loading, targetScene);
             return;
         }
-
         if (hasTargetCompanionScene &&
             !targetCompanionSceneLoaded &&
             GameSceneTransitionSceneOperationUtility.TickLoadStep(targetCompanionScene,
@@ -434,7 +421,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Loading, targetCompanionScene);
             return;
         }
-
         bool shouldUnloadSourceScene = !sourceSceneUnloadComplete &&
                                        !unloadSourceBeforeLoad &&
                                        GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceAfterLoad(hasSourceScene,
@@ -449,7 +435,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                                           hasTargetCompanionScene,
                                                                                                                           sourceCompanionScene,
                                                                                                                           targetCompanionScene);
-
         if (GameSceneTransitionUnloadPolicyUtility.ShouldRunPostUnload(shouldUnloadSourceScene,
                                                                        shouldUnloadSourceCompanionScene,
                                                                        persistentPlayerPostLoadUnloadScenes.Count))
@@ -457,7 +442,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             BeginPhase(GameSceneTransitionPhase.PostUnload, ref transitionState, ref fadeState, ref loadingProgressState, config);
             return;
         }
-
         if (transactionalRoomStreaming &&
             !singleSlotRoomStreaming &&
             activePurpose == GameSceneTransitionPurpose.ProceduralRoomTraversal)
@@ -470,11 +454,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                             targetScene);
                 return;
             }
-
             BeginHoldOrFadeIn(ref transitionState, ref fadeState, ref loadingProgressState, config);
             return;
         }
-
         if (!GameSceneTransitionExecutionTimingUtility.TryCompleteReadinessWarmup(EntityManager,
                                                                                  targetScene,
                                                                                  hasTargetCompanionScene,
@@ -492,14 +474,10 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Readiness, targetScene);
             return;
         }
-
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
-
     #endregion
-
     #region Post Unload
-
     /// <summary>Unloads the previous non-persistent scene after the target scene is active.</summary>
     /// <param name="transitionState">Mutable scene transition state.</param>
     /// <param name="fadeState">Mutable fade presentation state.</param>
@@ -526,7 +504,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, sourceScene);
             return;
         }
-
         if (GameSceneTransitionUnloadPolicyUtility.ShouldUnloadSourceCompanionAfterLoad(hasSourceCompanionScene,
                                                                                       reloadActiveScene,
                                                                                       hasTargetCompanionScene,
@@ -543,7 +520,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Unloading, sourceCompanionScene);
             return;
         }
-
         if (GameScenePersistentPlayerSceneUtility.TickUnloadSteps(persistentPlayerPostLoadUnloadScenes, ref persistentPlayerPostLoadUnloadIndex))
         {
             ApplyCurrentLoadingProgress(ref loadingProgressState,
@@ -554,7 +530,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                            targetScene));
             return;
         }
-
         if (!GameSceneTransitionExecutionTimingUtility.TryCompleteReadinessWarmup(EntityManager,
                                                                                  targetScene,
                                                                                  hasTargetCompanionScene,
@@ -572,10 +547,8 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
             ApplyCurrentLoadingProgress(ref loadingProgressState, config, GameSceneLoadingProgressOperationKind.Readiness, targetScene);
             return;
         }
-
         BeginHoldOrFadeIn(ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
-
     #endregion
     #region Helpers
     /// <summary>Clears per-transition load and unload progress flags before a new transition starts.</summary>
@@ -598,7 +571,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                  ref physicsReadinessRequested,
                                                                  ref requiredPhysicsStepVersion);
     }
-
     /// <summary>Moves from fade out to required source or companion unload work, otherwise directly to target loading.</summary>
     /// <param name="transitionState">Mutable scene transition state.</param>
     /// <param name="fadeState">Mutable fade presentation state.</param>
@@ -615,7 +587,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                                                            reloadTargetCompanion);
         BeginPhase(nextPhase, ref transitionState, ref fadeState, ref loadingProgressState, config);
     }
-
     /// <summary>Starts the hold-black phase when configured, otherwise starts fade-in.</summary>
     /// <param name="transitionState">Mutable scene transition state.</param>
     /// <param name="fadeState">Mutable fade presentation state.</param>
@@ -629,11 +600,9 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         GameSceneTransitionPhase revealPhase =
             GameSceneTransitionExecutionUtility.ResolveReadyRevealPhase(postLoadReadyExtraSeconds);
         BeginPhase(revealPhase, ref transitionState, ref fadeState, ref loadingProgressState, config);
-
         if (revealPhase == GameSceneTransitionPhase.FadeIn && fadeInSeconds <= 0f)
             CompleteTransition(Entity.Null, config, ref transitionState, ref fadeState, ref loadingProgressState);
     }
-
     /// <summary>Applies loading-progress visibility and status when a transition phase starts.</summary>
     /// <param name="phase">Transition phase whose presentation state is being initialized.</param>
     /// <param name="loadingProgressState">Mutable loading-progress presentation component.</param>
@@ -646,7 +615,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                      config,
                                                                      suppressLoadingProgress,
                                                                      BuildLoadingProgressSnapshot());
-
     /// <summary>Applies aggregate loading progress for the current operation step.</summary>
     /// <param name="loadingProgressState">Mutable loading-progress presentation state.</param>
     /// <param name="config">Runtime scene manager configuration.</param>
@@ -662,7 +630,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                     sceneDefinition,
                                                                     suppressLoadingProgress,
                                                                     BuildLoadingProgressSnapshot());
-
     /// <summary>Builds an immutable snapshot of the counters used by loading-progress calculations.</summary>
     /// <returns>Current transition progress snapshot.</returns>
     private GameSceneTransitionProgressSnapshot BuildLoadingProgressSnapshot()
@@ -676,7 +643,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                    persistentPlayerPreLoadUnloadIndex, persistentPlayerLoadIndex,
                                                    persistentPlayerPostLoadUnloadIndex, loadingProgressTotalSteps,
                                                    activeOperation);
-
     /// <summary>Updates managed and ECS phase fields and resets the phase timer.</summary>
     /// <param name="phase">New transition phase.</param>
     /// <param name="transitionState">Mutable scene transition state.</param>
@@ -692,16 +658,16 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
         activePhase = phase;
         phaseTimer = 0f;
         transitionState.Phase = phase;
-
         if (phase == GameSceneTransitionPhase.FadeIn)
+        {
             GameSceneTransitionTimeScaleUtility.Restore(ref timeScaleChanged, previousTimeScale);
-
-        if (phase != GameSceneTransitionPhase.FadeIn)
+            fadeState.Operation = GameUiPaintRevealOperation.Remove;
+        }
+        else
             GameSceneTransitionExecutionUtility.SetFade(ref fadeState, fadeState.Alpha, true, config);
 
         ApplyLoadingProgressForPhase(phase, ref loadingProgressState, config);
     }
-
     /// <summary>Completes the active transition and restores idle state.</summary>
     /// <param name="managerEntity">Scene manager entity that owns the transition state.</param>
     /// <param name="config">Runtime scene manager configuration.</param>
@@ -718,8 +684,6 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                   ref suppressLoadingProgress, targetSceneId, ref transitionState,
                                                                   ref fadeState, ref loadingProgressState, config,
                                                                   ref timeScaleChanged, previousTimeScale);
-
     #endregion
-
     #endregion
 }

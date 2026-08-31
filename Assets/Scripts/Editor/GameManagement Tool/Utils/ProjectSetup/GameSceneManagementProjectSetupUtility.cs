@@ -30,7 +30,7 @@ public static class GameSceneManagementProjectSetupUtility
     private const string DefaultScenePresetPath = "Assets/Scriptable Objects/Game/Scene Management/GameSceneManagerPreset.asset";
     private const string DefaultSettingsPresetPath = "Assets/Scriptable Objects/Game/Settings/GameSettingsManagerPreset.asset";
     private const string DefaultHudPresetPath = "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset";
-    private const string FadeMaterialPath = "Assets/2D/Materials/M_UI_SceneFadeGradient.mat";
+    private const string FadeMaterialPath = "Assets/2D/Materials/M_UI_PaintRevealSceneTransition.mat";
     private const string BootstrapManagerObjectName = "GameSceneManager";
     private const string FadeCanvasObjectName = "Canvas_SceneTransitionFade";
     private const string FadeSurfaceObjectName = "FadeSurface";
@@ -82,6 +82,7 @@ public static class GameSceneManagementProjectSetupUtility
     public static void ApplyDefaultProjectSetup(bool logToConsole)
     {
         EnsureSceneFolders();
+        GameUiAerosolPaintProjectSetupUtility.EnsureAssets(false);
         GameSceneTransitionLayerUtility.TryCreateLayer(GameSceneTriggerSettings.DefaultTransitionLayerName);
         GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureProjectLayer();
         GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureRendererFeatureLayers();
@@ -248,38 +249,13 @@ public static class GameSceneManagementProjectSetupUtility
         SetBool(serializedPreset, "autoLoadInitialScene", true);
         SetInt(serializedPreset, "loadBackend", (int)GameSceneLoadBackend.Addressables);
         SetBool(serializedPreset, "logTransitions", true);
-        SynchronizeFadeSettings(serializedPreset);
+        GameSceneFadeProjectSetupUtility.Synchronize(serializedPreset);
         GameSceneManagementProjectSetupLoadingProgressUtility.SynchronizeLoadingProgressSettings(serializedPreset);
         SynchronizeTriggerSettings(serializedPreset);
         SynchronizeSceneDefinitions(serializedPreset);
         SynchronizeTransitionDefinitions(serializedPreset);
         serializedPreset.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(preset);
-    }
-
-    /// <summary>
-    /// Writes default fade timing values used by bootstrap transitions.
-    /// </summary>
-    /// <param name="serializedPreset">Serialized Scene Manager preset.</param>
-    private static void SynchronizeFadeSettings(SerializedObject serializedPreset)
-    {
-        SerializedProperty fadeSettingsProperty = serializedPreset.FindProperty("fadeSettings");
-
-        if (fadeSettingsProperty == null)
-            return;
-
-        SetColor(fadeSettingsProperty, "fadeColor", Color.black);
-        SetInt(fadeSettingsProperty, "fadeMode", (int)GameSceneFadeMode.DirectionalGradient);
-        SetInt(fadeSettingsProperty, "wipeDirection", (int)GameSceneFadeWipeDirection.LeftToRight);
-        SetFloat(fadeSettingsProperty, "directionalEdgeSoftness", 0.16f);
-        SetFloat(fadeSettingsProperty, "directionalNoiseStrength", 0.035f);
-        SetFloat(fadeSettingsProperty, "directionalNoiseScale", 5.5f);
-        SetInt(fadeSettingsProperty, "easing", (int)GameSceneFadeEasing.SmoothStep);
-        SetFloat(fadeSettingsProperty, "fadeOutSeconds", 0.35f);
-        SetFloat(fadeSettingsProperty, "postLoadReadyExtraSeconds", 0.08f);
-        SetFloat(fadeSettingsProperty, "fadeInSeconds", 0.35f);
-        SetBool(fadeSettingsProperty, "lockGameplayInput", true);
-        SetBool(fadeSettingsProperty, "setTimeScaleDuringTransition", true);
     }
 
     /// <summary>
@@ -607,7 +583,7 @@ public static class GameSceneManagementProjectSetupUtility
         Material fadeMaterial = AssetDatabase.LoadAssetAtPath<Material>(FadeMaterialPath);
 
         if (fadeMaterial == null)
-            throw new InvalidOperationException("Scene fade gradient material is missing: " + FadeMaterialPath + ".");
+            throw new InvalidOperationException("Scene fade paint material is missing: " + FadeMaterialPath + ".");
 
         RectTransform canvasRect = EnsureComponent<RectTransform>(view.gameObject);
         StretchToParent(canvasRect);

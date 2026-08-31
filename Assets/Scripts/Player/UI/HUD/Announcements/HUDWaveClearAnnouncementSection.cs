@@ -3,6 +3,7 @@ using TMPro;
 using Unity.Entities;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Presents interruptible preauthored room-clear messages from versioned ECS presentation requests.
@@ -29,6 +30,23 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
     [Tooltip("Canvas group used to hide the announcement without enabling or instantiating UI at runtime.")]
     [SerializeField]
     private CanvasGroup canvasGroup;
+
+    [Header("Paint Reveal")]
+    [Tooltip("Preauthored Image whose paint material writes the stencil mask used by the announcement content.")]
+    [SerializeField]
+    private Image paintMaskImage;
+
+    [Tooltip("Preauthored UI Mask that clips the text and background to the animated paint coverage.")]
+    [SerializeField]
+    private Mask paintMask;
+
+    [Tooltip("Preauthored Image rendered behind the text and clipped by the animated paint mask.")]
+    [SerializeField]
+    private Image paintBackgroundImage;
+
+    [Tooltip("Dedicated authored Paint Reveal material used only by the room-clear stencil mask.")]
+    [SerializeField]
+    private Material paintRevealMaterial;
     #endregion
 
     #region Runtime Fields
@@ -46,6 +64,7 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
     private bool queriesInitialized;
     private bool configApplied;
     private bool progressionObserved;
+    private Material paintMaskRuntimeMaterial;
     #endregion
 
     #endregion
@@ -213,11 +232,16 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
             return;
 
         presentationConfig.Content = baseConfig.FinalWaveContent;
+        presentationConfig.PresentationMode = baseConfig.FinalWavePresentationMode;
         presentationConfig.Direction = baseConfig.FinalWaveDirection;
+        presentationConfig.PaintExitDirection = baseConfig.FinalWavePaintExitDirection;
         presentationConfig.TraversalDurationSeconds = baseConfig.FinalWaveTraversalDurationSeconds;
         presentationConfig.Easing = baseConfig.FinalWaveEasing;
         presentationConfig.PauseAtCenter = baseConfig.FinalWavePauseAtCenter;
         presentationConfig.CenterHoldDurationSeconds = baseConfig.FinalWaveCenterHoldDurationSeconds;
+        presentationConfig.PaintRevealDurationSeconds = baseConfig.FinalWavePaintRevealDurationSeconds;
+        presentationConfig.PaintHoldDurationSeconds = baseConfig.FinalWavePaintHoldDurationSeconds;
+        presentationConfig.PaintFadeOutDurationSeconds = baseConfig.FinalWavePaintFadeOutDurationSeconds;
     }
 
     /// <summary>
@@ -291,7 +315,7 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
     }
 
     /// <summary>
-    /// Starts one interruptible sweep from its configured screen edge using current canvas dimensions.
+    /// Starts one interruptible traversal or paint reveal using current canvas dimensions.
     /// </summary>
     /// <param name="entityManager">Entity manager receiving active presentation state.</param>
     /// <param name="requestVersion">Version of the request being displayed.</param>
@@ -309,21 +333,84 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
         ApplyTypography();
         Canvas.ForceUpdateCanvases();
         announcementText.ForceMeshUpdate();
-        float horizontalDistance = presentationRoot.rect.width * 0.5f +
-                                   announcementText.preferredWidth * 0.5f +
-                                   presentationConfig.HorizontalOffscreenPadding;
+        ConfigurePresentationBounds();
         float verticalPosition = math.lerp(-presentationRoot.rect.height * 0.5f,
                                            presentationRoot.rect.height * 0.5f,
                                            presentationConfig.VerticalPositionNormalized);
+        textRoot.anchoredPosition = new Vector2(0f, verticalPosition);
+        canvasGroup.alpha = 1f;
+        MarkRequestActive(entityManager, requestVersion);
+
+        switch (presentationConfig.PresentationMode)
+        {
+            case GameHudWaveClearAnnouncementPresentationMode.PaintReveal:
+                if (!ConfigurePaintPresentation())
+                {
+                    CompleteRequest(entityManager, requestVersion);
+                    activeRequestVersion = 0;
+                    HidePresentation();
+                    return;
+                }
+
+                presentationCoroutine = StartCoroutine(PresentPaint(requestVersion));
+                return;
+            default:
+                ConfigureTraversalPresentation();
+                StartTraversal(verticalPosition, requestVersion);
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Sizes the preauthored content root from measured text bounds and configured paint padding.
+    /// </summary>
+    private void ConfigurePresentationBounds()
+    {
+        Vector2 padding = new Vector2(math.max(0f, presentationConfig.PaintBackgroundPadding.x),
+                                      math.max(0f, presentationConfig.PaintBackgroundPadding.y));
+        textRoot.sizeDelta = new Vector2(announcementText.preferredWidth + padding.x * 2f,
+                                         announcementText.preferredHeight + padding.y * 2f);
+        RectTransform announcementRect = announcementText.rectTransform;
+        announcementRect.anchorMin = Vector2.zero;
+        announcementRect.anchorMax = Vector2.one;
+        announcementRect.offsetMin = padding;
+        announcementRect.offsetMax = -padding;
+    }
+
+    /// <summary>
+    /// Disables stencil clipping and background rendering for the legacy traversal presentation.
+    /// </summary>
+    private void ConfigureTraversalPresentation()
+    {
+        paintMaskRuntimeMaterial = null;
+
+        if (paintMask != null)
+            paintMask.enabled = false;
+
+        if (paintMaskImage != null)
+            paintMaskImage.enabled = false;
+
+        if (paintBackgroundImage != null)
+            paintBackgroundImage.enabled = false;
+    }
+
+    /// <summary>
+    /// Resolves off-screen endpoints and begins the edge-to-edge traversal coroutine.
+    /// </summary>
+    /// <param name="verticalPosition">Canvas-space vertical position shared by both endpoints.</param>
+    /// <param name="requestVersion">Version completed after the outgoing segment.</param>
+    private void StartTraversal(float verticalPosition, uint requestVersion)
+    {
+        float horizontalDistance = presentationRoot.rect.width * 0.5f +
+                                   textRoot.rect.width * 0.5f +
+                                   presentationConfig.HorizontalOffscreenPadding;
         float direction = presentationConfig.Direction == GameHudWaveClearAnnouncementDirection.LeftToRight
             ? 1f
             : -1f;
         Vector2 startPosition = new Vector2(-horizontalDistance * direction, verticalPosition);
         Vector2 endPosition = new Vector2(horizontalDistance * direction, verticalPosition);
         textRoot.anchoredPosition = startPosition;
-        canvasGroup.alpha = 1f;
-        MarkRequestActive(entityManager, requestVersion);
-        presentationCoroutine = StartCoroutine(Present(startPosition, endPosition, requestVersion));
+        presentationCoroutine = StartCoroutine(PresentTraversal(startPosition, endPosition, requestVersion));
     }
 
     /// <summary>
@@ -333,26 +420,146 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
     /// <param name="endPosition">Fully off-screen exit position.</param>
     /// <param name="requestVersion">Version completed after the outgoing segment.</param>
     /// <returns>Coroutine enumerator scheduled only while the announcement is visible.</returns>
-    private IEnumerator Present(Vector2 startPosition, Vector2 endPosition, uint requestVersion)
+    private IEnumerator PresentTraversal(Vector2 startPosition, Vector2 endPosition, uint requestVersion)
     {
         float halfDuration = presentationConfig.TraversalDurationSeconds * 0.5f;
         yield return MoveSegment(startPosition, new Vector2(0f, startPosition.y), halfDuration, true);
 
         if (presentationConfig.PauseAtCenter != 0 && presentationConfig.CenterHoldDurationSeconds > 0f)
-        {
-            float elapsedSeconds = 0f;
-
-            while (elapsedSeconds < presentationConfig.CenterHoldDurationSeconds)
-            {
-                elapsedSeconds += ResolveDeltaTime();
-                yield return null;
-            }
-        }
+            yield return WaitDuration(presentationConfig.CenterHoldDurationSeconds);
 
         yield return MoveSegment(new Vector2(0f, endPosition.y), endPosition, halfDuration, false);
         presentationCoroutine = null;
         CompleteActiveRequest(requestVersion);
         HidePresentation();
+    }
+
+    /// <summary>
+    /// Configures the authored stencil hierarchy and dedicated material for stationary paint presentation.
+    /// </summary>
+    /// <returns>True when all paint references and required shader properties are available.</returns>
+    private bool ConfigurePaintPresentation()
+    {
+        if (paintMaskImage == null ||
+            paintMask == null ||
+            paintBackgroundImage == null ||
+            paintRevealMaterial == null ||
+            !GameUiPaintRevealMaterialUtility.IsCompatible(paintRevealMaterial))
+            return false;
+
+        Sprite paintSprite = presentationConfig.PaintBackgroundSprite.Value;
+
+        if (paintSprite == null)
+            return false;
+
+        paintMaskImage.sprite = paintSprite;
+        paintBackgroundImage.sprite = paintSprite;
+        paintBackgroundImage.color = new Color(presentationConfig.PaintBackgroundColor.x,
+                                               presentationConfig.PaintBackgroundColor.y,
+                                               presentationConfig.PaintBackgroundColor.z,
+                                               presentationConfig.PaintBackgroundColor.w);
+        paintBackgroundImage.enabled = true;
+        paintMaskImage.material = paintRevealMaterial;
+        paintMaskImage.enabled = true;
+        paintMask.enabled = true;
+        paintMaskImage.SetMaterialDirty();
+        paintMaskRuntimeMaterial = paintMaskImage.materialForRendering;
+        ConfigurePaintOperation(presentationConfig.Direction,
+                                GameUiPaintRevealOperation.Deposit);
+        SetPaintProgress(0f);
+        return true;
+    }
+
+    /// <summary>
+    /// Deposits, holds, and directionally removes the stationary paint announcement before completing its ECS request.
+    /// </summary>
+    /// <param name="requestVersion">Version completed after the paint presentation.</param>
+    /// <returns>Coroutine enumerator for the complete paint sequence.</returns>
+    private IEnumerator PresentPaint(uint requestVersion)
+    {
+        yield return AnimatePaintOperation(presentationConfig.Direction,
+                                           GameUiPaintRevealOperation.Deposit,
+                                           presentationConfig.PaintRevealDurationSeconds);
+        yield return WaitDuration(presentationConfig.PaintHoldDurationSeconds);
+        yield return AnimatePaintOperation(presentationConfig.PaintExitDirection,
+                                           GameUiPaintRevealOperation.Remove,
+                                           presentationConfig.PaintFadeOutDurationSeconds);
+        presentationCoroutine = null;
+        CompleteActiveRequest(requestVersion);
+        HidePresentation();
+    }
+
+    /// <summary>
+    /// Advances one deposit or removal frontier once per rendered frame for the configured interval.
+    /// </summary>
+    /// <param name="direction">Screen-space direction followed by the active frontier.</param>
+    /// <param name="operation">Deposit for entry or remove for exit.</param>
+    /// <param name="durationSeconds">Positive phase duration.</param>
+    /// <returns>Coroutine enumerator for the active paint operation.</returns>
+    private IEnumerator AnimatePaintOperation(GameHudWaveClearAnnouncementDirection direction,
+                                              GameUiPaintRevealOperation operation,
+                                              float durationSeconds)
+    {
+        float elapsedSeconds = 0f;
+        ConfigurePaintOperation(direction, operation);
+        SetPaintProgress(0f);
+
+        while (elapsedSeconds < durationSeconds)
+        {
+            elapsedSeconds += ResolveDeltaTime();
+            float normalizedTime = math.saturate(elapsedSeconds / durationSeconds);
+            SetPaintProgress(normalizedTime * normalizedTime * (3f - 2f * normalizedTime));
+            yield return null;
+        }
+
+        SetPaintProgress(1f);
+    }
+
+    /// <summary>
+    /// Applies one phase direction and operation to the generated stencil material without mutating the authored asset.
+    /// </summary>
+    /// <param name="direction">Horizontal direction followed by the active paint frontier.</param>
+    /// <param name="operation">Deposit or removal operation evaluated by the shader.</param>
+    private void ConfigurePaintOperation(GameHudWaveClearAnnouncementDirection direction,
+                                         GameUiPaintRevealOperation operation)
+    {
+        float aspectRatio = textRoot.rect.width / math.max(1f, textRoot.rect.height);
+        Material targetMaterial = paintMaskRuntimeMaterial != null
+            ? paintMaskRuntimeMaterial
+            : paintRevealMaterial;
+        GameUiPaintRevealMaterialUtility.ConfigureRoomClear(targetMaterial,
+                                                            in presentationConfig,
+                                                            direction,
+                                                            operation,
+                                                            aspectRatio);
+    }
+
+    /// <summary>
+    /// Waits without allocations while respecting the announcement time source.
+    /// </summary>
+    /// <param name="durationSeconds">Non-negative hold duration.</param>
+    /// <returns>Coroutine enumerator for the hold interval.</returns>
+    private IEnumerator WaitDuration(float durationSeconds)
+    {
+        float elapsedSeconds = 0f;
+
+        while (elapsedSeconds < durationSeconds)
+        {
+            elapsedSeconds += ResolveDeltaTime();
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Writes the only per-frame paint value to the generated stencil material.
+    /// </summary>
+    /// <param name="progress">Normalized paint coverage.</param>
+    private void SetPaintProgress(float progress)
+    {
+        GameUiPaintRevealMaterialUtility.SetProgress(paintMaskRuntimeMaterial != null
+                                                         ? paintMaskRuntimeMaterial
+                                                         : paintRevealMaterial,
+                                                     progress);
     }
 
     /// <summary>
@@ -459,6 +666,17 @@ public sealed class HUDWaveClearAnnouncementSection : MonoBehaviour
         canvasGroup.alpha = 0f;
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
+
+        if (paintMask != null)
+            paintMask.enabled = false;
+
+        if (paintMaskImage != null)
+            paintMaskImage.enabled = false;
+
+        if (paintBackgroundImage != null)
+            paintBackgroundImage.enabled = false;
+
+        paintMaskRuntimeMaterial = null;
     }
     #endregion
 

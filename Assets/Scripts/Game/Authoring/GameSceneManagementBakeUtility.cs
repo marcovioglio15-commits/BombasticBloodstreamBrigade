@@ -20,7 +20,9 @@ public static class GameSceneManagementBakeUtility
         GameSceneFadeSettings fadeSettings = preset != null ? preset.FadeSettings : null;
         GameSceneLoadingProgressSettings loadingProgressSettings = preset != null ? preset.LoadingProgressSettings : null;
         GameSceneTriggerSettings triggerSettings = preset != null ? preset.TriggerSettings : null;
-        Color fadeColor = fadeSettings != null ? fadeSettings.FadeColor : Color.black;
+        Color fadeColor = fadeSettings != null
+            ? fadeSettings.FadeColor
+            : Color.black;
         Color loadingProgressRingColor = loadingProgressSettings != null ? loadingProgressSettings.RingColor : new Color(0.55f, 0.82f, 1f, 1f);
         Color loadingProgressTrackColor = loadingProgressSettings != null ? loadingProgressSettings.TrackColor : new Color(1f, 1f, 1f, 0.18f);
         Color loadingProgressTextColor = loadingProgressSettings != null ? loadingProgressSettings.TextColor : Color.white;
@@ -35,18 +37,35 @@ public static class GameSceneManagementBakeUtility
             AutoLoadInitialScene = preset != null && preset.AutoLoadInitialScene ? (byte)1 : (byte)0,
             LogTransitions = preset != null && preset.LogTransitions ? (byte)1 : (byte)0,
             EnablePlayerCameraOcclusion = preset == null || preset.EnablePlayerCameraOcclusion ? (byte)1 : (byte)0,
+            EnableCameraBoundaries = preset == null || preset.EnableCameraBoundaries ? (byte)1 : (byte)0,
+            CameraBoundaryMode = preset != null
+                ? preset.CameraBoundaryMode
+                : GameCameraBoundaryMode.ContainmentVolume,
+            CameraBoundarySoftZoneDistance = preset != null &&
+                                             math.isfinite(preset.CameraBoundarySoftZoneDistance) &&
+                                             preset.CameraBoundarySoftZoneDistance >= 0f
+                ? preset.CameraBoundarySoftZoneDistance
+                : GameCameraBoundaryDefaults.SoftZoneDistance,
             LockGameplayInput = fadeSettings != null && fadeSettings.LockGameplayInput ? (byte)1 : (byte)0,
             SetTimeScaleDuringTransition = fadeSettings != null && fadeSettings.SetTimeScaleDuringTransition ? (byte)1 : (byte)0,
-            FadeOutSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeOutSeconds) : 0.35f,
-            PostLoadReadyExtraSeconds = fadeSettings != null ? math.max(0f, fadeSettings.PostLoadReadyExtraSeconds) : 0.08f,
-            FadeInSeconds = fadeSettings != null ? math.max(0f, fadeSettings.FadeInSeconds) : 0.35f,
+            FadeOutSeconds = ResolveNonNegative(fadeSettings != null ? fadeSettings.FadeOutSeconds : 0.35f, 0.35f),
+            PostLoadReadyExtraSeconds = ResolveNonNegative(fadeSettings != null ? fadeSettings.PostLoadReadyExtraSeconds : 0.08f, 0.08f),
+            FadeInSeconds = ResolveNonNegative(fadeSettings != null ? fadeSettings.FadeInSeconds : 0.35f, 0.35f),
             FadeColor = new float4(fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a),
+            FadeVisualStyle = fadeSettings != null
+                ? fadeSettings.VisualStyle
+                : GameSceneFadeVisualStyle.Paint,
             FadeMode = fadeSettings != null ? fadeSettings.FadeMode : GameSceneFadeMode.DirectionalGradient,
             FadeWipeDirection = fadeSettings != null ? fadeSettings.WipeDirection : GameSceneFadeWipeDirection.LeftToRight,
             FadeEasing = fadeSettings != null ? fadeSettings.Easing : GameSceneFadeEasing.SmoothStep,
-            FadeDirectionalEdgeSoftness = fadeSettings != null ? math.clamp(fadeSettings.DirectionalEdgeSoftness, 0.001f, 0.5f) : 0.16f,
-            FadeDirectionalNoiseStrength = fadeSettings != null ? math.clamp(fadeSettings.DirectionalNoiseStrength, 0f, 0.25f) : 0.035f,
-            FadeDirectionalNoiseScale = fadeSettings != null ? math.clamp(fadeSettings.DirectionalNoiseScale, 0.25f, 24f) : 5.5f,
+            FadeDirectionalEdgeSoftness = ResolveClamped(fadeSettings != null ? fadeSettings.DirectionalEdgeSoftness : 0.16f, 0.16f, 0.001f, 0.5f),
+            FadeDirectionalNoiseStrength = ResolveClamped(fadeSettings != null ? fadeSettings.DirectionalNoiseStrength : 0.035f, 0.035f, 0f, 0.25f),
+            FadeDirectionalNoiseScale = ResolveClamped(fadeSettings != null ? fadeSettings.DirectionalNoiseScale : 5.5f, 5.5f, 0.25f, 24f),
+            FadePaintEdgeSoftness = ResolveClamped(fadeSettings != null ? fadeSettings.PaintEdgeSoftness : 0.025f, 0.025f, 0.001f, 0.25f),
+            FadePaintNoiseStrength = ResolveClamped(fadeSettings != null ? fadeSettings.PaintNoiseStrength : 0.22f, 0.22f, 0f, 0.5f),
+            FadePaintNoiseScale = ResolveClamped(fadeSettings != null ? fadeSettings.PaintNoiseScale : 2.4f, 2.4f, 0.25f, 12f),
+            FadePaintBristleStrength = ResolveClamped(fadeSettings != null ? fadeSettings.PaintBristleStrength : 0.075f, 0.075f, 0f, 0.25f),
+            FadePaintBristleScale = ResolveClamped(fadeSettings != null ? fadeSettings.PaintBristleScale : 48f, 48f, 1f, 96f),
             ShowLoadingProgress = loadingProgressSettings != null && loadingProgressSettings.ShowLoadingProgress ? (byte)1 : (byte)0,
             ShowLoadingProgressPercentage = loadingProgressSettings == null || loadingProgressSettings.ShowPercentage ? (byte)1 : (byte)0,
             ShowLoadingProgressStatusText = loadingProgressSettings == null || loadingProgressSettings.ShowStatusText ? (byte)1 : (byte)0,
@@ -164,6 +183,32 @@ public static class GameSceneManagementBakeUtility
                 FadeInSeconds = math.max(0f, transitionDefinition.FadeInSeconds)
             });
         }
+    }
+    #endregion
+
+    #region Private Methods
+    /// <summary>
+    /// Resolves a finite non-negative runtime value without changing the source preset.
+    /// </summary>
+    /// <param name="value">Authored scalar.</param>
+    /// <param name="fallback">Runtime fallback used for non-finite values.</param>
+    /// <returns>Finite non-negative runtime scalar.</returns>
+    private static float ResolveNonNegative(float value, float fallback)
+    {
+        return math.isfinite(value) ? math.max(0f, value) : fallback;
+    }
+
+    /// <summary>
+    /// Resolves and clamps one finite shader value without changing the source preset.
+    /// </summary>
+    /// <param name="value">Authored scalar.</param>
+    /// <param name="fallback">Runtime fallback used for non-finite values.</param>
+    /// <param name="minimum">Inclusive runtime minimum.</param>
+    /// <param name="maximum">Inclusive runtime maximum.</param>
+    /// <returns>Finite scalar constrained to the supported shader range.</returns>
+    private static float ResolveClamped(float value, float fallback, float minimum, float maximum)
+    {
+        return math.clamp(math.isfinite(value) ? value : fallback, minimum, maximum);
     }
     #endregion
 

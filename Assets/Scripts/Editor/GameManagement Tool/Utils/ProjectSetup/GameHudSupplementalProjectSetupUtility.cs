@@ -44,6 +44,7 @@ public static class GameHudSupplementalProjectSetupUtility
     // [MenuItem("Tools/Game/HUD/Apply Supplemental HUD Setup")]
     public static void ExecuteBatchSetup()
     {
+        GameUiAerosolPaintProjectSetupUtility.EnsureAssets(false);
         GameHudManagerPreset hudPreset = AssetDatabase.LoadAssetAtPath<GameHudManagerPreset>(
             "Assets/Scriptable Objects/Game/HUD/GameHudManagerPreset.asset");
         EnsureDefaultSettings(hudPreset);
@@ -91,6 +92,7 @@ public static class GameHudSupplementalProjectSetupUtility
         serializedHudPreset.Update();
         EnsureDefaultStatistics(serializedHudPreset);
         EnsureDefaultButtonProfiles(serializedHudPreset.FindProperty("buttonInteractionSettings.menuProfiles"));
+        EnsureWaveClearPaintDefaults(serializedHudPreset);
         InputActionAsset inputAsset = PlayerInputActionsAssetUtility.LoadOrCreateAsset();
         EnsureDefaultActionReference(serializedHudPreset,
                                      "powerUpSummarySettings.toggleActionId",
@@ -182,6 +184,44 @@ public static class GameHudSupplementalProjectSetupUtility
     #endregion
 
     #region Preset Defaults
+    /// <summary>
+    /// Migrates a legacy room-clear paint configuration when it has no authored aerosol silhouette.
+    /// </summary>
+    /// <param name="serializedHudPreset">Serialized HUD preset containing room-clear paint settings.</param>
+    private static void EnsureWaveClearPaintDefaults(SerializedObject serializedHudPreset)
+    {
+        SerializedProperty paintSettings = serializedHudPreset.FindProperty("waveClearAnnouncementSettings");
+
+        if (paintSettings == null)
+            return;
+
+        SerializedProperty spriteProperty = paintSettings.FindPropertyRelative("paintBackgroundSprite");
+
+        if (spriteProperty == null || spriteProperty.objectReferenceValue != null)
+            return;
+
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            GameUiAerosolPaintProjectSetupUtility.RoomClearSpritePath);
+
+        if (sprite == null)
+            return;
+
+        spriteProperty.objectReferenceValue = sprite;
+        SetColor(paintSettings, "paintBackgroundColor", new Color(0.95f, 0.015f, 0.32f, 0.97f));
+        SetVector2(paintSettings, "paintBackgroundPadding", new Vector2(112f, 46f));
+        SetFloat(paintSettings, "paintEdgeSoftness", 0.025f);
+        SetFloat(paintSettings, "paintNoiseStrength", 0.22f);
+        SetFloat(paintSettings, "paintNoiseScale", 2.4f);
+        SetFloat(paintSettings, "paintBristleStrength", 0.075f);
+        SetFloat(paintSettings, "paintBristleScale", 48f);
+        SetInt(paintSettings,
+               "paintExitDirection",
+               (int)GameHudWaveClearAnnouncementDirection.RightToLeft);
+        SetInt(paintSettings,
+               "finalWavePaintExitDirection",
+               (int)GameHudWaveClearAnnouncementDirection.RightToLeft);
+    }
+
     /// <summary>
     /// Adds a balanced initial statistic list only when the inline HUD settings contain no authored rows.
     /// </summary>
@@ -359,17 +399,69 @@ public static class GameHudSupplementalProjectSetupUtility
             SerializedObject serializedRelay = new SerializedObject(relay);
             serializedRelay.Update();
             SerializedProperty menuKindProperty = serializedRelay.FindProperty("menuKind");
+            SerializedProperty buttonContentIdProperty = serializedRelay.FindProperty("buttonContentId");
+            SerializedProperty targetImageProperty = serializedRelay.FindProperty("targetImageOverride");
+            Image imageContent = EnsureButtonImageContent(button);
+            bool relayChanged = false;
 
             if (menuKindProperty != null && menuKindProperty.enumValueIndex != (int)menuKind)
             {
                 menuKindProperty.enumValueIndex = (int)menuKind;
-                serializedRelay.ApplyModifiedPropertiesWithoutUndo();
-                EditorUtility.SetDirty(relay);
-                changed = true;
+                relayChanged = true;
             }
+
+            if (buttonContentIdProperty != null && string.IsNullOrWhiteSpace(buttonContentIdProperty.stringValue))
+            {
+                buttonContentIdProperty.stringValue = button.gameObject.name;
+                relayChanged = true;
+            }
+
+            if (targetImageProperty != null && targetImageProperty.objectReferenceValue != imageContent)
+            {
+                targetImageProperty.objectReferenceValue = imageContent;
+                relayChanged = true;
+            }
+
+            if (!relayChanged)
+                continue;
+
+            serializedRelay.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(relay);
+            changed = true;
         }
 
         return changed;
+    }
+
+    /// <summary>
+    /// Ensures one disabled, stretched image target exists in the authored button hierarchy.
+    /// </summary>
+    /// <param name="button">Button receiving image-content presentation support.</param>
+    /// <returns>Preauthored Image assigned to the runtime relay.</returns>
+    private static Image EnsureButtonImageContent(Button button)
+    {
+        Transform existing = button.transform.Find("ImageContent");
+        GameObject imageObject;
+
+        if (existing != null)
+            imageObject = existing.gameObject;
+        else
+        {
+            imageObject = new GameObject("ImageContent", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            imageObject.layer = button.gameObject.layer;
+            imageObject.transform.SetParent(button.transform, false);
+        }
+
+        RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+        Image image = imageObject.GetComponent<Image>();
+        image.raycastTarget = false;
+        image.enabled = false;
+        return image;
     }
 
     /// <summary>
@@ -533,6 +625,20 @@ public static class GameHudSupplementalProjectSetupUtility
 
         if (property != null)
             property.vector3Value = value;
+    }
+
+    /// <summary>
+    /// Sets one relative Vector2 property when available.
+    /// </summary>
+    /// <param name="root">Parent serialized property.</param>
+    /// <param name="name">Relative field name.</param>
+    /// <param name="value">Vector value to assign.</param>
+    private static void SetVector2(SerializedProperty root, string name, Vector2 value)
+    {
+        SerializedProperty property = root.FindPropertyRelative(name);
+
+        if (property != null)
+            property.vector2Value = value;
     }
 
     /// <summary>

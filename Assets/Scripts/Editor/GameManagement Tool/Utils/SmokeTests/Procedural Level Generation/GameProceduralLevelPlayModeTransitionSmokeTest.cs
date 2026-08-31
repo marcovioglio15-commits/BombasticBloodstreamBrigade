@@ -21,6 +21,7 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     private const string SourceNodeKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.SourceNode";
     private const string RestartPlayerIndexKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.RestartPlayerIndex";
     private const string RestartPlayerVersionKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.RestartPlayerVersion";
+    private const string InitialReleaseCompleteKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.InitialReleaseComplete";
     private const string TargetPortalIdKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.TargetPortalId";
     private const string TargetPortalSideKey = "NashCore.GameProceduralLevelPlayModeTransitionSmokeTest.TargetPortalSide";
     private const string MainMenuSceneId = "SCN_MainMenu";
@@ -36,7 +37,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
     private const string restartControlCycle = "Restart control release";
     private const double StepTimeoutSeconds = 180d;
     #endregion
-
     #region Constructors
     /// <summary>
     /// Restores editor, Play Mode and log callbacks after every domain reload.
@@ -51,9 +51,7 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         Application.logMessageReceived += HandleLog;
     }
     #endregion
-
     #region Methods
-
     #region Public Methods
     /// <summary>
     /// Refreshes generated room metadata, opens bootstrap and starts the time-bounded Play Mode transition regression test.
@@ -77,9 +75,10 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         SessionState.SetString(PhaseKey, WaitingForMainMenuPhase);
         SessionState.SetString(StepTicksKey, DateTime.UtcNow.Ticks.ToString());
         SessionState.SetInt(SourceNodeKey, -1);
+        SessionState.SetBool(InitialReleaseCompleteKey, false);
         GameProceduralCameraContinuitySmokeUtility.Reset();
         GameProceduralPlayerControlReleaseSmokeUtility.Reset();
-        SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, true);
+        GameSceneManagementPlayModeSceneGuard.RequestOneShotBypass(ActiveKey);
         EditorApplication.isPlaying = true;
     }
     #endregion
@@ -244,6 +243,23 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
             return;
         }
 
+        if (!SessionState.GetBool(InitialReleaseCompleteKey, false))
+        {
+            if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
+                                                                            initialRoomControlCycle,
+                                                                            out bool releaseReady,
+                                                                            out string releaseCompletionFailure))
+            {
+                SessionState.SetString(FailureKey, releaseCompletionFailure);
+                return;
+            }
+
+            if (!releaseReady)
+                return;
+
+            SessionState.SetBool(InitialReleaseCompleteKey, true);
+        }
+
         if (!GameRoomRewardPresentationPlayModeSmokeUtility.TryValidate(entityManager,
                                                                         managerEntity,
                                                                         out bool presentationReady,
@@ -254,18 +270,6 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         }
 
         if (!presentationReady)
-            return;
-
-        if (!GameProceduralPlayerControlReleaseSmokeUtility.TryComplete(entityManager,
-                                                                        initialRoomControlCycle,
-                                                                        out bool releaseReady,
-                                                                        out string releaseCompletionFailure))
-        {
-            SessionState.SetString(FailureKey, releaseCompletionFailure);
-            return;
-        }
-
-        if (!releaseReady)
             return;
 
         if (!GameProceduralCameraContinuitySmokeUtility.CaptureAndStore(entityManager, out string cameraFailure))
@@ -400,9 +404,12 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
             return;
         }
 
-        if (!GameProceduralCameraContinuitySmokeUtility.ValidateTargetPortalAlignment(
+        string targetPortalId = SessionState.GetString(TargetPortalIdKey, string.Empty);
+
+        if (!string.IsNullOrEmpty(targetPortalId) &&
+            !GameProceduralCameraContinuitySmokeUtility.ValidateTargetPortalAlignment(
                 entityManager,
-                SessionState.GetString(TargetPortalIdKey, string.Empty),
+                targetPortalId,
                 (GameRoomPortalSide)SessionState.GetInt(TargetPortalSideKey, -1),
                 out string portalFailure))
         {
@@ -671,11 +678,12 @@ public static class GameProceduralLevelPlayModeTransitionSmokeTest
         SessionState.SetString(PhaseKey, string.Empty);
         SessionState.SetString(StepTicksKey, string.Empty);
         SessionState.SetInt(SourceNodeKey, -1);
+        SessionState.SetBool(InitialReleaseCompleteKey, false);
         SessionState.SetInt(RestartPlayerIndexKey, -1);
         SessionState.SetInt(RestartPlayerVersionKey, -1);
         SessionState.SetString(TargetPortalIdKey, string.Empty);
         SessionState.SetInt(TargetPortalSideKey, -1);
-        SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, false);
+        GameSceneManagementPlayModeSceneGuard.ClearOneShotBypass();
         GameProceduralPlayerControlReleaseSmokeUtility.Reset();
 
         if (passed)

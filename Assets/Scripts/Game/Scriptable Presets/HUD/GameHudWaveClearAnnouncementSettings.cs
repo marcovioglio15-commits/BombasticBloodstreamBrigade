@@ -22,6 +22,15 @@ public enum GameHudWaveClearAnnouncementEasing : byte
 }
 
 /// <summary>
+/// Selects the traversal or paint-reveal presentation used by a room-clear announcement.
+/// </summary>
+public enum GameHudWaveClearAnnouncementPresentationMode : byte
+{
+    Traversal = 0,
+    PaintReveal = 1
+}
+
+/// <summary>
 /// Stores standard and terminal-Boss content, motion, audio, placement, and style for the preauthored room-clear announcement.
 /// </summary>
 [Serializable]
@@ -48,9 +57,19 @@ public sealed class GameHudWaveClearAnnouncementSettings
     private GameAudioEventId audioEventId = GameAudioEventId.WaveClear;
 
     [Header("Motion")]
+    [Tooltip("Selects an edge-to-edge traversal or a stationary aerosol-paint reveal at screen center.")]
+    [SerializeField]
+    private GameHudWaveClearAnnouncementPresentationMode presentationMode =
+        GameHudWaveClearAnnouncementPresentationMode.PaintReveal;
+
     [Tooltip("Screen edge from which the announcement enters before continuing through the opposite edge.")]
     [SerializeField]
     private GameHudWaveClearAnnouncementDirection direction = GameHudWaveClearAnnouncementDirection.RightToLeft;
+
+    [Tooltip("Direction followed by the atomizing removal front after the standard paint announcement hold.")]
+    [SerializeField]
+    private GameHudWaveClearAnnouncementDirection paintExitDirection =
+        GameHudWaveClearAnnouncementDirection.RightToLeft;
 
     [Tooltip("Seconds used for the complete edge-to-edge traversal, excluding the optional center hold.")]
     [SerializeField]
@@ -68,6 +87,19 @@ public sealed class GameHudWaveClearAnnouncementSettings
     [SerializeField]
     private float centerHoldDurationSeconds = 0.7f;
 
+    [Tooltip("Seconds used to reveal the standard message through the paint mask.")]
+    [SerializeField]
+    private float paintRevealDurationSeconds = 0.65f;
+
+    [Tooltip("Seconds the fully revealed standard paint announcement remains visible.")]
+    [SerializeField]
+    private float paintHoldDurationSeconds = 0.85f;
+
+    [Tooltip("Seconds used by the moving aerosol-removal front after the standard paint hold phase.")]
+    [InspectorName("Paint Removal Duration Seconds")]
+    [SerializeField]
+    private float paintFadeOutDurationSeconds = 0.25f;
+
     [Tooltip("Uses unscaled time so the announcement remains deterministic while gameplay time scale is reduced.")]
     [SerializeField]
     private bool useUnscaledTime = true;
@@ -81,9 +113,19 @@ public sealed class GameHudWaveClearAnnouncementSettings
     [SerializeField]
     private string finalWaveContent = "AREA CLEARED";
 
+    [Tooltip("Selects traversal or paint reveal for the terminal Boss announcement.")]
+    [SerializeField]
+    private GameHudWaveClearAnnouncementPresentationMode finalWavePresentationMode =
+        GameHudWaveClearAnnouncementPresentationMode.PaintReveal;
+
     [Tooltip("Screen edge from which the terminal Boss announcement enters.")]
     [SerializeField]
     private GameHudWaveClearAnnouncementDirection finalWaveDirection = GameHudWaveClearAnnouncementDirection.RightToLeft;
+
+    [Tooltip("Direction followed by the terminal Boss announcement removal front after its paint hold.")]
+    [SerializeField]
+    private GameHudWaveClearAnnouncementDirection finalWavePaintExitDirection =
+        GameHudWaveClearAnnouncementDirection.RightToLeft;
 
     [Tooltip("Seconds used for the terminal Boss announcement traversal, excluding its optional center hold.")]
     [SerializeField]
@@ -101,6 +143,19 @@ public sealed class GameHudWaveClearAnnouncementSettings
     [SerializeField]
     private float finalWaveCenterHoldDurationSeconds = 1.5f;
 
+    [Tooltip("Seconds used to reveal the terminal Boss message through the paint mask.")]
+    [SerializeField]
+    private float finalWavePaintRevealDurationSeconds = 0.9f;
+
+    [Tooltip("Seconds the fully revealed terminal Boss paint announcement remains visible.")]
+    [SerializeField]
+    private float finalWavePaintHoldDurationSeconds = 1.35f;
+
+    [Tooltip("Seconds used by the moving aerosol-removal front after the terminal Boss paint hold phase.")]
+    [InspectorName("Paint Removal Duration Seconds")]
+    [SerializeField]
+    private float finalWavePaintFadeOutDurationSeconds = 0.35f;
+
     [Tooltip("Requests the selected Audio Manager event when the terminal Boss message starts.")]
     [SerializeField]
     private bool playFinalWaveAudioEvent;
@@ -117,6 +172,44 @@ public sealed class GameHudWaveClearAnnouncementSettings
     [Tooltip("Additional horizontal distance beyond the text bounds used to keep its start and end positions fully off-screen.")]
     [SerializeField]
     private float horizontalOffscreenPadding = 48f;
+
+    [Header("Paint Reveal")]
+    [Tooltip("Aerosol stain silhouette rendered behind the text and used by the animated paint mask.")]
+    [SerializeField]
+    private Sprite paintBackgroundSprite;
+
+    [Tooltip("Color applied to the paint background sprite.")]
+    [SerializeField]
+    private Color paintBackgroundColor = new Color(0.95f, 0.015f, 0.32f, 0.97f);
+
+    [Tooltip("Horizontal and vertical canvas padding added around the measured text bounds.")]
+    [SerializeField]
+    private Vector2 paintBackgroundPadding = new Vector2(112f, 46f);
+
+    [Tooltip("Normalized antialiasing width applied around newly deposited pigment without softening the final sprite silhouette.")]
+    [InspectorName("Deposit Softness")]
+    [SerializeField]
+    private float paintEdgeSoftness = 0.025f;
+
+    [Tooltip("Maximum local arrival-time variation used to keep aerosol deposits separated while they accumulate.")]
+    [InspectorName("Deposit Variation")]
+    [SerializeField]
+    private float paintNoiseStrength = 0.22f;
+
+    [Tooltip("Scale of the overlapping deposit clusters sampled across the announcement background.")]
+    [InspectorName("Deposit Scale")]
+    [SerializeField]
+    private float paintNoiseScale = 2.4f;
+
+    [Tooltip("Strength of fine aerosol breakup and sparse droplets around active deposit edges.")]
+    [InspectorName("Mist Strength")]
+    [SerializeField]
+    private float paintBristleStrength = 0.075f;
+
+    [Tooltip("Spatial density of fine aerosol mist sampled around active deposit edges.")]
+    [InspectorName("Mist Density")]
+    [SerializeField]
+    private float paintBristleScale = 48f;
 
     [Header("Style")]
     [Tooltip("Optional font asset applied to the announcement. The preauthored font remains in use when this is empty.")]
@@ -143,23 +236,41 @@ public sealed class GameHudWaveClearAnnouncementSettings
     public string Content => content;
     public bool PlayAudioEvent => playAudioEvent;
     public GameAudioEventId AudioEventId => audioEventId;
+    public GameHudWaveClearAnnouncementPresentationMode PresentationMode => presentationMode;
     public GameHudWaveClearAnnouncementDirection Direction => direction;
+    public GameHudWaveClearAnnouncementDirection PaintExitDirection => paintExitDirection;
     public float TraversalDurationSeconds => traversalDurationSeconds;
     public GameHudWaveClearAnnouncementEasing Easing => easing;
     public bool PauseAtCenter => pauseAtCenter;
     public float CenterHoldDurationSeconds => centerHoldDurationSeconds;
+    public float PaintRevealDurationSeconds => paintRevealDurationSeconds;
+    public float PaintHoldDurationSeconds => paintHoldDurationSeconds;
+    public float PaintFadeOutDurationSeconds => paintFadeOutDurationSeconds;
     public bool UseUnscaledTime => useUnscaledTime;
     public bool UseFinalWaveOverride => useFinalWaveOverride;
     public string FinalWaveContent => finalWaveContent;
+    public GameHudWaveClearAnnouncementPresentationMode FinalWavePresentationMode => finalWavePresentationMode;
     public GameHudWaveClearAnnouncementDirection FinalWaveDirection => finalWaveDirection;
+    public GameHudWaveClearAnnouncementDirection FinalWavePaintExitDirection => finalWavePaintExitDirection;
     public float FinalWaveTraversalDurationSeconds => finalWaveTraversalDurationSeconds;
     public GameHudWaveClearAnnouncementEasing FinalWaveEasing => finalWaveEasing;
     public bool FinalWavePauseAtCenter => finalWavePauseAtCenter;
     public float FinalWaveCenterHoldDurationSeconds => finalWaveCenterHoldDurationSeconds;
+    public float FinalWavePaintRevealDurationSeconds => finalWavePaintRevealDurationSeconds;
+    public float FinalWavePaintHoldDurationSeconds => finalWavePaintHoldDurationSeconds;
+    public float FinalWavePaintFadeOutDurationSeconds => finalWavePaintFadeOutDurationSeconds;
     public bool PlayFinalWaveAudioEvent => playFinalWaveAudioEvent;
     public GameAudioEventId FinalWaveAudioEventId => finalWaveAudioEventId;
     public float VerticalPositionNormalized => verticalPositionNormalized;
     public float HorizontalOffscreenPadding => horizontalOffscreenPadding;
+    public Sprite PaintBackgroundSprite => paintBackgroundSprite;
+    public Color PaintBackgroundColor => paintBackgroundColor;
+    public Vector2 PaintBackgroundPadding => paintBackgroundPadding;
+    public float PaintEdgeSoftness => paintEdgeSoftness;
+    public float PaintNoiseStrength => paintNoiseStrength;
+    public float PaintNoiseScale => paintNoiseScale;
+    public float PaintBristleStrength => paintBristleStrength;
+    public float PaintBristleScale => paintBristleScale;
     public TMP_FontAsset Font => font;
     public float FontSize => fontSize;
     public FontStyles FontStyle => fontStyle;

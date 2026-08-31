@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using Unity.Entities;
+using UnityEngine;
 
 /// <summary>
 /// Resolves baked menu interaction profiles for preauthored button relays with explicit menu categories.
@@ -9,9 +12,12 @@ public static class GameMenuButtonInteractionRuntimeUtility
     private static readonly GameUiMenuButtonInteractionElement[] CachedInteractions =
         new GameUiMenuButtonInteractionElement[(int)GameUiMenuKind.RuntimeTools + 1];
     private static readonly bool[] CachedInteractionStates = new bool[(int)GameUiMenuKind.RuntimeTools + 1];
+    private static readonly List<GameUiButtonImageContentElement> CachedImageContents =
+        new List<GameUiButtonImageContentElement>();
 
     private static World cachedWorld;
     private static bool cacheInitialized;
+    private static int lastCacheBuildAttemptFrame = -1;
     #endregion
 
     #region Methods
@@ -29,13 +35,7 @@ public static class GameMenuButtonInteractionRuntimeUtility
 
         World world = World.DefaultGameObjectInjectionWorld;
 
-        if (world == null || !world.IsCreated)
-            return false;
-
-        if (!ReferenceEquals(cachedWorld, world))
-            ResetCache(world);
-
-        if (!cacheInitialized && !TryBuildCache(world.EntityManager))
+        if (!TryEnsureCache(world))
             return false;
 
         int menuIndex = (int)menuKind;
@@ -45,6 +45,69 @@ public static class GameMenuButtonInteractionRuntimeUtility
 
         interaction = CachedInteractions[menuIndex];
         return true;
+    }
+
+    /// <summary>
+    /// Finds one baked image-content mapping after the shared HUD cache has been initialized.
+    /// </summary>
+    /// <param name="menuKind">Menu category owning the button.</param>
+    /// <param name="buttonId">Stable ID authored on the preauthored relay.</param>
+    /// <param name="content">Matching state sprites and tints when available.</param>
+    /// <returns>True when one exact menu and button ID mapping exists.</returns>
+    public static bool TryResolveImageContent(GameUiMenuKind menuKind,
+                                              string buttonId,
+                                              out GameUiButtonImageContentElement content)
+    {
+        content = default;
+
+        if (string.IsNullOrWhiteSpace(buttonId))
+            return false;
+
+        World world = World.DefaultGameObjectInjectionWorld;
+
+        if (!TryEnsureCache(world))
+            return false;
+
+        string normalizedButtonId = buttonId.Trim();
+
+        for (int contentIndex = 0; contentIndex < CachedImageContents.Count; contentIndex++)
+        {
+            GameUiButtonImageContentElement candidate = CachedImageContents[contentIndex];
+
+            if (candidate.MenuKind == menuKind &&
+                string.Equals(candidate.ButtonId.ToString(), normalizedButtonId, StringComparison.Ordinal))
+            {
+                content = candidate;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves or rebuilds the current world's immutable menu cache at most once per rendered frame.
+    /// </summary>
+    /// <param name="world">Current default ECS world, or null before DOTS initialization.</param>
+    /// <returns>True when the interaction and image-content buffers are ready for lookup.</returns>
+    private static bool TryEnsureCache(World world)
+    {
+        if (world == null || !world.IsCreated)
+            return false;
+
+        if (!ReferenceEquals(cachedWorld, world))
+            ResetCache(world);
+
+        if (cacheInitialized)
+            return true;
+
+        int currentFrame = Time.frameCount;
+
+        if (lastCacheBuildAttemptFrame == currentFrame)
+            return false;
+
+        lastCacheBuildAttemptFrame = currentFrame;
+        return TryBuildCache(world.EntityManager);
     }
 
     /// <summary>
@@ -79,6 +142,17 @@ public static class GameMenuButtonInteractionRuntimeUtility
             CachedInteractionStates[menuIndex] = true;
         }
 
+        CachedImageContents.Clear();
+
+        if (entityManager.HasBuffer<GameUiButtonImageContentElement>(configEntity))
+        {
+            DynamicBuffer<GameUiButtonImageContentElement> imageContents =
+                entityManager.GetBuffer<GameUiButtonImageContentElement>(configEntity, true);
+
+            for (int contentIndex = 0; contentIndex < imageContents.Length; contentIndex++)
+                CachedImageContents.Add(imageContents[contentIndex]);
+        }
+
         cacheInitialized = true;
         return true;
     }
@@ -91,6 +165,8 @@ public static class GameMenuButtonInteractionRuntimeUtility
     {
         cachedWorld = world;
         cacheInitialized = false;
+        lastCacheBuildAttemptFrame = -1;
+        CachedImageContents.Clear();
 
         for (int menuIndex = 0; menuIndex < CachedInteractionStates.Length; menuIndex++)
         {

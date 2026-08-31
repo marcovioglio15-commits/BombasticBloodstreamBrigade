@@ -1,67 +1,43 @@
 using System;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Forces Play Mode to start from the bootstrap scene in editor, then restores the previous scene setup afterward.
+/// Configures Unity's Play Mode start scene as the project bootstrap while preserving the open editor scene setup.
 /// </summary>
 [InitializeOnLoad]
 public static class GameSceneManagementPlayModeSceneGuard
 {
     #region Constants
-    private const string EnabledPreferenceKey = "NashCore.GameSceneManagement.ForceBootstrapPlayMode.V3";
-    private const string PendingRestoreKey = "NashCore.GameSceneManagement.PlayModeRestorePending";
-    private const string SerializedSetupKey = "NashCore.GameSceneManagement.SerializedPlayModeSceneSetup";
-    private const string MenuPath = "Tools/Game/Scene Manager/Force Bootstrap Play Mode";
-    internal const string BypassSessionKey = "NashCore.GameSceneManagement.BypassForcedBootstrapPlayMode";
+    private const string BypassSessionKey = "NashCore.GameSceneManagement.BypassForcedBootstrapPlayMode";
+    private const string BypassOwnerSessionKey =
+        "NashCore.GameSceneManagement.BypassForcedBootstrapPlayMode.OwnerSessionKey";
+    private const string BypassRequestTicksKey =
+        "NashCore.GameSceneManagement.BypassForcedBootstrapPlayMode.RequestTicks";
+    private const long BypassRequestValidityTicks = 10L * TimeSpan.TicksPerSecond;
     #endregion
 
     #region Constructors
     /// <summary>
-    /// Registers Play Mode callbacks once when editor assemblies load.
+    /// Registers Play Mode callbacks and arms the bootstrap start scene after editor assemblies load.
     /// </summary>
     static GameSceneManagementPlayModeSceneGuard()
     {
         EditorApplication.playModeStateChanged -= HandlePlayModeStateChanged;
         EditorApplication.playModeStateChanged += HandlePlayModeStateChanged;
 
-        if (!EditorApplication.isPlayingOrWillChangePlaymode &&
-            SessionState.GetBool(PendingRestoreKey, false))
-        {
-            EditorApplication.delayCall += RestorePreviousSceneSetup;
-        }
+        if (!EditorApplication.isPlayingOrWillChangePlaymode)
+            ScheduleBootstrapPlayModeStartScene();
     }
     #endregion
 
     #region Methods
 
-    #region Menu
-    /// <summary>
-    /// Toggles forced bootstrap Play Mode scene setup for local editor sessions.
-    /// </summary>
-    //[MenuItem(MenuPath)]
-    private static void ToggleForcedBootstrapPlayMode()
-    {
-        SetEnabled(!IsEnabled());
-    }
-
-    /// <summary>
-    /// Validates the Play Mode guard menu item and keeps its check mark synchronized.
-    /// </summary>
-    /// <returns>True because the menu item is always available in editor.</returns>
-    //[MenuItem(MenuPath, true)]
-    private static bool ValidateForcedBootstrapPlayMode()
-    {
-        Menu.SetChecked(MenuPath, IsEnabled());
-        return true;
-    }
-    #endregion
-
     #region Play Mode Events
     /// <summary>
-    /// Applies bootstrap setup before entering Play Mode and restores the previous scene setup after exit.
+    /// Validates normal Play Mode before entry and rearms bootstrap behavior after returning to Edit Mode.
     /// </summary>
     /// <param name="state">Current Play Mode state transition.</param>
     private static void HandlePlayModeStateChanged(PlayModeStateChange state)
@@ -72,23 +48,26 @@ public static class GameSceneManagementPlayModeSceneGuard
                 PrepareBootstrapPlayMode();
                 break;
             case PlayModeStateChange.EnteredEditMode:
-                EditorApplication.delayCall += RestorePreviousSceneSetup;
+                ScheduleBootstrapPlayModeStartScene();
                 break;
         }
     }
     #endregion
 
-    #region Preparation
+    #region Preparation Methods
     /// <summary>
-    /// Captures the current scene setup and opens only the bootstrap scene before Play Mode starts.
+    /// Validates generated metadata and bootstrap authoring before Unity enters its configured Play Mode start scene.
     /// </summary>
     private static void PrepareBootstrapPlayMode()
     {
         if (ConsumeBypassRequest())
             return;
 
-        if (!IsEnabled())
+        if (!ConfigureBootstrapPlayModeStartScene())
+        {
+            EditorApplication.isPlaying = false;
             return;
+        }
 
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
         {
@@ -96,287 +75,239 @@ public static class GameSceneManagementPlayModeSceneGuard
             return;
         }
 
-        // A scene save queues metadata work, but Play Mode can begin before that delayed callback runs.
-        // Complete and persist the generated room snapshot now so runtime bootstrap never reads a stale asset.
+        // Complete deferred room work before Play Mode reads generated procedural metadata.
         GameRoomMetadataRefreshReport metadataReport = GameRoomMetadataAutomaticRefreshUtility.RefreshAllStaleReferencedRooms();
 
         if (!metadataReport.Succeeded)
         {
-            Debug.LogError("[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural room metadata could not be refreshed: " +
-                           string.Join(" | ", metadataReport.Errors));
+            Debug.LogError(
+                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural room metadata could not be refreshed: " +
+                string.Join(" | ", metadataReport.Errors));
             EditorApplication.isPlaying = false;
             return;
         }
 
-        if (!CanCaptureCurrentSceneSetup())
-        {
+        if (!ValidateBootstrapRuntimeConfiguration())
             EditorApplication.isPlaying = false;
-            return;
-        }
-
-        SceneSetup[] currentSetup = EditorSceneManager.GetSceneManagerSetup();
-        StoreSceneSetup(currentSetup);
-
-        if (!OpenBootstrapScene() || !ValidateBootstrapRuntimeConfiguration())
-        {
-            RestorePreviousSceneSetup();
-            EditorApplication.isPlaying = false;
-        }
     }
 
     /// <summary>
-    /// Verifies that all open scenes can be restored after Play Mode.
+    /// Schedules bootstrap start-scene configuration after the current editor callback has completed.
     /// </summary>
-    /// <returns>True when every loaded scene has a persistent asset path.</returns>
-    private static bool CanCaptureCurrentSceneSetup()
+    private static void ScheduleBootstrapPlayModeStartScene()
     {
-        SceneSetup[] currentSetup = EditorSceneManager.GetSceneManagerSetup();
-
-        for (int index = 0; index < currentSetup.Length; index++)
-        {
-            SceneSetup setup = currentSetup[index];
-
-            if (!setup.isLoaded)
-                continue;
-
-            if (!string.IsNullOrWhiteSpace(setup.path))
-                continue;
-
-            EditorUtility.DisplayDialog("Scene Manager Play Mode",
-                                        "The current scene setup contains an unsaved scene. Save it before entering Play Mode so the editor can restore your workspace after testing.",
-                                        "OK");
-            return false;
-        }
-
-        return true;
+        EditorApplication.delayCall -= ApplyScheduledBootstrapPlayModeStartScene;
+        EditorApplication.delayCall += ApplyScheduledBootstrapPlayModeStartScene;
     }
 
     /// <summary>
-    /// Opens the authored bootstrap scene as the only loaded scene for Play Mode.
+    /// Applies one deferred bootstrap start-scene request and removes its one-shot editor callback.
     /// </summary>
-    /// <returns>True when the bootstrap scene was opened successfully.</returns>
-    private static bool OpenBootstrapScene()
+    private static void ApplyScheduledBootstrapPlayModeStartScene()
+    {
+        EditorApplication.delayCall -= ApplyScheduledBootstrapPlayModeStartScene;
+        ConfigureBootstrapPlayModeStartScene();
+    }
+
+    /// <summary>
+    /// Assigns the authored bootstrap SceneAsset to Unity's native Play Mode start-scene mechanism.
+    /// </summary>
+    /// <returns>True when the configured bootstrap scene exists and was assigned.</returns>
+    private static bool ConfigureBootstrapPlayModeStartScene()
     {
         string bootstrapPath = GameSceneManagementProjectSetupUtility.BootstrapScenePath;
+        SceneAsset bootstrapScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(bootstrapPath);
 
-        if (AssetDatabase.LoadAssetAtPath<SceneAsset>(bootstrapPath) == null)
+        if (bootstrapScene == null)
         {
-            Debug.LogWarning("[GameSceneManagementPlayModeSceneGuard] Bootstrap scene is missing at path: " + bootstrapPath + ".");
+            EditorSceneManager.playModeStartScene = null;
+            Debug.LogWarning(
+                "[GameSceneManagementPlayModeSceneGuard] Bootstrap scene is missing at path: " + bootstrapPath + ".");
             return false;
         }
 
-        EditorSceneManager.OpenScene(bootstrapPath, OpenSceneMode.Single);
+        EditorSceneManager.playModeStartScene = bootstrapScene;
         return true;
     }
+    #endregion
 
+    #region Validation Methods
     /// <summary>
-    /// Blocks Play Mode when the bootstrap's procedural graph or room reward configuration cannot bake safely.
+    /// Validates bootstrap presets from an isolated preview scene without replacing the open editor scene setup.
     /// </summary>
-    /// <returns>True when the active bootstrap authoring configuration passes bake-equivalent validation.</returns>
+    /// <returns>True when the bootstrap contains one valid Scene Manager authoring configuration.</returns>
     private static bool ValidateBootstrapRuntimeConfiguration()
     {
-        GameSceneManagerAuthoring[] authorings =
-            UnityEngine.Object.FindObjectsByType<GameSceneManagerAuthoring>(
-                FindObjectsInactive.Include,
-                FindObjectsSortMode.None);
+        Scene bootstrapScene = EditorSceneManager.OpenPreviewScene(
+            GameSceneManagementProjectSetupUtility.BootstrapScenePath);
 
-        if (authorings.Length != 1)
+        if (!bootstrapScene.IsValid() || !bootstrapScene.isLoaded)
         {
             Debug.LogError(
-                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because the bootstrap scene must contain exactly one GameSceneManagerAuthoring component.");
+                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because the bootstrap preview scene could not be opened.");
             return false;
         }
 
-        GameSceneManagerAuthoring authoring = authorings[0];
-        GameProceduralLevelPreset proceduralPreset = authoring.ResolveProceduralLevelPreset();
-
-        if (proceduralPreset == null)
-            return true;
-
-        GameSceneManagerPreset scenePreset = authoring.ResolveSceneManagerPreset();
-
-        if (!GameProceduralLevelBakeUtility.TryValidateRuntimeConfiguration(
-                proceduralPreset,
-                scenePreset,
-                out string proceduralFailure))
+        try
         {
+            if (!TryResolveBootstrapAuthoring(bootstrapScene, out GameSceneManagerAuthoring authoring))
+                return false;
+
+            GameProceduralLevelPreset proceduralPreset = authoring.ResolveProceduralLevelPreset();
+
+            if (proceduralPreset == null)
+                return true;
+
+            GameSceneManagerPreset scenePreset = authoring.ResolveSceneManagerPreset();
+
+            if (!GameProceduralLevelBakeUtility.TryValidateRuntimeConfiguration(
+                    proceduralPreset,
+                    scenePreset,
+                    out string proceduralFailure))
+            {
+                Debug.LogError(
+                    "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural generation is invalid. " +
+                    proceduralFailure,
+                    authoring);
+                return false;
+            }
+
+            GameRoomClearRewardsPreset rewardPreset = authoring.ResolveRoomClearRewardsPreset();
+
+            if (rewardPreset == null)
+                return true;
+
+            if (GameRoomRewardBakeUtility.TryValidateRuntimeConfiguration(
+                    rewardPreset,
+                    proceduralPreset,
+                    out string rewardFailure))
+            {
+                return true;
+            }
+
             Debug.LogError(
-                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because procedural generation is invalid. " +
-                proceduralFailure,
+                "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because Room Clear Rewards are invalid. " +
+                rewardFailure,
                 authoring);
             return false;
         }
+        finally
+        {
+            EditorSceneManager.ClosePreviewScene(bootstrapScene);
+        }
+    }
 
-        GameRoomClearRewardsPreset rewardPreset = authoring.ResolveRoomClearRewardsPreset();
+    /// <summary>
+    /// Resolves the single Scene Manager authoring component contained by the bootstrap preview scene.
+    /// </summary>
+    /// <param name="bootstrapScene">Loaded preview scene whose hierarchy should be inspected.</param>
+    /// <param name="authoring">Single resolved authoring component when validation succeeds.</param>
+    /// <returns>True when the preview scene contains exactly one Scene Manager authoring component.</returns>
+    private static bool TryResolveBootstrapAuthoring(Scene bootstrapScene,
+                                                     out GameSceneManagerAuthoring authoring)
+    {
+        authoring = null;
+        int authoringCount = 0;
+        GameObject[] roots = bootstrapScene.GetRootGameObjects();
 
-        if (rewardPreset == null)
-            return true;
+        // Count inactive and nested components so the validation matches the baker's complete authored input.
+        for (int rootIndex = 0; rootIndex < roots.Length; rootIndex++)
+        {
+            GameSceneManagerAuthoring[] rootAuthorings =
+                roots[rootIndex].GetComponentsInChildren<GameSceneManagerAuthoring>(true);
 
-        if (GameRoomRewardBakeUtility.TryValidateRuntimeConfiguration(
-                rewardPreset,
-                proceduralPreset,
-                out string rewardFailure))
+            for (int authoringIndex = 0; authoringIndex < rootAuthorings.Length; authoringIndex++)
+            {
+                authoring = rootAuthorings[authoringIndex];
+                authoringCount++;
+            }
+        }
+
+        if (authoringCount == 1)
             return true;
 
         Debug.LogError(
-            "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because Room Clear Rewards are invalid. " +
-            rewardFailure,
-            authoring);
+            "[GameSceneManagementPlayModeSceneGuard] Play Mode was cancelled because the bootstrap scene must contain exactly one GameSceneManagerAuthoring component.");
         return false;
     }
     #endregion
 
-    #region Restoration
+    #region Bypass Methods
     /// <summary>
-    /// Restores the scene setup captured before Play Mode, when a restore is pending.
+    /// Requests a short-lived bypass owned by a focused editor runner and clears Unity's configured start scene.
     /// </summary>
-    private static void RestorePreviousSceneSetup()
+    /// <param name="ownerSessionKey">SessionState boolean key that remains true only while the requesting runner is active.</param>
+    internal static void RequestOneShotBypass(string ownerSessionKey)
     {
-        EditorApplication.delayCall -= RestorePreviousSceneSetup;
+        if (string.IsNullOrWhiteSpace(ownerSessionKey))
+            throw new ArgumentException("A Play Mode bypass requires an owner SessionState key.", nameof(ownerSessionKey));
 
-        if (!SessionState.GetBool(PendingRestoreKey, false))
-            return;
-
-        SceneSetup[] restoredSetup = LoadSceneSetup();
-
-        if (restoredSetup.Length > 0)
-            EditorSceneManager.RestoreSceneManagerSetup(restoredSetup);
-
-        SessionState.SetBool(PendingRestoreKey, false);
-        SessionState.SetString(SerializedSetupKey, string.Empty);
-    }
-    #endregion
-
-    #region Persistence
-    /// <summary>
-    /// Stores a serializable copy of the current editor scene setup in SessionState.
-    /// </summary>
-    /// <param name="sceneSetup">Scene setup captured before Play Mode.</param>
-    private static void StoreSceneSetup(SceneSetup[] sceneSetup)
-    {
-        StoredSceneSetupCollection collection = new StoredSceneSetupCollection();
-        collection.Scenes = new List<StoredSceneSetup>(sceneSetup.Length);
-
-        for (int index = 0; index < sceneSetup.Length; index++)
-        {
-            collection.Scenes.Add(new StoredSceneSetup(sceneSetup[index]));
-        }
-
-        SessionState.SetString(SerializedSetupKey, JsonUtility.ToJson(collection));
-        SessionState.SetBool(PendingRestoreKey, true);
+        SessionState.SetString(BypassOwnerSessionKey, ownerSessionKey);
+        SessionState.SetString(BypassRequestTicksKey, DateTime.UtcNow.Ticks.ToString());
+        SessionState.SetBool(BypassSessionKey, true);
+        EditorSceneManager.playModeStartScene = null;
     }
 
     /// <summary>
-    /// Loads the previously stored editor scene setup from SessionState.
+    /// Clears a pending one-shot bypass and rearms bootstrap entry when the editor is idle.
     /// </summary>
-    /// <returns>Scene setup array ready for EditorSceneManager.RestoreSceneManagerSetup.</returns>
-    private static SceneSetup[] LoadSceneSetup()
+    internal static void ClearOneShotBypass()
     {
-        string serializedSetup = SessionState.GetString(SerializedSetupKey, string.Empty);
+        ClearBypassState();
 
-        if (string.IsNullOrWhiteSpace(serializedSetup))
-            return Array.Empty<SceneSetup>();
-
-        StoredSceneSetupCollection collection = JsonUtility.FromJson<StoredSceneSetupCollection>(serializedSetup);
-
-        if (collection == null || collection.Scenes == null)
-            return Array.Empty<SceneSetup>();
-
-        List<SceneSetup> sceneSetups = new List<SceneSetup>(collection.Scenes.Count);
-
-        for (int index = 0; index < collection.Scenes.Count; index++)
-        {
-            StoredSceneSetup storedScene = collection.Scenes[index];
-
-            if (storedScene == null || string.IsNullOrWhiteSpace(storedScene.Path))
-                continue;
-
-            sceneSetups.Add(storedScene.ToSceneSetup());
-        }
-
-        return sceneSetups.ToArray();
-    }
-    #endregion
-
-    #region Preferences
-    /// <summary>
-    /// Resolves whether forced bootstrap Play Mode is enabled for the local editor.
-    /// </summary>
-    /// <returns>True when Play Mode should open SCN_Bootstrap automatically.</returns>
-    private static bool IsEnabled()
-    {
-        return EditorPrefs.GetBool(EnabledPreferenceKey, true);
+        if (!EditorApplication.isPlayingOrWillChangePlaymode)
+            ScheduleBootstrapPlayModeStartScene();
     }
 
     /// <summary>
-    /// Consumes the one-shot bypass requested by automated Play Mode tests without disabling future  sessions.
+    /// Consumes a bypass only when its timestamp and owning editor runner are both still valid.
     /// </summary>
-    /// <returns>True when the current Play Mode entry alone should keep its existing scene setup.</returns>
+    /// <returns>True when the current Play Mode entry should preserve its existing scene setup.</returns>
     private static bool ConsumeBypassRequest()
     {
         if (!SessionState.GetBool(BypassSessionKey, false))
             return false;
 
+        string ownerSessionKey = SessionState.GetString(BypassOwnerSessionKey, string.Empty);
+        string requestTicksText = SessionState.GetString(BypassRequestTicksKey, string.Empty);
+        bool ownerActive = !string.IsNullOrWhiteSpace(ownerSessionKey) &&
+                           SessionState.GetBool(ownerSessionKey, false);
+        ClearBypassState();
+        return IsBypassRequestValid(requestTicksText, DateTime.UtcNow.Ticks, ownerActive);
+    }
+
+    /// <summary>
+    /// Validates that a bypass is owned, parseable, non-future, and inside its short request window.
+    /// </summary>
+    /// <param name="requestTicksText">Serialized UTC tick count stored when the editor runner requested bypass.</param>
+    /// <param name="currentTicks">Current UTC tick count used for deterministic validation.</param>
+    /// <param name="ownerActive">True when the requesting editor runner still owns an active session.</param>
+    /// <returns>True only while the one-shot request belongs to the current active runner and Play action.</returns>
+    internal static bool IsBypassRequestValid(string requestTicksText,
+                                              long currentTicks,
+                                              bool ownerActive)
+    {
+        if (!ownerActive ||
+            !long.TryParse(requestTicksText, out long requestTicks) ||
+            requestTicks <= 0 ||
+            currentTicks < requestTicks)
+        {
+            return false;
+        }
+
+        return currentTicks - requestTicks <= BypassRequestValidityTicks;
+    }
+
+    /// <summary>
+    /// Clears every SessionState value used by the one-shot Play Mode bypass.
+    /// </summary>
+    private static void ClearBypassState()
+    {
         SessionState.SetBool(BypassSessionKey, false);
-        return true;
-    }
-
-    /// <summary>
-    /// Stores the local editor preference that controls forced bootstrap Play Mode.
-    /// </summary>
-    /// <param name="enabled">True to force bootstrap scene setup before Play Mode.</param>
-    private static void SetEnabled(bool enabled)
-    {
-        EditorPrefs.SetBool(EnabledPreferenceKey, enabled);
+        SessionState.SetString(BypassOwnerSessionKey, string.Empty);
+        SessionState.SetString(BypassRequestTicksKey, string.Empty);
     }
     #endregion
 
-    #endregion
-
-    #region Types
-    /// <summary>
-    /// Serializable collection wrapper used by SessionState JSON storage.
-    /// </summary>
-    [Serializable]
-    private sealed class StoredSceneSetupCollection
-    {
-        public List<StoredSceneSetup> Scenes;
-    }
-
-    /// <summary>
-    /// Serializable scene setup entry used to survive Play Mode domain reloads.
-    /// </summary>
-    [Serializable]
-    private sealed class StoredSceneSetup
-    {
-        public string Path;
-        public bool IsLoaded;
-        public bool IsActive;
-
-        /// <summary>
-        /// Creates a JSON-serializable scene setup entry.
-        /// </summary>
-        /// <param name="sceneSetup">Source editor scene setup.</param>
-        public StoredSceneSetup(SceneSetup sceneSetup)
-        {
-            Path = sceneSetup.path;
-            IsLoaded = sceneSetup.isLoaded;
-            IsActive = sceneSetup.isActive;
-        }
-
-        /// <summary>
-        /// Converts this stored entry back into Unity's editor scene setup type.
-        /// </summary>
-        /// <returns>SceneSetup value compatible with EditorSceneManager.RestoreSceneManagerSetup.</returns>
-        public SceneSetup ToSceneSetup()
-        {
-            return new SceneSetup
-            {
-                path = Path,
-                isLoaded = IsLoaded,
-                isActive = IsActive
-            };
-        }
-    }
     #endregion
 }

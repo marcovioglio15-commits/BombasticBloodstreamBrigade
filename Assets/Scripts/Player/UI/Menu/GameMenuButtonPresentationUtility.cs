@@ -195,6 +195,61 @@ internal static class GameMenuButtonPresentationUtility
                 return ToColor(interaction.NormalTextColor);
         }
     }
+
+
+    /// <summary>
+    /// Resolves the image-content sprite for one button state with a normal-state fallback.
+    /// </summary>
+    /// <param name="content">Baked per-button image mapping.</param>
+    /// <param name="state">Current presentation state.</param>
+    /// <returns>State sprite when assigned, otherwise the normal sprite.</returns>
+    public static Sprite ResolveContentSprite(in GameUiButtonImageContentElement content,
+                                              GameUiButtonPresentationState state)
+    {
+        Sprite sprite;
+
+        switch (state)
+        {
+            case GameUiButtonPresentationState.Hovered:
+            case GameUiButtonPresentationState.Selected:
+                sprite = content.HoverSprite.Value;
+                break;
+            case GameUiButtonPresentationState.Pressed:
+                sprite = content.PressedSprite.Value;
+                break;
+            case GameUiButtonPresentationState.Disabled:
+                sprite = content.DisabledSprite.Value;
+                break;
+            default:
+                sprite = content.NormalSprite.Value;
+                break;
+        }
+
+        return sprite != null ? sprite : content.NormalSprite.Value;
+    }
+
+    /// <summary>
+    /// Resolves the image-content tint authored for one button state.
+    /// </summary>
+    /// <param name="content">Baked per-button image mapping.</param>
+    /// <param name="state">Current presentation state.</param>
+    /// <returns>Unity color selected from the baked mapping.</returns>
+    public static Color ResolveContentColor(in GameUiButtonImageContentElement content,
+                                            GameUiButtonPresentationState state)
+    {
+        switch (state)
+        {
+            case GameUiButtonPresentationState.Hovered:
+            case GameUiButtonPresentationState.Selected:
+                return ToColor(content.HoverColor);
+            case GameUiButtonPresentationState.Pressed:
+                return ToColor(content.PressedColor);
+            case GameUiButtonPresentationState.Disabled:
+                return ToColor(content.DisabledColor);
+            default:
+                return ToColor(content.NormalColor);
+        }
+    }
     #endregion
 
     #region Conversion

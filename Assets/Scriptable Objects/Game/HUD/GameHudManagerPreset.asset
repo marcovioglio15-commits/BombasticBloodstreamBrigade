@@ -305,23 +305,41 @@ MonoBehaviour:
     content: ROOM CLEARED
     playAudioEvent: 0
     audioEventId: 28
+    presentationMode: 1
     direction: 1
+    paintExitDirection: 1
     traversalDurationSeconds: 1.4
     easing: 2
     pauseAtCenter: 1
     centerHoldDurationSeconds: 0.7
+    paintRevealDurationSeconds: 1.5
+    paintHoldDurationSeconds: 1.2
+    paintFadeOutDurationSeconds: 1.5
     useUnscaledTime: 1
     useFinalWaveOverride: 1
     finalWaveContent: AREA CLEARED
+    finalWavePresentationMode: 1
     finalWaveDirection: 1
+    finalWavePaintExitDirection: 1
     finalWaveTraversalDurationSeconds: 2.4
     finalWaveEasing: 2
     finalWavePauseAtCenter: 1
     finalWaveCenterHoldDurationSeconds: 1.5
+    finalWavePaintRevealDurationSeconds: 1.5
+    finalWavePaintHoldDurationSeconds: 1.35
+    finalWavePaintFadeOutDurationSeconds: 1.5
     playFinalWaveAudioEvent: 0
     finalWaveAudioEventId: 29
     verticalPositionNormalized: 0.62
     horizontalOffscreenPadding: 48
+    paintBackgroundSprite: {fileID: 21300000, guid: bc43f46a66c7eb649b96fdb4bf7dddf4, type: 3}
+    paintBackgroundColor: {r: 0.95, g: 0.015, b: 0.32, a: 0.97}
+    paintBackgroundPadding: {x: 112, y: 46}
+    paintEdgeSoftness: 0.025
+    paintNoiseStrength: 0.22
+    paintNoiseScale: 2.4
+    paintBristleStrength: 0.075
+    paintBristleScale: 48
     font: {fileID: 0}
     fontSize: 72
     fontStyle: 1
@@ -330,6 +348,41 @@ MonoBehaviour:
     menuProfiles:
     - menuKind: 0
       isEnabled: 1
+      contentMode: 1
+      imageContentDefinitions:
+      - buttonId: PlayButton
+        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        preserveAspect: 1
+        normalColor: {r: 1, g: 1, b: 1, a: 1}
+        hoverColor: {r: 1, g: 1, b: 1, a: 1}
+        pressedColor: {r: 1, g: 1, b: 1, a: 1}
+        disabledColor: {r: 1, g: 1, b: 1, a: 0.45}
+        serializedVersion: 1
+      - buttonId: SettingsButton
+        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        preserveAspect: 1
+        normalColor: {r: 1, g: 1, b: 1, a: 1}
+        hoverColor: {r: 1, g: 1, b: 1, a: 1}
+        pressedColor: {r: 1, g: 1, b: 1, a: 1}
+        disabledColor: {r: 1, g: 1, b: 1, a: 0.45}
+        serializedVersion: 1
+      - buttonId: QuitButton
+        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        preserveAspect: 1
+        normalColor: {r: 1, g: 1, b: 1, a: 1}
+        hoverColor: {r: 1, g: 1, b: 1, a: 1}
+        pressedColor: {r: 1, g: 1, b: 1, a: 1}
+        disabledColor: {r: 1, g: 1, b: 1, a: 0.45}
+        serializedVersion: 1
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -372,6 +425,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 1
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -414,6 +469,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 2
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -456,6 +513,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 3
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -498,6 +557,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 4
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -540,6 +601,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 5
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -582,6 +645,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 6
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12
@@ -624,6 +689,8 @@ MonoBehaviour:
       disabledTextColor: {r: 1, g: 1, b: 1, a: 0.45}
     - menuKind: 7
       isEnabled: 1
+      contentMode: 0
+      imageContentDefinitions: []
       motionMode: 1
       motionTarget: 1
       transitionDurationSeconds: 0.12

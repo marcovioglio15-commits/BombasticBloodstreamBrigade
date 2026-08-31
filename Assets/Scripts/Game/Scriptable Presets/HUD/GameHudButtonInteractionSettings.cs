@@ -35,7 +35,16 @@ public enum GameUiButtonMotionMode : byte
 public enum GameUiButtonMotionTarget : byte
 {
     WholeButton = 0,
-    TextOnly = 1
+    ContentOnly = 1
+}
+
+/// <summary>
+/// Selects whether one menu profile presents authored text or a preauthored image as button content.
+/// </summary>
+public enum GameUiButtonContentMode : byte
+{
+    Text = 0,
+    Image = 1
 }
 
 /// <summary>
@@ -45,6 +54,103 @@ public enum GameUiButtonHoverTransformMode : byte
 {
     HoldTarget = 0,
     Pulse = 1
+}
+
+/// <summary>
+/// Stores the state sprites and tints used by one image-content button inside a menu profile.
+/// </summary>
+[Serializable]
+public sealed class GameUiButtonImageContentDefinition
+{
+    #region Constants
+    private const int CurrentSerializedVersion = 1;
+    #endregion
+
+    #region Fields
+
+    #region Serialized Fields
+    [Tooltip("Stable preauthored button ID matched by the runtime relay. Project setup uses the button GameObject name by default.")]
+    [SerializeField]
+    private string buttonId;
+
+    [Tooltip("Image displayed while the button is in its normal state.")]
+    [SerializeField]
+    private Sprite normalSprite;
+
+    [Tooltip("Optional image displayed while the button is hovered or focused. The normal image is used when empty.")]
+    [SerializeField]
+    private Sprite hoverSprite;
+
+    [Tooltip("Optional image displayed while the button is pressed. The normal image is used when empty.")]
+    [SerializeField]
+    private Sprite pressedSprite;
+
+    [Tooltip("Optional image displayed while the button is non-interactable. The normal image is used when empty.")]
+    [SerializeField]
+    private Sprite disabledSprite;
+
+    [Tooltip("Keeps the source sprite proportions inside the authored image-content rectangle.")]
+    [SerializeField]
+    private bool preserveAspect = true;
+
+    [Tooltip("Tint applied to the image in its normal state.")]
+    [SerializeField]
+    private Color normalColor = Color.white;
+
+    [Tooltip("Tint applied to the image while the button is hovered or focused.")]
+    [SerializeField]
+    private Color hoverColor = Color.white;
+
+    [Tooltip("Tint applied to the image while the button is pressed.")]
+    [SerializeField]
+    private Color pressedColor = Color.white;
+
+    [Tooltip("Tint applied to the image while the button is non-interactable.")]
+    [SerializeField]
+    private Color disabledColor = new Color(1f, 1f, 1f, 0.45f);
+
+    [Tooltip("Internal data version used to initialize image tint defaults created by older HUD tools.")]
+    [SerializeField]
+    [HideInInspector]
+    private int serializedVersion;
+    #endregion
+
+    #endregion
+
+    #region Properties
+    public string ButtonId => buttonId;
+    public Sprite NormalSprite => normalSprite;
+    public Sprite HoverSprite => hoverSprite;
+    public Sprite PressedSprite => pressedSprite;
+    public Sprite DisabledSprite => disabledSprite;
+    public bool PreserveAspect => preserveAspect;
+    public Color NormalColor => normalColor;
+    public Color HoverColor => hoverColor;
+    public Color PressedColor => pressedColor;
+    public Color DisabledColor => disabledColor;
+    #endregion
+
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Initializes image presentation defaults that older serialized list entries did not receive.
+    /// </summary>
+    public void EnsureInitialized()
+    {
+        if (serializedVersion >= CurrentSerializedVersion)
+            return;
+
+        preserveAspect = true;
+        normalColor = Color.white;
+        hoverColor = Color.white;
+        pressedColor = Color.white;
+        disabledColor = new Color(1f, 1f, 1f, 0.45f);
+        serializedVersion = CurrentSerializedVersion;
+    }
+    #endregion
+
+    #endregion
 }
 
 /// <summary>
@@ -63,11 +169,21 @@ public sealed class GameUiMenuButtonInteractionDefinition
     [Tooltip("Enables this interaction profile without disabling the underlying Button controls.")]
     [SerializeField] private bool isEnabled = true;
 
+    [Header("Content")]
+    [Tooltip("Uses the existing TMP label or a preauthored image selected by the per-button image-content list.")]
+    [SerializeField]
+    private GameUiButtonContentMode contentMode;
+
+    [Tooltip("Per-button state images matched through the stable IDs assigned to preauthored menu relays.")]
+    [SerializeField]
+    private List<GameUiButtonImageContentDefinition> imageContentDefinitions =
+        new List<GameUiButtonImageContentDefinition>();
+
     [Header("Motion")]
     [Tooltip("Selects manual RectTransform motion, authored clips, both paths, or no motion.")]
     [SerializeField] private GameUiButtonMotionMode motionMode = GameUiButtonMotionMode.ManualTransform;
 
-    [Tooltip("Selects whether transform and clip feedback animates the complete button or only its TMP label. Sprite overrides and graphic colors remain independent.")]
+    [Tooltip("Selects whether transform and clip feedback animates the complete button or only the active text or image content. Sprite overrides and graphic colors remain independent.")]
     [SerializeField] private GameUiButtonMotionTarget motionTarget;
 
     [Tooltip("Seconds used to blend manual transform states and sample transition clips through the selected time source.")]
@@ -195,6 +311,8 @@ public sealed class GameUiMenuButtonInteractionDefinition
     #region Properties
     public GameUiMenuKind MenuKind => menuKind;
     public bool IsEnabled => isEnabled;
+    public GameUiButtonContentMode ContentMode => contentMode;
+    public IReadOnlyList<GameUiButtonImageContentDefinition> ImageContentDefinitions => imageContentDefinitions;
     public GameUiButtonMotionMode MotionMode => motionMode;
     public GameUiButtonMotionTarget MotionTarget => motionTarget;
     public float TransitionDurationSeconds => transitionDurationSeconds;
@@ -236,6 +354,27 @@ public sealed class GameUiMenuButtonInteractionDefinition
     public Color PressedTextColor => pressedTextColor;
     public Color DisabledTextColor => disabledTextColor;
     #endregion
+
+    #region Methods
+
+    #region Public Methods
+    /// <summary>
+    /// Restores the per-button image-content collection when an older preset is loaded.
+    /// </summary>
+    public void EnsureInitialized()
+    {
+        if (imageContentDefinitions == null)
+            imageContentDefinitions = new List<GameUiButtonImageContentDefinition>();
+
+        for (int contentIndex = 0; contentIndex < imageContentDefinitions.Count; contentIndex++)
+        {
+            if (imageContentDefinitions[contentIndex] != null)
+                imageContentDefinitions[contentIndex].EnsureInitialized();
+        }
+    }
+    #endregion
+
+    #endregion
 }
 
 /// <summary>
@@ -267,6 +406,12 @@ public sealed class GameHudButtonInteractionSettings
     {
         if (menuProfiles == null)
             menuProfiles = new List<GameUiMenuButtonInteractionDefinition>();
+
+        for (int profileIndex = 0; profileIndex < menuProfiles.Count; profileIndex++)
+        {
+            if (menuProfiles[profileIndex] != null)
+                menuProfiles[profileIndex].EnsureInitialized();
+        }
     }
     #endregion
 

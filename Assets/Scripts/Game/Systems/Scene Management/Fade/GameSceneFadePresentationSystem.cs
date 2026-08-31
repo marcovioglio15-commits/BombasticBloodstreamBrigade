@@ -15,10 +15,16 @@ public partial class GameSceneFadePresentationSystem : SystemBase
     private byte lastVisible = byte.MaxValue;
     private GameSceneFadeMode lastMode = (GameSceneFadeMode)byte.MaxValue;
     private GameSceneFadeWipeDirection lastWipeDirection = (GameSceneFadeWipeDirection)byte.MaxValue;
+    private GameUiPaintRevealOperation lastOperation = (GameUiPaintRevealOperation)byte.MaxValue;
     private GameSceneFadeEasing lastEasing = (GameSceneFadeEasing)byte.MaxValue;
     private float lastDirectionalEdgeSoftness = -1f;
     private float lastDirectionalNoiseStrength = -1f;
     private float lastDirectionalNoiseScale = -1f;
+    private float lastPaintEdgeSoftness = -1f;
+    private float lastPaintNoiseStrength = -1f;
+    private float lastPaintNoiseScale = -1f;
+    private float lastPaintBristleStrength = -1f;
+    private float lastPaintBristleScale = -1f;
     private int lastAppliedViewVersion = -1;
     #endregion
 
@@ -51,10 +57,16 @@ public partial class GameSceneFadePresentationSystem : SystemBase
             fadeState.Visible == lastVisible &&
             fadeState.Mode == lastMode &&
             fadeState.WipeDirection == lastWipeDirection &&
+            fadeState.Operation == lastOperation &&
             fadeState.Easing == lastEasing &&
             math.abs(fadeState.DirectionalEdgeSoftness - lastDirectionalEdgeSoftness) <= 0.0001f &&
             math.abs(fadeState.DirectionalNoiseStrength - lastDirectionalNoiseStrength) <= 0.0001f &&
             math.abs(fadeState.DirectionalNoiseScale - lastDirectionalNoiseScale) <= 0.0001f &&
+            math.abs(fadeState.PaintEdgeSoftness - lastPaintEdgeSoftness) <= 0.0001f &&
+            math.abs(fadeState.PaintNoiseStrength - lastPaintNoiseStrength) <= 0.0001f &&
+            math.abs(fadeState.PaintNoiseScale - lastPaintNoiseScale) <= 0.0001f &&
+            math.abs(fadeState.PaintBristleStrength - lastPaintBristleStrength) <= 0.0001f &&
+            math.abs(fadeState.PaintBristleScale - lastPaintBristleScale) <= 0.0001f &&
             math.lengthsq(fadeState.Color - lastColor) <= 0.000001f &&
             GameSceneFadeCanvasView.ActiveViewVersion == lastAppliedViewVersion &&
             (fadeState.Alpha < 0.9999f || fadeState.OpaquePresented != 0))
@@ -62,16 +74,7 @@ public partial class GameSceneFadePresentationSystem : SystemBase
             return;
         }
 
-        Color color = new Color(fadeState.Color.x, fadeState.Color.y, fadeState.Color.z, fadeState.Color.w);
-        bool applied = GameSceneFadeCanvasView.TryApply(fadeState.Alpha,
-                                                        fadeState.Visible != 0,
-                                                        color,
-                                                        fadeState.Mode,
-                                                        fadeState.WipeDirection,
-                                                        fadeState.Easing,
-                                                        fadeState.DirectionalEdgeSoftness,
-                                                        fadeState.DirectionalNoiseStrength,
-                                                        fadeState.DirectionalNoiseScale);
+        bool applied = GameSceneFadeCanvasView.TryApply(in fadeState);
 
         if (applied &&
             GameSceneFadeCanvasView.HasRenderedOpaqueCoverage &&
@@ -88,10 +91,16 @@ public partial class GameSceneFadePresentationSystem : SystemBase
         lastColor = fadeState.Color;
         lastMode = fadeState.Mode;
         lastWipeDirection = fadeState.WipeDirection;
+        lastOperation = fadeState.Operation;
         lastEasing = fadeState.Easing;
         lastDirectionalEdgeSoftness = fadeState.DirectionalEdgeSoftness;
         lastDirectionalNoiseStrength = fadeState.DirectionalNoiseStrength;
         lastDirectionalNoiseScale = fadeState.DirectionalNoiseScale;
+        lastPaintEdgeSoftness = fadeState.PaintEdgeSoftness;
+        lastPaintNoiseStrength = fadeState.PaintNoiseStrength;
+        lastPaintNoiseScale = fadeState.PaintNoiseScale;
+        lastPaintBristleStrength = fadeState.PaintBristleStrength;
+        lastPaintBristleScale = fadeState.PaintBristleScale;
         lastAppliedViewVersion = GameSceneFadeCanvasView.ActiveViewVersion;
     }
     #endregion

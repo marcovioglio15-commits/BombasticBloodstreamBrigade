@@ -20,18 +20,21 @@ public sealed class GameSceneFadeSettingsPropertyDrawer : PropertyDrawer
     {
         VisualElement root = new VisualElement();
         root.style.marginBottom = 6f;
-        AddProperty(root, property, "fadeColor", "Color used by the full-screen transition overlay.");
-        SerializedProperty fadeModeProperty = AddProperty(root,
-                                                          property,
-                                                          "fadeMode",
-                                                          "Selects uniform opacity or a shader-driven directional gradient.");
+        AddProperty(root,
+                    property,
+                    "fadeColor",
+                    "Single transition pigment. Covered pixels use this RGB value directly, with black as the default.");
+        SerializedProperty visualStyleProperty = AddProperty(root,
+                                                              property,
+                                                              "visualStyle",
+                                                              "Selects gradient coverage or clustered aerosol deposition.");
         VisualElement directionalSettings = new VisualElement();
         directionalSettings.style.marginLeft = 12f;
         root.Add(directionalSettings);
         AddProperty(directionalSettings,
                     property,
                     "wipeDirection",
-                    "Direction used to spread darkness over the outgoing scene. Reveal progresses in reverse.");
+                    "Fallback direction used before a portal-directed transition supplies its traversal direction.");
         AddProperty(directionalSettings,
                     property,
                     "directionalEdgeSoftness",
@@ -44,23 +47,54 @@ public sealed class GameSceneFadeSettingsPropertyDrawer : PropertyDrawer
                     property,
                     "directionalNoiseScale",
                     "Spatial frequency of the procedural variation. Larger values create smaller boundary details.");
+        VisualElement paintSettings = new VisualElement();
+        paintSettings.style.marginLeft = 12f;
+        root.Add(paintSettings);
+        AddProperty(paintSettings,
+                    property,
+                    "wipeDirection",
+                    "Fallback direction used before a portal-directed transition supplies its traversal direction.");
+        AddProperty(paintSettings,
+                    property,
+                    "paintEdgeSoftness",
+                    "Normalized antialiasing width around newly deposited pigment.");
+        AddProperty(paintSettings,
+                    property,
+                    "paintNoiseStrength",
+                    "Maximum local arrival-time variation between overlapping aerosol deposits.");
+        AddProperty(paintSettings,
+                    property,
+                    "paintNoiseScale",
+                    "Scale of the repeated deposit clusters across the transition surface.");
+        AddProperty(paintSettings,
+                    property,
+                    "paintBristleStrength",
+                    "Strength of fine aerosol breakup and sparse satellite droplets.");
+        AddProperty(paintSettings,
+                    property,
+                    "paintBristleScale",
+                    "Spatial density of fine aerosol mist around active deposit edges.");
         AddProperty(root, property, "easing", "Interpolation applied to transition progress before shader evaluation.");
         AddProperty(root, property, "fadeOutSeconds", "Seconds used to fade from transparent to fully opaque before loading starts.");
-        AddProperty(root, property, "postLoadReadyExtraSeconds", "Small extra black time after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.");
-        AddProperty(root, property, "fadeInSeconds", "Seconds used to fade from fully opaque back to transparent after readiness and extra black time.");
+        AddProperty(root, property, "postLoadReadyExtraSeconds", "Small extra complete-coverage time after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.");
+        AddProperty(root, property, "fadeInSeconds", "Seconds used to remove complete paint coverage after readiness and the configured post-load hold.");
         AddProperty(root, property, "lockGameplayInput", "Blocks gameplay by using the transition time-scale lock path while the fade is active.");
         AddProperty(root, property, "setTimeScaleDuringTransition", "Sets Time.timeScale to zero while a transition is active, then restores the previous value.");
-        RefreshDirectionalVisibility();
+        RefreshStyleVisibility();
 
-        if (fadeModeProperty != null)
-            root.TrackPropertyValue(fadeModeProperty, changedProperty => RefreshDirectionalVisibility());
+        if (visualStyleProperty != null)
+            root.TrackPropertyValue(visualStyleProperty, changedProperty => RefreshStyleVisibility());
 
         return root;
 
-        void RefreshDirectionalVisibility()
+        void RefreshStyleVisibility()
         {
-            directionalSettings.style.display = fadeModeProperty != null &&
-                                                 fadeModeProperty.enumValueIndex == (int)GameSceneFadeMode.DirectionalGradient
+            bool usesPaint = visualStyleProperty != null &&
+                             visualStyleProperty.enumValueIndex == (int)GameSceneFadeVisualStyle.Paint;
+            directionalSettings.style.display = !usesPaint
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+            paintSettings.style.display = usesPaint
                 ? DisplayStyle.Flex
                 : DisplayStyle.None;
         }

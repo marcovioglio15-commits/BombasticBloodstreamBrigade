@@ -1,28 +1,40 @@
 /// <summary>
 /// Resolves and applies fade presentation policy independently from scene mutation orchestration.
 /// </summary>
-internal static class GameSceneTransitionFadePresentationUtility
+public static class GameSceneTransitionFadePresentationUtility
 {
     #region Methods
     /// <summary>
-    /// Selects portal-directed darkness only for physical room traversal and keeps other transitions uniform.
+    /// Selects portal-directed coverage only for physical room traversal and keeps other transitions uniform.
     /// </summary>
     /// <param name="request">Request whose purpose and portal direction define the presentation.</param>
+    /// <param name="visualStyle">Gradient or paint visual family selected by the Scene Manager preset.</param>
     /// <param name="fadeMode">Resolved shader fade mode.</param>
     /// <param name="wipeDirection">Resolved directional-gradient orientation.</param>
-    internal static void Resolve(in GameSceneTransitionRequest request,
-                                 out GameSceneFadeMode fadeMode,
-                                 out GameSceneFadeWipeDirection wipeDirection)
+    public static void Resolve(in GameSceneTransitionRequest request,
+                               GameSceneFadeVisualStyle visualStyle,
+                               out GameSceneFadeMode fadeMode,
+                               out GameSceneFadeWipeDirection wipeDirection)
     {
-        if (request.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal)
+        bool directional = request.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
+
+        if (visualStyle == GameSceneFadeVisualStyle.Paint)
         {
-            fadeMode = GameSceneFadeMode.DirectionalGradient;
-            wipeDirection = request.PortalWipeDirection;
+            fadeMode = directional
+                ? GameSceneFadeMode.DirectionalPaint
+                : GameSceneFadeMode.UniformPaint;
+            wipeDirection = directional
+                ? request.PortalWipeDirection
+                : GameSceneFadeWipeDirection.LeftToRight;
             return;
         }
 
-        fadeMode = GameSceneFadeMode.Uniform;
-        wipeDirection = GameSceneFadeWipeDirection.LeftToRight;
+        fadeMode = directional
+            ? GameSceneFadeMode.DirectionalGradient
+            : GameSceneFadeMode.Uniform;
+        wipeDirection = directional
+            ? request.PortalWipeDirection
+            : GameSceneFadeWipeDirection.LeftToRight;
     }
 
     /// <summary>

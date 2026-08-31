@@ -75,7 +75,18 @@ public enum GameSceneTransitionPurpose : byte
 public enum GameSceneFadeMode : byte
 {
     Uniform = 0,
-    DirectionalGradient = 1
+    DirectionalGradient = 1,
+    UniformPaint = 2,
+    DirectionalPaint = 3
+}
+
+/// <summary>
+/// Selects the visual family used for automatic uniform and portal-directed scene coverage.
+/// </summary>
+public enum GameSceneFadeVisualStyle : byte
+{
+    Gradient = 0,
+    Paint = 1
 }
 
 /// <summary>

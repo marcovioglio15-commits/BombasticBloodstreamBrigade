@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Scriptable preset that defines the project-wide scene flow, transition graph and fade settings.
+/// Scriptable preset that defines project-wide scene flow, gameplay-camera behavior and transition presentation.
 /// </summary>
 [CreateAssetMenu(fileName = "GameSceneManagerPreset", menuName = "Game/Scene Manager Preset", order = 23)]
 public sealed class GameSceneManagerPreset : ScriptableObject
@@ -50,6 +50,18 @@ public sealed class GameSceneManagerPreset : ScriptableObject
     [Header("Gameplay Camera")]
     [Tooltip("When enabled, environment renderers between the gameplay camera and the player are hidden without changing their collision.")]
     [SerializeField] private bool enablePlayerCameraOcclusion = true;
+
+    [Tooltip("When enabled, Camera Boundary footprints constrain the gameplay camera according to the selected mode.")]
+    [SerializeField]
+    private bool enableCameraBoundaries = true;
+
+    [Tooltip("Containment Volume keeps the camera inside the player-selected footprint. Impassable Volume treats every footprint as a solid planar obstacle that the camera cannot cross.")]
+    [SerializeField]
+    private GameCameraBoundaryMode cameraBoundaryMode = GameCameraBoundaryMode.ContainmentVolume;
+
+    [Tooltip("World-space distance from a Camera Boundary edge over which the follow target progressively brakes before reaching the hard limit. Set to zero for a hard stop.")]
+    [SerializeField]
+    private float cameraBoundarySoftZoneDistance = GameCameraBoundaryDefaults.SoftZoneDistance;
 
     [Header("Fade")]
     [Tooltip("Default fade presentation and timing applied to transitions without overrides.")]
@@ -168,6 +180,39 @@ public sealed class GameSceneManagerPreset : ScriptableObject
         get
         {
             return enablePlayerCameraOcclusion;
+        }
+    }
+
+    /// <summary>
+    /// Gets whether runtime camera-boundary selection and constraints are enabled.
+    /// </summary>
+    public bool EnableCameraBoundaries
+    {
+        get
+        {
+            return enableCameraBoundaries;
+        }
+    }
+
+    /// <summary>
+    /// Gets whether footprints contain the camera or block it as independent obstacles.
+    /// </summary>
+    public GameCameraBoundaryMode CameraBoundaryMode
+    {
+        get
+        {
+            return cameraBoundaryMode;
+        }
+    }
+
+    /// <summary>
+    /// Gets the authored braking distance applied before the camera reaches a hard boundary edge.
+    /// </summary>
+    public float CameraBoundarySoftZoneDistance
+    {
+        get
+        {
+            return cameraBoundarySoftZoneDistance;
         }
     }
 

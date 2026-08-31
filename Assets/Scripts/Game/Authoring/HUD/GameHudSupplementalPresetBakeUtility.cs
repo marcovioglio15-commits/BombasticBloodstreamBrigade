@@ -174,23 +174,41 @@ public static class GameHudSupplementalPresetBakeUtility
             Content = BuildFixedString512(settings.Content),
             PlayAudioEvent = ToByte(settings.PlayAudioEvent),
             AudioEventId = settings.AudioEventId,
+            PresentationMode = settings.PresentationMode,
             Direction = settings.Direction,
+            PaintExitDirection = settings.PaintExitDirection,
             TraversalDurationSeconds = ResolvePositive(settings.TraversalDurationSeconds, 1.4f),
             Easing = settings.Easing,
             PauseAtCenter = ToByte(settings.PauseAtCenter),
             CenterHoldDurationSeconds = ResolveNonNegative(settings.CenterHoldDurationSeconds, 0.7f),
+            PaintRevealDurationSeconds = ResolvePositive(settings.PaintRevealDurationSeconds, 0.65f),
+            PaintHoldDurationSeconds = ResolveNonNegative(settings.PaintHoldDurationSeconds, 0.85f),
+            PaintFadeOutDurationSeconds = ResolvePositive(settings.PaintFadeOutDurationSeconds, 0.25f),
             UseUnscaledTime = ToByte(settings.UseUnscaledTime),
             UseFinalWaveOverride = ToByte(settings.UseFinalWaveOverride),
             FinalWaveContent = BuildFixedString512(settings.FinalWaveContent),
+            FinalWavePresentationMode = settings.FinalWavePresentationMode,
             FinalWaveDirection = settings.FinalWaveDirection,
+            FinalWavePaintExitDirection = settings.FinalWavePaintExitDirection,
             FinalWaveTraversalDurationSeconds = ResolvePositive(settings.FinalWaveTraversalDurationSeconds, 2.4f),
             FinalWaveEasing = settings.FinalWaveEasing,
             FinalWavePauseAtCenter = ToByte(settings.FinalWavePauseAtCenter),
             FinalWaveCenterHoldDurationSeconds = ResolveNonNegative(settings.FinalWaveCenterHoldDurationSeconds, 1.5f),
+            FinalWavePaintRevealDurationSeconds = ResolvePositive(settings.FinalWavePaintRevealDurationSeconds, 0.9f),
+            FinalWavePaintHoldDurationSeconds = ResolveNonNegative(settings.FinalWavePaintHoldDurationSeconds, 1.35f),
+            FinalWavePaintFadeOutDurationSeconds = ResolvePositive(settings.FinalWavePaintFadeOutDurationSeconds, 0.35f),
             PlayFinalWaveAudioEvent = ToByte(settings.PlayFinalWaveAudioEvent),
             FinalWaveAudioEventId = settings.FinalWaveAudioEventId,
             VerticalPositionNormalized = math.saturate(ResolveFinite(settings.VerticalPositionNormalized, 0.62f)),
             HorizontalOffscreenPadding = ResolveNonNegative(settings.HorizontalOffscreenPadding, 48f),
+            PaintBackgroundSprite = settings.PaintBackgroundSprite,
+            PaintBackgroundColor = ToFloat4(settings.PaintBackgroundColor),
+            PaintBackgroundPadding = ResolveFinite(settings.PaintBackgroundPadding, new Vector2(112f, 46f)),
+            PaintEdgeSoftness = math.clamp(ResolveFinite(settings.PaintEdgeSoftness, 0.025f), 0.001f, 0.25f),
+            PaintNoiseStrength = math.clamp(ResolveFinite(settings.PaintNoiseStrength, 0.22f), 0f, 0.5f),
+            PaintNoiseScale = math.clamp(ResolveFinite(settings.PaintNoiseScale, 2.4f), 0.25f, 12f),
+            PaintBristleStrength = math.clamp(ResolveFinite(settings.PaintBristleStrength, 0.075f), 0f, 0.25f),
+            PaintBristleScale = math.clamp(ResolveFinite(settings.PaintBristleScale, 48f), 1f, 96f),
             Font = settings.Font,
             FontSize = ResolvePositive(settings.FontSize, 72f),
             FontStyle = (int)settings.FontStyle,
@@ -274,6 +292,52 @@ public static class GameHudSupplementalPresetBakeUtility
     }
 
     /// <summary>
+    /// Rebuilds deduplicated per-button image mappings from the first profile authored for each menu group.
+    /// </summary>
+    /// <param name="settings">Authored menu interaction settings.</param>
+    /// <param name="destination">Baked image-content destination buffer on the HUD singleton entity.</param>
+    public static void PopulateButtonImageContentBuffer(GameHudButtonInteractionSettings settings,
+                                                        DynamicBuffer<GameUiButtonImageContentElement> destination)
+    {
+        destination.Clear();
+
+        if (settings == null || settings.MenuProfiles == null)
+            return;
+
+        HashSet<GameUiMenuKind> addedMenus = new HashSet<GameUiMenuKind>();
+
+        for (int profileIndex = 0; profileIndex < settings.MenuProfiles.Count; profileIndex++)
+        {
+            GameUiMenuButtonInteractionDefinition profile = settings.MenuProfiles[profileIndex];
+
+            if (profile == null ||
+                !addedMenus.Add(profile.MenuKind) ||
+                profile.ContentMode != GameUiButtonContentMode.Image ||
+                profile.ImageContentDefinitions == null)
+            {
+                continue;
+            }
+
+            HashSet<string> addedButtonIds = new HashSet<string>(System.StringComparer.Ordinal);
+
+            for (int contentIndex = 0; contentIndex < profile.ImageContentDefinitions.Count; contentIndex++)
+            {
+                GameUiButtonImageContentDefinition content = profile.ImageContentDefinitions[contentIndex];
+
+                if (content == null || string.IsNullOrWhiteSpace(content.ButtonId))
+                    continue;
+
+                string buttonId = content.ButtonId.Trim();
+
+                if (!addedButtonIds.Add(buttonId))
+                    continue;
+
+                destination.Add(BuildButtonImageContentElement(profile.MenuKind, buttonId, content));
+            }
+        }
+    }
+
+    /// <summary>
     /// Converts one menu profile and its object references into a runtime buffer element.
     /// </summary>
     /// <param name="profile">Source menu profile.</param>
@@ -284,6 +348,7 @@ public static class GameHudSupplementalPresetBakeUtility
         {
             MenuKind = profile.MenuKind,
             Enabled = ToByte(profile.IsEnabled),
+            ContentMode = profile.ContentMode,
             MotionMode = profile.MotionMode,
             MotionTarget = profile.MotionTarget,
             TransitionDurationSeconds = ResolveNonNegative(profile.TransitionDurationSeconds, 0.12f),
@@ -324,6 +389,34 @@ public static class GameHudSupplementalPresetBakeUtility
             HoverTextColor = ToFloat4(profile.HoverTextColor),
             PressedTextColor = ToFloat4(profile.PressedTextColor),
             DisabledTextColor = ToFloat4(profile.DisabledTextColor)
+        };
+    }
+
+    /// <summary>
+    /// Converts one per-button image definition into an immutable runtime buffer element.
+    /// </summary>
+    /// <param name="menuKind">Menu group owning the button mapping.</param>
+    /// <param name="buttonId">Trimmed stable button ID.</param>
+    /// <param name="content">Source sprite and tint settings.</param>
+    /// <returns>Baked image-content mapping resolved by one preauthored relay.</returns>
+    private static GameUiButtonImageContentElement BuildButtonImageContentElement(
+        GameUiMenuKind menuKind,
+        string buttonId,
+        GameUiButtonImageContentDefinition content)
+    {
+        return new GameUiButtonImageContentElement
+        {
+            MenuKind = menuKind,
+            ButtonId = BuildFixedString128(buttonId),
+            NormalSprite = content.NormalSprite,
+            HoverSprite = content.HoverSprite,
+            PressedSprite = content.PressedSprite,
+            DisabledSprite = content.DisabledSprite,
+            PreserveAspect = ToByte(content.PreserveAspect),
+            NormalColor = ToFloat4(content.NormalColor),
+            HoverColor = ToFloat4(content.HoverColor),
+            PressedColor = ToFloat4(content.PressedColor),
+            DisabledColor = ToFloat4(content.DisabledColor)
         };
     }
     #endregion
@@ -403,6 +496,18 @@ public static class GameHudSupplementalPresetBakeUtility
         FixedString64Bytes result = default;
         string resolvedValue = value ?? string.Empty;
         result.CopyFromTruncated(resolvedValue);
+        return result;
+    }
+
+    /// <summary>
+    /// Converts a stable button ID into a fixed string and truncates oversized UTF-8 input at bake time.
+    /// </summary>
+    /// <param name="value">Button ID to store in the runtime mapping.</param>
+    /// <returns>Fixed-capacity button ID.</returns>
+    private static FixedString128Bytes BuildFixedString128(string value)
+    {
+        FixedString128Bytes result = default;
+        result.CopyFromTruncated(value ?? string.Empty);
         return result;
     }
 

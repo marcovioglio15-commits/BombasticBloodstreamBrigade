@@ -10,6 +10,10 @@ using UnityEngine;
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct PlayerCameraFollowSystem : ISystem
 {
+    #region Constants
+    private const float BoundaryReacquisitionToleranceSquared = 0.0001f;
+    #endregion
+
     #region Fields
 
     #region Static Fields
@@ -34,10 +38,14 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private float3 canonicalAutoOffset;
     private float3 canonicalChildLocalOffset;
     private Entity lastPlayerEntity;
+    private Entity lastBoundaryEntity;
     private EntityQuery runOutcomeQuery;
+    private int boundaryCameraInstanceId;
     private bool hasCanonicalAutoOffset;
     private bool hasCanonicalChildOffset;
     private bool hasTrackedPlayer;
+    private bool hasTrackedBoundary;
+    private bool smoothBoundaryReacquisition;
     #endregion
 
     #endregion
@@ -104,12 +112,26 @@ public partial struct PlayerCameraFollowSystem : ISystem
         float shakeNoiseTime = (float)SystemAPI.Time.ElapsedTime;
         int cameraInstanceId = camera.GetInstanceID();
         bool cameraChanged = cameraInstanceId != lastCameraInstanceId;
+        bool hasBoundaryRuntimeState =
+            SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState);
+        bool hasContainmentBoundary = hasBoundaryRuntimeState &&
+                                      cameraBoundaryState.Enabled != 0 &&
+                                      cameraBoundaryState.Mode == GameCameraBoundaryMode.ContainmentVolume &&
+                                      cameraBoundaryState.HasBoundary != 0;
+        bool hasImpassableBoundaries = hasBoundaryRuntimeState &&
+                                       cameraBoundaryState.Enabled != 0 &&
+                                       cameraBoundaryState.Mode == GameCameraBoundaryMode.ImpassableVolume;
+        bool hasFastPlayPlayer = SystemAPI.TryGetSingletonEntity<GameCameraBoundaryFastPlayPlayer>(
+            out Entity fastPlayPlayerEntity);
 
-        // Only support one player camera config at a time, so breaks after the first iteration.
+        // Fast Play owns camera focus when present; regular gameplay still supports one camera config at a time.
         foreach ((RefRO<LocalTransform> localTransform,
                   RefRO<PlayerRuntimeCameraConfig> runtimeCameraConfig,
                   Entity entity) in SystemAPI.Query<RefRO<LocalTransform>, RefRO<PlayerRuntimeCameraConfig>>().WithEntityAccess())
         {
+            if (hasFastPlayPlayer && entity != fastPlayPlayerEntity)
+                continue;
+
             PlayerRuntimeCameraConfig cameraConfig = runtimeCameraConfig.ValueRO;
             float3 playerPosition = localTransform.ValueRO.Position;
 
@@ -183,6 +205,12 @@ public partial struct PlayerCameraFollowSystem : ISystem
                 lastCameraInstanceId = cameraInstanceId;
             }
 
+            RefreshBoundaryReacquisition(camera,
+                                         in shakeState,
+                                         in cameraBoundaryState,
+                                         hasContainmentBoundary,
+                                         cameraChanged || playerChanged);
+
             // A new run receives a deterministic baseline from the persistent rig. Never recapture the previous
             // run's final camera-to-player relation as the next run's automatic offset.
             if (playerChanged)
@@ -192,7 +220,9 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                   playerPosition,
                                   localTransform.ValueRO.Rotation,
                                   in cameraConfig,
-                                  in shakeState);
+                                  in shakeState,
+                                  in cameraBoundaryState,
+                                  hasContainmentBoundary);
             }
 
             if (cameraConfig.Behavior == CameraBehavior.RoomFixed)
@@ -243,26 +273,171 @@ public partial struct PlayerCameraFollowSystem : ISystem
             {
                 case CameraBehavior.ChildOfPlayer:
                     float3 rotatedOffset = math.rotate(localTransform.ValueRO.Rotation, offset);
+                    float3 childTargetPosition = playerPosition + rotatedOffset;
+                    float3 childSmoothingSource =
+                        PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position,
+                                                                               in shakeState);
+
+                    if (hasContainmentBoundary)
+                    {
+                        childTargetPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
+                            in cameraBoundaryState.Boundary,
+                            childTargetPosition,
+                            cameraBoundaryState.SoftZoneDistance);
+                    }
+                    else if (hasImpassableBoundaries)
+                    {
+                        childTargetPosition = ResolveImpassableSoftConstraints(ref state,
+                                                                                childSmoothingSource,
+                                                                                childTargetPosition,
+                                                                                cameraBoundaryState.SoftZoneDistance);
+                    }
+
+                    float3 childDesiredPosition = childTargetPosition;
+
+                    if (smoothBoundaryReacquisition)
+                    {
+                        childTargetPosition = PlayerControllerMath.SmoothCameraPosition(
+                            childSmoothingSource,
+                            childTargetPosition,
+                            cameraConfig.Values,
+                            ref followVelocity,
+                            deltaTime);
+
+                        if (hasContainmentBoundary)
+                        {
+                            GameCameraBoundaryUtility.ApplyReachableHardConstraint(
+                                in cameraBoundaryState.Boundary,
+                                childSmoothingSource,
+                                ref childTargetPosition,
+                                ref followVelocity);
+                        }
+
+                        if (math.distancesq(childTargetPosition, childDesiredPosition) <=
+                            BoundaryReacquisitionToleranceSquared)
+                        {
+                            smoothBoundaryReacquisition = false;
+                        }
+                    }
+
+                    if (hasImpassableBoundaries)
+                    {
+                        ApplyImpassableHardConstraints(ref state,
+                                                       childSmoothingSource,
+                                                       ref childTargetPosition,
+                                                       ref followVelocity);
+                    }
+
                     PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
-                                                                 playerPosition + rotatedOffset,
+                                                                 childTargetPosition,
                                                                  in shakeState,
                                                                  true,
                                                                  localTransform.ValueRO.Rotation);
                     break;
                 default:
-                    float3 newPosition = targetPosition;
                     float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+
+                    if (hasContainmentBoundary)
+                    {
+                        targetPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
+                            in cameraBoundaryState.Boundary,
+                            targetPosition,
+                            cameraBoundaryState.SoftZoneDistance);
+                    }
+                    else if (hasImpassableBoundaries)
+                    {
+                        targetPosition = ResolveImpassableSoftConstraints(ref state,
+                                                                          smoothingSource,
+                                                                          targetPosition,
+                                                                          cameraBoundaryState.SoftZoneDistance);
+                    }
+
+                    float3 newPosition = targetPosition;
                     newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource,
                                                                            targetPosition,
                                                                            cameraConfig.Values,
                                                                            ref followVelocity,
                                                                            deltaTime);
 
+                    if (hasContainmentBoundary)
+                    {
+                        GameCameraBoundaryUtility.ApplyReachableHardConstraint(
+                            in cameraBoundaryState.Boundary,
+                            smoothingSource,
+                            ref newPosition,
+                            ref followVelocity);
+                    }
+                    else if (hasImpassableBoundaries)
+                    {
+                        ApplyImpassableHardConstraints(ref state,
+                                                       smoothingSource,
+                                                       ref newPosition,
+                                                       ref followVelocity);
+                    }
+
+                    if (smoothBoundaryReacquisition &&
+                        math.distancesq(smoothingSource, targetPosition) <=
+                        BoundaryReacquisitionToleranceSquared)
+                    {
+                        smoothBoundaryReacquisition = false;
+                    }
+
                     PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
                     break;
             }
 
             break;
+        }
+    }
+    #endregion
+
+    #region Impassable Boundary Methods
+    /// <summary>
+    /// Applies every static impassable footprint to a desired camera target without allocating a runtime collection.
+    /// </summary>
+    /// <param name="state">System state used by the generated boundary query.</param>
+    /// <param name="sourcePosition">Current unshaken camera position.</param>
+    /// <param name="desiredPosition">Unconstrained camera target.</param>
+    /// <param name="softZoneDistance">World-space braking distance outside each footprint.</param>
+    /// <returns>Target progressively blocked by every approached footprint.</returns>
+    private float3 ResolveImpassableSoftConstraints(ref SystemState state,
+                                                    float3 sourcePosition,
+                                                    float3 desiredPosition,
+                                                    float softZoneDistance)
+    {
+        foreach (RefRO<GameCameraBoundary> boundaryReference in
+                 SystemAPI.Query<RefRO<GameCameraBoundary>>())
+        {
+            desiredPosition = GameCameraBoundaryUtility.ResolveSoftBlockedPosition(
+                in boundaryReference.ValueRO,
+                sourcePosition,
+                desiredPosition,
+                softZoneDistance);
+        }
+
+        return desiredPosition;
+    }
+
+    /// <summary>
+    /// Stops an integrated camera step against every crossed impassable footprint without temporary allocations.
+    /// </summary>
+    /// <param name="state">System state used by the generated boundary query.</param>
+    /// <param name="sourcePosition">Camera position before spring integration.</param>
+    /// <param name="candidatePosition">Integrated camera position constrained in place.</param>
+    /// <param name="velocity">Persistent spring velocity stabilized at crossed faces.</param>
+    private void ApplyImpassableHardConstraints(ref SystemState state,
+                                                float3 sourcePosition,
+                                                ref float3 candidatePosition,
+                                                ref float3 velocity)
+    {
+        foreach (RefRO<GameCameraBoundary> boundaryReference in
+                 SystemAPI.Query<RefRO<GameCameraBoundary>>())
+        {
+            GameCameraBoundaryUtility.ApplyImpassableHardConstraint(
+                in boundaryReference.ValueRO,
+                sourcePosition,
+                ref candidatePosition,
+                ref velocity);
         }
     }
     #endregion
@@ -334,6 +509,54 @@ public partial struct PlayerCameraFollowSystem : ISystem
     #region Cache Methods
 
     /// <summary>
+    /// Detects boundary ownership changes and enables a spring-driven entrance when direct hard containment would snap
+    /// the current camera into a newly selected footprint.
+    /// </summary>
+    /// <param name="camera">Persistent gameplay camera being constrained.</param>
+    /// <param name="shakeState">Feedback state used to recover the unshaken camera position.</param>
+    /// <param name="cameraBoundaryState">Current boundary selection published before camera presentation.</param>
+    /// <param name="hasCameraBoundary">True when the selection contains an active boundary.</param>
+    /// <param name="forceReacquisition">True when camera or player ownership changed without a boundary entity change.</param>
+    private void RefreshBoundaryReacquisition(Camera camera,
+                                              in PlayerCameraShakeState shakeState,
+                                              in GameCameraBoundaryRuntimeState cameraBoundaryState,
+                                              bool hasCameraBoundary,
+                                              bool forceReacquisition)
+    {
+        if (!hasCameraBoundary)
+        {
+            lastBoundaryEntity = Entity.Null;
+            boundaryCameraInstanceId = 0;
+            hasTrackedBoundary = false;
+            smoothBoundaryReacquisition = false;
+            return;
+        }
+
+        int cameraInstanceId = camera.GetInstanceID();
+        bool boundaryChanged = hasTrackedBoundary &&
+                               cameraBoundaryState.BoundaryEntity != lastBoundaryEntity;
+
+        if (!forceReacquisition && !boundaryChanged &&
+            hasTrackedBoundary && cameraInstanceId == boundaryCameraInstanceId)
+        {
+            return;
+        }
+
+        // Every real boundary hand-off is smoothed; first acquisition only needs it when the camera starts outside.
+        float3 currentBasePosition =
+            PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+        smoothBoundaryReacquisition = boundaryChanged ||
+                                      !GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary,
+                                                                          currentBasePosition);
+        lastBoundaryEntity = cameraBoundaryState.BoundaryEntity;
+        boundaryCameraInstanceId = cameraInstanceId;
+        hasTrackedBoundary = true;
+
+        if (smoothBoundaryReacquisition)
+            followVelocity = float3.zero;
+    }
+
+    /// <summary>
     /// Rebinds the persistent camera to a newly created player without inheriting the previous run's spring,
     /// traversal offset or final world position. Automatic behaviors retain the first valid offset captured for
     /// the same persistent camera instance and reuse it on later runs.
@@ -344,12 +567,16 @@ public partial struct PlayerCameraFollowSystem : ISystem
     /// <param name="playerRotation">Current authored player rotation.</param>
     /// <param name="cameraConfig">Resolved runtime camera behavior and fixed offset.</param>
     /// <param name="shakeState">New player's feedback state used to avoid baking shake into the baseline.</param>
+    /// <param name="cameraBoundaryState">Selected boundary data available for the new player.</param>
+    /// <param name="hasCameraBoundary">True when the selected boundary must constrain the reset pose.</param>
     private void ResetForNewPlayer(Camera camera,
                                    Entity playerEntity,
                                    float3 playerPosition,
                                    quaternion playerRotation,
                                    in PlayerRuntimeCameraConfig cameraConfig,
-                                   in PlayerCameraShakeState shakeState)
+                                   in PlayerCameraShakeState shakeState,
+                                   in GameCameraBoundaryRuntimeState cameraBoundaryState,
+                                   bool hasCameraBoundary)
     {
         float3 currentBasePosition = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position,
                                                                                             in shakeState);
@@ -390,7 +617,20 @@ public partial struct PlayerCameraFollowSystem : ISystem
                 break;
         }
 
-        if (cameraConfig.Behavior != CameraBehavior.RoomFixed)
+        if (hasCameraBoundary && cameraConfig.Behavior != CameraBehavior.RoomFixed)
+        {
+            resolvedPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
+                in cameraBoundaryState.Boundary,
+                resolvedPosition,
+                cameraBoundaryState.SoftZoneDistance);
+        }
+
+        bool mayApplyImmediately = !hasCameraBoundary ||
+                                   !smoothBoundaryReacquisition &&
+                                   GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary,
+                                                                       currentBasePosition);
+
+        if (cameraConfig.Behavior != CameraBehavior.RoomFixed && mayApplyImmediately)
         {
             PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
                                                           resolvedPosition,

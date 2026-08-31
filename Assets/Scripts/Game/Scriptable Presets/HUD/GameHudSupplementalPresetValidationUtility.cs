@@ -125,21 +125,37 @@ public static class GameHudSupplementalPresetValidationUtility
         else if (Encoding.UTF8.GetByteCount(settings.Content) > FixedString512Bytes.UTF8MaxLengthInBytes)
             warnings.Add("Room Clear Announcement content exceeds the baked 512-byte UTF-8 capacity and will be truncated at runtime.");
 
-        ValidatePositive(settings.TraversalDurationSeconds,
-                         "Room Clear Announcement traversal duration",
-                         warnings);
+        ValidateAnnouncementMode(settings.PresentationMode,
+                                 settings.TraversalDurationSeconds,
+                                 settings.PauseAtCenter,
+                                 settings.CenterHoldDurationSeconds,
+                                 settings.PaintRevealDurationSeconds,
+                                 settings.PaintHoldDurationSeconds,
+                                 settings.PaintFadeOutDurationSeconds,
+                                 "Room Clear Announcement",
+                                 warnings);
+        ValidateAnnouncementDirection(settings.Direction,
+                                      "Room Clear Announcement direction",
+                                      warnings);
+
+        if (settings.PresentationMode == GameHudWaveClearAnnouncementPresentationMode.PaintReveal)
+            ValidateAnnouncementDirection(settings.PaintExitDirection,
+                                          "Room Clear Announcement removal direction",
+                                          warnings);
+
         ValidateNormalized(settings.VerticalPositionNormalized,
                            "Room Clear Announcement vertical position",
                            warnings);
-        ValidateNonNegative(settings.HorizontalOffscreenPadding,
-                            "Room Clear Announcement off-screen padding",
-                            warnings);
-        ValidatePositive(settings.FontSize, "Room Clear Announcement font size", warnings);
-
-        if (settings.PauseAtCenter)
-            ValidateNonNegative(settings.CenterHoldDurationSeconds,
-                                "Room Clear Announcement center hold duration",
+        if (settings.PresentationMode == GameHudWaveClearAnnouncementPresentationMode.Traversal ||
+            settings.UseFinalWaveOverride &&
+            settings.FinalWavePresentationMode == GameHudWaveClearAnnouncementPresentationMode.Traversal)
+        {
+            ValidateNonNegative(settings.HorizontalOffscreenPadding,
+                                "Room Clear Announcement off-screen padding",
                                 warnings);
+        }
+
+        ValidatePositive(settings.FontSize, "Room Clear Announcement font size", warnings);
 
         if (settings.PlayAudioEvent && settings.AudioEventId == GameAudioEventId.None)
             warnings.Add("Room Clear Announcement audio is enabled but no standard Audio Event is selected.");
@@ -151,14 +167,23 @@ public static class GameHudSupplementalPresetValidationUtility
             else if (Encoding.UTF8.GetByteCount(settings.FinalWaveContent) > FixedString512Bytes.UTF8MaxLengthInBytes)
                 warnings.Add("Room Clear Announcement terminal Boss content exceeds the baked 512-byte UTF-8 capacity and will be truncated at runtime.");
 
-            ValidatePositive(settings.FinalWaveTraversalDurationSeconds,
-                             "Room Clear Announcement terminal Boss traversal duration",
-                             warnings);
+            ValidateAnnouncementMode(settings.FinalWavePresentationMode,
+                                     settings.FinalWaveTraversalDurationSeconds,
+                                     settings.FinalWavePauseAtCenter,
+                                     settings.FinalWaveCenterHoldDurationSeconds,
+                                     settings.FinalWavePaintRevealDurationSeconds,
+                                     settings.FinalWavePaintHoldDurationSeconds,
+                                     settings.FinalWavePaintFadeOutDurationSeconds,
+                                     "Room Clear Announcement terminal Boss",
+                                     warnings);
+            ValidateAnnouncementDirection(settings.FinalWaveDirection,
+                                          "Room Clear Announcement terminal Boss direction",
+                                          warnings);
 
-            if (settings.FinalWavePauseAtCenter)
-                ValidateNonNegative(settings.FinalWaveCenterHoldDurationSeconds,
-                                    "Room Clear Announcement terminal Boss center hold duration",
-                                    warnings);
+            if (settings.FinalWavePresentationMode == GameHudWaveClearAnnouncementPresentationMode.PaintReveal)
+                ValidateAnnouncementDirection(settings.FinalWavePaintExitDirection,
+                                              "Room Clear Announcement terminal Boss removal direction",
+                                              warnings);
 
             if (settings.PlayFinalWaveAudioEvent && settings.FinalWaveAudioEventId == GameAudioEventId.None)
                 warnings.Add("Room Clear Announcement terminal Boss audio is enabled but no Audio Event is selected.");
@@ -166,6 +191,52 @@ public static class GameHudSupplementalPresetValidationUtility
 
         if (!IsFinite(settings.Color))
             warnings.Add("Room Clear Announcement color should contain only finite channels.");
+
+        bool usesPaint = settings.PresentationMode == GameHudWaveClearAnnouncementPresentationMode.PaintReveal ||
+                         settings.UseFinalWaveOverride &&
+                         settings.FinalWavePresentationMode == GameHudWaveClearAnnouncementPresentationMode.PaintReveal;
+
+        if (!usesPaint)
+            return;
+
+        if (!IsFinite(settings.PaintBackgroundColor))
+            warnings.Add("Room Clear Announcement paint background color should contain only finite channels.");
+
+        if (settings.PaintBackgroundSprite == null)
+            warnings.Add("Room Clear Announcement requires a paint background sprite to define its final aerosol silhouette.");
+
+        if (!IsFinite(settings.PaintBackgroundPadding) ||
+            settings.PaintBackgroundPadding.x < 0f ||
+            settings.PaintBackgroundPadding.y < 0f)
+        {
+            warnings.Add("Room Clear Announcement paint background padding should contain finite non-negative components.");
+        }
+
+        ValidateRange(settings.PaintEdgeSoftness,
+                      0.001f,
+                      0.25f,
+                      "Room Clear Announcement deposit softness",
+                      warnings);
+        ValidateRange(settings.PaintNoiseStrength,
+                      0f,
+                      0.5f,
+                      "Room Clear Announcement deposit variation",
+                      warnings);
+        ValidateRange(settings.PaintNoiseScale,
+                      0.25f,
+                      12f,
+                      "Room Clear Announcement deposit scale",
+                      warnings);
+        ValidateRange(settings.PaintBristleStrength,
+                      0f,
+                      0.25f,
+                      "Room Clear Announcement mist strength",
+                      warnings);
+        ValidateRange(settings.PaintBristleScale,
+                      1f,
+                      96f,
+                      "Room Clear Announcement mist density",
+                      warnings);
     }
     #endregion
 
@@ -253,7 +324,7 @@ public static class GameHudSupplementalPresetValidationUtility
             switch (profile.MotionTarget)
             {
                 case GameUiButtonMotionTarget.WholeButton:
-                case GameUiButtonMotionTarget.TextOnly:
+                case GameUiButtonMotionTarget.ContentOnly:
                     break;
                 default:
                     warnings.Add(string.Format("{0} button motion target is unsupported. Runtime will use the complete button target.", profile.MenuKind));
@@ -282,11 +353,155 @@ public static class GameHudSupplementalPresetValidationUtility
                 ValidatePositive(profile.NormalFontSize, string.Format("{0} normal button font size", profile.MenuKind), warnings);
                 ValidatePositive(profile.EmphasizedFontSize, string.Format("{0} emphasized button font size", profile.MenuKind), warnings);
             }
+
+            ValidateButtonImageContent(profile, warnings);
+        }
+    }
+
+    /// <summary>
+    /// Validates stable IDs, required normal sprites, duplicate mappings, and finite image tints.
+    /// </summary>
+    /// <param name="profile">Menu profile whose image-content path is inspected.</param>
+    /// <param name="warnings">Mutable warning list receiving diagnostics.</param>
+    private static void ValidateButtonImageContent(GameUiMenuButtonInteractionDefinition profile,
+                                                   List<string> warnings)
+    {
+        if (profile.ContentMode != GameUiButtonContentMode.Image)
+            return;
+
+        if (profile.ImageContentDefinitions == null || profile.ImageContentDefinitions.Count == 0)
+        {
+            warnings.Add(string.Format("{0} uses Image button content but has no per-button image mappings.", profile.MenuKind));
+            return;
+        }
+
+        HashSet<string> visitedButtonIds = new HashSet<string>(StringComparer.Ordinal);
+
+        for (int contentIndex = 0; contentIndex < profile.ImageContentDefinitions.Count; contentIndex++)
+        {
+            GameUiButtonImageContentDefinition content = profile.ImageContentDefinitions[contentIndex];
+
+            if (content == null)
+            {
+                warnings.Add(string.Format("{0} image mapping {1} is missing.", profile.MenuKind, contentIndex + 1));
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(content.ButtonId))
+            {
+                warnings.Add(string.Format("{0} image mapping {1} has no Button ID.", profile.MenuKind, contentIndex + 1));
+                continue;
+            }
+
+            string buttonId = content.ButtonId.Trim();
+
+            if (!visitedButtonIds.Add(buttonId))
+                warnings.Add(string.Format("{0} contains more than one image mapping for Button ID '{1}'. Only the first is baked.", profile.MenuKind, buttonId));
+
+            if (content.NormalSprite == null)
+                warnings.Add(string.Format("{0} image mapping '{1}' has no normal sprite. Its relay will retain TMP text.", profile.MenuKind, buttonId));
+
+            if (!IsFinite(content.NormalColor) ||
+                !IsFinite(content.HoverColor) ||
+                !IsFinite(content.PressedColor) ||
+                !IsFinite(content.DisabledColor))
+            {
+                warnings.Add(string.Format("{0} image mapping '{1}' contains a non-finite tint channel.", profile.MenuKind, buttonId));
+            }
+
+            if (content.NormalColor.a <= 0f)
+            {
+                warnings.Add(string.Format(
+                    "{0} image mapping '{1}' has a fully transparent normal tint, so its image is invisible while the button is idle.",
+                    profile.MenuKind,
+                    buttonId));
+            }
         }
     }
     #endregion
 
     #region Helpers
+    /// <summary>
+    /// Validates only the timing family consumed by one announcement presentation mode.
+    /// </summary>
+    /// <param name="mode">Selected presentation mode.</param>
+    /// <param name="traversalDuration">Complete edge-to-edge traversal duration.</param>
+    /// <param name="pauseAtCenter">Whether the traversal pauses at screen center.</param>
+    /// <param name="centerHoldDuration">Traversal center hold duration.</param>
+    /// <param name="paintRevealDuration">Paint coverage duration.</param>
+    /// <param name="paintHoldDuration">Fully revealed paint hold duration.</param>
+    /// <param name="paintRemovalDuration">Directional paint-removal duration.</param>
+    /// <param name="label">Diagnostic prefix identifying the presentation.</param>
+    /// <param name="warnings">Mutable warning list receiving diagnostics.</param>
+    private static void ValidateAnnouncementMode(GameHudWaveClearAnnouncementPresentationMode mode,
+                                                 float traversalDuration,
+                                                 bool pauseAtCenter,
+                                                 float centerHoldDuration,
+                                                 float paintRevealDuration,
+                                                 float paintHoldDuration,
+                                                 float paintRemovalDuration,
+                                                 string label,
+                                                 List<string> warnings)
+    {
+        switch (mode)
+        {
+            case GameHudWaveClearAnnouncementPresentationMode.PaintReveal:
+                ValidatePositive(paintRevealDuration, label + " paint reveal duration", warnings);
+                ValidateNonNegative(paintHoldDuration, label + " paint hold duration", warnings);
+                ValidatePositive(paintRemovalDuration, label + " paint removal duration", warnings);
+                return;
+            default:
+                ValidatePositive(traversalDuration, label + " traversal duration", warnings);
+
+                if (pauseAtCenter)
+                    ValidateNonNegative(centerHoldDuration, label + " center hold duration", warnings);
+
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Warns when one announcement direction does not map to a supported horizontal frontier.
+    /// </summary>
+    /// <param name="direction">Authored announcement direction.</param>
+    /// <param name="label">Setting label included in the warning.</param>
+    /// <param name="warnings">Mutable warning list receiving diagnostics.</param>
+    private static void ValidateAnnouncementDirection(GameHudWaveClearAnnouncementDirection direction,
+                                                      string label,
+                                                      List<string> warnings)
+    {
+        switch (direction)
+        {
+            case GameHudWaveClearAnnouncementDirection.LeftToRight:
+            case GameHudWaveClearAnnouncementDirection.RightToLeft:
+                return;
+            default:
+                warnings.Add(label + " is unsupported. Runtime will retain the serialized value without changing the preset.");
+                return;
+        }
+    }
+
+    /// <summary>
+    /// Warns when one scalar lies outside its finite inclusive range.
+    /// </summary>
+    /// <param name="value">Authored scalar value.</param>
+    /// <param name="minimum">Inclusive supported minimum.</param>
+    /// <param name="maximum">Inclusive supported maximum.</param>
+    /// <param name="label">Setting label included in the warning.</param>
+    /// <param name="warnings">Mutable warning list receiving diagnostics.</param>
+    private static void ValidateRange(float value,
+                                      float minimum,
+                                      float maximum,
+                                      string label,
+                                      List<string> warnings)
+    {
+        if (!IsFinite(value) || value < minimum || value > maximum)
+            warnings.Add(string.Format("{0} should remain inside the finite {1}..{2} range. Runtime will use a safe fallback without changing the preset.",
+                                       label,
+                                       minimum,
+                                       maximum));
+    }
+
     /// <summary>
     /// Warns when one required stable Input Action ID is empty.
     /// </summary>

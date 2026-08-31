@@ -11,9 +11,14 @@ public sealed class GameSceneFadeSettings
 
     #region Serialized Fields
     [Header("Fade")]
-    [Tooltip("Color used by the full-screen transition overlay.")]
+    [Tooltip("Single pigment color used by every full-screen paint deposit and removal phase. Black is the default.")]
+    [InspectorName("Transition Color")]
     [SerializeField]
     private Color fadeColor = Color.black;
+
+    [Tooltip("Selects the gradient transition family or aerosol deposition for every scene transition.")]
+    [SerializeField]
+    private GameSceneFadeVisualStyle visualStyle = GameSceneFadeVisualStyle.Paint;
 
     [Tooltip("Selects a uniform opacity fade or a shader-driven directional gradient that progressively covers and reveals the scene.")]
     [SerializeField]
@@ -36,6 +41,32 @@ public sealed class GameSceneFadeSettings
     [SerializeField]
     private float directionalNoiseScale = 5.5f;
 
+    [Header("Paint Reveal")]
+    [Tooltip("Normalized antialiasing width applied around newly deposited pigment without blurring completed coverage.")]
+    [InspectorName("Deposit Softness")]
+    [SerializeField]
+    private float paintEdgeSoftness = 0.025f;
+
+    [Tooltip("Maximum local arrival-time variation used to keep aerosol deposits separated while they accumulate.")]
+    [InspectorName("Deposit Variation")]
+    [SerializeField]
+    private float paintNoiseStrength = 0.22f;
+
+    [Tooltip("Scale of the overlapping deposit clusters sampled across the transition surface.")]
+    [InspectorName("Deposit Scale")]
+    [SerializeField]
+    private float paintNoiseScale = 2.4f;
+
+    [Tooltip("Strength of fine aerosol breakup and sparse droplets around active deposit edges.")]
+    [InspectorName("Mist Strength")]
+    [SerializeField]
+    private float paintBristleStrength = 0.075f;
+
+    [Tooltip("Spatial density of fine aerosol mist sampled around active deposit edges.")]
+    [InspectorName("Mist Density")]
+    [SerializeField]
+    private float paintBristleScale = 48f;
+
     [Tooltip("Interpolation applied before shader evaluation. Smooth Step softens acceleration at the beginning and end of the transition.")]
     [SerializeField]
     private GameSceneFadeEasing easing = GameSceneFadeEasing.SmoothStep;
@@ -44,7 +75,7 @@ public sealed class GameSceneFadeSettings
     [SerializeField]
     private float fadeOutSeconds = 0.35f;
 
-    [Tooltip("Extra seconds spent at full opacity after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
+    [Tooltip("Extra seconds spent at complete transition coverage after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
     [FormerlySerializedAs("holdBlackSeconds")]
     [SerializeField]
     private float postLoadReadyExtraSeconds = 0.08f;
@@ -70,6 +101,14 @@ public sealed class GameSceneFadeSettings
         get
         {
             return fadeColor;
+        }
+    }
+
+    public GameSceneFadeVisualStyle VisualStyle
+    {
+        get
+        {
+            return visualStyle;
         }
     }
 
@@ -110,6 +149,46 @@ public sealed class GameSceneFadeSettings
         get
         {
             return directionalNoiseScale;
+        }
+    }
+
+    public float PaintEdgeSoftness
+    {
+        get
+        {
+            return paintEdgeSoftness;
+        }
+    }
+
+    public float PaintNoiseStrength
+    {
+        get
+        {
+            return paintNoiseStrength;
+        }
+    }
+
+    public float PaintNoiseScale
+    {
+        get
+        {
+            return paintNoiseScale;
+        }
+    }
+
+    public float PaintBristleStrength
+    {
+        get
+        {
+            return paintBristleStrength;
+        }
+    }
+
+    public float PaintBristleScale
+    {
+        get
+        {
+            return paintBristleScale;
         }
     }
 

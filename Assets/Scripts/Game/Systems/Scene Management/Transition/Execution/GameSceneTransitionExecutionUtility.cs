@@ -396,10 +396,16 @@ internal static class GameSceneTransitionExecutionUtility
         fadeState.Color = config.FadeColor;
         fadeState.Mode = config.FadeMode;
         fadeState.WipeDirection = config.FadeWipeDirection;
+        fadeState.Operation = GameUiPaintRevealOperation.Deposit;
         fadeState.Easing = config.FadeEasing;
         fadeState.DirectionalEdgeSoftness = config.FadeDirectionalEdgeSoftness;
         fadeState.DirectionalNoiseStrength = config.FadeDirectionalNoiseStrength;
         fadeState.DirectionalNoiseScale = config.FadeDirectionalNoiseScale;
+        fadeState.PaintEdgeSoftness = config.FadePaintEdgeSoftness;
+        fadeState.PaintNoiseStrength = config.FadePaintNoiseStrength;
+        fadeState.PaintNoiseScale = config.FadePaintNoiseScale;
+        fadeState.PaintBristleStrength = config.FadePaintBristleStrength;
+        fadeState.PaintBristleScale = config.FadePaintBristleScale;
 
         if (fadeState.Alpha < 0.9999f || !visible)
             fadeState.OpaquePresented = 0;

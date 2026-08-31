@@ -216,6 +216,51 @@ internal static class GameSceneManagerPresetsPanelSectionsUtility
                          section,
                          "enablePlayerCameraOcclusion",
                          "Hide environment renderers that block the camera's view of the player while preserving collision and simulation.");
+        SerializedProperty enableBoundariesProperty = panel.PresetSerializedObject.FindProperty("enableCameraBoundaries");
+        SerializedProperty boundaryModeProperty = panel.PresetSerializedObject.FindProperty("cameraBoundaryMode");
+        SerializedProperty softZoneProperty = panel.PresetSerializedObject.FindProperty("cameraBoundarySoftZoneDistance");
+
+        if (enableBoundariesProperty == null || boundaryModeProperty == null || softZoneProperty == null)
+            return;
+
+        PropertyField enableBoundariesField = new PropertyField(enableBoundariesProperty);
+        enableBoundariesField.tooltip = "Enable camera constraints from authored Camera Boundary footprints.";
+        enableBoundariesField.BindProperty(enableBoundariesProperty);
+        section.Add(enableBoundariesField);
+
+        PropertyField boundaryModeField = new PropertyField(boundaryModeProperty);
+        boundaryModeField.tooltip = "Keep the camera inside the player-selected volume or treat every footprint as an impassable obstacle.";
+        boundaryModeField.BindProperty(boundaryModeProperty);
+        section.Add(boundaryModeField);
+
+        PropertyField softZoneField = new PropertyField(softZoneProperty);
+        softZoneField.tooltip = "Set the braking distance used before the camera reaches a hard boundary edge.";
+        softZoneField.BindProperty(softZoneProperty);
+        section.Add(softZoneField);
+
+        enableBoundariesField.RegisterCallback<SerializedPropertyChangeEvent>(changeEvent =>
+        {
+            panel.MarkSelectedPresetDirty();
+            RefreshCameraBoundaryFieldVisibility(enableBoundariesProperty, boundaryModeField, softZoneField);
+        });
+        boundaryModeField.RegisterCallback<SerializedPropertyChangeEvent>(changeEvent => panel.MarkSelectedPresetDirty());
+        softZoneField.RegisterCallback<SerializedPropertyChangeEvent>(changeEvent => panel.MarkSelectedPresetDirty());
+        RefreshCameraBoundaryFieldVisibility(enableBoundariesProperty, boundaryModeField, softZoneField);
+    }
+
+    /// <summary>
+    /// Shows boundary braking controls only while camera boundaries are enabled.
+    /// </summary>
+    /// <param name="enableBoundariesProperty">Serialized toggle controlling boundary runtime support.</param>
+    /// <param name="boundaryModeField">Dependent boundary-mode field.</param>
+    /// <param name="softZoneField">Dependent braking-distance field.</param>
+    private static void RefreshCameraBoundaryFieldVisibility(SerializedProperty enableBoundariesProperty,
+                                                             VisualElement boundaryModeField,
+                                                             VisualElement softZoneField)
+    {
+        DisplayStyle display = enableBoundariesProperty.boolValue ? DisplayStyle.Flex : DisplayStyle.None;
+        boundaryModeField.style.display = display;
+        softZoneField.style.display = display;
     }
 
     /// <summary>

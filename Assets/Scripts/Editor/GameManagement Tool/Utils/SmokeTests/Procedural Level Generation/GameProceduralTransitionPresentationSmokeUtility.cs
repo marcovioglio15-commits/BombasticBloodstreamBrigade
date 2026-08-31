@@ -51,6 +51,46 @@ public static class GameProceduralTransitionPresentationSmokeUtility
             world.Dispose();
         }
     }
+
+    /// <summary>
+    /// Verifies room traversal uses portal-directed paint while reload-like transitions use uniform paint.
+    /// </summary>
+    public static void ValidateFadePresentationPolicy()
+    {
+        GameSceneTransitionRequest traversalRequest = new GameSceneTransitionRequest
+        {
+            Purpose = GameSceneTransitionPurpose.ProceduralRoomTraversal,
+            PortalWipeDirection = GameSceneFadeWipeDirection.TopToBottom
+        };
+        GameSceneTransitionFadePresentationUtility.Resolve(in traversalRequest,
+                                                           GameSceneFadeVisualStyle.Paint,
+                                                           out GameSceneFadeMode traversalMode,
+                                                           out GameSceneFadeWipeDirection traversalDirection);
+        Require(traversalMode == GameSceneFadeMode.DirectionalPaint &&
+                traversalDirection == GameSceneFadeWipeDirection.TopToBottom,
+                "Room traversal did not retain its portal-directed paint coverage.");
+
+        GameSceneTransitionRequest reloadRequest = new GameSceneTransitionRequest
+        {
+            Purpose = GameSceneTransitionPurpose.Standard,
+            PortalWipeDirection = GameSceneFadeWipeDirection.RightToLeft
+        };
+        GameSceneTransitionFadePresentationUtility.Resolve(in reloadRequest,
+                                                           GameSceneFadeVisualStyle.Paint,
+                                                           out GameSceneFadeMode reloadMode,
+                                                           out GameSceneFadeWipeDirection reloadDirection);
+        Require(reloadMode == GameSceneFadeMode.UniformPaint &&
+                reloadDirection == GameSceneFadeWipeDirection.LeftToRight,
+                "Reload-like transition did not select direction-independent paint coverage.");
+
+        GameSceneTransitionFadePresentationUtility.Resolve(in traversalRequest,
+                                                           GameSceneFadeVisualStyle.Gradient,
+                                                           out GameSceneFadeMode gradientMode,
+                                                           out GameSceneFadeWipeDirection gradientDirection);
+        Require(gradientMode == GameSceneFadeMode.DirectionalGradient &&
+                gradientDirection == GameSceneFadeWipeDirection.TopToBottom,
+                "Gradient compatibility mode did not retain portal direction.");
+    }
     #endregion
 
     #region Assertion Methods

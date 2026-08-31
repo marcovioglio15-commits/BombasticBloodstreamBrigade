@@ -43,7 +43,7 @@ public sealed class GameSceneTransitionDefinition
     [Tooltip("Override fade-out duration in seconds when Override Fade Settings is enabled.")]
     [SerializeField] private float fadeOutSeconds = 0.35f;
 
-    [Tooltip("Override extra black duration after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
+    [Tooltip("Override complete-coverage duration after Unity scene loading, DOTS SubScene streaming and presentation readiness have completed.")]
     [FormerlySerializedAs("holdBlackSeconds")]
     [SerializeField] private float postLoadReadyExtraSeconds = 0.08f;
 

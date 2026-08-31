@@ -70,23 +70,41 @@ public struct GameHudWaveClearAnnouncementRuntimeConfig : IComponentData
     public FixedString512Bytes Content;
     public byte PlayAudioEvent;
     public GameAudioEventId AudioEventId;
+    public GameHudWaveClearAnnouncementPresentationMode PresentationMode;
     public GameHudWaveClearAnnouncementDirection Direction;
+    public GameHudWaveClearAnnouncementDirection PaintExitDirection;
     public float TraversalDurationSeconds;
     public GameHudWaveClearAnnouncementEasing Easing;
     public byte PauseAtCenter;
     public float CenterHoldDurationSeconds;
+    public float PaintRevealDurationSeconds;
+    public float PaintHoldDurationSeconds;
+    public float PaintFadeOutDurationSeconds;
     public byte UseUnscaledTime;
     public byte UseFinalWaveOverride;
     public FixedString512Bytes FinalWaveContent;
+    public GameHudWaveClearAnnouncementPresentationMode FinalWavePresentationMode;
     public GameHudWaveClearAnnouncementDirection FinalWaveDirection;
+    public GameHudWaveClearAnnouncementDirection FinalWavePaintExitDirection;
     public float FinalWaveTraversalDurationSeconds;
     public GameHudWaveClearAnnouncementEasing FinalWaveEasing;
     public byte FinalWavePauseAtCenter;
     public float FinalWaveCenterHoldDurationSeconds;
+    public float FinalWavePaintRevealDurationSeconds;
+    public float FinalWavePaintHoldDurationSeconds;
+    public float FinalWavePaintFadeOutDurationSeconds;
     public byte PlayFinalWaveAudioEvent;
     public GameAudioEventId FinalWaveAudioEventId;
     public float VerticalPositionNormalized;
     public float HorizontalOffscreenPadding;
+    public UnityObjectRef<Sprite> PaintBackgroundSprite;
+    public float4 PaintBackgroundColor;
+    public float2 PaintBackgroundPadding;
+    public float PaintEdgeSoftness;
+    public float PaintNoiseStrength;
+    public float PaintNoiseScale;
+    public float PaintBristleStrength;
+    public float PaintBristleScale;
     public UnityObjectRef<TMP_FontAsset> Font;
     public float FontSize;
     public int FontStyle;
@@ -180,6 +198,7 @@ public struct GameUiMenuButtonInteractionElement : IBufferElementData
     #region Fields
     public GameUiMenuKind MenuKind;
     public byte Enabled;
+    public GameUiButtonContentMode ContentMode;
     public GameUiButtonMotionMode MotionMode;
     public GameUiButtonMotionTarget MotionTarget;
     public float TransitionDurationSeconds;
@@ -220,5 +239,26 @@ public struct GameUiMenuButtonInteractionElement : IBufferElementData
     public float4 HoverTextColor;
     public float4 PressedTextColor;
     public float4 DisabledTextColor;
+    #endregion
+}
+
+/// <summary>
+/// Stores one baked image-content mapping resolved once by a preauthored menu-button relay.
+/// </summary>
+[InternalBufferCapacity(0)]
+public struct GameUiButtonImageContentElement : IBufferElementData
+{
+    #region Fields
+    public GameUiMenuKind MenuKind;
+    public FixedString128Bytes ButtonId;
+    public UnityObjectRef<Sprite> NormalSprite;
+    public UnityObjectRef<Sprite> HoverSprite;
+    public UnityObjectRef<Sprite> PressedSprite;
+    public UnityObjectRef<Sprite> DisabledSprite;
+    public byte PreserveAspect;
+    public float4 NormalColor;
+    public float4 HoverColor;
+    public float4 PressedColor;
+    public float4 DisabledColor;
     #endregion
 }

@@ -17,6 +17,10 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
                                                ISelectHandler,
                                                IDeselectHandler
 {
+    #region Constants
+    private const int InteractionResolutionMaxFrames = 300;
+    #endregion
+
     #region Fields
 
     #region Serialized Fields
@@ -34,7 +38,15 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     [Tooltip("Optional TMP label override. The first child TMP text is used when this is empty.")]
     [SerializeField] private TMP_Text targetTextOverride;
 
-    [Tooltip("Optional whole-button motion target used instead of the layout-driven button root. Text Only motion ignores this override and automatically uses the resolved TMP label.")]
+    [Tooltip("Stable ID matched to the button image configured in the HUD preset. Project setup uses this GameObject name by default.")]
+    [SerializeField]
+    private string buttonContentId;
+
+    [Tooltip("Preauthored image-content target used when the active menu profile selects Image content.")]
+    [SerializeField]
+    private Image targetImageOverride;
+
+    [Tooltip("Optional whole-button motion target used instead of the layout-driven button root. Content Only motion ignores this override and uses the active text or image content.")]
     [SerializeField] private Transform transformTargetOverride;
     #endregion
 
@@ -43,6 +55,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     private MenuSelectionController selectionController;
     private Graphic targetGraphic;
     private TMP_Text targetText;
+    private Image targetImage;
     private Transform presentationTransform;
     private Sprite originalSprite;
     private Color originalGraphicColor;
@@ -50,13 +63,21 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     private float originalFontSize;
     private FontStyles originalFontStyle;
     private Color originalTextColor;
+    private Sprite originalImageSprite;
+    private Color originalImageColor;
+    private bool originalImagePreserveAspect;
+    private bool originalImageEnabled;
+    private bool originalTextEnabled;
     private Vector3 originalLocalPosition;
     private Quaternion originalLocalRotation;
     private Vector3 originalLocalScale;
     private GameUiMenuButtonInteractionElement interaction;
+    private GameUiButtonImageContentElement imageContent;
+    private Coroutine interactionResolutionCoroutine;
     private Coroutine transitionCoroutine;
     private GameUiButtonPresentationState currentState;
     private bool interactionResolved;
+    private bool usesImageContent;
     private bool isHovered;
     private bool isPressed;
     private bool isSelected;
@@ -78,11 +99,11 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         selectable = GetComponent<Selectable>();
         targetGraphic = targetGraphicOverride != null ? targetGraphicOverride : selectable.targetGraphic;
         targetText = targetTextOverride != null ? targetTextOverride : GetComponentInChildren<TMP_Text>(true);
+        targetImage = targetImageOverride != null ? targetImageOverride : FindImageContentTarget();
         presentationTransform = transformTargetOverride != null ? transformTargetOverride : transform;
         protectLayoutPosition = transformTargetOverride == null;
         CacheOriginalPresentation();
         ResolveSelectionController();
-        TryResolveInteraction();
     }
 
     /// <summary>
@@ -91,17 +112,11 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     private void OnEnable()
     {
         ResolveSelectionController();
-        TryResolveInteraction();
-        ApplyCurrentState(false);
-    }
 
-    /// <summary>
-    /// Performs one deferred ECS-config lookup after scene initialization has completed.
-    /// </summary>
-    private void Start()
-    {
-        if (!interactionResolved && TryResolveInteraction())
+        if (TryResolveInteraction())
             ApplyCurrentState(false);
+        else
+            BeginInteractionResolution();
     }
 
     /// <summary>
@@ -115,6 +130,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         isHovered = false;
         isPressed = false;
         isSelected = false;
+        StopInteractionResolution();
         StopTransition();
 
         if (protectLayoutPosition &&
@@ -218,6 +234,13 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         if (!GameMenuButtonInteractionRuntimeUtility.TryResolve(menuKind, out interaction))
             return false;
 
+        usesImageContent = interaction.ContentMode == GameUiButtonContentMode.Image &&
+                           targetImage != null &&
+                           GameMenuButtonInteractionRuntimeUtility.TryResolveImageContent(menuKind,
+                                                                                          buttonContentId,
+                                                                                          out imageContent) &&
+                           imageContent.NormalSprite.Value != null;
+        GameMenuButtonContentPresentationUtility.ApplyVisibility(targetText, targetImage, usesImageContent);
         ConfigureMotionTarget(interaction.MotionTarget);
         interactionResolved = true;
         return true;
@@ -228,8 +251,58 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     /// </summary>
     private void EnsureInteractionAndApply()
     {
-        TryResolveInteraction();
+        if (!TryResolveInteraction())
+            BeginInteractionResolution();
+
         ApplyCurrentState(true);
+    }
+
+    /// <summary>
+    /// Starts one transient initialization retry while the DOTS HUD singleton is still being created.
+    /// </summary>
+    private void BeginInteractionResolution()
+    {
+        if (interactionResolved || interactionResolutionCoroutine != null || !isActiveAndEnabled)
+            return;
+
+        interactionResolutionCoroutine = StartCoroutine(ResolveInteractionWhenReady());
+    }
+
+    /// <summary>
+    /// Retries the shared ECS lookup only during startup and applies the idle state as soon as it succeeds.
+    /// </summary>
+    /// <returns>Coroutine enumerator that completes immediately after the HUD interaction buffer becomes available.</returns>
+    private IEnumerator ResolveInteractionWhenReady()
+    {
+        int attemptedFrames = 0;
+
+        while (isActiveAndEnabled &&
+               !interactionResolved &&
+               attemptedFrames < InteractionResolutionMaxFrames)
+        {
+            if (TryResolveInteraction())
+            {
+                ApplyCurrentState(false);
+                break;
+            }
+
+            attemptedFrames++;
+            yield return null;
+        }
+
+        interactionResolutionCoroutine = null;
+    }
+
+    /// <summary>
+    /// Stops the transient ECS initialization retry when the authored button hierarchy is hidden.
+    /// </summary>
+    private void StopInteractionResolution()
+    {
+        if (interactionResolutionCoroutine == null)
+            return;
+
+        StopCoroutine(interactionResolutionCoroutine);
+        interactionResolutionCoroutine = null;
     }
 
     /// <summary>
@@ -243,6 +316,8 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
             RestoreOriginalPresentation();
             return;
         }
+
+        GameMenuButtonContentPresentationUtility.ApplyVisibility(targetText, targetImage, usesImageContent);
 
         GameUiButtonPresentationState state;
 
@@ -270,8 +345,24 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         PreparePositionBaseline(state);
         currentState = state;
         stateInitialized = true;
-        ApplySpriteAndGraphic(state);
-        ApplyTextStyle(state);
+        GameMenuButtonContentPresentationUtility.ApplyTargetGraphic(targetGraphic,
+                                                                    originalGraphicColor,
+                                                                    originalSprite,
+                                                                    in interaction,
+                                                                    state);
+        GameMenuButtonContentPresentationUtility.ApplyText(targetText,
+                                                           usesImageContent,
+                                                           originalFont,
+                                                           originalFontSize,
+                                                           originalFontStyle,
+                                                           originalTextColor,
+                                                           originalTextEnabled,
+                                                           in interaction,
+                                                           state);
+        GameMenuButtonContentPresentationUtility.ApplyImage(targetImage,
+                                                            usesImageContent,
+                                                            in imageContent,
+                                                            state);
         StopTransition();
 
         // Resolve motion independently from sprite, graphic-color, and text-style state changes.
@@ -428,74 +519,6 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     }
 
     /// <summary>
-    /// Applies the state sprite and target-graphic tint when those overrides are enabled.
-    /// </summary>
-    /// <param name="state">Current button presentation state.</param>
-    private void ApplySpriteAndGraphic(GameUiButtonPresentationState state)
-    {
-        if (targetGraphic == null)
-            return;
-
-        if (interaction.OverrideGraphicColors != 0)
-            targetGraphic.color = GameMenuButtonPresentationUtility.ResolveGraphicColor(in interaction, state);
-        else
-            targetGraphic.color = originalGraphicColor;
-
-        Image image = targetGraphic as Image;
-
-        if (image == null)
-            return;
-
-        if (interaction.OverrideSprites == 0)
-        {
-            image.sprite = originalSprite;
-            return;
-        }
-
-        Sprite stateSprite = GameMenuButtonPresentationUtility.ResolveSprite(in interaction, state);
-        image.sprite = stateSprite != null || interaction.AllowEmptySprites != 0
-            ? stateSprite
-            : originalSprite;
-
-        if (stateSprite == null && interaction.AllowEmptySprites != 0)
-        {
-            Color transparentGraphicColor = targetGraphic.color;
-            transparentGraphicColor.a = 0f;
-            targetGraphic.color = transparentGraphicColor;
-        }
-    }
-
-    /// <summary>
-    /// Applies normal, emphasized, or disabled TMP text style from the current menu profile.
-    /// </summary>
-    /// <param name="state">Current button presentation state.</param>
-    private void ApplyTextStyle(GameUiButtonPresentationState state)
-    {
-        if (targetText == null)
-            return;
-
-        if (interaction.OverrideTextStyle == 0)
-        {
-            RestoreOriginalTextStyle();
-            return;
-        }
-
-        bool emphasized = state == GameUiButtonPresentationState.Hovered ||
-                          state == GameUiButtonPresentationState.Selected ||
-                          state == GameUiButtonPresentationState.Pressed;
-        TMP_FontAsset font = emphasized ? interaction.EmphasizedFont.Value : interaction.NormalFont.Value;
-
-        if (font != null)
-            targetText.font = font;
-        else if (originalFont != null)
-            targetText.font = originalFont;
-
-        targetText.fontSize = emphasized ? interaction.EmphasizedFontSize : interaction.NormalFontSize;
-        targetText.fontStyle = (FontStyles)(emphasized ? interaction.EmphasizedFontStyle : interaction.NormalFontStyle);
-        targetText.color = GameMenuButtonPresentationUtility.ResolveTextColor(in interaction, state);
-    }
-
-    /// <summary>
     /// Applies one local transform state without writing layout-owned root position.
     /// </summary>
     /// <param name="position">Target local position.</param>
@@ -524,6 +547,11 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         originalGraphicColor = targetGraphic != null ? targetGraphic.color : Color.white;
         Image image = targetGraphic as Image;
         originalSprite = image != null ? image.sprite : null;
+        originalImageSprite = targetImage != null ? targetImage.sprite : null;
+        originalImageColor = targetImage != null ? targetImage.color : Color.white;
+        originalImagePreserveAspect = targetImage != null && targetImage.preserveAspect;
+        originalImageEnabled = targetImage != null && targetImage.enabled;
+        originalTextEnabled = targetText != null && targetText.enabled;
 
         if (targetText == null)
             return;
@@ -548,7 +576,7 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
     }
 
     /// <summary>
-    /// Selects the whole-button or TMP-label motion target once when the ECS profile becomes available.
+    /// Selects the whole-button or active content motion target once when the ECS profile becomes available.
     /// </summary>
     /// <param name="motionTarget">Baked target policy selected by the active menu profile.</param>
     private void ConfigureMotionTarget(GameUiButtonMotionTarget motionTarget)
@@ -558,8 +586,10 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
 
         switch (motionTarget)
         {
-            case GameUiButtonMotionTarget.TextOnly:
-                resolvedTarget = targetText != null ? targetText.transform : null;
+            case GameUiButtonMotionTarget.ContentOnly:
+                resolvedTarget = usesImageContent
+                    ? targetImage.transform
+                    : targetText != null ? targetText.transform : null;
                 resolvedLayoutProtection = false;
                 break;
             default:
@@ -614,23 +644,34 @@ public sealed class MenuSelectableHoverRelay : MonoBehaviour,
         if (image != null)
             image.sprite = originalSprite;
 
-        RestoreOriginalTextStyle();
+        GameMenuButtonContentPresentationUtility.RestoreImage(targetImage,
+                                                              originalImageSprite,
+                                                              originalImageColor,
+                                                              originalImagePreserveAspect,
+                                                              originalImageEnabled);
+        GameMenuButtonContentPresentationUtility.RestoreText(targetText,
+                                                             originalFont,
+                                                             originalFontSize,
+                                                             originalFontStyle,
+                                                             originalTextColor,
+                                                             originalTextEnabled);
     }
 
     /// <summary>
-    /// Restores authored TMP font, size, style, and color values.
+    /// Finds the preauthored image-content child while excluding the selectable target graphic.
     /// </summary>
-    private void RestoreOriginalTextStyle()
+    /// <returns>First eligible child Image, or null when project setup has not authored one.</returns>
+    private Image FindImageContentTarget()
     {
-        if (targetText == null)
-            return;
+        Image[] images = GetComponentsInChildren<Image>(true);
 
-        if (originalFont != null)
-            targetText.font = originalFont;
+        for (int imageIndex = 0; imageIndex < images.Length; imageIndex++)
+        {
+            if (images[imageIndex] != targetGraphic && images[imageIndex].name == "ImageContent")
+                return images[imageIndex];
+        }
 
-        targetText.fontSize = originalFontSize;
-        targetText.fontStyle = originalFontStyle;
-        targetText.color = originalTextColor;
+        return null;
     }
 
     /// <summary>

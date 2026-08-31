@@ -21,6 +21,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
         Foldout root = new Foldout();
         SerializedProperty menuKindProperty = property.FindPropertyRelative("menuKind");
         SerializedProperty enabledProperty = property.FindPropertyRelative("isEnabled");
+        SerializedProperty contentModeProperty = property.FindPropertyRelative("contentMode");
         SerializedProperty motionModeProperty = property.FindPropertyRelative("motionMode");
         SerializedProperty hoverTransformModeProperty = property.FindPropertyRelative("hoverTransformMode");
         SerializedProperty loopHoverPulseProperty = property.FindPropertyRelative("loopHoverPulse");
@@ -36,6 +37,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
         System.Action rebuild = () => BuildConditionalFields(conditionalRoot,
                                                               property,
                                                               enabledProperty.boolValue,
+                                                              (GameUiButtonContentMode)contentModeProperty.enumValueIndex,
                                                               (GameUiButtonMotionMode)motionModeProperty.enumValueIndex,
                                                               (GameUiButtonHoverTransformMode)hoverTransformModeProperty.enumValueIndex,
                                                               loopHoverPulseProperty.boolValue,
@@ -48,6 +50,11 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
             GameManagementDraftSession.MarkDirty();
         });
         root.TrackPropertyValue(enabledProperty, changedProperty =>
+        {
+            rebuild();
+            GameManagementDraftSession.MarkDirty();
+        });
+        root.TrackPropertyValue(contentModeProperty, changedProperty =>
         {
             rebuild();
             GameManagementDraftSession.MarkDirty();
@@ -95,6 +102,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
     /// <param name="root">Container receiving conditional fields.</param>
     /// <param name="property">Serialized menu profile.</param>
     /// <param name="isEnabled">Current profile enabled state.</param>
+    /// <param name="contentMode">Selected text or image content path.</param>
     /// <param name="motionMode">Selected motion path.</param>
     /// <param name="hoverTransformMode">Selected held-target or pulse hover behavior.</param>
     /// <param name="loopHoverPulse">Whether pulse cycles repeat until pointer exit.</param>
@@ -104,6 +112,7 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
     private static void BuildConditionalFields(VisualElement root,
                                                SerializedProperty property,
                                                bool isEnabled,
+                                               GameUiButtonContentMode contentMode,
                                                GameUiButtonMotionMode motionMode,
                                                GameUiButtonHoverTransformMode hoverTransformMode,
                                                bool loopHoverPulse,
@@ -118,6 +127,11 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
             root.Add(new HelpBox("This profile is disabled; authored Button behavior remains unchanged.", HelpBoxMessageType.Info));
             return;
         }
+
+        AddProperty(root, property.FindPropertyRelative("contentMode"), "Button Content");
+
+        if (contentMode == GameUiButtonContentMode.Image)
+            AddProperty(root, property.FindPropertyRelative("imageContentDefinitions"), "Button Images");
 
         AddProperty(root, property.FindPropertyRelative("motionMode"), "Motion Mode");
 
@@ -146,9 +160,10 @@ public sealed class GameUiMenuButtonInteractionDefinitionPropertyDrawer : Proper
         if (overrideColors)
             AddGraphicColorFields(root, property);
 
-        AddProperty(root, property.FindPropertyRelative("overrideTextStyle"), "Override Text Style");
+        if (contentMode == GameUiButtonContentMode.Text)
+            AddProperty(root, property.FindPropertyRelative("overrideTextStyle"), "Override Text Style");
 
-        if (overrideText)
+        if (contentMode == GameUiButtonContentMode.Text && overrideText)
             AddTextFields(root, property);
     }
 

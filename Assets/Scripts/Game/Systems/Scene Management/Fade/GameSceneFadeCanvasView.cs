@@ -12,13 +12,6 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     #region Constants
     private const int MaxFadeSortingOrder = 32767;
     private const float OpaqueThreshold = 0.9999f;
-
-    private static readonly int fadeProgressProperty = Shader.PropertyToID("_FadeProgress");
-    private static readonly int fadeModeProperty = Shader.PropertyToID("_FadeMode");
-    private static readonly int fadeDirectionProperty = Shader.PropertyToID("_FadeDirection");
-    private static readonly int edgeSoftnessProperty = Shader.PropertyToID("_EdgeSoftness");
-    private static readonly int noiseStrengthProperty = Shader.PropertyToID("_NoiseStrength");
-    private static readonly int noiseScaleProperty = Shader.PropertyToID("_NoiseScale");
     #endregion
 
     #region Fields
@@ -37,7 +30,7 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     [SerializeField]
     private Image fadeImage;
 
-    [Tooltip("Authored UI material using the Scene Fade Gradient shader. The runtime updates only its transition parameters and never creates UI or materials.")]
+    [Tooltip("Authored UI material using the Paint Reveal shader. The runtime updates only transition parameters and never creates UI or materials.")]
     [SerializeField]
     private Material fadeMaterial;
     #endregion
@@ -51,6 +44,9 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     private bool opaqueCoverageApplied;
     private bool opaqueCoverageAwaitingRender;
     private bool opaqueCoverageRendered;
+    private bool fadeMaterialStateCaptured;
+    private Material capturedFadeMaterial;
+    private GameUiPaintRevealMaterialState capturedFadeMaterialState;
     #endregion
 
     #endregion
@@ -61,40 +57,30 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     /// <summary>
     /// Applies the latest fade state to the active authored view when one exists.
     /// </summary>
-    /// <param name="alpha">Fade alpha in the 0..1 range.</param>
-    /// <param name="visible">True when the overlay GameObject should stay active.</param>
-    /// <param name="color">Fade surface color.</param>
-    /// <param name="mode">Coverage mode used by the fade surface.</param>
-    /// <param name="wipeDirection">Screen-space wipe direction used by directional coverage.</param>
-    /// <param name="easing">Interpolation applied to raw transition progress.</param>
-    /// <param name="directionalEdgeSoftness">Normalized half-width of the shader gradient boundary.</param>
-    /// <param name="directionalNoiseStrength">Maximum normalized procedural displacement of the boundary.</param>
-    /// <param name="directionalNoiseScale">Spatial frequency of the procedural boundary variation.</param>
+    /// <param name="state">Complete ECS fade state containing progress, direction, color, and shader shaping.</param>
     /// <returns>True when a fade view received the state.</returns>
-    public static bool TryApply(float alpha,
-                                bool visible,
-                                Color color,
-                                GameSceneFadeMode mode,
-                                GameSceneFadeWipeDirection wipeDirection,
-                                GameSceneFadeEasing easing,
-                                float directionalEdgeSoftness,
-                                float directionalNoiseStrength,
-                                float directionalNoiseScale)
+    public static bool TryApply(in GameSceneFadePresentationState state)
     {
-        GameProceduralTransitionCameraBridge.SetFadePresentationVisible(visible || alpha > 0.001f);
+        GameProceduralTransitionCameraBridge.SetFadePresentationVisible(state.Visible != 0 || state.Alpha > 0.001f);
 
         if (activeView == null)
             return false;
 
-        activeView.Apply(alpha,
-                         visible,
-                         color,
-                         mode,
-                         wipeDirection,
-                         easing,
-                         directionalEdgeSoftness,
-                         directionalNoiseStrength,
-                         directionalNoiseScale);
+        activeView.Apply(state.Alpha,
+                         state.Visible != 0,
+                         new Color(state.Color.x, state.Color.y, state.Color.z, state.Color.w),
+                         state.Mode,
+                         state.WipeDirection,
+                         state.Operation,
+                         state.Easing,
+                         state.DirectionalEdgeSoftness,
+                         state.DirectionalNoiseStrength,
+                         state.DirectionalNoiseScale,
+                         state.PaintEdgeSoftness,
+                         state.PaintNoiseStrength,
+                         state.PaintNoiseScale,
+                         state.PaintBristleStrength,
+                         state.PaintBristleScale);
         return true;
     }
 
@@ -150,6 +136,7 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
             fadeImage = GetComponentInChildren<Image>(true);
 
         ConfigureFadeSurface();
+        CaptureFadeMaterialState();
         ConfigureCanvas();
         activeView = this;
         activeViewVersion++;
@@ -161,10 +148,16 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
                   Color.black,
                   GameSceneFadeMode.DirectionalGradient,
                   GameSceneFadeWipeDirection.LeftToRight,
+                  GameUiPaintRevealOperation.Deposit,
                   GameSceneFadeEasing.SmoothStep,
                   0.16f,
                   0.035f,
-                  5.5f);
+                  5.5f,
+                  0.025f,
+                  0.22f,
+                  2.4f,
+                  0.075f,
+                  48f);
     }
 
     /// <summary>
@@ -174,6 +167,7 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     {
         Canvas.willRenderCanvases -= HandleCanvasWillRender;
         ResetOpaqueCoverageState();
+        RestoreFadeMaterialState();
 
         if (activeView == this)
         {
@@ -192,24 +186,39 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     /// <param name="color">Fade surface color.</param>
     /// <param name="mode">Coverage mode applied to the authored image.</param>
     /// <param name="wipeDirection">Screen-space direction applied to directional coverage.</param>
+    /// <param name="operation">Deposit while covering or remove while revealing the scene.</param>
     /// <param name="easing">Interpolation applied to raw transition progress.</param>
     /// <param name="directionalEdgeSoftness">Normalized half-width of the shader gradient boundary.</param>
     /// <param name="directionalNoiseStrength">Maximum normalized procedural displacement of the boundary.</param>
     /// <param name="directionalNoiseScale">Spatial frequency of the procedural boundary variation.</param>
+    /// <param name="paintEdgeSoftness">Normalized half-width of the paint boundary.</param>
+    /// <param name="paintNoiseStrength">Broad paint-boundary displacement.</param>
+    /// <param name="paintNoiseScale">Broad paint-boundary frequency.</param>
+    /// <param name="paintBristleStrength">Fine bristle displacement.</param>
+    /// <param name="paintBristleScale">Fine bristle frequency.</param>
     private void Apply(float alpha,
                        bool visible,
                        Color color,
                        GameSceneFadeMode mode,
                        GameSceneFadeWipeDirection wipeDirection,
+                       GameUiPaintRevealOperation operation,
                        GameSceneFadeEasing easing,
                        float directionalEdgeSoftness,
                        float directionalNoiseStrength,
-                       float directionalNoiseScale)
+                       float directionalNoiseScale,
+                       float paintEdgeSoftness,
+                       float paintNoiseStrength,
+                       float paintNoiseScale,
+                       float paintBristleStrength,
+                       float paintBristleScale)
     {
         float clampedAlpha = Mathf.Clamp01(alpha);
         float easedAlpha = easing == GameSceneFadeEasing.SmoothStep
             ? clampedAlpha * clampedAlpha * (3f - 2f * clampedAlpha)
             : clampedAlpha;
+        float operationProgress = operation == GameUiPaintRevealOperation.Remove
+            ? 1f - easedAlpha
+            : easedAlpha;
 
         bool shaderApplied = false;
 
@@ -217,12 +226,18 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
         {
             fadeImage.color = color;
             fadeImage.enabled = visible || easedAlpha > 0.001f;
-            shaderApplied = ApplyShaderParameters(easedAlpha,
+            shaderApplied = ApplyShaderParameters(operationProgress,
                                                   mode,
                                                   wipeDirection,
+                                                  operation,
                                                   directionalEdgeSoftness,
                                                   directionalNoiseStrength,
-                                                  directionalNoiseScale);
+                                                  directionalNoiseScale,
+                                                  paintEdgeSoftness,
+                                                  paintNoiseStrength,
+                                                  paintNoiseScale,
+                                                  paintBristleStrength,
+                                                  paintBristleScale);
         }
 
         if (canvasGroup != null)
@@ -241,35 +256,51 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
     /// <param name="progress">Eased transition progress in the 0..1 range.</param>
     /// <param name="mode">Uniform or directional shader coverage mode.</param>
     /// <param name="wipeDirection">Direction used to advance the shader gradient.</param>
+    /// <param name="operation">Deposit or removal operation applied to normalized progress.</param>
     /// <param name="directionalEdgeSoftness">Normalized half-width of the shader gradient boundary.</param>
     /// <param name="directionalNoiseStrength">Maximum normalized procedural displacement of the boundary.</param>
     /// <param name="directionalNoiseScale">Spatial frequency of the procedural boundary variation.</param>
+    /// <param name="paintEdgeSoftness">Normalized half-width of the paint boundary.</param>
+    /// <param name="paintNoiseStrength">Broad paint-boundary displacement.</param>
+    /// <param name="paintNoiseScale">Broad paint-boundary frequency.</param>
+    /// <param name="paintBristleStrength">Fine bristle displacement.</param>
+    /// <param name="paintBristleScale">Fine bristle frequency.</param>
     /// <returns>True when a compatible authored material received every property.</returns>
     private bool ApplyShaderParameters(float progress,
                                        GameSceneFadeMode mode,
                                        GameSceneFadeWipeDirection wipeDirection,
+                                       GameUiPaintRevealOperation operation,
                                        float directionalEdgeSoftness,
                                        float directionalNoiseStrength,
-                                       float directionalNoiseScale)
+                                       float directionalNoiseScale,
+                                       float paintEdgeSoftness,
+                                       float paintNoiseStrength,
+                                       float paintNoiseScale,
+                                       float paintBristleStrength,
+                                       float paintBristleScale)
     {
-        if (fadeMaterial == null ||
-            !fadeMaterial.HasProperty(fadeProgressProperty) ||
-            !fadeMaterial.HasProperty(fadeModeProperty) ||
-            !fadeMaterial.HasProperty(fadeDirectionProperty) ||
-            !fadeMaterial.HasProperty(edgeSoftnessProperty) ||
-            !fadeMaterial.HasProperty(noiseStrengthProperty) ||
-            !fadeMaterial.HasProperty(noiseScaleProperty))
+        if (!GameUiPaintRevealMaterialUtility.IsCompatible(fadeMaterial))
             return false;
 
         if (fadeImage.material != fadeMaterial)
             fadeImage.material = fadeMaterial;
 
-        fadeMaterial.SetFloat(fadeProgressProperty, progress);
-        fadeMaterial.SetFloat(fadeModeProperty, (float)mode);
-        fadeMaterial.SetFloat(fadeDirectionProperty, (float)wipeDirection);
-        fadeMaterial.SetFloat(edgeSoftnessProperty, Mathf.Clamp(directionalEdgeSoftness, 0.001f, 0.5f));
-        fadeMaterial.SetFloat(noiseStrengthProperty, Mathf.Clamp(directionalNoiseStrength, 0f, 0.25f));
-        fadeMaterial.SetFloat(noiseScaleProperty, Mathf.Clamp(directionalNoiseScale, 0.25f, 24f));
+        GameUiPaintRevealMaterialUtility.SetProgress(fadeMaterial, progress);
+        GameUiPaintRevealMaterialUtility.ConfigureSceneTransition(
+            fadeMaterial,
+            mode,
+            wipeDirection,
+            operation,
+            directionalEdgeSoftness,
+            directionalNoiseStrength,
+            directionalNoiseScale,
+            paintEdgeSoftness,
+            paintNoiseStrength,
+            paintNoiseScale,
+            paintBristleStrength,
+            paintBristleScale,
+            (float)Screen.width / Mathf.Max(1f, Screen.height));
+
         return true;
     }
 
@@ -289,6 +320,34 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
 
         if (fadeMaterial != null && fadeImage.material != fadeMaterial)
             fadeImage.material = fadeMaterial;
+    }
+
+    /// <summary>
+    /// Captures authored shader values before presentation writes transient transition state.
+    /// </summary>
+    private void CaptureFadeMaterialState()
+    {
+        if (!GameUiPaintRevealMaterialUtility.IsCompatible(fadeMaterial))
+            return;
+
+        capturedFadeMaterial = fadeMaterial;
+        capturedFadeMaterialState = GameUiPaintRevealMaterialUtility.Capture(fadeMaterial);
+        fadeMaterialStateCaptured = true;
+    }
+
+    /// <summary>
+    /// Restores authored shader values so Editor execution cannot persist transient fade parameters.
+    /// </summary>
+    private void RestoreFadeMaterialState()
+    {
+        if (!fadeMaterialStateCaptured || capturedFadeMaterial == null)
+            return;
+
+        GameUiPaintRevealMaterialUtility.Restore(capturedFadeMaterial,
+                                                 in capturedFadeMaterialState);
+
+        capturedFadeMaterial = null;
+        fadeMaterialStateCaptured = false;
     }
 
     /// <summary>
@@ -368,10 +427,16 @@ public sealed class GameSceneFadeCanvasView : MonoBehaviour
               new Color(fadeColor.x, fadeColor.y, fadeColor.z, fadeColor.w),
               fadeState.Mode,
               fadeState.WipeDirection,
+              fadeState.Operation,
               fadeState.Easing,
               fadeState.DirectionalEdgeSoftness,
               fadeState.DirectionalNoiseStrength,
-              fadeState.DirectionalNoiseScale);
+              fadeState.DirectionalNoiseScale,
+              fadeState.PaintEdgeSoftness,
+              fadeState.PaintNoiseStrength,
+              fadeState.PaintNoiseScale,
+              fadeState.PaintBristleStrength,
+              fadeState.PaintBristleScale);
         return true;
     }
 

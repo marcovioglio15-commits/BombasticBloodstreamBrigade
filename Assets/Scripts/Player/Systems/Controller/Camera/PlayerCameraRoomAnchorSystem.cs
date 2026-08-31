@@ -42,6 +42,9 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
     /// <param name="state">System state providing camera-anchor and player feedback components.</param>
     public void OnUpdate(ref SystemState state)
     {
+        if (SystemAPI.HasSingleton<GameCameraBoundaryFastPlayPlayer>())
+            return;
+
         bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
 
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
@@ -67,6 +70,8 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(true);
+        bool hasCameraBoundary = SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState) &&
+                                 cameraBoundaryState.HasBoundary != 0;
         bool appliedRoomFixed = false;
 
         foreach ((RefRO<PlayerCameraAnchor> cameraAnchor, RefRO<PlayerRuntimeCameraConfig> runtimeCameraConfig, Entity entity) in SystemAPI.Query<RefRO<PlayerCameraAnchor>, RefRO<PlayerRuntimeCameraConfig>>().WithEntityAccess())
@@ -95,11 +100,22 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             else
                 continue;
 
+            if (hasCameraBoundary)
+            {
+                anchorPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
+                    in cameraBoundaryState.Boundary,
+                    anchorPosition,
+                    cameraBoundaryState.SoftZoneDistance);
+            }
+
             appliedRoomFixed = true;
 
             // Apply the damage shake already evolved this frame by PlayerCameraFollowSystem (the single trauma owner).
             // Removing the previously applied offset before smoothing keeps the shake from feeding the follow spring.
             PlayerCameraShakeState shakeState = shakeStateLookup.HasComponent(entity) ? shakeStateLookup[entity] : default;
+            float3 smoothingSource =
+                PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
+            bool isFirstTarget = !hasTrackedTarget;
             bool targetChanged = !hasTrackedTarget ||
                                  !wasRoomFixedActive ||
                                  entity != lastPlayerEntity ||
@@ -114,16 +130,32 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
                 lastCameraInstanceId = camera.GetInstanceID();
                 hasTrackedTarget = true;
                 wasRoomFixedActive = true;
-                PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
-                                                              anchorPosition,
-                                                              in shakeState,
-                                                              false,
-                                                              quaternion.identity);
-                break;
+
+                // Only the first already-valid pose may initialize directly; later room hand-offs use the spring.
+                if (isFirstTarget &&
+                    (!hasCameraBoundary ||
+                     GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary, smoothingSource)))
+                {
+                    PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
+                                                                  anchorPosition,
+                                                                  in shakeState,
+                                                                  false,
+                                                                  quaternion.identity);
+                    break;
+                }
             }
 
-            float3 smoothingSource = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
             float3 newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
+
+            if (hasCameraBoundary)
+            {
+                GameCameraBoundaryUtility.ApplyReachableHardConstraint(
+                    in cameraBoundaryState.Boundary,
+                    smoothingSource,
+                    ref newPosition,
+                    ref anchorFollowVelocity);
+            }
+
             PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform, newPosition, in shakeState, false, quaternion.identity);
             // FOV is intentionally not applied here: PlayerCameraFollowSystem (the single trauma owner) already wrote it
             // once per frame, so re-applying would double-count the delta against PreviousAppliedFovDelta.

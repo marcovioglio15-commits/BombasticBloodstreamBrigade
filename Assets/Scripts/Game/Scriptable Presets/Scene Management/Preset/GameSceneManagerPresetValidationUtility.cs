@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Produces non-mutating validation warnings for GameSceneManagerPreset assets.
@@ -27,6 +28,7 @@ public static class GameSceneManagerPresetValidationUtility
         }
 
         ValidateStartup(preset, warnings);
+        ValidateGameplayCamera(preset, warnings);
         ValidateFade(preset, warnings);
         ValidateLoadingProgress(preset, warnings);
         ValidateTriggerSettings(preset, warnings);
@@ -37,6 +39,34 @@ public static class GameSceneManagerPresetValidationUtility
     #endregion
 
     #region Private Methods
+    /// <summary>
+    /// Validates gameplay-camera boundary tuning without rewriting authored values.
+    /// </summary>
+    /// <param name="preset">Preset being inspected.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidateGameplayCamera(GameSceneManagerPreset preset, List<string> warnings)
+    {
+        if (!preset.EnableCameraBoundaries)
+            return;
+
+        switch (preset.CameraBoundaryMode)
+        {
+            case GameCameraBoundaryMode.ContainmentVolume:
+            case GameCameraBoundaryMode.ImpassableVolume:
+                break;
+            default:
+                warnings.Add("Camera Boundary Mode is unsupported. Runtime constraints may not be applied.");
+                break;
+        }
+
+        if (float.IsNaN(preset.CameraBoundarySoftZoneDistance) ||
+            float.IsInfinity(preset.CameraBoundarySoftZoneDistance) ||
+            preset.CameraBoundarySoftZoneDistance < 0f)
+        {
+            warnings.Add("Camera Boundary Soft Zone Distance should be finite and non-negative while camera boundaries are enabled.");
+        }
+    }
+
     /// <summary>
     /// Validates startup scene IDs against the configured scene table.
     /// </summary>
@@ -86,32 +116,38 @@ public static class GameSceneManagerPresetValidationUtility
             return;
         }
 
-        if (fadeSettings.FadeOutSeconds < 0f)
-            warnings.Add("Fade Out Seconds is negative.");
+        if (!IsFiniteNonNegative(fadeSettings.FadeOutSeconds))
+            warnings.Add("Fade Out Seconds should be finite and non-negative.");
 
-        if (fadeSettings.PostLoadReadyExtraSeconds < 0f)
-            warnings.Add("Post Load Ready Extra Seconds is negative.");
+        if (!IsFiniteNonNegative(fadeSettings.PostLoadReadyExtraSeconds))
+            warnings.Add("Post Load Ready Extra Seconds should be finite and non-negative.");
 
-        if (fadeSettings.FadeInSeconds < 0f)
-            warnings.Add("Fade In Seconds is negative.");
+        if (!IsFiniteNonNegative(fadeSettings.FadeInSeconds))
+            warnings.Add("Fade In Seconds should be finite and non-negative.");
 
-        if (fadeSettings.FadeColor.a < 0.999f)
-            warnings.Add("Fade Color alpha is below full opacity, so scene resets may remain visible behind complete transition coverage.");
+        if (!IsFiniteColor(fadeSettings.FadeColor))
+            warnings.Add("Transition Color should contain only finite channels.");
+        else if (fadeSettings.FadeColor.a < 0.999f)
+            warnings.Add("Transition Color alpha is below full opacity, so scene resets may remain visible behind complete transition coverage.");
 
-        if (fadeSettings.FadeMode != GameSceneFadeMode.DirectionalGradient)
-            return;
-
-        if (fadeSettings.DirectionalEdgeSoftness < 0.001f ||
-            fadeSettings.DirectionalEdgeSoftness > 0.5f)
-            warnings.Add("Directional Edge Softness must be between 0.001 and 0.5.");
-
-        if (fadeSettings.DirectionalNoiseStrength < 0f ||
-            fadeSettings.DirectionalNoiseStrength > 0.25f)
-            warnings.Add("Directional Noise Strength must be between 0 and 0.25.");
-
-        if (fadeSettings.DirectionalNoiseScale < 0.25f ||
-            fadeSettings.DirectionalNoiseScale > 24f)
-            warnings.Add("Directional Noise Scale must be between 0.25 and 24.");
+        switch (fadeSettings.VisualStyle)
+        {
+            case GameSceneFadeVisualStyle.Paint:
+                ValidateFadeRange(fadeSettings.PaintEdgeSoftness, 0.001f, 0.25f, "Deposit Softness", warnings);
+                ValidateFadeRange(fadeSettings.PaintNoiseStrength, 0f, 0.5f, "Deposit Variation", warnings);
+                ValidateFadeRange(fadeSettings.PaintNoiseScale, 0.25f, 12f, "Deposit Scale", warnings);
+                ValidateFadeRange(fadeSettings.PaintBristleStrength, 0f, 0.25f, "Mist Strength", warnings);
+                ValidateFadeRange(fadeSettings.PaintBristleScale, 1f, 96f, "Mist Density", warnings);
+                return;
+            case GameSceneFadeVisualStyle.Gradient:
+                ValidateFadeRange(fadeSettings.DirectionalEdgeSoftness, 0.001f, 0.5f, "Directional Edge Softness", warnings);
+                ValidateFadeRange(fadeSettings.DirectionalNoiseStrength, 0f, 0.25f, "Directional Noise Strength", warnings);
+                ValidateFadeRange(fadeSettings.DirectionalNoiseScale, 0.25f, 24f, "Directional Noise Scale", warnings);
+                return;
+            default:
+                warnings.Add("Fade Visual Style is unsupported.");
+                return;
+        }
     }
 
     /// <summary>
@@ -462,6 +498,47 @@ public static class GameSceneManagerPresetValidationUtility
     {
         if (preset.LoadBackend != GameSceneLoadBackend.Addressables)
             return;
+    }
+
+    /// <summary>
+    /// Appends a warning when one scene-fade shader value lies outside its finite supported range.
+    /// </summary>
+    /// <param name="value">Authored shader scalar.</param>
+    /// <param name="minimum">Inclusive supported minimum.</param>
+    /// <param name="maximum">Inclusive supported maximum.</param>
+    /// <param name="label">Field label used in the warning.</param>
+    /// <param name="warnings">Mutable warning output list.</param>
+    private static void ValidateFadeRange(float value,
+                                          float minimum,
+                                          float maximum,
+                                          string label,
+                                          List<string> warnings)
+    {
+        if (float.IsNaN(value) || float.IsInfinity(value) || value < minimum || value > maximum)
+            warnings.Add(label + " must be finite and between " + minimum + " and " + maximum + ".");
+    }
+
+    /// <summary>
+    /// Checks whether one timing value is finite and non-negative.
+    /// </summary>
+    /// <param name="value">Timing value to inspect.</param>
+    /// <returns>True when the value is valid for runtime transition timing.</returns>
+    private static bool IsFiniteNonNegative(float value)
+    {
+        return !float.IsNaN(value) && !float.IsInfinity(value) && value >= 0f;
+    }
+
+    /// <summary>
+    /// Checks whether every authored transition-color channel is finite.
+    /// </summary>
+    /// <param name="color">Transition color to inspect.</param>
+    /// <returns>True when no channel is NaN or infinite.</returns>
+    private static bool IsFiniteColor(Color color)
+    {
+        return !float.IsNaN(color.r) && !float.IsInfinity(color.r) &&
+               !float.IsNaN(color.g) && !float.IsInfinity(color.g) &&
+               !float.IsNaN(color.b) && !float.IsInfinity(color.b) &&
+               !float.IsNaN(color.a) && !float.IsInfinity(color.a);
     }
     #endregion
 

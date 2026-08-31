@@ -55,9 +55,9 @@ public static class PlayerHealthBarsPlayModeSmokeTest
         SessionState.SetString(FailureKey, string.Empty);
         SessionState.SetString(StartTicksKey, string.Empty);
         SessionState.SetString(LaunchTicksKey, DateTime.UtcNow.Ticks.ToString());
-        SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, true);
         EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.GameplayScenePath, OpenSceneMode.Single);
         EditorSceneManager.OpenScene(GameSceneManagementProjectSetupUtility.GameplayUiScenePath, OpenSceneMode.Additive);
+        GameSceneManagementPlayModeSceneGuard.RequestOneShotBypass(ActiveKey);
         EditorApplication.isPlaying = true;
     }
     #endregion
@@ -247,7 +247,7 @@ public static class PlayerHealthBarsPlayModeSmokeTest
         SessionState.SetString(FailureKey, string.Empty);
         SessionState.SetString(StartTicksKey, string.Empty);
         SessionState.SetString(LaunchTicksKey, string.Empty);
-        SessionState.SetBool(GameSceneManagementPlayModeSceneGuard.BypassSessionKey, false);
+        GameSceneManagementPlayModeSceneGuard.ClearOneShotBypass();
 
         if (passed)
             Debug.Log("[PlayerHealthBarsPlayModeSmokeTest] Passed gameplay Play Mode player-archetype validation.");

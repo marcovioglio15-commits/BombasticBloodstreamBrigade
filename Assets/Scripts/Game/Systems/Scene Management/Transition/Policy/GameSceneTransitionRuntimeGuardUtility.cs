@@ -191,23 +191,22 @@ internal static class GameSceneTransitionRuntimeGuardUtility
     }
 
     /// <summary>
-    /// Allows current movement and look samples while the procedural source or fully prepared destination still owns safe physics.
+    /// Allows current movement and look while a prepared procedural destination is revealed, plus traversal FadeOut.
     /// </summary>
     /// <param name="transitionState">Current authoritative transition state.</param>
-    /// <returns>True during procedural fade-out or fade-in presentation.</returns>
+    /// <returns>True during every procedural FadeIn and during room-traversal FadeOut.</returns>
     private static bool IsSafeProceduralPresentationPhase(GameSceneTransitionState transitionState)
     {
         if (transitionState.IsTransitioning == 0 ||
-            transitionState.Purpose != GameSceneTransitionPurpose.ProceduralRoomTraversal)
-        {
+            !GameSceneTransitionPurposeUtility.IsProcedural(transitionState.Purpose))
             return false;
-        }
 
         switch (transitionState.Phase)
         {
-            case GameSceneTransitionPhase.FadeOut:
             case GameSceneTransitionPhase.FadeIn:
                 return true;
+            case GameSceneTransitionPhase.FadeOut:
+                return transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
             default:
                 return false;
         }

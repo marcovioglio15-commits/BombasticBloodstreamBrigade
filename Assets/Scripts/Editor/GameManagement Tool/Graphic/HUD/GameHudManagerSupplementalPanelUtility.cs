@@ -273,120 +273,7 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="serializedObject">Serialized HUD preset containing announcement settings.</param>
     public static void BuildWaveClearAnnouncementSection(VisualElement root, SerializedObject serializedObject)
     {
-        string prefix = "waveClearAnnouncementSettings.";
-        Foldout availability = CreateFoldout("Availability And Content",
-                                             "Controls whether authoritative room completions present an announcement and which standard text is displayed.");
-        PropertyField enabledField = AddProperty(availability, serializedObject, prefix + "isEnabled", "Enabled");
-        AddProperty(availability, serializedObject, prefix + "content", "Content");
-        root.Add(availability);
-
-        VisualElement enabledOptions = new VisualElement();
-        Foldout motion = CreateFoldout("Motion",
-                                       "Controls traversal direction, velocity profile, and the optional pause at screen center.");
-        AddProperty(motion, serializedObject, prefix + "direction", "Direction");
-        AddProperty(motion, serializedObject, prefix + "traversalDurationSeconds", "Traversal Duration");
-        AddProperty(motion, serializedObject, prefix + "easing", "Easing");
-        PropertyField pauseField = AddProperty(motion, serializedObject, prefix + "pauseAtCenter", "Pause At Center");
-        PropertyField holdField = AddProperty(motion,
-                                              serializedObject,
-                                              prefix + "centerHoldDurationSeconds",
-                                              "Center Hold Duration");
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(pauseField,
-                                                                    holdField,
-                                                                    serializedObject,
-                                                                    prefix + "pauseAtCenter",
-                                                                    true);
-        AddProperty(motion, serializedObject, prefix + "useUnscaledTime", "Use Unscaled Time");
-        enabledOptions.Add(motion);
-
-        Foldout standardAudio = CreateFoldout("Standard Audio",
-                                              "Optionally requests one stable Audio Manager event with standard room-clear messages.");
-        PropertyField playAudioField = AddProperty(standardAudio,
-                                                   serializedObject,
-                                                   prefix + "playAudioEvent",
-                                                   "Play Audio Event");
-        PropertyField audioEventField = AddProperty(standardAudio,
-                                                    serializedObject,
-                                                    prefix + "audioEventId",
-                                                    "Audio Event");
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(playAudioField,
-                                                                    audioEventField,
-                                                                    serializedObject,
-                                                                    prefix + "playAudioEvent",
-                                                                    true);
-        enabledOptions.Add(standardAudio);
-
-        Foldout finalWave = CreateFoldout("Terminal Boss Room",
-                                          "Overrides content, motion timing, and audio when the final Boss room is cleared.");
-        PropertyField finalOverrideField = AddProperty(finalWave,
-                                                       serializedObject,
-                                                       prefix + "useFinalWaveOverride",
-                                                       "Use Final Wave Override");
-        VisualElement finalOptions = new VisualElement();
-        AddProperty(finalOptions, serializedObject, prefix + "finalWaveContent", "Content");
-        AddProperty(finalOptions, serializedObject, prefix + "finalWaveDirection", "Direction");
-        AddProperty(finalOptions,
-                    serializedObject,
-                    prefix + "finalWaveTraversalDurationSeconds",
-                    "Traversal Duration");
-        AddProperty(finalOptions, serializedObject, prefix + "finalWaveEasing", "Easing");
-        PropertyField finalPauseField = AddProperty(finalOptions,
-                                                    serializedObject,
-                                                    prefix + "finalWavePauseAtCenter",
-                                                    "Pause At Center");
-        PropertyField finalHoldField = AddProperty(finalOptions,
-                                                   serializedObject,
-                                                   prefix + "finalWaveCenterHoldDurationSeconds",
-                                                   "Center Hold Duration");
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalPauseField,
-                                                                    finalHoldField,
-                                                                    serializedObject,
-                                                                    prefix + "finalWavePauseAtCenter",
-                                                                    true);
-        PropertyField finalAudioField = AddProperty(finalOptions,
-                                                    serializedObject,
-                                                    prefix + "playFinalWaveAudioEvent",
-                                                    "Play Audio Event");
-        PropertyField finalAudioEventField = AddProperty(finalOptions,
-                                                         serializedObject,
-                                                         prefix + "finalWaveAudioEventId",
-                                                         "Audio Event");
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalAudioField,
-                                                                    finalAudioEventField,
-                                                                    serializedObject,
-                                                                    prefix + "playFinalWaveAudioEvent",
-                                                                    true);
-        finalWave.Add(finalOptions);
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(finalOverrideField,
-                                                                    finalOptions,
-                                                                    serializedObject,
-                                                                    prefix + "useFinalWaveOverride",
-                                                                    true);
-        enabledOptions.Add(finalWave);
-
-        Foldout placement = CreateFoldout("Placement", "Controls the vertical path and fully off-screen travel margin.");
-        AddProperty(placement,
-                    serializedObject,
-                    prefix + "verticalPositionNormalized",
-                    "Vertical Screen Position");
-        AddProperty(placement,
-                    serializedObject,
-                    prefix + "horizontalOffscreenPadding",
-                    "Off-Screen Padding");
-        enabledOptions.Add(placement);
-
-        Foldout typography = CreateFoldout("Style", "Controls the preauthored announcement text presentation.");
-        AddProperty(typography, serializedObject, prefix + "font", "Font");
-        AddProperty(typography, serializedObject, prefix + "fontSize", "Font Size");
-        AddProperty(typography, serializedObject, prefix + "fontStyle", "Font Style");
-        AddProperty(typography, serializedObject, prefix + "color", "Color");
-        enabledOptions.Add(typography);
-        root.Add(enabledOptions);
-        GameHudManagerPresetsPanelUtility.TrackConditionalVisibility(enabledField,
-                                                                    enabledOptions,
-                                                                    serializedObject,
-                                                                    prefix + "isEnabled",
-                                                                    true);
+        GameHudWaveClearAnnouncementPanelUtility.Build(root, serializedObject);
     }
     #endregion
 
@@ -596,7 +483,7 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="propertyPath">Serialized property path.</param>
     /// <param name="label">Visible property label.</param>
     /// <returns>Created field, or null when the path is unavailable.</returns>
-    private static PropertyField AddProperty(VisualElement root,
+    internal static PropertyField AddProperty(VisualElement root,
                                              SerializedObject serializedObject,
                                              string propertyPath,
                                              string label)
@@ -620,7 +507,7 @@ internal static class GameHudManagerSupplementalPanelUtility
     /// <param name="title">Visible submenu title.</param>
     /// <param name="tooltip">Explanation of the grouped controls.</param>
     /// <returns>Configured foldout.</returns>
-    private static Foldout CreateFoldout(string title, string tooltip)
+    internal static Foldout CreateFoldout(string title, string tooltip)
     {
         return GameHudManagerPresetsPanelUtility.CreateFoldout(title, tooltip);
     }

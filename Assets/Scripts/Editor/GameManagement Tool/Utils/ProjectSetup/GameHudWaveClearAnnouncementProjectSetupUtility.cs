@@ -14,6 +14,8 @@ internal static class GameHudWaveClearAnnouncementProjectSetupUtility
     public const string AnnouncementPrefabPath =
         announcementPrefabFolder + "/PF_WaveClearAnnouncement.prefab";
     private const string defaultFontPath = "Assets/2D/UI/Fonts/NoctraDrip-Solid SDF.asset";
+    private const string paintRevealMaterialPath =
+        "Assets/2D/Materials/M_UI_PaintRevealRoomClearMask.mat";
     #endregion
 
     #region Methods
@@ -102,7 +104,7 @@ internal static class GameHudWaveClearAnnouncementProjectSetupUtility
     }
 
     /// <summary>
-    /// Configures the full-screen root, text transform, and serialized runtime references.
+    /// Configures the full-screen root, paint-mask hierarchy, and serialized runtime references.
     /// </summary>
     /// <param name="prefabRoot">Announcement prefab root to refresh.</param>
     private static void ConfigurePrefab(GameObject prefabRoot)
@@ -115,12 +117,30 @@ internal static class GameHudWaveClearAnnouncementProjectSetupUtility
         canvasGroup.interactable = false;
         canvasGroup.blocksRaycasts = false;
 
-        RectTransform textRoot = EnsureRect("Text", presentationRoot);
-        textRoot.anchorMin = new Vector2(0.5f, 0.5f);
-        textRoot.anchorMax = textRoot.anchorMin;
-        textRoot.pivot = new Vector2(0.5f, 0.5f);
-        textRoot.sizeDelta = new Vector2(1600f, 160f);
-        textRoot.anchoredPosition = Vector2.zero;
+        RectTransform paintMaskRoot = EnsureRect("PaintMask", presentationRoot);
+        paintMaskRoot.anchorMin = new Vector2(0.5f, 0.5f);
+        paintMaskRoot.anchorMax = paintMaskRoot.anchorMin;
+        paintMaskRoot.pivot = new Vector2(0.5f, 0.5f);
+        paintMaskRoot.sizeDelta = new Vector2(1600f, 220f);
+        paintMaskRoot.anchoredPosition = Vector2.zero;
+        Image paintMaskImage = EnsureComponent<Image>(paintMaskRoot.gameObject);
+        paintMaskImage.color = Color.white;
+        paintMaskImage.raycastTarget = false;
+        paintMaskImage.type = Image.Type.Simple;
+        Mask paintMask = EnsureComponent<Mask>(paintMaskRoot.gameObject);
+        paintMask.showMaskGraphic = false;
+
+        RectTransform paintBackgroundRoot = EnsureRect("Background", paintMaskRoot);
+        Stretch(paintBackgroundRoot);
+        Image paintBackgroundImage = EnsureComponent<Image>(paintBackgroundRoot.gameObject);
+        paintBackgroundImage.color = new Color(0.95f, 0.015f, 0.32f, 0.97f);
+        paintBackgroundImage.raycastTarget = false;
+        paintBackgroundImage.type = Image.Type.Simple;
+        paintBackgroundRoot.SetAsFirstSibling();
+
+        RectTransform textRoot = FindOrMoveRect("Text", presentationRoot, paintMaskRoot);
+        Stretch(textRoot);
+        textRoot.SetAsLastSibling();
         TextMeshProUGUI announcementText = EnsureComponent<TextMeshProUGUI>(textRoot.gameObject);
         announcementText.text = "ROOM CLEARED";
         announcementText.fontSize = 72f;
@@ -131,17 +151,35 @@ internal static class GameHudWaveClearAnnouncementProjectSetupUtility
         announcementText.textWrappingMode = TextWrappingModes.NoWrap;
         announcementText.overflowMode = TextOverflowModes.Overflow;
         TMP_FontAsset defaultFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(defaultFontPath);
+        Material paintRevealMaterial = AssetDatabase.LoadAssetAtPath<Material>(paintRevealMaterialPath);
+        Sprite paintSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+            GameUiAerosolPaintProjectSetupUtility.RoomClearSpritePath);
+
+        if (paintRevealMaterial == null || paintSprite == null)
+            throw new System.InvalidOperationException(
+                "Room-clear aerosol material or sprite is missing from the default project setup.");
 
         if (defaultFont != null)
             announcementText.font = defaultFont;
+
+        paintMaskImage.sprite = paintSprite;
+        paintBackgroundImage.sprite = paintSprite;
+        paintMaskImage.material = paintRevealMaterial;
+        paintMaskImage.enabled = false;
+        paintMask.enabled = false;
+        paintBackgroundImage.enabled = false;
 
         HUDWaveClearAnnouncementSection section = EnsureComponent<HUDWaveClearAnnouncementSection>(prefabRoot);
         SerializedObject serializedSection = new SerializedObject(section);
         serializedSection.Update();
         SetReference(serializedSection, "presentationRoot", presentationRoot);
-        SetReference(serializedSection, "textRoot", textRoot);
+        SetReference(serializedSection, "textRoot", paintMaskRoot);
         SetReference(serializedSection, "announcementText", announcementText);
         SetReference(serializedSection, "canvasGroup", canvasGroup);
+        SetReference(serializedSection, "paintMaskImage", paintMaskImage);
+        SetReference(serializedSection, "paintMask", paintMask);
+        SetReference(serializedSection, "paintBackgroundImage", paintBackgroundImage);
+        SetReference(serializedSection, "paintRevealMaterial", paintRevealMaterial);
         serializedSection.ApplyModifiedPropertiesWithoutUndo();
         EditorUtility.SetDirty(section);
     }
@@ -165,6 +203,33 @@ internal static class GameHudWaveClearAnnouncementProjectSetupUtility
         child.layer = parent.gameObject.layer;
         RectTransform rectTransform = child.GetComponent<RectTransform>();
         rectTransform.SetParent(parent, false);
+        return rectTransform;
+    }
+
+    /// <summary>
+    /// Finds an existing child under either hierarchy level or creates it under the requested parent.
+    /// </summary>
+    /// <param name="name">Stable child name.</param>
+    /// <param name="legacyParent">Previous hierarchy parent searched for migration.</param>
+    /// <param name="parent">Current parent receiving the child.</param>
+    /// <returns>Resolved RectTransform under the current parent.</returns>
+    private static RectTransform FindOrMoveRect(string name,
+                                                RectTransform legacyParent,
+                                                RectTransform parent)
+    {
+        Transform existing = parent.Find(name);
+
+        if (existing == null)
+            existing = legacyParent.Find(name);
+
+        if (existing == null)
+            return EnsureRect(name, parent);
+
+        RectTransform rectTransform = existing as RectTransform;
+
+        if (rectTransform != null && rectTransform.parent != parent)
+            rectTransform.SetParent(parent, false);
+
         return rectTransform;
     }
 
