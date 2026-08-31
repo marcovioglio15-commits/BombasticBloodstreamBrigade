@@ -120,6 +120,7 @@ public struct GameSceneTransitionState : IComponentData
     public FixedString64Bytes TargetSceneId;
     public GameSceneTransitionPhase Phase;
     public GameSceneTransitionPurpose Purpose;
+    public GameSceneTransitionCameraPreparation CameraPreparation;
     public byte Initialized;
     public byte IsTransitioning;
 }

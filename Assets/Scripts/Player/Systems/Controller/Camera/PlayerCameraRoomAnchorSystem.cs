@@ -45,9 +45,15 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         if (SystemAPI.HasSingleton<GameCameraBoundaryFastPlayPlayer>())
             return;
 
-        bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
+        // Resolve transition presentation once so room-fixed framing can close the same reveal handshake.
+        bool hasTransitionState = SystemAPI.TryGetSingleton(out GameSceneTransitionState transitionState);
+        bool isSceneTransitioning = hasTransitionState && transitionState.IsTransitioning != 0;
+        bool isRevealPreparationPending = hasTransitionState &&
+                                           GameSceneTransitionCameraReadinessUtility.IsPreparationPending(
+                                               in transitionState);
 
-        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
+        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery) &&
+            !isRevealPreparationPending)
             return;
 
         // Dying bypasses the hard-pause gate: room-fixed cameras must still receive the shake offset and roll while the
@@ -139,19 +145,24 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
                 lastCameraInstanceId = camera.GetInstanceID();
                 hasTrackedTarget = true;
                 wasRoomFixedActive = true;
+            }
 
-                // Only the first already-valid pose may initialize directly; later room hand-offs use the spring.
-                if (isFirstTarget &&
-                    (!hasCameraBoundary ||
-                     GameCameraBoundaryUtility.Contains(containmentBoundaries, smoothingSource)))
-                {
-                    PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
-                                                                  anchorPosition,
-                                                                  in shakeState,
-                                                                  false,
-                                                                  quaternion.identity);
-                    break;
-                }
+            // Initial valid targets and hidden destination containment can be applied without exposing a camera jump.
+            bool applyInitialTarget = targetChanged &&
+                                      isFirstTarget &&
+                                      (!hasCameraBoundary ||
+                                       GameCameraBoundaryUtility.Contains(containmentBoundaries, smoothingSource));
+            bool applyPreparedTarget = isRevealPreparationPending && hasCameraBoundary;
+
+            if (applyInitialTarget || applyPreparedTarget)
+            {
+                anchorFollowVelocity = float3.zero;
+                PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
+                                                              anchorPosition,
+                                                              in shakeState,
+                                                              false,
+                                                              quaternion.identity);
+                break;
             }
 
             float3 newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource, anchorPosition, cameraConfig.Values, ref anchorFollowVelocity, deltaTime);
@@ -169,6 +180,14 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             // FOV is intentionally not applied here: PlayerCameraFollowSystem (the single trauma owner) already wrote it
             // once per frame, so re-applying would double-count the delta against PreviousAppliedFovDelta.
             break;
+        }
+
+        // Room-fixed behavior owns the acknowledgment, including safe fallback when no valid anchor was resolved.
+        if (isRevealPreparationPending)
+        {
+            RefRW<GameSceneTransitionState> transitionStateReference =
+                SystemAPI.GetSingletonRW<GameSceneTransitionState>();
+            GameSceneTransitionCameraReadinessUtility.MarkPrepared(ref transitionStateReference.ValueRW);
         }
 
         wasRoomFixedActive = appliedRoomFixed;

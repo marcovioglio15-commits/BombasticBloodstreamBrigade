@@ -33,6 +33,7 @@ public static class GameCameraBoundarySmokeTest
         ValidateAuthoringConversion();
         ValidateConstraintMath();
         ValidateCompoundConstraintMath();
+        ValidateTransitionRevealReadiness();
         Debug.Log("[GameCameraBoundarySmokeTest] All deterministic checks passed.");
     }
 
@@ -384,6 +385,56 @@ public static class GameCameraBoundarySmokeTest
         {
             world.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Confirms containment-enabled gameplay transitions remain opaque until camera presentation acknowledges the
+    /// destination pose, without delaying scenes or boundary modes that do not require the handshake.
+    /// </summary>
+    private static void ValidateTransitionRevealReadiness()
+    {
+        GameSceneManagerConfig config = new GameSceneManagerConfig
+        {
+            EnableCameraBoundaries = 1,
+            CameraBoundaryMode = GameCameraBoundaryMode.ContainmentVolume
+        };
+        GameSceneDefinitionElement targetScene = new GameSceneDefinitionElement
+        {
+            SceneKind = GameSceneKind.Gameplay
+        };
+        GameSceneTransitionState transitionState = new GameSceneTransitionState
+        {
+            Phase = GameSceneTransitionPhase.HoldBlack,
+            IsTransitioning = 1
+        };
+
+        // Gameplay containment must block reveal while allowing camera systems to replace traversal framing under black.
+        GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState, config, targetScene);
+        Assert(GameSceneTransitionCameraReadinessUtility.IsPreparationPending(in transitionState),
+               "Containment gameplay did not request hidden camera preparation.");
+        Assert(GameSceneTransitionCameraReadinessUtility.UsesPreparedFraming(in transitionState),
+               "Hidden camera preparation did not release procedural source framing.");
+        Assert(!GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
+               "Fade-in was allowed before camera preparation completed.");
+
+        // The presentation acknowledgment must open the gate without disabling prepared framing during fade-in.
+        GameSceneTransitionCameraReadinessUtility.MarkPrepared(ref transitionState);
+        transitionState.Phase = GameSceneTransitionPhase.FadeIn;
+        Assert(GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
+               "Camera preparation acknowledgment did not release fade-in.");
+        Assert(GameSceneTransitionCameraReadinessUtility.UsesPreparedFraming(in transitionState),
+               "Prepared destination framing was not retained throughout fade-in.");
+
+        // Impassable mode and non-gameplay targets preserve the existing reveal path without waiting for a camera writer.
+        config.CameraBoundaryMode = GameCameraBoundaryMode.ImpassableVolume;
+        GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState, config, targetScene);
+        Assert(GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
+               "Impassable boundaries incorrectly blocked scene reveal.");
+        config.CameraBoundaryMode = GameCameraBoundaryMode.ContainmentVolume;
+        targetScene.SceneKind = GameSceneKind.MainMenu;
+        GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState, config, targetScene);
+        Assert(GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
+               "A non-gameplay scene incorrectly waited for camera containment.");
     }
     #endregion
 

@@ -193,10 +193,15 @@ public static class ProjectileReturnStartModeUtility
     /// Resolves whether endpoint suspension waits indefinitely for an external recall request.
     /// </summary>
     /// <param name="mode">Return trigger mode to inspect.</param>
-    /// <returns>True when no automatic endpoint delay can complete the return trigger.</returns>
-    public static bool WaitsForExternalRecall(ProjectileReturnStartMode mode)
+    /// <param name="returnDelaySeconds">Authored automatic delay; zero disables only the timed branch when another trigger is available.</param>
+    /// <returns>True when the projectile must remain at its endpoint until an activation or resource recall request arrives.</returns>
+    public static bool WaitsForExternalRecall(ProjectileReturnStartMode mode, float returnDelaySeconds)
     {
-        return !UsesAutomaticDelay(mode);
+        if (!UsesAutomaticDelay(mode))
+            return true;
+
+        return returnDelaySeconds <= 0f &&
+               (UsesActivationTap(mode) || UsesResourceDrain(mode));
     }
 
     #endregion

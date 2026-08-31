@@ -265,10 +265,15 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                                                        config))
                     break;
                 BeginPhase(GameSceneTransitionPhase.FadeIn, ref transitionState, ref fadeState, ref loadingProgressState, config);
-                if (fadeInSeconds <= 0f)
+                if (fadeInSeconds <= 0f &&
+                    GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState))
                     CompleteTransition(Entity.Null, config, ref transitionState, ref fadeState, ref loadingProgressState);
                 break;
             case GameSceneTransitionPhase.FadeIn:
+                // Retain exact opaque coverage until camera presentation confirms destination containment.
+                if (!GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState))
+                    break;
+
                 if (GameSceneTransitionFadePhaseUtility.TickFadeIn(ref phaseTimer,
                                                                    fadeInSeconds,
                                                                    deltaTime,
@@ -597,10 +602,16 @@ public partial class GameSceneTransitionExecutionSystem : SystemBase
                                    ref GameSceneLoadingProgressPresentationState loadingProgressState,
                                    GameSceneManagerConfig config)
     {
+        // Arm the presentation handshake only for loaded gameplay targets using containment boundaries.
+        GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState,
+                                                                      config,
+                                                                      targetScene);
         GameSceneTransitionPhase revealPhase =
             GameSceneTransitionExecutionUtility.ResolveReadyRevealPhase(postLoadReadyExtraSeconds);
         BeginPhase(revealPhase, ref transitionState, ref fadeState, ref loadingProgressState, config);
-        if (revealPhase == GameSceneTransitionPhase.FadeIn && fadeInSeconds <= 0f)
+        if (revealPhase == GameSceneTransitionPhase.FadeIn &&
+            fadeInSeconds <= 0f &&
+            GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState))
             CompleteTransition(Entity.Null, config, ref transitionState, ref fadeState, ref loadingProgressState);
     }
     /// <summary>Applies loading-progress visibility and status when a transition phase starts.</summary>

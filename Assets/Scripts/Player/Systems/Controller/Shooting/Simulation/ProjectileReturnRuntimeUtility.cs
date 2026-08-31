@@ -172,7 +172,8 @@ public static class ProjectileReturnRuntimeUtility
         returnState.ReturnFeedbackPending = 0;
         returnState.OutboundSpeed = math.max(0.01f, math.length(projectile.Velocity));
         returnState.ReturnDelayRemainingSeconds = math.max(0f, returnState.Config.ReturnDelaySeconds);
-        bool waitsForExternalRecall = ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode) &&
+        bool waitsForExternalRecall = ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode,
+                                                                                               returnState.Config.ReturnDelaySeconds) &&
                                       !activationRecallRequested;
         bool usesAutomaticDelay = ProjectileReturnStartModeUtility.UsesAutomaticDelay(returnState.Config.ReturnStartMode) &&
                                   returnState.ReturnDelayRemainingSeconds > 0f &&
@@ -387,7 +388,8 @@ public static class ProjectileReturnRuntimeUtility
         {
             projectile.Velocity = float3.zero;
 
-            if (ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode))
+            if (ProjectileReturnStartModeUtility.WaitsForExternalRecall(returnState.Config.ReturnStartMode,
+                                                                        returnState.Config.ReturnDelaySeconds))
             {
                 AlignFlightRotation(ref projectileTransform,
                                     ref returnState,

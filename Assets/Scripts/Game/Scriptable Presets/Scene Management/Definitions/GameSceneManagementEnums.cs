@@ -70,6 +70,16 @@ public enum GameSceneTransitionPurpose : byte
 }
 
 /// <summary>
+/// Tracks whether the persistent gameplay camera must apply its loaded-scene containment before visual reveal.
+/// </summary>
+public enum GameSceneTransitionCameraPreparation : byte
+{
+    NotRequired = 0,
+    Pending = 1,
+    Prepared = 2
+}
+
+/// <summary>
 /// Selects how transition darkness is distributed across the authored full-screen fade surface.
 /// </summary>
 public enum GameSceneFadeMode : byte

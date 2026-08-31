@@ -63,7 +63,7 @@ public sealed class PowerUpReturningProjectilesModuleData
     [SerializeField]
     private ProjectileReturnStartMode returnStartMode = ProjectileReturnStartMode.AutomaticDelay;
 
-    [Tooltip("Seconds the projectile remains positionally stationary at its outbound endpoint before turnaround or direct return begins. Set to zero to disable the delay.")]
+    [Tooltip("Seconds the projectile remains stationary at its outbound endpoint. In mixed trigger modes, zero disables automatic return and waits for activation or resource recall; Automatic Delay alone returns immediately.")]
     [SerializeField]
     private float returnDelaySeconds;
 

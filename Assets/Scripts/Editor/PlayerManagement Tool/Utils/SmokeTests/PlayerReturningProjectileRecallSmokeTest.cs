@@ -403,7 +403,7 @@ public static class PlayerReturningProjectileRecallSmokeTest
 
     #region Return Transition
     /// <summary>
-    /// Verifies that activation-tap projectiles remain stationary at their endpoint and bypass waiting after an accepted recall.
+    /// Verifies that a zero timed branch in mixed mode waits at the endpoint and bypasses waiting after an accepted recall.
     /// </summary>
     private static void ValidateEndpointWaitingAndDirectRecall()
     {
@@ -419,7 +419,7 @@ public static class PlayerReturningProjectileRecallSmokeTest
             });
             ReturningProjectilesConfig config = new ReturningProjectilesConfig
             {
-                ReturnStartMode = ProjectileReturnStartMode.ActivationTap,
+                ReturnStartMode = ProjectileReturnStartMode.AutomaticDelayOrActivationTapOrResourceDrain,
                 ReturnSpeedMultiplier = 1f,
                 OutboundSizeMultiplier = 1f,
                 ReturnSizeMultiplier = 1f,
@@ -465,7 +465,15 @@ public static class PlayerReturningProjectileRecallSmokeTest
                 math.lengthsq(projectile.Velocity) > PrecisionEpsilon ||
                 math.lengthsq(projectileTransform.Position - new float3(0f, 0f, 8f)) > PrecisionEpsilon)
             {
-                throw new InvalidOperationException("Activation Tap did not keep the projectile stationary at its outbound endpoint.");
+                throw new InvalidOperationException("A mixed return mode with zero delay did not remain stationary for activation or resource recall.");
+            }
+
+            // Zero disables only a mixed timed branch; a pure automatic mode still returns without endpoint suspension.
+            if (!ProjectileReturnStartModeUtility.WaitsForExternalRecall(config.ReturnStartMode, config.ReturnDelaySeconds) ||
+                ProjectileReturnStartModeUtility.WaitsForExternalRecall(config.ReturnStartMode, 0.25f) ||
+                ProjectileReturnStartModeUtility.WaitsForExternalRecall(ProjectileReturnStartMode.AutomaticDelay, 0f))
+            {
+                throw new InvalidOperationException("Zero-delay return trigger semantics did not distinguish mixed and pure automatic modes.");
             }
 
             // An accepted early recall uses the same transition data but skips endpoint waiting.

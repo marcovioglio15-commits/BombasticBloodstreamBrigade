@@ -49,6 +49,7 @@ internal static class GameSceneTransitionExecutionCompletionUtility
         transitionState.TargetSceneId = default;
         transitionState.Phase = GameSceneTransitionPhase.Idle;
         transitionState.Purpose = GameSceneTransitionPurpose.Standard;
+        transitionState.CameraPreparation = GameSceneTransitionCameraPreparation.NotRequired;
         transitionState.IsTransitioning = 0;
         transitionState.Initialized = 1;
         fadeState.Alpha = 0f;

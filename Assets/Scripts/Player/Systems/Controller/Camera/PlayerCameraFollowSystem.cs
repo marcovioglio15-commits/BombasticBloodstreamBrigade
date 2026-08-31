@@ -4,8 +4,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 /// <summary>
-/// This system is responsible for updating the main camera's position to follow the 
-/// player based on the configuration specified in the PlayerControllerConfig component.
+/// Updates the persistent gameplay camera from the authoritative player configuration, transition policy and boundaries.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 public partial struct PlayerCameraFollowSystem : ISystem
@@ -13,14 +12,11 @@ public partial struct PlayerCameraFollowSystem : ISystem
     #region Constants
     private const float BoundaryReacquisitionToleranceSquared = 0.0001f;
     #endregion
-
     #region Fields
-
     #region Static Fields
     private static int traversalOverrideCameraInstanceId;
     private static int traversalOverrideFrame = -1;
     #endregion
-
     #region Runtime Fields
     private bool hasAutoOffset;
     private float3 autoOffset;
@@ -47,43 +43,39 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private bool hasTrackedBoundary;
     private bool smoothBoundaryReacquisition;
     #endregion
-
     #endregion
-
     #region Methods
-
     #region Lifecycle Methods
     /// <summary>
-    /// Configures the system to require updates 
-    /// for entities that have the PlayerControllerConfig component, which contains
-    /// a reference to the camera configuration that determines how the camera should follow the player.
+    /// Requires an authoritative runtime camera target and caches the run-outcome query used by pause policy.
     /// </summary>
-    /// <param name="state"></param>
+    /// <param name="state">System state used to register requirements and cache queries.</param>
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<PlayerRuntimeCameraConfig>();
         runOutcomeQuery = state.GetEntityQuery(ComponentType.ReadOnly<PlayerControllerConfig>(),
                                                ComponentType.ReadOnly<PlayerRunOutcomeState>());
     }
-
     /// <summary>
-    /// Updates the main camera's position based on the player's position and the specified camera behavior 
-    /// in the PlayerControllerConfig. In detail it calculates the desired camera position using 
-    /// the player's position and the configured follow offset,
-    /// then smoothly moves the camera towards that position using the SmoothCameraPosition method from 
-    /// PlayerControllerMath. It also handles different camera behaviors, such as maintaining
-    /// a fixed offset or being a child of the player, 
-    /// and ensures that the camera's position is updated accordingly.
+    /// Resolves the configured follow behavior, applies camera feedback and constraints, and acknowledges hidden
+    /// destination containment before a scene transition starts revealing the loaded scene.
     /// </summary>
-    /// <param name="state"></param>
+    /// <param name="state">System state providing player transforms, camera runtime data and boundary state.</param>
     public void OnUpdate(ref SystemState state)
     {
-        bool isSceneTransitioning = GameSceneTransitionRuntimeGuardUtility.IsDefaultWorldTransitioning();
-        bool isProceduralRoomTraversal = SystemAPI.TryGetSingleton(out GameSceneTransitionState transitionState) &&
-                                         transitionState.IsTransitioning != 0 &&
-                                         transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
+        // Resolve transition presentation once so camera continuity and reveal acknowledgment share one state snapshot.
+        bool hasTransitionState = SystemAPI.TryGetSingleton(out GameSceneTransitionState transitionState);
+        bool isSceneTransitioning = hasTransitionState && transitionState.IsTransitioning != 0;
+        bool isProceduralRoomTraversal = isSceneTransitioning &&
+                                          transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
+        bool isRevealPreparationPending = hasTransitionState &&
+                                           GameSceneTransitionCameraReadinessUtility.IsPreparationPending(
+                                               in transitionState);
+        bool usesPreparedFraming = hasTransitionState &&
+                                   GameSceneTransitionCameraReadinessUtility.UsesPreparedFraming(in transitionState);
 
-        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
+        if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery) &&
+            !isRevealPreparationPending)
             return;
 
         // Dying bypasses the hard-pause gate: the freeze system pinned Time.timeScale to zero on the lethal hit but the
@@ -240,7 +232,8 @@ public partial struct PlayerCameraFollowSystem : ISystem
             if (TryApplyTraversalFraming(camera,
                                          playerPosition,
                                          in shakeState,
-                                         isProceduralRoomTraversal))
+                                         isProceduralRoomTraversal,
+                                         usesPreparedFraming))
             {
                 break;
             }
@@ -302,6 +295,12 @@ public partial struct PlayerCameraFollowSystem : ISystem
 
                     float3 childDesiredPosition = childTargetPosition;
 
+                    if (isRevealPreparationPending && hasContainmentBoundary)
+                    {
+                        followVelocity = float3.zero;
+                        smoothBoundaryReacquisition = false;
+                    }
+
                     if (smoothBoundaryReacquisition)
                     {
                         childTargetPosition = PlayerControllerMath.SmoothCameraPosition(
@@ -360,13 +359,23 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     }
 
                     float3 newPosition = targetPosition;
-                    newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource,
-                                                                           targetPosition,
-                                                                           cameraConfig.Values,
-                                                                           ref followVelocity,
-                                                                           deltaTime);
+                    bool applyPreparedContainment = isRevealPreparationPending && hasContainmentBoundary;
 
-                    if (hasContainmentBoundary)
+                    if (applyPreparedContainment)
+                    {
+                        followVelocity = float3.zero;
+                        smoothBoundaryReacquisition = false;
+                    }
+                    else
+                    {
+                        newPosition = PlayerControllerMath.SmoothCameraPosition(smoothingSource,
+                                                                               targetPosition,
+                                                                               cameraConfig.Values,
+                                                                               ref followVelocity,
+                                                                               deltaTime);
+                    }
+
+                    if (hasContainmentBoundary && !applyPreparedContainment)
                     {
                         GameCameraBoundaryUtility.ApplyReachableHardConstraint(
                             containmentBoundaries,
@@ -393,11 +402,18 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     break;
             }
 
+            // Acknowledge only after the authoritative non-room-fixed writer committed its hidden destination pose.
+            if (isRevealPreparationPending)
+            {
+                RefRW<GameSceneTransitionState> transitionStateReference =
+                    SystemAPI.GetSingletonRW<GameSceneTransitionState>();
+                GameSceneTransitionCameraReadinessUtility.MarkPrepared(ref transitionStateReference.ValueRW);
+            }
+
             break;
         }
     }
     #endregion
-
     #region Impassable Boundary Methods
     /// <summary>
     /// Applies every static impassable footprint to a desired camera target without allocating a runtime collection.
@@ -448,7 +464,6 @@ public partial struct PlayerCameraFollowSystem : ISystem
         }
     }
     #endregion
-
     #region Traversal Continuity Methods
     /// <summary>
     /// Checks whether the follow system already wrote authoritative traversal framing for the supplied camera this frame.
@@ -471,12 +486,23 @@ public partial struct PlayerCameraFollowSystem : ISystem
     /// <param name="playerPosition">Current world-space position of the persistent ECS player.</param>
     /// <param name="shakeState">Current feedback state layered above the preserved base framing.</param>
     /// <param name="isProceduralRoomTraversal">True while the transactional room traversal remains active.</param>
+    /// <param name="usesPreparedFraming">True when destination containment must replace traversal framing before reveal.</param>
     /// <returns>True when this method wrote the authoritative camera transform for the current frame.</returns>
     private bool TryApplyTraversalFraming(Camera camera,
                                           float3 playerPosition,
                                           in PlayerCameraShakeState shakeState,
-                                          bool isProceduralRoomTraversal)
+                                          bool isProceduralRoomTraversal,
+                                          bool usesPreparedFraming)
     {
+        // Release source framing while fully covered so destination containment can become authoritative before reveal.
+        if (usesPreparedFraming)
+        {
+            hasTraversalCameraOffset = false;
+            traversalCameraInstanceId = 0;
+            wasProceduralRoomTraversal = false;
+            return false;
+        }
+
         if (!isProceduralRoomTraversal && !wasProceduralRoomTraversal)
             return false;
 
@@ -512,9 +538,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
         return true;
     }
     #endregion
-
     #region Cache Methods
-
     /// <summary>
     /// Detects boundary ownership changes and enables a spring-driven entrance when direct hard containment would snap
     /// the current camera into a newly selected footprint.
@@ -669,7 +693,5 @@ public partial struct PlayerCameraFollowSystem : ISystem
         followVelocity = float3.zero;
     }
     #endregion
-
     #endregion
-
 }
