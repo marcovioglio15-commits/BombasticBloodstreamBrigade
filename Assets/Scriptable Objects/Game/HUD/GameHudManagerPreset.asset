@@ -306,8 +306,8 @@ MonoBehaviour:
     playAudioEvent: 0
     audioEventId: 28
     presentationMode: 1
-    direction: 1
-    paintExitDirection: 1
+    direction: 0
+    paintExitDirection: 0
     traversalDurationSeconds: 1.4
     easing: 2
     pauseAtCenter: 1
@@ -319,8 +319,8 @@ MonoBehaviour:
     useFinalWaveOverride: 1
     finalWaveContent: AREA CLEARED
     finalWavePresentationMode: 1
-    finalWaveDirection: 1
-    finalWavePaintExitDirection: 1
+    finalWaveDirection: 0
+    finalWavePaintExitDirection: 0
     finalWaveTraversalDurationSeconds: 2.4
     finalWaveEasing: 2
     finalWavePauseAtCenter: 1
