@@ -269,13 +269,13 @@ MonoBehaviour:
       selectionWeight: 6
     - entryKind: 0
       powerUpId: Active_DamageBoost
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 0
       powerUpId: Active_GigaLaser
       selectionWeight: 6
     - entryKind: 0
       powerUpId: Active_PortableHealthPack
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_AllRoundProtection
       selectionWeight: 7
@@ -296,18 +296,21 @@ MonoBehaviour:
       selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_MegaProjectiles
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_MultivitaminKids
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_OrbitalSpear
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_RearShield
-      selectionWeight: 7
+      selectionWeight: 6
     - entryKind: 1
       powerUpId: Passive_SplittingProjectiles
+      selectionWeight: 6
+    - entryKind: 0
+      powerUpId: ActiveEngineeredGrowth
       selectionWeight: 6
   - tierId: Milestone_Tier3
     entries:
@@ -35736,16 +35739,16 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 100
-          initialEnergy: 100
-          activationCost: 35
-          maintenanceCostPerSecond: 0
+          maximumEnergy: 25
+          initialEnergy: 25
+          activationCost: 5
+          maintenanceCostPerSecond: 5
           isToggleable: 0
-          maintenanceTicksPerSecond: 4
-          minimumActivationEnergyPercent: 0
-          chargeType: 0
-          chargePerTrigger: 25
-          cooldownSeconds: 0.6
+          maintenanceTicksPerSecond: 1
+          minimumActivationEnergyPercent: 20
+          chargeType: 1
+          chargePerTrigger: 1
+          cooldownSeconds: 1
           allowRechargeDuringToggleStartupLock: 0
           maximumToggleActiveDurationSeconds: 0
         suppressShooting:
@@ -36506,8 +36509,8 @@ MonoBehaviour:
           outboundLifetimeMultiplier: 1.5
           outboundHitPolicy: 1
           additionalOutboundHits: 1
-          returnStartMode: 1
-          returnDelaySeconds: 0.5
+          returnStartMode: 4
+          returnDelaySeconds: 0
           allowEarlyActivationRecall: 1
           reapplyResourceGateCostOnRecall: 0
           resourceReturnThresholdPercent: 0
@@ -36623,10 +36626,9 @@ MonoBehaviour:
     stealProtected: 0
   - commonData:
       powerUpId: ActiveEngineeredGrowth
-      displayName: Engineered Growth
-      description: Permanently increases one random player statistic after enough
-        enemy kills.
-      icon: {fileID: 0}
+      displayName: Artificial Growth
+      description: Permanently increases a random stat when activated.
+      icon: {fileID: 21300000, guid: 0a1ad6fe770c83245bbca4b35e85af23, type: 3}
       dropPools:
       - Milestone
       dropTier: 3
@@ -37233,16 +37235,16 @@ MonoBehaviour:
         resourceGate:
           activationResource: 1
           maintenanceResource: 1
-          maximumEnergy: 100
+          maximumEnergy: 25
           initialEnergy: 0
-          activationCost: 50
+          activationCost: 25
           maintenanceCostPerSecond: 0
           isToggleable: 0
           maintenanceTicksPerSecond: 4
-          minimumActivationEnergyPercent: 0
+          minimumActivationEnergyPercent: 100
           chargeType: 1
-          chargePerTrigger: 10
-          cooldownSeconds: 0
+          chargePerTrigger: 1
+          cooldownSeconds: 1
           allowRechargeDuringToggleStartupLock: 0
           maximumToggleActiveDurationSeconds: 0
         suppressShooting:
@@ -37952,110 +37954,54 @@ MonoBehaviour:
         randomStatGrowth:
           useWeightedSelection: 1
           entries:
-          - entryId: a7ba421787f14785bbe3d8a60331a0ac
-            target: 0
-            customScalableStatName: 
-            minimumIncrease: 5
-            maximumIncrease: 15
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 1, g: 0.6984, b: 0.42, a: 1}
-          - entryId: 9312c0e1edc04716af40a778cd4286db
-            target: 1
-            customScalableStatName: 
-            minimumIncrease: 4
-            maximumIncrease: 12
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 0.5291583, g: 0.42, b: 1, a: 1}
-          - entryId: 6ccffaf045534202b2d06f4f0b951ae5
-            target: 2
-            customScalableStatName: 
-            minimumIncrease: 0.25
-            maximumIncrease: 0.75
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 0.4800834, g: 1, b: 0.42, a: 1}
-          - entryId: 032ccc1678bc42ddb579596a9e6b7827
-            target: 3
-            customScalableStatName: 
-            minimumIncrease: 0.1
-            maximumIncrease: 0.3
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 1, g: 0.42, b: 0.6493252, a: 1}
-          - entryId: b7aa6feb239f42aab2859c2bec453f8e
-            target: 4
-            customScalableStatName: 
-            minimumIncrease: 0.15
-            maximumIncrease: 0.45
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 0.42, g: 0.8185669, b: 1, a: 1}
-          - entryId: c1643546b19d4fd1bbeafb828d09fcb0
-            target: 10
-            customScalableStatName: 
-            minimumIncrease: 1
-            maximumIncrease: 3
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 0.6740172, g: 1, b: 0.42, a: 1}
           - entryId: f570f1806f494e4092cff29139315bde
             target: 14
             customScalableStatName: MovementSpeed
-            minimumIncrease: 0.1
-            maximumIncrease: 0.25
+            minimumIncrease: 0.5
+            maximumIncrease: 0.5
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 1, g: 0.42, b: 0.5294675, a: 1}
           - entryId: 2fa3383066094159b7413a7370a228f0
             target: 14
             customScalableStatName: Damage
-            minimumIncrease: 0.5
-            maximumIncrease: 1.5
+            minimumIncrease: 0.2
+            maximumIncrease: 0.2
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 0.42, g: 0.6987092, b: 1, a: 1}
           - entryId: af38633d69214c8ebdea55f1f64908d4
             target: 14
             customScalableStatName: FireRate
-            minimumIncrease: 0.05
-            maximumIncrease: 0.15
+            minimumIncrease: 0.1
+            maximumIncrease: 0.1
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 0.8679509, g: 1, b: 0.42, a: 1}
           - entryId: 2a498662c0534b8e8b715b3af43bc9ad
             target: 14
             customScalableStatName: ShotRange
-            minimumIncrease: 0.5
-            maximumIncrease: 1.5
+            minimumIncrease: 0.01
+            maximumIncrease: 0.01
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 0.9628073, g: 0.42, b: 1, a: 1}
           - entryId: d9661696152a4ba5814f781131e8e6ba
             target: 14
             customScalableStatName: GatheringRadius
-            minimumIncrease: 0.25
-            maximumIncrease: 0.75
+            minimumIncrease: 1
+            maximumIncrease: 1
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 0.42, g: 1, b: 0.7935656, a: 1}
           - entryId: f798af71e352440e8c7d79edb4ba43c1
             target: 14
             customScalableStatName: Luck
-            minimumIncrease: 0.25
+            minimumIncrease: 1
             maximumIncrease: 1
             selectionWeight: 1
             useCustomPresentationColor: 1
             presentationColor: {r: 1, g: 0.6243239, b: 0.42, a: 1}
-          - entryId: 1045991de3b245339831d3330256be7e
-            target: 14
-            customScalableStatName: Knockback
-            minimumIncrease: 0.25
-            maximumIncrease: 0.75
-            selectionWeight: 1
-            useCustomPresentationColor: 1
-            presentationColor: {r: 1, g: 0.9381153, b: 0.42, a: 1}
         deathExplosion:
           triggerMode: 0
           cooldownSeconds: 2
@@ -62588,7 +62534,7 @@ MonoBehaviour:
         stackable:
           maxAcquisitions: 0
     stealProtected: 1
-  primaryActivePowerUpId: ActiveEngineeredGrowth
+  primaryActivePowerUpId: Active_Boomerang
   secondaryActivePowerUpId: 
   equippedPassivePowerUpIds: []
   passiveTools:
