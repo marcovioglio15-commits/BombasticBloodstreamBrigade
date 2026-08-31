@@ -1,3 +1,4 @@
+using Unity.Entities;
 using Unity.Mathematics;
 
 /// <summary>
@@ -6,7 +7,7 @@ using Unity.Mathematics;
 public static class GameCameraBoundaryUtility
 {
     #region Constants
-    private const float BoundaryEpsilon = 0.0001f;
+    internal const float BoundaryEpsilon = 0.0001f;
     #endregion
 
     #region Methods
@@ -26,6 +27,108 @@ public static class GameCameraBoundaryUtility
     }
 
     /// <summary>
+    /// Checks whether a world-space point lies inside any member of an active compound containment group.
+    /// </summary>
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="focusPosition">World-space point tested against the group union.</param>
+    /// <returns>True when at least one member contains the horizontal point.</returns>
+    public static bool Contains(DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+                                float3 focusPosition)
+    {
+        // Stop on the first containing footprint because the group represents their geometric union.
+        for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
+        {
+            GameCameraBoundary boundary = boundaries[boundaryIndex].Boundary;
+
+            if (Contains(in boundary, focusPosition))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Checks whether an entity already belongs to an active compound containment group.
+    /// </summary>
+    /// <param name="boundaries">Active containment group membership buffer.</param>
+    /// <param name="boundaryEntity">Boundary entity searched in the group.</param>
+    /// <returns>True when the entity is already registered as a group member.</returns>
+    public static bool ContainsEntity(DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+                                      Entity boundaryEntity)
+    {
+        // Membership checks run only during selection and rare group rebuilds.
+        for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
+        {
+            if (boundaries[boundaryIndex].BoundaryEntity == boundaryEntity)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tests whether two oriented footprints share positive planar area and can form one continuous containment group.
+    /// Edge-only contact is intentionally excluded because it cannot provide a stable camera passage.
+    /// </summary>
+    /// <param name="left">First oriented boundary footprint.</param>
+    /// <param name="right">Second oriented boundary footprint.</param>
+    /// <returns>True when the footprint interiors overlap on every separating axis.</returns>
+    public static bool Overlaps(in GameCameraBoundary left, in GameCameraBoundary right)
+    {
+        float2 leftPlanarRight = ResolvePlanarRight(in left);
+        float2 leftPlanarForward = ResolvePlanarForward(leftPlanarRight);
+        float2 rightPlanarRight = ResolvePlanarRight(in right);
+        float2 rightPlanarForward = ResolvePlanarForward(rightPlanarRight);
+        float2 centerDelta = right.Center - left.Center;
+
+        // Oriented rectangles can separate only on one of their four local axes.
+        return HasPositiveOverlapOnAxis(centerDelta,
+                                        leftPlanarRight,
+                                        in left,
+                                        leftPlanarRight,
+                                        leftPlanarForward,
+                                        in right,
+                                        rightPlanarRight,
+                                        rightPlanarForward) &&
+               HasPositiveOverlapOnAxis(centerDelta,
+                                        leftPlanarForward,
+                                        in left,
+                                        leftPlanarRight,
+                                        leftPlanarForward,
+                                        in right,
+                                        rightPlanarRight,
+                                        rightPlanarForward) &&
+               HasPositiveOverlapOnAxis(centerDelta,
+                                        rightPlanarRight,
+                                        in left,
+                                        leftPlanarRight,
+                                        leftPlanarForward,
+                                        in right,
+                                        rightPlanarRight,
+                                        rightPlanarForward) &&
+               HasPositiveOverlapOnAxis(centerDelta,
+                                        rightPlanarForward,
+                                        in left,
+                                        leftPlanarRight,
+                                        leftPlanarForward,
+                                        in right,
+                                        rightPlanarRight,
+                                        rightPlanarForward);
+    }
+
+    /// <summary>
+    /// Checks whether two footprints can share one containment group without weakening authored priority overrides.
+    /// </summary>
+    /// <param name="left">First boundary supplying geometry and selection priority.</param>
+    /// <param name="right">Second boundary supplying geometry and selection priority.</param>
+    /// <returns>True when both priorities match and the footprint interiors overlap.</returns>
+    public static bool CanShareContainmentGroup(in GameCameraBoundary left,
+                                                in GameCameraBoundary right)
+    {
+        return left.Priority == right.Priority && Overlaps(in left, in right);
+    }
+
+    /// <summary>
     /// Calculates footprint area for deterministic overlap selection; smaller volumes win equal-priority ties.
     /// </summary>
     /// <param name="boundary">Boundary whose horizontal footprint is measured.</param>
@@ -37,6 +140,44 @@ public static class GameCameraBoundaryUtility
     #endregion
 
     #region Constraint Methods
+    /// <summary>
+    /// Compresses a desired camera position only against the external edge of a compound containment group.
+    /// Internal edges shared by overlapping members remain fully traversable.
+    /// </summary>
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="desiredPosition">Unconstrained world-space camera target.</param>
+    /// <param name="softZoneDistance">Authored braking distance before external edges.</param>
+    /// <returns>Soft-constrained target inside the closest group member, or the original target when already inside the union.</returns>
+    public static float3 ResolveSoftConstrainedPosition(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 desiredPosition,
+        float softZoneDistance)
+    {
+        if (boundaries.Length == 0)
+            return desiredPosition;
+
+        float closestDistanceSquared = float.MaxValue;
+        float3 closestPosition = desiredPosition;
+
+        // Select the least-displacing member projection so only the union's nearest external edge brakes the target.
+        for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
+        {
+            GameCameraBoundary boundary = boundaries[boundaryIndex].Boundary;
+            float3 constrainedPosition = ResolveSoftConstrainedPosition(in boundary,
+                                                                        desiredPosition,
+                                                                        softZoneDistance);
+            float distanceSquared = PlanarDistanceSquared(constrainedPosition, desiredPosition);
+
+            if (distanceSquared >= closestDistanceSquared)
+                continue;
+
+            closestDistanceSquared = distanceSquared;
+            closestPosition = constrainedPosition;
+        }
+
+        return closestPosition;
+    }
+
     /// <summary>
     /// Compresses a desired camera position through the boundary braking zones while preserving world-space height.
     /// </summary>
@@ -75,6 +216,39 @@ public static class GameCameraBoundaryUtility
     }
 
     /// <summary>
+    /// Projects a camera position to the closest point of a compound containment union while preserving height.
+    /// </summary>
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="position">Integrated world-space camera position.</param>
+    /// <returns>Original position when it is inside any member, otherwise the closest member projection.</returns>
+    public static float3 ResolveHardConstrainedPosition(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 position)
+    {
+        if (boundaries.Length == 0 || Contains(boundaries, position))
+            return position;
+
+        float closestDistanceSquared = float.MaxValue;
+        float3 closestPosition = position;
+
+        // The closest member projection is the closest valid point on the compound union.
+        for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
+        {
+            GameCameraBoundary boundary = boundaries[boundaryIndex].Boundary;
+            float3 constrainedPosition = ResolveHardConstrainedPosition(in boundary, position);
+            float distanceSquared = PlanarDistanceSquared(constrainedPosition, position);
+
+            if (distanceSquared >= closestDistanceSquared)
+                continue;
+
+            closestDistanceSquared = distanceSquared;
+            closestPosition = constrainedPosition;
+        }
+
+        return closestPosition;
+    }
+
+    /// <summary>
     /// Determines when a newly selected boundary may enforce its hard edge without teleporting an outside camera.
     /// The spring remains authoritative until the camera reaches the new footprint, then hard containment resumes.
     /// </summary>
@@ -87,6 +261,21 @@ public static class GameCameraBoundaryUtility
                                                  float3 candidatePosition)
     {
         return Contains(in boundary, sourcePosition) || Contains(in boundary, candidatePosition);
+    }
+
+    /// <summary>
+    /// Determines when a compound group may enforce its external hard edge without teleporting an outside camera.
+    /// </summary>
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="sourcePosition">Camera position before the current spring step.</param>
+    /// <param name="candidatePosition">Camera position produced by the current spring step.</param>
+    /// <returns>True when either end of the spring step has reached the group union.</returns>
+    public static bool ShouldApplyHardConstraint(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 sourcePosition,
+        float3 candidatePosition)
+    {
+        return Contains(boundaries, sourcePosition) || Contains(boundaries, candidatePosition);
     }
 
     /// <summary>
@@ -106,6 +295,27 @@ public static class GameCameraBoundaryUtility
 
         candidatePosition = ResolveHardConstrainedPosition(in boundary, candidatePosition);
         CancelOutwardVelocity(in boundary, candidatePosition, ref velocity);
+    }
+
+    /// <summary>
+    /// Enforces only the external hard edge of a reached compound containment group and stabilizes its spring velocity.
+    /// </summary>
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="sourcePosition">Camera position before the current spring step.</param>
+    /// <param name="candidatePosition">Spring result constrained in place when the group is reachable.</param>
+    /// <param name="velocity">Persistent spring velocity stabilized only at external edges.</param>
+    public static void ApplyReachableHardConstraint(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 sourcePosition,
+        ref float3 candidatePosition,
+        ref float3 velocity)
+    {
+        // An entering spring remains authoritative, while an already-contained spring stops at its first union exit.
+        if (!Contains(boundaries, sourcePosition) || Contains(boundaries, candidatePosition))
+            return;
+
+        candidatePosition = ResolveFirstExternalEdge(boundaries, sourcePosition, candidatePosition);
+        CancelOutwardVelocity(boundaries, candidatePosition, ref velocity);
     }
 
     /// <summary>
@@ -143,103 +353,160 @@ public static class GameCameraBoundaryUtility
     }
 
     /// <summary>
-    /// Brakes a desired camera target before it enters an impassable footprint while preserving tangential motion.
+    /// Removes spring velocity only when every member containing the reached point blocks that direction.
+    /// This preserves motion through shared seams and around overlapping corners.
     /// </summary>
-    /// <param name="boundary">Static footprint treated as a planar obstacle.</param>
-    /// <param name="sourcePosition">Current unshaken camera position.</param>
-    /// <param name="desiredPosition">Unconstrained camera target.</param>
-    /// <param name="softZoneDistance">World-space braking distance outside the blocking face.</param>
-    /// <returns>Target compressed toward the first face approached from outside.</returns>
-    public static float3 ResolveSoftBlockedPosition(in GameCameraBoundary boundary,
-                                                    float3 sourcePosition,
-                                                    float3 desiredPosition,
-                                                    float softZoneDistance)
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="constrainedPosition">Hard-constrained world-space camera position.</param>
+    /// <param name="velocity">Persistent world-space spring velocity updated in place.</param>
+    public static void CancelOutwardVelocity(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 constrainedPosition,
+        ref float3 velocity)
     {
-        float2 sourceLocal = ToLocal(in boundary, sourcePosition);
+        float3 sourceVelocity = velocity;
+        float3 leastConstrainedVelocity = velocity;
+        float greatestRetainedPlanarSpeedSquared = -1f;
 
-        // A camera already inside malformed or newly enabled authoring may leave without being snapped or trapped.
-        if (IsStrictlyInside(sourceLocal, boundary.HalfExtents))
-            return desiredPosition;
-
-        float2 desiredLocal = ToLocal(in boundary, desiredPosition);
-        float2 movement = desiredLocal - sourceLocal;
-
-        if (!TryGetRayEntry(sourceLocal,
-                            movement,
-                            boundary.HalfExtents,
-                            out float entryDistance,
-                            out float2 outwardNormal) ||
-            entryDistance < 0f)
+        // Any member that permits the direction keeps it valid for the compound union.
+        for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
         {
-            return desiredPosition;
+            GameCameraBoundary boundary = boundaries[boundaryIndex].Boundary;
+
+            if (!Contains(in boundary, constrainedPosition))
+                continue;
+
+            float3 candidateVelocity = sourceVelocity;
+            CancelOutwardVelocity(in boundary, constrainedPosition, ref candidateVelocity);
+            float retainedPlanarSpeedSquared = candidateVelocity.x * candidateVelocity.x +
+                                               candidateVelocity.z * candidateVelocity.z;
+
+            if (retainedPlanarSpeedSquared <= greatestRetainedPlanarSpeedSquared)
+                continue;
+
+            greatestRetainedPlanarSpeedSquared = retainedPlanarSpeedSquared;
+            leastConstrainedVelocity = candidateVelocity;
         }
 
-        float softZone = math.max(0f, softZoneDistance);
-        bool blocksLocalX = math.abs(outwardNormal.x) > 0.5f;
-        float normalSign = blocksLocalX ? outwardNormal.x : outwardNormal.y;
-        float hardEdge = normalSign * (blocksLocalX ? boundary.HalfExtents.x : boundary.HalfExtents.y);
-        float desiredAxis = blocksLocalX ? desiredLocal.x : desiredLocal.y;
-        float outsideDistance = (desiredAxis - hardEdge) * normalSign;
-
-        if (outsideDistance >= softZone)
-            return desiredPosition;
-
-        float resolvedDistance = softZone <= BoundaryEpsilon
-            ? BoundaryEpsilon
-            : softZone * math.exp(-(softZone - outsideDistance) / softZone);
-
-        if (blocksLocalX)
-            desiredLocal.x = hardEdge + normalSign * math.max(BoundaryEpsilon, resolvedDistance);
-        else
-            desiredLocal.y = hardEdge + normalSign * math.max(BoundaryEpsilon, resolvedDistance);
-
-        return ToWorldPreservingHeight(in boundary, desiredLocal, desiredPosition.y);
+        if (greatestRetainedPlanarSpeedSquared >= 0f)
+            velocity = leastConstrainedVelocity;
     }
 
     /// <summary>
-    /// Stops an integrated camera step at the first impassable footprint face and removes only inward velocity.
+    /// Resolves the first external edge crossed by a segment that starts inside a compound containment group.
+    /// Boundary intersection intervals are merged transitively so internal overlap seams never stop the camera.
     /// </summary>
-    /// <param name="boundary">Static footprint treated as a planar obstacle.</param>
-    /// <param name="sourcePosition">Camera position before spring integration.</param>
-    /// <param name="candidatePosition">Integrated camera position constrained in place on intersection.</param>
-    /// <param name="velocity">Persistent spring velocity stabilized against the reached face.</param>
-    public static void ApplyImpassableHardConstraint(in GameCameraBoundary boundary,
-                                                     float3 sourcePosition,
-                                                     ref float3 candidatePosition,
-                                                     ref float3 velocity)
+    /// <param name="boundaries">Active same-priority overlapping containment group.</param>
+    /// <param name="sourcePosition">Contained camera position before spring integration.</param>
+    /// <param name="candidatePosition">Integrated camera position outside the group union.</param>
+    /// <returns>World-space position on the first external edge reached along the spring segment.</returns>
+    private static float3 ResolveFirstExternalEdge(
+        DynamicBuffer<GameCameraBoundaryContainmentElement> boundaries,
+        float3 sourcePosition,
+        float3 candidatePosition)
     {
-        float2 sourceLocal = ToLocal(in boundary, sourcePosition);
+        float reachableExit = 0f;
 
-        if (IsStrictlyInside(sourceLocal, boundary.HalfExtents))
-            return;
-
-        float2 candidateLocal = ToLocal(in boundary, candidatePosition);
-        float2 movement = candidateLocal - sourceLocal;
-
-        if (!TryGetRayEntry(sourceLocal,
-                            movement,
-                            boundary.HalfExtents,
-                            out float entryDistance,
-                            out float2 outwardNormal) ||
-            entryDistance < 0f ||
-            entryDistance > 1f)
+        // Repeated interval expansion follows every overlapping member reachable without crossing an external gap.
+        for (int expansionIndex = 0; expansionIndex < boundaries.Length; expansionIndex++)
         {
-            return;
+            float previousReachableExit = reachableExit;
+
+            for (int boundaryIndex = 0; boundaryIndex < boundaries.Length; boundaryIndex++)
+            {
+                GameCameraBoundary boundary = boundaries[boundaryIndex].Boundary;
+
+                if (!TryGetSegmentInterval(in boundary,
+                                           sourcePosition,
+                                           candidatePosition,
+                                           out float entryDistance,
+                                           out float exitDistance) ||
+                    entryDistance > reachableExit + BoundaryEpsilon ||
+                    exitDistance <= reachableExit)
+                    continue;
+
+                reachableExit = math.min(1f, exitDistance);
+            }
+
+            if (reachableExit >= 1f - BoundaryEpsilon ||
+                reachableExit <= previousReachableExit + BoundaryEpsilon)
+                break;
         }
 
-        float2 constrainedLocal = sourceLocal + movement * entryDistance + outwardNormal * BoundaryEpsilon * 2f;
-        candidatePosition = ToWorldPreservingHeight(in boundary, constrainedLocal, candidatePosition.y);
-        float2 planarRight = ResolvePlanarRight(in boundary);
-        float2 planarForward = ResolvePlanarForward(planarRight);
-        float2 worldNormal = planarRight * outwardNormal.x + planarForward * outwardNormal.y;
-        float inwardSpeed = math.dot(new float2(velocity.x, velocity.z), worldNormal);
-
-        if (inwardSpeed >= 0f)
-            return;
-
-        velocity.x -= worldNormal.x * inwardSpeed;
-        velocity.z -= worldNormal.y * inwardSpeed;
+        return math.lerp(sourcePosition, candidatePosition, math.saturate(reachableExit));
     }
+
+    /// <summary>
+    /// Calculates the normalized segment interval contained by one oriented boundary footprint.
+    /// </summary>
+    /// <param name="boundary">Boundary intersected by the world-space segment.</param>
+    /// <param name="sourcePosition">World-space segment origin.</param>
+    /// <param name="candidatePosition">World-space segment end.</param>
+    /// <param name="entryDistance">Normalized parameter at which the segment enters the footprint.</param>
+    /// <param name="exitDistance">Normalized parameter at which the segment exits the footprint.</param>
+    /// <returns>True when the segment intersects the footprint between its endpoints.</returns>
+    private static bool TryGetSegmentInterval(in GameCameraBoundary boundary,
+                                              float3 sourcePosition,
+                                              float3 candidatePosition,
+                                              out float entryDistance,
+                                              out float exitDistance)
+    {
+        float2 sourceLocal = ToLocal(in boundary, sourcePosition);
+        float2 candidateLocal = ToLocal(in boundary, candidatePosition);
+        float2 direction = candidateLocal - sourceLocal;
+        entryDistance = 0f;
+        exitDistance = 1f;
+
+        return UpdateSegmentSlab(sourceLocal.x,
+                                 direction.x,
+                                 -boundary.HalfExtents.x,
+                                 boundary.HalfExtents.x,
+                                 ref entryDistance,
+                                 ref exitDistance) &&
+               UpdateSegmentSlab(sourceLocal.y,
+                                 direction.y,
+                                 -boundary.HalfExtents.y,
+                                 boundary.HalfExtents.y,
+                                 ref entryDistance,
+                                 ref exitDistance);
+    }
+
+    /// <summary>
+    /// Intersects one segment axis with a local boundary slab and narrows its normalized containment interval.
+    /// </summary>
+    /// <param name="source">Segment origin on the inspected local axis.</param>
+    /// <param name="direction">Segment displacement on the inspected local axis.</param>
+    /// <param name="minimum">Local slab minimum.</param>
+    /// <param name="maximum">Local slab maximum.</param>
+    /// <param name="entryDistance">Latest normalized entry parameter updated in place.</param>
+    /// <param name="exitDistance">Earliest normalized exit parameter updated in place.</param>
+    /// <returns>True when the inspected slab retains a non-empty segment interval.</returns>
+    private static bool UpdateSegmentSlab(float source,
+                                          float direction,
+                                          float minimum,
+                                          float maximum,
+                                          ref float entryDistance,
+                                          ref float exitDistance)
+    {
+        if (math.abs(direction) <= BoundaryEpsilon)
+            return source >= minimum - BoundaryEpsilon && source <= maximum + BoundaryEpsilon;
+
+        float inverseDirection = 1f / direction;
+        float firstDistance = (minimum - source) * inverseDirection;
+        float secondDistance = (maximum - source) * inverseDirection;
+
+        if (firstDistance > secondDistance)
+        {
+            float distanceSwap = firstDistance;
+            firstDistance = secondDistance;
+            secondDistance = distanceSwap;
+        }
+
+        entryDistance = math.max(entryDistance, firstDistance);
+        exitDistance = math.min(exitDistance, secondDistance);
+        return entryDistance <= exitDistance + BoundaryEpsilon;
+    }
+
     #endregion
 
     #region Comparison Methods
@@ -257,6 +524,46 @@ public static class GameCameraBoundaryUtility
                math.distancesq(ResolvePlanarRight(in left), ResolvePlanarRight(in right)) <=
                BoundaryEpsilon * BoundaryEpsilon;
     }
+
+    /// <summary>
+    /// Tests one separating axis using the projected radii of two oriented boundary footprints.
+    /// </summary>
+    /// <param name="centerDelta">Vector from the first footprint center to the second.</param>
+    /// <param name="axis">Normalized axis receiving both footprint projections.</param>
+    /// <param name="left">First boundary supplying its half extents.</param>
+    /// <param name="leftPlanarRight">Normalized local-right axis of the first boundary.</param>
+    /// <param name="leftPlanarForward">Normalized local-forward axis of the first boundary.</param>
+    /// <param name="right">Second boundary supplying its half extents.</param>
+    /// <param name="rightPlanarRight">Normalized local-right axis of the second boundary.</param>
+    /// <param name="rightPlanarForward">Normalized local-forward axis of the second boundary.</param>
+    /// <returns>True when the footprint interiors overlap on the inspected axis.</returns>
+    private static bool HasPositiveOverlapOnAxis(float2 centerDelta,
+                                                 float2 axis,
+                                                 in GameCameraBoundary left,
+                                                 float2 leftPlanarRight,
+                                                 float2 leftPlanarForward,
+                                                 in GameCameraBoundary right,
+                                                 float2 rightPlanarRight,
+                                                 float2 rightPlanarForward)
+    {
+        float leftRadius = math.abs(math.dot(axis, leftPlanarRight)) * left.HalfExtents.x +
+                           math.abs(math.dot(axis, leftPlanarForward)) * left.HalfExtents.y;
+        float rightRadius = math.abs(math.dot(axis, rightPlanarRight)) * right.HalfExtents.x +
+                            math.abs(math.dot(axis, rightPlanarForward)) * right.HalfExtents.y;
+        return math.abs(math.dot(centerDelta, axis)) < leftRadius + rightRadius - BoundaryEpsilon;
+    }
+
+    /// <summary>
+    /// Calculates horizontal squared distance without allowing preserved camera height to affect footprint selection.
+    /// </summary>
+    /// <param name="left">First world-space camera position.</param>
+    /// <param name="right">Second world-space camera position.</param>
+    /// <returns>Squared distance on the world XZ plane.</returns>
+    private static float PlanarDistanceSquared(float3 left, float3 right)
+    {
+        float2 delta = new float2(left.x - right.x, left.z - right.z);
+        return math.lengthsq(delta);
+    }
     #endregion
 
     #region Coordinate Methods
@@ -266,7 +573,7 @@ public static class GameCameraBoundaryUtility
     /// <param name="boundary">Boundary defining the horizontal coordinate frame.</param>
     /// <param name="worldPosition">World-space position to convert.</param>
     /// <returns>Horizontal position relative to the boundary center and yaw.</returns>
-    private static float2 ToLocal(in GameCameraBoundary boundary, float3 worldPosition)
+    internal static float2 ToLocal(in GameCameraBoundary boundary, float3 worldPosition)
     {
         float2 planarRight = ResolvePlanarRight(in boundary);
         float2 planarForward = ResolvePlanarForward(planarRight);
@@ -282,9 +589,9 @@ public static class GameCameraBoundaryUtility
     /// <param name="localPosition">Boundary-local horizontal position to convert.</param>
     /// <param name="worldHeight">World-space Y value retained by the planar constraint.</param>
     /// <returns>World-space constrained position.</returns>
-    private static float3 ToWorldPreservingHeight(in GameCameraBoundary boundary,
-                                                  float2 localPosition,
-                                                  float worldHeight)
+    internal static float3 ToWorldPreservingHeight(in GameCameraBoundary boundary,
+                                                   float2 localPosition,
+                                                   float worldHeight)
     {
         float2 planarRight = ResolvePlanarRight(in boundary);
         float2 planarForward = ResolvePlanarForward(planarRight);
@@ -299,7 +606,7 @@ public static class GameCameraBoundaryUtility
     /// </summary>
     /// <param name="boundary">Boundary containing the baked horizontal orientation.</param>
     /// <returns>Normalized local-right direction on world XZ.</returns>
-    private static float2 ResolvePlanarRight(in GameCameraBoundary boundary)
+    internal static float2 ResolvePlanarRight(in GameCameraBoundary boundary)
     {
         return math.normalizesafe(boundary.PlanarRight, new float2(1f, 0f));
     }
@@ -309,118 +616,9 @@ public static class GameCameraBoundaryUtility
     /// </summary>
     /// <param name="planarRight">Normalized local-right direction on world XZ.</param>
     /// <returns>Normalized local-forward direction on world XZ.</returns>
-    private static float2 ResolvePlanarForward(float2 planarRight)
+    internal static float2 ResolvePlanarForward(float2 planarRight)
     {
         return new float2(-planarRight.y, planarRight.x);
-    }
-
-    /// <summary>
-    /// Checks whether a local point lies strictly inside an obstacle, leaving edge points on the outside path.
-    /// </summary>
-    /// <param name="localPosition">Boundary-local point.</param>
-    /// <param name="halfExtents">Positive obstacle half extents.</param>
-    /// <returns>True when the point must be allowed to escape before blocking resumes.</returns>
-    private static bool IsStrictlyInside(float2 localPosition, float2 halfExtents)
-    {
-        return math.abs(localPosition.x) < halfExtents.x - BoundaryEpsilon &&
-               math.abs(localPosition.y) < halfExtents.y - BoundaryEpsilon;
-    }
-
-    /// <summary>
-    /// Resolves the first face reached by a ray against a local axis-aligned footprint.
-    /// </summary>
-    /// <param name="source">Ray origin in boundary-local coordinates.</param>
-    /// <param name="direction">Unnormalized ray direction.</param>
-    /// <param name="halfExtents">Obstacle half extents.</param>
-    /// <param name="entryDistance">Ray parameter at the first blocking face.</param>
-    /// <param name="outwardNormal">Local outward normal of the first blocking face.</param>
-    /// <returns>True when the ray intersects the footprint in its forward direction.</returns>
-    private static bool TryGetRayEntry(float2 source,
-                                       float2 direction,
-                                       float2 halfExtents,
-                                       out float entryDistance,
-                                       out float2 outwardNormal)
-    {
-        entryDistance = -float.MaxValue;
-        float exitDistance = float.MaxValue;
-        outwardNormal = float2.zero;
-
-        if (!UpdateRaySlab(source.x,
-                           direction.x,
-                           -halfExtents.x,
-                           halfExtents.x,
-                           new float2(1f, 0f),
-                           ref entryDistance,
-                           ref exitDistance,
-                           ref outwardNormal))
-        {
-            return false;
-        }
-
-        if (!UpdateRaySlab(source.y,
-                           direction.y,
-                           -halfExtents.y,
-                           halfExtents.y,
-                           new float2(0f, 1f),
-                           ref entryDistance,
-                           ref exitDistance,
-                           ref outwardNormal))
-        {
-            return false;
-        }
-
-        return exitDistance >= math.max(0f, entryDistance);
-    }
-
-    /// <summary>
-    /// Intersects one ray axis and retains the latest near face and earliest far face.
-    /// </summary>
-    /// <param name="source">Ray origin on the inspected axis.</param>
-    /// <param name="direction">Ray direction on the inspected axis.</param>
-    /// <param name="minimum">Slab minimum.</param>
-    /// <param name="maximum">Slab maximum.</param>
-    /// <param name="positiveNormal">Local normal of the positive slab face.</param>
-    /// <param name="entryDistance">Current latest near-face parameter.</param>
-    /// <param name="exitDistance">Current earliest far-face parameter.</param>
-    /// <param name="outwardNormal">Normal replaced when this axis owns the latest near face.</param>
-    /// <returns>True when this slab does not reject the ray.</returns>
-    private static bool UpdateRaySlab(float source,
-                                      float direction,
-                                      float minimum,
-                                      float maximum,
-                                      float2 positiveNormal,
-                                      ref float entryDistance,
-                                      ref float exitDistance,
-                                      ref float2 outwardNormal)
-    {
-        if (math.abs(direction) <= BoundaryEpsilon)
-            return source >= minimum && source <= maximum;
-
-        float nearDistance;
-        float farDistance;
-        float2 nearNormal;
-
-        if (direction > 0f)
-        {
-            nearDistance = (minimum - source) / direction;
-            farDistance = (maximum - source) / direction;
-            nearNormal = -positiveNormal;
-        }
-        else
-        {
-            nearDistance = (maximum - source) / direction;
-            farDistance = (minimum - source) / direction;
-            nearNormal = positiveNormal;
-        }
-
-        if (nearDistance > entryDistance)
-        {
-            entryDistance = nearDistance;
-            outwardNormal = nearNormal;
-        }
-
-        exitDistance = math.min(exitDistance, farDistance);
-        return entryDistance <= exitDistance;
     }
 
     /// <summary>

@@ -36506,7 +36506,7 @@ MonoBehaviour:
           outboundLifetimeMultiplier: 1.5
           outboundHitPolicy: 1
           additionalOutboundHits: 1
-          returnStartMode: 1
+          returnStartMode: 4
           returnDelaySeconds: 0.5
           allowEarlyActivationRecall: 1
           reapplyResourceGateCostOnRecall: 0

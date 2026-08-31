@@ -301,7 +301,7 @@ MonoBehaviour:
     eventPath: event:/SFX/Weapon/NASH_SfxMC_SFX_Misc_DeatJIngle
     volume: 1
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0
@@ -316,7 +316,7 @@ MonoBehaviour:
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Spawn
     volume: 5
     pitch: 1
-    spatialize: 1
+    spatialize: 0
     minimumDistance: 1
     maximumDistance: 45
     singleInstance: 0

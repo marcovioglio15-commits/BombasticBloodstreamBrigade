@@ -1,9 +1,10 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// Selects one active Camera Boundary from the local player position and publishes immutable state for camera writers.
+/// Selects an active Camera Boundary group from the local player position and publishes immutable state for camera writers.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateBefore(typeof(PlayerCameraFollowSystem))]
@@ -11,6 +12,8 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
 {
     #region Fields
     private Entity runtimeStateEntity;
+    private EntityQuery boundaryQuery;
+    private int boundaryOrderVersion;
     #endregion
 
     #region Methods
@@ -23,28 +26,40 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         runtimeStateEntity = state.EntityManager.CreateEntity(typeof(GameCameraBoundaryRuntimeState));
+        state.EntityManager.AddBuffer<GameCameraBoundaryContainmentElement>(runtimeStateEntity);
+        boundaryQuery = state.GetEntityQuery(ComponentType.ReadOnly<GameCameraBoundary>());
         state.RequireForUpdate<PlayerRuntimeCameraConfig>();
     }
 
     /// <summary>
-    /// Resolves the highest-priority containing boundary without allocations and publishes changes only when needed.
+    /// Resolves the highest-priority containing group and publishes changes only when ownership or settings change.
     /// </summary>
     /// <param name="state">System state providing player transforms, boundaries and Scene Manager settings.</param>
     public void OnUpdate(ref SystemState state)
     {
+        DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries =
+            state.EntityManager.GetBuffer<GameCameraBoundaryContainmentElement>(runtimeStateEntity);
         ResolveSettings(out bool boundariesEnabled,
                         out GameCameraBoundaryMode boundaryMode,
                         out float softZoneDistance);
 
         if (!boundariesEnabled)
         {
-            PublishInactive(state.EntityManager, false, boundaryMode, softZoneDistance);
+            PublishInactive(state.EntityManager,
+                            containmentBoundaries,
+                            false,
+                            boundaryMode,
+                            softZoneDistance);
             return;
         }
 
         if (boundaryMode == GameCameraBoundaryMode.ImpassableVolume)
         {
-            PublishInactive(state.EntityManager, true, boundaryMode, softZoneDistance);
+            PublishInactive(state.EntityManager,
+                            containmentBoundaries,
+                            true,
+                            boundaryMode,
+                            softZoneDistance);
             return;
         }
 
@@ -71,7 +86,11 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
 
         if (!hasFocusPosition)
         {
-            PublishInactive(state.EntityManager, true, boundaryMode, softZoneDistance);
+            PublishInactive(state.EntityManager,
+                            containmentBoundaries,
+                            true,
+                            boundaryMode,
+                            softZoneDistance);
             return;
         }
 
@@ -101,22 +120,48 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
             selectedArea = area;
         }
 
+        GameCameraBoundaryRuntimeState currentState =
+            state.EntityManager.GetComponentData<GameCameraBoundaryRuntimeState>(runtimeStateEntity);
+
+        // Track only boundary structural changes so unrelated projectile and enemy churn cannot rebuild the group.
+        int currentBoundaryOrderVersion = boundaryQuery.GetCombinedComponentOrderVersion(false);
+        bool boundaryStructureChanged = currentBoundaryOrderVersion != boundaryOrderVersion;
+        boundaryOrderVersion = currentBoundaryOrderVersion;
+        bool hasValidCurrentSelection = currentState.HasBoundary != 0 &&
+                                        containmentBoundaries.Length > 0 &&
+                                        !boundaryStructureChanged &&
+                                        state.EntityManager.Exists(currentState.BoundaryEntity) &&
+                                        state.EntityManager.HasComponent<GameCameraBoundary>(currentState.BoundaryEntity);
+
         if (selectedEntity == Entity.Null)
         {
-            GameCameraBoundaryRuntimeState currentState =
-                state.EntityManager.GetComponentData<GameCameraBoundaryRuntimeState>(runtimeStateEntity);
-
-            // Retain the last valid volume while crossing its edge so the camera cannot escape through an uncovered gap.
-            if (currentState.HasBoundary == 0 ||
-                !state.EntityManager.Exists(currentState.BoundaryEntity) ||
-                !state.EntityManager.HasComponent<GameCameraBoundary>(currentState.BoundaryEntity))
+            // Retain the last valid group while crossing its external edge so the camera cannot escape through a gap.
+            if (!hasValidCurrentSelection)
             {
-                PublishInactive(state.EntityManager, true, boundaryMode, softZoneDistance);
+                PublishInactive(state.EntityManager,
+                                containmentBoundaries,
+                                true,
+                                boundaryMode,
+                                softZoneDistance);
                 return;
             }
 
             selectedEntity = currentState.BoundaryEntity;
             selectedBoundary = state.EntityManager.GetComponentData<GameCameraBoundary>(selectedEntity);
+        }
+
+        // Keep one stable group identity while the player crosses any of its internal overlap seams.
+        if (hasValidCurrentSelection &&
+            GameCameraBoundaryUtility.ContainsEntity(containmentBoundaries, selectedEntity))
+        {
+            selectedEntity = currentState.BoundaryEntity;
+            selectedBoundary = state.EntityManager.GetComponentData<GameCameraBoundary>(selectedEntity);
+        }
+        else
+        {
+            RebuildContainmentGroup(selectedEntity,
+                                    in selectedBoundary,
+                                    containmentBoundaries);
         }
 
         PublishSelection(state.EntityManager,
@@ -167,6 +212,55 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
         boundaryMode = sceneManagerConfig.CameraBoundaryMode;
         softZoneDistance = math.max(0f, sceneManagerConfig.CameraBoundarySoftZoneDistance);
     }
+
+    /// <summary>
+    /// Rebuilds the transitive same-priority overlap group reached from a selected seed boundary.
+    /// The temporary query arrays are allocated only when group ownership or boundary structure changes.
+    /// </summary>
+    /// <param name="selectedEntity">Seed boundary entity selected from the player position.</param>
+    /// <param name="selectedBoundary">Seed boundary geometry and priority.</param>
+    /// <param name="containmentBoundaries">Runtime membership buffer replaced with the connected group.</param>
+    private void RebuildContainmentGroup(Entity selectedEntity,
+                                         in GameCameraBoundary selectedBoundary,
+                                         DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries)
+    {
+        containmentBoundaries.Clear();
+        containmentBoundaries.Add(new GameCameraBoundaryContainmentElement
+        {
+            BoundaryEntity = selectedEntity,
+            Boundary = selectedBoundary
+        });
+
+        NativeArray<Entity> boundaryEntities = boundaryQuery.ToEntityArray(Allocator.Temp);
+        NativeArray<GameCameraBoundary> boundaries =
+            boundaryQuery.ToComponentDataArray<GameCameraBoundary>(Allocator.Temp);
+
+        // Breadth-first expansion includes indirect overlaps, allowing long and angled camera paths.
+        for (int memberIndex = 0; memberIndex < containmentBoundaries.Length; memberIndex++)
+        {
+            GameCameraBoundary memberBoundary = containmentBoundaries[memberIndex].Boundary;
+
+            for (int candidateIndex = 0; candidateIndex < boundaries.Length; candidateIndex++)
+            {
+                Entity candidateEntity = boundaryEntities[candidateIndex];
+                GameCameraBoundary candidateBoundary = boundaries[candidateIndex];
+
+                if (GameCameraBoundaryUtility.ContainsEntity(containmentBoundaries, candidateEntity) ||
+                    !GameCameraBoundaryUtility.CanShareContainmentGroup(in memberBoundary,
+                                                                        in candidateBoundary))
+                    continue;
+
+                containmentBoundaries.Add(new GameCameraBoundaryContainmentElement
+                {
+                    BoundaryEntity = candidateEntity,
+                    Boundary = candidateBoundary
+                });
+            }
+        }
+
+        boundaries.Dispose();
+        boundaryEntities.Dispose();
+    }
     #endregion
 
     #region Publication Methods
@@ -174,15 +268,20 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
     /// Clears containment selection while preserving current enable, mode, and soft-zone settings.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the selection singleton.</param>
+    /// <param name="containmentBoundaries">Runtime group buffer cleared when containment becomes inactive.</param>
     /// <param name="enabled">True when any boundary policy remains active.</param>
     /// <param name="boundaryMode">Current containment or impassable-volume policy.</param>
     /// <param name="softZoneDistance">Resolved braking distance retained for diagnostics.</param>
     private void PublishInactive(EntityManager entityManager,
+                                 DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries,
                                  bool enabled,
                                  GameCameraBoundaryMode boundaryMode,
                                  float softZoneDistance)
     {
         GameCameraBoundaryRuntimeState currentState = entityManager.GetComponentData<GameCameraBoundaryRuntimeState>(runtimeStateEntity);
+
+        if (containmentBoundaries.Length > 0)
+            containmentBoundaries.Clear();
 
         if (currentState.HasBoundary == 0 &&
             currentState.Enabled == (enabled ? (byte)1 : (byte)0) &&
@@ -204,7 +303,7 @@ public partial struct PlayerCameraBoundarySelectionSystem : ISystem
     }
 
     /// <summary>
-    /// Publishes an active selection only when its entity, geometry or braking setting changed.
+    /// Publishes an active containment group only when its identity, seed geometry or braking setting changed.
     /// </summary>
     /// <param name="entityManager">Entity manager owning the selection singleton.</param>
     /// <param name="selectedEntity">Selected boundary entity.</param>

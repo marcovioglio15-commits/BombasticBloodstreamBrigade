@@ -114,10 +114,15 @@ public partial struct PlayerCameraFollowSystem : ISystem
         bool cameraChanged = cameraInstanceId != lastCameraInstanceId;
         bool hasBoundaryRuntimeState =
             SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState);
+        DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries = default;
+        bool hasContainmentBuffer =
+            SystemAPI.TryGetSingletonBuffer<GameCameraBoundaryContainmentElement>(out containmentBoundaries, true);
         bool hasContainmentBoundary = hasBoundaryRuntimeState &&
                                       cameraBoundaryState.Enabled != 0 &&
                                       cameraBoundaryState.Mode == GameCameraBoundaryMode.ContainmentVolume &&
-                                      cameraBoundaryState.HasBoundary != 0;
+                                      cameraBoundaryState.HasBoundary != 0 &&
+                                      hasContainmentBuffer &&
+                                      containmentBoundaries.Length > 0;
         bool hasImpassableBoundaries = hasBoundaryRuntimeState &&
                                        cameraBoundaryState.Enabled != 0 &&
                                        cameraBoundaryState.Mode == GameCameraBoundaryMode.ImpassableVolume;
@@ -208,6 +213,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
             RefreshBoundaryReacquisition(camera,
                                          in shakeState,
                                          in cameraBoundaryState,
+                                         containmentBoundaries,
                                          hasContainmentBoundary,
                                          cameraChanged || playerChanged);
 
@@ -222,6 +228,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                   in cameraConfig,
                                   in shakeState,
                                   in cameraBoundaryState,
+                                  containmentBoundaries,
                                   hasContainmentBoundary);
             }
 
@@ -281,7 +288,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     if (hasContainmentBoundary)
                     {
                         childTargetPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
-                            in cameraBoundaryState.Boundary,
+                            containmentBoundaries,
                             childTargetPosition,
                             cameraBoundaryState.SoftZoneDistance);
                     }
@@ -307,7 +314,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                         if (hasContainmentBoundary)
                         {
                             GameCameraBoundaryUtility.ApplyReachableHardConstraint(
-                                in cameraBoundaryState.Boundary,
+                                containmentBoundaries,
                                 childSmoothingSource,
                                 ref childTargetPosition,
                                 ref followVelocity);
@@ -340,7 +347,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     if (hasContainmentBoundary)
                     {
                         targetPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
-                            in cameraBoundaryState.Boundary,
+                            containmentBoundaries,
                             targetPosition,
                             cameraBoundaryState.SoftZoneDistance);
                     }
@@ -362,7 +369,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                     if (hasContainmentBoundary)
                     {
                         GameCameraBoundaryUtility.ApplyReachableHardConstraint(
-                            in cameraBoundaryState.Boundary,
+                            containmentBoundaries,
                             smoothingSource,
                             ref newPosition,
                             ref followVelocity);
@@ -408,7 +415,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
         foreach (RefRO<GameCameraBoundary> boundaryReference in
                  SystemAPI.Query<RefRO<GameCameraBoundary>>())
         {
-            desiredPosition = GameCameraBoundaryUtility.ResolveSoftBlockedPosition(
+            desiredPosition = GameCameraBoundaryImpassableUtility.ResolveSoftBlockedPosition(
                 in boundaryReference.ValueRO,
                 sourcePosition,
                 desiredPosition,
@@ -433,7 +440,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
         foreach (RefRO<GameCameraBoundary> boundaryReference in
                  SystemAPI.Query<RefRO<GameCameraBoundary>>())
         {
-            GameCameraBoundaryUtility.ApplyImpassableHardConstraint(
+            GameCameraBoundaryImpassableUtility.ApplyHardConstraint(
                 in boundaryReference.ValueRO,
                 sourcePosition,
                 ref candidatePosition,
@@ -515,11 +522,13 @@ public partial struct PlayerCameraFollowSystem : ISystem
     /// <param name="camera">Persistent gameplay camera being constrained.</param>
     /// <param name="shakeState">Feedback state used to recover the unshaken camera position.</param>
     /// <param name="cameraBoundaryState">Current boundary selection published before camera presentation.</param>
+    /// <param name="containmentBoundaries">Active compound containment group used for continuity checks.</param>
     /// <param name="hasCameraBoundary">True when the selection contains an active boundary.</param>
     /// <param name="forceReacquisition">True when camera or player ownership changed without a boundary entity change.</param>
     private void RefreshBoundaryReacquisition(Camera camera,
                                               in PlayerCameraShakeState shakeState,
                                               in GameCameraBoundaryRuntimeState cameraBoundaryState,
+                                              DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries,
                                               bool hasCameraBoundary,
                                               bool forceReacquisition)
     {
@@ -546,13 +555,13 @@ public partial struct PlayerCameraFollowSystem : ISystem
         float3 currentBasePosition =
             PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position, in shakeState);
         smoothBoundaryReacquisition = boundaryChanged ||
-                                      !GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary,
+                                      !GameCameraBoundaryUtility.Contains(containmentBoundaries,
                                                                           currentBasePosition);
         lastBoundaryEntity = cameraBoundaryState.BoundaryEntity;
         boundaryCameraInstanceId = cameraInstanceId;
         hasTrackedBoundary = true;
 
-        if (smoothBoundaryReacquisition)
+        if (smoothBoundaryReacquisition && !boundaryChanged)
             followVelocity = float3.zero;
     }
 
@@ -568,6 +577,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
     /// <param name="cameraConfig">Resolved runtime camera behavior and fixed offset.</param>
     /// <param name="shakeState">New player's feedback state used to avoid baking shake into the baseline.</param>
     /// <param name="cameraBoundaryState">Selected boundary data available for the new player.</param>
+    /// <param name="containmentBoundaries">Active compound containment group available for the new player.</param>
     /// <param name="hasCameraBoundary">True when the selected boundary must constrain the reset pose.</param>
     private void ResetForNewPlayer(Camera camera,
                                    Entity playerEntity,
@@ -576,6 +586,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                    in PlayerRuntimeCameraConfig cameraConfig,
                                    in PlayerCameraShakeState shakeState,
                                    in GameCameraBoundaryRuntimeState cameraBoundaryState,
+                                   DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries,
                                    bool hasCameraBoundary)
     {
         float3 currentBasePosition = PlayerCameraShakeRuntimeUtility.ResolveSmoothingSource(camera.transform.position,
@@ -620,14 +631,14 @@ public partial struct PlayerCameraFollowSystem : ISystem
         if (hasCameraBoundary && cameraConfig.Behavior != CameraBehavior.RoomFixed)
         {
             resolvedPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
-                in cameraBoundaryState.Boundary,
+                containmentBoundaries,
                 resolvedPosition,
                 cameraBoundaryState.SoftZoneDistance);
         }
 
         bool mayApplyImmediately = !hasCameraBoundary ||
                                    !smoothBoundaryReacquisition &&
-                                   GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary,
+                                   GameCameraBoundaryUtility.Contains(containmentBoundaries,
                                                                        currentBasePosition);
 
         if (cameraConfig.Behavior != CameraBehavior.RoomFixed && mayApplyImmediately)

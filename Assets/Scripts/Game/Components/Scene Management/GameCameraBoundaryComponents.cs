@@ -35,7 +35,7 @@ public struct GameCameraBoundary : IComponentData
 
 #region Runtime State
 /// <summary>
-/// Stores the boundary selected for the local player and the resolved braking distance consumed by camera systems.
+/// Stores the containment group selected for the local player and the resolved braking distance consumed by camera systems.
 /// </summary>
 public struct GameCameraBoundaryRuntimeState : IComponentData
 {
@@ -45,6 +45,16 @@ public struct GameCameraBoundaryRuntimeState : IComponentData
     public GameCameraBoundaryMode Mode;
     public byte Enabled;
     public byte HasBoundary;
+}
+
+/// <summary>
+/// Stores one member of the active same-priority containment group built from overlapping boundary footprints.
+/// </summary>
+[InternalBufferCapacity(8)]
+public struct GameCameraBoundaryContainmentElement : IBufferElementData
+{
+    public Entity BoundaryEntity;
+    public GameCameraBoundary Boundary;
 }
 #endregion
 

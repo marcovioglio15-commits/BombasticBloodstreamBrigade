@@ -13,7 +13,7 @@ public sealed class GameCameraBoundaryAuthoring : MonoBehaviour
 
     #region Serialized Fields
     [Header("Selection")]
-    [Tooltip("Selection priority used when the player is inside overlapping Camera Boundary volumes. Higher values win; equal priorities prefer the smaller footprint.")]
+    [Tooltip("Selection priority used when containment groups overlap. Higher values win, while overlapping volumes with the same priority form one continuous camera path.")]
     [SerializeField]
     private int priority;
 

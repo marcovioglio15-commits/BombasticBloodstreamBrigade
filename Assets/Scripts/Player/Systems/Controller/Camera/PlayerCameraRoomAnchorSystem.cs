@@ -70,8 +70,17 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
         ComponentLookup<LocalTransform> localTransformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
         ComponentLookup<PlayerCameraShakeState> shakeStateLookup = SystemAPI.GetComponentLookup<PlayerCameraShakeState>(true);
-        bool hasCameraBoundary = SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState) &&
-                                 cameraBoundaryState.HasBoundary != 0;
+        bool hasBoundaryRuntimeState =
+            SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState);
+        DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries = default;
+        bool hasContainmentBuffer =
+            SystemAPI.TryGetSingletonBuffer<GameCameraBoundaryContainmentElement>(out containmentBoundaries, true);
+        bool hasCameraBoundary = hasBoundaryRuntimeState &&
+                                 cameraBoundaryState.Enabled != 0 &&
+                                 cameraBoundaryState.Mode == GameCameraBoundaryMode.ContainmentVolume &&
+                                 cameraBoundaryState.HasBoundary != 0 &&
+                                 hasContainmentBuffer &&
+                                 containmentBoundaries.Length > 0;
         bool appliedRoomFixed = false;
 
         foreach ((RefRO<PlayerCameraAnchor> cameraAnchor, RefRO<PlayerRuntimeCameraConfig> runtimeCameraConfig, Entity entity) in SystemAPI.Query<RefRO<PlayerCameraAnchor>, RefRO<PlayerRuntimeCameraConfig>>().WithEntityAccess())
@@ -103,7 +112,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             if (hasCameraBoundary)
             {
                 anchorPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
-                    in cameraBoundaryState.Boundary,
+                    containmentBoundaries,
                     anchorPosition,
                     cameraBoundaryState.SoftZoneDistance);
             }
@@ -134,7 +143,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
                 // Only the first already-valid pose may initialize directly; later room hand-offs use the spring.
                 if (isFirstTarget &&
                     (!hasCameraBoundary ||
-                     GameCameraBoundaryUtility.Contains(in cameraBoundaryState.Boundary, smoothingSource)))
+                     GameCameraBoundaryUtility.Contains(containmentBoundaries, smoothingSource)))
                 {
                     PlayerCameraShakeRuntimeUtility.ApplyToCamera(camera.transform,
                                                                   anchorPosition,
@@ -150,7 +159,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
             if (hasCameraBoundary)
             {
                 GameCameraBoundaryUtility.ApplyReachableHardConstraint(
-                    in cameraBoundaryState.Boundary,
+                    containmentBoundaries,
                     smoothingSource,
                     ref newPosition,
                     ref anchorFollowVelocity);

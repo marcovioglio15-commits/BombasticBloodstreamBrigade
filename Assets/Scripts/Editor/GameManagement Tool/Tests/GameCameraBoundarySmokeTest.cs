@@ -32,6 +32,7 @@ public static class GameCameraBoundarySmokeTest
         ValidateSceneManagerPropagation();
         ValidateAuthoringConversion();
         ValidateConstraintMath();
+        ValidateCompoundConstraintMath();
         Debug.Log("[GameCameraBoundarySmokeTest] All deterministic checks passed.");
     }
 
@@ -252,18 +253,19 @@ public static class GameCameraBoundarySmokeTest
                "Hard containment should activate as soon as the spring enters the new footprint.");
 
         // Impassable mode brakes outside the approached face and prevents a complete high-speed crossing.
-        float3 blockedTarget = GameCameraBoundaryUtility.ResolveSoftBlockedPosition(in boundary,
-                                                                                     new float3(-15f, 4f, 0f),
-                                                                                     new float3(-9f, 4f, 0f),
-                                                                                     3f);
+        float3 blockedTarget = GameCameraBoundaryImpassableUtility.ResolveSoftBlockedPosition(
+            in boundary,
+            new float3(-15f, 4f, 0f),
+            new float3(-9f, 4f, 0f),
+            3f);
         Assert(blockedTarget.x < -10f && blockedTarget.x > -15f,
                "Impassable soft braking did not retain the camera outside the approached face.");
         float3 crossingCandidate = new float3(15f, 4f, 0f);
         float3 crossingVelocity = new float3(20f, 1f, 0f);
-        GameCameraBoundaryUtility.ApplyImpassableHardConstraint(in boundary,
-                                                                 new float3(-15f, 4f, 0f),
-                                                                 ref crossingCandidate,
-                                                                 ref crossingVelocity);
+        GameCameraBoundaryImpassableUtility.ApplyHardConstraint(in boundary,
+                                                                new float3(-15f, 4f, 0f),
+                                                                ref crossingCandidate,
+                                                                ref crossingVelocity);
         Assert(crossingCandidate.x < -10f && crossingCandidate.x > -10.01f,
                "Impassable hard constraint did not stop a complete footprint crossing at the entry face.");
         Assert(math.abs(crossingVelocity.x) <= TestTolerance &&
@@ -271,12 +273,117 @@ public static class GameCameraBoundarySmokeTest
                "Impassable hard constraint did not cancel only inward planar velocity.");
 
         // Enabling obstacle mode around an already enclosed camera must allow recovery without a direct snap.
-        float3 recoveryTarget = GameCameraBoundaryUtility.ResolveSoftBlockedPosition(in boundary,
-                                                                                      new float3(0f, 4f, 0f),
-                                                                                      new float3(12f, 4f, 0f),
-                                                                                      3f);
+        float3 recoveryTarget = GameCameraBoundaryImpassableUtility.ResolveSoftBlockedPosition(
+            in boundary,
+            new float3(0f, 4f, 0f),
+            new float3(12f, 4f, 0f),
+            3f);
         Assert(math.distance(recoveryTarget, new float3(12f, 4f, 0f)) <= TestTolerance,
                "An already enclosed camera was prevented from leaving an impassable footprint.");
+    }
+
+    /// <summary>
+    /// Confirms overlapping equal-priority footprints behave as one continuous L-shaped containment path.
+    /// Internal seams preserve target and velocity continuity while external edges remain authoritative.
+    /// </summary>
+    private static void ValidateCompoundConstraintMath()
+    {
+        World world = new World("Camera Boundary Compound Constraint Test");
+
+        try
+        {
+            GameCameraBoundary horizontalBoundary = new GameCameraBoundary
+            {
+                Center = float2.zero,
+                HalfExtents = new float2(6f, 2f),
+                PlanarRight = new float2(1f, 0f),
+                Priority = 0
+            };
+            GameCameraBoundary verticalBoundary = new GameCameraBoundary
+            {
+                Center = new float2(4f, 4f),
+                HalfExtents = new float2(2f, 6f),
+                PlanarRight = new float2(1f, 0f),
+                Priority = 0
+            };
+            GameCameraBoundary edgeTouchingBoundary = new GameCameraBoundary
+            {
+                Center = new float2(12f, 0f),
+                HalfExtents = new float2(6f, 2f),
+                PlanarRight = new float2(1f, 0f),
+                Priority = 0
+            };
+            GameCameraBoundary priorityOverrideBoundary = verticalBoundary;
+            priorityOverrideBoundary.Priority = 1;
+
+            // Only same-priority positive-area overlaps form passages; edge contact and overrides remain separate.
+            Assert(GameCameraBoundaryUtility.Overlaps(in horizontalBoundary, in verticalBoundary),
+                   "Overlapping perpendicular footprints were not recognized as one continuous path.");
+            Assert(GameCameraBoundaryUtility.CanShareContainmentGroup(in horizontalBoundary, in verticalBoundary),
+                   "Equal-priority overlapping footprints were not accepted into one containment group.");
+            Assert(!GameCameraBoundaryUtility.Overlaps(in horizontalBoundary, in edgeTouchingBoundary),
+                   "Edge-only footprint contact was incorrectly treated as a stable camera passage.");
+            Assert(!GameCameraBoundaryUtility.CanShareContainmentGroup(in horizontalBoundary,
+                                                                        in priorityOverrideBoundary),
+                   "A higher-priority overlap was incorrectly merged into the active containment group.");
+
+            Entity groupEntity = world.EntityManager.CreateEntity();
+            DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries =
+                world.EntityManager.AddBuffer<GameCameraBoundaryContainmentElement>(groupEntity);
+            containmentBoundaries.Add(new GameCameraBoundaryContainmentElement
+            {
+                BoundaryEntity = world.EntityManager.CreateEntity(typeof(GameCameraBoundary)),
+                Boundary = horizontalBoundary
+            });
+            containmentBoundaries.Add(new GameCameraBoundaryContainmentElement
+            {
+                BoundaryEntity = world.EntityManager.CreateEntity(typeof(GameCameraBoundary)),
+                Boundary = verticalBoundary
+            });
+
+            // A target inside either branch must pass through unchanged instead of being clamped to the seed volume.
+            float3 verticalBranchTarget = new float3(4f, 3f, 5f);
+            float3 compoundSoftPosition = GameCameraBoundaryUtility.ResolveSoftConstrainedPosition(
+                containmentBoundaries,
+                verticalBranchTarget,
+                3f);
+            Assert(math.distance(compoundSoftPosition, verticalBranchTarget) <= TestTolerance,
+                   "Compound soft containment still brakes a target inside the second path branch.");
+
+            // Crossing the seed volume's top seam remains valid because the perpendicular member contains that motion.
+            float3 seamVelocity = new float3(0f, 0f, 3f);
+            GameCameraBoundaryUtility.CancelOutwardVelocity(containmentBoundaries,
+                                                            new float3(4f, 3f, 2f),
+                                                            ref seamVelocity);
+            Assert(math.distance(seamVelocity, new float3(0f, 0f, 3f)) <= TestTolerance,
+                   "An internal overlap seam removed camera velocity allowed by another group member.");
+
+            // A diagonal spring step into the missing quadrant must stop at the concave corner it actually crossed.
+            float3 concaveCornerCandidate = new float3(0f, 3f, 4f);
+            float3 concaveCornerVelocity = new float3(-3f, 0f, 3f);
+            GameCameraBoundaryUtility.ApplyReachableHardConstraint(containmentBoundaries,
+                                                                   new float3(3f, 3f, 1f),
+                                                                   ref concaveCornerCandidate,
+                                                                   ref concaveCornerVelocity);
+            Assert(math.distance(concaveCornerCandidate, new float3(2f, 3f, 2f)) <= TestTolerance,
+                   "Compound hard containment projected across a concave corner instead of stopping at its first exit.");
+
+            // The nearest external edge still clamps position and removes only its outward velocity component.
+            float3 externalCandidate = new float3(7f, 3f, 8f);
+            float3 externalVelocity = new float3(4f, 1f, 2f);
+            GameCameraBoundaryUtility.ApplyReachableHardConstraint(containmentBoundaries,
+                                                                   new float3(5.5f, 3f, 8f),
+                                                                   ref externalCandidate,
+                                                                   ref externalVelocity);
+            Assert(math.distance(externalCandidate, new float3(6f, 3f, 8f)) <= TestTolerance,
+                   "Compound hard containment did not select the closest external group edge.");
+            Assert(math.distance(externalVelocity, new float3(0f, 1f, 2f)) <= TestTolerance,
+                   "Compound hard containment removed tangential or vertical velocity at an external edge.");
+        }
+        finally
+        {
+            world.Dispose();
+        }
     }
     #endregion
 
