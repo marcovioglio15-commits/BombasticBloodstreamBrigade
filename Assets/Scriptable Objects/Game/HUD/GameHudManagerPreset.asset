@@ -351,10 +351,10 @@ MonoBehaviour:
       contentMode: 1
       imageContentDefinitions:
       - buttonId: PlayButton
-        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        normalSprite: {fileID: 21300000, guid: e8891bc2bf953a842bf84a5ee9e2a98c, type: 3}
+        hoverSprite: {fileID: 21300000, guid: 05a2bccb5ec3a8842959fa1fc12e6276, type: 3}
+        pressedSprite: {fileID: 21300000, guid: 05a2bccb5ec3a8842959fa1fc12e6276, type: 3}
+        disabledSprite: {fileID: 21300000, guid: e8891bc2bf953a842bf84a5ee9e2a98c, type: 3}
         preserveAspect: 1
         normalColor: {r: 1, g: 1, b: 1, a: 1}
         hoverColor: {r: 1, g: 1, b: 1, a: 1}
@@ -362,10 +362,10 @@ MonoBehaviour:
         disabledColor: {r: 1, g: 1, b: 1, a: 0.45}
         serializedVersion: 1
       - buttonId: SettingsButton
-        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        normalSprite: {fileID: 21300000, guid: 8c987e9af38cd594a9f17ec02bc4a3a5, type: 3}
+        hoverSprite: {fileID: 21300000, guid: d7a87d72af082c449b9f71124d0cd7f2, type: 3}
+        pressedSprite: {fileID: 21300000, guid: d7a87d72af082c449b9f71124d0cd7f2, type: 3}
+        disabledSprite: {fileID: 21300000, guid: 8c987e9af38cd594a9f17ec02bc4a3a5, type: 3}
         preserveAspect: 1
         normalColor: {r: 1, g: 1, b: 1, a: 1}
         hoverColor: {r: 1, g: 1, b: 1, a: 1}
@@ -373,10 +373,10 @@ MonoBehaviour:
         disabledColor: {r: 1, g: 1, b: 1, a: 0.45}
         serializedVersion: 1
       - buttonId: QuitButton
-        normalSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        pressedSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
-        disabledSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+        normalSprite: {fileID: 21300000, guid: 0ee889e42b0168b4eab9304e9c7626c7, type: 3}
+        hoverSprite: {fileID: 21300000, guid: a18f3607ded915448b5b2fd28f319da1, type: 3}
+        pressedSprite: {fileID: 21300000, guid: a18f3607ded915448b5b2fd28f319da1, type: 3}
+        disabledSprite: {fileID: 21300000, guid: 0ee889e42b0168b4eab9304e9c7626c7, type: 3}
         preserveAspect: 1
         normalColor: {r: 1, g: 1, b: 1, a: 1}
         hoverColor: {r: 1, g: 1, b: 1, a: 1}
@@ -404,7 +404,7 @@ MonoBehaviour:
       overrideSprites: 1
       allowEmptySprites: 1
       normalSprite: {fileID: 0}
-      hoverSprite: {fileID: 21300000, guid: eb3df9aa9c2dbd24a96c5f49e0832656, type: 3}
+      hoverSprite: {fileID: 21300000, guid: bfcd6ea1b55b3f140b644efc0ca96424, type: 3}
       pressedSprite: {fileID: 0}
       disabledSprite: {fileID: 0}
       overrideGraphicColors: 0
