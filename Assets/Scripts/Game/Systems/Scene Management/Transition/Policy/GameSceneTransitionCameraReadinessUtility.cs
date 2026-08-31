@@ -54,6 +54,16 @@ public static class GameSceneTransitionCameraReadinessUtility
     }
 
     /// <summary>
+    /// Reports whether presentation may switch from source continuity to the acknowledged destination framing.
+    /// </summary>
+    /// <param name="transitionState">Current authoritative transition state.</param>
+    /// <returns>True after camera preparation completed and while the destination reveal framing remains active.</returns>
+    public static bool UsesPreparedRevealFraming(in GameSceneTransitionState transitionState)
+    {
+        return UsesPreparedFraming(in transitionState) && CanReveal(in transitionState);
+    }
+
+    /// <summary>
     /// Resolves whether fade-in may advance without exposing an unresolved destination boundary.
     /// </summary>
     /// <param name="transitionState">Current authoritative transition state.</param>

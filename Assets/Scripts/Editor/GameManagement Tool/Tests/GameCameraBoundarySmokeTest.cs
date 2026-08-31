@@ -414,6 +414,8 @@ public static class GameCameraBoundarySmokeTest
                "Containment gameplay did not request hidden camera preparation.");
         Assert(GameSceneTransitionCameraReadinessUtility.UsesPreparedFraming(in transitionState),
                "Hidden camera preparation did not release procedural source framing.");
+        Assert(!GameSceneTransitionCameraReadinessUtility.UsesPreparedRevealFraming(in transitionState),
+               "Player presentation switched to destination framing before camera preparation completed.");
         Assert(!GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
                "Fade-in was allowed before camera preparation completed.");
 
@@ -424,12 +426,16 @@ public static class GameCameraBoundarySmokeTest
                "Camera preparation acknowledgment did not release fade-in.");
         Assert(GameSceneTransitionCameraReadinessUtility.UsesPreparedFraming(in transitionState),
                "Prepared destination framing was not retained throughout fade-in.");
+        Assert(GameSceneTransitionCameraReadinessUtility.UsesPreparedRevealFraming(in transitionState),
+               "Prepared player presentation did not join the destination reveal framing.");
 
         // Impassable mode and non-gameplay targets preserve the existing reveal path without waiting for a camera writer.
         config.CameraBoundaryMode = GameCameraBoundaryMode.ImpassableVolume;
         GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState, config, targetScene);
         Assert(GameSceneTransitionCameraReadinessUtility.CanReveal(in transitionState),
                "Impassable boundaries incorrectly blocked scene reveal.");
+        Assert(!GameSceneTransitionCameraReadinessUtility.UsesPreparedRevealFraming(in transitionState),
+               "Impassable boundaries incorrectly changed player reveal framing.");
         config.CameraBoundaryMode = GameCameraBoundaryMode.ContainmentVolume;
         targetScene.SceneKind = GameSceneKind.MainMenu;
         GameSceneTransitionCameraReadinessUtility.InitializeForReveal(ref transitionState, config, targetScene);

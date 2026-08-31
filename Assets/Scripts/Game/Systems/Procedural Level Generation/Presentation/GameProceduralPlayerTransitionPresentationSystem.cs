@@ -5,6 +5,7 @@ using Unity.Entities;
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
 [UpdateAfter(typeof(PlayerManagedVisualAnimatorBridgeSystem))]
+[UpdateAfter(typeof(PlayerCameraRoomAnchorSystem))]
 public partial class GameProceduralPlayerTransitionPresentationSystem : SystemBase
 {
     #region Fields
@@ -43,7 +44,11 @@ public partial class GameProceduralPlayerTransitionPresentationSystem : SystemBa
 
         if (shouldShowPlayer)
         {
-            GameProceduralPlayerTransitionPresentationUtility.Begin(EntityManager, config);
+            bool usePreparedRevealFraming =
+                GameSceneTransitionCameraReadinessUtility.UsesPreparedRevealFraming(in transitionState);
+            GameProceduralPlayerTransitionPresentationUtility.Begin(EntityManager,
+                                                                     config,
+                                                                     usePreparedRevealFraming);
             return;
         }
 

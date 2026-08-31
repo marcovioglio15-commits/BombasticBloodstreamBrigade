@@ -21,7 +21,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     [SerializeField]
     private Camera fadeCamera;
 
-    [Tooltip("URP overlay camera rendering only the temporarily isolated persistent player above the fade.")]
+    [Tooltip("URP overlay camera rendering the isolated persistent player above the outgoing fade, then below the destination reveal fade.")]
     [SerializeField]
     private Camera playerCamera;
 
@@ -50,6 +50,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     private bool hasPlayerTrackingPosition;
     private bool hasPlayerTrackingStartPosition;
     private bool playerPresentationVisible;
+    private bool playerRevealFramingActive;
     #endregion
 
     #endregion
@@ -99,7 +100,7 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
     /// <summary>
     /// Enables or disables the authored player-only overlay and normalizes camera stack order immediately.
     /// </summary>
-    /// <param name="visible">True while an intra-level transition should keep player presentation above black.</param>
+    /// <param name="visible">True while an intra-level transition requires isolated player presentation.</param>
     public static void SetPlayerPresentationVisible(bool visible)
     {
         if (activeBridge == null)
@@ -111,26 +112,31 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
             return;
         }
 
-        if (visible && !activeBridge.playerPresentationVisible)
-        {
-            activeBridge.hasPlayerCameraSnapshot = false;
-            activeBridge.hasPlayerTrackingPosition = false;
-            activeBridge.hasPlayerTrackingStartPosition = false;
-        }
+        if (activeBridge.playerPresentationVisible != visible)
+            activeBridge.ResetPlayerPresentationState();
 
         activeBridge.playerPresentationVisible = visible;
 
         if (activeBridge.playerCamera != null)
             activeBridge.playerCamera.enabled = visible;
 
-        activeBridge.ApplyCachedPresentationState();
+        activeBridge.RefreshCameraStack();
+    }
 
-        if (!visible)
-        {
-            activeBridge.hasPlayerCameraSnapshot = false;
-            activeBridge.hasPlayerTrackingPosition = false;
-            activeBridge.hasPlayerTrackingStartPosition = false;
-        }
+    /// <summary>
+    /// Switches isolated player rendering to the prepared destination camera and places it beneath the reveal fade.
+    /// </summary>
+    /// <param name="active">True after destination containment was applied by the authoritative camera writer.</param>
+    public static void SetPlayerRevealFraming(bool active)
+    {
+        if (activeBridge == null || !activeBridge.playerPresentationVisible)
+            return;
+
+        if (activeBridge.playerRevealFramingActive == active)
+            return;
+
+        activeBridge.playerRevealFramingActive = active;
+        activeBridge.RefreshCameraStack();
     }
 
     /// <summary>
@@ -153,7 +159,13 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
 
         // PresentationSystemGroup may run after MonoBehaviour LateUpdate. Applying here keeps camera and visual
         // relocation in the same render submission instead of exposing one frame with mismatched world positions.
-        if (activeBridge.hasPlayerCameraSnapshot && activeBridge.playerCamera != null)
+        if (activeBridge.playerRevealFramingActive &&
+            activeBridge.playerCamera != null &&
+            activeBridge.activeBaseCamera != null)
+        {
+            SynchronizePlayerCamera(activeBridge.activeBaseCamera, activeBridge.playerCamera);
+        }
+        else if (activeBridge.hasPlayerCameraSnapshot && activeBridge.playerCamera != null)
             activeBridge.playerCameraSnapshot.Apply(activeBridge.playerCamera,
                                                     activeBridge.ResolvePlayerTrackingOffset());
     }
@@ -211,7 +223,9 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (!playerPresentationVisible || playerCamera == null || activeBaseCamera == null)
             return;
 
-        if (hasPlayerCameraSnapshot)
+        if (playerRevealFramingActive)
+            SynchronizePlayerCamera(activeBaseCamera, playerCamera);
+        else if (hasPlayerCameraSnapshot)
             playerCameraSnapshot.Apply(playerCamera, ResolvePlayerTrackingOffset());
         else
             SynchronizePlayerCamera(activeBaseCamera, playerCamera);
@@ -329,11 +343,16 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         if (playerCamera != null)
             GameSceneUrpCameraStackUtility.RemoveOverlayCameraFromLoadedBaseStacks(playerCamera);
 
-        if (fadeCamera != null)
-            GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, fadeCamera);
+        // Source continuity keeps the player above paint. Destination reveal renders it first so the same fade covers
+        // both the prepared room and the isolated player without exposing their hidden framing handoff.
+        Camera firstTransitionCamera = playerRevealFramingActive ? playerCamera : fadeCamera;
+        Camera secondTransitionCamera = playerRevealFramingActive ? fadeCamera : playerCamera;
 
-        if (playerCamera != null)
-            GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, playerCamera);
+        if (firstTransitionCamera != null)
+            GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, firstTransitionCamera);
+
+        if (secondTransitionCamera != null)
+            GameSceneUrpCameraStackUtility.AppendOverlayCamera(baseCameraData, secondTransitionCamera);
 
         ApplyCachedPresentationState();
     }
@@ -365,8 +384,14 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
 
         ExcludePlayerLayerFromCameraStack(activeBaseCamera, baseCameraData);
 
-        // Capture the persistent gameplay view once so the isolated player overlay preserves identical framing
-        // while the same bootstrap-owned camera follows the relocated player behind the black environment fade.
+        // Destination reveal must share the live base-camera view so boundary-relative framing remains exact while
+        // player movement resumes. Source continuity retains its initial snapshot until that handoff is acknowledged.
+        if (playerRevealFramingActive)
+        {
+            SynchronizePlayerCamera(activeBaseCamera, playerCamera);
+            return;
+        }
+
         if (!hasPlayerCameraSnapshot)
         {
             playerCameraSnapshot = CameraRenderSnapshot.Capture(activeBaseCamera);
@@ -434,6 +459,17 @@ public sealed class GameProceduralTransitionCameraBridge : MonoBehaviour
         }
 
         originalCameraMasks.Clear();
+    }
+
+    /// <summary>
+    /// Clears source tracking and destination reveal ownership before isolated player presentation changes state.
+    /// </summary>
+    private void ResetPlayerPresentationState()
+    {
+        hasPlayerCameraSnapshot = false;
+        hasPlayerTrackingPosition = false;
+        hasPlayerTrackingStartPosition = false;
+        playerRevealFramingActive = false;
     }
 
     /// <summary>

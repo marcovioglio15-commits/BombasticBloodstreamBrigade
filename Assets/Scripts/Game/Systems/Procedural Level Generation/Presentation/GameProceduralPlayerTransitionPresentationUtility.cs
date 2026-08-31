@@ -37,7 +37,10 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
     /// </summary>
     /// <param name="entityManager">Entity manager owning the persistent player's managed Animator companion.</param>
     /// <param name="config">Baked procedural transition presentation settings.</param>
-    public static void Begin(EntityManager entityManager, GameProceduralLevelConfig config)
+    /// <param name="usePreparedRevealFraming">True after the gameplay camera applied destination containment.</param>
+    public static void Begin(EntityManager entityManager,
+                             GameProceduralLevelConfig config,
+                             bool usePreparedRevealFraming)
     {
         if (!active)
         {
@@ -55,6 +58,7 @@ internal static class GameProceduralPlayerTransitionPresentationUtility
         }
 
         GameProceduralTransitionCameraBridge.SetPlayerTrackingPosition(trackingPosition);
+        GameProceduralTransitionCameraBridge.SetPlayerRevealFraming(usePreparedRevealFraming);
 
         if (rendererIsolationReady && isolatedAnimator == animator)
             return;
