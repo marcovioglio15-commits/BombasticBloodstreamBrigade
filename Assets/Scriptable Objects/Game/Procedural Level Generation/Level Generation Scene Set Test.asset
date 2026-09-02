@@ -19,8 +19,8 @@ MonoBehaviour:
   version: 1.0.0
   sceneCatalogPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
   generationSettings:
-    seedMode: 0
-    fixedSeed: 2165703038
+    seedMode: 1
+    fixedSeed: 3027450565
     maximumNodeCount: 32
     maximumDepth: 12
     maximumGenerationAttempts: 20
@@ -41,13 +41,13 @@ MonoBehaviour:
     levelId: LEVEL_LGTEST_01
     displayName: Metro Concourse
     enabled: 1
-    targetNodeCountRange: {x: 8, y: 11}
+    targetNodeCountRange: {x: 10, y: 16}
     preferredBossDepthRange: {x: 3, y: 6}
     ruleSettings:
       roomDepthScore: 2
       bossDepthScore: 20
       fittingScore: 2
-    requireRoomClearBeforeExit: 1
+    requireRoomClearBeforeExit: 0
     useCenterArrival: 0
     roomTiles:
     - technicalId: 2fd953db24ac453187084cf5d59fa164
@@ -137,9 +137,9 @@ MonoBehaviour:
       role: 1
       maximumCopies: 3
       preferredDepthRange: {x: 1, y: 8}
-      useExactDepthConstraint: 0
-      exactDepth: 1
-      baseSelectionWeight: 1
+      useExactDepthConstraint: 1
+      exactDepth: 3
+      baseSelectionWeight: 10
       roomRewards:
       - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
         quantity: 1
@@ -438,7 +438,7 @@ MonoBehaviour:
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
       useExactDepthConstraint: 1
-      exactDepth: 6
+      exactDepth: 5
       baseSelectionWeight: 1
       roomRewards:
       - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
@@ -921,7 +921,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NE
     sceneGuid: 20653c736dac57c49842cb85bddcc563
-    dependencyHash: 40a1abe8a2abf5750eab5713da6029c4
+    dependencyHash: cb52e445f0cdaaf2f688e7f0280ad783
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity
@@ -936,6 +936,10 @@ MonoBehaviour:
       connectionPolicy: 1
     - portalId: MAIN_METRO_04_NE_EAST
       side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NE_WEST
+      side: 3
       capability: 2
       connectionPolicy: 1
     authoringWarnings: []

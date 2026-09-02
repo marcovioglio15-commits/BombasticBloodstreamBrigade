@@ -240,6 +240,68 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+--- !u!1001 &629751724
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 7383124897548811481, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_Name
+      value: PF_SignExit_A-red (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -6.43
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.283
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.31
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -2.5679061e-24
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7871711978153928291, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+--- !u!1 &629751725 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7383124897548811481, guid: ea2efb59eda9be54b89bab8386d15d64, type: 3}
+  m_PrefabInstance: {fileID: 629751724}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &740984063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -739,6 +801,127 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1934173976
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[0].bindingId
+      value: ExitSign_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[1].bindingId
+      value: AnimatedExitDoor_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[0].displayName
+      value: ExitSign_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[1].displayName
+      value: AnimatedExitDoor_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[0].targetObject
+      value: 
+      objectReference: {fileID: 629751725}
+    - target: {fileID: 610271392951262406, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: linkedObjects.Array.data[1].targetObject
+      value: 
+      objectReference: {fileID: 3152142906217542503}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -4.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -5.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 649015273392379195, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097113701923057890, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: portalId
+      value: MAIN_METRO_04_NE_WEST
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -0.42000008
+      objectReference: {fileID: 0}
+    - target: {fileID: 1981884056481647434, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -1.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 8499497740196082647, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
+      propertyPath: m_Name
+      value: Portal Reward - MAIN_METRO_04_NE_WEST
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: bf089c3d364396b4199b52c6296bc72b, type: 3}
 --- !u!1001 &2000978071
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -874,15 +1057,22 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 5874583845824321346, guid: 9b020e13444c009439dbf73a87e59f52, type: 3}
   m_PrefabInstance: {fileID: 3152142906217542500}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &3152142906217542503 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2170460494210105605, guid: 9b020e13444c009439dbf73a87e59f52, type: 3}
+  m_PrefabInstance: {fileID: 3152142906217542500}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 363357781}
+  - {fileID: 1934173976}
   - {fileID: 1433948460}
   - {fileID: 2000978071}
   - {fileID: 3152142906217542500}
   - {fileID: 877856778}
   - {fileID: 1596918762}
+  - {fileID: 629751724}
   - {fileID: 1027147219}
   - {fileID: 1709829741}
