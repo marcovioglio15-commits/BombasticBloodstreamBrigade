@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{3362729f-7a60-4dce-bf4b-0817fa0ddfec}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>NASH_SfxMISC_SFX_LaserImpact</value>
 		</property>

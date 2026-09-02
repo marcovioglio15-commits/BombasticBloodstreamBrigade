@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{b13ca9fe-ab55-491a-9b08-332616fc0776}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>MC_SFX_LevelUp 2</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>0</value>
 		</property>
 		<relationship name="folder">
 			<destination>{094e3029-92dc-443d-bb30-06cc19ae44ea}</destination>
@@ -84,7 +87,7 @@
 	</object>
 	<object class="MultiSound" id="{d1f44c08-9f1f-40a3-a128-84574f2d7e55}">
 		<relationship name="sounds">
-			<destination>{64187d4b-98c0-4ec7-af01-cf6858009ebe}</destination>
+			<destination>{f8d12563-0760-419a-9e01-8fdbdc657f41}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusEffectChain" id="{c5bba4da-8237-47b7-8b55-d4d941e3cbbd}">
@@ -99,14 +102,7 @@
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{d17268ec-b73a-4bd5-b0e3-8925660a611e}" />
-	<object class="SingleSound" id="{64187d4b-98c0-4ec7-af01-cf6858009ebe}">
-		<property name="startOffset">
-			<value>24</value>
-		</property>
-		<relationship name="audioFile">
-			<destination>{85b3897f-47af-4eb0-8bb1-62a986bbf155}</destination>
-		</relationship>
-	</object>
+	<object class="SingleSound" id="{f8d12563-0760-419a-9e01-8fdbdc657f41}" />
 	<object class="MixerBusFader" id="{ce5f4c59-201a-4718-a9fa-5acfa605b0f9}" />
 	<object class="MixerBusFader" id="{0dea41c3-4bab-4e50-bf99-5be9a803bbe8}" />
 </objects>

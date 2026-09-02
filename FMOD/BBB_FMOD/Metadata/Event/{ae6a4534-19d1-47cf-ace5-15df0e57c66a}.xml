@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{ae6a4534-19d1-47cf-ace5-15df0e57c66a}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>MC_SFX_HealthRecharge</value>
 		</property>

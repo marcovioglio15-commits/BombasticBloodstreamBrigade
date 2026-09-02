@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{fc34e4df-ef78-4902-9327-7f4b65cd6155}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>NASH_SfxENEMY_SFX_AttackWarning</value>
 		</property>
