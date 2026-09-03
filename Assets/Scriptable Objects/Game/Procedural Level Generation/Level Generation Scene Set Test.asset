@@ -633,7 +633,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_BOSS
     sceneGuid: 27d9e1327f828944794adba3410c0657
-    dependencyHash: 5107365be4d8db2f68fd4b09745c82c9
+    dependencyHash: 2ff2c2afce9bf8653a564f98f92645ac
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity
@@ -709,7 +709,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_DOUBLE
     sceneGuid: 433f03176860b0e409c1d762e15cd364
-    dependencyHash: 70fbb235c9771273a8d9a2295efa54fe
+    dependencyHash: aed2dc3646fc7ad3e04e6a0b2fbb5af4
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
@@ -718,18 +718,10 @@ MonoBehaviour:
     activeSpawnerCount: 1
     activeSpawnerWithWavesCount: 1
     portals:
-    - portalId: LGTEST_METRO_DOUBLE_NORTH_01
-      side: 0
-      capability: 2
-      connectionPolicy: 1
     - portalId: LGTEST_METRO_DOUBLE_NORTH_02
       side: 0
       capability: 2
-      connectionPolicy: 1
-    - portalId: LGTEST_METRO_DOUBLE_SOUTH_03
-      side: 1
-      capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_DOUBLE_SOUTH_04
       side: 1
       capability: 2

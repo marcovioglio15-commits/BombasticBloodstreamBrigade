@@ -293,7 +293,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_BOSS
     sceneGuid: 27d9e1327f828944794adba3410c0657
-    dependencyHash: 5107365be4d8db2f68fd4b09745c82c9
+    dependencyHash: 2ff2c2afce9bf8653a564f98f92645ac
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_BOSS.unity

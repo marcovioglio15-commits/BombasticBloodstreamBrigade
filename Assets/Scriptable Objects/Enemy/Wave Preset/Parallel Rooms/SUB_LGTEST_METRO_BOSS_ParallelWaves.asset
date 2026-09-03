@@ -18,7 +18,7 @@ MonoBehaviour:
     sequenceStepIndex: 0
     referenceWaveId: 
     previewInScene: 0
-    startMode: 3
+    startMode: 0
     startDelaySeconds: 1
     spawnDurationSeconds: 4
     defaultDistributionCurve:
