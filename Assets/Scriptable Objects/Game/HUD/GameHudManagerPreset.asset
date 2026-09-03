@@ -330,7 +330,7 @@ MonoBehaviour:
     finalWavePaintFadeOutDurationSeconds: 1.5
     playFinalWaveAudioEvent: 0
     finalWaveAudioEventId: 29
-    verticalPositionNormalized: 0.62
+    verticalPositionNormalized: 0.7
     horizontalOffscreenPadding: 48
     paintBackgroundSprite: {fileID: 21300000, guid: bc43f46a66c7eb649b96fdb4bf7dddf4, type: 3}
     paintBackgroundColor: {r: 0.95, g: 0.015, b: 0.32, a: 0.97}
