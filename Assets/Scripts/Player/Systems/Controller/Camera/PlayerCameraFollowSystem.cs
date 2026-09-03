@@ -7,6 +7,7 @@ using UnityEngine;
 /// Updates the persistent gameplay camera from the authoritative player configuration, transition policy and boundaries.
 /// </summary>
 [UpdateInGroup(typeof(PresentationSystemGroup))]
+[UpdateAfter(typeof(PlayerRecorderCameraSystem))]
 public partial struct PlayerCameraFollowSystem : ISystem
 {
     #region Constants
@@ -14,8 +15,6 @@ public partial struct PlayerCameraFollowSystem : ISystem
     #endregion
     #region Fields
     #region Static Fields
-    private static int traversalOverrideCameraInstanceId;
-    private static int traversalOverrideFrame = -1;
     #endregion
     #region Runtime Fields
     private bool hasAutoOffset;
@@ -42,6 +41,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
     private bool hasTrackedPlayer;
     private bool hasTrackedBoundary;
     private bool smoothBoundaryReacquisition;
+    private bool wasRecorderCameraActive;
     #endregion
     #endregion
     #region Methods
@@ -65,6 +65,10 @@ public partial struct PlayerCameraFollowSystem : ISystem
     {
         // Resolve transition presentation once so camera continuity and reveal acknowledgment share one state snapshot.
         bool hasTransitionState = SystemAPI.TryGetSingleton(out GameSceneTransitionState transitionState);
+        bool recorderCameraActive = SystemAPI.TryGetSingleton(out GameRecorderCameraRuntimeState recorderCameraState) &&
+            recorderCameraState.ActiveCameraEntity != Entity.Null;
+        if (recorderCameraActive)
+            wasRecorderCameraActive = true;
         bool isSceneTransitioning = hasTransitionState && transitionState.IsTransitioning != 0;
         bool isProceduralRoomTraversal = isSceneTransitioning &&
                                           transitionState.Purpose == GameSceneTransitionPurpose.ProceduralRoomTraversal;
@@ -103,7 +107,10 @@ public partial struct PlayerCameraFollowSystem : ISystem
         ComponentLookup<PlayerImpactFrameBuildInState> impactFrameBuildInLookup = SystemAPI.GetComponentLookup<PlayerImpactFrameBuildInState>(true);
         float shakeNoiseTime = (float)SystemAPI.Time.ElapsedTime;
         int cameraInstanceId = camera.GetInstanceID();
-        bool cameraChanged = cameraInstanceId != lastCameraInstanceId;
+        bool recorderCameraReleased = wasRecorderCameraActive && !recorderCameraActive;
+        bool cameraChanged = cameraInstanceId != lastCameraInstanceId || recorderCameraReleased;
+        if (recorderCameraReleased)
+            wasRecorderCameraActive = false;
         bool hasBoundaryRuntimeState =
             SystemAPI.TryGetSingleton(out GameCameraBoundaryRuntimeState cameraBoundaryState);
         DynamicBuffer<GameCameraBoundaryContainmentElement> containmentBoundaries = default;
@@ -183,9 +190,17 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                                                         camera.transform.forward);
                 }
 
+                if (recorderCameraActive)
+                    PlayerCameraShakePresentationUtility.ClearOutput(ref shakeState);
+
                 shakeStateLookup[entity] = shakeState;
-                PlayerCameraShakeRuntimeUtility.ApplyFovToCamera(camera, in shakeState);
+
+                if (!recorderCameraActive)
+                    PlayerCameraShakeRuntimeUtility.ApplyFovToCamera(camera, in shakeState);
             }
+
+            if (recorderCameraActive)
+                break;
 
             bool behaviorChanged = cameraConfig.Behavior != lastBehavior;
 
@@ -466,19 +481,6 @@ public partial struct PlayerCameraFollowSystem : ISystem
     #endregion
     #region Traversal Continuity Methods
     /// <summary>
-    /// Checks whether the follow system already wrote authoritative traversal framing for the supplied camera this frame.
-    /// The room-anchor system uses this ownership marker to avoid a second competing camera transform write.
-    /// </summary>
-    /// <param name="camera">Gameplay camera whose transform ownership is being queried.</param>
-    /// <returns>True when traversal continuity owns this camera for the current rendered frame.</returns>
-    internal static bool OwnsTraversalFraming(Camera camera)
-    {
-        return camera != null &&
-               traversalOverrideFrame == Time.frameCount &&
-               traversalOverrideCameraInstanceId == camera.GetInstanceID();
-    }
-
-    /// <summary>
     /// Captures the unshaken source camera-to-player offset once, reapplies it while room coordinates change under
     /// black, and retains it for the first released frame so no spring step becomes visible at fade completion.
     /// </summary>
@@ -524,8 +526,7 @@ public partial struct PlayerCameraFollowSystem : ISystem
                                                       in shakeState,
                                                       false,
                                                       quaternion.identity);
-        traversalOverrideCameraInstanceId = cameraInstanceId;
-        traversalOverrideFrame = Time.frameCount;
+        PlayerCameraTraversalFramingUtility.MarkWritten(camera);
         wasProceduralRoomTraversal = isProceduralRoomTraversal;
 
         // The release frame remains exact; normal follow smoothing resumes from this pose on the following frame.

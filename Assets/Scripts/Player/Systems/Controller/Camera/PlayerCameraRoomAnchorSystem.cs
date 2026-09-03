@@ -45,6 +45,10 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         if (SystemAPI.HasSingleton<GameCameraBoundaryFastPlayPlayer>())
             return;
 
+        if (SystemAPI.TryGetSingleton(out GameRecorderCameraRuntimeState recorderCameraState) &&
+            recorderCameraState.ActiveCameraEntity != Entity.Null)
+            return;
+
         // Resolve transition presentation once so room-fixed framing can close the same reveal handshake.
         bool hasTransitionState = SystemAPI.TryGetSingleton(out GameSceneTransitionState transitionState);
         bool isSceneTransitioning = hasTransitionState && transitionState.IsTransitioning != 0;
@@ -66,7 +70,7 @@ public partial struct PlayerCameraRoomAnchorSystem : ISystem
         if (!PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera camera))
             return;
 
-        if (PlayerCameraFollowSystem.OwnsTraversalFraming(camera))
+        if (PlayerCameraTraversalFramingUtility.Owns(camera))
             return;
 
         float deltaTime = PlayerGameplayPauseUtility.ResolveFeedbackDeltaTime(SystemAPI.Time.DeltaTime,

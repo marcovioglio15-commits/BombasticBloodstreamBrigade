@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// This utility class provides methods to load or create the player input action asset used for managing player controls. It ensures that the required input actions (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, and cheat preset bindings) are present in the asset, and if not, it creates them with default bindings. 
+/// This utility class provides methods to load or create the player input action asset used for managing player controls. It ensures that the required input actions (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, cheat preset bindings, and recorder-camera cycling) are present in the asset, and if not, it creates them with default bindings.
 /// The utility also handles asset creation and folder management within the Unity Editor.
 /// </summary>
 public static class PlayerInputActionsAssetUtility
@@ -43,7 +43,7 @@ public static class PlayerInputActionsAssetUtility
     #region Private Methods
     /// <summary>
     /// This method checks the provided input action asset for the presence of required actions 
-    /// (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, CheatPresetDigit, CheatModifierControl, CheatModifierShift) within a "Player" action map. If any of the required actions are missing, 
+    /// (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, CheatPresetDigit, CheatModifierControl, CheatModifierShift, CycleRecorderCamera) within a "Player" action map. If any of the required actions are missing,
     /// it creates them with default configurations and bindings. If any changes are made to the asset, 
     /// it marks it as dirty and saves the changes to ensure they persist in the Unity Editor.
     /// </summary>
@@ -70,6 +70,7 @@ public static class PlayerInputActionsAssetUtility
         changed |= EnsureAction(map, "CheatPresetDigit", InputActionType.Button, "Button", AddDefaultCheatPresetDigitBindings);
         changed |= EnsureAction(map, "CheatModifierControl", InputActionType.Button, "Button", AddDefaultCheatModifierControlBindings);
         changed |= EnsureAction(map, "CheatModifierShift", InputActionType.Button, "Button", AddDefaultCheatModifierShiftBindings);
+        changed |= EnsureAction(map, "CycleRecorderCamera", InputActionType.Button, "Button", AddDefaultRecorderCameraCycleBindings);
 
         InputActionMap uiMap = EnsureActionMap(asset, "UI", ref changed);
         changed |= EnsureAction(uiMap, "Navigate", InputActionType.PassThrough, "Vector2", AddDefaultUINavigateBindings);
@@ -352,6 +353,21 @@ public static class PlayerInputActionsAssetUtility
     }
 
     /// <summary>
+    /// Adds the default configurable Ctrl+Shift+F9 chord used to cycle recorder viewpoints and gameplay camera control.
+    /// </summary>
+    /// <param name="action">Button action receiving the default recorder-camera cheat chord.</param>
+    private static void AddDefaultRecorderCameraCycleBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddCompositeBinding("ButtonWithTwoModifiers")
+            .With("Modifier1", "<Keyboard>/leftCtrl")
+            .With("Modifier2", "<Keyboard>/leftShift")
+            .With("Button", "<Keyboard>/f9");
+    }
+
+    /// <summary>
     /// Adds default direct UI navigation bindings for keyboard and gamepad.
     /// </summary>
     /// <param name="action"></param>
@@ -496,7 +512,7 @@ public static class PlayerInputActionsAssetUtility
 
     /// <summary>
     /// This method creates a new input action asset with a "Player" action map containing 
-    /// the required actions (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, and cheat preset actions) and their default bindings.
+    /// the required actions (Move, Look, Shoot, Pause, PowerUpPrimary, PowerUpSecondary, PowerUpSwapSlots, PowerUpContainerInteract, PowerUpContainerReplacePrimary, PowerUpContainerReplaceSecondary, cheat preset actions, and recorder-camera cycling) and their default bindings.
     /// </summary>
     /// <returns> Returns the created InputActionAsset instance. </returns>
     private static InputActionAsset CreateDefaultAsset()
@@ -547,6 +563,9 @@ public static class PlayerInputActionsAssetUtility
 
         InputAction cheatModifierShift = map.AddAction("CheatModifierShift", InputActionType.Button, null, null, null, null, "Button");
         AddDefaultCheatModifierShiftBindings(cheatModifierShift);
+
+        InputAction recorderCameraCycle = map.AddAction("CycleRecorderCamera", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultRecorderCameraCycleBindings(recorderCameraCycle);
 
         asset.AddActionMap(map);
 

@@ -59,6 +59,10 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             return;
         }
 
+        bool recorderCameraOverridesMovementReference =
+            SystemAPI.TryGetSingleton(out GameRecorderCameraRuntimeState recorderCameraState) &&
+            IsRecorderCameraMovementAlignmentActive(in recorderCameraState, state.EntityManager);
+
         // Camera basis is resolved lazily inside the loop and only for camera-relative movement,
         // so frames where no moving entity needs the camera forward skip the lookup entirely.
         bool cameraResolved = false;
@@ -73,6 +77,9 @@ public partial struct PlayerMovementDirectionSystem : ISystem
                   RefRO<LocalTransform> localTransform) in SystemAPI.Query<RefRO<PlayerInputState>, RefRW<PlayerMovementState>, RefRO<PlayerRuntimeMovementConfig>, RefRO<LocalTransform>>())
         {
             PlayerRuntimeMovementConfig movementConfig = runtimeMovementConfig.ValueRO;
+            ReferenceFrame movementReference = recorderCameraOverridesMovementReference
+                ? ReferenceFrame.CameraForward
+                : movementConfig.MovementReference;
 
             if (inputState.ValueRO.SuppressMotionIntegration != 0)
                 continue;
@@ -92,7 +99,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             }
 
             // Resolve the camera forward once, and only when this entity actually drives camera-relative movement.
-            if (movementConfig.MovementReference == ReferenceFrame.CameraForward && !cameraResolved)
+            if (movementReference == ReferenceFrame.CameraForward && !cameraResolved)
             {
                 hasCamera = PlayerRuntimeCameraUtility.TryResolveGameplayCamera(out Camera resolvedCamera);
 
@@ -103,7 +110,7 @@ public partial struct PlayerMovementDirectionSystem : ISystem
             }
 
             float3 playerForward = PlayerControllerMath.NormalizePlanar(math.forward(localTransform.ValueRO.Rotation), new float3(0f, 0f, 1f));
-            PlayerControllerMath.GetReferenceBasis(movementConfig.MovementReference, playerForward, cameraForward, hasCamera, out float3 forward, out float3 right);
+            PlayerControllerMath.GetReferenceBasis(movementReference, playerForward, cameraForward, hasCamera, out float3 forward, out float3 right);
 
             float2 resolvedInput = moveInput;
 
@@ -175,6 +182,27 @@ public partial struct PlayerMovementDirectionSystem : ISystem
 
 
     #region Helpers
+    /// <summary>
+    /// Checks whether the selected recorder viewpoint temporarily owns the movement reference frame.
+    /// </summary>
+    /// <param name="recorderState">Current recorder-camera selection state.</param>
+    /// <param name="entityManager">Entity manager containing the selected viewpoint data.</param>
+    /// <returns>True when an active, valid recorder camera requests camera-relative movement.</returns>
+    private static bool IsRecorderCameraMovementAlignmentActive(in GameRecorderCameraRuntimeState recorderState,
+                                                                EntityManager entityManager)
+    {
+        Entity activeCameraEntity = recorderState.ActiveCameraEntity;
+
+        if (activeCameraEntity == Entity.Null ||
+            !entityManager.Exists(activeCameraEntity) ||
+            !entityManager.HasComponent<GameRecorderCamera>(activeCameraEntity))
+            return false;
+
+        GameRecorderCamera recorderCamera =
+            entityManager.GetComponentData<GameRecorderCamera>(activeCameraEntity);
+        return recorderCamera.AlignMovementToCamera != 0;
+    }
+
     /// <summary>
     /// Clears keyboard/D-pad stabilization state when an analog stick owns movement input.
     /// </summary>

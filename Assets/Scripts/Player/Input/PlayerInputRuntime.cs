@@ -31,6 +31,7 @@ public static class PlayerInputRuntime
     private static InputAction cheatPresetDigitAction;
     private static InputAction cheatModifierControlAction;
     private static InputAction cheatModifierShiftAction;
+    private static InputAction recorderCameraCycleAction;
     private static InputAction runtimeGizmoPanelToggleAction;
     private static bool lookActionUsesMousePointer;
 
@@ -179,6 +180,14 @@ public static class PlayerInputRuntime
         get
         {
             return cheatModifierShiftAction;
+        }
+    }
+
+    public static InputAction RecorderCameraCycleAction
+    {
+        get
+        {
+            return recorderCameraCycleAction;
         }
     }
 
@@ -418,6 +427,7 @@ public static class PlayerInputRuntime
         cheatPresetDigitAction = ResolveAction(instantiatedAsset, null, "CheatPresetDigit");
         cheatModifierControlAction = ResolveAction(instantiatedAsset, null, "CheatModifierControl");
         cheatModifierShiftAction = ResolveAction(instantiatedAsset, null, "CheatModifierShift");
+        recorderCameraCycleAction = ResolveAction(instantiatedAsset, null, "CycleRecorderCamera");
         runtimeGizmoPanelToggleAction = ResolveAction(instantiatedAsset, null, "ToggleRuntimeGizmoPanel");
         lookActionUsesMousePointer = ResolveLookActionUsesMousePointer(lookAction);
         PlayerInputBindingDisplayRuntime.Initialize();
@@ -460,6 +470,7 @@ public static class PlayerInputRuntime
         cheatPresetDigitAction = null;
         cheatModifierControlAction = null;
         cheatModifierShiftAction = null;
+        recorderCameraCycleAction = null;
         runtimeGizmoPanelToggleAction = null;
         lookActionUsesMousePointer = false;
 
@@ -622,7 +633,7 @@ public static class PlayerInputRuntime
         if (asset == null)
             return;
 
-        string message = string.Format("[PlayerInputRuntime] Initialized '{0}'. Move: {1} | Look: {2} | Shoot: {3} | PowerUpPrimary: {4} | PowerUpSecondary: {5} | PowerUpSwapSlots: {6} | PowerUpContainerInteract: {7} | PowerUpContainerReplacePrimary: {8} | PowerUpContainerReplaceSecondary: {9} | UINavigate: {10} | UISubmit: {11} | UICancel: {12} | Pause: {13} | CheatPresetDigit: {14} | CheatModifierControl: {15} | CheatModifierShift: {16} | ToggleRuntimeGizmoPanel: {17} | MousePointerLook: {18}",
+        string message = string.Format("[PlayerInputRuntime] Initialized '{0}'. Move: {1} | Look: {2} | Shoot: {3} | PowerUpPrimary: {4} | PowerUpSecondary: {5} | PowerUpSwapSlots: {6} | PowerUpContainerInteract: {7} | PowerUpContainerReplacePrimary: {8} | PowerUpContainerReplaceSecondary: {9} | UINavigate: {10} | UISubmit: {11} | UICancel: {12} | Pause: {13} | CheatPresetDigit: {14} | CheatModifierControl: {15} | CheatModifierShift: {16} | CycleRecorderCamera: {17} | ToggleRuntimeGizmoPanel: {18} | MousePointerLook: {19}",
                                        asset.name,
                                        BuildActionStatus(moveAction),
                                        BuildActionStatus(lookAction),
@@ -640,6 +651,7 @@ public static class PlayerInputRuntime
                                        BuildActionStatus(cheatPresetDigitAction),
                                        BuildActionStatus(cheatModifierControlAction),
                                        BuildActionStatus(cheatModifierShiftAction),
+                                       BuildActionStatus(recorderCameraCycleAction),
                                        BuildActionStatus(runtimeGizmoPanelToggleAction),
                                        lookActionUsesMousePointer);
         //Debug.Log(message, asset);
