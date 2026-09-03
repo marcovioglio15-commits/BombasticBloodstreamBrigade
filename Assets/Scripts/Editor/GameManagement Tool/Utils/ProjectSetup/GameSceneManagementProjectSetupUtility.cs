@@ -88,15 +88,22 @@ public static class GameSceneManagementProjectSetupUtility
         GameSceneManagementProjectSetupProceduralTransitionUtility.EnsureRendererFeatureLayers();
 
         GameSettingsManagerPreset settingsPreset = EnsureSettingsManagerPreset();
+        GameDataCollectionManagerPreset dataCollectionPreset =
+            GameDataCollectionProjectSetupUtility.EnsureDefaultPreset();
         GameHudManagerPreset hudPreset = EnsureHudManagerPreset();
         GameHudSupplementalProjectSetupUtility.EnsureDefaultSettings(hudPreset);
+        GameDataCollectionSettingsMenuSetupUtility.EnsurePrefab();
         GameSceneManagerPreset scenePreset = EnsureSceneManagerPreset();
         GameMasterPreset existingMasterPreset = AssetDatabase.LoadAssetAtPath<GameMasterPreset>(DefaultMasterPresetPath);
         GameProceduralLevelPreset proceduralLevelPreset = GameProceduralLevelProjectSetupUtility.EnsurePreset(existingMasterPreset != null
                                                                                                                 ? existingMasterPreset.ProceduralLevelPreset
                                                                                                                 : null,
                                                                                                             scenePreset);
-        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset, settingsPreset, hudPreset, proceduralLevelPreset);
+        GameMasterPreset masterPreset = EnsureGameMasterPreset(scenePreset,
+                                                               settingsPreset,
+                                                               dataCollectionPreset,
+                                                               hudPreset,
+                                                               proceduralLevelPreset);
         EnsureBootstrapScene(masterPreset, scenePreset);
         GameHudSupplementalProjectSetupUtility.EnsureLoadedGameplayUiAndMenus();
         GameSceneEnvironmentPostProcessSetupUtility.ApplyDefaultGameplaySceneSetup(false);
@@ -140,6 +147,10 @@ public static class GameSceneManagementProjectSetupUtility
 
         if (preset == null)
             throw new InvalidOperationException("Unable to create the default GameSettingsManagerPreset asset.");
+
+        preset.EnsureInitialized();
+        GameDataCollectionProjectSetupUtility.EnsureDefaultInputActionReference(preset);
+        EditorUtility.SetDirty(preset);
 
         GameSettingsManagerPresetLibrary library = GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
         library.AddPreset(preset);
@@ -196,12 +207,14 @@ public static class GameSceneManagementProjectSetupUtility
     /// Loads or creates the default Game Master preset and links the Settings and Scene Manager sub-presets.
     /// </summary>
     /// <param name="settingsPreset">Settings Manager preset assigned as the master sub-preset.</param>
+    /// <param name="dataCollectionPreset">Data Collection Manager preset assigned as the global feature gate.</param>
     /// <param name="hudPreset">HUD Manager preset assigned as the master sub-preset.</param>
     /// <param name="scenePreset">Scene Manager preset assigned as the master sub-preset.</param>
     /// <param name="proceduralLevelPreset">Procedural Level preset assigned as the master sub-preset.</param>
     /// <returns>Default Game Master preset asset.</returns>
     private static GameMasterPreset EnsureGameMasterPreset(GameSceneManagerPreset scenePreset,
                                                            GameSettingsManagerPreset settingsPreset,
+                                                           GameDataCollectionManagerPreset dataCollectionPreset,
                                                            GameHudManagerPreset hudPreset,
                                                            GameProceduralLevelPreset proceduralLevelPreset)
     {
@@ -220,6 +233,7 @@ public static class GameSceneManagementProjectSetupUtility
         SerializedObject serializedMaster = new SerializedObject(masterPreset);
         serializedMaster.Update();
         SetObjectReference(serializedMaster, "settingsManagerPreset", settingsPreset);
+        SetObjectReference(serializedMaster, "dataCollectionManagerPreset", dataCollectionPreset);
         SetObjectReference(serializedMaster, "hudManagerPreset", hudPreset);
         SetObjectReference(serializedMaster, "sceneManagerPreset", scenePreset);
         SetObjectReference(serializedMaster, "proceduralLevelPreset", proceduralLevelPreset);

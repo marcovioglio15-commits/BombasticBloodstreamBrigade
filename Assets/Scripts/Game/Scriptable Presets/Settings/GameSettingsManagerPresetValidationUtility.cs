@@ -29,6 +29,7 @@ public static class GameSettingsManagerPresetValidationUtility
         ValidateAudioSettings(preset.AudioSettings, warnings);
         ValidateGameplaySettings(preset.ExperienceSettings, warnings);
         ValidateControllerNavigationSettings(preset.ControllerNavigationSettings, warnings);
+        GameDataCollectionSettingsValidationUtility.CollectWarnings(preset.DataCollectionSettings, warnings);
     }
     #endregion
 

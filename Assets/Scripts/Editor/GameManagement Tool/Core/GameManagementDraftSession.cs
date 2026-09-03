@@ -305,6 +305,7 @@ public static class GameManagementDraftSession
         AddAssetPathsOfType<GameAudioManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSettingsManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSettingsManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
+        AddAssetPathsOfType<GameDataCollectionManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameHudManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameHudManagerPreset>(uniquePaths, TrackedGameAssetsRoot);
         AddAssetPathsOfType<GameSceneManagerPresetLibrary>(uniquePaths, TrackedGameAssetsRoot);
@@ -359,6 +360,7 @@ public static class GameManagementDraftSession
         GameMasterPresetLibraryUtility.GetOrCreateLibrary();
         GameAudioManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSettingsManagerPresetLibraryUtility.GetOrCreateLibrary();
+        GameDataCollectionProjectSetupUtility.EnsureDefaultPreset();
         GameHudManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameSceneManagerPresetLibraryUtility.GetOrCreateLibrary();
         GameProceduralLevelPresetLibraryUtility.GetOrCreateLibrary();

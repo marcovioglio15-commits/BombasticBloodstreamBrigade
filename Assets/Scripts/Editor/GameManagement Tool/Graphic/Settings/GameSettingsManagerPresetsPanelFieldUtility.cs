@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -11,6 +12,179 @@ internal static class GameSettingsManagerPresetsPanelFieldUtility
     #region Methods
 
     #region Public Methods
+    /// <summary>
+    /// Adds one bound text field and optionally refreshes the preset list after an edit.
+    /// </summary>
+    /// <param name="panel">Owning panel with serialized preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="propertyName">Serialized property name.</param>
+    /// <param name="refreshList">True when list labels should update after change.</param>
+    /// <param name="multiline">True when multiline editing is enabled.</param>
+    public static void AddBoundTextField(GameSettingsManagerPresetsPanel panel,
+                                         VisualElement parent,
+                                         string label,
+                                         string propertyName,
+                                         bool refreshList,
+                                         bool multiline)
+    {
+        SerializedProperty property = panel.PresetSerializedObject.FindProperty(propertyName);
+
+        if (property == null)
+            return;
+
+        TextField field = new TextField(label);
+        field.tooltip = "Edit " + label + " for this Settings Manager preset.";
+        field.isDelayed = true;
+        field.multiline = multiline;
+        field.BindProperty(property);
+        field.RegisterValueChangedCallback(evt =>
+        {
+            Undo.RecordObject(panel.SelectedPreset, "Edit Settings Manager Preset");
+            panel.PresetSerializedObject.ApplyModifiedProperties();
+            panel.MarkSelectedPresetDirty();
+
+            if (refreshList)
+                panel.RefreshPresetList();
+        });
+        parent.Add(field);
+    }
+
+    /// <summary>
+    /// Adds one delayed string property field.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized string property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    public static void AddDelayedStringProperty(GameSettingsManagerPresetsPanel panel,
+                                                VisualElement parent,
+                                                SerializedProperty property,
+                                                string label,
+                                                string tooltip)
+    {
+        if (property == null)
+            return;
+
+        TextField field = new TextField(label);
+        field.tooltip = tooltip;
+        field.isDelayed = true;
+        field.SetValueWithoutNotify(property.stringValue);
+        field.RegisterValueChangedCallback(evt =>
+        {
+            Undo.RecordObject(panel.SelectedPreset, "Edit Settings Manager Text");
+            panel.PresetSerializedObject.Update();
+            property.stringValue = evt.newValue;
+            panel.PresetSerializedObject.ApplyModifiedProperties();
+            panel.MarkSelectedPresetDirty();
+        });
+        parent.Add(field);
+    }
+
+    /// <summary>
+    /// Adds one boolean toggle property and optionally rebuilds dependent controls.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized boolean property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    /// <param name="rebuildOnChange">True when dependent controls must refresh immediately.</param>
+    public static void AddBooleanToggleProperty(GameSettingsManagerPresetsPanel panel,
+                                                VisualElement parent,
+                                                SerializedProperty property,
+                                                string label,
+                                                string tooltip,
+                                                bool rebuildOnChange)
+    {
+        if (property == null)
+            return;
+
+        Toggle toggle = new Toggle(label);
+        toggle.tooltip = tooltip;
+        toggle.SetValueWithoutNotify(property.boolValue);
+        toggle.RegisterValueChangedCallback(evt =>
+        {
+            Undo.RecordObject(panel.SelectedPreset, "Edit Settings Manager Toggle");
+            panel.PresetSerializedObject.Update();
+            property.boolValue = evt.newValue;
+            panel.PresetSerializedObject.ApplyModifiedProperties();
+            panel.MarkSelectedPresetDirty();
+
+            if (rebuildOnChange)
+                panel.BuildActiveSection();
+        });
+        parent.Add(toggle);
+    }
+
+    /// <summary>
+    /// Adds one integer property field.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized integer property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    public static void AddIntegerProperty(GameSettingsManagerPresetsPanel panel,
+                                          VisualElement parent,
+                                          SerializedProperty property,
+                                          string label,
+                                          string tooltip)
+    {
+        if (property == null)
+            return;
+
+        IntegerField field = new IntegerField(label);
+        field.tooltip = tooltip;
+        field.SetValueWithoutNotify(property.intValue);
+        field.RegisterValueChangedCallback(evt =>
+        {
+            Undo.RecordObject(panel.SelectedPreset, "Edit Settings Manager Integer");
+            panel.PresetSerializedObject.Update();
+            property.intValue = evt.newValue;
+            panel.PresetSerializedObject.ApplyModifiedProperties();
+            panel.MarkSelectedPresetDirty();
+        });
+        parent.Add(field);
+    }
+
+    /// <summary>
+    /// Adds one float slider property field.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected preset context.</param>
+    /// <param name="parent">Parent section.</param>
+    /// <param name="property">Serialized float property.</param>
+    /// <param name="label">Display label.</param>
+    /// <param name="lowValue">Lower slider value.</param>
+    /// <param name="highValue">Upper slider value.</param>
+    /// <param name="tooltip">Field tooltip.</param>
+    public static void AddFloatSliderProperty(GameSettingsManagerPresetsPanel panel,
+                                              VisualElement parent,
+                                              SerializedProperty property,
+                                              string label,
+                                              float lowValue,
+                                              float highValue,
+                                              string tooltip)
+    {
+        if (property == null)
+            return;
+
+        Slider slider = new Slider(label, lowValue, highValue);
+        slider.showInputField = true;
+        slider.tooltip = tooltip;
+        slider.SetValueWithoutNotify(property.floatValue);
+        slider.RegisterValueChangedCallback(evt =>
+        {
+            Undo.RecordObject(panel.SelectedPreset, "Edit Settings Manager Slider");
+            panel.PresetSerializedObject.Update();
+            property.floatValue = evt.newValue;
+            panel.PresetSerializedObject.ApplyModifiedProperties();
+            panel.MarkSelectedPresetDirty();
+        });
+        parent.Add(slider);
+    }
+
     /// <summary>
     /// Adds one enum popup bound to a serialized enum and optionally rebuilds dependent controls after a real value change.
     /// </summary>

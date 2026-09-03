@@ -25,6 +25,7 @@ internal static class SettingsMenuDirectNavigationUtility
     /// <param name="candidates">Precached authored Selectables from active and inactive macro panels.</param>
     /// <param name="audioTabButton">Audio macro-tab button excluded from content navigation.</param>
     /// <param name="gameplayTabButton">Gameplay macro-tab button excluded from content navigation.</param>
+    /// <param name="devTabButton">Dev macro-tab button excluded from content navigation.</param>
     /// <param name="includeDropdownHeaders">True when expandable section headers may receive focus.</param>
     /// <param name="direction">Requested cardinal navigation direction.</param>
     public static void Navigate(EventSystem eventSystem,
@@ -33,6 +34,7 @@ internal static class SettingsMenuDirectNavigationUtility
                                 Selectable[] candidates,
                                 Selectable audioTabButton,
                                 Selectable gameplayTabButton,
+                                Selectable devTabButton,
                                 bool includeDropdownHeaders,
                                 RuntimeMenuNavigationDirection direction)
     {
@@ -43,11 +45,13 @@ internal static class SettingsMenuDirectNavigationUtility
                        menuRoot,
                        audioTabButton,
                        gameplayTabButton,
+                       devTabButton,
                        includeDropdownHeaders))
             defaultSelectable = ResolveFirstAllowed(candidates,
                                                     menuRoot,
                                                     audioTabButton,
                                                     gameplayTabButton,
+                                                    devTabButton,
                                                     includeDropdownHeaders);
 
         if (current == null)
@@ -64,6 +68,7 @@ internal static class SettingsMenuDirectNavigationUtility
                                                       menuRoot,
                                                       audioTabButton,
                                                       gameplayTabButton,
+                                                      devTabButton,
                                                       includeDropdownHeaders,
                                                       direction);
 
@@ -81,6 +86,7 @@ internal static class SettingsMenuDirectNavigationUtility
     /// <param name="menuRoot">Settings root constraining candidates.</param>
     /// <param name="audioTabButton">Audio macro tab excluded from content navigation.</param>
     /// <param name="gameplayTabButton">Gameplay macro tab excluded from content navigation.</param>
+    /// <param name="devTabButton">Dev macro tab excluded from content navigation.</param>
     /// <param name="includeDropdownHeaders">True when expandable section headers may receive focus.</param>
     /// <param name="direction">Requested cardinal navigation direction.</param>
     /// <returns>Nearest valid candidate, or null when the requested direction has no option.</returns>
@@ -89,6 +95,7 @@ internal static class SettingsMenuDirectNavigationUtility
                                                           GameObject menuRoot,
                                                           Selectable audioTabButton,
                                                           Selectable gameplayTabButton,
+                                                          Selectable devTabButton,
                                                           bool includeDropdownHeaders,
                                                           RuntimeMenuNavigationDirection direction)
     {
@@ -109,6 +116,7 @@ internal static class SettingsMenuDirectNavigationUtility
                            menuRoot,
                            audioTabButton,
                            gameplayTabButton,
+                           devTabButton,
                            includeDropdownHeaders))
                 continue;
 
@@ -133,12 +141,14 @@ internal static class SettingsMenuDirectNavigationUtility
     /// <param name="menuRoot">Settings root constraining candidates.</param>
     /// <param name="audioTabButton">Audio macro tab excluded from content navigation.</param>
     /// <param name="gameplayTabButton">Gameplay macro tab excluded from content navigation.</param>
+    /// <param name="devTabButton">Dev macro tab excluded from content navigation.</param>
     /// <param name="includeDropdownHeaders">True when expandable section headers may receive focus.</param>
     /// <returns>First valid candidate in authored hierarchy order, or null.</returns>
     private static Selectable ResolveFirstAllowed(Selectable[] candidates,
                                                   GameObject menuRoot,
                                                   Selectable audioTabButton,
                                                   Selectable gameplayTabButton,
+                                                  Selectable devTabButton,
                                                   bool includeDropdownHeaders)
     {
         if (candidates == null)
@@ -153,6 +163,7 @@ internal static class SettingsMenuDirectNavigationUtility
                           menuRoot,
                           audioTabButton,
                           gameplayTabButton,
+                          devTabButton,
                           includeDropdownHeaders))
                 return candidate;
         }
@@ -167,12 +178,14 @@ internal static class SettingsMenuDirectNavigationUtility
     /// <param name="menuRoot">Settings root constraining candidates.</param>
     /// <param name="audioTabButton">Audio macro tab excluded from content navigation.</param>
     /// <param name="gameplayTabButton">Gameplay macro tab excluded from content navigation.</param>
+    /// <param name="devTabButton">Dev macro tab excluded from content navigation.</param>
     /// <param name="includeDropdownHeaders">True when expandable section headers may receive focus.</param>
     /// <returns>True when the candidate may receive direct Settings focus.</returns>
     private static bool IsAllowed(Selectable candidate,
                                   GameObject menuRoot,
                                   Selectable audioTabButton,
                                   Selectable gameplayTabButton,
+                                  Selectable devTabButton,
                                   bool includeDropdownHeaders)
     {
         if (!RuntimeMenuDirectNavigationUtility.IsSelectionCandidateValid(candidate))
@@ -181,7 +194,7 @@ internal static class SettingsMenuDirectNavigationUtility
         if (menuRoot != null && !candidate.transform.IsChildOf(menuRoot.transform))
             return false;
 
-        if (candidate == audioTabButton || candidate == gameplayTabButton)
+        if (candidate == audioTabButton || candidate == gameplayTabButton || candidate == devTabButton)
             return false;
 
         if (includeDropdownHeaders)

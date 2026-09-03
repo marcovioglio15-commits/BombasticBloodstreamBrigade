@@ -330,7 +330,8 @@ public sealed class GameSettingsManagerPresetsPanel
         Audio = 1,
         Gameplay = 2,
         Validation = 3,
-        ControllerNavigation = 4
+        ControllerNavigation = 4,
+        DataCollection = 5
     }
     #endregion
 }

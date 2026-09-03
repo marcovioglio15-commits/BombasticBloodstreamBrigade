@@ -7,7 +7,7 @@ using static GameSceneManagementProjectSetupSceneUtility;
 using static GameSceneManagementProjectSetupSerializedUtility;
 
 /// <summary>
-/// Maintains the persistent regular-scene Audio Manager authoring used before gameplay SubScenes load.
+/// Maintains persistent manager authoring and the managed telemetry API boundary before gameplay SubScenes load.
 /// </summary>
 internal static class GameSceneManagementAudioBootstrapSetupUtility
 {
@@ -45,6 +45,14 @@ internal static class GameSceneManagementAudioBootstrapSetupUtility
         for (int index = 1; index < authoringComponents.Count; index++)
             UnityEngine.Object.DestroyImmediate(authoringComponents[index]);
 
+        GameDataCollectionApiClient[] apiClients = sceneManager.GetComponents<GameDataCollectionApiClient>();
+
+        if (apiClients.Length == 0)
+            sceneManager.gameObject.AddComponent<GameDataCollectionApiClient>();
+
+        for (int index = 1; index < apiClients.Length; index++)
+            UnityEngine.Object.DestroyImmediate(apiClients[index]);
+
         GameAudioManagerPreset audioPreset = ResolvePreset(
             masterPreset != null ? masterPreset.AudioManagerPreset : null,
             DefaultAudioPresetPath,
@@ -53,6 +61,10 @@ internal static class GameSceneManagementAudioBootstrapSetupUtility
             masterPreset != null ? masterPreset.SettingsManagerPreset : null,
             DefaultSettingsPresetPath,
             "Settings Manager preset");
+        GameDataCollectionManagerPreset dataCollectionPreset = ResolvePreset(
+            masterPreset != null ? masterPreset.DataCollectionManagerPreset : null,
+            GameDataCollectionProjectSetupUtility.DefaultPresetPath,
+            "Data Collection Manager preset");
         GameHudManagerPreset hudPreset = ResolvePreset(
             masterPreset != null ? masterPreset.HudManagerPreset : null,
             DefaultHudPresetPath,
@@ -62,6 +74,7 @@ internal static class GameSceneManagementAudioBootstrapSetupUtility
         SetObjectReference(serializedAuthoring, "masterPreset", masterPreset);
         SetObjectReference(serializedAuthoring, "audioManagerPreset", audioPreset);
         SetObjectReference(serializedAuthoring, "settingsManagerPreset", settingsPreset);
+        SetObjectReference(serializedAuthoring, "dataCollectionManagerPreset", dataCollectionPreset);
         SetObjectReference(serializedAuthoring, "hudManagerPreset", hudPreset);
         SetBool(serializedAuthoring, "createRuntimeSingletonWhenNotBaked", true);
         serializedAuthoring.ApplyModifiedPropertiesWithoutUndo();

@@ -888,6 +888,7 @@ GameObject:
   - component: {fileID: 898689532}
   - component: {fileID: 898689531}
   - component: {fileID: 898689533}
+  - component: {fileID: 898689534}
   m_Layer: 0
   m_Name: GameSceneManager
   m_TagString: Untagged
@@ -935,13 +936,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b27dbf469464e3146842bfb0e9deb7cc, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameAudioManagerAuthoring
   masterPreset: {fileID: 11400000, guid: bb0def9f47982654eab79c983db7c947, type: 2}
   audioManagerPreset: {fileID: 11400000, guid: 4762fb1f960c08e40b031f534d613690, type: 2}
   settingsManagerPreset: {fileID: 11400000, guid: 7863a90fb7b62c04b810ee60e0156cc3, type: 2}
+  dataCollectionManagerPreset: {fileID: 11400000, guid: 992daf5cb43e8c04283991dc0e27d818, type: 2}
   hudManagerPreset: {fileID: 11400000, guid: e9ae73ef80d765c42ae45e03caeea19b, type: 2}
   createRuntimeSingletonWhenNotBaked: 1
+--- !u!114 &898689534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 898689530}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e87ac3e1879ebc041b95c6370911a838, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameDataCollectionApiClient
 --- !u!1 &1002157443
 GameObject:
   m_ObjectHideFlags: 0

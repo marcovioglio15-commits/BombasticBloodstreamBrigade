@@ -188,6 +188,108 @@ public static class GameAudioManagerPresetBakeUtility
                     : GameSettingsManagerControllerNavigationSettings.DefaultRepeatIntervalSeconds)
         };
     }
+
+    /// <summary>
+    /// Builds safe automatic data-collection runtime settings without changing invalid authored values.
+    /// </summary>
+    /// <param name="settingsPreset">Source Settings Manager preset, or null to use disabled-safe defaults.</param>
+    /// <param name="dataPreset">Global Data Collection Manager preset controlling feature availability.</param>
+    /// <returns>Baked data-collection config consumed by ECS producers and the managed HTTPS boundary.</returns>
+    public static GameDataCollectionRuntimeConfig BuildDataCollectionRuntimeConfig(
+        GameSettingsManagerPreset settingsPreset,
+        GameDataCollectionManagerPreset dataPreset)
+    {
+        GameDataCollectionSettings settings = settingsPreset != null
+            ? settingsPreset.DataCollectionSettings
+            : null;
+        string serviceBaseUrl = ResolveString(settings != null ? settings.ServiceBaseUrl : null,
+                                              GameDataCollectionSettings.DefaultServiceBaseUrl);
+        string schemaVersion = ResolveString(settings != null ? settings.SchemaVersion : null,
+                                             GameDataCollectionSettings.DefaultSchemaVersion);
+        string consentPolicyVersion = ResolveString(settings != null ? settings.ConsentPolicyVersion : null,
+                                                    GameDataCollectionSettings.DefaultConsentPolicyVersion);
+        string revealActionId = ResolveString(settings != null ? settings.RevealDevActionsActionId : null,
+                                              GameDataCollectionSettings.DefaultRevealDevActionsActionName);
+
+        return new GameDataCollectionRuntimeConfig
+        {
+            Enabled = dataPreset != null &&
+                      dataPreset.DataCollectionEnabled &&
+                      settings != null
+                ? (byte)1
+                : (byte)0,
+            CollectInEditor = settings != null && settings.CollectInEditor ? (byte)1 : (byte)0,
+            Environment = settings != null
+                ? settings.Environment
+                : GameDataCollectionEnvironment.Development,
+            ServiceBaseUrl = BuildFixedString512(serviceBaseUrl),
+            SchemaVersion = BuildFixedString64(schemaVersion),
+            ConsentPolicyVersion = BuildFixedString64(consentPolicyVersion),
+            RevealDevActionsActionId = BuildFixedString64(revealActionId),
+            PerformanceSampleIntervalSeconds = math.max(
+                0.1f,
+                settings != null
+                    ? settings.PerformanceSampleIntervalSeconds
+                    : GameDataCollectionSettings.DefaultPerformanceSampleIntervalSeconds),
+            RenderingSampleIntervalSeconds = math.max(
+                0.25f,
+                settings != null
+                    ? settings.RenderingSampleIntervalSeconds
+                    : GameDataCollectionSettings.DefaultRenderingSampleIntervalSeconds),
+            UploadIntervalSeconds = math.max(
+                1f,
+                settings != null
+                    ? settings.UploadIntervalSeconds
+                    : GameDataCollectionSettings.DefaultUploadIntervalSeconds),
+            MaximumEventsPerBatch = math.clamp(
+                settings != null
+                    ? settings.MaximumEventsPerBatch
+                    : GameDataCollectionSettings.DefaultMaximumEventsPerBatch,
+                1,
+                100),
+            MaximumPendingEvents = math.max(
+                1,
+                settings != null
+                    ? settings.MaximumPendingEvents
+                    : GameDataCollectionSettings.DefaultMaximumPendingEvents),
+            MaximumPayloadBytes = math.clamp(
+                settings != null
+                    ? settings.MaximumPayloadBytes
+                    : GameDataCollectionSettings.DefaultMaximumPayloadBytes,
+                4096,
+                1048576),
+            RequestTimeoutSeconds = math.max(
+                1f,
+                settings != null
+                    ? settings.RequestTimeoutSeconds
+                    : GameDataCollectionSettings.DefaultRequestTimeoutSeconds),
+            InitialRetryDelaySeconds = math.max(
+                0.5f,
+                settings != null
+                    ? settings.InitialRetryDelaySeconds
+                    : GameDataCollectionSettings.DefaultInitialRetryDelaySeconds),
+            MaximumRetryDelaySeconds = math.max(
+                settings != null
+                    ? settings.InitialRetryDelaySeconds
+                    : GameDataCollectionSettings.DefaultInitialRetryDelaySeconds,
+                settings != null
+                    ? settings.MaximumRetryDelaySeconds
+                    : GameDataCollectionSettings.DefaultMaximumRetryDelaySeconds),
+            PersistPendingEvents = settings != null && settings.PersistPendingEvents ? (byte)1 : (byte)0,
+            PendingEventRetentionDays = math.clamp(
+                settings != null
+                    ? settings.PendingEventRetentionDays
+                    : GameDataCollectionSettings.DefaultPendingEventRetentionDays,
+                1,
+                30),
+            DashboardPageSize = math.clamp(
+                settings != null
+                    ? settings.DashboardPageSize
+                    : GameDataCollectionSettings.DefaultDashboardPageSize,
+                1,
+                100)
+        };
+    }
     #endregion
 
     #region Buffer Population
@@ -264,6 +366,30 @@ public static class GameAudioManagerPresetBakeUtility
             default:
                 return DefaultFrameRateLimit;
         }
+    }
+
+    /// <summary>
+    /// Copies one managed string into a bounded 64-byte ECS string without allowing invalid authoring to break baking.
+    /// </summary>
+    /// <param name="value">Managed source value.</param>
+    /// <returns>Bounded ECS string containing as much of the source as fits.</returns>
+    private static FixedString64Bytes BuildFixedString64(string value)
+    {
+        FixedString64Bytes result = default;
+        result.CopyFromTruncated(value ?? string.Empty);
+        return result;
+    }
+
+    /// <summary>
+    /// Copies one managed string into a bounded 512-byte ECS string without allowing invalid authoring to break baking.
+    /// </summary>
+    /// <param name="value">Managed source value.</param>
+    /// <returns>Bounded ECS string containing as much of the source as fits.</returns>
+    private static FixedString512Bytes BuildFixedString512(string value)
+    {
+        FixedString512Bytes result = default;
+        result.CopyFromTruncated(value ?? string.Empty);
+        return result;
     }
 
     /// <summary>

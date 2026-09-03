@@ -3,7 +3,7 @@ using Unity.Entities;
 using UnityEngine;
 
 /// <summary>
-/// Resolves Audio, Settings, and HUD Manager presets for baking or persistent regular-scene bootstrap.
+/// Resolves Audio, Settings, Data Collection, and HUD Manager presets for baking or persistent regular-scene bootstrap.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameAudioManagerAuthoring : MonoBehaviour
@@ -20,6 +20,10 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
 
     [Tooltip("Direct Settings Manager preset fallback used when Master Preset is missing or has no Settings Manager assigned.")]
     [SerializeField] private GameSettingsManagerPreset settingsManagerPreset;
+
+    [Tooltip("Direct Data Collection Manager fallback used when Master Preset has no global data-collection preset assigned.")]
+    [SerializeField]
+    private GameDataCollectionManagerPreset dataCollectionManagerPreset;
 
     [Tooltip("Direct HUD Manager preset fallback used when Master Preset is missing or has no HUD Manager assigned.")]
     [SerializeField] private GameHudManagerPreset hudManagerPreset;
@@ -57,6 +61,14 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
         get
         {
             return settingsManagerPreset;
+        }
+    }
+
+    public GameDataCollectionManagerPreset DataCollectionManagerPreset
+    {
+        get
+        {
+            return dataCollectionManagerPreset;
         }
     }
 
@@ -102,6 +114,32 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
             return masterPreset.SettingsManagerPreset;
 
         return settingsManagerPreset;
+    }
+
+    /// <summary>
+    /// Resolves the effective Data Collection Manager preset used as the global feature gate.
+    /// </summary>
+    /// <returns>Data Collection Manager preset from MasterPreset or direct fallback.</returns>
+    public GameDataCollectionManagerPreset ResolveDataCollectionManagerPreset()
+    {
+        if (masterPreset != null && masterPreset.DataCollectionManagerPreset != null)
+            return masterPreset.DataCollectionManagerPreset;
+
+        return dataCollectionManagerPreset;
+    }
+
+    /// <summary>
+    /// Reports whether the global switch is enabled and the required technical settings exist.
+    /// </summary>
+    /// <returns>True only when the feature is enabled and has a complete settings source.</returns>
+    public bool IsDataCollectionAvailable()
+    {
+        GameDataCollectionManagerPreset dataPreset = ResolveDataCollectionManagerPreset();
+        GameSettingsManagerPreset settingsPreset = ResolveSettingsManagerPreset();
+        return dataPreset != null &&
+               dataPreset.DataCollectionEnabled &&
+               settingsPreset != null &&
+               settingsPreset.DataCollectionSettings != null;
     }
 
     /// <summary>
@@ -153,6 +191,7 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         DeclarePresetDependencies(authoring);
         GameAudioManagerPreset audioPreset = authoring.ResolveAudioManagerPreset();
         GameSettingsManagerPreset settingsPreset = authoring.ResolveSettingsManagerPreset();
+        GameDataCollectionManagerPreset dataPreset = authoring.ResolveDataCollectionManagerPreset();
         GameHudManagerPreset hudPreset = authoring.ResolveHudManagerPreset();
 
         Entity entity = GetEntity(TransformUsageFlags.None);
@@ -181,6 +220,21 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         GameAudioManagerPresetBakeUtility.PopulateBindingBuffer(audioPreset, bindingBuffer);
         requestBuffer.Clear();
         rateLimitStateBuffer.Clear();
+
+        if (!authoring.IsDataCollectionAvailable())
+            return;
+
+        // Keep variable-size telemetry storage away from the already dense manager archetype.
+        Entity telemetryEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                        false,
+                                                        "Game Data Collection");
+        AddComponent(telemetryEntity,
+                     GameAudioManagerPresetBakeUtility.BuildDataCollectionRuntimeConfig(settingsPreset,
+                                                                                         dataPreset));
+        AddComponent(telemetryEntity, new GameDataCollectionSessionState());
+        AddComponent(telemetryEntity, new GameTelemetrySamplingState());
+        AddComponent(telemetryEntity, new GameTelemetryProgressionObservationState());
+        AddBuffer<GameTelemetryEvent>(telemetryEntity);
     }
     #endregion
 
@@ -201,6 +255,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
             if (authoring.MasterPreset.SettingsManagerPreset != null)
                 DependsOn(authoring.MasterPreset.SettingsManagerPreset);
 
+            if (authoring.MasterPreset.DataCollectionManagerPreset != null)
+                DependsOn(authoring.MasterPreset.DataCollectionManagerPreset);
+
             if (authoring.MasterPreset.HudManagerPreset != null)
             {
                 DependsOn(authoring.MasterPreset.HudManagerPreset);
@@ -213,6 +270,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
         if (authoring.SettingsManagerPreset != null)
             DependsOn(authoring.SettingsManagerPreset);
+
+        if (authoring.DataCollectionManagerPreset != null)
+            DependsOn(authoring.DataCollectionManagerPreset);
 
         if (authoring.HudManagerPreset != null)
         {

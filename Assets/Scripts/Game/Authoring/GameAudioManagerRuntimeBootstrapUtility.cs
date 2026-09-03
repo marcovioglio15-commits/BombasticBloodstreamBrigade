@@ -51,10 +51,16 @@ public static class GameAudioManagerRuntimeBootstrapUtility
             return false;
         }
 
-        CreateSingleton(entityManager,
-                        audioPreset,
-                        authoring.ResolveSettingsManagerPreset(),
-                        authoring.ResolveHudManagerPreset());
+        GameSettingsManagerPreset settingsPreset = authoring.ResolveSettingsManagerPreset();
+        GameDataCollectionManagerPreset dataPreset = authoring.ResolveDataCollectionManagerPreset();
+        CreateManagerSingleton(entityManager,
+                               audioPreset,
+                               settingsPreset,
+                               authoring.ResolveHudManagerPreset());
+
+        if (authoring.IsDataCollectionAvailable())
+            CreateDataCollectionSingleton(entityManager, settingsPreset, dataPreset);
+
         return true;
     }
     #endregion
@@ -67,10 +73,10 @@ public static class GameAudioManagerRuntimeBootstrapUtility
     /// <param name="audioPreset">Audio Manager preset used for FMOD bindings.</param>
     /// <param name="settingsPreset">Settings Manager preset used for runtime menu defaults.</param>
     /// <param name="hudPreset">HUD Manager preset used for supplemental presentation data.</param>
-    private static void CreateSingleton(EntityManager entityManager,
-                                        GameAudioManagerPreset audioPreset,
-                                        GameSettingsManagerPreset settingsPreset,
-                                        GameHudManagerPreset hudPreset)
+    private static void CreateManagerSingleton(EntityManager entityManager,
+                                               GameAudioManagerPreset audioPreset,
+                                               GameSettingsManagerPreset settingsPreset,
+                                               GameHudManagerPreset hudPreset)
     {
         GameHudPowerUpSummarySettings summarySettings = hudPreset != null
             ? hudPreset.PowerUpSummarySettings
@@ -118,6 +124,28 @@ public static class GameAudioManagerRuntimeBootstrapUtility
         GameAudioManagerPresetBakeUtility.PopulateBindingBuffer(audioPreset, bindingBuffer);
         requestBuffer.Clear();
         rateLimitStateBuffer.Clear();
+    }
+
+    /// <summary>
+    /// Creates the isolated telemetry singleton only when the global feature gate is enabled.
+    /// </summary>
+    /// <param name="entityManager">Default-world entity manager receiving the singleton.</param>
+    /// <param name="settingsPreset">Settings Manager preset containing transport and sampling values.</param>
+    /// <param name="dataPreset">Data Collection Manager preset containing the global feature gate.</param>
+    private static void CreateDataCollectionSingleton(EntityManager entityManager,
+                                                      GameSettingsManagerPreset settingsPreset,
+                                                      GameDataCollectionManagerPreset dataPreset)
+    {
+        Entity entity = entityManager.CreateEntity();
+
+        // Keep telemetry state in a compact archetype independent from audio and HUD configuration.
+        entityManager.AddComponentData(
+            entity,
+            GameAudioManagerPresetBakeUtility.BuildDataCollectionRuntimeConfig(settingsPreset, dataPreset));
+        entityManager.AddComponentData(entity, new GameDataCollectionSessionState());
+        entityManager.AddComponentData(entity, new GameTelemetrySamplingState());
+        entityManager.AddComponentData(entity, new GameTelemetryProgressionObservationState());
+        entityManager.AddBuffer<GameTelemetryEvent>(entity);
     }
     #endregion
 

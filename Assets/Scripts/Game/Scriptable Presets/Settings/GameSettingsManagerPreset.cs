@@ -32,6 +32,9 @@ public sealed class GameSettingsManagerPreset : ScriptableObject
 
     [Tooltip("Controller navigation mode and actions used by the runtime Settings menu while a gamepad is connected.")]
     [SerializeField] private GameSettingsManagerControllerNavigationSettings controllerNavigationSettings = new GameSettingsManagerControllerNavigationSettings();
+
+    [Tooltip("Consent, Input Action, batching, retry, and HTTPS settings used by automatic data collection and the Settings Dev tab.")]
+    [SerializeField] private GameDataCollectionSettings dataCollectionSettings = new GameDataCollectionSettings();
     #endregion
 
     #endregion
@@ -92,6 +95,14 @@ public sealed class GameSettingsManagerPreset : ScriptableObject
             return controllerNavigationSettings;
         }
     }
+
+    public GameDataCollectionSettings DataCollectionSettings
+    {
+        get
+        {
+            return dataCollectionSettings;
+        }
+    }
     #endregion
 
     #region Methods
@@ -115,6 +126,9 @@ public sealed class GameSettingsManagerPreset : ScriptableObject
 
         if (controllerNavigationSettings == null)
             controllerNavigationSettings = new GameSettingsManagerControllerNavigationSettings();
+
+        if (dataCollectionSettings == null)
+            dataCollectionSettings = new GameDataCollectionSettings();
     }
     #endregion
 

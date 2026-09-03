@@ -483,8 +483,8 @@ MonoBehaviour:
     description: Requested when pointer or navigation focus reaches an interactable
       menu button.
     eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
-    volume: 1
-    pitch: 1
+    volume: 0.8
+    pitch: 0.95
     spatialize: 0
     minimumDistance: 8
     maximumDistance: 45
@@ -498,9 +498,9 @@ MonoBehaviour:
     displayName: Menu Button Select
     description: Requested when an interactable menu button accepts pointer or submit
       input.
-    eventPath: event:/SFX/Warnings/NASH_SfxENEMY_SFX_AttackWarning
+    eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
     volume: 1
-    pitch: 1
+    pitch: 1.05
     spatialize: 0
     minimumDistance: 8
     maximumDistance: 45

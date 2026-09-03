@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +17,8 @@ public sealed class SettingsMenuController : MonoBehaviour
     private enum SettingsPanel
     {
         Audio = 0,
-        Gameplay = 1
+        Gameplay = 1,
+        Dev = 2
     }
     #endregion
 
@@ -53,6 +53,9 @@ public sealed class SettingsMenuController : MonoBehaviour
 
     [Tooltip("Shared project Input Action asset used by Settings navigation before a player runtime input clone exists.")]
     [SerializeField] private InputActionAsset navigationInputAsset;
+
+    [Tooltip("Controller for the authored Dev tab, account flow and configurable reveal Input Action.")]
+    [SerializeField] private SettingsDevSectionController devSectionController;
     #endregion
 
     #region Serialized Fields - Panels
@@ -160,7 +163,7 @@ public sealed class SettingsMenuController : MonoBehaviour
     private GameUserSettingsRuntimeOptions runtimeOptions;
     private GameAudioSettingsPreviewSet audioPreviewSet;
     private Selectable restoreSelectionTarget;
-    private Coroutine stopPreviewCoroutine;
+    private SettingsMenuAudioPreviewStopController audioPreviewStopController;
     private bool suppressControlCallbacks;
     private bool wrapSettingsTabs;
     #endregion
@@ -197,8 +200,10 @@ public sealed class SettingsMenuController : MonoBehaviour
                                                       visualPointerToggle,
                                                       audioTabButton,
                                                       gameplayTabButton,
-                                                      confirmButton);
+                                                      confirmButton,
+                                                      devSectionController);
         GameAudioSettingsFmodRuntimeUtility.ConfigurePreviewFades(audioPreviewFadeInSeconds, audioPreviewFadeOutSeconds);
+        audioPreviewStopController = new SettingsMenuAudioPreviewStopController(this, audioPreviewStopDelaySeconds);
         RefreshRuntimeConfig();
         savedSettings = GameUserSettingsRuntimeUtility.LoadAndApply(in runtimeOptions);
         draftSettings = savedSettings;
@@ -237,10 +242,13 @@ public sealed class SettingsMenuController : MonoBehaviour
     private void OnDisable()
     {
         UnregisterCallbacks();
-        StopPreviewNow();
+        audioPreviewStopController?.StopNow();
 
         if (inputActionNavigation != null)
             inputActionNavigation.Deactivate();
+
+        if (devSectionController != null)
+            devSectionController.Deactivate();
     }
 
     /// <summary>
@@ -250,6 +258,8 @@ public sealed class SettingsMenuController : MonoBehaviour
     {
         if (inputActionNavigation != null)
             inputActionNavigation.Dispose();
+
+        audioPreviewStopController?.Dispose();
     }
     #endregion
 
@@ -269,6 +279,9 @@ public sealed class SettingsMenuController : MonoBehaviour
             panelRoot.SetActive(true);
 
         ApplyDraftToRuntime();
+        if (devSectionController != null)
+            devSectionController.Activate(navigationInputAsset);
+
         tabController.Show((int)SettingsPanel.Audio, false);
 
         Selectable defaultSelectable = tabController.ResolveDefault((int)SettingsPanel.Audio);
@@ -286,7 +299,10 @@ public sealed class SettingsMenuController : MonoBehaviour
                                                                      eventSystemOverride,
                                                                      navigationInputAsset,
                                                                      audioTabButton,
-                                                                     gameplayTabButton);
+                                                                     gameplayTabButton,
+                                                                     devSectionController != null
+                                                                         ? devSectionController.TabButton
+                                                                         : null);
         }
 
         if (!directNavigationActive)
@@ -316,6 +332,9 @@ public sealed class SettingsMenuController : MonoBehaviour
         if (gameplayTabButton != null)
             gameplayTabButton.onClick.AddListener(HandleGameplayTabPressed);
 
+        if (devSectionController != null && devSectionController.TabButton != null)
+            devSectionController.TabButton.onClick.AddListener(HandleDevTabPressed);
+
         if (confirmButton != null)
             confirmButton.onClick.AddListener(HandleConfirmPressed);
 
@@ -338,6 +357,9 @@ public sealed class SettingsMenuController : MonoBehaviour
 
         if (gameplayTabButton != null)
             gameplayTabButton.onClick.RemoveListener(HandleGameplayTabPressed);
+
+        if (devSectionController != null && devSectionController.TabButton != null)
+            devSectionController.TabButton.onClick.RemoveListener(HandleDevTabPressed);
 
         if (confirmButton != null)
             confirmButton.onClick.RemoveListener(HandleConfirmPressed);
@@ -430,6 +452,14 @@ public sealed class SettingsMenuController : MonoBehaviour
     }
 
     /// <summary>
+    /// Shows the Dev account and dashboard panel.
+    /// </summary>
+    private void HandleDevTabPressed()
+    {
+        tabController.Show((int)SettingsPanel.Dev, true);
+    }
+
+    /// <summary>
     /// Persists the current draft and closes the menu.
     /// </summary>
     private void HandleConfirmPressed()
@@ -464,7 +494,9 @@ public sealed class SettingsMenuController : MonoBehaviour
         draftSettings.MasterVolume = value;
         ApplyDraftToRuntime();
         RefreshValueLabels();
-        SettingsMenuAudioPreviewUtility.PlayMasterPreview(in audioPreviewSet, value, QueuePreviewStop);
+        SettingsMenuAudioPreviewUtility.PlayMasterPreview(in audioPreviewSet,
+                                                          value,
+                                                          audioPreviewStopController.Queue);
     }
 
     /// <summary>
@@ -479,7 +511,7 @@ public sealed class SettingsMenuController : MonoBehaviour
         draftSettings.SfxVolume = value;
         ApplyDraftToRuntime();
         RefreshValueLabels();
-        SettingsMenuAudioPreviewUtility.PlayPreview(audioPreviewSet.Sfx, value, QueuePreviewStop);
+        SettingsMenuAudioPreviewUtility.PlayPreview(audioPreviewSet.Sfx, value, audioPreviewStopController.Queue);
     }
 
     /// <summary>
@@ -494,7 +526,7 @@ public sealed class SettingsMenuController : MonoBehaviour
         draftSettings.MusicVolume = value;
         ApplyDraftToRuntime();
         RefreshValueLabels();
-        SettingsMenuAudioPreviewUtility.PlayPreview(audioPreviewSet.Music, value, QueuePreviewStop);
+        SettingsMenuAudioPreviewUtility.PlayPreview(audioPreviewSet.Music, value, audioPreviewStopController.Queue);
     }
 
     /// <summary>
@@ -637,55 +669,19 @@ public sealed class SettingsMenuController : MonoBehaviour
     }
     #endregion
 
-    #region Preview
-    /// <summary>
-    /// Queues a delayed stop so loop-capable preview events do not linger after slider movement stops.
-    /// </summary>
-    private void QueuePreviewStop()
-    {
-        if (stopPreviewCoroutine != null)
-            StopCoroutine(stopPreviewCoroutine);
-
-        stopPreviewCoroutine = StartCoroutine(StopPreviewAfterDelay());
-    }
-
-    /// <summary>
-    /// Stops the current settings-preview voice after the configured unscaled delay.
-    /// </summary>
-    /// <returns>Enumerator used by Unity coroutine scheduling.</returns>
-    private IEnumerator StopPreviewAfterDelay()
-    {
-        yield return new WaitForSecondsRealtime(Mathf.Max(0.05f, audioPreviewStopDelaySeconds));
-        stopPreviewCoroutine = null;
-        GameAudioSettingsFmodRuntimeUtility.StopPreviewEvent();
-    }
-
-    /// <summary>
-    /// Stops the current preview immediately, without fading, and clears pending delayed-stop work. Used when the menu
-    /// closes, where the fade tick can no longer run.
-    /// </summary>
-    private void StopPreviewNow()
-    {
-        if (stopPreviewCoroutine != null)
-        {
-            StopCoroutine(stopPreviewCoroutine);
-            stopPreviewCoroutine = null;
-        }
-
-        GameAudioSettingsFmodRuntimeUtility.StopPreviewImmediate();
-    }
-    #endregion
-
     #region Closing
     /// <summary>
     /// Hides the menu, stops preview audio and reports closure to the owning menu controller.
     /// </summary>
     private void CloseMenu()
     {
-        StopPreviewNow();
+        audioPreviewStopController?.StopNow();
 
         if (inputActionNavigation != null)
             inputActionNavigation.Deactivate();
+
+        if (devSectionController != null)
+            devSectionController.Deactivate();
 
         if (panelRoot != null)
             panelRoot.SetActive(false);
