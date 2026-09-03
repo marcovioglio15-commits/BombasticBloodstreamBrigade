@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{6b3744b7-b998-4e19-b223-4e43152f252c}">
 		<property name="color">
-			<value>Red</value>
+			<value>Green</value>
 		</property>
 		<property name="name">
 			<value>NASH_SfxMISC_SFX_BulletImpact</value>
@@ -109,6 +109,9 @@
 	<object class="MultiSound" id="{1583f554-0db6-4a32-a569-cdd4b21625eb}">
 		<property name="pitch">
 			<value>2</value>
+		</property>
+		<property name="playlistMode">
+			<value>1</value>
 		</property>
 		<relationship name="modulators">
 			<destination>{1d332ae5-1ad4-43de-a32a-78b8f1c12ea5}</destination>
