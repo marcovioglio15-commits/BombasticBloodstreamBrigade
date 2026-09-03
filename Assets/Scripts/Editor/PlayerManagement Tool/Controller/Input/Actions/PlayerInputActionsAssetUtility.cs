@@ -79,6 +79,7 @@ public static class PlayerInputActionsAssetUtility
         changed |= EnsureAction(uiMap, "SettingsNextTab", InputActionType.Button, "Button", AddDefaultSettingsNextTabBindings);
         changed |= EnsureAction(uiMap, "SettingsNavigateVertical", InputActionType.PassThrough, "Axis", AddDefaultSettingsVerticalBindings);
         changed |= EnsureAction(uiMap, "SettingsNavigateHorizontal", InputActionType.PassThrough, "Axis", AddDefaultSettingsHorizontalBindings);
+        changed |= EnsureAction(uiMap, "RevealDevActions", InputActionType.Button, "Button", AddDefaultRevealDevActionsBindings);
 
         if (changed)
             PersistAssetChanges(asset);
@@ -475,6 +476,21 @@ public static class PlayerInputActionsAssetUtility
             .With("Positive", "<Keyboard>/d");
     }
 
+    /// <summary>
+    /// Adds the default configurable chord that reveals developer authentication controls in the Settings Dev tab.
+    /// </summary>
+    /// <param name="action">Button action receiving the default keyboard chord.</param>
+    private static void AddDefaultRevealDevActionsBindings(InputAction action)
+    {
+        if (action == null)
+            return;
+
+        action.AddCompositeBinding("ButtonWithTwoModifiers")
+            .With("Modifier1", "<Keyboard>/leftCtrl")
+            .With("Modifier2", "<Keyboard>/leftShift")
+            .With("Button", "<Keyboard>/f10");
+    }
+
 
 
 
@@ -549,6 +565,8 @@ public static class PlayerInputActionsAssetUtility
         AddDefaultSettingsVerticalBindings(settingsNavigateVertical);
         InputAction settingsNavigateHorizontal = uiMap.AddAction("SettingsNavigateHorizontal", InputActionType.PassThrough, null, null, null, null, "Axis");
         AddDefaultSettingsHorizontalBindings(settingsNavigateHorizontal);
+        InputAction revealDevActions = uiMap.AddAction("RevealDevActions", InputActionType.Button, null, null, null, null, "Button");
+        AddDefaultRevealDevActionsBindings(revealDevActions);
         asset.AddActionMap(uiMap);
 
         return asset;

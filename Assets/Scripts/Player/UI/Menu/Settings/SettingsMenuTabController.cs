@@ -3,14 +3,14 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 /// <summary>
-/// Controls the two authored Settings macro panels and their deterministic initial selections.
+/// Controls the authored Settings macro panels and excludes the Dev panel when data collection is disabled.
 /// </summary>
 internal sealed class SettingsMenuTabController
 {
     #region Constants
     private const int AudioPanelIndex = 0;
     private const int GameplayPanelIndex = 1;
-    private const int PanelCount = 2;
+    private const int DevPanelIndex = 2;
     #endregion
 
     #region Fields
@@ -22,6 +22,7 @@ internal sealed class SettingsMenuTabController
     private readonly Button audioTabButton;
     private readonly Button gameplayTabButton;
     private readonly Button confirmButton;
+    private readonly SettingsDevSectionController devSectionController;
     private int activePanelIndex;
     #endregion
 
@@ -37,6 +38,7 @@ internal sealed class SettingsMenuTabController
     /// <param name="audioTabButtonValue">Audio tab fallback.</param>
     /// <param name="gameplayTabButtonValue">Gameplay tab fallback.</param>
     /// <param name="confirmButtonValue">Shared final fallback.</param>
+    /// <param name="devSectionControllerValue">Authored Dev tab and panel controller.</param>
     public SettingsMenuTabController(GameObject audioPanelRootValue,
                                      GameObject gameplayPanelRootValue,
                                      EventSystem eventSystemOverrideValue,
@@ -44,7 +46,8 @@ internal sealed class SettingsMenuTabController
                                      Toggle visualPointerToggleValue,
                                      Button audioTabButtonValue,
                                      Button gameplayTabButtonValue,
-                                     Button confirmButtonValue)
+                                     Button confirmButtonValue,
+                                     SettingsDevSectionController devSectionControllerValue)
     {
         audioPanelRoot = audioPanelRootValue;
         gameplayPanelRoot = gameplayPanelRootValue;
@@ -54,6 +57,7 @@ internal sealed class SettingsMenuTabController
         audioTabButton = audioTabButtonValue;
         gameplayTabButton = gameplayTabButtonValue;
         confirmButton = confirmButtonValue;
+        devSectionController = devSectionControllerValue;
     }
     #endregion
 
@@ -67,13 +71,20 @@ internal sealed class SettingsMenuTabController
     /// <param name="focusFirstControl">True to update EventSystem selection.</param>
     public void Show(int panelIndex, bool focusFirstControl)
     {
-        activePanelIndex = Mathf.Clamp(panelIndex, AudioPanelIndex, GameplayPanelIndex);
+        activePanelIndex = Mathf.Clamp(panelIndex, AudioPanelIndex, ResolvePanelCount() - 1);
 
         if (audioPanelRoot != null)
             audioPanelRoot.SetActive(activePanelIndex == AudioPanelIndex);
 
         if (gameplayPanelRoot != null)
             gameplayPanelRoot.SetActive(activePanelIndex == GameplayPanelIndex);
+
+        if (devSectionController != null && devSectionController.PanelRoot != null)
+            devSectionController.PanelRoot.SetActive(devSectionController.IsAvailable &&
+                                                     activePanelIndex == DevPanelIndex);
+
+        if (activePanelIndex == DevPanelIndex && devSectionController != null)
+            devSectionController.RefreshPresentation();
 
         if (focusFirstControl)
             SettingsMenuControllerUiUtility.SelectSelectable(eventSystemOverride, ResolveDefault(activePanelIndex));
@@ -91,7 +102,7 @@ internal sealed class SettingsMenuTabController
 
         int targetIndex = SettingsMenuControllerUiUtility.ResolveAdjacentTabIndex(activePanelIndex,
                                                                                   direction,
-                                                                                  PanelCount,
+                                                                                  ResolvePanelCount(),
                                                                                   wrap);
 
         if (targetIndex != activePanelIndex)
@@ -105,12 +116,30 @@ internal sealed class SettingsMenuTabController
     /// <returns>First available control with tab and confirmation fallbacks.</returns>
     public Selectable ResolveDefault(int panelIndex)
     {
+        if (panelIndex == DevPanelIndex && devSectionController != null)
+            return devSectionController.DefaultSelectable != null
+                ? devSectionController.DefaultSelectable
+                : confirmButton;
+
         return SettingsMenuControllerUiUtility.ResolvePanelDefault(panelIndex == GameplayPanelIndex,
                                                                    masterVolumeSlider,
                                                                    visualPointerToggle,
                                                                    audioTabButton,
                                                                    gameplayTabButton,
                                                                    confirmButton);
+    }
+    #endregion
+
+    #region Helpers
+    /// <summary>
+    /// Resolves the active authored tab count without exposing the disabled Dev destination.
+    /// </summary>
+    /// <returns>Two standard tabs, plus the Dev tab only while data collection is available.</returns>
+    private int ResolvePanelCount()
+    {
+        return devSectionController != null && devSectionController.IsAvailable
+            ? DevPanelIndex + 1
+            : GameplayPanelIndex + 1;
     }
     #endregion
 

@@ -24,6 +24,7 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
     private Selectable[] navigationCandidates;
     private Selectable audioTabButton;
     private Selectable gameplayTabButton;
+    private Selectable devTabButton;
     private InputAction previousTabAction;
     private InputAction nextTabAction;
     private InputAction verticalAction;
@@ -75,6 +76,7 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
     /// <param name="authoredInputAsset">Shared project Input Action asset available before player runtime initialization.</param>
     /// <param name="audioTabButtonValue">Audio macro-tab button excluded from ordinary content navigation.</param>
     /// <param name="gameplayTabButtonValue">Gameplay macro-tab button excluded from ordinary content navigation.</param>
+    /// <param name="devTabButtonValue">Dev macro-tab button excluded from ordinary content navigation.</param>
     /// <returns>True when at least one configured action was resolved and direct navigation is active.</returns>
     public bool Activate(in GameHudSettingsNavigationRuntimeConfig config,
                          GameObject root,
@@ -82,7 +84,8 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
                          EventSystem eventSystemOverride,
                          InputActionAsset authoredInputAsset,
                          Selectable audioTabButtonValue,
-                         Selectable gameplayTabButtonValue)
+                         Selectable gameplayTabButtonValue,
+                         Selectable devTabButtonValue)
     {
         Deactivate();
 
@@ -94,6 +97,7 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
         navigationCandidates = root != null ? root.GetComponentsInChildren<Selectable>(true) : null;
         audioTabButton = audioTabButtonValue;
         gameplayTabButton = gameplayTabButtonValue;
+        devTabButton = devTabButtonValue;
         eventSystem = eventSystemOverride != null ? eventSystemOverride : EventSystem.current;
         inputModule = eventSystem != null ? eventSystem.GetComponent<InputSystemUIInputModule>() : null;
         inputDeadzone = Mathf.Clamp(config.InputDeadzone, 0.05f, 1f);
@@ -159,6 +163,7 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
         navigationCandidates = null;
         audioTabButton = null;
         gameplayTabButton = null;
+        devTabButton = null;
         verticalRepeatState = default;
         horizontalRepeatState = default;
         active = false;
@@ -228,6 +233,7 @@ internal sealed class SettingsMenuInputActionNavigationController : IDisposable
                                                        navigationCandidates,
                                                        audioTabButton,
                                                        gameplayTabButton,
+                                                       devTabButton,
                                                        includeDropdownHeaders,
                                                        direction);
     }

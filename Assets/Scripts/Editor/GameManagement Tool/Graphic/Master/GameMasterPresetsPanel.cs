@@ -441,6 +441,14 @@ public sealed class GameMasterPresetsPanel
     }
 
     /// <summary>
+    /// Creates a new Data Collection Manager preset and assigns it to the selected master preset.
+    /// </summary>
+    internal void CreateDataCollectionManagerPreset()
+    {
+        GameMasterPresetsPanelSectionsUtility.CreateDataCollectionManagerPreset(this);
+    }
+
+    /// <summary>
     /// Creates a new HUD Manager preset and assigns it to the selected master preset.
     /// </summary>
     internal void CreateHudManagerPreset()

@@ -49,3 +49,22 @@ MonoBehaviour:
     navigateDeadzone: 0.5
     repeatDelaySeconds: 0.32
     repeatIntervalSeconds: 0.11
+  dataCollectionSettings:
+    collectInEditor: 0
+    environment: 0
+    serviceBaseUrl: https://YOUR_ACCOUNT.alwaysdata.net/api/v1
+    requestTimeoutSeconds: 10
+    maximumPayloadBytes: 131072
+    schemaVersion: 1.0.0
+    consentPolicyVersion: 1.0
+    revealDevActionsActionId: b1a55933-cba6-4f6c-b2e6-20558f7dffb8
+    dashboardPageSize: 20
+    performanceSampleIntervalSeconds: 1
+    renderingSampleIntervalSeconds: 2
+    uploadIntervalSeconds: 15
+    maximumEventsPerBatch: 50
+    maximumPendingEvents: 1000
+    persistPendingEvents: 1
+    pendingEventRetentionDays: 7
+    initialRetryDelaySeconds: 2
+    maximumRetryDelaySeconds: 60

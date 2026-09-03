@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Unity.Entities;
-using Unity.Mathematics;
 using UnityEngine;
 
 /// <summary>
-/// Scene authoring component that bakes selected Audio, Settings and HUD Manager presets into ECS singletons.
+/// Resolves Audio, Settings, Data Collection, and HUD Manager presets for baking or persistent regular-scene bootstrap.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class GameAudioManagerAuthoring : MonoBehaviour
@@ -22,8 +21,20 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
     [Tooltip("Direct Settings Manager preset fallback used when Master Preset is missing or has no Settings Manager assigned.")]
     [SerializeField] private GameSettingsManagerPreset settingsManagerPreset;
 
+    [Tooltip("Direct Data Collection Manager fallback used when Master Preset has no global data-collection preset assigned.")]
+    [SerializeField]
+    private GameDataCollectionManagerPreset dataCollectionManagerPreset;
+
     [Tooltip("Direct HUD Manager preset fallback used when Master Preset is missing or has no HUD Manager assigned.")]
     [SerializeField] private GameHudManagerPreset hudManagerPreset;
+
+    [Header("Runtime Bootstrap")]
+    [Tooltip("Creates the persistent manager ECS singleton when this component lives in the regular Bootstrap scene instead of a SubScene.")]
+    [SerializeField] private bool createRuntimeSingletonWhenNotBaked = true;
+    #endregion
+
+    #region Runtime
+    private bool runtimeSingletonCreated;
     #endregion
 
     #endregion
@@ -53,11 +64,27 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
         }
     }
 
+    public GameDataCollectionManagerPreset DataCollectionManagerPreset
+    {
+        get
+        {
+            return dataCollectionManagerPreset;
+        }
+    }
+
     public GameHudManagerPreset HudManagerPreset
     {
         get
         {
             return hudManagerPreset;
+        }
+    }
+
+    public bool CreateRuntimeSingletonWhenNotBaked
+    {
+        get
+        {
+            return createRuntimeSingletonWhenNotBaked;
         }
     }
     #endregion
@@ -90,6 +117,32 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
     }
 
     /// <summary>
+    /// Resolves the effective Data Collection Manager preset used as the global feature gate.
+    /// </summary>
+    /// <returns>Data Collection Manager preset from MasterPreset or direct fallback.</returns>
+    public GameDataCollectionManagerPreset ResolveDataCollectionManagerPreset()
+    {
+        if (masterPreset != null && masterPreset.DataCollectionManagerPreset != null)
+            return masterPreset.DataCollectionManagerPreset;
+
+        return dataCollectionManagerPreset;
+    }
+
+    /// <summary>
+    /// Reports whether the global switch is enabled and the required technical settings exist.
+    /// </summary>
+    /// <returns>True only when the feature is enabled and has a complete settings source.</returns>
+    public bool IsDataCollectionAvailable()
+    {
+        GameDataCollectionManagerPreset dataPreset = ResolveDataCollectionManagerPreset();
+        GameSettingsManagerPreset settingsPreset = ResolveSettingsManagerPreset();
+        return dataPreset != null &&
+               dataPreset.DataCollectionEnabled &&
+               settingsPreset != null &&
+               settingsPreset.DataCollectionSettings != null;
+    }
+
+    /// <summary>
     /// Resolves the effective HUD Manager preset used by baking.
     /// </summary>
     /// <returns>HUD Manager preset from MasterPreset or direct fallback.</returns>
@@ -102,6 +155,19 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
     }
     #endregion
 
+    #region Unity Methods
+    /// <summary>
+    /// Creates the persistent manager singleton for the regular Bootstrap scene before additive menus are loaded.
+    /// </summary>
+    private void Start()
+    {
+        if (!Application.isPlaying || !createRuntimeSingletonWhenNotBaked || runtimeSingletonCreated)
+            return;
+
+        runtimeSingletonCreated = GameAudioManagerRuntimeBootstrapUtility.TryCreate(this);
+    }
+    #endregion
+
     #endregion
 }
 
@@ -110,15 +176,6 @@ public sealed class GameAudioManagerAuthoring : MonoBehaviour
 /// </summary>
 public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAuthoring>
 {
-    #region Constants
-    private const string DefaultMasterBusPath = "bus:/";
-    private const string DefaultSfxBusPath = "bus:/SFX";
-    private const string DefaultMusicBusPath = "bus:/Music";
-    private const int DefaultWindowedWidth = 1280;
-    private const int DefaultWindowedHeight = 720;
-    private const int DefaultFrameRateLimit = 60;
-    #endregion
-
     #region Methods
 
     #region Bake
@@ -134,10 +191,11 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         DeclarePresetDependencies(authoring);
         GameAudioManagerPreset audioPreset = authoring.ResolveAudioManagerPreset();
         GameSettingsManagerPreset settingsPreset = authoring.ResolveSettingsManagerPreset();
+        GameDataCollectionManagerPreset dataPreset = authoring.ResolveDataCollectionManagerPreset();
         GameHudManagerPreset hudPreset = authoring.ResolveHudManagerPreset();
 
         Entity entity = GetEntity(TransformUsageFlags.None);
-        AddComponent(entity, BuildSettingsRuntimeConfig(settingsPreset));
+        AddComponent(entity, GameAudioManagerPresetBakeUtility.BuildSettingsRuntimeConfig(settingsPreset));
         AddComponent(entity, GameHudManagerPresetBakeUtility.BuildConfig(hudPreset));
         GameHudPowerUpSummarySettings summarySettings = hudPreset != null ? hudPreset.PowerUpSummarySettings : null;
         AddComponent(entity, GameHudSupplementalPresetBakeUtility.BuildSummaryConfig(summarySettings));
@@ -155,13 +213,28 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         if (audioPreset == null)
             return;
 
-        AddComponent(entity, BuildRuntimeConfig(audioPreset));
+        AddComponent(entity, GameAudioManagerPresetBakeUtility.BuildAudioRuntimeConfig(audioPreset));
         DynamicBuffer<GameAudioEventBindingElement> bindingBuffer = AddBuffer<GameAudioEventBindingElement>(entity);
         DynamicBuffer<GameAudioEventRequest> requestBuffer = AddBuffer<GameAudioEventRequest>(entity);
         DynamicBuffer<GameAudioRateLimitStateElement> rateLimitStateBuffer = AddBuffer<GameAudioRateLimitStateElement>(entity);
-        PopulateBindingBuffer(audioPreset, bindingBuffer);
+        GameAudioManagerPresetBakeUtility.PopulateBindingBuffer(audioPreset, bindingBuffer);
         requestBuffer.Clear();
         rateLimitStateBuffer.Clear();
+
+        if (!authoring.IsDataCollectionAvailable())
+            return;
+
+        // Keep variable-size telemetry storage away from the already dense manager archetype.
+        Entity telemetryEntity = CreateAdditionalEntity(TransformUsageFlags.None,
+                                                        false,
+                                                        "Game Data Collection");
+        AddComponent(telemetryEntity,
+                     GameAudioManagerPresetBakeUtility.BuildDataCollectionRuntimeConfig(settingsPreset,
+                                                                                         dataPreset));
+        AddComponent(telemetryEntity, new GameDataCollectionSessionState());
+        AddComponent(telemetryEntity, new GameTelemetrySamplingState());
+        AddComponent(telemetryEntity, new GameTelemetryProgressionObservationState());
+        AddBuffer<GameTelemetryEvent>(telemetryEntity);
     }
     #endregion
 
@@ -182,6 +255,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
             if (authoring.MasterPreset.SettingsManagerPreset != null)
                 DependsOn(authoring.MasterPreset.SettingsManagerPreset);
 
+            if (authoring.MasterPreset.DataCollectionManagerPreset != null)
+                DependsOn(authoring.MasterPreset.DataCollectionManagerPreset);
+
             if (authoring.MasterPreset.HudManagerPreset != null)
             {
                 DependsOn(authoring.MasterPreset.HudManagerPreset);
@@ -194,6 +270,9 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
 
         if (authoring.SettingsManagerPreset != null)
             DependsOn(authoring.SettingsManagerPreset);
+
+        if (authoring.DataCollectionManagerPreset != null)
+            DependsOn(authoring.DataCollectionManagerPreset);
 
         if (authoring.HudManagerPreset != null)
         {
@@ -246,220 +325,6 @@ public sealed class GameAudioManagerAuthoringBaker : Baker<GameAudioManagerAutho
         }
     }
 
-    /// <summary>
-    /// Builds the runtime singleton config from playback settings.
-    /// </summary>
-    /// <param name="preset">Source audio preset.</param>
-    /// <returns>Baked runtime config component.</returns>
-    private static GameAudioRuntimeConfig BuildRuntimeConfig(GameAudioManagerPreset preset)
-    {
-        GameAudioPlaybackSettings playbackSettings = preset.PlaybackSettings;
-        GameAudioRoutingSettings routingSettings = preset.RoutingSettings;
-        GameAudioBackgroundMusicSettings backgroundMusicSettings = preset.BackgroundMusicSettings;
-
-        if (playbackSettings == null)
-        {
-            return new GameAudioRuntimeConfig
-            {
-                Enabled = 0,
-                LogMissingEventPaths = 1,
-                BackgroundMusicEnabled = 0,
-                BackgroundMusicAutoStart = 0,
-                BackgroundMusicRestartWhenPathChanges = 0,
-                BackgroundMusicStopWhenDisabled = 1,
-                BackgroundMusicEventPath = default,
-                BackgroundMusicBankName = default,
-                MasterVolume = 0f,
-                BackgroundMusicVolume = 0f,
-                DefaultMinimumDistance = 8f,
-                DefaultMaximumDistance = 45f
-            };
-        }
-
-        float musicRoutingVolume = routingSettings != null ? math.max(0f, routingSettings.MusicVolume) : 1f;
-        string backgroundMusicPath = backgroundMusicSettings != null ? backgroundMusicSettings.EventPath : string.Empty;
-        string backgroundMusicBankName = backgroundMusicSettings != null ? backgroundMusicSettings.BankName : string.Empty;
-        float backgroundMusicVolume = backgroundMusicSettings != null ? math.max(0f, backgroundMusicSettings.Volume) * musicRoutingVolume : 0f;
-
-        return new GameAudioRuntimeConfig
-        {
-            Enabled = playbackSettings.Enabled ? (byte)1 : (byte)0,
-            LogMissingEventPaths = playbackSettings.LogMissingEventPaths ? (byte)1 : (byte)0,
-            BackgroundMusicEnabled = backgroundMusicSettings != null && backgroundMusicSettings.Enabled ? (byte)1 : (byte)0,
-            BackgroundMusicAutoStart = backgroundMusicSettings != null && backgroundMusicSettings.AutoStart ? (byte)1 : (byte)0,
-            BackgroundMusicRestartWhenPathChanges = backgroundMusicSettings != null && backgroundMusicSettings.RestartWhenPathChanges ? (byte)1 : (byte)0,
-            BackgroundMusicStopWhenDisabled = backgroundMusicSettings == null || backgroundMusicSettings.StopWhenDisabled ? (byte)1 : (byte)0,
-            BackgroundMusicEventPath = new Unity.Collections.FixedString512Bytes(backgroundMusicPath ?? string.Empty),
-            BackgroundMusicBankName = new Unity.Collections.FixedString64Bytes(backgroundMusicBankName ?? string.Empty),
-            MasterVolume = math.max(0f, playbackSettings.MasterVolume),
-            BackgroundMusicVolume = backgroundMusicVolume,
-            DefaultMinimumDistance = math.max(0f, playbackSettings.DefaultMinimumDistance),
-            DefaultMaximumDistance = math.max(playbackSettings.DefaultMinimumDistance, playbackSettings.DefaultMaximumDistance)
-        };
-    }
-
-    /// <summary>
-    /// Builds the runtime Settings singleton from Settings Manager defaults.
-    /// </summary>
-    /// <param name="preset">Source Settings Manager preset, or null to bake project defaults.</param>
-    /// <returns>Baked Settings runtime config component.</returns>
-    private static GameSettingsRuntimeConfig BuildSettingsRuntimeConfig(GameSettingsManagerPreset preset)
-    {
-        GameSettingsManagerAudioSettings audioSettings = preset != null ? preset.AudioSettings : null;
-        GameSettingsManagerExperienceSettings experienceSettings = preset != null ? preset.ExperienceSettings : null;
-        GameSettingsManagerControllerNavigationSettings navigationSettings = preset != null ? preset.ControllerNavigationSettings : null;
-        GameSettingsManagerPreviewEventSettings masterPreview = audioSettings != null && audioSettings.MasterVolumePreview != null
-            ? audioSettings.MasterVolumePreview
-            : GameSettingsManagerPreviewEventSettings.CreateSfxDefault();
-        GameSettingsManagerPreviewEventSettings sfxPreview = audioSettings != null && audioSettings.SfxVolumePreview != null
-            ? audioSettings.SfxVolumePreview
-            : GameSettingsManagerPreviewEventSettings.CreateSfxDefault();
-        GameSettingsManagerPreviewEventSettings musicPreview = audioSettings != null && audioSettings.MusicVolumePreview != null
-            ? audioSettings.MusicVolumePreview
-            : GameSettingsManagerPreviewEventSettings.CreateMusicDefault();
-
-        return new GameSettingsRuntimeConfig
-        {
-            MasterBusPath = new Unity.Collections.FixedString128Bytes(ResolveString(audioSettings != null ? audioSettings.MasterBusPath : null, DefaultMasterBusPath)),
-            SfxBusPath = new Unity.Collections.FixedString128Bytes(ResolveString(audioSettings != null ? audioSettings.SfxBusPath : null, DefaultSfxBusPath)),
-            MusicBusPath = new Unity.Collections.FixedString128Bytes(ResolveString(audioSettings != null ? audioSettings.MusicBusPath : null, DefaultMusicBusPath)),
-            MasterPreviewEventPath = new Unity.Collections.FixedString512Bytes(ResolvePreviewEventPath(masterPreview)),
-            MasterPreviewBankName = new Unity.Collections.FixedString64Bytes(ResolvePreviewBankName(masterPreview)),
-            SfxPreviewEventPath = new Unity.Collections.FixedString512Bytes(ResolvePreviewEventPath(sfxPreview)),
-            SfxPreviewBankName = new Unity.Collections.FixedString64Bytes(ResolvePreviewBankName(sfxPreview)),
-            MusicPreviewEventPath = new Unity.Collections.FixedString512Bytes(ResolvePreviewEventPath(musicPreview)),
-            MusicPreviewBankName = new Unity.Collections.FixedString64Bytes(ResolvePreviewBankName(musicPreview)),
-            MasterPreviewPlaysAllOthers = audioSettings != null && audioSettings.MasterPlaysAllPreviews ? (byte)1 : (byte)0,
-            DefaultMasterVolume = math.clamp(audioSettings != null ? audioSettings.DefaultMasterVolume : 1f, 0f, 1f),
-            DefaultSfxVolume = math.clamp(audioSettings != null ? audioSettings.DefaultSfxVolume : 1f, 0f, 1f),
-            DefaultMusicVolume = math.clamp(audioSettings != null ? audioSettings.DefaultMusicVolume : 1f, 0f, 1f),
-            DefaultVisualPointerEnabled = experienceSettings == null || experienceSettings.DefaultVisualPointerEnabled ? (byte)1 : (byte)0,
-            DefaultFullscreenEnabled = experienceSettings == null || experienceSettings.DefaultFullscreenEnabled ? (byte)1 : (byte)0,
-            DefaultFrameRateLimit = ResolveFrameRateLimit(experienceSettings != null ? (int)experienceSettings.DefaultFrameRateLimit : DefaultFrameRateLimit),
-            DefaultDamageRumbleMultiplier = math.clamp(experienceSettings != null ? experienceSettings.DefaultDamageRumbleMultiplier : 1f, 0f, 2f),
-            DefaultFireRumbleMultiplier = math.clamp(experienceSettings != null ? experienceSettings.DefaultFireRumbleMultiplier : 1f, 0f, 2f),
-            WindowedWidth = experienceSettings != null ? math.max(1, experienceSettings.WindowedWidth) : DefaultWindowedWidth,
-            WindowedHeight = experienceSettings != null ? math.max(1, experienceSettings.WindowedHeight) : DefaultWindowedHeight,
-            GamepadNavigationMode = navigationSettings != null ? navigationSettings.GamepadNavigationMode : RuntimeMenuGamepadNavigationMode.Hybrid,
-            NavigateActionName = new Unity.Collections.FixedString64Bytes(ResolveString(navigationSettings != null ? navigationSettings.NavigateActionName : null, GameSettingsManagerControllerNavigationSettings.DefaultNavigateActionName)),
-            SubmitActionName = new Unity.Collections.FixedString64Bytes(ResolveString(navigationSettings != null ? navigationSettings.SubmitActionName : null, GameSettingsManagerControllerNavigationSettings.DefaultSubmitActionName)),
-            CancelActionName = new Unity.Collections.FixedString64Bytes(ResolveString(navigationSettings != null ? navigationSettings.CancelActionName : null, GameSettingsManagerControllerNavigationSettings.DefaultCancelActionName)),
-            NavigateDeadzone = math.clamp(navigationSettings != null ? navigationSettings.NavigateDeadzone : GameSettingsManagerControllerNavigationSettings.DefaultNavigateDeadzone, 0f, 1f),
-            NavigationRepeatDelaySeconds = math.max(0f, navigationSettings != null ? navigationSettings.RepeatDelaySeconds : GameSettingsManagerControllerNavigationSettings.DefaultRepeatDelaySeconds),
-            NavigationRepeatIntervalSeconds = math.max(0.01f, navigationSettings != null ? navigationSettings.RepeatIntervalSeconds : GameSettingsManagerControllerNavigationSettings.DefaultRepeatIntervalSeconds)
-        };
-    }
-
-    /// <summary>
-    /// Resolves a supported target frame-rate value for baked runtime settings.
-    /// </summary>
-    /// <param name="frameRateLimit">Authored frame-rate limit.</param>
-    /// <returns>Supported target frame rate in frames per second.</returns>
-    private static int ResolveFrameRateLimit(int frameRateLimit)
-    {
-        switch (frameRateLimit)
-        {
-            case 60:
-            case 120:
-            case 180:
-                return frameRateLimit;
-            default:
-                return DefaultFrameRateLimit;
-        }
-    }
-
-    /// <summary>
-    /// Resolves one authored string with a fallback used only for runtime bake output.
-    /// </summary>
-    /// <param name="value">Authored string value.</param>
-    /// <param name="fallback">Fallback used when value is empty.</param>
-    /// <returns>Resolved string value.</returns>
-    private static string ResolveString(string value, string fallback)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return fallback;
-
-        return value.Trim();
-    }
-
-    /// <summary>
-    /// Resolves one Settings menu preview event path for ECS bake output.
-    /// </summary>
-    /// <param name="preview">Preview event settings from the Settings Manager preset.</param>
-    /// <returns>Preview FMOD event path or an empty string.</returns>
-    private static string ResolvePreviewEventPath(GameSettingsManagerPreviewEventSettings preview)
-    {
-        if (preview == null || string.IsNullOrWhiteSpace(preview.EventPath))
-            return string.Empty;
-
-        return preview.EventPath.Trim();
-    }
-
-    /// <summary>
-    /// Resolves one Settings menu preview bank name for ECS bake output.
-    /// </summary>
-    /// <param name="preview">Preview event settings from the Settings Manager preset.</param>
-    /// <returns>Preview FMOD bank name or an empty string.</returns>
-    private static string ResolvePreviewBankName(GameSettingsManagerPreviewEventSettings preview)
-    {
-        if (preview == null || string.IsNullOrWhiteSpace(preview.BankName))
-            return string.Empty;
-
-        return preview.BankName.Trim();
-    }
-
-    /// <summary>
-    /// Populates the baked binding buffer while skipping null or None bindings.
-    /// </summary>
-    /// <param name="preset">Source audio preset.</param>
-    /// <param name="bindingBuffer">Output buffer on the audio singleton.</param>
-    private static void PopulateBindingBuffer(GameAudioManagerPreset preset, DynamicBuffer<GameAudioEventBindingElement> bindingBuffer)
-    {
-        bindingBuffer.Clear();
-        System.Collections.Generic.IReadOnlyList<GameAudioEventBinding> eventBindings = preset.EventBindings;
-
-        if (eventBindings == null)
-            return;
-
-        for (int index = 0; index < eventBindings.Count; index++)
-        {
-            GameAudioEventBinding binding = eventBindings[index];
-
-            if (binding == null)
-                continue;
-
-            if (binding.EventId == GameAudioEventId.None)
-                continue;
-
-            bindingBuffer.Add(BuildBindingElement(binding));
-        }
-    }
-
-    /// <summary>
-    /// Converts one ScriptableObject binding into an ECS buffer element.
-    /// </summary>
-    /// <param name="binding">Source event binding.</param>
-    /// <returns>Baked buffer element.</returns>
-    private static GameAudioEventBindingElement BuildBindingElement(GameAudioEventBinding binding)
-    {
-        GameAudioRateLimitSettings rateLimit = binding.RateLimit;
-
-        return new GameAudioEventBindingElement
-        {
-            EventId = binding.EventId,
-            EventCode = new Unity.Collections.FixedString64Bytes(binding.EventCode ?? string.Empty),
-            EventPath = new Unity.Collections.FixedString512Bytes(binding.EventPath ?? string.Empty),
-            Volume = math.max(0f, binding.Volume),
-            Pitch = math.max(0.0001f, binding.Pitch),
-            Spatialize = binding.Spatialize ? (byte)1 : (byte)0,
-            MinimumDistance = math.max(0f, binding.MinimumDistance),
-            MaximumDistance = math.max(binding.MinimumDistance, binding.MaximumDistance),
-            SingleInstance = binding.SingleInstance ? (byte)1 : (byte)0,
-            RateLimitEnabled = rateLimit != null && rateLimit.Enabled ? (byte)1 : (byte)0,
-            MaxPlaysPerWindow = rateLimit != null ? math.max(0, rateLimit.MaxPlaysPerWindow) : 0,
-            WindowSeconds = rateLimit != null ? math.max(0f, rateLimit.WindowSeconds) : 0f
-        };
-    }
     #endregion
 
     #endregion

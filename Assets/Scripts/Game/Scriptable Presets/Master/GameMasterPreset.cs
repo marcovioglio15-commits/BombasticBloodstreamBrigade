@@ -30,6 +30,10 @@ public sealed class GameMasterPreset : ScriptableObject
     [Tooltip("Settings manager preset used to configure runtime Settings menu defaults and preview behavior.")]
     [SerializeField] private GameSettingsManagerPreset settingsManagerPreset;
 
+    [Tooltip("Data Collection Manager preset containing the global switch for telemetry, database access, and the Settings Dev tab.")]
+    [SerializeField]
+    private GameDataCollectionManagerPreset dataCollectionManagerPreset;
+
     [Tooltip("HUD manager preset used to configure gameplay HUD runtime behavior that is not a scene reference.")]
     [SerializeField] private GameHudManagerPreset hudManagerPreset;
 
@@ -101,6 +105,14 @@ public sealed class GameMasterPreset : ScriptableObject
         get
         {
             return settingsManagerPreset;
+        }
+    }
+
+    public GameDataCollectionManagerPreset DataCollectionManagerPreset
+    {
+        get
+        {
+            return dataCollectionManagerPreset;
         }
     }
 

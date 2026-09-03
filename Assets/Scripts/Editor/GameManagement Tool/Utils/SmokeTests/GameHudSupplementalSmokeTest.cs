@@ -47,6 +47,7 @@ public static class GameHudSupplementalSmokeTest
                 "Default HUD preset does not contain Wave Clear Announcement settings.");
         ValidatePreset(hudPreset);
         GameHudWaveClearAnnouncementSmokeTestUtility.ValidateAudioBindings();
+        ValidateMenuAudioPreset();
         ValidateInputActions(hudPreset);
         ValidateBakeAndRuntime(hudPreset);
         ValidateExperienceDropSystemOrdering();
@@ -158,7 +159,48 @@ public static class GameHudSupplementalSmokeTest
 
     #region Authored UI
     /// <summary>
-    /// Verifies the persistent bootstrap authoring resolves the HUD preset that supplies profiles to every menu scene.
+    /// Verifies the default Audio Manager preset exposes one configured global binding for each menu interaction.
+    /// </summary>
+    private static void ValidateMenuAudioPreset()
+    {
+        GameAudioManagerPreset audioPreset = AssetDatabase.LoadAssetAtPath<GameAudioManagerPreset>(
+            "Assets/Scriptable Objects/Game/Audio/GameAudioManagerPreset.asset");
+        Require(audioPreset != null, "Default Audio Manager preset is missing.");
+        ValidateMenuAudioBinding(audioPreset, GameAudioEventId.MenuButtonHover);
+        ValidateMenuAudioBinding(audioPreset, GameAudioEventId.MenuButtonSelect);
+        GameMenuAudioRuntimeSmokeTestUtility.Validate(audioPreset);
+    }
+
+    /// <summary>
+    /// Verifies one menu event owns a catalog definition and exactly one non-spatial configured binding.
+    /// </summary>
+    /// <param name="audioPreset">Default Audio Manager preset containing menu bindings.</param>
+    /// <param name="eventId">Menu event identifier to validate.</param>
+    private static void ValidateMenuAudioBinding(GameAudioManagerPreset audioPreset, GameAudioEventId eventId)
+    {
+        Require(GameAudioDefaultEventDefinitions.TryGetDefinition(eventId, out GameAudioDefaultEventDefinition definition),
+                eventId + " is missing from the default Audio Manager event catalog.");
+        int matchingBindings = 0;
+
+        for (int bindingIndex = 0; bindingIndex < audioPreset.EventBindings.Count; bindingIndex++)
+        {
+            GameAudioEventBinding binding = audioPreset.EventBindings[bindingIndex];
+
+            if (binding == null || binding.EventId != eventId)
+                continue;
+
+            matchingBindings++;
+            Require(!string.IsNullOrWhiteSpace(binding.EventPath),
+                    definition.EventCode + " has no configured FMOD event path.");
+            Require(!binding.Spatialize, definition.EventCode + " must use global UI playback.");
+        }
+
+        Require(matchingBindings == 1,
+                definition.EventCode + " must have exactly one Audio Manager binding.");
+    }
+
+    /// <summary>
+    /// Verifies persistent bootstrap authoring resolves both HUD profiles and the global Audio Manager preset.
     /// </summary>
     /// <param name="hudPreset">Default HUD preset expected from the global Game Master preset.</param>
     private static void ValidateBootstrapProfileSource(GameHudManagerPreset hudPreset)
@@ -170,6 +212,22 @@ public static class GameHudSupplementalSmokeTest
         Require(authoring != null, "Bootstrap scene does not contain GameSceneManagerAuthoring.");
         Require(authoring.ResolveHudManagerPreset() == hudPreset,
                 "Bootstrap authoring does not resolve the HUD preset that owns global menu profiles.");
+        GameAudioManagerAuthoring audioAuthoring =
+            GameSceneManagementProjectSetupSceneUtility.FindFirstComponentInScene<GameAudioManagerAuthoring>(scene);
+        Require(audioAuthoring != null, "Bootstrap scene does not contain GameAudioManagerAuthoring.");
+        Require(audioAuthoring.ResolveAudioManagerPreset() != null,
+                "Bootstrap Audio Manager authoring does not resolve an Audio Manager preset.");
+        Require(audioAuthoring.CreateRuntimeSingletonWhenNotBaked,
+                "Bootstrap Audio Manager authoring does not create the persistent regular-scene singleton.");
+
+        Scene persistentPlayerScene = EditorSceneManager.OpenScene(
+            GameSceneManagementProjectSetupUtility.PersistentPlayerScenePath,
+            OpenSceneMode.Single);
+        GameAudioManagerAuthoring persistentPlayerAuthoring =
+            GameSceneManagementProjectSetupSceneUtility.FindFirstComponentInScene<GameAudioManagerAuthoring>(
+                persistentPlayerScene);
+        Require(persistentPlayerAuthoring == null,
+                "Persistent Player scene still bakes a duplicate Audio Manager singleton.");
     }
 
     /// <summary>
@@ -273,6 +331,8 @@ public static class GameHudSupplementalSmokeTest
         Require(toggleButton != null, "Summary toggle button is missing.");
         Require(toggleButton.GetComponent<MenuSelectableHoverRelay>() != null,
                 "Summary toggle does not own a preauthored menu interaction relay.");
+        Require(toggleButton.GetComponent<MenuSelectableAudioRelay>() != null,
+                "Summary toggle does not own a preauthored menu audio relay.");
     }
 
     /// <summary>
@@ -327,8 +387,12 @@ public static class GameHudSupplementalSmokeTest
                 "Main Menu authored navigation does not bypass the inactive runtime tool button.");
 
         for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
+        {
             Require(buttons[buttonIndex].GetComponent<MenuSelectableHoverRelay>() != null,
                     "Main Menu button " + buttons[buttonIndex].name + " has no interaction relay.");
+            Require(buttons[buttonIndex].GetComponent<MenuSelectableAudioRelay>() != null,
+                    "Main Menu button " + buttons[buttonIndex].name + " has no audio relay.");
+        }
     }
 
     /// <summary>
@@ -387,8 +451,12 @@ public static class GameHudSupplementalSmokeTest
                 Require(buttons.Length > 0, prefabPath + " contains no Buttons.");
 
                 for (int buttonIndex = 0; buttonIndex < buttons.Length; buttonIndex++)
+                {
                     Require(buttons[buttonIndex].GetComponent<MenuSelectableHoverRelay>() != null,
                             prefabPath + " button " + buttons[buttonIndex].name + " has no interaction relay.");
+                    Require(buttons[buttonIndex].GetComponent<MenuSelectableAudioRelay>() != null,
+                            prefabPath + " button " + buttons[buttonIndex].name + " has no audio relay.");
+                }
 
                 if (string.Equals(prefabPath,
                                   PlayerSettingsMenuSetupUtility.SettingsMenuPrefabPath,

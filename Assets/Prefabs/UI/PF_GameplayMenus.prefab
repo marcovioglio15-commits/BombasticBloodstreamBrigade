@@ -151,6 +151,7 @@ GameObject:
   - component: {fileID: 4770041736726884901}
   - component: {fileID: 432724253734426905}
   - component: {fileID: 6039373179528498221}
+  - component: {fileID: 7368541083585137711}
   m_Layer: 0
   m_Name: ResumeButton
   m_TagString: Untagged
@@ -300,6 +301,18 @@ MonoBehaviour:
   buttonContentId: ResumeButton
   targetImageOverride: {fileID: 207131799160181464}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &7368541083585137711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1490072676541624157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &1575311225583182335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1683,6 +1696,7 @@ GameObject:
   - component: {fileID: 3135194344012754796}
   - component: {fileID: 3119232725231386713}
   - component: {fileID: 2855157095156719376}
+  - component: {fileID: 7862271000835262250}
   m_Layer: 0
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -1832,6 +1846,18 @@ MonoBehaviour:
   buttonContentId: SettingsButton
   targetImageOverride: {fileID: 149806290349593602}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &7862271000835262250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5147232076035179219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &5366772894690525698
 GameObject:
   m_ObjectHideFlags: 0
@@ -1921,6 +1947,7 @@ GameObject:
   - component: {fileID: 5652042099023964843}
   - component: {fileID: 7061698999211410585}
   - component: {fileID: 627725169839814200}
+  - component: {fileID: 5536091035492789977}
   m_Layer: 0
   m_Name: EndingQuitButton
   m_TagString: Untagged
@@ -2070,6 +2097,18 @@ MonoBehaviour:
   buttonContentId: EndingQuitButton
   targetImageOverride: {fileID: 8555762544847739908}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &5536091035492789977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5422271176871256162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &5459530395928175643
 GameObject:
   m_ObjectHideFlags: 0
@@ -2084,6 +2123,7 @@ GameObject:
   - component: {fileID: 1714471842806212576}
   - component: {fileID: 9101423811193712970}
   - component: {fileID: 8018431798511233939}
+  - component: {fileID: 4655053388532955628}
   m_Layer: 0
   m_Name: RestartButton
   m_TagString: Untagged
@@ -2233,6 +2273,18 @@ MonoBehaviour:
   buttonContentId: RestartButton
   targetImageOverride: {fileID: 3152930360442923109}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &4655053388532955628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5459530395928175643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &5501066969875845136
 GameObject:
   m_ObjectHideFlags: 0
@@ -2581,6 +2633,7 @@ GameObject:
   - component: {fileID: 2593723538302929131}
   - component: {fileID: 4019656273031009792}
   - component: {fileID: 327264911725831966}
+  - component: {fileID: 6038408575125842421}
   m_Layer: 0
   m_Name: PlayAgainButton
   m_TagString: Untagged
@@ -2730,6 +2783,18 @@ MonoBehaviour:
   buttonContentId: PlayAgainButton
   targetImageOverride: {fileID: 5191002653277403626}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &6038408575125842421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6933101421806098570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &7042415350507178239
 GameObject:
   m_ObjectHideFlags: 0
@@ -3052,6 +3117,7 @@ GameObject:
   - component: {fileID: 6557616067134797293}
   - component: {fileID: 7438298416021306320}
   - component: {fileID: 3833851452005421315}
+  - component: {fileID: 4593936529940360554}
   m_Layer: 0
   m_Name: MainMenuButton
   m_TagString: Untagged
@@ -3201,6 +3267,18 @@ MonoBehaviour:
   buttonContentId: MainMenuButton
   targetImageOverride: {fileID: 8939052848764049598}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &4593936529940360554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7709167946875285396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &8000966525981686751
 GameObject:
   m_ObjectHideFlags: 0
@@ -3215,6 +3293,7 @@ GameObject:
   - component: {fileID: 7064780009475089197}
   - component: {fileID: 2749818602158126315}
   - component: {fileID: 2975368180486176215}
+  - component: {fileID: 4273937237394288282}
   m_Layer: 0
   m_Name: QuitButton
   m_TagString: Untagged
@@ -3364,6 +3443,18 @@ MonoBehaviour:
   buttonContentId: QuitButton
   targetImageOverride: {fileID: 8809280413138225775}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &4273937237394288282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8000966525981686751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &8241878147623520197
 GameObject:
   m_ObjectHideFlags: 0
@@ -3378,6 +3469,7 @@ GameObject:
   - component: {fileID: 603466033218834606}
   - component: {fileID: 8354894939157329511}
   - component: {fileID: 3390958711673532180}
+  - component: {fileID: 791963564528789201}
   m_Layer: 0
   m_Name: EndingMainMenuButton
   m_TagString: Untagged
@@ -3527,6 +3619,18 @@ MonoBehaviour:
   buttonContentId: EndingMainMenuButton
   targetImageOverride: {fileID: 4970365824838889799}
   transformTargetOverride: {fileID: 0}
+--- !u!114 &791963564528789201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8241878147623520197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &8260505570069979775
 GameObject:
   m_ObjectHideFlags: 0

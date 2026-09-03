@@ -127,6 +127,24 @@ internal static class GameMasterPresetsPanelSectionsUtility
     }
 
     /// <summary>
+    /// Creates and assigns a dedicated global Data Collection Manager preset.
+    /// </summary>
+    /// <param name="panel">Owning panel with selected master preset context.</param>
+    public static void CreateDataCollectionManagerPreset(GameMasterPresetsPanel panel)
+    {
+        if (panel == null || panel.SelectedPreset == null)
+            return;
+
+        GameDataCollectionManagerPreset newPreset =
+            GameDataCollectionProjectSetupUtility.CreatePresetAsset("GameDataCollectionManagerPreset");
+
+        if (newPreset == null)
+            return;
+
+        AssignSubPreset(panel, "dataCollectionManagerPreset", newPreset);
+    }
+
+    /// <summary>
     /// Creates, registers and assigns a new HUD Manager preset to the selected master preset.
     /// </summary>
     /// <param name="panel">Owning panel with selected master preset context.</param>
@@ -324,6 +342,7 @@ internal static class GameMasterPresetsPanelSectionsUtility
                             GameManagementWindow.PanelType.SettingsManager,
                             "Settings Manager",
                             panel.CreateSettingsManagerPreset);
+        AddDataCollectionPresetControl(panel, section);
         AddSubPresetControl(panel,
                             section,
                             "HUD Manager Preset",
@@ -520,6 +539,56 @@ internal static class GameMasterPresetsPanelSectionsUtility
     #endregion
 
     #region Detail Helpers
+    /// <summary>
+    /// Adds the dedicated data preset reference and its global availability switch.
+    /// </summary>
+    /// <param name="panel">Owning panel with serialized master preset context.</param>
+    /// <param name="section">Parent Sub Presets section.</param>
+    private static void AddDataCollectionPresetControl(GameMasterPresetsPanel panel, VisualElement section)
+    {
+        SerializedProperty property = panel.PresetSerializedObject.FindProperty("dataCollectionManagerPreset");
+
+        if (property == null)
+            return;
+
+        ObjectField objectField = new ObjectField("Data Collection Manager Preset");
+        objectField.objectType = typeof(GameDataCollectionManagerPreset);
+        objectField.tooltip = "Dedicated global switch for telemetry collection, HTTPS database access, and the Settings Dev tab.";
+        objectField.SetValueWithoutNotify(property.objectReferenceValue);
+        objectField.RegisterValueChangedCallback(evt =>
+        {
+            AssignSubPreset(panel, "dataCollectionManagerPreset", evt.newValue);
+        });
+        section.Add(objectField);
+
+        GameDataCollectionManagerPreset dataPreset = property.objectReferenceValue as GameDataCollectionManagerPreset;
+
+        if (dataPreset != null)
+        {
+            SerializedObject serializedDataPreset = new SerializedObject(dataPreset);
+            SerializedProperty enabledProperty = serializedDataPreset.FindProperty("dataCollectionEnabled");
+
+            if (enabledProperty != null)
+            {
+                PropertyField enabledField = new PropertyField(enabledProperty, "Data Collection Enabled");
+                enabledField.tooltip = "Disables collection, the local telemetry queue, all HTTPS database calls, and the Settings Dev tab.";
+                enabledField.BindProperty(enabledProperty);
+                enabledField.RegisterCallback<SerializedPropertyChangeEvent>(evt =>
+                {
+                    EditorUtility.SetDirty(dataPreset);
+                    GameManagementDraftSession.MarkDirty();
+                });
+                section.Add(enabledField);
+            }
+        }
+
+        Button newButton = new Button(panel.CreateDataCollectionManagerPreset);
+        newButton.text = "New Data Collection Preset";
+        newButton.tooltip = "Create and assign a dedicated Data Collection Manager preset.";
+        GameManagementPanelLayoutUtility.ConfigureToolbarButton(newButton, 180f);
+        section.Add(newButton);
+    }
+
     /// <summary>
     /// Adds one master sub-preset object field with section open and asset create actions.
     /// </summary>
