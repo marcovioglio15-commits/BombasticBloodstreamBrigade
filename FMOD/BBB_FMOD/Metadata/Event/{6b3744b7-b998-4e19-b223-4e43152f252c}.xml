@@ -128,10 +128,10 @@
 			<value>7</value>
 		</property>
 		<property name="frequencyA">
-			<value>11816.1611</value>
+			<value>13660.4131</value>
 		</property>
 		<property name="frequencyB">
-			<value>3552.8811</value>
+			<value>3703.19922</value>
 		</property>
 		<property name="frequencyC">
 			<value>58.7403564</value>
