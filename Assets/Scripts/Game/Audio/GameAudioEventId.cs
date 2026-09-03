@@ -32,5 +32,7 @@ public enum GameAudioEventId : byte
     PlayerDeathJingle = 26,
     RoomRewardPortalUnlock = 27,
     WaveClear = 28,
-    FinalWaveClear = 29
+    FinalWaveClear = 29,
+    MenuButtonHover = 30,
+    MenuButtonSelect = 31
 }

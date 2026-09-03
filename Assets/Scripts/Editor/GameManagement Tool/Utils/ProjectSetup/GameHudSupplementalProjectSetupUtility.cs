@@ -396,6 +396,12 @@ public static class GameHudSupplementalProjectSetupUtility
                 changed = true;
             }
 
+            if (button.GetComponent<MenuSelectableAudioRelay>() == null)
+            {
+                button.gameObject.AddComponent<MenuSelectableAudioRelay>();
+                changed = true;
+            }
+
             SerializedObject serializedRelay = new SerializedObject(relay);
             serializedRelay.Update();
             SerializedProperty menuKindProperty = serializedRelay.FindProperty("menuKind");

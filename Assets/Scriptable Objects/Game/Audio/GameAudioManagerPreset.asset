@@ -418,7 +418,7 @@ MonoBehaviour:
   - eventId: 25
     eventCode: MISC_SFX_Explosion_Enemy
     displayName: Enemy Explosion
-    description: Reserved for exploding enemy payloads once authored.
+    description: Requested when enemy-kill passive explosion payloads resolve.
     eventPath: event:/SFX/Explosions/NASH_SfxMISC_SFX_Explosion_001
     volume: 1
     pitch: 1
@@ -432,9 +432,9 @@ MonoBehaviour:
       windowSeconds: 1
   - eventId: 27
     eventCode: MISC_SFX_RoomReward_PortalAnimation
-    displayName: Room Reward Portal Animation
-    description: Requested when the selected room reward portal activation animation
-      starts.
+    displayName: Room Reward Portal Unlock
+    description: Requested when clearing a room unlocks its assigned destination
+      portals.
     eventPath: event:/SFX/Activations/MC_SFX_Active_EnergyFull
     volume: 1
     pitch: 1
@@ -467,6 +467,38 @@ MonoBehaviour:
     description: Optionally requested when the terminal Boss room-clear HUD message
       starts.
     eventPath: event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_02
+    volume: 1
+    pitch: 1
+    spatialize: 0
+    minimumDistance: 8
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1
+  - eventId: 30
+    eventCode: UI_SFX_Button_Hover
+    displayName: Menu Button Hover
+    description: Requested when pointer or navigation focus reaches an interactable
+      menu button.
+    eventPath: event:/SFX/Weapon/SFX_Shoot_Projectile
+    volume: 1
+    pitch: 1
+    spatialize: 0
+    minimumDistance: 8
+    maximumDistance: 45
+    singleInstance: 0
+    rateLimit:
+      enabled: 0
+      maxPlaysPerWindow: 0
+      windowSeconds: 1
+  - eventId: 31
+    eventCode: UI_SFX_Button_Select
+    displayName: Menu Button Select
+    description: Requested when an interactable menu button accepts pointer or submit
+      input.
+    eventPath: event:/SFX/Warnings/NASH_SfxENEMY_SFX_AttackWarning
     volume: 1
     pitch: 1
     spatialize: 0

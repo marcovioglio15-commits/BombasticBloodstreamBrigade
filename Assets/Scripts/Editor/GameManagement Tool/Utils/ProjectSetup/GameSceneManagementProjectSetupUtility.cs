@@ -434,6 +434,7 @@ public static class GameSceneManagementProjectSetupUtility
         EnsureBootstrapCamera(bootstrapScene);
         EnsureBootstrapLight(bootstrapScene);
         EnsureSceneManagerAuthoring(bootstrapScene, masterPreset, scenePreset);
+        GameSceneManagementAudioBootstrapSetupUtility.Ensure(bootstrapScene, masterPreset);
         EnsureFadeCanvas(bootstrapScene);
         EditorSceneManager.MarkSceneDirty(bootstrapScene);
         EditorSceneManager.SaveScene(bootstrapScene, BootstrapScenePath);

@@ -166,6 +166,18 @@ public static class GameAudioDefaultEventDefinitions
                                             "Final Boss Room Clear",
                                             "Optionally requested when the terminal Boss room-clear HUD message starts.",
                                             "event:/SFX/Voices/NASH_SfxMC_SFX_Misc_Victory_02",
+                                            false),
+        new GameAudioDefaultEventDefinition(GameAudioEventId.MenuButtonHover,
+                                            "UI_SFX_Button_Hover",
+                                            "Menu Button Hover",
+                                            "Requested when pointer or navigation focus reaches an interactable menu button.",
+                                            "event:/UI/ui_click",
+                                            false),
+        new GameAudioDefaultEventDefinition(GameAudioEventId.MenuButtonSelect,
+                                            "UI_SFX_Button_Select",
+                                            "Menu Button Select",
+                                            "Requested when an interactable menu button accepts pointer or submit input.",
+                                            "event:/UI/ui_click",
                                             false)
     };
     #endregion

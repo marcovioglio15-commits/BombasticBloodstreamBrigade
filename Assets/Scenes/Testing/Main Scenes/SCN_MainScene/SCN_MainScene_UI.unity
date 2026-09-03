@@ -4559,6 +4559,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 292415233}
   m_CullTransparentMesh: 1
+--- !u!114 &295246546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 539589476735432986}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &300891281
 GameObject:
   m_ObjectHideFlags: 0
@@ -10695,6 +10707,18 @@ Material:
     - _UnderlayColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
+--- !u!114 &988986287
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 539589476735432983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &990580000
 GameObject:
   m_ObjectHideFlags: 0
@@ -20270,7 +20294,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1533665184476437905, guid: 1ad1ee322779a81459f144eac4f12611, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1561949257}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5141378777663294544, guid: 1ad1ee322779a81459f144eac4f12611, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1913238575}
   m_SourcePrefab: {fileID: 100100000, guid: 1ad1ee322779a81459f144eac4f12611, type: 3}
 --- !u!224 &1913238571 stripped
 RectTransform:
@@ -20293,6 +20320,23 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1533665184476437905, guid: 1ad1ee322779a81459f144eac4f12611, type: 3}
   m_PrefabInstance: {fileID: 1913238570}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1913238574 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5141378777663294544, guid: 1ad1ee322779a81459f144eac4f12611, type: 3}
+  m_PrefabInstance: {fileID: 1913238570}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1913238575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1913238574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e945121fe1340da489986992579773fd, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::MenuSelectableAudioRelay
 --- !u!1 &1915895471
 GameObject:
   m_ObjectHideFlags: 0
@@ -22495,9 +22539,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6489449049402059659, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1600462836}
+    - targetCorrespondingSourceObject: {fileID: 6489449049402059659, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 295246546}
     - targetCorrespondingSourceObject: {fileID: 7280947271858279680, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1392002101}
+    - targetCorrespondingSourceObject: {fileID: 7280947271858279680, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 988986287}
   m_SourcePrefab: {fileID: 100100000, guid: 69106703b9c4c1e40b6c05ce72e5b20a, type: 3}
 --- !u!1 &539589476735432983 stripped
 GameObject:
