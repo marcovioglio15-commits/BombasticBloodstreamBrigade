@@ -75,6 +75,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{e8c6f3ee-e056-4280-a2c3-edd791d76f0e}">
+		<property name="volume">
+			<value>-21</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{4e489651-e32d-49a6-949f-2de0edc20ead}</destination>
 		</relationship>
@@ -98,8 +101,9 @@
 	<object class="MixerBusPanner" id="{34168952-068f-48d7-8a95-078a1ff2d71d}" />
 	<object class="MixerBusEffectChain" id="{4e489651-e32d-49a6-949f-2de0edc20ead}">
 		<relationship name="effects">
-			<destination>{64d1a56f-d7f0-4d19-97f2-e24c7e8f4454}</destination>
+			<destination>{98c789e4-fff8-4a3c-8962-08aaeba9df31}</destination>
 			<destination>{ff943cd5-762a-4540-8ab0-72b1ae17fde0}</destination>
+			<destination>{0fac6490-2f7d-440d-a77e-ae4025ca2a1e}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{3a3ca6a9-1a66-41b2-b431-b007bbdf4d48}" />
@@ -108,7 +112,7 @@
 			<value>-5</value>
 		</property>
 		<property name="pitch">
-			<value>9.5</value>
+			<value>14</value>
 		</property>
 		<relationship name="modulators">
 			<destination>{a7b3bf41-4716-4691-8e92-5ce3bb70a121}</destination>
@@ -121,24 +125,38 @@
 		</relationship>
 	</object>
 	<object class="MixerBusFader" id="{14e63503-77b8-4691-a6f0-4f9581b4587d}" />
-	<object class="MultibandEqEffect" id="{64d1a56f-d7f0-4d19-97f2-e24c7e8f4454}">
+	<object class="MultibandEqEffect" id="{98c789e4-fff8-4a3c-8962-08aaeba9df31}">
 		<property name="filterTypeB">
 			<value>7</value>
 		</property>
+		<property name="filterTypeC">
+			<value>6</value>
+		</property>
 		<property name="frequencyA">
-			<value>1793.24646</value>
+			<value>7336.98682</value>
 		</property>
 		<property name="frequencyB">
-			<value>143.172394</value>
+			<value>27.2899704</value>
+		</property>
+		<property name="frequencyC">
+			<value>40.4546928</value>
 		</property>
 		<property name="qualityA">
-			<value>0.581413805</value>
+			<value>0.330241382</value>
+		</property>
+		<property name="qualityC">
+			<value>2.72413778</value>
 		</property>
 		<property name="gainB">
-			<value>-7.5</value>
+			<value>-4.13793182</value>
 		</property>
 	</object>
 	<object class="MixerBusFader" id="{ff943cd5-762a-4540-8ab0-72b1ae17fde0}" />
+	<object class="DistortionEffect" id="{0fac6490-2f7d-440d-a77e-ae4025ca2a1e}">
+		<property name="level">
+			<value>0.914999962</value>
+		</property>
+	</object>
 	<object class="RandomizerModulator" id="{a7b3bf41-4716-4691-8e92-5ce3bb70a121}">
 		<property name="nameOfPropertyBeingModulated">
 			<value>pitch</value>
