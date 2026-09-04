@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{a540b3cb-2fd8-423f-94c7-823e93edc359}">
+		<property name="assetPath">
+			<value>Let It Me - Jeremy Black.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>218.51428571428571</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{429dc413-3f2e-4779-b48b-7589343f41dd}</destination>
+		</relationship>
+	</object>
+</objects>

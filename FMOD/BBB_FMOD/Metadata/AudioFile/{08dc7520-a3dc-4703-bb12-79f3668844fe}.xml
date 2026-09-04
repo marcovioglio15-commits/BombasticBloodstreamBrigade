@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{08dc7520-a3dc-4703-bb12-79f3668844fe}">
+		<property name="assetPath">
+			<value>SelectMenu - AC_Metal_Ding.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>48</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.43127083333333333</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{429dc413-3f2e-4779-b48b-7589343f41dd}</destination>
+		</relationship>
+	</object>
+</objects>

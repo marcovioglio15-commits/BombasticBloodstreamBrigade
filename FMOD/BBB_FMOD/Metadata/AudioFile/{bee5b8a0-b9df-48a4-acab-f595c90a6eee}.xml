@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{bee5b8a0-b9df-48a4-acab-f595c90a6eee}">
+		<property name="assetPath">
+			<value>Der König - Jeremy Black.mp3</value>
+		</property>
+		<property name="isStreaming">
+			<value>true</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>2</value>
+		</property>
+		<property name="length">
+			<value>187.29795918367347</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{429dc413-3f2e-4779-b48b-7589343f41dd}</destination>
+		</relationship>
+	</object>
+</objects>
