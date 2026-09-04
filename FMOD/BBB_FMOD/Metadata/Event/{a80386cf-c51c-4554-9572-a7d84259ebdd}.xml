@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{a80386cf-c51c-4554-9572-a7d84259ebdd}">
+		<property name="color">
+			<value>Red</value>
+		</property>
 		<property name="name">
 			<value>NASH_SfxMC_SFX_Misc_DeatJIngle</value>
 		</property>
@@ -101,6 +104,9 @@
 	</object>
 	<object class="MixerBusPanner" id="{6949b8c7-198a-49cc-b0db-586081bc6ad4}" />
 	<object class="SingleSound" id="{95496312-2803-44dc-9e6f-3911af670438}">
+		<property name="startOffset">
+			<value>52.5</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{f1646f7e-a212-4fb3-9c6a-6f6b91b22899}</destination>
 		</relationship>
