@@ -119,6 +119,76 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &29843730
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1161327343}
+    m_Modifications:
+    - target: {fileID: 521581553706946848, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_Name
+      value: Portal 02 - South - Both
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -12.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.000112161026
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -360.013
+      objectReference: {fileID: 0}
+    - target: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4649037868646300206, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: m_Size.x
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7451780377204190828, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+      propertyPath: portalId
+      value: MAIN_METRO_04_NE_SOUTH
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+--- !u!4 &29843731 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 920955097757512029, guid: ea98a28780afdeb4693de88eedb97288, type: 3}
+  m_PrefabInstance: {fileID: 29843730}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &525487026
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -137,7 +207,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4708883588253899702, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: connectionPolicy
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5098296206624047734, guid: 0bd6a989c4f3a67488ce092ef9cd64dc, type: 3}
       propertyPath: m_Name
@@ -489,6 +559,7 @@ Transform:
   - {fileID: 525487027}
   - {fileID: 658837842}
   - {fileID: 2026428411}
+  - {fileID: 29843731}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1211805216
@@ -955,7 +1026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7720009711717620977, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
       propertyPath: connectionPolicy
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

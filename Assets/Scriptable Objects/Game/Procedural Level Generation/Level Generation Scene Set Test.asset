@@ -177,9 +177,9 @@ MonoBehaviour:
       role: 1
       maximumCopies: 3
       preferredDepthRange: {x: 1, y: 8}
-      useExactDepthConstraint: 0
+      useExactDepthConstraint: 1
       exactDepth: 1
-      baseSelectionWeight: 1
+      baseSelectionWeight: 100
       roomRewards:
       - rewardTechnicalId: 225f71ef9e4f494dad247d9ab21306d2
         quantity: 1
@@ -709,7 +709,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_DOUBLE
     sceneGuid: 433f03176860b0e409c1d762e15cd364
-    dependencyHash: 10a6d6c7a0e9ab19d57676dab6c34306
+    dependencyHash: e7297793fd3c799c6f76688d5a3fef3d
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
@@ -733,11 +733,11 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_DOUBLE_WEST_06
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_EW
     sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7
-    dependencyHash: 36b72a839af063412cf0531e057f38b3
+    dependencyHash: 5797f6ecec529da004208bed512cead6
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_EW.unity
@@ -765,7 +765,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_NS
     sceneGuid: 0b11934e90dbb314e87551aabe87ec57
-    dependencyHash: 8498eb9660fbd90bf98d950290f06257
+    dependencyHash: f70c7ffefae3cfa0fc0436d6830b43a3
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
@@ -821,7 +821,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_01
     sceneGuid: 5a34e40218bcc094382de3b9fedebc81
-    dependencyHash: 9e9d2be43a0ea978dd2516b3172f8e43
+    dependencyHash: d63bc89431070475fae488e7674b48a0
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_01.unity
@@ -833,7 +833,7 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_NS_NORTH_01
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: LGTEST_METRO_NS_SOUTH_02
       side: 1
       capability: 2
@@ -841,15 +841,15 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_EW_EAST_01
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: LGTEST_METRO_EW_WEST_02
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_02
     sceneGuid: eef1df284c2a6f148996f3c85310ad6a
-    dependencyHash: fef7cea8302d900c9ed0659c81e0252e
+    dependencyHash: 9ea06bf9a6f28b8f2c450e7f68992fb4
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_02.unity
@@ -866,10 +866,18 @@ MonoBehaviour:
       side: 1
       capability: 2
       connectionPolicy: 1
+    - portalId: MAIN_METRO_02_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_02_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_03
     sceneGuid: c65cf1455f2597b45b5565007602b3f9
-    dependencyHash: d1bba481dfc4abc006d6dcc27cd88d3a
+    dependencyHash: 2e9510b385af45b502f90ce28b2e9c24
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_03.unity
@@ -886,10 +894,18 @@ MonoBehaviour:
       side: 1
       capability: 2
       connectionPolicy: 1
+    - portalId: MAIN_METRO_03_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_03_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SE
     sceneGuid: f4daaf1b9ca5fc04c8cc56d949181e3d
-    dependencyHash: cdb227304dc6e3b19626de762c30e12f
+    dependencyHash: 1cedf56b95f09531414d9fe2e6bf6a29
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SE.unity
@@ -898,6 +914,10 @@ MonoBehaviour:
     activeSpawnerCount: 1
     activeSpawnerWithWavesCount: 1
     portals:
+    - portalId: MAIN_METRO_04_SE_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_04_SE_SOUTH
       side: 1
       capability: 2
@@ -906,10 +926,14 @@ MonoBehaviour:
       side: 2
       capability: 2
       connectionPolicy: 1
+    - portalId: MAIN_METRO_04_SE_WEST
+      side: 3
+      capability: 2
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_SW
     sceneGuid: eee02f3814ad6e14eb8fb848d1a9d0aa
-    dependencyHash: 58885249a4c467890ec7443952b4f249
+    dependencyHash: 0c29ebfde20c5be116f465cd136a2b92
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_SW.unity
@@ -918,8 +942,16 @@ MonoBehaviour:
     activeSpawnerCount: 1
     activeSpawnerWithWavesCount: 1
     portals:
+    - portalId: MAIN_METRO_04_SW_NORTH
+      side: 0
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_04_SW_SOUTH
       side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_SW_EAST
+      side: 2
       capability: 2
       connectionPolicy: 1
     - portalId: MAIN_METRO_04_SW_WEST
@@ -929,7 +961,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NE
     sceneGuid: 20653c736dac57c49842cb85bddcc563
-    dependencyHash: 303a9543090985951944804d2367962e
+    dependencyHash: bfd6eff091ee3e1e34ce473a71abbece
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NE.unity
@@ -941,11 +973,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_04_NE_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NE_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_04_NE_EAST
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_04_NE_WEST
       side: 3
       capability: 2
@@ -953,7 +989,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_04_NW
     sceneGuid: 418b98d17eadea44fa63e7920b7d332f
-    dependencyHash: 4e96242e657fd33d368709fe5f4ab303
+    dependencyHash: f17cd1c5723486d53fc9f08f79f045ac
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_04_NW.unity
@@ -966,6 +1002,14 @@ MonoBehaviour:
       side: 0
       capability: 2
       connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NW_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_04_NW_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_04_NW_WEST
       side: 3
       capability: 2
@@ -973,7 +1017,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_05
     sceneGuid: 65fda9dbaf737904cab55a5bfac83af7
-    dependencyHash: 4c2816506707d80f6b59c2a67f15239d
+    dependencyHash: a284670d9f3827835b3938888f7a8694
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_05.unity
@@ -985,7 +1029,7 @@ MonoBehaviour:
     - portalId: MAIN_METRO_05_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_05_SOUTH
       side: 1
       capability: 2
@@ -993,15 +1037,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_05_EAST
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_05_WEST
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_06
     sceneGuid: 9c92c06e192f18f48b91af96b0f282f4
-    dependencyHash: 14196b650098561acb7ce8ea6eb169dd
+    dependencyHash: 55bd0cd82463a2a2298831c780ff74f1
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_06.unity
@@ -1013,7 +1057,7 @@ MonoBehaviour:
     - portalId: MAIN_METRO_06_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_06_SOUTH
       side: 1
       capability: 2
@@ -1021,15 +1065,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_06_EAST
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_06_WEST
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_07
     sceneGuid: 1d02753ae1d89004f93b02d845ea2923
-    dependencyHash: c1d906b140dd7f180d1dc79dd8448e09
+    dependencyHash: 805f5e874084f5623d91d825bb4fa0ca
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_07.unity
@@ -1041,7 +1085,7 @@ MonoBehaviour:
     - portalId: MAIN_METRO_07_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_07_SOUTH
       side: 1
       capability: 2
@@ -1053,11 +1097,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_07_WEST
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_08
     sceneGuid: f08825b3338e25c4e8fb7ac2944cb7d3
-    dependencyHash: e31f005d8e8137c54ef909b7f28a2007
+    dependencyHash: 571f0703b9966df4e906c750fc1804d8
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_08.unity
@@ -1069,7 +1113,7 @@ MonoBehaviour:
     - portalId: MAIN_METRO_08_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_08_SOUTH
       side: 1
       capability: 2
@@ -1077,7 +1121,7 @@ MonoBehaviour:
     - portalId: MAIN_METRO_08_EAST
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_08_WEST
       side: 3
       capability: 2
@@ -1085,7 +1129,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_S
     sceneGuid: b876bd73a1ac8d746a8ecc10a78c9654
-    dependencyHash: b58b962234cc8e27219b3f0380574279
+    dependencyHash: 6184ac282528a080d0aa1515d65cba6c
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_S.unity
@@ -1097,11 +1141,15 @@ MonoBehaviour:
     - portalId: MAIN_METRO_09_S_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_S_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_09_S_EAST
       side: 2
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: MAIN_METRO_09_S_WEST
       side: 3
       capability: 2
@@ -1109,7 +1157,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_09_N
     sceneGuid: 6b27e57c5f994d54ba3f445e6d33ad27
-    dependencyHash: db01e52add006b0ca5489533583c1f86
+    dependencyHash: ba0742af8c8d09d40850a65fedf20a99
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_09_N.unity
@@ -1121,7 +1169,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_09_N_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_09_N_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_09_N_EAST
       side: 2
       capability: 2
@@ -1129,11 +1181,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_09_N_WEST
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
-    dependencyHash: 47d02939c957b7594c95ebe305df35b8
+    dependencyHash: c2bb63eb5caf1e5c25d8c8df90200512
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
@@ -1145,7 +1197,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_10_NORTH
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_10_SOUTH
+      side: 1
+      capability: 2
+      connectionPolicy: 1
     - portalId: MAIN_METRO_10_EAST
       side: 2
       capability: 2
@@ -1153,11 +1209,11 @@ MonoBehaviour:
     - portalId: MAIN_METRO_10_WEST
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_11
     sceneGuid: 39a3d674b1a76df41a7d38f06a4964ef
-    dependencyHash: 6090fe9ba08451f6581e4bfadd9dfb32
+    dependencyHash: 1217cf5348162b3dd30c63615b1f37ff
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_11.unity
@@ -1172,6 +1228,14 @@ MonoBehaviour:
       connectionPolicy: 1
     - portalId: MAIN_METRO_11_SOUTH
       side: 1
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_11_EAST
+      side: 2
+      capability: 2
+      connectionPolicy: 1
+    - portalId: MAIN_METRO_11_WEST
+      side: 3
       capability: 2
       connectionPolicy: 1
     authoringWarnings: []
