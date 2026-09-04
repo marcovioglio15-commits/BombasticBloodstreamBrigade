@@ -409,7 +409,7 @@ MonoBehaviour:
   - sceneId: SCN_LGTEST_METRO_NS
     sceneGuid: 0b11934e90dbb314e87551aabe87ec57
     dependencyHash: 454b3f6420298613306ad3e4698c93e1
-    cacheStale: 0
+    cacheStale: 1
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SubScenes/SUB_LGTEST_METRO_NS.unity

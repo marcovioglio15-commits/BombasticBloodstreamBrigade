@@ -304,7 +304,7 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 0, y: 15}
+    - cellCoordinate: {x: 1, y: 14}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
       useWaveDefaultDistribution: 0
@@ -314,7 +314,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 8, y: 15}
+    - cellCoordinate: {x: 7, y: 14}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
       useWaveDefaultDistribution: 0
@@ -324,7 +324,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 8, y: 0}
+    - cellCoordinate: {x: 1, y: 1}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
       useWaveDefaultDistribution: 0
@@ -334,7 +334,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 0, y: 0}
+    - cellCoordinate: {x: 7, y: 1}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
       useWaveDefaultDistribution: 0
@@ -344,45 +344,6 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
-  - waveId: 1ef734f8e46a4cb49644c851a96d2a69
-    waveLabel: Wave 2 Parallel
-    sequenceStepIndex: 1
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells: []
     useDifficultySelection: 0
     difficultySelectionGroupId: 
     difficultyCoefficientId: 
