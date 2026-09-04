@@ -2,7 +2,7 @@
 <objects serializationModel="Studio.02.03.00">
 	<object class="Event" id="{5bed8e0c-a6f1-4b0a-8258-81d021b1c0eb}">
 		<property name="color">
-			<value>Red</value>
+			<value>Green</value>
 		</property>
 		<property name="name">
 			<value>SFX_Shoot_Cannon</value>
@@ -75,6 +75,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{6e3aeae9-1db5-44f7-9261-9c964cb926ab}">
+		<property name="volume">
+			<value>-5</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{8f56d81f-d26f-46d3-a123-057335b94675}</destination>
 		</relationship>
@@ -99,12 +102,16 @@
 	<object class="MixerBusEffectChain" id="{8f56d81f-d26f-46d3-a123-057335b94675}">
 		<relationship name="effects">
 			<destination>{b4fe0cca-d23e-460f-9f70-1dd06abdd499}</destination>
+			<destination>{59c774b3-b162-4965-88cf-461512ea58e1}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{2ce8ca2c-fe74-4610-b8da-3538256e121b}" />
 	<object class="SingleSound" id="{4faafc7b-abe4-4ea0-a996-0ea8121d1b1e}">
+		<property name="startOffset">
+			<value>4</value>
+		</property>
 		<property name="pitch">
-			<value>0.699999988</value>
+			<value>3.79999995</value>
 		</property>
 		<relationship name="modulators">
 			<destination>{002c2e93-bad1-4bb5-b8e1-4fdc96ee9a4d}</destination>
@@ -115,6 +122,17 @@
 	</object>
 	<object class="MixerBusFader" id="{481d734b-f6c9-46ae-b52d-41d76ba832a7}" />
 	<object class="MixerBusFader" id="{b4fe0cca-d23e-460f-9f70-1dd06abdd499}" />
+	<object class="MultibandEqEffect" id="{59c774b3-b162-4965-88cf-461512ea58e1}">
+		<property name="filterTypeA">
+			<value>7</value>
+		</property>
+		<property name="frequencyA">
+			<value>39.6251335</value>
+		</property>
+		<property name="gainA">
+			<value>-28.965517</value>
+		</property>
+	</object>
 	<object class="RandomizerModulator" id="{002c2e93-bad1-4bb5-b8e1-4fdc96ee9a4d}">
 		<property name="nameOfPropertyBeingModulated">
 			<value>pitch</value>
