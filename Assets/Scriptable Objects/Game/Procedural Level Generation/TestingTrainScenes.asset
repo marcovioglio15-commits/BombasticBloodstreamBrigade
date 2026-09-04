@@ -360,7 +360,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_DOUBLE
     sceneGuid: 433f03176860b0e409c1d762e15cd364
-    dependencyHash: e7297793fd3c799c6f76688d5a3fef3d
+    dependencyHash: 4bbe73d9985d67663f88b097ad1f66d9
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
@@ -372,7 +372,7 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_DOUBLE_NORTH_02
       side: 0
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_DOUBLE_SOUTH_04
       side: 1
       capability: 2
@@ -380,7 +380,7 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_DOUBLE_EAST_05
       side: 2
       capability: 2
-      connectionPolicy: 1
+      connectionPolicy: 0
     - portalId: LGTEST_METRO_DOUBLE_WEST_06
       side: 3
       capability: 2

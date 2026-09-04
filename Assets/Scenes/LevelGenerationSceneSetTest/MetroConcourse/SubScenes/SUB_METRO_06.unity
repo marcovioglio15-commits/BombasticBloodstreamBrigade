@@ -822,6 +822,10 @@ PrefabInstance:
       propertyPath: portalId
       value: MAIN_METRO_06_NORTH
       objectReference: {fileID: 0}
+    - target: {fileID: 7720009711717620977, guid: 323c71006a1e7b44b9144021d8d25954, type: 3}
+      propertyPath: connectionPolicy
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1362,6 +1366,10 @@ PrefabInstance:
     - target: {fileID: 1600336667147593329, guid: 0015d0a23a998c94e8e16af1b69f9466, type: 3}
       propertyPath: portalId
       value: MAIN_METRO_06_WEST
+      objectReference: {fileID: 0}
+    - target: {fileID: 1600336667147593329, guid: 0015d0a23a998c94e8e16af1b69f9466, type: 3}
+      propertyPath: connectionPolicy
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1965374107918840196, guid: 0015d0a23a998c94e8e16af1b69f9466, type: 3}
       propertyPath: m_Size.z
