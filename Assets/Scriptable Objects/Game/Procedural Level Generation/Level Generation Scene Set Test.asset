@@ -19,11 +19,11 @@ MonoBehaviour:
   version: 1.0.0
   sceneCatalogPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
   generationSettings:
-    seedMode: 1
+    seedMode: 0
     fixedSeed: 3027450565
     maximumNodeCount: 32
     maximumDepth: 12
-    maximumGenerationAttempts: 20
+    maximumGenerationAttempts: 100
   transitionSettings:
     roomStreamingMode: 0
     adjacentPreloadPolicy: 2
@@ -137,7 +137,7 @@ MonoBehaviour:
       role: 1
       maximumCopies: 3
       preferredDepthRange: {x: 1, y: 8}
-      useExactDepthConstraint: 1
+      useExactDepthConstraint: 0
       exactDepth: 3
       baseSelectionWeight: 10
       roomRewards:
@@ -438,7 +438,7 @@ MonoBehaviour:
       maximumCopies: 1
       preferredDepthRange: {x: 4, y: 6}
       useExactDepthConstraint: 1
-      exactDepth: 5
+      exactDepth: 6
       baseSelectionWeight: 1
       roomRewards:
       - rewardTechnicalId: 42edc383944b49648e73bac5645b80c9
@@ -709,7 +709,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_DOUBLE
     sceneGuid: 433f03176860b0e409c1d762e15cd364
-    dependencyHash: aed2dc3646fc7ad3e04e6a0b2fbb5af4
+    dependencyHash: dd728173b9899998e1a71360e3a561b6
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_DOUBLE.unity
@@ -721,7 +721,7 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_DOUBLE_NORTH_02
       side: 0
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     - portalId: LGTEST_METRO_DOUBLE_SOUTH_04
       side: 1
       capability: 2
@@ -733,7 +733,7 @@ MonoBehaviour:
     - portalId: LGTEST_METRO_DOUBLE_WEST_06
       side: 3
       capability: 2
-      connectionPolicy: 0
+      connectionPolicy: 1
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_EW
     sceneGuid: 39277a5b9bc1c5f4dadfe16f2ed4a6f7

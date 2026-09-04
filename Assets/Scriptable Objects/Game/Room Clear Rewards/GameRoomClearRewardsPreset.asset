@@ -710,6 +710,34 @@ MonoBehaviour:
       animatorClip: {fileID: 0}
       animatorPath: 
       animatorSpeed: 1
+    - targetBindingId: TrainWestArrival02
+      targetSlot: 0
+      source: 0
+      mode: 0
+      playback: 0
+      easing: 5
+      startDelay: 0.15
+      duration: 3.5
+      positionOffset: {x: 0, y: 0, z: 72}
+      rotationOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: {x: 1, y: 1, z: 1}
+      animatorClip: {fileID: 0}
+      animatorPath: 
+      animatorSpeed: 1
+    - targetBindingId: TrainEastArrival02
+      targetSlot: 0
+      source: 0
+      mode: 0
+      playback: 0
+      easing: 5
+      startDelay: 0.15
+      duration: 3.5
+      positionOffset: {x: 0, y: 0, z: -81}
+      rotationOffset: {x: 0, y: 0, z: 0}
+      scaleMultiplier: {x: 1, y: 1, z: 1}
+      animatorClip: {fileID: 0}
+      animatorPath: 
+      animatorSpeed: 1
     activationPrefabReplacements:
     - targetBindingId: ExitSign_02
       targetSlot: 1
