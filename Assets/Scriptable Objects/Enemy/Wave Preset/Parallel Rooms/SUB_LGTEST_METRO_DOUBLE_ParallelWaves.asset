@@ -127,26 +127,6 @@ MonoBehaviour:
     paintedCells:
     - cellCoordinate: {x: 1, y: 0}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 5
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 2, y: 0}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 4, y: 0}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
@@ -175,7 +155,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 6, y: 0}
+    - cellCoordinate: {x: 7, y: 0}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -185,27 +165,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 7, y: 0}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 5
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
     - cellCoordinate: {x: 1, y: 15}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 5
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 2, y: 15}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -225,27 +185,7 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 4, y: 15}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
     - cellCoordinate: {x: 5, y: 15}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 6, y: 15}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 1
       useWaveDefaultDistribution: 0
@@ -257,7 +197,7 @@ MonoBehaviour:
         m_RotationOrder: 0
     - cellCoordinate: {x: 7, y: 15}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 5
+      enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -306,27 +246,7 @@ MonoBehaviour:
     paintedCells:
     - cellCoordinate: {x: 4, y: 12}
       brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 2
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 4, y: 2}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 2
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 7, y: 7}
-      brushCategoryId: category_a2b7a40275fc25d4c91e
-      enemyCount: 1
+      enemyCount: 5
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2

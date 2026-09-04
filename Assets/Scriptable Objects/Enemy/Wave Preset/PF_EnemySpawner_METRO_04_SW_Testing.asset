@@ -165,16 +165,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 15, y: 15}
-      brushCategoryId: category_a35ced4eda7a12b4dbaa
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
     - cellCoordinate: {x: 1, y: 10}
       brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 5
@@ -208,6 +198,16 @@ MonoBehaviour:
     - cellCoordinate: {x: 9, y: 1}
       brushCategoryId: category_c64113c66ddb2374d8f8
       enemyCount: 5
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 14, y: 14}
+      brushCategoryId: category_a35ced4eda7a12b4dbaa
+      enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -323,36 +323,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 0, y: 8}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 8, y: 0}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 15, y: 15}
-      brushCategoryId: category_5281a0b709fc544408ab
-      enemyCount: 1
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
     - cellCoordinate: {x: 14, y: 2}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
@@ -366,6 +336,36 @@ MonoBehaviour:
     - cellCoordinate: {x: 2, y: 14}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 14, y: 14}
+      brushCategoryId: category_5281a0b709fc544408ab
+      enemyCount: 1
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 1, y: 9}
+      brushCategoryId: category_5281a0b709fc544408ab
+      enemyCount: 1
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 9, y: 1}
+      brushCategoryId: category_5281a0b709fc544408ab
+      enemyCount: 1
       useWaveDefaultDistribution: 0
       distributionCurveOverride:
         serializedVersion: 2
@@ -412,26 +412,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     paintedCells:
-    - cellCoordinate: {x: 15, y: 15}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 3
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
-    - cellCoordinate: {x: 15, y: 14}
-      brushCategoryId: category_2d6bd7af6ef90e14c9b2
-      enemyCount: 3
-      useWaveDefaultDistribution: 0
-      distributionCurveOverride:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 0
-        m_PostInfinity: 0
-        m_RotationOrder: 0
     - cellCoordinate: {x: 14, y: 14}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
@@ -442,7 +422,27 @@ MonoBehaviour:
         m_PreInfinity: 0
         m_PostInfinity: 0
         m_RotationOrder: 0
-    - cellCoordinate: {x: 14, y: 15}
+    - cellCoordinate: {x: 13, y: 14}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 13, y: 13}
+      brushCategoryId: category_2d6bd7af6ef90e14c9b2
+      enemyCount: 3
+      useWaveDefaultDistribution: 0
+      distributionCurveOverride:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 0
+        m_PostInfinity: 0
+        m_RotationOrder: 0
+    - cellCoordinate: {x: 14, y: 13}
       brushCategoryId: category_2d6bd7af6ef90e14c9b2
       enemyCount: 3
       useWaveDefaultDistribution: 0

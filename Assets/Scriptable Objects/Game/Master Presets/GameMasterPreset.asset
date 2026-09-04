@@ -21,7 +21,7 @@ MonoBehaviour:
   dataCollectionManagerPreset: {fileID: 11400000, guid: 6c1eef3c49124f2458359e0d04f7daf2, type: 2}
   hudManagerPreset: {fileID: 11400000, guid: e9ae73ef80d765c42ae45e03caeea19b, type: 2}
   sceneManagerPreset: {fileID: 11400000, guid: 26f21fce37108264c8959e02d84d7655, type: 2}
-  proceduralLevelPreset: {fileID: 11400000, guid: 589c03b88dfe96a4381b34b67c2585f9, type: 2}
+  proceduralLevelPreset: {fileID: 11400000, guid: b9e71c44606464d4bb3d2300874f705a, type: 2}
   roomClearRewardsPreset: {fileID: 11400000, guid: 5776e426487aeeb41a83910393190b28, type: 2}
   difficultyScalingPreset: {fileID: 11400000, guid: bb490fc31b49663468df61da5c39c5b9, type: 2}
   wavesPreset: {fileID: 11400000, guid: 458ea596921f12343a695aaf946d9657, type: 2}

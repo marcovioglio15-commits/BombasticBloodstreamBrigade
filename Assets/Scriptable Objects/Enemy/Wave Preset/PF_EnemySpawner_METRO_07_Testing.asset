@@ -440,43 +440,4 @@ MonoBehaviour:
     minimumDifficulty: 0
     maximumDifficulty: 100
     selectionWeight: 1
-  - waveId: 0a65371370964e959bce3db9fa043a40
-    waveLabel: Wave 2 Parallel
-    sequenceStepIndex: 1
-    referenceWaveId: 
-    previewInScene: 0
-    startMode: 3
-    startDelaySeconds: 0
-    spawnDurationSeconds: 4
-    defaultDistributionCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 1
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 1
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    paintedCells: []
-    useDifficultySelection: 0
-    difficultySelectionGroupId: 
-    difficultyCoefficientId: 
-    minimumDifficulty: 0
-    maximumDifficulty: 100
-    selectionWeight: 1
   wavesPreset: {fileID: 11400000, guid: 458ea596921f12343a695aaf946d9657, type: 2}
