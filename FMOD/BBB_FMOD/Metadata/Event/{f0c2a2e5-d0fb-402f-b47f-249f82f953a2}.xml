@@ -92,6 +92,12 @@
 		<property name="length">
 			<value>1.0625</value>
 		</property>
+		<property name="pitch">
+			<value>11.5</value>
+		</property>
+		<relationship name="modulators">
+			<destination>{7d4d0eae-03dd-47c0-838b-b0ae7dcd317f}</destination>
+		</relationship>
 		<relationship name="sounds">
 			<destination>{3df9dea1-3058-44d0-ae1b-3eed0cebd06c}</destination>
 			<destination>{d84c1932-25f2-458c-a18c-17f6324ee90b}</destination>
@@ -131,12 +137,26 @@
 	</object>
 	<object class="MixerBusPanner" id="{102d410f-959b-4409-bc93-71f4bfc3d934}" />
 	<object class="MixerBusFader" id="{30807e2a-158c-451e-861d-88390c6fa81b}" />
+	<object class="RandomizerModulator" id="{7d4d0eae-03dd-47c0-838b-b0ae7dcd317f}">
+		<property name="nameOfPropertyBeingModulated">
+			<value>pitch</value>
+		</property>
+		<property name="amount">
+			<value>15.5</value>
+		</property>
+	</object>
 	<object class="SingleSound" id="{3df9dea1-3058-44d0-ae1b-3eed0cebd06c}">
+		<property name="volume">
+			<value>-10</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{2fa37b59-9e7e-4ad0-9fa8-f7fadcbd316e}</destination>
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{d84c1932-25f2-458c-a18c-17f6324ee90b}">
+		<property name="volume">
+			<value>-8</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{956a5f2c-68bf-425f-afcb-e4020dfe2f37}</destination>
 		</relationship>
@@ -152,6 +172,9 @@
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{f8b02e7a-cba4-463b-83d8-5334dcdb01e3}">
+		<property name="volume">
+			<value>-10</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{41b2e441-29f1-452d-a5a7-f744922b5a4a}</destination>
 		</relationship>
@@ -172,6 +195,9 @@
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{0a65d8a9-1efd-4b9c-a3c7-a04597968da5}">
+		<property name="volume">
+			<value>-3.5</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{35c46ffe-6119-4567-a882-1cf85c75d7d0}</destination>
 		</relationship>
@@ -197,6 +223,12 @@
 		</relationship>
 	</object>
 	<object class="SingleSound" id="{d99f55a6-d488-47fd-b670-c013851684c0}">
+		<property name="startOffset">
+			<value>13</value>
+		</property>
+		<property name="volume">
+			<value>-7</value>
+		</property>
 		<relationship name="audioFile">
 			<destination>{0b0feb25-00c3-4656-bc64-2b0346d4c7fc}</destination>
 		</relationship>
