@@ -215,6 +215,10 @@ MonoBehaviour:
     notes: Fires when the input is initially pressed.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -710,6 +714,10 @@ MonoBehaviour:
     notes: Fires when the input is released.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -1205,6 +1213,10 @@ MonoBehaviour:
     notes: Accumulates charge while the input stays pressed.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 80
         maximumCharge: 120
         chargeRatePerSecond: 140
@@ -1700,6 +1712,10 @@ MonoBehaviour:
     notes: Checks and consumes activation resource.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -2195,6 +2211,10 @@ MonoBehaviour:
     notes: Fires from a runtime event selected in payload.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -2690,6 +2710,10 @@ MonoBehaviour:
     notes: Disables standard shooting while active.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -3185,6 +3209,10 @@ MonoBehaviour:
     notes: Shoots a cone of multiple projectiles.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -3680,6 +3708,10 @@ MonoBehaviour:
     notes: Applies scale and stat multipliers to projectiles.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -4175,6 +4207,10 @@ MonoBehaviour:
     notes: Deploys a bomb and detonates after fuse.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -4670,6 +4706,10 @@ MonoBehaviour:
     notes: Moves player rapidly with optional invulnerability.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -5165,6 +5205,10 @@ MonoBehaviour:
     notes: Slows enemy simulation for a short duration.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -5660,6 +5704,10 @@ MonoBehaviour:
     notes: Restores a flat health amount up to missing HP.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -6155,6 +6203,10 @@ MonoBehaviour:
     notes: Spawns trail segments while moving.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -6650,6 +6702,10 @@ MonoBehaviour:
     notes: Applies elemental stacks in area over time.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -7145,6 +7201,10 @@ MonoBehaviour:
     notes: Triggers explosions on enemy death.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -7640,6 +7700,10 @@ MonoBehaviour:
     notes: Overrides projectile trajectory to orbit mode.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -8135,6 +8199,10 @@ MonoBehaviour:
     notes: Makes projectiles bounce on walls.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -8630,6 +8698,10 @@ MonoBehaviour:
     notes: Splits projectiles when they expire.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -9125,6 +9197,10 @@ MonoBehaviour:
     notes: 
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -9620,6 +9696,10 @@ MonoBehaviour:
     notes: 
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -10116,6 +10196,10 @@ MonoBehaviour:
       activation succeeds.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -10611,6 +10695,10 @@ MonoBehaviour:
     notes: Displays a selected weapon mesh while the owning power-up is active.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -11107,6 +11195,10 @@ MonoBehaviour:
       active power-up activation.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -11603,6 +11695,10 @@ MonoBehaviour:
       shot.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -12099,6 +12195,10 @@ MonoBehaviour:
       projectile or object-spawn effects to the next base shot.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -12595,6 +12695,10 @@ MonoBehaviour:
       configured threshold from above.
     data:
       holdCharge:
+        chargeCompleteRumbleEnabled: 0
+        chargeCompleteRumbleDurationSeconds: 0.12
+        chargeCompleteRumbleLowFrequency: 0.35
+        chargeCompleteRumbleHighFrequency: 0.65
         requiredCharge: 500
         maximumCharge: 500
         chargeRatePerSecond: 125
@@ -13103,6 +13207,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -13598,6 +13706,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -14093,6 +14205,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -14588,6 +14704,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -15083,6 +15203,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -15592,6 +15716,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -16087,6 +16215,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 90
           maximumCharge: 90
           chargeRatePerSecond: 30
@@ -16582,6 +16714,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -17077,6 +17213,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -17572,6 +17712,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -18071,6 +18215,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -18583,6 +18731,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -19078,6 +19230,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -19573,6 +19729,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -20081,6 +20241,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -20576,6 +20740,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -21071,6 +21239,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -21579,6 +21751,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -22074,6 +22250,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -22569,6 +22749,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -23077,6 +23261,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -23572,6 +23760,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -24067,6 +24259,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -24572,6 +24768,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -25067,6 +25267,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -25562,6 +25766,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -26069,6 +26277,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -26562,6 +26774,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -27069,6 +27285,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -27564,6 +27784,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -28072,6 +28296,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -28580,6 +28808,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -29075,6 +29307,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -29584,6 +29820,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -30092,6 +30332,10 @@ MonoBehaviour:
       useOverridePayload: 0
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 500
           maximumCharge: 500
           chargeRatePerSecond: 125
@@ -30597,6 +30841,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -31103,6 +31351,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -31597,6 +31849,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -32101,6 +32357,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -32595,6 +32855,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -33089,6 +33353,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -33593,6 +33861,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -34087,6 +34359,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -34591,6 +34867,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -35085,6 +35365,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -35589,6 +35873,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -36083,6 +36371,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -36587,6 +36879,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -37081,6 +37377,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -37585,6 +37885,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -38079,6 +38383,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -38584,6 +38892,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -39089,6 +39401,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -39594,6 +39910,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
@@ -40087,6 +40407,10 @@ MonoBehaviour:
       useOverridePayload: 1
       overridePayload:
         holdCharge:
+          chargeCompleteRumbleEnabled: 0
+          chargeCompleteRumbleDurationSeconds: 0.12
+          chargeCompleteRumbleLowFrequency: 0.35
+          chargeCompleteRumbleHighFrequency: 0.65
           requiredCharge: 0
           maximumCharge: 0
           chargeRatePerSecond: 0
