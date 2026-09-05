@@ -1469,7 +1469,8 @@ PrefabInstance:
       value: Maintenance Managed Environment
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6914943133163914265, guid: 76a33b94c6449de4da886ed5b2216f4e, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 76a33b94c6449de4da886ed5b2216f4e, type: 3}
