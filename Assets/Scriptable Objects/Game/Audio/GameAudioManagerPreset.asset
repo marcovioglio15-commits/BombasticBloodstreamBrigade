@@ -36,6 +36,23 @@ MonoBehaviour:
     autoStart: 1
     restartWhenPathChanges: 1
     stopWhenDisabled: 1
+  bossMusicSettings:
+    enabled: 1
+    eventPath: event:/MUSIC/mus_boss
+    bankName: BankMusic
+    volume: 1
+    autoStart: 1
+    restartWhenPathChanges: 1
+    stopWhenDisabled: 1
+  mainMenuMusicSettings:
+    enabled: 1
+    eventPath: event:/MUSIC/mus_menu
+    bankName: BankMusic
+    volume: 1
+    autoStart: 1
+    restartWhenPathChanges: 1
+    stopWhenDisabled: 1
+  musicCrossfadeSeconds: 1.5
   eventBindings:
   - eventId: 1
     eventCode: MC_SFX_Shoot_Projectile_Player

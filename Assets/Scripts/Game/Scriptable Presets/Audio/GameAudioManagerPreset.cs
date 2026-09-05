@@ -41,6 +41,21 @@ public sealed class GameAudioManagerPreset : ScriptableObject
     [Tooltip("Background music event and runtime control settings.")]
     [SerializeField] private GameAudioBackgroundMusicSettings backgroundMusicSettings = new GameAudioBackgroundMusicSettings();
 
+    [Header("Boss Music")]
+    [Tooltip("Independent music selected while at least one active boss has BOSS UI enabled.")]
+    [SerializeField]
+    private GameAudioBackgroundMusicSettings bossMusicSettings = new GameAudioBackgroundMusicSettings();
+
+    [Header("Main Menu Music")]
+    [Tooltip("Independent background music selected in the Main Menu scene.")]
+    [SerializeField]
+    private GameAudioBackgroundMusicSettings mainMenuMusicSettings = new GameAudioBackgroundMusicSettings();
+
+    [Header("Music Transitions")]
+    [Tooltip("Crossfade duration in real seconds between gameplay, boss and menu music. Must be greater than zero.")]
+    [SerializeField]
+    private float musicCrossfadeSeconds = 1.5f;
+
     [Header("Event Sound Map")]
     [Tooltip("Gameplay event to FMOD event-path bindings baked into ECS.")]
     [SerializeField] private List<GameAudioEventBinding> eventBindings = new List<GameAudioEventBinding>();
@@ -105,6 +120,10 @@ public sealed class GameAudioManagerPreset : ScriptableObject
         }
     }
 
+    public GameAudioBackgroundMusicSettings BossMusicSettings => bossMusicSettings;
+    public GameAudioBackgroundMusicSettings MainMenuMusicSettings => mainMenuMusicSettings;
+    public float MusicCrossfadeSeconds => musicCrossfadeSeconds;
+
     public IReadOnlyList<GameAudioEventBinding> EventBindings
     {
         get
@@ -133,6 +152,12 @@ public sealed class GameAudioManagerPreset : ScriptableObject
 
         if (backgroundMusicSettings == null)
             backgroundMusicSettings = new GameAudioBackgroundMusicSettings();
+
+        if (bossMusicSettings == null)
+            bossMusicSettings = new GameAudioBackgroundMusicSettings();
+
+        if (mainMenuMusicSettings == null)
+            mainMenuMusicSettings = new GameAudioBackgroundMusicSettings();
 
         if (eventBindings == null)
             eventBindings = new List<GameAudioEventBinding>();

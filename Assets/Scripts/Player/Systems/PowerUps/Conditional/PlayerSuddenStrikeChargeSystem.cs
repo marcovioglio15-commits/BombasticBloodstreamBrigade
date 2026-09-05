@@ -59,12 +59,17 @@ public partial struct PlayerSuddenStrikeChargeSystem : ISystem
                 if (passive.Tool.ConditionalApplication.Mode != PowerUpConditionalApplicationMode.SuddenStrike)
                     continue;
 
+                float previousCharge = passive.ConditionalApplicationState.Charge;
                 PlayerConditionalPowerUpRuntimeUtility.UpdateSuddenStrike(in passive.Tool.ConditionalApplication,
                                                                            deltaTime,
                                                                            in movementState.ValueRO,
                                                                            in lookState.ValueRO,
                                                                            shootingState.ValueRO.ShotPulseVersion,
                                                                            ref passive.ConditionalApplicationState);
+                PlayerChargeRumbleRuntimeUtility.QueueCompletion(in passive.Tool.ConditionalApplication.HoldCharge,
+                                                                  previousCharge,
+                                                                  passive.ConditionalApplicationState.Charge,
+                                                                  ref powerUpsState.ValueRW.ChargeRumble, true);
             }
 
             UpdateToggleSlot(in powerUpsConfig.PrimarySlot,
@@ -73,14 +78,16 @@ public partial struct PlayerSuddenStrikeChargeSystem : ISystem
                              in movementState.ValueRO,
                              in lookState.ValueRO,
                              shootingState.ValueRO.ShotPulseVersion,
-                             ref powerUpsState.ValueRW.PrimaryConditionalApplication);
+                             ref powerUpsState.ValueRW.PrimaryConditionalApplication,
+                             ref powerUpsState.ValueRW.ChargeRumble);
             UpdateToggleSlot(in powerUpsConfig.SecondarySlot,
                              powerUpsState.ValueRO.SecondaryIsActive,
                              deltaTime,
                              in movementState.ValueRO,
                              in lookState.ValueRO,
                              shootingState.ValueRO.ShotPulseVersion,
-                             ref powerUpsState.ValueRW.SecondaryConditionalApplication);
+                             ref powerUpsState.ValueRW.SecondaryConditionalApplication,
+                             ref powerUpsState.ValueRW.ChargeRumble);
         }
     }
     #endregion
@@ -95,6 +102,7 @@ public partial struct PlayerSuddenStrikeChargeSystem : ISystem
     /// <param name="movementState">Current player movement state.</param>
     /// <param name="lookState">Current player look state.</param>
     /// <param name="shotPulseVersion">Current real-shot pulse version.</param>
+    /// <param name="chargeRumbleState">Player-owned impulse mixed with other controller feedback.</param>
     /// <param name="runtimeState">Mutable slot-owned conditional state.</param>
     private static void UpdateToggleSlot(in PlayerPowerUpSlotConfig slotConfig,
                                          byte isActive,
@@ -102,7 +110,8 @@ public partial struct PlayerSuddenStrikeChargeSystem : ISystem
                                          in PlayerMovementState movementState,
                                          in PlayerLookState lookState,
                                          uint shotPulseVersion,
-                                         ref PowerUpConditionalApplicationRuntimeState runtimeState)
+                                         ref PowerUpConditionalApplicationRuntimeState runtimeState,
+                                         ref PlayerChargeRumbleState chargeRumbleState)
     {
         if (isActive == 0 || slotConfig.Toggleable == 0)
         {
@@ -113,12 +122,15 @@ public partial struct PlayerSuddenStrikeChargeSystem : ISystem
         switch (slotConfig.TogglePassiveTool.ConditionalApplication.Mode)
         {
             case PowerUpConditionalApplicationMode.SuddenStrike:
+                float previousCharge = runtimeState.Charge;
                 PlayerConditionalPowerUpRuntimeUtility.UpdateSuddenStrike(in slotConfig.TogglePassiveTool.ConditionalApplication,
                                                                            deltaTime,
                                                                            in movementState,
                                                                            in lookState,
                                                                            shotPulseVersion,
                                                                            ref runtimeState);
+                PlayerChargeRumbleRuntimeUtility.QueueCompletion(in slotConfig.TogglePassiveTool.ConditionalApplication.HoldCharge,
+                                                                  previousCharge, runtimeState.Charge, ref chargeRumbleState, true);
                 return;
             case PowerUpConditionalApplicationMode.DelayedShootApplication:
                 return;

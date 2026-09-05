@@ -12,12 +12,6 @@ public partial struct GameAudioPlaybackSystem : ISystem
     private static readonly bool[] cachedEventPathValidById = new bool[byte.MaxValue + 1];
     private static readonly FixedString512Bytes[] cachedEventFixedPathById = new FixedString512Bytes[byte.MaxValue + 1];
     private static readonly string[] cachedEventManagedPathById = new string[byte.MaxValue + 1];
-    private static bool cachedBackgroundMusicPathValid;
-    private static FixedString512Bytes cachedBackgroundMusicFixedPath;
-    private static string cachedBackgroundMusicManagedPath;
-    private static bool cachedBackgroundMusicBankValid;
-    private static FixedString64Bytes cachedBackgroundMusicFixedBank;
-    private static string cachedBackgroundMusicManagedBank;
     #endregion
 
     #region Methods
@@ -36,13 +30,11 @@ public partial struct GameAudioPlaybackSystem : ISystem
     }
 
     /// <summary>
-    /// Stops managed background music and any still-tracked single-instance gameplay voice when the ECS audio
-    /// playback system is destroyed so stale FMOD handles do not survive into the next play session.
+    /// Stops tracked gameplay voices on world teardown; the music system owns music cleanup.
     /// </summary>
     /// <param name="state">Mutable system state.</param>
     public void OnDestroy(ref SystemState state)
     {
-        GameAudioFmodRuntimeUtility.StopBackgroundMusic();
         GameAudioFmodRuntimeUtility.StopAllTrackedSingleInstances();
     }
 
@@ -52,29 +44,16 @@ public partial struct GameAudioPlaybackSystem : ISystem
     /// <param name="state">Mutable system state.</param>
     public void OnUpdate(ref SystemState state)
     {
+        GameAudioFmodRuntimeUtility.UpdateGlobalVoices();
         Entity audioEntity = SystemAPI.GetSingletonEntity<GameAudioRuntimeConfig>();
         EntityManager entityManager = state.EntityManager;
         GameAudioRuntimeConfig runtimeConfig = entityManager.GetComponentData<GameAudioRuntimeConfig>(audioEntity);
         DynamicBuffer<GameAudioEventRequest> requests = entityManager.GetBuffer<GameAudioEventRequest>(audioEntity);
-        bool shouldStopBackgroundMusicForMainMenu = SystemAPI.TryGetSingleton<GameSceneManagerConfig>(out GameSceneManagerConfig sceneConfig) &&
-                                                    SystemAPI.TryGetSingleton<GameSceneTransitionState>(out GameSceneTransitionState transitionState) &&
-                                                    ShouldStopBackgroundMusicForMainMenu(in sceneConfig, in transitionState);
 
         if (runtimeConfig.Enabled == 0)
         {
-            SyncBackgroundMusic(in runtimeConfig, false, false, 0f);
             requests.Clear();
             return;
-        }
-
-        if (shouldStopBackgroundMusicForMainMenu)
-            GameAudioFmodRuntimeUtility.StopBackgroundMusicImmediate();
-        else
-        {
-            SyncBackgroundMusic(in runtimeConfig,
-                                runtimeConfig.BackgroundMusicEnabled != 0,
-                                runtimeConfig.BackgroundMusicAutoStart != 0,
-                                math.max(0f, runtimeConfig.MasterVolume) * math.max(0f, runtimeConfig.BackgroundMusicVolume));
         }
 
         if (requests.Length <= 0)
@@ -134,54 +113,6 @@ public partial struct GameAudioPlaybackSystem : ISystem
 
     #region Private Methods
     /// <summary>
-    /// Resolves whether background music should be stopped because the scene manager is entering or already in main menu.
-    /// </summary>
-    /// <param name="sceneConfig">Runtime scene manager configuration.</param>
-    /// <param name="transitionState">Current scene transition state.</param>
-    /// <returns>True when gameplay background music must not run.</returns>
-    private static bool ShouldStopBackgroundMusicForMainMenu(in GameSceneManagerConfig sceneConfig,
-                                                             in GameSceneTransitionState transitionState)
-    {
-        if (sceneConfig.MainMenuSceneId.Length <= 0)
-            return false;
-
-        if (transitionState.IsTransitioning != 0)
-        {
-            if (transitionState.TargetSceneId.Equals(sceneConfig.MainMenuSceneId))
-                return true;
-
-            // The gameplay bank was prepared under cover. Start music at the first fully ready FadeIn frame so its
-            // startup precedes queued spawn feedback and never lands on the visible transition-completion frame.
-            if (transitionState.Phase == GameSceneTransitionPhase.FadeIn)
-                return false;
-        }
-
-        return transitionState.ActiveSceneId.Equals(sceneConfig.MainMenuSceneId);
-    }
-
-    /// <summary>
-    /// Forwards the baked background music config to the FMOD runtime bridge.
-    /// </summary>
-    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
-    /// <param name="enabled">True when background music should be active.</param>
-    /// <param name="autoStart">True when music should start automatically.</param>
-    /// <param name="volume">Final music volume after master and routing multipliers.</param>
-    private static void SyncBackgroundMusic(in GameAudioRuntimeConfig runtimeConfig,
-                                            bool enabled,
-                                            bool autoStart,
-                                            float volume)
-    {
-        GameAudioFmodRuntimeUtility.SyncBackgroundMusic(ResolveManagedBackgroundMusicPath(in runtimeConfig),
-                                                        ResolveManagedBackgroundMusicBankName(in runtimeConfig),
-                                                        enabled,
-                                                        autoStart,
-                                                        volume,
-                                                        runtimeConfig.BackgroundMusicRestartWhenPathChanges != 0,
-                                                        runtimeConfig.BackgroundMusicStopWhenDisabled != 0,
-                                                        runtimeConfig.LogMissingEventPaths != 0);
-    }
-
-    /// <summary>
     /// Finds the first binding matching a requested event ID.
     /// </summary>
     /// <param name="bindings">Baked binding buffer.</param>
@@ -225,44 +156,6 @@ public partial struct GameAudioPlaybackSystem : ISystem
         }
 
         return cachedEventManagedPathById[eventIndex];
-    }
-
-    /// <summary>
-    /// Resolves the baked music path to a managed string only when the fixed string changes.
-    /// </summary>
-    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
-    /// <returns>Cached managed music path.</returns>
-    private static string ResolveManagedBackgroundMusicPath(in GameAudioRuntimeConfig runtimeConfig)
-    {
-        FixedString512Bytes eventPath = runtimeConfig.BackgroundMusicEventPath;
-
-        if (!cachedBackgroundMusicPathValid || !cachedBackgroundMusicFixedPath.Equals(eventPath))
-        {
-            cachedBackgroundMusicFixedPath = eventPath;
-            cachedBackgroundMusicManagedPath = eventPath.ToString();
-            cachedBackgroundMusicPathValid = true;
-        }
-
-        return cachedBackgroundMusicManagedPath;
-    }
-
-    /// <summary>
-    /// Resolves the baked music bank name to a managed string only when the fixed string changes.
-    /// </summary>
-    /// <param name="runtimeConfig">Current baked audio singleton config.</param>
-    /// <returns>Cached managed music bank name.</returns>
-    private static string ResolveManagedBackgroundMusicBankName(in GameAudioRuntimeConfig runtimeConfig)
-    {
-        FixedString64Bytes bankName = runtimeConfig.BackgroundMusicBankName;
-
-        if (!cachedBackgroundMusicBankValid || !cachedBackgroundMusicFixedBank.Equals(bankName))
-        {
-            cachedBackgroundMusicFixedBank = bankName;
-            cachedBackgroundMusicManagedBank = bankName.ToString();
-            cachedBackgroundMusicBankValid = true;
-        }
-
-        return cachedBackgroundMusicManagedBank;
     }
 
     /// <summary>

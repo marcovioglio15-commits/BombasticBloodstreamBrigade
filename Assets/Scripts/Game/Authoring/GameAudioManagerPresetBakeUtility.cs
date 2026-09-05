@@ -83,9 +83,37 @@ public static class GameAudioManagerPresetBakeUtility
             BackgroundMusicBankName = new FixedString64Bytes(backgroundMusicBankName ?? string.Empty),
             MasterVolume = math.max(0f, playbackSettings.MasterVolume),
             BackgroundMusicVolume = backgroundMusicVolume,
+            BossMusic = BuildMusicTrack(preset.BossMusicSettings, musicRoutingVolume),
+            MainMenuMusic = BuildMusicTrack(preset.MainMenuMusicSettings, musicRoutingVolume),
+            MusicCrossfadeSeconds = math.isfinite(preset.MusicCrossfadeSeconds) && preset.MusicCrossfadeSeconds > 0f
+                ? preset.MusicCrossfadeSeconds
+                : 1.5f,
             DefaultMinimumDistance = math.max(0f, playbackSettings.DefaultMinimumDistance),
             DefaultMaximumDistance = math.max(playbackSettings.DefaultMinimumDistance,
                                               playbackSettings.DefaultMaximumDistance)
+        };
+    }
+
+    /// <summary>
+    /// Compiles an independent music event through the same builder for bake and regular-scene bootstrap.
+    /// </summary>
+    /// <param name="settings">Music settings from the Audio Manager preset.</param>
+    /// <param name="routingVolume">Preset music routing multiplier.</param>
+    /// <returns>Complete ECS event identity and playback controls.</returns>
+    public static GameAudioMusicTrackConfig BuildMusicTrack(GameAudioBackgroundMusicSettings settings, float routingVolume)
+    {
+        if (settings == null)
+            return default;
+
+        return new GameAudioMusicTrackConfig
+        {
+            Enabled = settings.Enabled ? (byte)1 : (byte)0,
+            AutoStart = settings.AutoStart ? (byte)1 : (byte)0,
+            RestartWhenPathChanges = settings.RestartWhenPathChanges ? (byte)1 : (byte)0,
+            StopWhenDisabled = settings.StopWhenDisabled ? (byte)1 : (byte)0,
+            EventPath = new FixedString512Bytes(settings.EventPath ?? string.Empty),
+            BankName = new FixedString64Bytes(settings.BankName ?? string.Empty),
+            Volume = math.isfinite(settings.Volume) ? math.max(0f, settings.Volume) * routingVolume : 0f
         };
     }
 

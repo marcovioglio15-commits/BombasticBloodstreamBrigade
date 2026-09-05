@@ -27,12 +27,15 @@ internal static class GameSceneTransitionGameplayWarmupUtility
 
             GameAudioRuntimeConfig audioConfig = audioQuery.GetSingleton<GameAudioRuntimeConfig>();
 
-            if (audioConfig.Enabled == 0 ||
-                audioConfig.BackgroundMusicEnabled == 0 ||
-                audioConfig.BackgroundMusicAutoStart == 0)
-            {
+            if (audioConfig.Enabled == 0)
                 return true;
-            }
+
+            // Optional contexts are prepared before gameplay so a boss spawn does not load banks mid-combat.
+            PrepareOptionalMusic(in audioConfig.BossMusic, audioConfig.LogMissingEventPaths != 0);
+            PrepareOptionalMusic(in audioConfig.MainMenuMusic, audioConfig.LogMissingEventPaths != 0);
+
+            if (audioConfig.BackgroundMusicEnabled == 0 || audioConfig.BackgroundMusicAutoStart == 0)
+                return true;
 
             return GameAudioFmodRuntimeUtility.PrepareBackgroundMusic(audioConfig.BackgroundMusicEventPath.ToString(),
                                                                       audioConfig.BackgroundMusicBankName.ToString(),
@@ -42,6 +45,19 @@ internal static class GameSceneTransitionGameplayWarmupUtility
         {
             audioQuery.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Warms optional contexts without making an unavailable optional event block scene readiness.
+    /// </summary>
+    /// <param name="track">Compiled boss or menu music settings.</param>
+    /// <param name="logWarnings">Whether resource failures should be reported.</param>
+    private static void PrepareOptionalMusic(in GameAudioMusicTrackConfig track, bool logWarnings)
+    {
+        if (!GameAudioMusicSelectionUtility.CanStart(in track))
+            return;
+
+        GameAudioFmodRuntimeUtility.PrepareBackgroundMusic(track.EventPath.ToString(), track.BankName.ToString(), logWarnings);
     }
     #endregion
 

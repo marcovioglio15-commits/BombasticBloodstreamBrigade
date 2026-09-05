@@ -15,6 +15,7 @@ public enum PlayerPowerUpCheatCommandType : byte
 /// </summary>
 public struct PlayerPowerUpsState : IComponentData
 {
+    public PlayerChargeRumbleState ChargeRumble;
     public float PrimaryEnergy;
     public float SecondaryEnergy;
     public float PrimaryCooldownRemaining;

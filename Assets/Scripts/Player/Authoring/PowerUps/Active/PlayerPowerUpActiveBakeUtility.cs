@@ -155,6 +155,7 @@ public static class PlayerPowerUpActiveBakeUtility
         bool interruptOtherSlotOnEnter = false;
         bool interruptOtherSlotChargingOnly = true;
         bool hasShotgun = false;
+        PlayerChargeRumbleConfig chargeRumbleConfig = default;
         bool hasHoldCharge = false;
         bool hasConditionalShotApplication = false;
         float holdChargeRequired = 0f;
@@ -300,6 +301,7 @@ public static class PlayerPowerUpActiveBakeUtility
                         break;
 
                     hasHoldCharge = true;
+                    PlayerChargeRumbleBakeUtility.Merge(holdChargeData, ref chargeRumbleConfig);
                     holdChargeRequired = math.max(holdChargeRequired, math.max(0f, holdChargeData.RequiredCharge));
                     holdChargeMaximum = math.max(math.max(holdChargeMaximum, holdChargeRequired), math.max(0f, holdChargeData.MaximumCharge));
                     holdChargeRatePerSecond += math.max(0f, holdChargeData.ChargeRatePerSecond);
@@ -754,6 +756,7 @@ public static class PlayerPowerUpActiveBakeUtility
                                                                        in randomStatGrowthEntries,
                                                                        resolvedToolKind,
                                                                        out slotConfig);
+        slotConfig.ChargeShot.ChargeCompleteRumble = chargeRumbleConfig;
 
         if (slotConfig.Toggleable != 0)
         {

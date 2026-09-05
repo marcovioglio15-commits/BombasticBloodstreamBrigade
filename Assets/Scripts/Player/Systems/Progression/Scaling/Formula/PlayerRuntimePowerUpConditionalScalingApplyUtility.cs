@@ -51,6 +51,11 @@ public static class PlayerRuntimePowerUpConditionalScalingApplyUtility
             return true;
         }
 
+        if (PlayerRuntimeChargeRumbleScalingUtility.TryApplyValue(payloadPath,
+                                                                   resolvedValue,
+                                                                   ref config.HoldCharge.ChargeCompleteRumble))
+            return true;
+
         switch (payloadPath)
         {
             case "delayedShootApplication.shotInterval":
@@ -188,6 +193,11 @@ public static class PlayerRuntimePowerUpConditionalScalingApplyUtility
         {
             return true;
         }
+
+        if (PlayerRuntimeChargeRumbleScalingUtility.TryApplyBooleanValue(payloadPath,
+                                                                   resolvedValue,
+                                                                   ref config.HoldCharge.ChargeCompleteRumble))
+            return true;
 
         switch (payloadPath)
         {

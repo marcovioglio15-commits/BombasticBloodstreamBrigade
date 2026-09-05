@@ -36,6 +36,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsConfig">Current runtime config used to initialize slot values.</param>
     public static void ResetRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpsConfig powerUpsConfig)
     {
+        powerUpsState.ChargeRumble = default;
         powerUpsState.PrimaryEnergy = ResolveInitialEnergy(in powerUpsConfig.PrimarySlot);
         powerUpsState.SecondaryEnergy = ResolveInitialEnergy(in powerUpsConfig.SecondarySlot);
         powerUpsState.PrimaryCooldownRemaining = 0f;
@@ -350,6 +351,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="powerUpsState">Runtime active-slot state to mutate.</param>
     public static void SwapActiveSlotRuntimeData(ref PlayerPowerUpsConfig powerUpsConfig, ref PlayerPowerUpsState powerUpsState)
     {
+        powerUpsState.ChargeRumble = default;
         SwapValues(ref powerUpsConfig.PrimarySlot, ref powerUpsConfig.SecondarySlot);
         SwapValues(ref powerUpsState.PrimaryEnergy, ref powerUpsState.SecondaryEnergy);
         SwapValues(ref powerUpsState.PrimaryCooldownRemaining, ref powerUpsState.SecondaryCooldownRemaining);
@@ -571,6 +573,8 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
                                                  ref PlayerPowerUpSlotConfig secondarySlotConfig,
                                                  ref PlayerPowerUpsState powerUpsState)
     {
+        powerUpsState.ChargeRumble = default;
+
         switch (targetSlotIndex)
         {
             case 0:
@@ -607,6 +611,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="slotConfig">Slot config that now owns the primary slot.</param>
     private static void ResetPrimaryRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpSlotConfig slotConfig)
     {
+        powerUpsState.ChargeRumble = default;
         powerUpsState.PrimaryEnergy = ResolveInitialEnergy(in slotConfig);
         powerUpsState.PrimaryCooldownRemaining = 0f;
         powerUpsState.PrimaryCharge = 0f;
@@ -624,6 +629,7 @@ internal static class PlayerPowerUpLoadoutRuntimeUtility
     /// <param name="slotConfig">Slot config that now owns the secondary slot.</param>
     private static void ResetSecondaryRuntimeState(ref PlayerPowerUpsState powerUpsState, in PlayerPowerUpSlotConfig slotConfig)
     {
+        powerUpsState.ChargeRumble = default;
         powerUpsState.SecondaryEnergy = ResolveInitialEnergy(in slotConfig);
         powerUpsState.SecondaryCooldownRemaining = 0f;
         powerUpsState.SecondaryCharge = 0f;

@@ -40,6 +40,21 @@ public static class PlayerScalingFieldElementFactory
 
     #region Public Methods
     /// <summary>
+    /// Checks whether a dependent setting can become enabled through its scaling formula.
+    /// </summary>
+    /// <param name="targetProperty">Serialized enable flag controlling dependent fields.</param>
+    /// <returns>True when the field owns an enabled Add Scaling rule.</returns>
+    public static bool HasEnabledScaling(SerializedProperty targetProperty)
+    {
+        // Reuse stable-key resolution for binding overrides and reordered module arrays.
+        SerializedProperty rule = FindRuleProperty(targetProperty.serializedObject.FindProperty("scalingRules"),
+                                                   targetProperty,
+                                                   PlayerScalingStatKeyUtility.BuildStatKey(targetProperty),
+                                                   false);
+        return rule != null && rule.FindPropertyRelative("addScaling").boolValue;
+    }
+
+    /// <summary>
     /// Creates a property editor for the provided property, adding scaling controls when the property supports formula scaling.
     /// </summary>
     /// <param name="targetProperty">Target serialized property to render.</param>

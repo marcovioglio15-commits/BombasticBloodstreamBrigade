@@ -39,6 +39,7 @@ public static class PlayerPowerUpActivationSlotUtility
     /// <param name="laserBeamState">Mutable player laser-beam runtime state.</param>
     /// <param name="slotEnergy">Mutable current energy for this slot.</param>
     /// <param name="cooldownRemaining">Mutable cooldown remaining for this slot.</param>
+    /// <param name="chargeRumbleState">Shared charge-completion impulse consumed by the controller mixer.</param>
     /// <param name="charge">Mutable hold-charge progress for this slot.</param>
     /// <param name="isCharging">Mutable flag indicating that this slot is charging.</param>
     /// <param name="isActive">Mutable flag indicating that this slot is active.</param>
@@ -94,6 +95,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                         ref PlayerLaserBeamState laserBeamState,
                                         ref float slotEnergy,
                                         ref float cooldownRemaining,
+                                        ref PlayerChargeRumbleState chargeRumbleState,
                                         ref float charge,
                                         ref byte isCharging,
                                         ref byte isActive,
@@ -172,6 +174,7 @@ public static class PlayerPowerUpActivationSlotUtility
                                                                                 ref laserBeamState,
                                                                                 ref slotEnergy,
                                                                                 ref cooldownRemaining,
+                                                                                ref chargeRumbleState,
                                                                                 ref charge,
                                                                                 ref isCharging,
                                                                                 ref isActive,

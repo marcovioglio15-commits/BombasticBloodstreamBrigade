@@ -22,6 +22,8 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     private byte hasAppliedMotorSpeeds;
     #endregion
 
+    #region Methods
+
     #region Lifecycle
     /// <summary>
     /// Requires the player shake state and runtime camera config, and caches the run-outcome query used to freeze the
@@ -55,8 +57,27 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
             fireRumbleMultiplier = math.max(0f, userSettings.FireRumbleMultiplier);
         }
 
+        bool isDying = PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery);
+        bool silenceRumble = ShouldSilenceRumble(isSceneTransitioning, isDying);
+        bool silenceChargeRumble = silenceRumble || isDying;
+
+        // Consume impulses through the single device writer; pause and transitions discard stale feedback.
+        foreach (RefRW<PlayerPowerUpsState> powerUpsState in SystemAPI.Query<RefRW<PlayerPowerUpsState>>())
+        {
+            if (silenceChargeRumble)
+            {
+                powerUpsState.ValueRW.ChargeRumble = default;
+                continue;
+            }
+
+            float2 chargeSpeeds = PlayerChargeRumbleRuntimeUtility.Advance(ref powerUpsState.ValueRW.ChargeRumble,
+                                                                          UnityEngine.Time.unscaledDeltaTime);
+            targetLowFrequency = chargeSpeeds.x * fireRumbleMultiplier;
+            targetHighFrequency = chargeSpeeds.y * fireRumbleMultiplier;
+        }
+
         // While not silenced, sum the per-channel motor speeds so a simultaneous hit and fire shake mix on the gamepad.
-        if (!ShouldSilenceRumble(isSceneTransitioning))
+        if (!silenceRumble)
         {
             foreach ((RefRO<PlayerCameraShakeState> shakeState, RefRO<PlayerRuntimeCameraConfig> cameraConfig)
                      in SystemAPI.Query<RefRO<PlayerCameraShakeState>, RefRO<PlayerRuntimeCameraConfig>>())
@@ -79,9 +100,9 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
                 float returnMultiplier = math.max(0f, shakeState.ValueRO.ReturnRumbleMultiplier);
 
                 // Cap the sum at the gamepad's normalized [0..1] motor range, otherwise overlapping channels would clip.
-                targetLowFrequency = math.saturate(damageLowFrequency * damageRumbleMultiplier +
+                targetLowFrequency = math.saturate(targetLowFrequency + damageLowFrequency * damageRumbleMultiplier +
                                                    (fireLowFrequency + returnLowFrequency * returnMultiplier) * fireRumbleMultiplier);
-                targetHighFrequency = math.saturate(damageHighFrequency * damageRumbleMultiplier +
+                targetHighFrequency = math.saturate(targetHighFrequency + damageHighFrequency * damageRumbleMultiplier +
                                                     (fireHighFrequency + returnHighFrequency * returnMultiplier) * fireRumbleMultiplier);
                 break;
             }
@@ -119,8 +140,6 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     }
     #endregion
 
-    #region Methods
-
     #region Gating
     /// <summary>
     /// Resolves whether the rumble must rest this frame, mirroring the camera systems' pause and end-of-run guards.
@@ -128,8 +147,9 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
     /// rumble feedback must keep playing along the trauma envelope so the final beat is felt on the controller.
     /// </summary>
     /// <param name="isSceneTransitioning">True while the scene manager is loading or fading between scenes.</param>
+    /// <param name="isDying">Cached lethal-hit state that preserves damage feedback while suppressing charge feedback.</param>
     /// <returns>True when the motors must be forced to rest for the current frame.</returns>
-    private readonly bool ShouldSilenceRumble(bool isSceneTransitioning)
+    private readonly bool ShouldSilenceRumble(bool isSceneTransitioning, bool isDying)
     {
         if (isSceneTransitioning)
             return true;
@@ -137,7 +157,7 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
         if (PlayerGameplayPauseUtility.IsFinalizedRunOutcomeActive(runOutcomeQuery))
             return true;
 
-        if (PlayerGameplayPauseUtility.IsDyingRunOutcomeActive(runOutcomeQuery))
+        if (isDying)
             return false;
 
         return PlayerGameplayPauseUtility.IsTimeScaleHardPaused();
@@ -190,7 +210,7 @@ public partial struct PlayerDamageShakeRumbleSystem : ISystem, ISystemStartStop
 
     /// <summary>
     /// Mirror of <see cref="ResolveDamageMotorSpeeds"/> for the fire shake channel. The two channels carry independent
-    /// rumble settings, so a  can drive only one motor for fire while damage uses both, or balance the two
+    /// rumble settings, allowing fire to drive one motor while damage uses both, or balancing the two
     /// shakes without coupling their amplitudes.
     /// </summary>
     /// <param name="shake">Resolved runtime fire shake config carrying the rumble enable flag and motor amplitudes.</param>

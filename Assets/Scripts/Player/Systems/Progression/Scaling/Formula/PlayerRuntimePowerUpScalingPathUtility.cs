@@ -231,6 +231,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
             return;
         }
 
+        if (PlayerRuntimeChargeRumbleScalingUtility.TryApplyValue(payloadPath,
+                                                                 resolvedValue,
+                                                                 ref activeSlotConfig.ChargeShot.ChargeCompleteRumble))
+            return;
+
         switch (payloadPath)
         {
             case "resourceGate.activationResource":
@@ -1061,6 +1066,11 @@ public static class PlayerRuntimePowerUpScalingPathUtility
         {
             return;
         }
+
+        if (PlayerRuntimeChargeRumbleScalingUtility.TryApplyBooleanValue(payloadPath,
+                                                                        resolvedValue,
+                                                                        ref activeSlotConfig.ChargeShot.ChargeCompleteRumble))
+            return;
 
         switch (payloadPath)
         {

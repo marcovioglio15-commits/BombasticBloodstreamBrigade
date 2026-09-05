@@ -28,7 +28,12 @@ public static class GameAudioManagerPresetValidationUtility
 
         ValidatePlaybackSettings(preset, warnings);
         ValidateRoutingSettings(preset, warnings);
-        ValidateBackgroundMusicSettings(preset, warnings);
+        ValidateMusicSettings(preset.BackgroundMusicSettings, "Background Music", warnings);
+        ValidateMusicSettings(preset.BossMusicSettings, "Boss Music", warnings);
+        ValidateMusicSettings(preset.MainMenuMusicSettings, "Main Menu Music", warnings);
+
+        if (float.IsNaN(preset.MusicCrossfadeSeconds) || float.IsInfinity(preset.MusicCrossfadeSeconds) || preset.MusicCrossfadeSeconds <= 0f)
+            warnings.Add("Music Crossfade Seconds must be finite and greater than zero.");
         ValidateEventBindings(preset, warnings);
     }
     #endregion
@@ -88,31 +93,32 @@ public static class GameAudioManagerPresetValidationUtility
     }
 
     /// <summary>
-    /// Validates background music settings without requiring the FMOD package at edit time.
+    /// Validates each music context without mutating authored settings or requiring FMOD playback.
     /// </summary>
-    /// <param name="preset">Preset that owns background music settings.</param>
-    /// <param name="warnings">Mutable warning output list.</param>
-    private static void ValidateBackgroundMusicSettings(GameAudioManagerPreset preset, List<string> warnings)
+    /// <param name="settings">Music settings being inspected.</param>
+    /// <param name="label">Context label used in warning messages.</param>
+    /// <param name="warnings">Mutable warning output.</param>
+    private static void ValidateMusicSettings(GameAudioBackgroundMusicSettings settings, string label, List<string> warnings)
     {
-        GameAudioBackgroundMusicSettings backgroundMusicSettings = preset.BackgroundMusicSettings;
-
-        if (backgroundMusicSettings == null)
+        if (settings == null)
         {
-            warnings.Add("Background Music settings are missing.");
+            warnings.Add(label + " settings are missing.");
             return;
         }
 
-        if (!backgroundMusicSettings.Enabled)
+        if (!settings.Enabled)
             return;
 
-        if (string.IsNullOrWhiteSpace(backgroundMusicSettings.EventPath))
-            warnings.Add("Background Music is enabled but FMOD Event Path is empty.");
+        if (string.IsNullOrWhiteSpace(settings.EventPath))
+            warnings.Add(label + " is enabled but FMOD Event Path is empty.");
+        else if (!settings.EventPath.StartsWith("event:/", System.StringComparison.Ordinal))
+            warnings.Add(label + " FMOD Event Path must start with event:/.");
 
-        if (string.IsNullOrWhiteSpace(backgroundMusicSettings.BankName))
-            warnings.Add("Background Music Bank Name is empty. Playback will rely on a bank loaded elsewhere.");
+        if (string.IsNullOrWhiteSpace(settings.BankName))
+            warnings.Add(label + " Bank Name is empty. Playback relies on a bank loaded elsewhere.");
 
-        if (backgroundMusicSettings.Volume < 0f)
-            warnings.Add("Background Music Volume is negative.");
+        if (float.IsNaN(settings.Volume) || float.IsInfinity(settings.Volume) || settings.Volume < 0f)
+            warnings.Add(label + " Volume must be finite and nonnegative.");
     }
 
     /// <summary>

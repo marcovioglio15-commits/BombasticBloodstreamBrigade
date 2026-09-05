@@ -175,6 +175,7 @@ internal static class GameSceneTransitionGameplayRuntimeCleanupUtility
                     continue;
 
                 PlayerPowerUpsState powerUpsState = entityManager.GetComponentData<PlayerPowerUpsState>(playerEntity);
+                powerUpsState.ChargeRumble = default;
                 PlayerReturningProjectileLoadoutRuntimeUtility.ResetConcurrency(ref powerUpsState);
                 entityManager.SetComponentData(playerEntity, powerUpsState);
 

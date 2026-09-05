@@ -286,6 +286,7 @@ public struct ChargeShotPowerUpConfig
 {
     public const int PlayerSlowCurveSampleCount = 16;
 
+    public PlayerChargeRumbleConfig ChargeCompleteRumble;
     public float RequiredCharge;
     public float MaximumCharge;
     public float ChargeRatePerSecond;

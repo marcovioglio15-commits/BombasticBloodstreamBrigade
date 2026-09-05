@@ -17,6 +17,9 @@ public struct GameAudioRuntimeConfig : IComponentData
     public FixedString64Bytes BackgroundMusicBankName;
     public float MasterVolume;
     public float BackgroundMusicVolume;
+    public GameAudioMusicTrackConfig BossMusic;
+    public GameAudioMusicTrackConfig MainMenuMusic;
+    public float MusicCrossfadeSeconds;
     public float DefaultMinimumDistance;
     public float DefaultMaximumDistance;
 }

@@ -23,10 +23,16 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
     /// <param name="lookState">Player look state used to resolve the firing direction.</param>
     /// <param name="movementState">Player movement state used when a Dash module is chained to the release.</param>
     /// <param name="runtimeMovementConfig">Movement config used to resolve movement-relative chained dash directions.</param>
-    /// <param name="controllerConfig">Player controller config used to resolve projectile defaults.</param>
+    /// <param name="runtimeShootingConfig">Scaled shooting configuration used by release projectiles.</param>
+    /// <param name="appliedElementSlots">Runtime elemental payloads inherited by release projectiles.</param>
     /// <param name="passiveToolsState">Aggregated passive state used to augment spawned projectiles.</param>
+    /// <param name="muzzleLookup">Read-only muzzle lookup used to resolve the release origin.</param>
+    /// <param name="transformLookup">Read-only transform lookup for chained actions.</param>
+    /// <param name="localToWorldLookup">Read-only world-pose lookup for chained actions.</param>
+    /// <param name="laserBeamState">Mutable laser state for releases containing a beam action.</param>
     /// <param name="slotEnergy">Mutable slot resource state.</param>
     /// <param name="cooldownRemaining">Mutable cooldown state reused to block charge-shot input while cooling down.</param>
+    /// <param name="chargeRumbleState">Shared charge-completion impulse consumed by the controller mixer.</param>
     /// <param name="charge">Mutable stored charge amount.</param>
     /// <param name="isCharging">Mutable charging flag for the slot.</param>
     /// <param name="isActive">Mutable active flag reset because charge shots are not persistent toggles.</param>
@@ -76,6 +82,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                              ref PlayerLaserBeamState laserBeamState,
                                              ref float slotEnergy,
                                              ref float cooldownRemaining,
+                                             ref PlayerChargeRumbleState chargeRumbleState,
                                              ref float charge,
                                              ref byte isCharging,
                                              ref byte isActive,
@@ -116,6 +123,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
             return false;
         }
 
+        float previousCharge = charge;
         float requiredCharge = math.max(0f, slotConfig.ChargeShot.RequiredCharge);
         float maximumCharge = math.max(requiredCharge, slotConfig.ChargeShot.MaximumCharge);
         float chargeRate = math.max(0f, slotConfig.ChargeShot.ChargeRatePerSecond);
@@ -155,6 +163,8 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
             charge += chargeRate * math.max(0f, deltaTime);
             charge = math.min(charge, maximumCharge);
         }
+
+        PlayerChargeRumbleRuntimeUtility.QueueCompletion(in slotConfig.ChargeShot, previousCharge, charge, ref chargeRumbleState);
 
         if (isCharging != 0 && isPressed)
         {
@@ -264,6 +274,7 @@ internal static class PlayerPowerUpChargeAndToggleActivationUtility
                                 deltaTime,
                                 maximumCharge,
                                 ref charge);
+        PlayerChargeRumbleRuntimeUtility.QueueCompletion(in slotConfig.ChargeShot, previousCharge, charge, ref chargeRumbleState);
         return false;
     }
 
