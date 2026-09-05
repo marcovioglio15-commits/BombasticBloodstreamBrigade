@@ -3,16 +3,11 @@ using Unity.Mathematics;
 using Unity.Transforms;
 
 /// <summary>
-/// This system processes player input and shooting state to determine when players should shoot 
-/// and enqueues shoot requests accordingly. 
-/// It runs after the PlayerLookDirectionSystem to ensure that the player's look direction is updated
-/// before processing shooting logic, and after the PlayerMovementApplySystem to ensure that player movement is applied before 
-/// determining shooting parameters like spawn position and projectile speed inheritance. Updates after these systems allows the PlayerShootingIntentSystem to have access to the most up-to-date player state information when generating
-/// shoot requests, ensuring that shooting behavior is responsive and consistent with player input 
-/// and movement.
+/// Enqueues player shots after movement and look rotation, using the current player heading and muzzle hierarchy.
+/// Analog projectile direction stays aligned with the aiming pointer even while rotation is damped or released.
 /// </summary>
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
-[UpdateAfter(typeof(PlayerLookDirectionSystem))]
+[UpdateAfter(typeof(PlayerLookRotationSystem))]
 [UpdateAfter(typeof(PlayerMovementApplySystem))]
 public partial struct PlayerShootingIntentSystem : ISystem
 {
@@ -56,10 +51,9 @@ public partial struct PlayerShootingIntentSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         float elapsedTime = (float)SystemAPI.Time.ElapsedTime;
-        state.EntityManager.CompleteDependencyBeforeRO<LocalToWorld>();
         ComponentLookup<ShooterMuzzleAnchor> muzzleLookup = SystemAPI.GetComponentLookup<ShooterMuzzleAnchor>(true);
         ComponentLookup<LocalTransform> transformLookup = SystemAPI.GetComponentLookup<LocalTransform>(true);
-        ComponentLookup<LocalToWorld> localToWorldLookup = SystemAPI.GetComponentLookup<LocalToWorld>(true);
+        ComponentLookup<Parent> parentLookup = SystemAPI.GetComponentLookup<Parent>(true);
         ComponentLookup<PlayerPowerUpsState> powerUpsStateLookup = SystemAPI.GetComponentLookup<PlayerPowerUpsState>(false);
         BufferLookup<PlayerPassiveToolsStateElement> passiveToolsLookup = SystemAPI.GetBufferLookup<PlayerPassiveToolsStateElement>(true);
         BufferLookup<PlayerPowerUpsConfigElement> powerUpsConfigLookup = SystemAPI.GetBufferLookup<PlayerPowerUpsConfigElement>(true);
@@ -200,9 +194,11 @@ public partial struct PlayerShootingIntentSystem : ISystem
                 !laserBeamStateLookup.HasComponent(entity))
                 continue;
 
-            // compute the shoot direction based on the player's look direction,
-            // falling back to their forward direction if the look direction is zero
-            float3 shootDirection = PlayerProjectileRequestUtility.ResolveShootDirection(in lookState.ValueRO, in localTransform.ValueRO);
+            // Analog rotation can stop between allowed directions when the stick is released. Match the pointer's
+            // actual heading, while keeping the existing target-based aiming behavior for pointer and digital input.
+            float3 shootDirection = inputState.ValueRO.LookUsesAnalogSource != 0
+                ? PlayerLaserBeamUtility.ResolveCurrentForwardDirection(in localTransform.ValueRO)
+                : PlayerProjectileRequestUtility.ResolveShootDirection(in lookState.ValueRO, in localTransform.ValueRO);
             PlayerPowerUpsConfig powerUpsConfig;
             PlayerPowerUpsConfigBufferUtility.Read(powerUpsConfigLookup[entity], out powerUpsConfig);
             DynamicBuffer<EquippedPassiveToolElement> equippedPassiveTools = equippedPassiveToolsLookup[entity];
@@ -259,12 +255,14 @@ public partial struct PlayerShootingIntentSystem : ISystem
                                                                                      bombRequests,
                                                                                      ref laserBeamState,
                                                                                      ref shotPassiveToolsState);
-                float3 spawnPosition = PlayerProjectileRequestUtility.ResolveShootSpawnPosition(entity,
-                                                                                               in localTransform.ValueRO,
-                                                                                               in shotShootingConfig,
-                                                                                               in muzzleLookup,
-                                                                                               in transformLookup,
-                                                                                               in localToWorldLookup);
+                // The controller runs before TransformSystemGroup, so child LocalToWorld still holds the old pose.
+                // Share the beam's hierarchy composition to apply this frame's movement and rotation to the muzzle.
+                float3 spawnPosition = PlayerLaserBeamUtility.ResolveCurrentFrameSpawnPosition(entity,
+                                                                                              in localTransform.ValueRO,
+                                                                                              in shotShootingConfig,
+                                                                                              in muzzleLookup,
+                                                                                              in transformLookup,
+                                                                                              in parentLookup);
                 bool hasPassiveShotgunPayload = shotPassiveToolsState.HasShotgun != 0;
                 int passiveShotgunProjectileCount = hasPassiveShotgunPayload
                     ? math.max(1, shotPassiveToolsState.Shotgun.ProjectileCount)

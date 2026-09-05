@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 #region Systems
 [UpdateInGroup(typeof(PlayerControllerSystemGroup))]
 [UpdateAfter(typeof(PlayerInputBridgeSystem))]
+[UpdateAfter(typeof(PlayerMovementDirectionSystem))]
 public partial struct PlayerLookDirectionSystem : ISystem
 {
     #region Constants
@@ -149,6 +150,14 @@ public partial struct PlayerLookDirectionSystem : ISystem
             // If the resolved input is within the dead zone, use fallback direction based on mode
             if (math.lengthsq(resolvedInput) <= deadZone * deadZone)
             {
+                // Analog rotation stops at the dead zone. Keep that exact heading instead of snapping the
+                // desired direction to a cone/discrete target that the released stick can no longer reach.
+                if (usesAnalogLookSource)
+                {
+                    lookState.ValueRW.DesiredDirection = PlayerControllerMath.NormalizePlanar(fallbackDirection, forward);
+                    continue;
+                }
+
                 switch (lookConfig.DirectionsMode)
                 {
                     case LookDirectionsMode.DiscreteCount:
