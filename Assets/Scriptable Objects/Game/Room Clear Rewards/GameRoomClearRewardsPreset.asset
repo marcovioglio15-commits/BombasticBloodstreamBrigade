@@ -767,6 +767,9 @@ MonoBehaviour:
       animatorPath: 
       animatorSpeed: 1
     activationPrefabReplacements:
+    - targetBindingId: ExitSign_01
+      targetSlot: 1
+      replacementPrefab: {fileID: 3434886789373703975, guid: 7036cb16ae174e140a3c0b618865f5c2, type: 3}
     - targetBindingId: ExitSign_02
       targetSlot: 1
       replacementPrefab: {fileID: 2042432454606494300, guid: a2aef4df48d1aaa4baec6d60aeed06f5, type: 3}

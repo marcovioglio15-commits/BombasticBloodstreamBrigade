@@ -765,7 +765,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_LGTEST_METRO_NS
     sceneGuid: 0b11934e90dbb314e87551aabe87ec57
-    dependencyHash: f70c7ffefae3cfa0fc0436d6830b43a3
+    dependencyHash: 4b8cc90a7797ae6002cffb8762faf3b1
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_LGTEST_METRO_NS.unity
@@ -877,7 +877,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_03
     sceneGuid: c65cf1455f2597b45b5565007602b3f9
-    dependencyHash: 2e9510b385af45b502f90ce28b2e9c24
+    dependencyHash: 72e772f3405d92998bb5854cc20de486
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_03.unity
@@ -1185,7 +1185,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_10
     sceneGuid: 6376a2397f53e644b8259a1c274e7bdf
-    dependencyHash: 5e869715741500cf3973b757198da377
+    dependencyHash: 6151067cc3973c2563e9292c379b44f2
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_10.unity
