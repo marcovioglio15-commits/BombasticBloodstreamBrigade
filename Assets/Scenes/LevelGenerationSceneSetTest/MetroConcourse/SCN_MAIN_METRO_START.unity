@@ -531,8 +531,22 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: -2.93
       objectReference: {fileID: 0}
+    - target: {fileID: 9123239150557756293, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
+      propertyPath: m_UVBias.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123239150557756293, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
+      propertyPath: m_UVScale.x
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9123239150557756293, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
+      propertyPath: m_RenderingLayerMask.m_Bits
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5764820508719964336, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
+    - {fileID: 5402108701419675893, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe73221a352edee49b60a2ce2e535038, type: 3}
