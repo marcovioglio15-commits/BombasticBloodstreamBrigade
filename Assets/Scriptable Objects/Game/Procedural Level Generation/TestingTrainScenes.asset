@@ -808,7 +808,7 @@ MonoBehaviour:
     authoringWarnings: []
   - sceneId: SCN_MAIN_METRO_START
     sceneGuid: 231f2d11e6deb854e8e91c2aba8a48ef
-    dependencyHash: 003f7e1e92bbe09b15de8a49d9425920
+    dependencyHash: 961af4939ba104c806ffc65844245300
     cacheStale: 0
     sourceScenePaths:
     - Assets/Scenes/LevelGenerationSceneSetTest/MetroConcourse/SCN_MAIN_METRO_START.unity

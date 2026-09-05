@@ -424,7 +424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 804145162}
   - component: {fileID: 804145161}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Decal Projector
   m_TagString: Untagged
   m_Icon: {fileID: 0}
